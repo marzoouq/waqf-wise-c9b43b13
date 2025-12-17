@@ -223,21 +223,21 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 {/* الكشف المالي المختصر */}
                 <Card className="border-2 border-primary/20">
                   <CardContent className="p-3 space-y-2">
-                    <div className="flex justify-between items-center p-2 bg-emerald-500/10 rounded">
+                    <div className="flex justify-between items-center p-2 bg-success/10 rounded">
                       <span className="text-xs">الإيرادات</span>
-                      <span className="font-bold text-emerald-600 text-sm">{formatCurrency(totalRevenues)}</span>
+                      <span className="font-bold text-success text-sm">{formatCurrency(totalRevenues)}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-red-500/10 rounded">
+                    <div className="flex justify-between items-center p-2 bg-destructive/10 rounded">
                       <span className="text-xs">المصروفات</span>
-                      <span className="font-bold text-red-600 text-sm">({formatCurrency(totalExpenses)})</span>
+                      <span className="font-bold text-destructive text-sm">({formatCurrency(totalExpenses)})</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-blue-500/10 rounded">
+                    <div className="flex justify-between items-center p-2 bg-info/10 rounded">
                       <span className="text-xs">صافي الدخل</span>
-                      <span className="font-bold text-blue-600 text-sm">{formatCurrency(netAfterExpenses)}</span>
+                      <span className="font-bold text-info text-sm">{formatCurrency(netAfterExpenses)}</span>
                     </div>
-                    <div className="flex justify-between items-center p-2 bg-amber-500/10 rounded">
+                    <div className="flex justify-between items-center p-2 bg-warning/10 rounded">
                       <span className="text-xs">التوزيعات</span>
-                      <span className="font-bold text-amber-600 text-sm">({formatCurrency(distributedAmount)})</span>
+                      <span className="font-bold text-warning text-sm">({formatCurrency(distributedAmount)})</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-primary/10 rounded border border-primary">
                       <span className="text-xs font-medium">رقبة الوقف</span>
@@ -250,7 +250,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 <Card>
                   <CardHeader className="p-3 pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Users className="h-4 w-4 text-amber-600" />
+                      <Users className="h-4 w-4 text-warning" />
                       توزيعات الورثة
                     </CardTitle>
                   </CardHeader>
@@ -280,7 +280,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <Card>
                     <CardHeader className="p-3 pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-emerald-600" />
+                        <TrendingUp className="h-4 w-4 text-success" />
                         الإيرادات
                       </CardTitle>
                     </CardHeader>
@@ -288,7 +288,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       {revenueItems.map((item, i) => (
                         <div key={i} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
                           <span>{translateRevenueName(item.name)}</span>
-                          <span className="text-emerald-600">{formatCurrency(item.amount)}</span>
+                          <span className="text-success">{formatCurrency(item.amount)}</span>
                         </div>
                       ))}
                     </CardContent>
@@ -364,17 +364,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
               <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0">
                 
                 {/* 1. إجمالي الإيرادات */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-success/10 rounded-lg border border-success/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="p-1.5 sm:p-2 bg-emerald-500/20 rounded-full">
-                      <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                    <div className="p-1.5 sm:p-2 bg-success/20 rounded-full">
+                      <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">إجمالي الإيرادات</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">جميع مصادر الدخل للسنة المالية</p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-emerald-600 text-left sm:text-right">{formatCurrency(totalRevenues)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-success text-left sm:text-right">{formatCurrency(totalRevenues)}</p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -383,17 +383,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </div>
 
                 {/* 2. إجمالي المصروفات (خصم) */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-red-500/10 rounded-lg border border-red-500/20 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-destructive/10 rounded-lg border border-destructive/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-full">
-                      <MinusCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                    <div className="p-1.5 sm:p-2 bg-destructive/20 rounded-full">
+                      <MinusCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">(-) إجمالي المصروفات</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">صيانة + إدارية + أخرى ({expenseItems.length || 4} بند)</p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-red-600 text-left sm:text-right">({formatCurrency(totalExpenses)})</p>
+                  <p className="text-lg sm:text-2xl font-bold text-destructive text-left sm:text-right">({formatCurrency(totalExpenses)})</p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -402,17 +402,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </div>
 
                 {/* 3. صافي الدخل بعد المصروفات */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-blue-500/10 rounded-lg border border-blue-500/20 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-info/10 rounded-lg border border-info/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-full">
-                      <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    <div className="p-1.5 sm:p-2 bg-info/20 rounded-full">
+                      <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-info" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">= صافي الدخل التشغيلي</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">الإيرادات - المصروفات</p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-blue-600 text-left sm:text-right">{formatCurrency(netAfterExpenses)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">{formatCurrency(netAfterExpenses)}</p>
                 </div>
 
                 <Separator className="my-4" />
@@ -425,30 +425,30 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </p>
                   
                   {/* ضريبة القيمة المضافة */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-orange-500/10 rounded-lg border border-orange-500/20 me-0 sm:me-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-warning/10 rounded-lg border border-warning/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
-                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
                       <span className="text-xs sm:text-sm">(-) ضريبة القيمة المضافة (15%)</span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-orange-600">({formatCurrency(vatAmount)})</p>
+                    <p className="font-bold text-sm sm:text-base text-warning">({formatCurrency(vatAmount)})</p>
                   </div>
 
                   {/* حصة الناظر */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-purple-500/10 rounded-lg border border-purple-500/20 me-0 sm:me-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
-                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
+                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                       <span className="text-xs sm:text-sm">(-) حصة الناظر ({disclosure.nazer_percentage}%)</span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-purple-600">({formatCurrency(nazerShare)})</p>
+                    <p className="font-bold text-sm sm:text-base text-primary">({formatCurrency(nazerShare)})</p>
                   </div>
 
                   {/* صدقة الواقف */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-pink-500/10 rounded-lg border border-pink-500/20 me-0 sm:me-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-secondary/50 rounded-lg border border-secondary me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
-                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-pink-600" />
+                      <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-secondary-foreground" />
                       <span className="text-xs sm:text-sm">(-) صدقة الواقف ({disclosure.charity_percentage}%)</span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-pink-600">({formatCurrency(charityShare)})</p>
+                    <p className="font-bold text-sm sm:text-base text-secondary-foreground">({formatCurrency(charityShare)})</p>
                   </div>
 
                   {/* إجمالي الاستقطاعات */}
@@ -464,17 +464,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </div>
 
                 {/* 5. المتاح للتوزيع */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-cyan-500/10 rounded-lg border border-cyan-500/20 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-info/10 rounded-lg border border-info/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="p-1.5 sm:p-2 bg-cyan-500/20 rounded-full">
-                      <Coins className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600" />
+                    <div className="p-1.5 sm:p-2 bg-info/20 rounded-full">
+                      <Coins className="h-4 w-4 sm:h-5 sm:w-5 text-info" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">= المتاح للتوزيع على الورثة</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">صافي الدخل - الاستقطاعات</p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-cyan-600 text-left sm:text-right">{formatCurrency(availableForDistribution)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">{formatCurrency(availableForDistribution)}</p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -483,10 +483,10 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </div>
 
                 {/* 6. توزيعات الورثة */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-amber-500/10 rounded-lg border border-amber-500/20 gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-warning/10 rounded-lg border border-warning/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="p-1.5 sm:p-2 bg-amber-500/20 rounded-full">
-                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+                    <div className="p-1.5 sm:p-2 bg-warning/20 rounded-full">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">(-) توزيعات الورثة</p>
@@ -495,7 +495,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-amber-600 text-left sm:text-right">({formatCurrency(distributedAmount)})</p>
+                  <p className="text-lg sm:text-2xl font-bold text-warning text-left sm:text-right">({formatCurrency(distributedAmount)})</p>
                 </div>
 
                 {/* سهم للأسفل */}

@@ -258,7 +258,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
                 </Button>
               </div>
               {ocrImageUrl && (
-                <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                <div className="mt-2 text-xs text-success flex items-center gap-1">
                   <FileImage className="h-3 w-3" />
                   تم استيراد البيانات من صورة
                 </div>

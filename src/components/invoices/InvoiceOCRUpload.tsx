@@ -150,7 +150,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-success" />
                 تم استخراج البيانات بنجاح
               </CardTitle>
               <CardDescription>
@@ -188,7 +188,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                     <p>
                       <strong>الرقم الضريبي:</strong> {extractedData.customer_vat_number || 'غير متوفر'}
                       {extractedData.customer_vat_number && !validateVATNumber(extractedData.customer_vat_number) && (
-                        <span className="text-red-600 text-xs me-2">⚠️ رقم غير صحيح</span>
+                        <span className="text-destructive text-xs me-2">⚠️ رقم غير صحيح</span>
                       )}
                     </p>
                   </div>

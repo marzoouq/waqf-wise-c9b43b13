@@ -31,11 +31,11 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
   };
 
   return (
-    <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 mb-4">
-      <Eye className="h-4 w-4 text-amber-600" />
-      <AlertTitle className="text-amber-800 dark:text-amber-200">وضع المعاينة</AlertTitle>
+    <Alert className="bg-warning/10 border-warning/30 dark:bg-warning/10 dark:border-warning/30 mb-4">
+      <Eye className="h-4 w-4 text-warning" />
+      <AlertTitle className="text-warning dark:text-warning">وضع المعاينة</AlertTitle>
       <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <span className="text-amber-700 dark:text-amber-300">
+        <span className="text-warning/80 dark:text-warning/80">
           أنت تشاهد لوحة المستفيد{beneficiaryName && `: ${beneficiaryName}`}
         </span>
         <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
             variant="outline" 
             size="sm" 
             onClick={handleBackToNazer}
-            className="border-amber-300 hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-900/50"
+            className="border-warning/50 hover:bg-warning/20 dark:border-warning/50 dark:hover:bg-warning/20"
           >
             <ArrowRight className="h-4 w-4 ms-1" />
             العودة للوحة الناظر
@@ -52,7 +52,7 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="h-8 w-8 text-amber-600 hover:text-amber-800"
+            className="h-8 w-8 text-warning hover:text-warning/80"
           >
             <X className="h-4 w-4" />
           </Button>

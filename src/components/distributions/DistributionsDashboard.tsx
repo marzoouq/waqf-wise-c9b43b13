@@ -99,25 +99,25 @@ export function DistributionsDashboard() {
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-blue-500" />
+            <TrendingUp className="h-4 w-4 text-info" />
             <span className="text-sm text-muted-foreground">هذا الشهر</span>
           </div>
-          <div className="text-2xl font-bold text-blue-500">{stats.thisMonth}</div>
+          <div className="text-2xl font-bold text-info">{stats.thisMonth}</div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="h-4 w-4 text-green-500" />
+            <DollarSign className="h-4 w-4 text-success" />
             <span className="text-sm text-muted-foreground">المبلغ الإجمالي</span>
           </div>
-          <div className="text-xl font-bold text-green-500">
+          <div className="text-xl font-bold text-success">
             {(stats.totalAmount / 1000000).toFixed(1)}م
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="h-4 w-4 text-purple-500" />
+            <Users className="h-4 w-4 text-primary" />
             <span className="text-sm text-muted-foreground">المتوسط</span>
           </div>
           <div className="text-xl font-bold">{(stats.avgAmount / 1000).toFixed(0)}ك</div>
@@ -125,7 +125,7 @@ export function DistributionsDashboard() {
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CheckCircle2 className="h-4 w-4 text-success" />
             <span className="text-sm text-muted-foreground">مكتمل</span>
           </div>
           <div className="text-2xl font-bold">{stats.completed}</div>
@@ -133,7 +133,7 @@ export function DistributionsDashboard() {
 
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-orange-500" />
+            <Clock className="h-4 w-4 text-warning" />
             <span className="text-sm text-muted-foreground">معلق</span>
           </div>
           <div className="text-2xl font-bold">{stats.pending}</div>
@@ -228,7 +228,7 @@ export function DistributionsDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">معدل النمو الشهري</div>
-              <div className="text-2xl font-bold text-green-500">+12.5%</div>
+              <div className="text-2xl font-bold text-success">+12.5%</div>
             </Card>
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">متوسط وقت الموافقة</div>
@@ -236,11 +236,11 @@ export function DistributionsDashboard() {
             </Card>
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">معدل الإكمال</div>
-              <div className="text-2xl font-bold text-green-500">94%</div>
+              <div className="text-2xl font-bold text-success">94%</div>
             </Card>
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">التوزيعات الملغاة</div>
-              <div className="text-2xl font-bold text-red-500">
+              <div className="text-2xl font-bold text-destructive">
                 {distributions.filter(d => d.status === 'cancelled').length}
               </div>
             </Card>
@@ -250,13 +250,13 @@ export function DistributionsDashboard() {
             <h3 className="text-lg font-semibold mb-4">ملخص تحليلي</h3>
             <div className="space-y-3 text-sm">
               <p className="flex items-start gap-2">
-                <span className="text-green-500 mt-1">✓</span>
+                <span className="text-success mt-1">✓</span>
                 <span>
                   أداء ممتاز: معدل الإكمال مرتفع ({((stats.completed / stats.total) * 100).toFixed(1)}%)
                 </span>
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-blue-500 mt-1">ℹ</span>
+                <span className="text-info mt-1">ℹ</span>
                 <span>النمو الشهري مستقر مع زيادة طفيفة في الربع الأخير</span>
               </p>
               <p className="flex items-start gap-2">

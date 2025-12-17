@@ -20,7 +20,7 @@ export function BudgetVarianceReport() {
 
   const getVarianceBadge = (variance: number) => {
     if (variance > 0) {
-      return <Badge className="bg-green-600">فائض</Badge>;
+      return <Badge className="bg-success">فائض</Badge>;
     } else if (variance < 0) {
       return <Badge variant="destructive">عجز</Badge>;
     }
@@ -69,7 +69,7 @@ export function BudgetVarianceReport() {
               <Card>
                 <CardContent className="pt-4">
                   <div className="text-sm text-muted-foreground">إجمالي الفعلي</div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-info">
                     {formatCurrency(summary.totalActual)}
                   </div>
                 </CardContent>
@@ -77,7 +77,7 @@ export function BudgetVarianceReport() {
               <Card>
                 <CardContent className="pt-4">
                   <div className="text-sm text-muted-foreground">إجمالي الانحراف</div>
-                  <div className={`text-2xl font-bold ${summary.totalVariance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`text-2xl font-bold ${summary.totalVariance >= 0 ? 'text-success' : 'text-destructive'}`}>
                     {formatCurrency(Math.abs(summary.totalVariance))}
                   </div>
                 </CardContent>
@@ -142,7 +142,7 @@ export function BudgetVarianceReport() {
                             {formatCurrency(budget.actual_amount || 0)}
                           </TableCell>
                           <TableCell className="text-right font-mono">
-                            <span className={variance >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            <span className={variance >= 0 ? 'text-success' : 'text-destructive'}>
                               {variance >= 0 ? '+' : ''}{formatCurrency(Math.abs(variance))}
                             </span>
                           </TableCell>
@@ -155,7 +155,7 @@ export function BudgetVarianceReport() {
                           <TableCell>
                             {getVarianceBadge(variance)}
                             {status === 'critical' && (
-                              <AlertTriangle className="h-4 w-4 text-red-600 inline me-1" />
+                              <AlertTriangle className="h-4 w-4 text-destructive inline me-1" />
                             )}
                           </TableCell>
                         </TableRow>

@@ -155,7 +155,7 @@ export function DisclosureCharts({ disclosure }: DisclosureChartsProps) {
 
           {/* دائرة المصروفات */}
           <div className="space-y-2">
-            <h4 className="text-xs sm:text-sm font-medium text-center text-red-600">المصروفات</h4>
+            <h4 className="text-xs sm:text-sm font-medium text-center text-destructive">المصروفات</h4>
             {expenseData.length > 0 ? (
               <ResponsiveContainer width="100%" height={180}>
                 <PieChart>

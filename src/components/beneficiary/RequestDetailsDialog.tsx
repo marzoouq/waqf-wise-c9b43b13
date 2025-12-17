@@ -45,14 +45,14 @@ export function RequestDetailsDialog({
     switch (status) {
       case "معتمد":
       case "مكتمل":
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className="h-5 w-5 text-success" />;
       case "مرفوض":
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       case "قيد المراجعة":
       case "قيد المعالجة":
-        return <Clock className="h-5 w-5 text-yellow-600" />;
+        return <Clock className="h-5 w-5 text-warning" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-gray-600" />;
+        return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -77,9 +77,9 @@ export function RequestDetailsDialog({
     if (!priority) return null;
 
     const colors: Record<string, string> = {
-      عاجل: "text-red-600 border-red-200 bg-red-50",
-      مهم: "text-orange-600 border-orange-200 bg-orange-50",
-      عادية: "text-blue-600 border-blue-200 bg-blue-50",
+      عاجل: "text-destructive border-destructive/20 bg-destructive/10",
+      مهم: "text-warning border-warning/20 bg-warning/10",
+      عادية: "text-info border-info/20 bg-info/10",
     };
 
     return (
