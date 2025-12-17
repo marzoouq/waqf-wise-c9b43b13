@@ -118,8 +118,8 @@ export function FinancialAnalyticsDashboard() {
                         <CardDescription className="text-sm">
                           {kpiLabels[kpi.kpi_name] || kpi.kpi_name}
                         </CardDescription>
-                        {status === 'good' && <TrendingUp className="h-4 w-4 text-green-500" />}
-                        {status === 'warning' && <TrendingDown className="h-4 w-4 text-yellow-500" />}
+                        {status === 'good' && <TrendingUp className="h-4 w-4 text-success" />}
+                        {status === 'warning' && <TrendingDown className="h-4 w-4 text-warning" />}
                       </div>
                     </CardHeader>
                     <CardContent>

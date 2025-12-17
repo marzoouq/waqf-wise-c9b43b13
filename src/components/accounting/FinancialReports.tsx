@@ -120,7 +120,7 @@ export function FinancialReports() {
               {/* الإيرادات */}
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  <TrendingUp className="h-5 w-5 text-success" />
                   الإيرادات
                 </h3>
                 <div className="space-y-2">
@@ -134,12 +134,12 @@ export function FinancialReports() {
                         <span className="text-sm">
                           {acc.code} - {acc.name_ar}
                         </span>
-                        <span className="font-mono text-green-600">
+                        <span className="font-mono text-success">
                           {(acc.current_balance || 0).toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     ))}
-                  <div className="flex items-center justify-between p-3 bg-green-100 dark:bg-green-950 rounded font-semibold">
+                  <div className="flex items-center justify-between p-3 bg-success/10 rounded font-semibold">
                     <span>إجمالي الإيرادات</span>
                     <span className="font-mono">
                       {totalRevenue.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
@@ -151,7 +151,7 @@ export function FinancialReports() {
               {/* المصروفات */}
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <TrendingDown className="h-5 w-5 text-red-600" />
+                  <TrendingDown className="h-5 w-5 text-destructive" />
                   المصروفات
                 </h3>
                 <div className="space-y-2">
@@ -165,12 +165,12 @@ export function FinancialReports() {
                         <span className="text-sm">
                           {acc.code} - {acc.name_ar}
                         </span>
-                        <span className="font-mono text-red-600">
+                        <span className="font-mono text-destructive">
                           {(acc.current_balance || 0).toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     ))}
-                  <div className="flex items-center justify-between p-3 bg-red-100 dark:bg-red-950 rounded font-semibold">
+                  <div className="flex items-center justify-between p-3 bg-destructive/10 rounded font-semibold">
                     <span>إجمالي المصروفات</span>
                     <span className="font-mono">
                       {totalExpense.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
@@ -183,8 +183,8 @@ export function FinancialReports() {
               <div
                 className={`p-4 rounded-lg ${
                   netIncome >= 0
-                    ? 'bg-green-100 dark:bg-green-950'
-                    : 'bg-red-100 dark:bg-red-950'
+                    ? 'bg-success/10'
+                    : 'bg-destructive/10'
                 }`}
               >
                 <div className="flex items-center justify-between text-lg font-bold">

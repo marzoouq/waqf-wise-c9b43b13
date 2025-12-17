@@ -118,10 +118,10 @@ export function FinancialRatiosReport() {
                       </CardDescription>
                     </div>
                     {status === 'good' && (
-                      <TrendingUp className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <TrendingUp className="h-5 w-5 text-success flex-shrink-0" />
                     )}
                     {status === 'warning' && (
-                      <TrendingDown className="h-5 w-5 text-yellow-500 flex-shrink-0" />
+                      <TrendingDown className="h-5 w-5 text-warning flex-shrink-0" />
                     )}
                   </div>
                 </CardHeader>

@@ -210,7 +210,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                 <div className="p-3 bg-primary/5 rounded-lg border">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">صافي الدخل (محسوب):</span>
-                    <span className={`font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
                       {netIncome.toLocaleString('ar-SA')} ر.س
                     </span>
                   </div>

@@ -47,13 +47,13 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
     <Card className={`relative overflow-hidden ${className}`}>
       {/* مؤشر التحديث المباشر */}
       {isLive && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-amber-500/50 to-amber-500 animate-pulse" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-warning via-warning/50 to-warning animate-pulse" />
       )}
       
       <CardHeader className={`flex flex-row items-center justify-between ${compact ? "pb-2 pt-4" : ""}`}>
         <CardTitle className={`flex items-center gap-2 ${compact ? "text-sm" : "text-base"}`}>
-          <div className="p-2 rounded-lg bg-amber-500/10">
-            <Building2 className={`${compact ? "h-4 w-4" : "h-5 w-5"} text-amber-600`} />
+          <div className="p-2 rounded-lg bg-warning/10">
+            <Building2 className={`${compact ? "h-4 w-4" : "h-5 w-5"} text-warning`} />
           </div>
           رقبة الوقف
         </CardTitle>
@@ -78,7 +78,7 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
           <DialogTrigger asChild>
             <button className="w-full text-right space-y-2 hover:opacity-80 transition-opacity cursor-pointer">
               <div className="flex items-center justify-between">
-                <div className={`font-bold text-amber-600 ${compact ? "text-2xl" : "text-3xl"}`}>
+                <div className={`font-bold text-warning ${compact ? "text-2xl" : "text-3xl"}`}>
                   {totalCorpus.toLocaleString("ar-SA")} ر.س
                 </div>
                 <ChevronLeft className="h-5 w-5 text-muted-foreground" />

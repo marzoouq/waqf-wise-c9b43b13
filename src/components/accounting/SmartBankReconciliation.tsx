@@ -54,9 +54,9 @@ export function SmartBankReconciliation({ statementId }: Props) {
 
   const getConfidenceBadge = (confidence: number) => {
     if (confidence >= 0.9) {
-      return <Badge className="bg-green-500">ثقة عالية {(confidence * 100).toFixed(0)}%</Badge>;
+      return <Badge className="bg-success">ثقة عالية {(confidence * 100).toFixed(0)}%</Badge>;
     } else if (confidence >= 0.7) {
-      return <Badge className="bg-yellow-500">ثقة متوسطة {(confidence * 100).toFixed(0)}%</Badge>;
+      return <Badge className="bg-warning">ثقة متوسطة {(confidence * 100).toFixed(0)}%</Badge>;
     } else {
       return <Badge variant="secondary">ثقة منخفضة {(confidence * 100).toFixed(0)}%</Badge>;
     }
@@ -159,7 +159,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
 
           {!isMatching && suggestions.length === 0 && matches.length > 0 && (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
+              <CheckCircle2 className="h-12 w-12 text-success mb-4" />
               <h4 className="font-semibold mb-2">تمت المطابقة بنجاح!</h4>
               <p className="text-sm text-muted-foreground">
                 تم مطابقة جميع العمليات المتاحة. يمكنك مراجعة النتائج في قائمة المطابقات.

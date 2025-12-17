@@ -311,23 +311,23 @@ export function WaqfUnitDetailsDialog({
                 )
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="p-4 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
-                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
+                  <Card className="p-4 border-info/30 bg-info/10">
+                    <div className="flex items-center gap-2 text-info mb-2">
                       <CalendarDays className="h-5 w-5" />
                       <span className="font-semibold">الإيراد الشهري</span>
                     </div>
-                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                    <p className="text-2xl font-bold text-info">
                       {revenues.monthlyRevenue.toLocaleString("ar-SA")} ريال
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">من العقود الشهرية النشطة</p>
                   </Card>
 
-                  <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
-                    <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                  <Card className="p-4 border-success/30 bg-success/10">
+                    <div className="flex items-center gap-2 text-success mb-2">
                       <CalendarRange className="h-5 w-5" />
                       <span className="font-semibold">الإيراد السنوي</span>
                     </div>
-                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                    <p className="text-2xl font-bold text-success">
                       {revenues.annualRevenue.toLocaleString("ar-SA")} ريال
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">من العقود السنوية النشطة</p>

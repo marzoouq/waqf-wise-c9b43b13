@@ -132,20 +132,20 @@ export function AutomaticClosingDialog({
                         {preview.closing_entry.lines.map((line, idx) => (
                           <tr key={idx} className="border-t">
                             <td className="p-2">{line.account_name}</td>
-                            <td className="p-2 text-green-600">
+                            <td className="p-2 text-success">
                               {line.debit_amount > 0 ? formatCurrency(line.debit_amount) : '-'}
                             </td>
-                            <td className="p-2 text-red-600">
+                            <td className="p-2 text-destructive">
                               {line.credit_amount > 0 ? formatCurrency(line.credit_amount) : '-'}
                             </td>
                           </tr>
                         ))}
                         <tr className="border-t font-bold bg-muted/50">
                           <td className="p-2">الإجمالي</td>
-                          <td className="p-2 text-green-600">
+                          <td className="p-2 text-success">
                             {formatCurrency(preview.closing_entry.total_debit)}
                           </td>
-                          <td className="p-2 text-red-600">
+                          <td className="p-2 text-destructive">
                             {formatCurrency(preview.closing_entry.total_credit)}
                           </td>
                         </tr>
@@ -156,7 +156,7 @@ export function AutomaticClosingDialog({
 
                 {preview.can_close ? (
                   <Alert>
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <CheckCircle2 className="h-4 w-4 text-success" />
                     <AlertDescription>
                       جميع الفحوصات تمت بنجاح. يمكنك الآن تأكيد الإقفال.
                     </AlertDescription>
