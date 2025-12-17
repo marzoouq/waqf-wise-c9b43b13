@@ -128,10 +128,10 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                   ),
                   // القوائم
                   ul: ({ children }) => (
-                    <ul className="list-disc list-inside mb-3 space-y-1.5 pr-2">{children}</ul>
+                    <ul className="list-disc list-inside mb-3 space-y-1.5 pe-2">{children}</ul>
                   ),
                   ol: ({ children }) => (
-                    <ol className="list-decimal list-inside mb-3 space-y-1.5 pr-2">{children}</ol>
+                    <ol className="list-decimal list-inside mb-3 space-y-1.5 pe-2">{children}</ol>
                   ),
                   li: ({ children }) => (
                     <li className="text-foreground leading-relaxed">{children}</li>
@@ -205,7 +205,7 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                   ),
                   // الاقتباسات
                   blockquote: ({ children }) => (
-                    <blockquote className="border-r-4 border-primary pr-4 my-3 text-muted-foreground italic bg-muted/30 py-2 rounded-l-lg">
+                    <blockquote className="border-e-4 border-primary pe-4 my-3 text-muted-foreground italic bg-muted/30 py-2 rounded-s-lg">
                       {children}
                     </blockquote>
                   ),

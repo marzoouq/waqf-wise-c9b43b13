@@ -138,7 +138,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-right font-normal",
+                            "w-full ps-3 text-right font-normal",
                             !field.value && "text-muted-foreground"
                           )}
                         >

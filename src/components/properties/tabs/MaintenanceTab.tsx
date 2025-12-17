@@ -91,7 +91,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             placeholder="البحث عن طلب صيانة..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
+            className="pe-10"
           />
         </div>
         {filteredRequests.length > 0 && (

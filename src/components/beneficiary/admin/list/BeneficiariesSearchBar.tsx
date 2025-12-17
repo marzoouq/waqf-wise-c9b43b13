@@ -48,7 +48,7 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
               placeholder="البحث (الاسم، رقم الهوية، العائلة...)"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pr-9 sm:pr-10 text-sm sm:text-base"
+              className="pe-9 sm:pe-10 text-sm sm:text-base"
             />
           </div>
           <div className="flex flex-wrap gap-2">

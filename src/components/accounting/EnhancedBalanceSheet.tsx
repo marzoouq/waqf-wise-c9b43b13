@@ -122,12 +122,12 @@ export function EnhancedBalanceSheet() {
             <div className="space-y-3">
               <h4 className="font-semibold text-warning">الخصوم:</h4>
               
-              <div className="flex justify-between items-center pr-4">
+              <div className="flex justify-between items-center pe-4">
                 <span>خصوم متداولة:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.current)}</span>
               </div>
               
-              <div className="flex justify-between items-center pr-4">
+              <div className="flex justify-between items-center pe-4">
                 <span>خصوم طويلة الأجل:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.longTerm)}</span>
               </div>
@@ -139,17 +139,17 @@ export function EnhancedBalanceSheet() {
 
               <h4 className="font-semibold text-accent pt-4">حقوق الملكية:</h4>
               
-              <div className="flex justify-between items-center pr-4">
+              <div className="flex justify-between items-center pe-4">
                 <span>رأس مال الوقف (رقبة الوقف):</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.capital)}</span>
               </div>
               
-              <div className="flex justify-between items-center pr-4">
+              <div className="flex justify-between items-center pe-4">
                 <span>الاحتياطيات:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.reserves)}</span>
               </div>
               
-              <div className="flex justify-between items-center pr-4">
+              <div className="flex justify-between items-center pe-4">
                 <span>الأرباح المحتجزة (صافي الدخل):</span>
                 <span className="font-mono">{formatNumber(balanceSheet.retainedEarnings || 0)}</span>
               </div>

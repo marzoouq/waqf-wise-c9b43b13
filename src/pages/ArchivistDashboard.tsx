@@ -134,7 +134,7 @@ export default function ArchivistDashboard() {
                 placeholder="البحث في المستندات..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>

@@ -66,7 +66,7 @@ export function AlertsPanel() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[400px] pr-4">
+          <ScrollArea className="h-[400px] pe-4">
             <div className="space-y-3">
               {isLoading ? (
                 <div className="text-center text-muted-foreground py-8">جاري التحميل...</div>

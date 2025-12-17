@@ -90,7 +90,7 @@ const RolesContent = () => {
                 placeholder="بحث بالاسم أو البريد الإلكتروني..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
