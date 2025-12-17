@@ -117,7 +117,7 @@ export function ArchiveFoldersTab({
               placeholder="البحث في المستندات..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pr-10"
+              className="pe-10"
             />
           </div>
 

@@ -135,7 +135,7 @@ export default function PaymentVouchers() {
                 placeholder="البحث برقم السند أو الوصف..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <div className="flex gap-2 flex-wrap">

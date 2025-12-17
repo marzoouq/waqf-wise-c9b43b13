@@ -230,7 +230,7 @@ export default function BeneficiaryAccountStatement() {
                   placeholder="ابحث..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-9"
+                  className="pe-9"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function BeneficiaryAccountStatement() {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="pr-9"
+                  className="pe-9"
                 />
               </div>
             </div>
@@ -258,7 +258,7 @@ export default function BeneficiaryAccountStatement() {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="pr-9"
+                  className="pe-9"
                 />
               </div>
             </div>

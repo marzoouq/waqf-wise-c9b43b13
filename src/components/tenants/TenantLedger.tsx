@@ -117,7 +117,7 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
 
                   {/* Row 2: Description */}
                   {entry.description && (
-                    <p className="text-xs sm:text-sm text-muted-foreground pr-8">
+                    <p className="text-xs sm:text-sm text-muted-foreground pe-8">
                       {entry.description}
                     </p>
                   )}

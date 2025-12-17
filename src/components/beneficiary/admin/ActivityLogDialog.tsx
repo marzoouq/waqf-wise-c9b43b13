@@ -56,7 +56,7 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
       title={`سجل النشاط: ${beneficiaryName}`}
       size="xl"
     >
-      <ScrollArea className="h-[400px] sm:h-[600px] pr-4">
+      <ScrollArea className="h-[400px] sm:h-[600px] pe-4">
           {isLoading ? (
             <div className="text-center py-8">جاري التحميل...</div>
           ) : activities.length === 0 ? (
@@ -66,7 +66,7 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
           ) : (
             <div className="space-y-4">
               {activities.map((activity) => (
-                <div key={activity.id} className="border-r-4 border-primary/20 pr-4 pb-4">
+                <div key={activity.id} className="border-e-4 border-primary/20 pe-4 pb-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-1">
                       <Badge variant={getActionColor(activity.action_type)} className="gap-1">

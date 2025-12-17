@@ -87,10 +87,10 @@ export function RegulationsContent({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-4">
-                  <div className="space-y-4 pr-11">
+                  <div className="space-y-4 pe-11">
                     {part.chapters.map((chapter, chapterIndex) => (
                       <div key={chapterIndex} className="space-y-3">
-                        <h4 className="font-semibold text-sm text-primary border-r-2 border-red-500 pr-3">
+                        <h4 className="font-semibold text-sm text-primary border-e-2 border-red-500 pe-3">
                           {highlightText(chapter.title)}
                         </h4>
                         <div className="space-y-3">

@@ -268,7 +268,7 @@ export default function Loans() {
                 placeholder="البحث برقم القرض، اسم المستفيد، أو رقم الهوية..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>

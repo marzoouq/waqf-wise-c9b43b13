@@ -136,7 +136,7 @@ export function TicketDetailsDialog({
                 التعليقات ({comments?.length || 0})
               </h3>
 
-              <ScrollArea className="h-[300px] pr-4">
+              <ScrollArea className="h-[300px] pe-4">
                 {comments && comments.length > 0 ? (
                   <div className="space-y-4">
                     {comments.map((comment) => (

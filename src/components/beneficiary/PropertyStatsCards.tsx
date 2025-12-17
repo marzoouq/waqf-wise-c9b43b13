@@ -122,7 +122,7 @@ export function PropertyStatsCards() {
                   className="border border-border/50 rounded-lg overflow-hidden"
                 >
                   <AccordionTrigger className="px-3 sm:px-4 hover:no-underline hover:bg-muted/50">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pr-3 sm:pr-4 gap-2 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pe-3 sm:pe-4 gap-2 sm:gap-0">
                       <div className="text-left flex-1 min-w-0">
                         <h4 className="font-semibold text-xs sm:text-sm lg:text-base truncate">{property.name}</h4>
                         <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 mt-0.5 sm:mt-1 truncate">

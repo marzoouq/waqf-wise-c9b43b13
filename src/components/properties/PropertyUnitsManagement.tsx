@@ -173,7 +173,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
               placeholder="بحث برقم أو اسم الوحدة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10"
+              className="pe-10"
             />
           </div>
 

@@ -230,7 +230,7 @@ export default function WaqfUnits() {
               placeholder="بحث بالاسم، الكود، أو الموقع..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10"
+              className="pe-10"
             />
           </div>
           <AdvancedFiltersDialog

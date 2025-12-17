@@ -87,12 +87,12 @@ export function EnhancedIncomeStatement() {
       <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6">
         {/* Revenue Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold border-r-4 border-success pr-3 flex items-center gap-2">
+          <h3 className="text-lg font-bold border-e-4 border-success pe-3 flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-success" />
             الإيرادات
           </h3>
           
-          <div className="space-y-3 pr-6">
+          <div className="space-y-3 pe-6">
             <div className="flex justify-between items-center">
               <span>إيرادات عقارية</span>
               <span className="font-mono">{formatNumber(incomeStatement.revenue.property)}</span>
@@ -117,7 +117,7 @@ export function EnhancedIncomeStatement() {
           </div>
 
           {/* Revenue Breakdown */}
-          <div className="space-y-2 pr-6">
+          <div className="space-y-2 pe-6">
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>إيرادات عقارية</span>
@@ -130,12 +130,12 @@ export function EnhancedIncomeStatement() {
 
         {/* Expenses Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold border-r-4 border-destructive pr-3 flex items-center gap-2">
+          <h3 className="text-lg font-bold border-e-4 border-destructive pe-3 flex items-center gap-2">
             <TrendingDown className="h-5 w-5 text-destructive" />
             المصروفات
           </h3>
           
-          <div className="space-y-3 pr-6">
+          <div className="space-y-3 pe-6">
             <div className="flex justify-between items-center">
               <span>مصروفات إدارية</span>
               <span className="font-mono">{formatNumber(incomeStatement.expenses.administrative)}</span>
