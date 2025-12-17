@@ -187,7 +187,7 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
           {favoriteSearches.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4 text-warning fill-warning" />
                 المفضلة ({favoriteSearches.length})
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -285,7 +285,7 @@ function SearchCard({ search, onLoad, onDelete }: SearchCardProps) {
               <div className="flex items-center gap-2">
                 <h4 className="font-medium truncate">{search.name}</h4>
                 {search.is_favorite && (
-                  <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                  <Star className="h-3 w-3 text-warning fill-warning flex-shrink-0" />
                 )}
               </div>
               {search.description && (

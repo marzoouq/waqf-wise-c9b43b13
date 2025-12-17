@@ -117,9 +117,9 @@ export const ContractExpiryAlert = ({ contracts, onRenewClick }: ContractExpiryA
 
       {/* معلومة - خلال 90 يوم */}
       {info.length > 0 && (
-        <Alert className="border-blue-500 bg-blue-500/5">
-          <Calendar className="h-4 w-4 text-blue-600" />
-          <AlertTitle className="font-bold text-blue-600">عقود تنتهي خلال 90 يوم ({info.length})</AlertTitle>
+        <Alert className="border-info bg-info/5">
+          <Calendar className="h-4 w-4 text-info" />
+          <AlertTitle className="font-bold text-info">عقود تنتهي خلال 90 يوم ({info.length})</AlertTitle>
           <AlertDescription className="text-sm">
             يُنصح بالتواصل مع المستأجرين لمعرفة رغبتهم في التجديد.
           </AlertDescription>

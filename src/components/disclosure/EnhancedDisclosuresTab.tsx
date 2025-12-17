@@ -117,8 +117,8 @@ export function EnhancedDisclosuresTab() {
                         variant="outline" 
                         className={`text-[10px] sm:text-xs ${
                           revenueChange > 0 
-                            ? 'text-emerald-600 border-emerald-600/30 bg-emerald-50' 
-                            : 'text-red-600 border-red-600/30 bg-red-50'
+                            ? 'text-success border-success/30 bg-success/10' 
+                            : 'text-destructive border-destructive/30 bg-destructive/10'
                         }`}
                       >
                         {revenueChange > 0 ? (
@@ -139,12 +139,12 @@ export function EnhancedDisclosuresTab() {
               <CardContent className="pt-4 space-y-4">
                 {/* البطاقات المالية الرئيسية */}
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                  <div className="p-3 sm:p-4 bg-emerald-500/10 rounded-lg text-center">
+                  <div className="p-3 sm:p-4 bg-success/10 rounded-lg text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
                       <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">الإيرادات</span>
                     </div>
-                    <p className="text-sm sm:text-xl font-bold text-emerald-600">
+                    <p className="text-sm sm:text-xl font-bold text-success">
                       <MaskedValue
                         value={formatCurrency(disclosure.total_revenues)}
                         type="amount"
@@ -153,12 +153,12 @@ export function EnhancedDisclosuresTab() {
                     </p>
                   </div>
 
-                  <div className="p-3 sm:p-4 bg-red-500/10 rounded-lg text-center">
+                  <div className="p-3 sm:p-4 bg-destructive/10 rounded-lg text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+                      <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
                       <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">المصروفات</span>
                     </div>
-                    <p className="text-sm sm:text-xl font-bold text-red-600">
+                    <p className="text-sm sm:text-xl font-bold text-destructive">
                       <MaskedValue
                         value={formatCurrency(disclosure.total_expenses)}
                         type="amount"

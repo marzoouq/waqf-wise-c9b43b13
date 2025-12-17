@@ -173,9 +173,9 @@ export function BeneficiaryPropertiesTab() {
         <>
           {/* تنبيه إذا كانت السنة غير منشورة */}
           {!isCurrentYearPublished && (
-            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
-              <EyeOff className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-amber-700 dark:text-amber-300">
+            <Alert className="border-warning/30 bg-warning/10">
+              <EyeOff className="h-4 w-4 text-warning" />
+              <AlertDescription className="text-warning/80">
                 تفاصيل العقود للسنة المالية الحالية مخفية حتى يتم نشرها من قبل الناظر
               </AlertDescription>
             </Alert>

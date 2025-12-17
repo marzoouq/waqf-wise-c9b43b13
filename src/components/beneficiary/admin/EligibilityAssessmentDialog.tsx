@@ -229,31 +229,31 @@ export function EligibilityAssessmentDialog({
                 <ul className="space-y-2 text-sm">
                   {assessment.score >= 70 && (
                     <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-0.5">✓</span>
+                      <span className="text-success mt-0.5">✓</span>
                       <span>المستفيد مؤهل بشكل كبير للحصول على الدعم الكامل</span>
                     </li>
                   )}
                   {assessment.score >= 50 && assessment.score < 70 && (
                     <li className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-0.5">✓</span>
+                      <span className="text-info mt-0.5">✓</span>
                       <span>المستفيد مؤهل للحصول على الدعم بناءً على المعايير المحددة</span>
                     </li>
                   )}
                   {assessment.score >= 30 && assessment.score < 50 && (
                     <>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-500 mt-0.5">!</span>
+                        <span className="text-warning mt-0.5">!</span>
                         <span>يُنصح بمراجعة الحالة مع لجنة التقييم</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="text-yellow-500 mt-0.5">!</span>
+                        <span className="text-warning mt-0.5">!</span>
                         <span>قد يحتاج المستفيد إلى دعم جزئي أو مؤقت</span>
                       </li>
                     </>
                   )}
                   {assessment.score < 30 && (
                     <li className="flex items-start gap-2">
-                      <span className="text-red-500 mt-0.5">✗</span>
+                      <span className="text-destructive mt-0.5">✗</span>
                       <span>المستفيد غير مؤهل حالياً بناءً على المعايير الحالية</span>
                     </li>
                   )}

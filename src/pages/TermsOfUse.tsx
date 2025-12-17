@@ -55,7 +55,7 @@ export default function TermsOfUse() {
 
           <section className="bg-card rounded-xl p-6 border border-border">
             <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-amber-500" />
+              <AlertTriangle className="w-6 h-6 text-warning" />
               <h2 className="text-xl font-semibold text-foreground m-0">إخلاء المسؤولية</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
