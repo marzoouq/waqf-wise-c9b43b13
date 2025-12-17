@@ -71,7 +71,7 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
       >
         <div className="space-y-4">
             <Button onClick={() => setShowUploadForm(!showUploadForm)} className="w-full">
-              <Upload className="ml-2 h-4 w-4" />
+              <Upload className="ms-2 h-4 w-4" />
               {showUploadForm ? "إخفاء نموذج الرفع" : "رفع مرفق جديد"}
             </Button>
 

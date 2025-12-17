@@ -271,12 +271,12 @@ export function UploadDocumentDialog({
             <Button type="submit" disabled={isUploading}>
               {isUploading ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   جاري الرفع...
                 </>
               ) : (
                 <>
-                  <Upload className="ml-2 h-4 w-4" />
+                  <Upload className="ms-2 h-4 w-4" />
                   رفع المستند
                 </>
               )}

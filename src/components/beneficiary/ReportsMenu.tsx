@@ -565,7 +565,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           className="w-full justify-start"
           variant="outline"
         >
-          <User className="ml-2 h-4 w-4" />
+          <User className="ms-2 h-4 w-4" />
           تقرير البيانات الشخصية (PDF)
         </Button>
         <Button
@@ -573,7 +573,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           className="w-full justify-start"
           variant="outline"
         >
-          <FileText className="ml-2 h-4 w-4" />
+          <FileText className="ms-2 h-4 w-4" />
           تقرير المدفوعات (PDF)
         </Button>
         <Button
@@ -581,7 +581,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           className="w-full justify-start"
           variant="outline"
         >
-          <Receipt className="ml-2 h-4 w-4" />
+          <Receipt className="ms-2 h-4 w-4" />
           كشف الحساب (PDF)
         </Button>
       </div>
@@ -593,7 +593,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           className="w-full justify-start"
           variant="outline"
         >
-          <Building2 className="ml-2 h-4 w-4" />
+          <Building2 className="ms-2 h-4 w-4" />
           تقرير العقارات (PDF)
         </Button>
         <Button
@@ -601,7 +601,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           className="w-full justify-start"
           variant="outline"
         >
-          <FileSpreadsheet className="ml-2 h-4 w-4" />
+          <FileSpreadsheet className="ms-2 h-4 w-4" />
           تقرير العقارات (Excel)
         </Button>
       </div>
@@ -612,11 +612,11 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
   const waqfReports = (
     <>
       <Button variant="outline" onClick={exportAnnualDisclosure} className="justify-start">
-        <FileSpreadsheet className="ml-2 h-4 w-4" />
+        <FileSpreadsheet className="ms-2 h-4 w-4" />
         الإفصاح السنوي (PDF)
       </Button>
       <Button variant="outline" onClick={exportPropertiesExcel} className="justify-start">
-        <Building2 className="ml-2 h-4 w-4" />
+        <Building2 className="ms-2 h-4 w-4" />
         تقرير العقارات (Excel)
       </Button>
     </>

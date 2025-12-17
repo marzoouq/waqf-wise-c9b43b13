@@ -228,15 +228,15 @@ export default function AdvancedSettings() {
 
                 <div className="flex gap-2">
                   <Button>
-                    <Download className="h-4 w-4 ml-2" />
+                    <Download className="h-4 w-4 ms-2" />
                     تنزيل آخر نسخة
                   </Button>
                   <Button variant="outline">
-                    <Upload className="h-4 w-4 ml-2" />
+                    <Upload className="h-4 w-4 ms-2" />
                     استعادة من نسخة
                   </Button>
                   <Button variant="outline">
-                    <Settings className="h-4 w-4 ml-2" />
+                    <Settings className="h-4 w-4 ms-2" />
                     إعدادات النسخ
                   </Button>
                 </div>

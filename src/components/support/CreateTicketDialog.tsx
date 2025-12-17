@@ -188,7 +188,7 @@ export function CreateTicketDialog({ open, onOpenChange }: CreateTicketDialogPro
                 إلغاء
               </Button>
               <Button type="submit" disabled={createTicket.isPending}>
-                {createTicket.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {createTicket.isPending && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 إرسال التذكرة
               </Button>
             </div>

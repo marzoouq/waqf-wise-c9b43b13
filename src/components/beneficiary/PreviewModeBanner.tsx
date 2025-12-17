@@ -45,7 +45,7 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
             onClick={handleBackToNazer}
             className="border-amber-300 hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-900/50"
           >
-            <ArrowRight className="h-4 w-4 ml-1" />
+            <ArrowRight className="h-4 w-4 ms-1" />
             العودة للوحة الناظر
           </Button>
           <Button

@@ -140,12 +140,12 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
                             <Badge variant={item.fiscal_years?.is_closed ? "secondary" : "default"}>
                               {item.fiscal_years?.is_closed ? (
                                 <>
-                                  <CheckCircle2 className="h-3 w-3 ml-1" />
+                                  <CheckCircle2 className="h-3 w-3 ms-1" />
                                   مقفلة
                                 </>
                               ) : (
                                 <>
-                                  <Clock className="h-3 w-3 ml-1" />
+                                  <Clock className="h-3 w-3 ms-1" />
                                   نشطة
                                 </>
                               )}

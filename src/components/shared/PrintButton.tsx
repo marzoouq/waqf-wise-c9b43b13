@@ -39,7 +39,7 @@ export const PrintButton = ({
       onClick={handlePrint}
       className={className}
     >
-      <Printer className="h-4 w-4 ml-2" />
+      <Printer className="h-4 w-4 ms-2" />
       طباعة
     </Button>
   );
