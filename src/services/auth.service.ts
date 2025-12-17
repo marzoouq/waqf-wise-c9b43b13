@@ -317,32 +317,7 @@ export class AuthService {
     if (error) throw error;
   }
 
-  // ==================== إدارة الصلاحيات (مفوضة لـ PermissionsService) ====================
-  // للتوافق الخلفي - استخدم PermissionsService مباشرة للكود الجديد
-
-  /**
-   * @deprecated استخدم PermissionsService.getAllPermissions()
-   */
-  static async getAllPermissions() {
-    const { PermissionsService } = await import("./permissions.service");
-    return PermissionsService.getAllPermissions();
-  }
-
-  /**
-   * @deprecated استخدم PermissionsService.getRolePermissions()
-   */
-  static async getRolePermissions(role: AppRole) {
-    const { PermissionsService } = await import("./permissions.service");
-    return PermissionsService.getRolePermissions(role);
-  }
-
-  /**
-   * @deprecated استخدم PermissionsService.updateRolePermission()
-   */
-  static async updateRolePermission(role: AppRole, permissionId: string, granted: boolean): Promise<void> {
-    const { PermissionsService } = await import("./permissions.service");
-    return PermissionsService.updateRolePermission(role, permissionId, granted);
-  }
+  // ==================== الملف الشخصي ====================
 
   /**
    * جلب ملف الشخصية
@@ -361,7 +336,7 @@ export class AuthService {
   /**
    * تحديث أو إنشاء ملف الشخصية
    */
-  static async upsertProfile(userId: string, profileData: Record<string, any>) {
+  static async upsertProfile(userId: string, profileData: Record<string, unknown>) {
     const { data, error } = await supabase
       .from("profiles")
       .upsert([{ ...profileData, user_id: userId }], { onConflict: "user_id" })
@@ -371,33 +346,6 @@ export class AuthService {
     if (error) throw error;
     if (!data) throw new Error("فشل في تحديث الملف الشخصي");
     return data;
-  }
-
-  // ==================== المصادقة الثنائية (مفوضة لـ TwoFactorService) ====================
-  // للتوافق الخلفي - استخدم TwoFactorService مباشرة للكود الجديد
-
-  /**
-   * @deprecated استخدم TwoFactorService.getStatus()
-   */
-  static async get2FAStatus(userId: string) {
-    const { TwoFactorService } = await import("./two-factor.service");
-    return TwoFactorService.getStatus(userId);
-  }
-
-  /**
-   * @deprecated استخدم TwoFactorService.enable()
-   */
-  static async enable2FA(userId: string, secret: string, backupCodes: string[]): Promise<void> {
-    const { TwoFactorService } = await import("./two-factor.service");
-    return TwoFactorService.enable(userId, secret, backupCodes);
-  }
-
-  /**
-   * @deprecated استخدم TwoFactorService.disable()
-   */
-  static async disable2FA(userId: string): Promise<void> {
-    const { TwoFactorService } = await import("./two-factor.service");
-    return TwoFactorService.disable(userId);
   }
 
   // ==================== إعدادات الإشعارات ====================
