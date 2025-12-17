@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.25
- * @date 2025-12-16
+ * @version 2.9.26
+ * @date 2025-12-17
  */
 
-export const APP_VERSION = '2.9.25';
-export const APP_VERSION_DATE = '2025-12-16';
+export const APP_VERSION = '2.9.26';
+export const APP_VERSION_DATE = '2025-12-17';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -18,14 +18,13 @@ export const VERSION_INFO = {
   features: [
     '55+ خدمة متكاملة في طبقة الخدمات',
     '175+ hooks منظمة في 36 مجلد (بدون re-exports)',
-    'QUERY_KEYS موحد لـ React Query',
-    'Realtime موحد للوحات التحكم والمستخدمين',
+    'نظام إشعارات متكامل مع Database Triggers',
+    'لوحة مراقبة حية مع رسوم بيانية Real-time',
+    'تقارير أسبوعية آلية عبر Edge Function',
     '50+ صلاحية مفعلة للناظر والمدير',
     'Server-side Pagination للعقود والحوكمة والمستخدمين',
     'UsersContext و RolesContext لتقليل Props Drilling',
     'Lazy Loading للـ Dialogs (تحسين الأداء 15%)',
-    'تنظيف شامل: حذف 125+ ملف re-export غير ضروري',
-    'جميع الاستيرادات تستخدم مسارات مباشرة',
     'RTL Margins باستخدام CSS Logical Properties',
     'Overlay Colors باستخدام CSS Variables',
   ],
