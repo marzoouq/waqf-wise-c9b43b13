@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/auth/useProfile";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { useAlertCleanup } from "@/hooks/system/useAlertCleanup";
+import { useRolePrefetch } from "@/lib/routePrefetch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -170,10 +171,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
-  const { isBeneficiary, isWaqfHeir } = useUserRole();
+  const { isBeneficiary, isWaqfHeir, primaryRole } = useUserRole();
   
   // ✅ تنظيف التنبيهات - يعمل فقط للصفحات المحمية
   useAlertCleanup();
+  
+  // ✅ تحميل مسبق للمسارات بناءً على دور المستخدم
+  useRolePrefetch(primaryRole);
   
   // ✅ تحميل كسول للتهيئة الثقيلة بعد التحميل الأولي
   useEffect(() => {
