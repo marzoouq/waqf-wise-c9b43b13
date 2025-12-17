@@ -18,7 +18,6 @@ import {
   ScrollText,
   Bell,
   Mail,
-  FolderOpen,
   ChevronDown,
   DollarSign,
   HandCoins,
@@ -31,7 +30,6 @@ import {
   Activity,
   AlertTriangle,
   TrendingUp,
-  Code,
   Calendar,
   Store,
 } from "lucide-react";
@@ -158,11 +156,7 @@ const menuGroups = [
       { icon: Shield, label: "الصلاحيات", path: "/settings/permissions", roles: ["admin", "nazer"] },
       { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
       { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
-      { icon: Code, label: "أدوات المطور", path: "/developer-tools", roles: ["admin"] },
       { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
-      { icon: Settings, label: "صيانة النظام", path: "/system-maintenance", roles: ["admin", "nazer"] },
-      { icon: BookOpen, label: "توثيق المشروع", path: "/project-documentation", roles: ["admin", "nazer"] },
-      { icon: BookOpen, label: "دليل المطور", path: "/developer-guide", roles: ["admin"] },
       { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
     ]
   },
