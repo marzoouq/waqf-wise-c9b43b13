@@ -68,6 +68,13 @@ export type Database = {
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
         ]
       }
       activities: {
@@ -731,6 +738,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
           },
         ]
       }
@@ -2167,6 +2181,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budgets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
           },
           {
             foreignKeyName: "budgets_fiscal_year_id_fkey"
@@ -4265,6 +4286,13 @@ export type Database = {
             referencedRelation: "accounts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "financial_forecasts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
         ]
       }
       financial_kpis: {
@@ -5794,6 +5822,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "invoice_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "invoice_lines_invoice_id_fkey"
             columns: ["invoice_id"]
             isOneToOne: false
@@ -6080,6 +6115,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
           },
           {
             foreignKeyName: "journal_entry_lines_journal_entry_id_fkey"
@@ -7470,6 +7512,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "opening_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "opening_balances_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
             isOneToOne: false
@@ -7954,7 +8003,9 @@ export type Database = {
           payment_method: string
           payment_number: string
           payment_type: string
+          reference_id: string | null
           reference_number: string | null
+          reference_type: string | null
           rental_payment_id: string | null
           status: string | null
           updated_at: string
@@ -7973,7 +8024,9 @@ export type Database = {
           payment_method: string
           payment_number: string
           payment_type: string
+          reference_id?: string | null
           reference_number?: string | null
+          reference_type?: string | null
           rental_payment_id?: string | null
           status?: string | null
           updated_at?: string
@@ -7992,7 +8045,9 @@ export type Database = {
           payment_method?: string
           payment_number?: string
           payment_type?: string
+          reference_id?: string | null
           reference_number?: string | null
+          reference_type?: string | null
           rental_payment_id?: string | null
           status?: string | null
           updated_at?: string
@@ -11496,22 +11551,54 @@ export type Database = {
           beneficiary_id: string | null
           full_name: string | null
           national_id: string | null
-          payments: Json | null
-          total_payments: number | null
+          pending_amount: number | null
           total_received: number | null
+        }
+        Insert: {
+          account_balance?: never
+          beneficiary_id?: string | null
+          full_name?: string | null
+          national_id?: string | null
+          pending_amount?: never
+          total_received?: never
+        }
+        Update: {
+          account_balance?: never
+          beneficiary_id?: string | null
+          full_name?: string | null
+          national_id?: string | null
+          pending_amount?: never
+          total_received?: never
         }
         Relationships: []
       }
       beneficiary_statistics: {
         Row: {
-          beneficiary_number: string | null
+          account_balance: number | null
           category: string | null
           full_name: string | null
           id: string | null
           status: string | null
-          total_attachments: number | null
-          total_distributions: number | null
-          total_requests: number | null
+          total_payments: number | null
+          total_received: number | null
+        }
+        Insert: {
+          account_balance?: never
+          category?: string | null
+          full_name?: string | null
+          id?: string | null
+          status?: string | null
+          total_payments?: never
+          total_received?: never
+        }
+        Update: {
+          account_balance?: never
+          category?: string | null
+          full_name?: string | null
+          id?: string | null
+          status?: string | null
+          total_payments?: never
+          total_received?: never
         }
         Relationships: []
       }
@@ -11538,15 +11625,14 @@ export type Database = {
       }
       general_ledger: {
         Row: {
-          account_code: string | null
-          account_name: string | null
-          credit_amount: number | null
-          debit_amount: number | null
-          entry_date: string | null
-          entry_description: string | null
-          entry_number: string | null
-          line_description: string | null
-          status: Database["public"]["Enums"]["entry_status"] | null
+          account_id: string | null
+          account_nature: Database["public"]["Enums"]["account_nature"] | null
+          account_type: Database["public"]["Enums"]["account_type"] | null
+          code: string | null
+          current_balance: number | null
+          name_ar: string | null
+          total_credit: number | null
+          total_debit: number | null
         }
         Relationships: []
       }
