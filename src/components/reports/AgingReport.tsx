@@ -11,11 +11,11 @@ export function AgingReport() {
 
   const getAgeCategoryBadge = (category: string, days: number) => {
     if (category === 'current') {
-      return <Badge className="bg-green-600">جاري</Badge>;
+      return <Badge className="bg-success">جاري</Badge>;
     } else if (category === '1-30') {
-      return <Badge className="bg-yellow-500">متأخر {days} يوم</Badge>;
+      return <Badge className="bg-warning">متأخر {days} يوم</Badge>;
     } else if (category === '30-60') {
-      return <Badge className="bg-orange-500">متأخر {days} يوم</Badge>;
+      return <Badge className="bg-warning">متأخر {days} يوم</Badge>;
     } else if (category === '60-90') {
       return <Badge variant="destructive">متأخر {days} يوم</Badge>;
     } else {
@@ -57,7 +57,7 @@ export function AgingReport() {
             <Card>
               <CardContent className="pt-4">
                 <div className="text-sm text-muted-foreground">جاري</div>
-                <div className="text-lg font-bold text-green-600">
+                <div className="text-lg font-bold text-success">
                   {formatCurrency(summary?.current || 0)}
                 </div>
               </CardContent>
@@ -65,7 +65,7 @@ export function AgingReport() {
             <Card>
               <CardContent className="pt-4">
                 <div className="text-sm text-muted-foreground">1-30 يوم</div>
-                <div className="text-lg font-bold text-yellow-600">
+                <div className="text-lg font-bold text-warning">
                   {formatCurrency(summary?.['1-30'] || 0)}
                 </div>
               </CardContent>
@@ -73,7 +73,7 @@ export function AgingReport() {
             <Card>
               <CardContent className="pt-4">
                 <div className="text-sm text-muted-foreground">30-60 يوم</div>
-                <div className="text-lg font-bold text-orange-600">
+                <div className="text-lg font-bold text-warning">
                   {formatCurrency(summary?.['30-60'] || 0)}
                 </div>
               </CardContent>
@@ -81,7 +81,7 @@ export function AgingReport() {
             <Card>
               <CardContent className="pt-4">
                 <div className="text-sm text-muted-foreground">60-90 يوم</div>
-                <div className="text-lg font-bold text-red-600">
+                <div className="text-lg font-bold text-destructive">
                   {formatCurrency(summary?.['60-90'] || 0)}
                 </div>
               </CardContent>
@@ -89,7 +89,7 @@ export function AgingReport() {
             <Card>
               <CardContent className="pt-4">
                 <div className="text-sm text-muted-foreground">+90 يوم</div>
-                <div className="text-lg font-bold text-red-700">
+                <div className="text-lg font-bold text-destructive">
                   {formatCurrency(summary?.['90+'] || 0)}
                 </div>
               </CardContent>
@@ -135,13 +135,13 @@ export function AgingReport() {
                       <TableCell>{formatCurrency(item.amount_due)}</TableCell>
                       <TableCell>
                         {item.daysPastDue > 0 && (
-                          <div className="flex items-center gap-1 text-red-600">
+                          <div className="flex items-center gap-1 text-destructive">
                             <AlertTriangle className="h-4 w-4" />
                             متأخر
                           </div>
                         )}
                         {item.daysPastDue <= 0 && (
-                          <span className="text-green-600">جاري</span>
+                          <span className="text-success">جاري</span>
                         )}
                       </TableCell>
                       <TableCell>
