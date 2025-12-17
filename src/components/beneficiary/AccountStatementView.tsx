@@ -6,6 +6,7 @@ import { Download, FileText, Calendar } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
 
 interface PaymentRecord {
   id: string;
@@ -31,7 +32,6 @@ export function AccountStatementView({
 
   const handleExportPDF = async () => {
     try {
-      // Dynamic import for jsPDF
       const [{ default: jsPDF }, autoTable] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
@@ -43,49 +43,55 @@ export function AccountStatementView({
         format: "a4",
       });
 
-      // Set Arabic font
-      doc.addFont("https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.setFont("Amiri");
-      doc.setR2L(true);
+      // تحميل الخط العربي من الملف المحلي
+      const fontName = await loadArabicFontToPDF(doc);
 
-      // Title
-      doc.setFontSize(20);
-      doc.text("كشف حساب مستفيد", 105, 20, { align: "center" });
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, 'كشف حساب مستفيد');
 
-    // Beneficiary Info
-    doc.setFontSize(12);
-    doc.text(`اسم المستفيد: ${beneficiaryName}`, 20, 40);
-    doc.text(`رقم المستفيد: ${beneficiaryId}`, 20, 50);
-    doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`, 20, 60);
-    doc.text(`عدد المدفوعات: ${payments.length}`, 20, 70);
+      const pageWidth = doc.internal.pageSize.width;
 
-    // Table
-    const tableData = payments.map((payment) => [
-      format(new Date(payment.date), "dd/MM/yyyy", { locale: ar }),
-      payment.type,
-      payment.description,
-      `${payment.amount.toLocaleString()} ر.س`,
-      payment.status,
-    ]);
+      // معلومات المستفيد
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`اسم المستفيد: ${beneficiaryName}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`رقم المستفيد: ${beneficiaryId}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`عدد المدفوعات: ${payments.length}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 10;
 
-    doc.autoTable({
-      startY: 80,
-      head: [["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]],
-      body: tableData,
-      styles: { font: "Amiri", halign: "right" },
-      headStyles: { fillColor: [34, 139, 34] },
-    });
+      // الجدول
+      const tableData = payments.map((payment) => [
+        format(new Date(payment.date), "dd/MM/yyyy", { locale: ar }),
+        payment.type,
+        payment.description,
+        `${payment.amount.toLocaleString()} ر.س`,
+        payment.status,
+      ]);
 
-    // Footer
-    const finalY = doc.lastAutoTable?.finalY ?? 80;
-    doc.setFontSize(10);
-    doc.text(
-      `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy - HH:mm", { locale: ar })}`,
-      20,
-      finalY + 20
-    );
+      const tableStyles = getDefaultTableStyles(fontName);
+
+      (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
+        startY: yPos,
+        head: [["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]],
+        body: tableData,
+        ...tableStyles,
+        headStyles: {
+          ...tableStyles.headStyles,
+          fillColor: WAQF_COLORS.secondary,
+        },
+        margin: { bottom: 30 },
+        didDrawPage: () => {
+          addWaqfFooter(doc, fontName);
+        },
+      });
 
       doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+      toast.success("تم تصدير كشف الحساب بنجاح");
     } catch (error) {
       toast.error("فشل تصدير كشف الحساب");
       productionLogger.error("PDF export error", error);

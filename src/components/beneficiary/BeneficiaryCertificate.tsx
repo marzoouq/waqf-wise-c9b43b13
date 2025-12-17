@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileCheck, Printer } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
+import { loadArabicFontToPDF, addWaqfFooter, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import { WAQF_IDENTITY } from "@/lib/waqf-identity";
 
 interface BeneficiaryCertificateProps {
   beneficiaryName: string;
@@ -37,80 +39,97 @@ export function BeneficiaryCertificate({
       format: "a4",
     });
 
-    // Set Arabic font
-    doc.addFont("https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/Amiri-Regular.ttf", "Amiri", "normal");
-    doc.setFont("Amiri");
-    doc.setR2L(true);
+    // تحميل الخط العربي من الملف المحلي
+    const fontName = await loadArabicFontToPDF(doc);
 
-    // Border
+    const pageWidth = doc.internal.pageSize.width;
+
+    // إطار الشهادة
     doc.setLineWidth(1);
+    doc.setDrawColor(...WAQF_COLORS.primary);
     doc.rect(10, 10, 190, 277);
     doc.setLineWidth(0.5);
     doc.rect(15, 15, 180, 267);
 
-    // Title with decorative elements
-    doc.setFontSize(24);
-    doc.text("شهادة استحقاق", 105, 40, { align: "center" });
-
-    // Subtitle
-    doc.setFontSize(16);
-    doc.text("من منصة إدارة الوقف الإلكترونية", 105, 55, { align: "center" });
-
-    // Main content
-    doc.setFontSize(14);
-    const startY = 80;
-    
-    doc.text(`تشهد منصة إدارة الوقف أن:`, 105, startY, { align: "center" });
-    
+    // شعار واسم الوقف
+    doc.setFont(fontName, "bold");
     doc.setFontSize(18);
-    doc.text(beneficiaryName, 105, startY + 20, { align: "center" });
-    
+    doc.setTextColor(...WAQF_COLORS.primary);
+    doc.text(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`, pageWidth / 2, 35, { align: "center" });
+
+    // العنوان الرئيسي
+    doc.setFontSize(24);
+    doc.text("شهادة استحقاق", pageWidth / 2, 55, { align: "center" });
+
+    // العنوان الفرعي
+    doc.setFont(fontName, "normal");
     doc.setFontSize(14);
-    doc.text(`رقم الهوية: ${nationalId}`, 105, startY + 35, { align: "center" });
+    doc.setTextColor(...WAQF_COLORS.muted);
+    doc.text("من منصة إدارة الوقف الإلكترونية", pageWidth / 2, 68, { align: "center" });
+
+    // المحتوى الرئيسي
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    const startY = 90;
     
+    doc.text("تشهد منصة إدارة الوقف أن:", pageWidth / 2, startY, { align: "center" });
+    
+    // اسم المستفيد
+    doc.setFont(fontName, "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(...WAQF_COLORS.primary);
+    doc.text(beneficiaryName, pageWidth / 2, startY + 20, { align: "center" });
+    
+    // رقم الهوية
+    doc.setFont(fontName, "normal");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`رقم الهوية: ${nationalId}`, pageWidth / 2, startY + 35, { align: "center" });
+    
+    // النص
     doc.text(
-      `هو من المستفيدين المسجلين لدى الوقف`,
-      105,
+      "هو من المستفيدين المسجلين لدى الوقف",
+      pageWidth / 2,
       startY + 55,
       { align: "center" }
     );
     
     doc.text(
-      `وله الحق في الانتفاع من غلة الوقف حسب الشروط`,
-      105,
+      "وله الحق في الانتفاع من غلة الوقف حسب الشروط",
+      pageWidth / 2,
       startY + 70,
       { align: "center" }
     );
 
-    // Category and Status
-    doc.text(`الفئة: ${category}`, 105, startY + 90, { align: "center" });
-    doc.text(`الحالة: ${status}`, 105, startY + 105, { align: "center" });
+    // الفئة والحالة
+    doc.setFont(fontName, "bold");
+    doc.setTextColor(...WAQF_COLORS.secondary);
+    doc.text(`الفئة: ${category}`, pageWidth / 2, startY + 95, { align: "center" });
+    doc.text(`الحالة: ${status}`, pageWidth / 2, startY + 110, { align: "center" });
 
-    // Issue date
+    // تاريخ الإصدار
+    doc.setFont(fontName, "normal");
     doc.setFontSize(12);
+    doc.setTextColor(...WAQF_COLORS.muted);
     doc.text(
       `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`,
-      105,
-      startY + 130,
+      pageWidth / 2,
+      startY + 135,
       { align: "center" }
     );
 
-    // Signature area
+    // منطقة التوقيع
     doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
     doc.text("الناظر", 50, 240);
     doc.line(30, 245, 80, 245);
     
     doc.text("الختم الرسمي", 150, 240);
+    doc.setDrawColor(...WAQF_COLORS.primary);
     doc.circle(150, 255, 15);
 
-    // Footer
-    doc.setFontSize(10);
-    doc.text(
-      "هذه الشهادة صادرة إلكترونياً ولا تحتاج لتوقيع",
-      105,
-      270,
-      { align: "center" }
-    );
+    // التذييل
+    addWaqfFooter(doc, fontName);
 
     doc.save(`شهادة-استحقاق-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
