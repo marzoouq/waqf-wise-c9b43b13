@@ -53,7 +53,7 @@ export function StorageUsageChart() {
         <CardTitle className="flex items-center gap-2">
           <HardDrive className="h-5 w-5 text-primary" />
           توزيع المساحة
-          <span className="text-sm font-normal text-muted-foreground mr-auto">
+          <span className="text-sm font-normal text-muted-foreground me-auto">
             {totalSize.toFixed(2)} MB
           </span>
         </CardTitle>

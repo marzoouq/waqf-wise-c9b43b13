@@ -147,7 +147,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                           ) : (
                             <span>اختر التاريخ</span>
                           )}
-                          <CalendarIcon className="mr-auto h-4 w-4 opacity-50" />
+                          <CalendarIcon className="me-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>

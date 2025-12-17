@@ -75,7 +75,7 @@ export const AdminTasks = () => {
         <CardTitle className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base md:text-lg">
           <CheckSquare className="h-4 w-4 sm:h-5 sm:w-5" />
           المهام المعلقة
-          <Badge variant="secondary" className="mr-auto text-[10px] sm:text-xs">
+          <Badge variant="secondary" className="me-auto text-[10px] sm:text-xs">
             {tasks.length}
           </Badge>
         </CardTitle>

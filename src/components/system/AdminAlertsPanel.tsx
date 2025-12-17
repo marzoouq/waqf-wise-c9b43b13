@@ -81,7 +81,7 @@ export function AdminAlertsPanel() {
           <Bell className="h-5 w-5" />
           تنبيهات النظام
           {activeAlerts.length > 0 && (
-            <Badge variant="destructive" className="mr-auto">
+            <Badge variant="destructive" className="me-auto">
               {activeAlerts.length} نشط
             </Badge>
           )}
