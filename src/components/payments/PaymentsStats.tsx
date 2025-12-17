@@ -20,25 +20,25 @@ export function PaymentsStats({
         label="سندات القبض"
         value={totalReceipts.toString()}
         icon={Receipt}
-        color="text-green-600"
+        color="text-success"
       />
       <StatCard
         label="إجمالي القبض"
         value={`${totalReceiptsAmount.toLocaleString()} ر.س`}
         icon={Receipt}
-        color="text-green-600"
+        color="text-success"
       />
       <StatCard
         label="سندات الصرف"
         value={totalVouchers.toString()}
         icon={CreditCard}
-        color="text-red-600"
+        color="text-destructive"
       />
       <StatCard
         label="إجمالي الصرف"
         value={`${totalVouchersAmount.toLocaleString()} ر.س`}
         icon={CreditCard}
-        color="text-red-600"
+        color="text-destructive"
       />
     </div>
   );

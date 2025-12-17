@@ -26,12 +26,12 @@ export function SLAIndicator({
   // If completed, show success
   if (status === "معتمد" || status === "مكتمل" || status === "مرفوض") {
     return showLabel ? (
-      <Badge variant="outline" className={cn("gap-1 text-green-600", className)}>
+      <Badge variant="outline" className={cn("gap-1 text-success", className)}>
         <CheckCircle className="h-3 w-3" />
         <span>مكتمل</span>
       </Badge>
     ) : (
-      <CheckCircle className={cn("h-4 w-4 text-green-600", className)} />
+      <CheckCircle className={cn("h-4 w-4 text-success", className)} />
     );
   }
 
@@ -53,7 +53,7 @@ export function SLAIndicator({
     return showLabel ? (
       <Badge
         variant="outline"
-        className={cn("gap-1 border-yellow-500 text-yellow-600", className)}
+        className={cn("gap-1 border-warning text-warning", className)}
       >
         <Clock className="h-3 w-3" />
         <span>
@@ -63,13 +63,13 @@ export function SLAIndicator({
         </span>
       </Badge>
     ) : (
-      <Clock className={cn("h-4 w-4 text-yellow-600", className)} />
+      <Clock className={cn("h-4 w-4 text-warning", className)} />
     );
   }
 
   // More than 6 hours remaining (green)
   return showLabel ? (
-    <Badge variant="outline" className={cn("gap-1 text-green-600", className)}>
+    <Badge variant="outline" className={cn("gap-1 text-success", className)}>
       <Clock className="h-3 w-3" />
       <span>
         {diffHours > 24
@@ -78,6 +78,6 @@ export function SLAIndicator({
       </span>
     </Badge>
   ) : (
-    <Clock className={cn("h-4 w-4 text-green-600", className)} />
+    <Clock className={cn("h-4 w-4 text-success", className)} />
   );
 }

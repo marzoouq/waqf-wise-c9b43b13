@@ -225,7 +225,7 @@ export function CreateBeneficiaryAccountsButton() {
                           {beneficiary.full_name}
                         </p>
                         {beneficiary.user_id && (
-                          <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-info/10 text-info px-2 py-0.5 rounded">
                             لديه حساب
                           </span>
                         )}

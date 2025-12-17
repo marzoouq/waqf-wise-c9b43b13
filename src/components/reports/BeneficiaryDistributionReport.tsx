@@ -137,18 +137,18 @@ export function BeneficiaryDistributionReport({
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <Users className="h-8 w-8 text-blue-500" />
+            <Users className="h-8 w-8 text-info" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">إجمالي المستفيدين</div>
           <div className="text-2xl font-bold">{stats.totalBeneficiaries}</div>
-          <div className="text-xs text-green-500 mt-1">
+          <div className="text-xs text-success mt-1">
             {stats.activeBeneficiaries} نشط
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <DollarSign className="h-8 w-8 text-green-500" />
+            <DollarSign className="h-8 w-8 text-success" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">إجمالي الموزع</div>
           <div className="text-2xl font-bold">
@@ -158,7 +158,7 @@ export function BeneficiaryDistributionReport({
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <TrendingUp className="h-8 w-8 text-purple-500" />
+            <TrendingUp className="h-8 w-8 text-primary" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">المتوسط لكل مستفيد</div>
           <div className="text-2xl font-bold">
@@ -168,7 +168,7 @@ export function BeneficiaryDistributionReport({
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <Award className="h-8 w-8 text-orange-500" />
+            <Award className="h-8 w-8 text-warning" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">عدد التوزيعات</div>
           <div className="text-2xl font-bold">{distributions.length}</div>

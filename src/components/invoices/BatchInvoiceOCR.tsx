@@ -94,9 +94,9 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
       case 'processing':
         return <Loader2 className="h-5 w-5 animate-spin text-primary" />;
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className="h-5 w-5 text-success" />;
       case 'error':
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
     }
   };
 
@@ -157,10 +157,10 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
                       {(result.file.size / 1024).toFixed(1)} KB
                     </p>
                     {result.status === 'error' && (
-                      <p className="text-xs text-red-600 mt-1">{result.error}</p>
+                      <p className="text-xs text-destructive mt-1">{result.error}</p>
                     )}
                     {result.status === 'success' && result.data && (
-                      <p className="text-xs text-green-600 mt-1">
+                      <p className="text-xs text-success mt-1">
                         نسبة الثقة: {result.data.overall_confidence}%
                       </p>
                     )}

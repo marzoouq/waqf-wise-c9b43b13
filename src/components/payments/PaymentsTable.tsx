@@ -38,9 +38,9 @@ export function PaymentsTable({
 
   const getPaymentTypeIcon = (type: string) => {
     return type === "receipt" ? (
-      <Receipt className="h-4 w-4 text-green-600" />
+      <Receipt className="h-4 w-4 text-success" />
     ) : (
-      <CreditCard className="h-4 w-4 text-red-600" />
+      <CreditCard className="h-4 w-4 text-destructive" />
     );
   };
 

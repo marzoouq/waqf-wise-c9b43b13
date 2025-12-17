@@ -13,10 +13,10 @@ export function MonthlyRevenueChart() {
 
   if (!publishStatusLoading && !isCurrentYearPublished) {
     return (
-      <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-        <EyeOff className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-800 dark:text-amber-200">الرسم البياني مخفي</AlertTitle>
-        <AlertDescription className="text-amber-700 dark:text-amber-300">
+      <Alert className="border-warning/30 bg-warning/10">
+        <EyeOff className="h-4 w-4 text-warning" />
+        <AlertTitle className="text-warning">الرسم البياني مخفي</AlertTitle>
+        <AlertDescription className="text-warning/80">
           بيانات الإيرادات الشهرية مخفية حتى يتم نشر السنة المالية من قبل الناظر
         </AlertDescription>
       </Alert>

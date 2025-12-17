@@ -306,7 +306,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
               {sons.map((son) => (
                 <div
                   key={son.id}
-                  className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-info/10 dark:bg-info/20 rounded-lg"
                 >
                   <div>
                     <p className="font-medium">{son.beneficiary?.full_name}</p>

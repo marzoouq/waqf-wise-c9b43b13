@@ -33,13 +33,13 @@ const TYPE_ICONS: Record<string, React.ElementType> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  'فاتورة_خدمات': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  'صيانة': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-  'زكاة_ضرائب': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  'تقرير_مالي': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-  'خدمات_محاسبية': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
-  'مصاريف_عامة': 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-  'اقفال_سنوي': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+  'فاتورة_خدمات': 'bg-info/10 text-info',
+  'صيانة': 'bg-warning/10 text-warning',
+  'زكاة_ضرائب': 'bg-success/10 text-success',
+  'تقرير_مالي': 'bg-primary/10 text-primary',
+  'خدمات_محاسبية': 'bg-accent/10 text-accent-foreground',
+  'مصاريف_عامة': 'bg-muted text-muted-foreground',
+  'اقفال_سنوي': 'bg-success/10 text-success',
 };
 
 function DocumentCard({ document, typeLabel }: { document: DisclosureDocument; typeLabel: string }) {
