@@ -204,7 +204,7 @@ export function CreateBeneficiaryAccountsButton() {
               </label>
             </div>
 
-            <ScrollArea className="h-[400px] pr-4">
+            <ScrollArea className="h-[400px] pe-4">
               <div className="space-y-2">
                 {eligibleBeneficiaries.map((beneficiary) => (
                   <div

@@ -96,7 +96,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
           placeholder="البحث عن عقار..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pr-10"
+          className="pe-10"
         />
       </div>
 

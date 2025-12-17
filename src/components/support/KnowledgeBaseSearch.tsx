@@ -38,7 +38,7 @@ export function KnowledgeBaseSearch({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="pr-10 pl-10"
+          className="pe-10 ps-10"
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
         />

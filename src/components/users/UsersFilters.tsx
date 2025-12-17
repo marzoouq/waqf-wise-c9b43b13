@@ -36,7 +36,7 @@ export function UsersFilters({
               placeholder="البحث بالاسم أو البريد الإلكتروني..."
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              className="pr-10"
+              className="pe-10"
             />
           </div>
 

@@ -124,7 +124,7 @@ export function EditUserEmailDialog({
               placeholder="أدخل البريد الإلكتروني الجديد"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className="pr-10"
+              className="pe-10"
               dir="ltr"
             />
           </div>

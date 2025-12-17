@@ -138,7 +138,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsOpen(true)}
-                className="pr-10"
+                className="pe-10"
               />
               {query && (
                 <Button

@@ -47,7 +47,7 @@ export function SettingsSearchFilter({
           placeholder={`بحث في ${totalSettings} إعداد...`}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pr-10"
+          className="pe-10"
         />
         {searchQuery && (
           <Button

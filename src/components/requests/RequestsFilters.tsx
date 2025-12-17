@@ -56,7 +56,7 @@ export function RequestsFilters({
           placeholder="بحث في الطلبات..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pr-10 text-sm"
+          className="pe-10 text-sm"
         />
       </div>
       <Select value={statusFilter} onValueChange={onStatusChange}>

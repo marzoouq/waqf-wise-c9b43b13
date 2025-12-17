@@ -57,7 +57,7 @@ export function PendingRentalsTable({ rentals, isLoading, onCollect, disabled }:
               placeholder="بحث..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-9"
+              className="pe-9"
             />
           </div>
         </div>

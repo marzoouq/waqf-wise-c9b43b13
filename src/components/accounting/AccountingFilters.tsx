@@ -56,7 +56,7 @@ export function AccountingFilters({
             placeholder="ابحث..."
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="pr-10"
+            className="pe-10"
           />
         </div>
       </div>
@@ -90,7 +90,7 @@ export function AccountingFilters({
                 type="date"
                 value={dateFrom}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
           </div>
@@ -104,7 +104,7 @@ export function AccountingFilters({
                   type="date"
                   value={dateTo}
                   onChange={(e) => onDateToChange(e.target.value)}
-                  className="pr-10"
+                  className="pe-10"
                 />
               </div>
             </div>

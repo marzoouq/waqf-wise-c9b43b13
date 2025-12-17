@@ -105,7 +105,7 @@ export function ArchiveDocumentsTab({
           placeholder="البحث في المستندات..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pr-10"
+          className="pe-10"
         />
       </div>
 

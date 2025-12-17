@@ -123,7 +123,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <ScrollArea className="max-h-[500px] pr-4">
+            <ScrollArea className="max-h-[500px] pe-4">
               <div className="space-y-4">
                 {/* Current Session */}
                 {currentSession && (

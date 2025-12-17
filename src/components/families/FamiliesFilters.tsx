@@ -25,7 +25,7 @@ export function FamiliesFilters({ searchQuery, onSearchChange }: FamiliesFilters
             placeholder="ابحث عن عائلة..."
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="pr-10"
+            className="pe-10"
           />
         </div>
       </CardContent>

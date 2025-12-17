@@ -19,7 +19,7 @@ export function PaymentsFilters({ searchQuery, onSearchChange }: PaymentsFilters
           placeholder="بحث بالرقم، الاسم، أو الوصف..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="pr-10"
+          className="pe-10"
         />
       </div>
     </div>
