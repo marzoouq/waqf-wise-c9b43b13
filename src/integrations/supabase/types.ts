@@ -12004,6 +12004,7 @@ export type Database = {
       }
     }
     Functions: {
+      archive_old_notifications: { Args: never; Returns: number }
       assign_user_role: {
         Args: {
           p_email: string
@@ -12518,6 +12519,8 @@ export type Database = {
         Returns: undefined
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
+      notify_overdue_invoices: { Args: never; Returns: undefined }
+      notify_overdue_loan_installments: { Args: never; Returns: undefined }
       notify_payment_due: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
       payment_requires_approval: {
@@ -12532,6 +12535,7 @@ export type Database = {
           success: boolean
         }[]
       }
+      refresh_financial_views: { Args: never; Returns: undefined }
       refresh_user_profile_cache: {
         Args: { p_user_id: string }
         Returns: undefined
