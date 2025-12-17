@@ -18,11 +18,11 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
   const remaining = 100 - total;
 
   const deductions = [
-    { key: 'nazer', label: 'نصيب الناظر', color: 'bg-blue-500' },
-    { key: 'reserve', label: 'الاحتياطي', color: 'bg-green-500' },
-    { key: 'development', label: 'التطوير', color: 'bg-purple-500' },
-    { key: 'maintenance', label: 'الصيانة', color: 'bg-orange-500' },
-    { key: 'investment', label: 'الاستثمار', color: 'bg-pink-500' },
+    { key: 'nazer', label: 'نصيب الناظر', color: 'bg-info' },
+    { key: 'reserve', label: 'الاحتياطي', color: 'bg-success' },
+    { key: 'development', label: 'التطوير', color: 'bg-primary' },
+    { key: 'maintenance', label: 'الصيانة', color: 'bg-warning' },
+    { key: 'investment', label: 'الاستثمار', color: 'bg-accent' },
   ];
 
   return (
@@ -30,7 +30,7 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
       <Card className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium">إجمالي الاستقطاعات</span>
-          <span className={`text-2xl font-bold ${remaining < 0 ? 'text-red-500' : 'text-green-500'}`}>
+          <span className={`text-2xl font-bold ${remaining < 0 ? 'text-destructive' : 'text-success'}`}>
             {total}%
           </span>
         </div>
@@ -69,7 +69,7 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
       </div>
 
       {remaining < 0 && (
-        <div className="p-3 bg-red-500/10 text-red-500 rounded-lg text-sm">
+        <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
           تحذير: مجموع النسب يتجاوز 100%. يرجى تعديل القيم.
         </div>
       )}

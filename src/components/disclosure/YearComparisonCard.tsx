@@ -54,16 +54,16 @@ function ComparisonRow({ label, currentValue, previousValue, isExpense = false }
         {change.isPositive === null ? (
           <Minus className="h-3 w-3 text-muted-foreground" />
         ) : change.isPositive ? (
-          <TrendingUp className={`h-3 w-3 ${isGood ? 'text-emerald-600' : 'text-red-600'}`} />
+          <TrendingUp className={`h-3 w-3 ${isGood ? 'text-success' : 'text-destructive'}`} />
         ) : (
-          <TrendingDown className={`h-3 w-3 ${isGood ? 'text-emerald-600' : 'text-red-600'}`} />
+          <TrendingDown className={`h-3 w-3 ${isGood ? 'text-success' : 'text-destructive'}`} />
         )}
         <span className={`font-medium ${
           change.isPositive === null 
             ? 'text-muted-foreground' 
             : isGood 
-              ? 'text-emerald-600' 
-              : 'text-red-600'
+              ? 'text-success' 
+              : 'text-destructive'
         }`}>
           {change.value.toFixed(1)}%
         </span>
@@ -153,8 +153,8 @@ export function YearComparisonCard({ currentYear, previousYear }: YearComparison
         {insight && (
           <div className={`flex items-center gap-2 p-3 rounded-lg text-xs sm:text-sm ${
             insight.type === 'success' 
-              ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20' 
-              : 'bg-amber-500/10 text-amber-700 border border-amber-500/20'
+              ? 'bg-success/10 text-success border border-success/20' 
+              : 'bg-warning/10 text-warning border border-warning/20'
           }`}>
             <span className="text-lg">{insight.type === 'success' ? '💡' : '⚠️'}</span>
             {insight.text}

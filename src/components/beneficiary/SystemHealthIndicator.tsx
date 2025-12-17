@@ -27,8 +27,8 @@ export function SystemHealthIndicator() {
         return {
           icon: CheckCircle2,
           label: 'النظام يعمل بشكل طبيعي',
-          color: 'text-green-600 dark:text-green-400',
-          bgColor: 'bg-green-100 dark:bg-green-900/30',
+          color: 'text-success',
+          bgColor: 'bg-success/10',
           variant: 'default' as const,
           show: false,
         };
@@ -36,8 +36,8 @@ export function SystemHealthIndicator() {
         return {
           icon: Clock,
           label: 'استجابة بطيئة',
-          color: 'text-yellow-600 dark:text-yellow-400',
-          bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+          color: 'text-warning',
+          bgColor: 'bg-warning/10',
           variant: 'secondary' as const,
           show: true,
         };
@@ -45,8 +45,8 @@ export function SystemHealthIndicator() {
         return {
           icon: AlertTriangle,
           label: 'مشكلة في النظام',
-          color: 'text-orange-600 dark:text-orange-400',
-          bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+          color: 'text-warning',
+          bgColor: 'bg-warning/10',
           variant: 'secondary' as const,
           show: true,
         };
@@ -54,8 +54,8 @@ export function SystemHealthIndicator() {
         return {
           icon: WifiOff,
           label: 'لا يوجد اتصال',
-          color: 'text-red-600 dark:text-red-400',
-          bgColor: 'bg-red-100 dark:bg-red-900/30',
+          color: 'text-destructive',
+          bgColor: 'bg-destructive/10',
           variant: 'destructive' as const,
           show: true,
         };
@@ -92,7 +92,7 @@ export function SystemHealthIndicator() {
             <div className="flex items-center gap-2">
               <Database className="h-3 w-3" />
               <span>قاعدة البيانات: </span>
-              <span className={details.database === 'ok' ? 'text-green-500' : 'text-red-500'}>
+              <span className={details.database === 'ok' ? 'text-success' : 'text-destructive'}>
                 {details.database === 'ok' ? 'متصل' : details.database === 'error' ? 'خطأ' : 'غير معروف'}
               </span>
             </div>
@@ -104,10 +104,10 @@ export function SystemHealthIndicator() {
                 <span>وقت الاستجابة: </span>
                 <span className={
                   details.responseTime < THRESHOLDS.SLOW_RESPONSE_MS 
-                    ? 'text-green-500' 
+                    ? 'text-success' 
                     : details.responseTime < THRESHOLDS.CRITICAL_RESPONSE_MS 
-                      ? 'text-yellow-500' 
-                      : 'text-red-500'
+                      ? 'text-warning' 
+                      : 'text-destructive'
                 }>
                   {details.responseTime}ms
                 </span>
@@ -116,7 +116,7 @@ export function SystemHealthIndicator() {
 
             {/* تفاصيل الخطأ */}
             {details.lastError && (
-              <div className="text-red-400 border-t pt-2 mt-2">
+              <div className="text-destructive border-t pt-2 mt-2">
                 <strong>السبب:</strong> {details.lastError}
               </div>
             )}

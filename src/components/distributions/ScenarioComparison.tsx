@@ -20,11 +20,11 @@ const patternNames: Record<string, string> = {
 };
 
 const patternColors: Record<string, string> = {
-  shariah: 'bg-emerald-500',
-  equal: 'bg-blue-500',
-  need_based: 'bg-amber-500',
-  custom: 'bg-purple-500',
-  hybrid: 'bg-pink-500',
+  shariah: 'bg-success',
+  equal: 'bg-info',
+  need_based: 'bg-warning',
+  custom: 'bg-primary',
+  hybrid: 'bg-accent',
 };
 
 export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonProps) {
@@ -135,10 +135,10 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>التباين: {comparison.variancePercent}%</span>
                         {parseFloat(comparison.variancePercent) > 20 && (
-                          <TrendingUp className="h-4 w-4 text-amber-500" />
+                          <TrendingUp className="h-4 w-4 text-warning" />
                         )}
                         {parseFloat(comparison.variancePercent) < 5 && (
-                          <Minus className="h-4 w-4 text-emerald-500" />
+                          <Minus className="h-4 w-4 text-success" />
                         )}
                       </div>
                     </div>
@@ -153,8 +153,8 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
                           <div
                             key={`${scenario.pattern}-${comparison.beneficiary}-${sIndex}`}
                             className={`flex items-center justify-between p-2 rounded-lg ${
-                              isMax ? 'bg-emerald-50 dark:bg-emerald-950' : 
-                              isMin ? 'bg-red-50 dark:bg-red-950' : 
+                              isMax ? 'bg-success/10 dark:bg-success/20' : 
+                              isMin ? 'bg-destructive/10 dark:bg-destructive/20' : 
                               'bg-muted/50'
                             }`}
                           >
@@ -170,8 +170,8 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
                               <span className="font-semibold">
                                 {amount.toLocaleString()} ر.س
                               </span>
-                              {isMax && <TrendingUp className="h-3 w-3 text-emerald-600" />}
-                              {isMin && <TrendingDown className="h-3 w-3 text-red-600" />}
+                              {isMax && <TrendingUp className="h-3 w-3 text-success" />}
+                              {isMin && <TrendingDown className="h-3 w-3 text-destructive" />}
                             </div>
                           </div>
                         );

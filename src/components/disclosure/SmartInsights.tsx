@@ -136,12 +136,12 @@ export function SmartInsights({ currentYear, previousYear }: SmartInsightsProps)
   const getInsightStyles = (type: Insight['type']) => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700';
+        return 'bg-success/10 border-success/20 text-success';
       case 'warning':
-        return 'bg-amber-500/10 border-amber-500/20 text-amber-700';
+        return 'bg-warning/10 border-warning/20 text-warning';
       case 'info':
       default:
-        return 'bg-blue-500/10 border-blue-500/20 text-blue-700';
+        return 'bg-info/10 border-info/20 text-info';
     }
   };
 

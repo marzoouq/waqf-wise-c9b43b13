@@ -25,11 +25,11 @@ export function FiscalYearTestPanel() {
   const getStatusIcon = (status: "success" | "error" | "pending") => {
     switch (status) {
       case "success":
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
       case "error":
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       case "pending":
-        return <Loader2 className="h-5 w-5 text-amber-600 animate-spin" />;
+        return <Loader2 className="h-5 w-5 text-warning animate-spin" />;
     }
   };
 
@@ -115,8 +115,8 @@ export function FiscalYearTestPanel() {
                       <div className="w-full bg-muted rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all ${
-                            percentage === 100 ? "bg-green-600" : 
-                            percentage >= 50 ? "bg-amber-600" : "bg-red-600"
+                            percentage === 100 ? "bg-success" : 
+                            percentage >= 50 ? "bg-warning" : "bg-destructive"
                           }`}
                           style={{ width: `${percentage}%` }}
                         />
