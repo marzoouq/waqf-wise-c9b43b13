@@ -22,6 +22,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { BankAccountRow } from "@/types/supabase-helpers";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
+import { useDeleteConfirmation } from "@/hooks/shared/useDeleteConfirmation";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 export function BankAccountsManagement() {
   const { bankAccounts, isLoading, addBankAccount, updateBankAccount, deleteBankAccount, error, refetch } =
@@ -41,6 +43,21 @@ export function BankAccountsManagement() {
   });
 
   const bankAccountsOnly = accounts.filter((acc) => acc.code?.startsWith("1.1.2"));
+
+  const {
+    confirmDelete,
+    isOpen: deleteDialogOpen,
+    onOpenChange: setDeleteDialogOpen,
+    executeDelete,
+    isDeleting,
+    itemName,
+  } = useDeleteConfirmation({
+    onDelete: deleteBankAccount,
+    successMessage: "تم حذف الحساب البنكي بنجاح",
+    errorMessage: "حدث خطأ أثناء حذف الحساب البنكي",
+    title: "حذف الحساب البنكي",
+    description: "هل أنت متأكد من حذف هذا الحساب البنكي؟",
+  });
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الحسابات البنكية..." />;
@@ -89,12 +106,6 @@ export function BankAccountsManagement() {
       setDialogOpen(false);
     } catch (error) {
       logger.error(error, { context: 'save_bank_account', severity: 'medium' });
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا الحساب البنكي؟")) {
-      await deleteBankAccount(id);
     }
   };
 
@@ -189,7 +200,7 @@ export function BankAccountsManagement() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(account.id)}
+                    onClick={() => confirmDelete(account.id, account.bank_name)}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -305,6 +316,16 @@ export function BankAccountsManagement() {
             </Button>
           </DialogFooter>
       </ResponsiveDialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={executeDelete}
+        title="حذف الحساب البنكي"
+        description="هل أنت متأكد من حذف هذا الحساب البنكي؟"
+        itemName={itemName}
+        isLoading={isDeleting}
+      />
     </>
   );
 }

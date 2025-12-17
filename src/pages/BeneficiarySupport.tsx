@@ -19,7 +19,8 @@ import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
 import { useSupportTickets } from "@/hooks/support/useSupportTickets";
-import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
+import { BottomNavigation } from "@/components/mobile/BottomNavigation";
+import { beneficiaryNavigationItems } from "@/components/beneficiary/config/bottomNavConfig";
 
 export default function BeneficiarySupport() {
   const { user } = useAuth();
@@ -272,7 +273,7 @@ export default function BeneficiarySupport() {
       </main>
       
       {/* Mobile Bottom Navigation */}
-      <BeneficiaryBottomNavigation />
+      <BottomNavigation items={beneficiaryNavigationItems} ariaLabel="التنقل السفلي للمستفيد" />
     </PageErrorBoundary>
   );
 }
