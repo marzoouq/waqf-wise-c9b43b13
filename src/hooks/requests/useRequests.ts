@@ -153,9 +153,12 @@ export const useRequests = (beneficiaryId?: string) => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
+      
+      const statusText = variables.status === 'موافق' ? 'الموافقة على' : 'رفض';
       toast({
         title: 'تم بنجاح',
-        description: variables.status === 'موافق' ? 'تم الموافقة على الطلب' : 'تم رفض الطلب',
+        description: `تم ${statusText} الطلب وإرسال إشعار للمستفيد`,
       });
     },
     onError: (error: Error) => {

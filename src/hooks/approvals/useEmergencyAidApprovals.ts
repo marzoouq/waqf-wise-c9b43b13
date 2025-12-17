@@ -51,12 +51,13 @@ export function useEmergencyAidApprovals() {
     }) => {
       await LoansService.approveEmergencyRequest(id, amount, notes);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast({
         title: '✅ تمت الموافقة',
-        description: 'تم الموافقة على الطلب بنجاح',
+        description: `تم الموافقة على الطلب بمبلغ ${variables.amount.toLocaleString('ar-SA')} ريال وإرسال إشعار للمستفيد`,
       });
       invalidateLoanQueries(queryClient);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
     },
     onError: (error: Error) => {
       toast({
@@ -81,9 +82,10 @@ export function useEmergencyAidApprovals() {
     onSuccess: () => {
       toast({
         title: '✅ تم الرفض',
-        description: 'تم رفض الطلب',
+        description: 'تم رفض الطلب وإرسال إشعار للمستفيد',
       });
       invalidateLoanQueries(queryClient);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
     },
     onError: (error: Error) => {
       toast({
