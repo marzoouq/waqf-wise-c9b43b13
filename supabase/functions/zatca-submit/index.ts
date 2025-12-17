@@ -13,6 +13,17 @@ interface ZATCASubmitRequest {
   submission_type: 'reporting' | 'clearance';
 }
 
+interface Invoice {
+  invoice_number: string;
+  invoice_date: string;
+  customer_name: string;
+  vat_number: string;
+  total_amount: number;
+  tax_amount: number;
+  zatca_uuid?: string;
+  invoice_lines?: unknown[];
+}
+
 // الأدوار المسموح لها بإرسال الفواتير لـ ZATCA
 const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 
@@ -75,20 +86,23 @@ serve(async (req) => {
       throw new Error('الرقم الضريبي مطلوب');
     }
 
+    // Cast to typed invoice
+    const typedInvoice = invoice as Invoice;
+
     // إنشاء رمز QR
-    const qrData = generateQRData(invoice);
+    const qrData = generateQRData(typedInvoice);
 
     // إنشاء Hash للفاتورة
-    const invoiceHash = await generateInvoiceHash(invoice);
+    const invoiceHash = await generateInvoiceHash(typedInvoice);
 
     // إنشاء XML حسب معيار ZATCA
-    const invoiceXML = generateInvoiceXML(invoice, qrData, invoiceHash);
+    const invoiceXML = generateInvoiceXML(typedInvoice, qrData, invoiceHash);
 
     // محاكاة الإرسال للهيئة (في الواقع يحتاج API key من ZATCA)
     // هذا مثال تجريبي فقط
     const simulatedResponse = {
       success: true,
-      invoice_uuid: invoice.zatca_uuid,
+      invoice_uuid: typedInvoice.zatca_uuid,
       clearance_status: 'CLEARED',
       warnings: [],
     };
@@ -121,13 +135,14 @@ serve(async (req) => {
       zatca_response: simulatedResponse,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('Error submitting to ZATCA:', error);
-    return errorResponse(error.message, 400);
+    return errorResponse(errorMessage, 400);
   }
 });
 
-function generateQRData(invoice: any): string {
+function generateQRData(invoice: Invoice): string {
   // TLV encoding for ZATCA QR
   const data = [
     { tag: 1, value: invoice.customer_name },
@@ -146,7 +161,7 @@ function generateQRData(invoice: any): string {
   return btoa(tlv);
 }
 
-async function generateInvoiceHash(invoice: any): Promise<string> {
+async function generateInvoiceHash(invoice: Invoice): Promise<string> {
   const hashInput = `${invoice.invoice_number}|${invoice.invoice_date}|${invoice.total_amount}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(hashInput);
@@ -155,7 +170,7 @@ async function generateInvoiceHash(invoice: any): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function generateInvoiceXML(invoice: any, qrData: string, hash: string): string {
+function generateInvoiceXML(invoice: Invoice, qrData: string, hash: string): string {
   // تبسيط - في الواقع يحتاج XML كامل حسب معيار UBL 2.1
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
