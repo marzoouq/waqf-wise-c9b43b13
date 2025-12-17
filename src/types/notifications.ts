@@ -9,7 +9,7 @@ export interface RealtimeNotification {
   title: string;
   message: string;
   type: string;
-  priority?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   is_read: boolean;
   created_at: string;
   action_url?: string | null;

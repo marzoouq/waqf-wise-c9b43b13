@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe, Settings, Users, FileText, Activity } from "lucide-react";
+import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,11 +25,13 @@ import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
+import { SendNotificationDialog } from "@/components/notifications/SendNotificationDialog";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [isRefreshing, setIsRefreshing] = useState(false);
   
@@ -72,6 +74,10 @@ export default function NazerDashboard() {
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
             <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">رسالة</span>
+          </Button>
+          <Button onClick={() => setNotificationDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
+            <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline text-sm">إشعار</span>
           </Button>
         </div>
       }
@@ -192,6 +198,11 @@ export default function NazerDashboard() {
       <PublishFiscalYearDialog
         open={publishDialogOpen}
         onOpenChange={setPublishDialogOpen}
+      />
+
+      <SendNotificationDialog
+        open={notificationDialogOpen}
+        onOpenChange={setNotificationDialogOpen}
       />
     </UnifiedDashboardLayout>
   );
