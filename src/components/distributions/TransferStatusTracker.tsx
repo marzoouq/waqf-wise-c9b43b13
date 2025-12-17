@@ -18,29 +18,29 @@ const statusConfig: Record<string, {
 }> = {
   completed: {
     icon: CheckCircle2,
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
     label: 'مكتمل',
     variant: 'default',
   },
   processing: {
     icon: Clock,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
+    color: 'text-info',
+    bgColor: 'bg-info/10',
     label: 'جاري المعالجة',
     variant: 'secondary',
   },
   pending: {
     icon: Clock,
-    color: 'text-gray-500',
-    bgColor: 'bg-gray-500/10',
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted',
     label: 'معلق',
     variant: 'outline',
   },
   failed: {
     icon: AlertCircle,
-    color: 'text-red-500',
-    bgColor: 'bg-red-500/10',
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10',
     label: 'فشل',
     variant: 'destructive',
   },
@@ -97,15 +97,15 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground mb-1">مكتملة</div>
-          <div className="text-2xl font-bold text-green-500">{stats.completed}</div>
+          <div className="text-2xl font-bold text-success">{stats.completed}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground mb-1">فاشلة</div>
-          <div className="text-2xl font-bold text-red-500">{stats.failed}</div>
+          <div className="text-2xl font-bold text-destructive">{stats.failed}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground mb-1">قيد المعالجة</div>
-          <div className="text-2xl font-bold text-blue-500">
+          <div className="text-2xl font-bold text-info">
             {stats.processing + stats.pending}
           </div>
         </Card>
@@ -170,7 +170,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
                     </div>
                   )}
                   {transfer.error_message && (
-                    <div className="text-xs text-red-500 mt-1">{transfer.error_message}</div>
+                    <div className="text-xs text-destructive mt-1">{transfer.error_message}</div>
                   )}
                 </div>
                 <Badge variant={config.variant}>{config.label}</Badge>
@@ -191,7 +191,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
           </div>
           <div>
             <div className="text-sm text-muted-foreground mb-1">المبلغ المحول</div>
-            <div className="text-xl font-bold text-green-500">
+            <div className="text-xl font-bold text-success">
               {stats.completedAmount.toLocaleString('ar-SA')} ريال
             </div>
           </div>

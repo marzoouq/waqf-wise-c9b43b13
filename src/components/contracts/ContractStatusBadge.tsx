@@ -48,7 +48,7 @@ export const ContractStatusBadge = ({ startDate, endDate, status }: ContractStat
     badgeVariant = "outline";
     icon = <Clock className="h-3 w-3" />;
     label = `ينتهي خلال ${daysRemaining} يوم`;
-    colorClass = "bg-blue-500/10 text-blue-600 border-blue-500/20";
+    colorClass = "bg-info/10 text-info border-info/20";
   }
 
   return (

@@ -38,13 +38,13 @@ const TYPE_ICONS: Record<string, React.ElementType> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  'فاتورة_خدمات': 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-  'صيانة': 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
-  'زكاة_ضرائب': 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
-  'تقرير_مالي': 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
-  'خدمات_محاسبية': 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
-  'مصاريف_عامة': 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
-  'اقفال_سنوي': 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  'فاتورة_خدمات': 'bg-info/10 text-info border-info/20',
+  'صيانة': 'bg-warning/10 text-warning border-warning/20',
+  'زكاة_ضرائب': 'bg-success/10 text-success border-success/20',
+  'تقرير_مالي': 'bg-primary/10 text-primary border-primary/20',
+  'خدمات_محاسبية': 'bg-accent/10 text-accent-foreground border-accent/20',
+  'مصاريف_عامة': 'bg-muted text-muted-foreground border-border',
+  'اقفال_سنوي': 'bg-success/10 text-success border-success/20',
 };
 
 export function DocumentCategorySummary({ categories }: DocumentCategorySummaryProps) {

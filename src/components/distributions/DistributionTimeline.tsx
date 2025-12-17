@@ -22,26 +22,26 @@ interface DistributionTimelineProps {
 const statusConfig = {
   completed: {
     icon: CheckCircle2,
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
     label: 'مكتمل',
   },
   in_progress: {
     icon: Clock,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
+    color: 'text-info',
+    bgColor: 'bg-info/10',
     label: 'جاري',
   },
   pending: {
     icon: Circle,
-    color: 'text-gray-400',
-    bgColor: 'bg-gray-400/10',
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted',
     label: 'معلق',
   },
   failed: {
     icon: XCircle,
-    color: 'text-red-500',
-    bgColor: 'bg-red-500/10',
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10',
     label: 'فشل',
   },
 };

@@ -27,7 +27,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-amber-500" />
+          <Lightbulb className="h-5 w-5 text-warning" />
           <div>
             <CardTitle>التوصيات الذكية</CardTitle>
             <CardDescription>تحليل تلقائي للسيناريوهات واقتراح الأنسب</CardDescription>
@@ -36,14 +36,14 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
       </CardHeader>
       <CardContent className="space-y-4">
         {/* التوصية الرئيسية */}
-        <Alert className="border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
-          <TrendingUp className="h-4 w-4 text-emerald-600" />
+        <Alert className="border-success bg-success/10">
+          <TrendingUp className="h-4 w-4 text-success" />
           <AlertDescription className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-emerald-900 dark:text-emerald-100">
+              <p className="font-semibold text-success">
                 التوصية الرئيسية: {getPatternName(analysis.balancedOption.pattern)}
               </p>
-              <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+              <p className="text-sm text-success/80 mt-1">
                 {analysis.balancedOption.reason}
               </p>
             </div>
@@ -63,10 +63,10 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
         {/* تحليلات إضافية */}
         <div className="grid gap-4 md:grid-cols-2">
           {/* الأكثر عدالة */}
-          <Card className="border-blue-200 dark:border-blue-800">
+          <Card className="border-info">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-blue-600" />
+                <Users className="h-4 w-4 text-info" />
                 <CardTitle className="text-base">الأكثر عدالة</CardTitle>
               </div>
             </CardHeader>
@@ -91,10 +91,10 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
           </Card>
 
           {/* الأكثر كفاءة */}
-          <Card className="border-purple-200 dark:border-purple-800">
+          <Card className="border-primary">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-purple-600" />
+                <DollarSign className="h-4 w-4 text-primary" />
                 <CardTitle className="text-base">الأكثر كفاءة</CardTitle>
               </div>
             </CardHeader>
@@ -123,7 +123,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
         {analysis.warnings.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-semibold flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <AlertTriangle className="h-4 w-4 text-warning" />
               ملاحظات مهمة
             </h4>
             {analysis.warnings.map((warning, index) => (
