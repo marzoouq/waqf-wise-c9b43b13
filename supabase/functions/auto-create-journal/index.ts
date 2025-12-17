@@ -2,12 +2,18 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
+interface AccountTemplate {
+  account_id?: string;
+  percentage?: number;
+  fixed_amount?: number;
+}
+
 interface AutoJournalRequest {
   trigger_event: string;
   reference_id: string;
   reference_type: string;
   amount: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 serve(async (req) => {
@@ -53,7 +59,7 @@ serve(async (req) => {
       .limit(1)
       .single();
 
-    const lastNumber = lastEntry?.entry_number ? parseInt(lastEntry.entry_number.split('-')[1]) : 0;
+    const lastNumber = lastEntry?.entry_number ? parseInt(lastEntry.entry_number.split('-')[1], 10) : 0;
     const newEntryNumber = `JE-${(lastNumber + 1).toString().padStart(6, '0')}`;
 
     // إنشاء القيد
@@ -74,14 +80,14 @@ serve(async (req) => {
     if (entryError) throw entryError;
 
     // إنشاء سطور القيد - المدين
-    const debitLines = template.debit_accounts.map((acc: any, idx: number) => {
+    const debitLines = template.debit_accounts.map((acc: AccountTemplate, idx: number) => {
       const accountAmount = acc.percentage 
         ? (amount * acc.percentage / 100)
         : (acc.fixed_amount || 0);
 
       return {
         journal_entry_id: journalEntry.id,
-        account_id: acc.account_id || null, // يجب تحويل الكود إلى ID
+        account_id: acc.account_id || null,
         line_number: idx + 1,
         description: template.description,
         debit_amount: accountAmount,
@@ -90,7 +96,7 @@ serve(async (req) => {
     });
 
     // إنشاء سطور القيد - الدائن
-    const creditLines = template.credit_accounts.map((acc: any, idx: number) => {
+    const creditLines = template.credit_accounts.map((acc: AccountTemplate, idx: number) => {
       const accountAmount = acc.percentage 
         ? (amount * acc.percentage / 100)
         : (acc.fixed_amount || 0);
@@ -114,8 +120,8 @@ serve(async (req) => {
     if (linesError) throw linesError;
 
     // التحقق من التوازن
-    const totalDebit = debitLines.reduce((sum: number, line: any) => sum + line.debit_amount, 0);
-    const totalCredit = creditLines.reduce((sum: number, line: any) => sum + line.credit_amount, 0);
+    const totalDebit = debitLines.reduce((sum: number, line: { debit_amount: number }) => sum + line.debit_amount, 0);
+    const totalCredit = creditLines.reduce((sum: number, line: { credit_amount: number }) => sum + line.credit_amount, 0);
 
     if (Math.abs(totalDebit - totalCredit) > 0.01) {
       throw new Error(`القيد غير متوازن: مدين ${totalDebit} ≠ دائن ${totalCredit}`);
@@ -145,8 +151,9 @@ serve(async (req) => {
       entry_number: newEntryNumber,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('Error creating auto journal:', error);
-    return errorResponse(error.message);
+    return errorResponse(errorMessage);
   }
 });
