@@ -541,8 +541,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {revenueItems.map((item, index) => (
-                          <TableRow key={index}>
+                        {revenueItems.map((item) => (
+                          <TableRow key={`revenue-${item.name}`}>
                             <TableCell className="font-medium text-xs sm:text-sm">{translateRevenueName(item.name)}</TableCell>
                             <TableCell className="text-emerald-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
@@ -587,9 +587,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {expenseItems.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="text-muted-foreground text-xs sm:text-sm">{index + 1}</TableCell>
+                        {expenseItems.map((item, idx) => (
+                          <TableRow key={`expense-${item.name}`}>
+                            <TableCell className="text-muted-foreground text-xs sm:text-sm">{idx + 1}</TableCell>
                             <TableCell className="font-medium text-xs sm:text-sm">{translateExpenseName(item.name)}</TableCell>
                             <TableCell className="text-red-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
