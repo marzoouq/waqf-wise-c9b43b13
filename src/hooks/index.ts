@@ -112,4 +112,7 @@ export * from './nazer';
 // ==================== Permissions ====================
 export * from './permissions';
 
+// ==================== Shared ====================
+export * from './shared';
+
 // Note: approvals exports omitted to avoid conflicts with distributions/requests
