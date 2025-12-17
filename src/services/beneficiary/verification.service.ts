@@ -23,7 +23,7 @@ export class BeneficiaryVerificationService {
       const reasons: string[] = [];
       let score = 100;
 
-      if (beneficiary.status !== 'active') {
+      if (beneficiary.status !== 'نشط' && beneficiary.status !== 'active') {
         reasons.push('الحساب غير نشط');
         score -= 50;
       }

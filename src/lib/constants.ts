@@ -47,6 +47,19 @@ export const LOAN_STATUS = {
   DEFAULTED: "متعثر",
 } as const;
 
+// Tenant Status
+export const TENANT_STATUS = {
+  ACTIVE: "نشط",
+  INACTIVE: "غير نشط",
+  SUSPENDED: "معلق",
+} as const;
+
+// Family Status
+export const FAMILY_STATUS = {
+  ACTIVE: "نشط",
+  INACTIVE: "غير نشط",
+} as const;
+
 export const REQUEST_STATUS = {
   PENDING: "معلق",
   APPROVED: "موافق عليه",

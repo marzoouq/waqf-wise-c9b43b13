@@ -54,7 +54,7 @@ export function LoansOverviewTab() {
                 ? Math.round((loan.paid_amount / loan.principal_amount) * 100)
                 : 0;
               const remaining = (loan.principal_amount || 0) - (loan.paid_amount || 0);
-              const statusLabel = loan.status === "active" ? "نشط" : loan.status === "paid" ? "مسدد" : "غير محدد";
+              const statusLabel = (loan.status === "نشط" || loan.status === "active") ? "نشط" : (loan.status === "مسدد" || loan.status === "paid") ? "مسدد" : "غير محدد";
               
               return (
               <div key={loan.id} className="space-y-4 p-4 border rounded-lg">
@@ -69,8 +69,8 @@ export function LoansOverviewTab() {
                       /> ريال
                     </p>
                   </div>
-                  <Badge variant={loan.status === "active" ? "default" : "secondary"}>
-                    {loan.status === "active" ? (
+                  <Badge variant={(loan.status === "نشط" || loan.status === "active") ? "default" : "secondary"}>
+                    {(loan.status === "نشط" || loan.status === "active") ? (
                       <AlertCircle className="h-4 w-4 ms-1" />
                     ) : (
                       <CheckCircle className="h-4 w-4 ms-1" />

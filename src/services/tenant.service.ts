@@ -91,7 +91,7 @@ export class TenantService {
 
   static async getStats() {
     const tenants = await this.getAll();
-    return { total: tenants.length, active: tenants.filter(t => t.status === 'active').length };
+    return { total: tenants.length, active: tenants.filter(t => t.status === 'نشط' || t.status === 'active').length };
   }
 
   static async delete(id: string): Promise<void> {
