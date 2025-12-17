@@ -190,111 +190,179 @@ export default function Tenants() {
               لا يوجد مستأجرين
             </div>
           ) : (
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">رقم المستأجر</TableHead>
-                    <TableHead className="text-xs sm:text-sm">الاسم</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم الهوية</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">التواصل</TableHead>
-                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                    <TableHead className="text-left text-xs sm:text-sm">الرصيد</TableHead>
-                    <TableHead className="w-12"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTenants.map((tenant) => (
-                    <TableRow
-                      key={tenant.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/tenants/${tenant.id}`)}
-                    >
-                      <TableCell className="font-mono text-xs sm:text-sm hidden md:table-cell">
-                        {tenant.tenant_number}
-                      </TableCell>
-                      <TableCell className="font-medium text-xs sm:text-sm">
-                        {tenant.full_name}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{tenant.id_number}</TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <div className="flex flex-col gap-1">
-                          {tenant.phone && (
-                            <div className="flex items-center gap-1 text-xs sm:text-sm">
-                              <Phone className="h-3 w-3" />
-                              {tenant.phone}
-                            </div>
-                          )}
-                          {tenant.email && (
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Mail className="h-3 w-3" />
-                              {tenant.email}
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
-                          {statusLabels[tenant.status]?.label || tenant.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-left text-xs sm:text-sm">
-                        <span
-                          className={
-                            tenant.current_balance > 0
-                              ? 'text-destructive font-medium'
-                              : tenant.current_balance < 0
-                              ? 'text-status-success font-medium'
-                              : ''
-                          }
-                        >
-                          {formatCurrency(tenant.current_balance)}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(tenant);
-                              }}
-                            >
-                              <Edit className="ms-2 h-4 w-4" />
-                              تعديل
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/tenants/${tenant.id}`);
-                              }}
-                            >
-                              <FileText className="ms-2 h-4 w-4" />
-                              كشف الحساب
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openDeleteDialog(tenant);
-                              }}
-                            >
-                              <Trash2 className="ms-2 h-4 w-4" />
-                              حذف
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            <>
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {filteredTenants.map((tenant) => (
+                  <Card 
+                    key={tenant.id} 
+                    className="p-3 cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/tenants/${tenant.id}`)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-medium">{tenant.full_name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{tenant.tenant_number}</p>
+                      </div>
+                      <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
+                        {statusLabels[tenant.status]?.label || tenant.status}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm mb-2">
+                      <div className="flex items-center gap-1">
+                        <Phone className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs">{tenant.phone || '-'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Mail className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs truncate">{tenant.email || '-'}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-xs text-muted-foreground">الرصيد:</span>
+                      <span className={`font-medium ${
+                        tenant.current_balance > 0 ? 'text-destructive' :
+                        tenant.current_balance < 0 ? 'text-status-success' : ''
+                      }`}>
+                        {formatCurrency(tenant.current_balance)}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 mt-2 pt-2 border-t">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 text-xs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(tenant);
+                        }}
+                      >
+                        <Edit className="h-3 w-3 ms-1" />
+                        تعديل
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteDialog(tenant);
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم المستأجر</TableHead>
+                      <TableHead className="text-xs sm:text-sm">الاسم</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم الهوية</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden xl:table-cell">التواصل</TableHead>
+                      <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                      <TableHead className="text-left text-xs sm:text-sm">الرصيد</TableHead>
+                      <TableHead className="w-12"></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTenants.map((tenant) => (
+                      <TableRow
+                        key={tenant.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/tenants/${tenant.id}`)}
+                      >
+                        <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">
+                          {tenant.tenant_number}
+                        </TableCell>
+                        <TableCell className="font-medium text-xs sm:text-sm">
+                          {tenant.full_name}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{tenant.id_number}</TableCell>
+                        <TableCell className="hidden xl:table-cell">
+                          <div className="flex flex-col gap-1">
+                            {tenant.phone && (
+                              <div className="flex items-center gap-1 text-xs sm:text-sm">
+                                <Phone className="h-3 w-3" />
+                                {tenant.phone}
+                              </div>
+                            )}
+                            {tenant.email && (
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Mail className="h-3 w-3" />
+                                {tenant.email}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
+                            {statusLabels[tenant.status]?.label || tenant.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-left text-xs sm:text-sm">
+                          <span
+                            className={
+                              tenant.current_balance > 0
+                                ? 'text-destructive font-medium'
+                                : tenant.current_balance < 0
+                                ? 'text-status-success font-medium'
+                                : ''
+                            }
+                          >
+                            {formatCurrency(tenant.current_balance)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(tenant);
+                                }}
+                              >
+                                <Edit className="ms-2 h-4 w-4" />
+                                تعديل
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/tenants/${tenant.id}`);
+                                }}
+                              >
+                                <FileText className="ms-2 h-4 w-4" />
+                                كشف الحساب
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openDeleteDialog(tenant);
+                                }}
+                              >
+                                <Trash2 className="ms-2 h-4 w-4" />
+                                حذف
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
