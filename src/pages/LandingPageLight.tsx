@@ -85,7 +85,7 @@ function StatItem({
         <div
           className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${color} mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
         >
-          <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+          <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
         </div>
 
         {/* Value */}

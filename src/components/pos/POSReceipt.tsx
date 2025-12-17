@@ -22,7 +22,7 @@ export const POSReceipt = forwardRef<HTMLDivElement, POSReceiptProps>(
     return (
       <div
         ref={ref}
-        className="bg-white p-6 max-w-[300px] mx-auto text-sm font-mono print:p-4"
+        className="bg-background print:bg-white p-6 max-w-[300px] mx-auto text-sm font-mono print:p-4"
         dir="rtl"
       >
         {/* Header */}
