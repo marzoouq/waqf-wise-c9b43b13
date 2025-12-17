@@ -12,9 +12,18 @@ import {
 } from "recharts";
 import { useBudgetComparison } from "@/hooks/dashboard/useDashboardCharts";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 const BudgetComparisonChart = () => {
   const { data, isLoading, error, refetch } = useBudgetComparison();
+  const isMobile = useIsMobile();
+
+  // Responsive chart dimensions
+  const chartHeight = isMobile ? 200 : 300;
+  const fontSize = isMobile ? '8px' : '11px';
+  const yAxisFontSize = isMobile ? '9px' : '12px';
+  const xAxisHeight = isMobile ? 60 : 80;
+  const yAxisWidth = isMobile ? 35 : 60;
 
   if (isLoading) {
     return (
@@ -54,21 +63,21 @@ const BudgetComparisonChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">مقارنة الميزانيات</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="account" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: window.innerWidth < 640 ? '8px' : '11px' }}
+              style={{ fontSize }}
               angle={-45}
               textAnchor="end"
-              height={window.innerWidth < 640 ? 60 : 80}
+              height={xAxisHeight}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
-              width={window.innerWidth < 640 ? 35 : 60}
+              style={{ fontSize: yAxisFontSize }}
+              width={yAxisWidth}
               tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip
