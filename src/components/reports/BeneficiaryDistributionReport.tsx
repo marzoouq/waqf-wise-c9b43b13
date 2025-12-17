@@ -32,7 +32,7 @@ export function BeneficiaryDistributionReport({
   // حساب الإحصائيات
   const stats = {
     totalBeneficiaries: beneficiaries.length,
-    activeBeneficiaries: beneficiaries.filter(b => b.status === 'active').length,
+    activeBeneficiaries: beneficiaries.filter(b => b.status === 'نشط' || b.status === 'active').length,
     totalDistributed: distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0),
     avgPerBeneficiary: 0,
   };
@@ -271,8 +271,8 @@ export function BeneficiaryDistributionReport({
                     {(b.total_received || 0).toLocaleString('ar-SA')} ريال
                   </td>
                   <td className="p-2">
-                    <Badge variant={b.status === 'active' ? 'default' : 'secondary'}>
-                      {b.status === 'active' ? 'نشط' : 'غير نشط'}
+                    <Badge variant={b.status === 'نشط' || b.status === 'active' ? 'default' : 'secondary'}>
+                      {b.status === 'نشط' || b.status === 'active' ? 'نشط' : 'غير نشط'}
                     </Badge>
                   </td>
                 </tr>
