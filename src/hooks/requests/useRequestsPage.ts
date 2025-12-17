@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useRequests } from './useRequests';
 import { useTableSort } from '@/hooks/ui/useTableSort';
 import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
+import { useDeleteConfirmation } from '@/hooks/shared';
 import { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
 import { toast } from 'sonner';
 import type { FullRequest } from '@/types/request.types';
@@ -69,24 +70,25 @@ export function useRequestsPage() {
     overdue: requests.filter(r => r.is_overdue).length,
   };
 
+  const bulkDeleteConfirmation = useDeleteConfirmation<string[]>({
+    onDelete: async (ids) => {
+      await Promise.all(ids.map(id => deleteRequest.mutateAsync(id)));
+      bulkSelection.clearSelection();
+    },
+    successMessage: `تم حذف ${bulkSelection.selectedCount} طلب بنجاح`,
+    errorMessage: 'فشل حذف بعض الطلبات',
+    title: 'حذف الطلبات',
+    description: `هل تريد حذف ${bulkSelection.selectedCount} طلب؟`,
+  });
+
   const handleDeleteClick = (request: FullRequest) => {
     setRequestToDelete(request);
     setDeleteDialogOpen(true);
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (bulkSelection.selectedCount === 0) return;
-    
-    const confirmed = window.confirm(`هل تريد حذف ${bulkSelection.selectedCount} طلب؟`);
-    if (!confirmed) return;
-
-    try {
-      await Promise.all(bulkSelection.selectedIds.map(id => deleteRequest.mutateAsync(id)));
-      toast.success(`تم حذف ${bulkSelection.selectedCount} طلب بنجاح`);
-      bulkSelection.clearSelection();
-    } catch (error) {
-      toast.error('فشل حذف بعض الطلبات');
-    }
+    bulkDeleteConfirmation.confirmDelete(bulkSelection.selectedIds);
   };
 
   const handleBulkExport = () => {
@@ -136,6 +138,7 @@ export function useRequestsPage() {
     bulkSelection,
     handleBulkDelete,
     handleBulkExport,
+    bulkDeleteConfirmation,
     
     // Dialog States
     selectedRequest,

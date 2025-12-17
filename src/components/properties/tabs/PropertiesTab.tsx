@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/DashboardStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { useDeleteConfirmation } from "@/hooks/shared";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 
 interface Props {
@@ -16,6 +18,25 @@ interface Props {
 export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { properties, isLoading, deleteProperty } = useProperties();
+
+  const {
+    confirmDelete,
+    isOpen: isDeleteOpen,
+    isDeleting,
+    executeDelete,
+    onOpenChange: onDeleteOpenChange,
+    itemName,
+    dialogTitle,
+    dialogDescription,
+  } = useDeleteConfirmation<string>({
+    onDelete: async (id) => {
+      deleteProperty(id);
+    },
+    successMessage: 'تم حذف العقار بنجاح',
+    errorMessage: 'فشل حذف العقار',
+    title: 'حذف العقار',
+    description: 'هل أنت متأكد من حذف هذا العقار؟',
+  });
 
   const filteredProperties = useMemo(() => {
     if (!searchQuery) return properties;
@@ -62,10 +83,8 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
     ];
   }, [properties]);
 
-  const handleDelete = (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا العقار؟")) {
-      deleteProperty(id);
-    }
+  const handleDelete = (id: string, name?: string) => {
+    confirmDelete(id, name);
   };
 
   return (
@@ -191,7 +210,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
               variant="ghost"
               size="sm"
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => handleDelete(property.id)}
+              onClick={() => handleDelete(property.id, property.name)}
               title="حذف"
             >
               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -199,6 +218,17 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
           </div>
         )}
         showMobileScrollHint={true}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={onDeleteOpenChange}
+        onConfirm={executeDelete}
+        title={dialogTitle}
+        description={dialogDescription}
+        itemName={itemName}
+        isLoading={isDeleting}
+        isDestructive={true}
       />
     </div>
   );

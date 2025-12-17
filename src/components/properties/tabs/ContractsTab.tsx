@@ -14,6 +14,8 @@ import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert"
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
+import { useDeleteConfirmation } from "@/hooks/shared";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -38,10 +40,27 @@ export const ContractsTab = ({ onEdit }: Props) => {
   
   const { printWithData } = usePrint();
 
-  const handleDelete = (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا العقد؟ سيتم حذف جميع الدفعات المرتبطة به.")) {
-      deleteContract.mutateAsync(id);
-    }
+  const {
+    confirmDelete,
+    isOpen: isDeleteOpen,
+    isDeleting,
+    executeDelete,
+    onOpenChange: onDeleteOpenChange,
+    itemName,
+    dialogTitle,
+    dialogDescription,
+  } = useDeleteConfirmation<string>({
+    onDelete: async (id) => {
+      await deleteContract.mutateAsync(id);
+    },
+    successMessage: 'تم حذف العقد بنجاح',
+    errorMessage: 'فشل حذف العقد',
+    title: 'حذف العقد',
+    description: 'هل أنت متأكد من حذف هذا العقد؟ سيتم حذف جميع الدفعات المرتبطة به.',
+  });
+
+  const handleDelete = (id: string, contractNumber?: string) => {
+    confirmDelete(id, contractNumber);
   };
 
   const handlePrintContract = (contract: Contract) => {
@@ -224,7 +243,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
               variant="ghost"
               size="sm"
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => handleDelete(contract.id)}
+              onClick={() => handleDelete(contract.id, contract.contract_number)}
               title="حذف"
             >
               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -255,6 +274,17 @@ export const ContractsTab = ({ onEdit }: Props) => {
           className="rounded-lg border"
         />
       )}
+
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={onDeleteOpenChange}
+        onConfirm={executeDelete}
+        title={dialogTitle}
+        description={dialogDescription}
+        itemName={itemName}
+        isLoading={isDeleting}
+        isDestructive={true}
+      />
     </div>
   );
 };

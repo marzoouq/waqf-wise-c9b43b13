@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useDeleteConfirmation } from '@/hooks/shared';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 
 // Type للبيانات المعادة من الـ API
 interface MemberWithBeneficiary {
@@ -61,6 +63,25 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
     notes: '',
   });
 
+  const {
+    confirmDelete,
+    isOpen: isDeleteOpen,
+    isDeleting,
+    executeDelete,
+    onOpenChange: onDeleteOpenChange,
+    itemName,
+    dialogTitle,
+    dialogDescription,
+  } = useDeleteConfirmation<string>({
+    onDelete: async (memberId) => {
+      await removeMember.mutateAsync(memberId);
+    },
+    successMessage: 'تم فصل الفرد من العائلة',
+    errorMessage: 'فشل فصل الفرد',
+    title: 'فصل من العائلة',
+    description: 'هل تريد فصل هذا الفرد من العائلة؟',
+  });
+
   const handleAddMember = async () => {
     if (!formData.beneficiary_id) {
       toast.error('يرجى اختيار مستفيد');
@@ -91,14 +112,8 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
     }
   };
 
-  const handleRemoveMember = async (memberId: string, memberName: string) => {
-    if (window.confirm(`هل تريد فصل ${memberName} من العائلة؟`)) {
-      removeMember.mutate(memberId, {
-        onSuccess: () => {
-          toast.success('تم فصل الفرد من العائلة');
-        },
-      });
-    }
+  const handleRemoveMember = (memberId: string, memberName: string) => {
+    confirmDelete(memberId, memberName);
   };
 
   if (isLoading) {
@@ -421,6 +436,17 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
           </CardContent>
         </Card>
       )}
+
+      <DeleteConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={onDeleteOpenChange}
+        onConfirm={executeDelete}
+        title={dialogTitle}
+        description={dialogDescription}
+        itemName={itemName}
+        isLoading={isDeleting}
+        isDestructive={true}
+      />
     </div>
   );
 }
