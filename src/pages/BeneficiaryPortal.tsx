@@ -91,7 +91,7 @@ export default function BeneficiaryPortal() {
   return (
     <PageErrorBoundary pageName="بوابة المستفيد">
       <SidebarProvider defaultOpen={true}>
-        <div className="flex min-h-screen w-full bg-background">
+        <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
           {/* Sidebar - يتحول تلقائياً بين Sheet (جوال) و fixed (ديسكتوب) */}
           <BeneficiarySidebar
             activeTab={activeTab}
@@ -108,8 +108,8 @@ export default function BeneficiaryPortal() {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
-              <div className="px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 pb-20 lg:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-5 md:space-y-6">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
+              <div className="px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 pb-20 lg:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-5 md:space-y-6 w-full">
                 {/* بانر وضع المعاينة */}
                 {isPreviewMode && (
                   <PreviewModeBanner 

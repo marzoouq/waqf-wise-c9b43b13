@@ -40,7 +40,7 @@ export default function TenantDetails() {
 
   if (tenantLoading) {
     return (
-      <div className="space-y-6 p-4">
+      <div className="space-y-6 p-4 w-full max-w-full overflow-x-hidden">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-64 w-full" />
       </div>
@@ -59,7 +59,7 @@ export default function TenantDetails() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Header - Mobile Optimized */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">

@@ -23,7 +23,7 @@ export default function LandingPageSettings() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
         <Skeleton className="h-8 w-64" />
         <div className="grid gap-4">
           {[1, 2, 3].map(i => (
@@ -39,7 +39,7 @@ export default function LandingPageSettings() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">إعدادات الصفحة الترحيبية</h1>

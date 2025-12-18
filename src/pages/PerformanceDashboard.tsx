@@ -28,7 +28,7 @@ export default function PerformanceDashboard() {
   ];
 
   return (
-    <div className="container-custom py-6 space-y-6">
+    <div className="container-custom py-6 space-y-6 w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="لوحة الأداء"
         description="مراقبة أداء النظام والاستعلامات"
