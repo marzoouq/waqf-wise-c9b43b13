@@ -206,11 +206,18 @@ export class MessageService {
    */
   static async getRecipients(userId: string): Promise<Recipient[]> {
     try {
+      console.log('[MessageService] Fetching recipients for user:', userId);
+      
       const { data, error } = await supabase.rpc('get_available_recipients', {
         current_user_id: userId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[MessageService] RPC error:', error);
+        throw error;
+      }
+
+      console.log('[MessageService] Recipients fetched:', data?.length || 0);
 
       return (data || []).map((row: { id: string; name: string; role: string; role_key: string }) => ({
         id: row.id,
