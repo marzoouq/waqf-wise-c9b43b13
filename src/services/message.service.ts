@@ -55,21 +55,18 @@ const ROLE_ORDER: Record<string, number> = {
 
 export class MessageService {
   /**
-   * جلب الرسائل الواردة
+   * جلب الرسائل الواردة باستخدام view موحد
    */
-  static async getInboxMessages(userId: string): Promise<InternalMessageRow[]> {
+  static async getInboxMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
       const { data, error } = await supabase
-        .from('internal_messages')
-        .select(`
-          *,
-          sender:profiles!internal_messages_sender_id_fkey(full_name, user_id)
-        `)
+        .from('messages_with_users')
+        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
         .eq('receiver_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as MessageWithUsers[];
     } catch (error) {
       productionLogger.error('Error fetching inbox messages', error);
       throw error;
@@ -77,21 +74,18 @@ export class MessageService {
   }
 
   /**
-   * جلب الرسائل المرسلة
+   * جلب الرسائل المرسلة باستخدام view موحد
    */
-  static async getSentMessages(userId: string): Promise<InternalMessageRow[]> {
+  static async getSentMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
       const { data, error } = await supabase
-        .from('internal_messages')
-        .select(`
-          *,
-          receiver:profiles!internal_messages_receiver_id_fkey(full_name, user_id)
-        `)
+        .from('messages_with_users')
+        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
         .eq('sender_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as MessageWithUsers[];
     } catch (error) {
       productionLogger.error('Error fetching sent messages', error);
       throw error;
