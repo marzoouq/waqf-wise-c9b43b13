@@ -2128,6 +2128,70 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_items: {
+        Row: {
+          account_id: string | null
+          actual_amount: number | null
+          budget_id: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          planned_amount: number
+          updated_at: string | null
+          variance: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          actual_amount?: number | null
+          budget_id?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          planned_amount?: number
+          updated_at?: string | null
+          variance?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          actual_amount?: number | null
+          budget_id?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          planned_amount?: number
+          updated_at?: string | null
+          variance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_items_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_items_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "budget_items_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budgets: {
         Row: {
           account_id: string
@@ -4542,6 +4606,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      fund_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          fund_id: string | null
+          id: string
+          performed_by: string | null
+          performed_by_name: string | null
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          fund_id?: string | null
+          id?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          fund_id?: string | null
+          id?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fund_transactions_fund_id_fkey"
+            columns: ["fund_id"]
+            isOneToOne: false
+            referencedRelation: "funds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       funds: {
         Row: {
@@ -7156,6 +7267,86 @@ export type Database = {
             columns: ["property_unit_id"]
             isOneToOne: false
             referencedRelation: "property_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          attachments: Json | null
+          beneficiary_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message_type: string | null
+          parent_message_id: string | null
+          priority: string | null
+          read_at: string | null
+          recipient_id: string | null
+          sender_id: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          beneficiary_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type?: string | null
+          parent_message_id?: string | null
+          priority?: string | null
+          read_at?: string | null
+          recipient_id?: string | null
+          sender_id?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          beneficiary_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message_type?: string | null
+          parent_message_id?: string | null
+          priority?: string | null
+          read_at?: string | null
+          recipient_id?: string | null
+          sender_id?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "messages_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -10906,6 +11097,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_comments: {
+        Row: {
+          attachments: Json | null
+          content: string
+          created_at: string | null
+          id: string
+          is_internal: boolean | null
+          ticket_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          ticket_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          ticket_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       translations: {
         Row: {
           ar: string
@@ -12635,6 +12870,7 @@ export type Database = {
       notify_overdue_loan_installments: { Args: never; Returns: undefined }
       notify_payment_due: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
+      owns_beneficiary: { Args: { p_beneficiary_id: string }; Returns: boolean }
       payment_requires_approval: {
         Args: { p_amount: number }
         Returns: boolean
