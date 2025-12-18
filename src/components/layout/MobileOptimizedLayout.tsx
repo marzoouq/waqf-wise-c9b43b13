@@ -13,11 +13,11 @@ interface MobileOptimizedLayoutProps {
 export function MobileOptimizedLayout({ children, className }: MobileOptimizedLayoutProps) {
   return (
     <div className={cn(
-      "min-h-screen bg-background",
+      "min-h-screen bg-background w-full max-w-full overflow-x-hidden",
       "px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8",
       className
     )}>
-      <div className="container mx-auto max-w-7xl space-y-4 sm:space-y-5 md:space-y-6">
+      <div className="container mx-auto max-w-7xl space-y-4 sm:space-y-5 md:space-y-6 w-full">
         {children}
       </div>
     </div>

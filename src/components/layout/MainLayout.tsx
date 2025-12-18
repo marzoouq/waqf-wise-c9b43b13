@@ -218,7 +218,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <IdleTimeoutManager />
       
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
+        <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
           {/* Sidebar - يعرض كـ Sheet على الجوال وثابت على الديسكتوب */}
           <AppSidebar />
           <SidebarInset>
@@ -241,7 +241,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             />
 
             {/* Page Content with padding for mobile bottom navigation */}
-            <div className="flex-1 overflow-auto flex flex-col pb-20 md:pb-0">
+            <div className="flex-1 overflow-x-hidden overflow-y-auto flex flex-col pb-20 md:pb-0">
               <main className="flex-1">
                 {children}
               </main>
