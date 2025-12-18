@@ -124,7 +124,7 @@ export class ApprovalService {
         beneficiaries(full_name, national_id),
         payment_approvals(*)
       `)
-      .eq("status", "pending")
+      .in("status", ["pending", "معلق"])
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -271,7 +271,7 @@ export class ApprovalService {
       supabase
         .from('approvals')
         .select(`id, created_at, journal_entries(entry_number, description)`)
-        .eq('status', 'pending')
+        .in('status', ['pending', 'معلق'])
         .limit(5)
     ]);
 
