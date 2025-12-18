@@ -11,30 +11,53 @@ import { WAQF_IDENTITY, getCurrentDateArabic, getCurrentDateTimeArabic } from "@
 import type { jsPDF } from "jspdf";
 
 // Import Arabic reshaper for proper text rendering
-import ArabicReshaper from 'js-arabic-reshaper';
+import { reshape } from "js-arabic-reshaper";
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
- * 1. إعادة تشكيل الحروف (reshape) لتصبح متصلة
- * 2. عكس ترتيب الأحرف للعرض من اليمين لليسار
+ * - إعادة تشكيل الحروف (reshape) لتصبح متصلة
+ * - معالجة النص المختلط (عربي + أرقام/رموز/إنجليزي) بدون قلب الأرقام
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
-  if (text === null || text === undefined) return '';
-  
+  if (text === null || text === undefined) return "";
+
   const strText = String(text);
-  if (!strText) return '';
-  
+  if (!strText) return "";
+
   try {
-    // إعادة تشكيل الحروف العربية لتصبح متصلة
-    const reshaped = ArabicReshaper.ArabicShaper.convertArabic(strText);
-    
-    // عكس النص للعرض الصحيح RTL
-    return reshaped.split('').reverse().join('');
+    return processRTLMixedText(strText);
   } catch (error) {
-    logger.error(error, { context: 'process_arabic_text', severity: 'low' });
+    logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
   }
 };
+
+/**
+ * معالجة RTL للنص المختلط بشكل آمن:
+ * - يعيد تشكيل العربية لتصبح الحروف متصلة
+ * - يعكس النص كاملاً لتجاوز غياب الـ bidi في jsPDF
+ * - ثم يُصلح قلب الأرقام/اللاتيني داخل النص حتى لا تنعكس (1,083,094)
+ */
+function processRTLMixedText(text: string): string {
+  const reverse = (s: string) => s.split("").reverse().join("");
+
+  // إعادة تشكيل العربية (لا تؤثر سلباً على الأرقام)
+  const reshaped = reshape(text);
+
+  // عكس كامل النص لمحاكاة RTL
+  let rtl = reverse(reshaped);
+
+  // إصلاح الأرقام (وأي فواصل شائعة معها) بعد عكس النص
+  rtl = rtl.replace(
+    /[0-9\u0660-\u0669][0-9\u0660-\u0669,\.\u066B\u066C\/%:-]*/g,
+    (m) => reverse(m)
+  );
+
+  // إصلاح الكلمات/الاختصارات اللاتينية إن وجدت
+  rtl = rtl.replace(/[A-Za-z][A-Za-z0-9._-]*/g, (m) => reverse(m));
+
+  return rtl;
+}
 
 /**
  * معالجة مصفوفة من الرؤوس للجداول
