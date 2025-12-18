@@ -2613,6 +2613,7 @@ export type Database = {
           security_deposit: number | null
           start_date: string
           status: string
+          tax_percentage: number | null
           tenant_email: string | null
           tenant_id: string | null
           tenant_id_number: string
@@ -2639,6 +2640,7 @@ export type Database = {
           security_deposit?: number | null
           start_date: string
           status?: string
+          tax_percentage?: number | null
           tenant_email?: string | null
           tenant_id?: string | null
           tenant_id_number: string
@@ -2665,6 +2667,7 @@ export type Database = {
           security_deposit?: number | null
           start_date?: string
           status?: string
+          tax_percentage?: number | null
           tenant_email?: string | null
           tenant_id?: string | null
           tenant_id_number?: string
