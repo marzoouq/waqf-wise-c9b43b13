@@ -12,6 +12,7 @@ import { ContractTenantFields } from "./contract/ContractTenantFields";
 import { ContractCalculations } from "./contract/ContractCalculations";
 import { ContractUnitsSelector } from "./contract/ContractUnitsSelector";
 import { ContractRenewalOptions } from "./contract/ContractRenewalOptions";
+import { ContractTaxOptions } from "./contract/ContractTaxOptions";
 
 interface Props {
   open: boolean;
@@ -114,6 +115,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       renewal_notice_days: parseInt(formData.renewal_notice_days),
       units_count: selectedUnits.length,
       unit_ids: selectedUnits,
+      tax_percentage: parseFloat(formData.tax_percentage) || 0,
     };
 
     if (contract) {
@@ -180,6 +182,11 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             isLoading={unitsLoading}
           />
         )}
+
+        <ContractTaxOptions
+          formData={formData}
+          onUpdate={updateFormData}
+        />
 
         <ContractRenewalOptions
           formData={formData}

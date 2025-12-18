@@ -20,6 +20,9 @@ export interface ContractFormData {
   renewal_notice_days: string;
   terms_and_conditions: string;
   notes: string;
+  // حقول الضريبة
+  tax_percentage: string;
+  is_tax_exempt: boolean;
 }
 
 const generateContractNumber = () => {
@@ -46,6 +49,9 @@ const getInitialFormData = (): ContractFormData => ({
   renewal_notice_days: "60",
   terms_and_conditions: "",
   notes: "",
+  // الضريبة - افتراضي معفي
+  tax_percentage: "0",
+  is_tax_exempt: true,
 });
 
 export function useContractForm(contract?: Contract | null) {
@@ -96,6 +102,7 @@ export function useContractForm(contract?: Contract | null) {
   // تعبئة البيانات عند التعديل فقط
   useEffect(() => {
     if (contract) {
+      const taxPct = (contract as { tax_percentage?: number }).tax_percentage || 0;
       setFormData({
         contract_number: contract.contract_number,
         property_id: contract.property_id,
@@ -115,6 +122,8 @@ export function useContractForm(contract?: Contract | null) {
         renewal_notice_days: contract.renewal_notice_days.toString(),
         terms_and_conditions: contract.terms_and_conditions || "",
         notes: contract.notes || "",
+        tax_percentage: taxPct.toString(),
+        is_tax_exempt: taxPct === 0,
       });
       setSelectedPropertyId(contract.property_id);
       
