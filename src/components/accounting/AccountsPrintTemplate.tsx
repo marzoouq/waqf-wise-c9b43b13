@@ -1,6 +1,7 @@
 import { format, arLocale as ar } from "@/lib/date";
 import { PrintHeader } from "@/components/shared/PrintHeader";
 import { PrintFooter } from "@/components/shared/PrintFooter";
+import { getAccountTypeLabel } from "@/lib/constants";
 
 interface Account {
   id: string;
@@ -101,7 +102,7 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
             <tr key={account.id}>
               <td>{account.code}</td>
               <td>{account.name_ar}</td>
-              <td>{account.account_type}</td>
+              <td>{getAccountTypeLabel(account.account_type)}</td>
               <td>{account.account_nature === 'debit' ? 'مدين' : 'دائن'}</td>
               <td className={account.account_nature === 'debit' ? 'debit-amount' : 'credit-amount'}>
                 {(account.current_balance || 0).toLocaleString()} ر.س

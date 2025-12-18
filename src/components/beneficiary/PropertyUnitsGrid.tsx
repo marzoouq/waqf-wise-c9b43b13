@@ -5,6 +5,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Home } from "lucide-react";
+import { getUnitTypeLabel } from "@/lib/constants";
 
 export function PropertyUnitsGrid() {
   const { units, isLoading, error, refetch } = usePropertyUnits();
@@ -34,7 +35,7 @@ export function PropertyUnitsGrid() {
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">النوع:</span>
-              <span className="font-medium">{unit.unit_type}</span>
+              <span className="font-medium">{getUnitTypeLabel(unit.unit_type)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">الطابق:</span>

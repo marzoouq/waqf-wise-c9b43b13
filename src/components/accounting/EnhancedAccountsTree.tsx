@@ -13,6 +13,7 @@ import { ExportButton } from "@/components/shared/ExportButton";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { getAccountTypeLabel } from "@/lib/constants";
 
 interface AccountNodeProps {
   account: AccountWithBalance;
@@ -202,7 +203,7 @@ export function EnhancedAccountsTree() {
       result.push({
         'الكود': account.code,
         'الاسم': account.name_ar,
-        'النوع': account.account_type,
+        'النوع': getAccountTypeLabel(account.account_type),
         'الطبيعة': account.account_nature === 'debit' ? 'مدين' : 'دائن',
         'الرصيد': account.current_balance?.toLocaleString() || '0.00',
         'الحالة': account.is_active ? 'نشط' : 'غير نشط',

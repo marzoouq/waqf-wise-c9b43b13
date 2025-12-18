@@ -13,6 +13,7 @@ import { Building2, Home, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { getUnitTypeLabel } from "@/lib/constants";
 
 export function PropertyAccordionView() {
   const { properties, isLoading, error, refetch } = useProperties();
@@ -179,7 +180,7 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-muted-foreground">
                   <span>النوع:</span>
-                  <span className="font-medium text-foreground">{unit.unit_type}</span>
+                  <span className="font-medium text-foreground">{getUnitTypeLabel(unit.unit_type)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>الطابق:</span>
