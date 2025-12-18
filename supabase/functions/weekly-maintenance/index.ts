@@ -16,10 +16,13 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    console.log("[weekly-maintenance] بدء الصيانة الأسبوعية");
+    console.log("[weekly-maintenance] بدء الصيانة الأسبوعية الشاملة");
 
     const cleanupResults = [];
+    const performanceResults = [];
 
+    // ===== المرحلة 1: تنظيف البيانات القديمة =====
+    
     // حذف سجلات الأخطاء القديمة (أكثر من 30 يوم)
     const { error: errorLogsError } = await supabase
       .from('system_error_logs')
@@ -69,22 +72,56 @@ Deno.serve(async (req) => {
       error: healthError?.message
     });
 
-    // تسجيل نتيجة الصيانة
+    // ===== المرحلة 2: تشغيل VACUUM ANALYZE =====
+    console.log("[weekly-maintenance] بدء VACUUM ANALYZE");
+    
+    const { data: vacuumResult, error: vacuumError } = await supabase
+      .rpc('run_vacuum_analyze');
+    
+    performanceResults.push({
+      operation: 'vacuum_analyze',
+      status: vacuumError ? 'error' : 'completed',
+      result: vacuumResult,
+      error: vacuumError?.message
+    });
+
+    // ===== المرحلة 3: تحليل الجداول عبر analyze_table =====
+    const tablesToAnalyze = [
+      'user_roles', 'beneficiaries', 'profiles', 'journal_entry_lines',
+      'journal_entries', 'payments', 'contracts', 'properties',
+      'distributions', 'loans', 'notifications', 'audit_logs'
+    ];
+
+    for (const table of tablesToAnalyze) {
+      const { data, error } = await supabase.rpc('analyze_table', { table_name: table });
+      performanceResults.push({
+        operation: `analyze_${table}`,
+        status: error ? 'error' : 'completed',
+        error: error?.message
+      });
+    }
+
+    // ===== تسجيل نتيجة الصيانة =====
     await supabase.from('system_alerts').insert({
       alert_type: 'maintenance_completed',
       severity: 'info',
-      title: 'اكتملت الصيانة الأسبوعية',
-      description: `تم تنظيف ${cleanupResults.filter(r => r.status === 'cleaned').length} جداول`,
+      title: 'اكتملت الصيانة الأسبوعية الشاملة',
+      description: `تم تنظيف ${cleanupResults.filter(r => r.status === 'cleaned').length} جداول. تم تحليل ${performanceResults.filter(r => r.status === 'completed').length} جدول.`,
       status: 'resolved'
     });
 
-    console.log("[weekly-maintenance] اكتملت الصيانة:", cleanupResults);
+    console.log("[weekly-maintenance] اكتملت الصيانة:", { cleanupResults, performanceResults });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'اكتملت الصيانة الأسبوعية',
-        results: cleanupResults,
+        message: 'اكتملت الصيانة الأسبوعية الشاملة',
+        cleanup: cleanupResults,
+        performance: performanceResults,
+        summary: {
+          tablesCleared: cleanupResults.filter(r => r.status === 'cleaned').length,
+          tablesAnalyzed: performanceResults.filter(r => r.status === 'completed').length
+        },
         timestamp: new Date().toISOString()
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

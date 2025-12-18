@@ -12438,6 +12438,7 @@ export type Database = {
         Args: { p_tenant_id: string }
         Returns: number
       }
+      can_manage_data: { Args: never; Returns: boolean }
       check_file_retention_eligibility: {
         Args: { p_file_category: string; p_uploaded_at: string }
         Returns: boolean
@@ -12819,9 +12820,12 @@ export type Database = {
       is_fiscal_year_published: { Args: { fy_id: string }; Returns: boolean }
       is_heir: { Args: never; Returns: boolean }
       is_heir_own_data: { Args: { _beneficiary_id: string }; Returns: boolean }
+      is_pos_user: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
-      is_waqf_heir: { Args: { _user_id?: string }; Returns: boolean }
+      is_waqf_heir:
+        | { Args: never; Returns: boolean }
+        | { Args: { _user_id?: string }; Returns: boolean }
       log_access_attempt: {
         Args: {
           p_action: string
@@ -12871,6 +12875,7 @@ export type Database = {
       notify_payment_due: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
       owns_beneficiary: { Args: { p_beneficiary_id: string }; Returns: boolean }
+      owns_support_ticket: { Args: { p_ticket_id: string }; Returns: boolean }
       payment_requires_approval: {
         Args: { p_amount: number }
         Returns: boolean
@@ -12888,7 +12893,9 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      reset_performance_stats: { Args: never; Returns: Json }
       run_scheduled_cleanup: { Args: never; Returns: Json }
+      run_vacuum_analyze: { Args: never; Returns: Json }
       search_beneficiaries_advanced:
         | {
             Args: {
