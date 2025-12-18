@@ -120,7 +120,7 @@ export function InternalMessagesDialog({
                             {message.subject}
                           </h4>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            من: {(message as unknown as { sender?: { full_name?: string } }).sender?.full_name || 'مستخدم'}
+                            من: {(message as { sender_name?: string }).sender_name || 'مستخدم'}
                           </p>
                         </div>
                       </div>
@@ -164,7 +164,7 @@ export function InternalMessagesDialog({
                       <div>
                         <h4 className="font-semibold">{message.subject}</h4>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          إلى: {(message as unknown as { receiver?: { full_name?: string } }).receiver?.full_name || 'مستخدم'}
+                          إلى: {(message as { receiver_name?: string }).receiver_name || 'مستخدم'}
                         </p>
                       </div>
                       <Badge variant="outline">مرسلة</Badge>
