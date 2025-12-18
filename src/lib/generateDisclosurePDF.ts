@@ -1,12 +1,12 @@
 /**
  * مولّد تقرير الإفصاح السنوي PDF
- * @version 2.9.42
+ * @version 2.9.74
  */
 
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { Database } from "@/integrations/supabase/types";
 import { logger } from "@/lib/logger";
-import { loadArabicFontToPDF, WAQF_COLORS } from "./pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
@@ -47,7 +47,7 @@ export const generateDisclosurePDF = async (
     doc.setFont(fontName, "bold");
     doc.setFontSize(22);
     doc.setTextColor(33, 37, 41);
-    doc.text(`الإفصاح السنوي`, 105, yPos, { align: "center" });
+    doc.text(processArabicText("الإفصاح السنوي"), 105, yPos, { align: "center" });
     
     yPos += 10;
     doc.setFontSize(18);
@@ -57,7 +57,7 @@ export const generateDisclosurePDF = async (
     yPos += 8;
     doc.setFontSize(14);
     doc.setTextColor(108, 117, 125);
-    doc.text(disclosure.waqf_name, 105, yPos, { align: "center" });
+    doc.text(processArabicText(disclosure.waqf_name), 105, yPos, { align: "center" });
     
     // خط فاصل
     yPos += 8;
@@ -71,18 +71,18 @@ export const generateDisclosurePDF = async (
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
     doc.setTextColor(33, 37, 41);
-    doc.text("الملخص المالي السنوي", 190, yPos, { align: "right" });
+    doc.text(processArabicText("الملخص المالي السنوي"), 190, yPos, { align: "right" });
     yPos += 8;
 
-    const financialData = [
+    const financialData = processArabicTableData([
       ["إجمالي الإيرادات", `${disclosure.total_revenues.toLocaleString()} ر.س`],
       ["إجمالي المصروفات", `${disclosure.total_expenses.toLocaleString()} ر.س`],
       ["صافي الدخل", `${disclosure.net_income.toLocaleString()} ر.س`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["البيان", "المبلغ"]],
+      head: [processArabicHeaders(["البيان", "المبلغ"])],
       body: financialData,
       theme: 'grid',
       styles: { 
@@ -107,18 +107,18 @@ export const generateDisclosurePDF = async (
     // نسب التوزيع
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
-    doc.text("نسب وحصص التوزيع", 190, yPos, { align: "right" });
+    doc.text(processArabicText("نسب وحصص التوزيع"), 190, yPos, { align: "right" });
     yPos += 8;
 
-    const distributionData = [
+    const distributionData = processArabicTableData([
       ["حصة الناظر", `${disclosure.nazer_share.toLocaleString()} ر.س`, `${disclosure.nazer_percentage}%`],
       ["صدقة الواقف", `${disclosure.charity_share.toLocaleString()} ر.س`, `${disclosure.charity_percentage}%`],
       ["رأس مال الوقف", `${disclosure.corpus_share.toLocaleString()} ر.س`, `${disclosure.corpus_percentage}%`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["النوع", "المبلغ", "النسبة"]],
+      head: [processArabicHeaders(["النوع", "المبلغ", "النسبة"])],
       body: distributionData,
       theme: 'grid',
       styles: { 
@@ -143,19 +143,19 @@ export const generateDisclosurePDF = async (
     // إحصائيات المستفيدين
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
-    doc.text("إحصائيات المستفيدين", 190, yPos, { align: "right" });
+    doc.text(processArabicText("إحصائيات المستفيدين"), 190, yPos, { align: "right" });
     yPos += 8;
 
-    const beneficiaryStats = [
+    const beneficiaryStats = processArabicTableData([
       ["عدد الأبناء", disclosure.sons_count.toString()],
       ["عدد البنات", disclosure.daughters_count.toString()],
       ["عدد الزوجات", disclosure.wives_count.toString()],
       ["الإجمالي", disclosure.total_beneficiaries.toString()],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["الفئة", "العدد"]],
+      head: [processArabicHeaders(["الفئة", "العدد"])],
       body: beneficiaryStats,
       theme: 'grid',
       styles: { 
@@ -189,20 +189,20 @@ export const generateDisclosurePDF = async (
       doc.setFont(fontName, "bold");
       doc.setFontSize(16);
       doc.setTextColor(33, 37, 41);
-      doc.text("قائمة المستفيدين وحصصهم", 105, yPos, { align: "center" });
+      doc.text(processArabicText("قائمة المستفيدين وحصصهم"), 105, yPos, { align: "center" });
       yPos += 12;
 
-      const beneficiariesData = beneficiaries.map(b => [
+      const beneficiariesData = processArabicTableData(beneficiaries.map(b => [
         b.beneficiary_name,
         b.beneficiary_type || "-",
         b.relationship || "-",
         `${b.allocated_amount.toLocaleString()} ر.س`,
         b.payments_count.toString(),
-      ]);
+      ]));
 
       autoTable(doc, {
         startY: yPos,
-        head: [["الاسم", "النوع", "القرابة", "المبلغ المخصص", "عدد الدفعات"]],
+        head: [processArabicHeaders(["الاسم", "النوع", "القرابة", "المبلغ المخصص", "عدد الدفعات"])],
         body: beneficiariesData,
         theme: 'grid',
         styles: { 
@@ -238,26 +238,28 @@ export const generateDisclosurePDF = async (
       doc.setFont(fontName, "bold");
       doc.setFontSize(16);
       doc.setTextColor(33, 37, 41);
-      doc.text("تفصيل المصروفات", 105, yPos, { align: "center" });
+      doc.text(processArabicText("تفصيل المصروفات"), 105, yPos, { align: "center" });
       yPos += 12;
 
-      const expensesData: string[][] = [];
+      const expensesDataRaw: string[][] = [];
       if (disclosure.maintenance_expenses) {
-        expensesData.push(["مصروفات الصيانة", `${disclosure.maintenance_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات الصيانة", `${disclosure.maintenance_expenses.toLocaleString()} ر.س`]);
       }
       if (disclosure.administrative_expenses) {
-        expensesData.push(["مصروفات إدارية", `${disclosure.administrative_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات إدارية", `${disclosure.administrative_expenses.toLocaleString()} ر.س`]);
       }
       if (disclosure.development_expenses) {
-        expensesData.push(["مصروفات التطوير", `${disclosure.development_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات التطوير", `${disclosure.development_expenses.toLocaleString()} ر.س`]);
       }
       if (disclosure.other_expenses) {
-        expensesData.push(["مصروفات أخرى", `${disclosure.other_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات أخرى", `${disclosure.other_expenses.toLocaleString()} ر.س`]);
       }
+
+      const expensesData = processArabicTableData(expensesDataRaw);
 
       autoTable(doc, {
         startY: yPos,
-        head: [["نوع المصروف", "المبلغ"]],
+        head: [processArabicHeaders(["نوع المصروف", "المبلغ"])],
         body: expensesData,
         theme: 'grid',
         styles: { 
@@ -292,13 +294,13 @@ export const generateDisclosurePDF = async (
       doc.line(20, 280, 190, 280);
       
       doc.text(
-        `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
+        processArabicText(`تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`),
         105,
         285,
         { align: "center" }
       );
       doc.text(
-        `صفحة ${i} من ${pageCount}`,
+        processArabicText(`صفحة ${i} من ${pageCount}`),
         105,
         290,
         { align: "center" }

@@ -1,6 +1,6 @@
 /**
  * مولّد فواتير PDF
- * @version 2.9.43
+ * @version 2.9.74
  */
 
 import QRCode from "qrcode";
@@ -8,6 +8,7 @@ import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
+import { processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
 import type { InvoiceLine } from "@/types/invoice-line";
 
 // Dynamic import type - jsPDF instance type
@@ -98,7 +99,7 @@ export const generateInvoicePDF = async (
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(26);
   doc.setFont("Amiri", "bold");
-  doc.text("فاتورة ضريبية", pageWidth / 2, 22, { align: "center" });
+  doc.text(processArabicText("فاتورة ضريبية"), pageWidth / 2, 22, { align: "center" });
   
   doc.setFontSize(11);
   doc.setFont("Amiri", "normal");
@@ -107,13 +108,13 @@ export const generateInvoicePDF = async (
   // رقم الفاتورة والتاريخ في صندوق
   doc.setFontSize(9);
   doc.setFont("Amiri", "normal");
-  doc.text(`رقم الفاتورة: ${invoice.invoice_number}`, pageWidth - margin, 42, {
+  doc.text(processArabicText(`رقم الفاتورة: ${invoice.invoice_number}`), pageWidth - margin, 42, {
     align: "right",
   });
   doc.text(
-    `التاريخ: ${new Date(invoice.invoice_date).toLocaleDateString("ar-SA")}${
+    processArabicText(`التاريخ: ${new Date(invoice.invoice_date).toLocaleDateString("ar-SA")}${
       invoice.invoice_time ? " | " + invoice.invoice_time : ""
-    }`,
+    }`),
     pageWidth - margin,
     48,
     { align: "right" }
@@ -128,32 +129,32 @@ export const generateInvoicePDF = async (
   // البائع (يسار)
   const sellerX = margin;
   doc.setFont("Amiri", "bold");
-  doc.text("معلومات البائع", sellerX, yPos);
+  doc.text(processArabicText("معلومات البائع"), sellerX, yPos);
   doc.setFont("Amiri", "normal");
   doc.setFontSize(9);
 
   if (orgSettings) {
     yPos += 7;
-    doc.text(orgSettings.organization_name_ar, sellerX, yPos);
+    doc.text(processArabicText(orgSettings.organization_name_ar), sellerX, yPos);
     yPos += 6;
     doc.text(
-      `الرقم الضريبي: ${formatVATNumber(orgSettings.vat_registration_number)}`,
+      processArabicText(`الرقم الضريبي: ${formatVATNumber(orgSettings.vat_registration_number)}`),
       sellerX,
       yPos
     );
     yPos += 6;
     doc.text(
-      `السجل التجاري: ${orgSettings.commercial_registration_number}`,
+      processArabicText(`السجل التجاري: ${orgSettings.commercial_registration_number}`),
       sellerX,
       yPos
     );
     yPos += 6;
-    doc.text(`العنوان: ${orgSettings.address_ar}`, sellerX, yPos);
+    doc.text(processArabicText(`العنوان: ${orgSettings.address_ar}`), sellerX, yPos);
     yPos += 6;
-    doc.text(`المدينة: ${orgSettings.city}`, sellerX, yPos);
+    doc.text(processArabicText(`المدينة: ${orgSettings.city}`), sellerX, yPos);
     if (orgSettings.phone) {
       yPos += 6;
-      doc.text(`الهاتف: ${orgSettings.phone}`, sellerX, yPos);
+      doc.text(processArabicText(`الهاتف: ${orgSettings.phone}`), sellerX, yPos);
     }
   }
 
@@ -162,17 +163,17 @@ export const generateInvoicePDF = async (
   const buyerX = pageWidth - margin;
   doc.setFont("Amiri", "bold");
   doc.setFontSize(11);
-  doc.text("معلومات المشتري", buyerX, yPos, { align: "right" });
+  doc.text(processArabicText("معلومات المشتري"), buyerX, yPos, { align: "right" });
   doc.setFont("Amiri", "normal");
   doc.setFontSize(9);
 
   yPos += 7;
-  doc.text(invoice.customer_name, buyerX, yPos, { align: "right" });
+  doc.text(processArabicText(invoice.customer_name), buyerX, yPos, { align: "right" });
 
   if (invoice.customer_vat_number) {
     yPos += 6;
     doc.text(
-      `الرقم الضريبي: ${formatVATNumber(invoice.customer_vat_number)}`,
+      processArabicText(`الرقم الضريبي: ${formatVATNumber(invoice.customer_vat_number)}`),
       buyerX,
       yPos,
       { align: "right" }
@@ -182,7 +183,7 @@ export const generateInvoicePDF = async (
   if (invoice.customer_commercial_registration) {
     yPos += 6;
     doc.text(
-      `السجل التجاري: ${invoice.customer_commercial_registration}`,
+      processArabicText(`السجل التجاري: ${invoice.customer_commercial_registration}`),
       buyerX,
       yPos,
       { align: "right" }
@@ -191,21 +192,21 @@ export const generateInvoicePDF = async (
 
   if (invoice.customer_address) {
     yPos += 6;
-    doc.text(`العنوان: ${invoice.customer_address}`, buyerX, yPos, {
+    doc.text(processArabicText(`العنوان: ${invoice.customer_address}`), buyerX, yPos, {
       align: "right",
     });
   }
 
   if (invoice.customer_city) {
     yPos += 6;
-    doc.text(`المدينة: ${invoice.customer_city}`, buyerX, yPos, {
+    doc.text(processArabicText(`المدينة: ${invoice.customer_city}`), buyerX, yPos, {
       align: "right",
     });
   }
 
   if (invoice.customer_phone) {
     yPos += 6;
-    doc.text(`الهاتف: ${invoice.customer_phone}`, buyerX, yPos, {
+    doc.text(processArabicText(`الهاتف: ${invoice.customer_phone}`), buyerX, yPos, {
       align: "right",
     });
   }
@@ -213,11 +214,11 @@ export const generateInvoicePDF = async (
   yPos += 20;
 
   // جدول البنود - تحسين التنسيق
-  const tableHeaders = [
-    ["الإجمالي", "ض.ق.م", "نسبة الضريبة", "المجموع", "السعر", "الكمية", "البيان"],
-  ];
+  const tableHeaders = processArabicHeaders([
+    "الإجمالي", "ض.ق.م", "نسبة الضريبة", "المجموع", "السعر", "الكمية", "البيان"
+  ]);
 
-  const tableData = lines.map((line) => [
+  const tableData = processArabicTableData(lines.map((line) => [
     formatZATCACurrency(line.line_total),
     formatZATCACurrency(line.tax_amount),
     `${line.tax_rate}%`,
@@ -225,11 +226,11 @@ export const generateInvoicePDF = async (
     formatZATCACurrency(line.unit_price),
     line.quantity.toString(),
     line.description,
-  ]);
+  ]));
 
   autoTable(doc, {
     startY: yPos,
-    head: tableHeaders,
+    head: [tableHeaders],
     body: tableData,
     theme: "grid",
     styles: {
@@ -283,18 +284,18 @@ export const generateInvoicePDF = async (
   doc.setFontSize(9);
 
   let summaryYPos = yPos + 8;
-  doc.text("المجموع (غير شامل ض.ق.م):", summaryX + 5, summaryYPos);
+  doc.text(processArabicText("المجموع (غير شامل ض.ق.م):"), summaryX + 5, summaryYPos);
   doc.text(
-    `${formatZATCACurrency(invoice.subtotal)} ريال`,
+    processArabicText(`${formatZATCACurrency(invoice.subtotal)} ريال`),
     summaryX + summaryWidth - 5,
     summaryYPos,
     { align: "right" }
   );
 
   summaryYPos += 8;
-  doc.text("ضريبة القيمة المضافة (15%):", summaryX + 5, summaryYPos);
+  doc.text(processArabicText("ضريبة القيمة المضافة (15%):"), summaryX + 5, summaryYPos);
   doc.text(
-    `${formatZATCACurrency(invoice.tax_amount)} ريال`,
+    processArabicText(`${formatZATCACurrency(invoice.tax_amount)} ريال`),
     summaryX + summaryWidth - 5,
     summaryYPos,
     { align: "right" }
@@ -311,9 +312,9 @@ export const generateInvoicePDF = async (
   doc.setFont("Amiri", "bold");
   doc.setFontSize(12);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text("الإجمالي الكلي:", summaryX + 5, summaryYPos);
+  doc.text(processArabicText("الإجمالي الكلي:"), summaryX + 5, summaryYPos);
   doc.text(
-    `${formatZATCACurrency(invoice.total_amount)} ريال`,
+    processArabicText(`${formatZATCACurrency(invoice.total_amount)} ريال`),
     summaryX + summaryWidth - 5,
     summaryYPos,
     { align: "right" }
@@ -347,7 +348,7 @@ export const generateInvoicePDF = async (
       doc.setFontSize(10);
       doc.setFont("Amiri", "bold");
       doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text("رمز التحقق ZATCA", qrBoxX + qrBoxWidth / 2, qrBoxY + 6, { align: "center" });
+      doc.text(processArabicText("رمز التحقق ZATCA"), qrBoxX + qrBoxWidth / 2, qrBoxY + 6, { align: "center" });
       
       // إضافة صورة QR Code
       const qrX = qrBoxX + (qrBoxWidth - qrImageSize) / 2;
@@ -358,7 +359,7 @@ export const generateInvoicePDF = async (
       doc.setFont("Amiri", "normal");
       doc.setTextColor(100, 100, 100);
       doc.text(
-        "امسح للتحقق من الفاتورة",
+        processArabicText("امسح للتحقق من الفاتورة"),
         qrBoxX + qrBoxWidth / 2,
         qrBoxY + qrBoxHeight - 4,
         { align: "center", maxWidth: qrBoxWidth - 4 }
@@ -375,14 +376,14 @@ export const generateInvoicePDF = async (
     doc.setFont("Amiri", "bold");
     doc.setFontSize(10);
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-    doc.text("ملاحظات:", margin, yPos);
+    doc.text(processArabicText("ملاحظات:"), margin, yPos);
     
     doc.setFont("Amiri", "normal");
     doc.setFontSize(9);
     yPos += 6;
     
     // تقسيم النص الطويل على أسطر متعددة
-    const noteLines = doc.splitTextToSize(invoice.notes, pageWidth - 2 * margin - 10);
+    const noteLines = doc.splitTextToSize(processArabicText(invoice.notes), pageWidth - 2 * margin - 10);
     doc.text(noteLines, margin + 5, yPos);
     yPos += noteLines.length * 5 + 10;
   }
@@ -406,7 +407,7 @@ export const generateInvoicePDF = async (
     // السطر الأول - معلومات التواصل
     doc.setFontSize(9);
     doc.text(
-      `${orgSettings.organization_name_ar}`,
+      processArabicText(orgSettings.organization_name_ar),
       pageWidth / 2,
       footerY + 9,
       { align: "center" }
@@ -431,7 +432,7 @@ export const generateInvoicePDF = async (
     // السطر الثالث - الرقم الضريبي
     doc.setFontSize(8);
     doc.text(
-      `الرقم الضريبي: ${formatVATNumber(orgSettings.vat_registration_number)}`,
+      processArabicText(`الرقم الضريبي: ${formatVATNumber(orgSettings.vat_registration_number)}`),
       pageWidth / 2,
       footerY + 20,
       { align: "center" }

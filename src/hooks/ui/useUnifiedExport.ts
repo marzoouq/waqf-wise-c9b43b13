@@ -8,7 +8,7 @@
  * - تصدير متعدد الصفحات
  * - تنسيق البيانات
  * 
- * @version 2.9.42
+ * @version 2.9.74
  */
 
 import { useCallback } from "react";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useToast } from "@/hooks/ui/use-toast";
 import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "@/lib/pdf/arabic-pdf-utils";
 import type { 
   PDFTableData, 
   ExcelRowData, 
@@ -86,11 +86,15 @@ export function useUnifiedExport() {
       // إضافة ترويسة الوقف
       let yPos = addWaqfHeader(doc, fontName, config.title);
 
+      // معالجة البيانات للعربية
+      const processedHeaders = processArabicHeaders(config.headers);
+      const processedData = processArabicTableData(config.data);
+
       // Table with unified styles
       const tableStyles = getDefaultTableStyles(fontName);
       autoTable(doc, {
-        head: [config.headers],
-        body: config.data,
+        head: [processedHeaders],
+        body: processedData,
         startY: yPos,
         ...tableStyles,
         headStyles: {
@@ -174,13 +178,13 @@ export function useUnifiedExport() {
       doc.setFontSize(11);
       config.sections.forEach((section) => {
         doc.setFont(fontName, "bold");
-        doc.text(section.title, 20, yPosition);
+        doc.text(processArabicText(section.title), 20, yPosition);
         yPosition += 7;
 
         doc.setFont(fontName, "normal");
         section.items.forEach((item) => {
-          const amountText = item.amount.toFixed(2);
-          doc.text(item.label, 30, yPosition);
+          const amountText = processArabicText(item.amount.toFixed(2));
+          doc.text(processArabicText(item.label), 30, yPosition);
           doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
             align: "right",
           });
@@ -203,8 +207,8 @@ export function useUnifiedExport() {
 
       doc.setFont(fontName, "bold");
       config.totals.forEach((total) => {
-        const amountText = total.amount.toFixed(2);
-        doc.text(total.label, 20, yPosition);
+        const amountText = processArabicText(total.amount.toFixed(2));
+        doc.text(processArabicText(total.label), 20, yPosition);
         doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
           align: "right",
         });

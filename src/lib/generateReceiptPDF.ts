@@ -1,7 +1,13 @@
+/**
+ * مولّد سندات القبض PDF
+ * @version 2.9.74
+ */
+
 import { formatZATCACurrency } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
+import { processArabicText } from "./pdf/arabic-pdf-utils";
 
 // Dynamic import type - jsPDF instance type
 type JsPDFInstance = InstanceType<typeof import('jspdf').default>;
@@ -67,7 +73,7 @@ export const generateReceiptPDF = async (
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(28);
     doc.setFont("Amiri", "bold");
-    doc.text("سند قبض", pageWidth / 2, 22, { align: "center" });
+    doc.text(processArabicText("سند قبض"), pageWidth / 2, 22, { align: "center" });
     
     doc.setFontSize(12);
     doc.setFont("Amiri", "normal");
@@ -75,7 +81,7 @@ export const generateReceiptPDF = async (
 
     // رقم السند والتاريخ
     doc.setFontSize(10);
-    doc.text(`رقم السند: ${receipt.payment_number}`, pageWidth - margin, 42, {
+    doc.text(processArabicText(`رقم السند: ${receipt.payment_number}`), pageWidth - margin, 42, {
       align: "right",
     });
 
@@ -85,23 +91,23 @@ export const generateReceiptPDF = async (
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
     doc.setFont("Amiri", "bold");
     doc.setFontSize(12);
-    doc.text("معلومات المنظمة", margin, yPos);
+    doc.text(processArabicText("معلومات المنظمة"), margin, yPos);
     
     doc.setFont("Amiri", "normal");
     doc.setFontSize(10);
     
     if (orgSettings) {
       yPos += 8;
-      doc.text(orgSettings.organization_name_ar, margin, yPos);
+      doc.text(processArabicText(orgSettings.organization_name_ar), margin, yPos);
       yPos += 6;
-      doc.text(`الرقم الضريبي: ${orgSettings.vat_registration_number}`, margin, yPos);
+      doc.text(processArabicText(`الرقم الضريبي: ${orgSettings.vat_registration_number}`), margin, yPos);
       yPos += 6;
-      doc.text(`السجل التجاري: ${orgSettings.commercial_registration_number}`, margin, yPos);
+      doc.text(processArabicText(`السجل التجاري: ${orgSettings.commercial_registration_number}`), margin, yPos);
       yPos += 6;
-      doc.text(`العنوان: ${orgSettings.address_ar}`, margin, yPos);
+      doc.text(processArabicText(`العنوان: ${orgSettings.address_ar}`), margin, yPos);
       if (orgSettings.phone) {
         yPos += 6;
-        doc.text(`الهاتف: ${orgSettings.phone}`, margin, yPos);
+        doc.text(processArabicText(`الهاتف: ${orgSettings.phone}`), margin, yPos);
       }
     }
 
@@ -118,7 +124,7 @@ export const generateReceiptPDF = async (
     doc.setFont("Amiri", "bold");
     doc.setFontSize(14);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text("تفاصيل السند", margin + 5, yPos + 10);
+    doc.text(processArabicText("تفاصيل السند"), margin + 5, yPos + 10);
 
     doc.setFont("Amiri", "normal");
     doc.setFontSize(11);
@@ -130,10 +136,10 @@ export const generateReceiptPDF = async (
 
     // التاريخ
     doc.setFont("Amiri", "bold");
-    doc.text("التاريخ:", labelX, detailY);
+    doc.text(processArabicText("التاريخ:"), labelX, detailY);
     doc.setFont("Amiri", "normal");
     doc.text(
-      new Date(receipt.payment_date).toLocaleDateString("ar-SA"),
+      processArabicText(new Date(receipt.payment_date).toLocaleDateString("ar-SA")),
       valueX,
       detailY,
       { align: "right" }
@@ -143,20 +149,20 @@ export const generateReceiptPDF = async (
 
     // اسم الدافع
     doc.setFont("Amiri", "bold");
-    doc.text("استلمنا من:", labelX, detailY);
+    doc.text(processArabicText("استلمنا من:"), labelX, detailY);
     doc.setFont("Amiri", "normal");
-    doc.text(receipt.payer_name, valueX, detailY, { align: "right" });
+    doc.text(processArabicText(receipt.payer_name), valueX, detailY, { align: "right" });
 
     detailY += 10;
 
     // المبلغ بالأرقام
     doc.setFont("Amiri", "bold");
-    doc.text("المبلغ:", labelX, detailY);
+    doc.text(processArabicText("المبلغ:"), labelX, detailY);
     doc.setFont("Amiri", "normal");
     doc.setFontSize(14);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.text(
-      `${formatZATCACurrency(receipt.amount)} ريال سعودي`,
+      processArabicText(`${formatZATCACurrency(receipt.amount)} ريال سعودي`),
       valueX,
       detailY,
       { align: "right" }
@@ -168,17 +174,17 @@ export const generateReceiptPDF = async (
     doc.setFont("Amiri", "bold");
     doc.setFontSize(11);
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-    doc.text("طريقة الدفع:", labelX, detailY);
+    doc.text(processArabicText("طريقة الدفع:"), labelX, detailY);
     doc.setFont("Amiri", "normal");
-    doc.text(receipt.payment_method || 'نقدي', valueX, detailY, { align: "right" });
+    doc.text(processArabicText(receipt.payment_method || 'نقدي'), valueX, detailY, { align: "right" });
 
     detailY += 10;
 
     // البيان
     doc.setFont("Amiri", "bold");
-    doc.text("البيان:", labelX, detailY);
+    doc.text(processArabicText("البيان:"), labelX, detailY);
     doc.setFont("Amiri", "normal");
-    const descLines = doc.splitTextToSize(receipt.description, pageWidth - 2 * margin - 30);
+    const descLines = doc.splitTextToSize(processArabicText(receipt.description), pageWidth - 2 * margin - 30);
     doc.text(descLines, labelX + 20, detailY);
 
     yPos += boxHeight + 15;
@@ -187,7 +193,7 @@ export const generateReceiptPDF = async (
     if (receipt.reference_number) {
       doc.setFont("Amiri", "bold");
       doc.setFontSize(10);
-      doc.text(`رقم المرجع: ${receipt.reference_number}`, margin, yPos);
+      doc.text(processArabicText(`رقم المرجع: ${receipt.reference_number}`), margin, yPos);
       yPos += 10;
     }
 
@@ -196,12 +202,12 @@ export const generateReceiptPDF = async (
       doc.setFont("Amiri", "bold");
       doc.setFontSize(11);
       doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-      doc.text("ملاحظات:", margin, yPos);
+      doc.text(processArabicText("ملاحظات:"), margin, yPos);
       
       doc.setFont("Amiri", "normal");
       doc.setFontSize(10);
       yPos += 7;
-      const noteLines = doc.splitTextToSize(receipt.notes, pageWidth - 2 * margin - 10);
+      const noteLines = doc.splitTextToSize(processArabicText(receipt.notes), pageWidth - 2 * margin - 10);
       doc.text(noteLines, margin + 5, yPos);
       yPos += noteLines.length * 5 + 10;
     }
@@ -209,13 +215,12 @@ export const generateReceiptPDF = async (
     // التوقيعات
     yPos = pageHeight - 70;
     const sigWidth = 70;
-    const sigGap = 20;
 
     // المستلم
     const receiverX = margin;
     doc.setFont("Amiri", "bold");
     doc.setFontSize(10);
-    doc.text("المستلم", receiverX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("المستلم"), receiverX + sigWidth / 2, yPos, { align: "center" });
     yPos += 3;
     doc.setLineWidth(0.3);
     doc.setDrawColor(100, 100, 100);
@@ -223,33 +228,33 @@ export const generateReceiptPDF = async (
     yPos += 5;
     doc.setFont("Amiri", "normal");
     doc.setFontSize(8);
-    doc.text("التوقيع", receiverX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("التوقيع"), receiverX + sigWidth / 2, yPos, { align: "center" });
 
     // المسؤول المالي
     yPos = pageHeight - 70;
     const financeX = pageWidth / 2 - sigWidth / 2;
     doc.setFont("Amiri", "bold");
     doc.setFontSize(10);
-    doc.text("المسؤول المالي", financeX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("المسؤول المالي"), financeX + sigWidth / 2, yPos, { align: "center" });
     yPos += 3;
     doc.line(financeX, yPos, financeX + sigWidth, yPos);
     yPos += 5;
     doc.setFont("Amiri", "normal");
     doc.setFontSize(8);
-    doc.text("التوقيع", financeX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("التوقيع"), financeX + sigWidth / 2, yPos, { align: "center" });
 
     // المعتمد
     yPos = pageHeight - 70;
     const approverX = pageWidth - margin - sigWidth;
     doc.setFont("Amiri", "bold");
     doc.setFontSize(10);
-    doc.text("المعتمد", approverX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("المعتمد"), approverX + sigWidth / 2, yPos, { align: "center" });
     yPos += 3;
     doc.line(approverX, yPos, approverX + sigWidth, yPos);
     yPos += 5;
     doc.setFont("Amiri", "normal");
     doc.setFontSize(8);
-    doc.text("التوقيع", approverX + sigWidth / 2, yPos, { align: "center" });
+    doc.text(processArabicText("التوقيع"), approverX + sigWidth / 2, yPos, { align: "center" });
 
     // التذييل
     const footerY = pageHeight - 20;
@@ -262,7 +267,7 @@ export const generateReceiptPDF = async (
     
     if (orgSettings) {
       doc.text(
-        `${orgSettings.organization_name_ar} | ${orgSettings.phone || ''} | ${orgSettings.email || ''}`,
+        processArabicText(`${orgSettings.organization_name_ar} | ${orgSettings.phone || ''} | ${orgSettings.email || ''}`),
         pageWidth / 2,
         footerY + 10,
         { align: "center" }
@@ -270,7 +275,7 @@ export const generateReceiptPDF = async (
       
       doc.setFontSize(8);
       doc.text(
-        `الرقم الضريبي: ${orgSettings.vat_registration_number}`,
+        processArabicText(`الرقم الضريبي: ${orgSettings.vat_registration_number}`),
         pageWidth / 2,
         footerY + 16,
         { align: "center" }
