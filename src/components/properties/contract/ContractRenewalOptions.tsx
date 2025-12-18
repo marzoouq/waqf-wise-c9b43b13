@@ -12,7 +12,7 @@ interface Props {
 export function ContractRenewalOptions({ formData, onUpdate }: Props) {
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="flex items-center space-x-2 space-x-reverse">
           <Switch
             checked={formData.is_renewable}

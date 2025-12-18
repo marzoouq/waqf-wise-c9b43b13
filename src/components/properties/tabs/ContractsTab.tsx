@@ -123,7 +123,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">إجمالي العقود</div>
           <div className="text-2xl font-bold">{pagination.totalCount}</div>
