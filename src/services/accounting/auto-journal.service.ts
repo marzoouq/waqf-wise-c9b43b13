@@ -151,7 +151,7 @@ export class AutoJournalService {
   }
 
   /**
-   * إنشاء قيد تلقائي
+   * إنشاء قيد تلقائي - يدعم account_code و account_id
    */
   static async createAutoJournalEntry(params: {
     trigger: string;
@@ -172,21 +172,43 @@ export class AutoJournalService {
       if (!templates || templates.length === 0) return null;
 
       const template = templates[0];
-      const debitAccounts = template.debit_accounts as { account_id: string; percentage: number }[];
-      const creditAccounts = template.credit_accounts as { account_id: string; percentage: number }[];
+      
+      // جلب قائمة الحسابات للبحث بالكود
+      const { data: accountsList } = await supabase
+        .from('accounts')
+        .select('id, code')
+        .eq('is_active', true);
+      
+      const accountCodeToId = new Map(accountsList?.map(a => [a.code, a.id]) || []);
+      
+      // دالة للحصول على account_id من الكود أو المعرف
+      const resolveAccountId = (acc: { account_code?: string; account_id?: string }) => {
+        if (acc.account_code) {
+          return accountCodeToId.get(acc.account_code) || acc.account_id;
+        }
+        return acc.account_id;
+      };
+
+      const debitAccounts = template.debit_accounts as { account_code?: string; account_id?: string; percentage: number }[];
+      const creditAccounts = template.credit_accounts as { account_code?: string; account_id?: string; percentage: number }[];
 
       const lines = [
         ...debitAccounts.map(acc => ({
-          account_id: acc.account_id,
-          debit_amount: (params.amount * acc.percentage) / 100,
+          account_id: resolveAccountId(acc),
+          debit_amount: (params.amount * (acc.percentage || 100)) / 100,
           credit_amount: 0,
         })),
         ...creditAccounts.map(acc => ({
-          account_id: acc.account_id,
+          account_id: resolveAccountId(acc),
           debit_amount: 0,
-          credit_amount: (params.amount * acc.percentage) / 100,
+          credit_amount: (params.amount * (acc.percentage || 100)) / 100,
         })),
-      ];
+      ].filter(line => line.account_id); // استبعاد السطور بدون حساب
+
+      if (lines.length === 0) {
+        productionLogger.error('No valid accounts found for auto journal entry', { template: template.id });
+        return null;
+      }
 
       const { data: activeFY } = await supabase
         .from('fiscal_years')
@@ -237,6 +259,17 @@ export class AutoJournalService {
       return journalEntry;
     } catch (error) {
       productionLogger.error('Error creating auto journal entry', error);
+      
+      // تسجيل الخطأ في السجل
+      await supabase.from('auto_journal_log').insert([{
+        trigger_event: params.trigger,
+        reference_id: params.referenceId,
+        reference_type: params.referenceType,
+        amount: params.amount,
+        success: false,
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      }]);
+      
       throw error;
     }
   }
