@@ -116,7 +116,7 @@ export function SmartArchiveFeatures() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (

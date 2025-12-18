@@ -60,7 +60,7 @@ export function DistributePreviewSection({
           <CardTitle className="text-base">ملخص التوزيع</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <div className="text-center p-3 bg-background rounded-lg">
               <p className="text-sm text-muted-foreground">
                 حصة الزوجات (الثمن)

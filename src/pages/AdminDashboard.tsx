@@ -46,7 +46,7 @@ export default function AdminDashboard() {
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* التبويبات - أيقونات فقط على الجوال */}
-        <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-muted/50">
+        <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-5 h-auto p-1 bg-muted/50 min-w-max sm:min-w-0">
           <TabsTrigger 
             value="system" 
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"

@@ -69,7 +69,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
               <div className="p-3 rounded-lg bg-success-light border border-success/20">
                 <div className="flex items-center justify-center gap-1 text-xs text-success mb-1">
                   <CircleDot className="h-3 w-3" />

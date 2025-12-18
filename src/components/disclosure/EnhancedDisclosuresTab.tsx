@@ -184,7 +184,7 @@ export function EnhancedDisclosuresTab() {
 
                 {/* معلومات المستفيدين */}
                 {settings?.show_total_beneficiaries_count && (
-                  <div className="flex items-center justify-center gap-4 sm:gap-8 py-2 px-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
+                  <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-center gap-2 sm:gap-4 md:gap-8 py-2 px-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                     <div className="text-center">
                       <span className="text-muted-foreground">الورثة</span>
                       <p className="font-bold">{disclosure.total_beneficiaries}</p>

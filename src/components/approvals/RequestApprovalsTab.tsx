@@ -59,7 +59,7 @@ export function RequestApprovalsTab() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">نوع الطلب</p>
                 <p className="text-base font-semibold">{request.request_types?.name_ar}</p>

@@ -105,7 +105,7 @@ export function ManualTasksCard() {
       </CardHeader>
       <CardContent className="p-3 sm:p-4 space-y-3">
         {/* الإشعارات اليومية */}
-        <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg border bg-card">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-primary/10">
               <Bell className="h-4 w-4 text-primary" />
@@ -129,7 +129,7 @@ export function ManualTasksCard() {
         </div>
 
         {/* التقرير الأسبوعي */}
-        <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg border bg-card">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-secondary/50">
               <FileText className="h-4 w-4 text-secondary-foreground" />
@@ -153,7 +153,7 @@ export function ManualTasksCard() {
         </div>
 
         {/* التنبيهات الذكية */}
-        <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-lg border bg-card">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-status-warning/20">
               <AlertTriangle className="h-4 w-4 text-status-warning" />

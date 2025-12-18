@@ -137,7 +137,7 @@ export function NazerSystemOverview() {
         </div>
 
         {/* مؤشرات الصحة */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-4 pt-4 border-t">
           <div className="flex items-center gap-2 text-sm">
             <div className="h-2 w-2 rounded-full bg-[hsl(var(--status-success))] animate-pulse" />
             <span className="text-muted-foreground">النظام يعمل بشكل طبيعي</span>
