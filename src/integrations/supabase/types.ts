@@ -12535,6 +12535,7 @@ export type Database = {
       }
       has_staff_access: { Args: never; Returns: boolean }
       is_accountant: { Args: never; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
       is_admin_or_nazer: { Args: never; Returns: boolean }
       is_archivist: { Args: never; Returns: boolean }
       is_beneficiary: { Args: never; Returns: boolean }
