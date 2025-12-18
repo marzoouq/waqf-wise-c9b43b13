@@ -70,17 +70,19 @@ const Notifications = () => {
         <Card>
           <CardContent className="p-2 sm:p-6">
             <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="all" className="text-xs sm:text-sm">
-                  الكل ({notifications.length})
-                </TabsTrigger>
-                <TabsTrigger value="unread" className="text-xs sm:text-sm">
-                  غير مقروءة ({unreadCount})
-                </TabsTrigger>
-                <TabsTrigger value="read" className="text-xs sm:text-sm">
-                  مقروءة ({readNotifications.length})
-                </TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0 pb-2">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 gap-1 h-auto min-w-full sm:min-w-0 mb-4">
+                  <TabsTrigger value="all" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                    الكل ({notifications.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="unread" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                    غير مقروءة ({unreadCount})
+                  </TabsTrigger>
+                  <TabsTrigger value="read" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                    مقروءة ({readNotifications.length})
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="all" className="mt-4">
                 {notifications.length === 0 ? (

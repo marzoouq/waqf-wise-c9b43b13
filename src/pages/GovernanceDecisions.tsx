@@ -104,11 +104,13 @@ export default function GovernanceDecisions() {
         ) : (
           <>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="active">نشطة ({activeDecisions.length})</TabsTrigger>
-                <TabsTrigger value="completed">منفذة ({completedDecisions.length})</TabsTrigger>
-                <TabsTrigger value="rejected">مرفوضة ({rejectedDecisions.length})</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 gap-1 h-auto min-w-full sm:min-w-0">
+                  <TabsTrigger value="active" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">نشطة ({activeDecisions.length})</TabsTrigger>
+                  <TabsTrigger value="completed" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">منفذة ({completedDecisions.length})</TabsTrigger>
+                  <TabsTrigger value="rejected" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">مرفوضة ({rejectedDecisions.length})</TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="active" className="mt-4 space-y-4">
                 {activeDecisions.length === 0 ? (
