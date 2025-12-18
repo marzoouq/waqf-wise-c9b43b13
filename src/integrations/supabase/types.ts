@@ -12345,6 +12345,15 @@ export type Database = {
         Returns: string
       }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
+      get_available_recipients: {
+        Args: { current_user_id: string }
+        Returns: {
+          id: string
+          name: string
+          role: string
+          role_key: string
+        }[]
+      }
       get_beneficiary_email_by_national_id: {
         Args: { p_national_id: string }
         Returns: {

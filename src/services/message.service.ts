@@ -202,64 +202,26 @@ export class MessageService {
 
   /**
    * جلب قائمة المستلمين المتاحين للمراسلة
+   * يستخدم دالة SECURITY DEFINER لتجاوز RLS بشكل آمن
    */
   static async getRecipients(userId: string): Promise<Recipient[]> {
-    // جلب دور المستخدم الحالي
-    const { data: currentUserRole, error: currentRoleError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase.rpc('get_available_recipients', {
+        current_user_id: userId
+      });
 
-    if (currentRoleError) throw currentRoleError;
+      if (error) throw error;
 
-    // تحديد الأدوار المتاحة للمراسلة
-    let allowedRoles: RoleType[];
-    
-    if (currentUserRole?.role === 'beneficiary' || currentUserRole?.role === 'waqf_heir') {
-      allowedRoles = ['admin', 'nazer'];
-    } else {
-      allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'waqf_heir', 'archivist'];
+      return (data || []).map((row: { id: string; name: string; role: string; role_key: string }) => ({
+        id: row.id,
+        name: row.name,
+        role: row.role,
+        roleKey: row.role_key
+      }));
+    } catch (error) {
+      productionLogger.error('Error fetching recipients', error);
+      throw error;
     }
-    
-    const { data: userRoles, error: rolesError } = await supabase
-      .from('user_roles')
-      .select('user_id, role')
-      .in('role', allowedRoles)
-      .neq('user_id', userId);
-
-    if (rolesError) throw rolesError;
-
-    if (!userRoles || userRoles.length === 0) {
-      return [];
-    }
-
-    const userIds = userRoles.map(ur => ur.user_id);
-    
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('user_id, full_name')
-      .in('user_id', userIds);
-
-    if (profilesError) throw profilesError;
-
-    const recipientsList = (profiles || []).map(profile => {
-      const userRole = userRoles.find(ur => ur.user_id === profile.user_id);
-      const roleName = userRole?.role || 'user';
-      return {
-        id: profile.user_id,
-        name: profile.full_name || 'مستخدم',
-        role: ROLE_TRANSLATIONS[roleName] || roleName,
-        roleKey: roleName
-      };
-    })
-    .sort((a, b) => {
-      const roleCompare = (ROLE_ORDER[a.roleKey] || 999) - (ROLE_ORDER[b.roleKey] || 999);
-      if (roleCompare !== 0) return roleCompare;
-      return a.name.localeCompare(b.name, 'ar');
-    });
-
-    return recipientsList;
   }
 
   /**
