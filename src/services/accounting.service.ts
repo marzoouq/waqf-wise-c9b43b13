@@ -423,27 +423,87 @@ export class AccountingService {
   }
 
   /**
-   * جلب الميزانية العمومية
+   * جلب الميزانية العمومية - حساب فعلي من الحسابات
    */
   static async getBalanceSheet() {
-    const summary = await TrialBalanceService.getFinancialSummary();
+    const { data: accounts, error } = await supabase
+      .from('accounts')
+      .select('code, account_type, current_balance, is_header')
+      .eq('is_active', true)
+      .eq('is_header', false);
+
+    if (error) throw error;
+
+    let currentAssets = 0, fixedAssets = 0;
+    let currentLiabilities = 0, longTermLiabilities = 0;
+    let capital = 0, reserves = 0;
+
+    (accounts || []).forEach(acc => {
+      const balance = acc.current_balance || 0;
+      // الأصول المتداولة (1.1.x)
+      if (acc.code.startsWith('1.1')) currentAssets += balance;
+      // الأصول الثابتة/الذمم (1.2.x, 1.3.x)
+      else if (acc.code.startsWith('1.')) fixedAssets += balance;
+      // الخصوم المتداولة (2.1.x)
+      else if (acc.code.startsWith('2.1')) currentLiabilities += balance;
+      // الخصوم طويلة الأجل (2.2.x)
+      else if (acc.code.startsWith('2.')) longTermLiabilities += balance;
+      // رأس المال (3.1.x)
+      else if (acc.code.startsWith('3.1')) capital += balance;
+      // الاحتياطيات والأرباح المحتجزة (3.2.x, 3.3.x)
+      else if (acc.code.startsWith('3.')) reserves += balance;
+    });
+
+    const totalAssets = currentAssets + fixedAssets;
+    const totalLiabilities = currentLiabilities + longTermLiabilities;
+    const totalEquity = capital + reserves;
+
     return {
-      assets: { current: summary.totalAssets * 0.6, fixed: summary.totalAssets * 0.4, total: summary.totalAssets },
-      liabilities: { current: summary.totalLiabilities * 0.7, longTerm: summary.totalLiabilities * 0.3, total: summary.totalLiabilities },
-      equity: { capital: summary.totalEquity * 0.8, reserves: summary.totalEquity * 0.2, total: summary.totalEquity },
-      retainedEarnings: summary.netIncome,
+      assets: { current: currentAssets, fixed: fixedAssets, total: totalAssets },
+      liabilities: { current: currentLiabilities, longTerm: longTermLiabilities, total: totalLiabilities },
+      equity: { capital, reserves, total: totalEquity },
+      retainedEarnings: totalAssets - totalLiabilities - totalEquity,
     };
   }
 
   /**
-   * جلب قائمة الدخل
+   * جلب قائمة الدخل - حساب فعلي من الحسابات
    */
   static async getIncomeStatement() {
-    const summary = await TrialBalanceService.getFinancialSummary();
+    const { data: accounts, error } = await supabase
+      .from('accounts')
+      .select('code, account_type, current_balance, is_header')
+      .eq('is_active', true)
+      .eq('is_header', false);
+
+    if (error) throw error;
+
+    let propertyRevenue = 0, investmentRevenue = 0, otherRevenue = 0;
+    let administrativeExp = 0, operationalExp = 0, beneficiariesExp = 0;
+
+    (accounts || []).forEach(acc => {
+      const balance = acc.current_balance || 0;
+      // إيرادات عقارية (4.1.x)
+      if (acc.code.startsWith('4.1')) propertyRevenue += balance;
+      // إيرادات استثمارات (4.2.x)
+      else if (acc.code.startsWith('4.2')) investmentRevenue += balance;
+      // إيرادات أخرى (4.x)
+      else if (acc.code.startsWith('4.')) otherRevenue += balance;
+      // مصروفات إدارية (5.1.x)
+      else if (acc.code.startsWith('5.1')) administrativeExp += balance;
+      // مصروفات تشغيلية (5.2.x, 5.3.x)
+      else if (acc.code.startsWith('5.2') || acc.code.startsWith('5.3')) operationalExp += balance;
+      // مصروفات مستفيدين (5.4.x, 5.5.x, etc.)
+      else if (acc.code.startsWith('5.')) beneficiariesExp += balance;
+    });
+
+    const totalRevenue = propertyRevenue + investmentRevenue + otherRevenue;
+    const totalExpenses = administrativeExp + operationalExp + beneficiariesExp;
+
     return {
-      revenue: { property: summary.totalRevenue * 0.7, investment: summary.totalRevenue * 0.2, other: summary.totalRevenue * 0.1, total: summary.totalRevenue },
-      expenses: { administrative: summary.totalExpenses * 0.3, operational: summary.totalExpenses * 0.4, beneficiaries: summary.totalExpenses * 0.3, total: summary.totalExpenses },
-      netIncome: summary.netIncome,
+      revenue: { property: propertyRevenue, investment: investmentRevenue, other: otherRevenue, total: totalRevenue },
+      expenses: { administrative: administrativeExp, operational: operationalExp, beneficiaries: beneficiariesExp, total: totalExpenses },
+      netIncome: totalRevenue - totalExpenses,
     };
   }
 
