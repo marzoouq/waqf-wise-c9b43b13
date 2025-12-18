@@ -55,12 +55,14 @@ export default function LandingPageSettings() {
       </div>
 
       <Tabs defaultValue="contact" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="contact">معلومات الاتصال</TabsTrigger>
-          <TabsTrigger value="social">التواصل الاجتماعي</TabsTrigger>
-          <TabsTrigger value="content">المحتوى</TabsTrigger>
-          <TabsTrigger value="legal">الصفحات القانونية</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+          <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 gap-1 h-auto min-w-full sm:min-w-0">
+            <TabsTrigger value="contact" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">معلومات الاتصال</TabsTrigger>
+            <TabsTrigger value="social" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التواصل الاجتماعي</TabsTrigger>
+            <TabsTrigger value="content" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">المحتوى</TabsTrigger>
+            <TabsTrigger value="legal" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">الصفحات القانونية</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="contact" className="space-y-4">
           <Card>

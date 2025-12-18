@@ -75,12 +75,14 @@ export default function SupportManagement() {
           <AgentAvailabilityCard />
 
           <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
-            <TabsList className="w-full grid grid-cols-4 h-auto">
-              <TabsTrigger value="overview" className="text-xs sm:text-sm py-2">نظرة عامة</TabsTrigger>
-              <TabsTrigger value="tickets" className="text-xs sm:text-sm py-2">التذاكر</TabsTrigger>
-              <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2">التحليلات</TabsTrigger>
-              <TabsTrigger value="performance" className="text-xs sm:text-sm py-2">الأداء</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+              <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 gap-1 h-auto min-w-full sm:min-w-0">
+                <TabsTrigger value="overview" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">نظرة عامة</TabsTrigger>
+                <TabsTrigger value="tickets" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التذاكر</TabsTrigger>
+                <TabsTrigger value="analytics" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التحليلات</TabsTrigger>
+                <TabsTrigger value="performance" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">الأداء</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* نظرة عامة */}
             <TabsContent value="overview" className="space-y-4 sm:space-y-6">

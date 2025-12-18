@@ -141,40 +141,42 @@ export default function TransparencySettings() {
           </Alert>
 
           <Tabs defaultValue="sections" dir="rtl">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2">
-              <TabsTrigger value="sections" className="flex items-center gap-2">
-                <Eye className="h-4 w-4" />
-                الأقسام
-              </TabsTrigger>
-              <TabsTrigger value="financial" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                المالية
-              </TabsTrigger>
-              <TabsTrigger value="beneficiaries" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                المستفيدون
-              </TabsTrigger>
-              <TabsTrigger value="privacy" className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                الخصوصية
-              </TabsTrigger>
-              <TabsTrigger value="governance" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                الحوكمة
-              </TabsTrigger>
-              <TabsTrigger value="loans" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                القروض
-              </TabsTrigger>
-              <TabsTrigger value="budgets" className="flex items-center gap-2">
-                <PieChart className="h-4 w-4" />
-                الميزانيات
-              </TabsTrigger>
-              <TabsTrigger value="accounting" className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4" />
-                المحاسبة
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+              <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:grid-cols-8 gap-1 h-auto min-w-full sm:min-w-0">
+                <TabsTrigger value="sections" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <Eye className="h-4 w-4" />
+                  <span className="hidden sm:inline">الأقسام</span>
+                </TabsTrigger>
+                <TabsTrigger value="financial" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <DollarSign className="h-4 w-4" />
+                  <span className="hidden sm:inline">المالية</span>
+                </TabsTrigger>
+                <TabsTrigger value="beneficiaries" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">المستفيدون</span>
+                </TabsTrigger>
+                <TabsTrigger value="privacy" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <Lock className="h-4 w-4" />
+                  <span className="hidden sm:inline">الخصوصية</span>
+                </TabsTrigger>
+                <TabsTrigger value="governance" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">الحوكمة</span>
+                </TabsTrigger>
+                <TabsTrigger value="loans" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <CreditCard className="h-4 w-4" />
+                  <span className="hidden sm:inline">القروض</span>
+                </TabsTrigger>
+                <TabsTrigger value="budgets" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <PieChart className="h-4 w-4" />
+                  <span className="hidden sm:inline">الميزانيات</span>
+                </TabsTrigger>
+                <TabsTrigger value="accounting" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <Briefcase className="h-4 w-4" />
+                  <span className="hidden sm:inline">المحاسبة</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* التبويب 1: الأقسام الرئيسية */}
             <TabsContent value="sections" className="space-y-4">

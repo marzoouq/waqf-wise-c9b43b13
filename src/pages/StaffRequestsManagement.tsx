@@ -142,14 +142,16 @@ export default function StaffRequestsManagement() {
           </CardHeader>
           <CardContent>
             <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="all">الكل</TabsTrigger>
-                <TabsTrigger value="pending">
-                  قيد المعالجة ({stats.pending})
-                </TabsTrigger>
-                <TabsTrigger value="approved">موافق عليها</TabsTrigger>
-                <TabsTrigger value="rejected">مرفوضة</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 gap-1 h-auto min-w-full sm:min-w-0">
+                  <TabsTrigger value="all" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">الكل</TabsTrigger>
+                  <TabsTrigger value="pending" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                    قيد المعالجة ({stats.pending})
+                  </TabsTrigger>
+                  <TabsTrigger value="approved" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">موافق عليها</TabsTrigger>
+                  <TabsTrigger value="rejected" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">مرفوضة</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value={selectedTab} className="mt-4">
                 {filteredRequests.length === 0 ? (
