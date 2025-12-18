@@ -75,7 +75,7 @@ export default function BeneficiaryPortal() {
 
   if (!beneficiary) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 overflow-x-hidden">
         <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center">
             <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
