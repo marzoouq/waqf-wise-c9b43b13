@@ -75,8 +75,8 @@ export default function BeneficiaryRequests() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6 w-full max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
