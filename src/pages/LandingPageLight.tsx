@@ -147,7 +147,7 @@ export default function LandingPageLight() {
   }, [isLoggedIn, isLoading, redirectPath, navigate]);
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
       {/* Header */}
       <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
