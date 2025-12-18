@@ -18,7 +18,7 @@ export class AnalysisService {
       const { data: distributions, error } = await supabase
         .from('distributions')
         .select('total_amount, distribution_date')
-        .eq('status', 'paid');
+        .in('status', ['مدفوع', 'paid', 'مكتمل', 'completed']);
 
       if (error) throw error;
 
@@ -82,7 +82,7 @@ export class AnalysisService {
   }> {
     try {
       const [beneficiaries, properties, distributions, payments] = await Promise.all([
-        supabase.from('beneficiaries').select('status').eq('status', 'active'),
+        supabase.from('beneficiaries').select('status').in('status', ['نشط', 'active']),
         supabase.from('properties').select('status'),
         supabase.from('distributions').select('total_amount, status'),
         supabase.from('payments').select('amount, payment_type'),
@@ -91,7 +91,7 @@ export class AnalysisService {
       const totalBeneficiaries = beneficiaries.data?.length || 0;
       const totalProperties = properties.data?.length || 0;
       const totalDistributed = (distributions.data || [])
-        .filter(d => d.status === 'paid')
+        .filter(d => d.status === 'paid' || d.status === 'مدفوع' || d.status === 'مكتمل' || d.status === 'completed')
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
       const totalCollected = (payments.data || [])
         .filter(p => p.payment_type === 'receipt')
@@ -124,7 +124,7 @@ export class AnalysisService {
       const { data: loans, error } = await supabase
         .from('loans')
         .select('*')
-        .eq('status', 'active');
+        .in('status', ['نشط', 'active']);
 
       if (error) throw error;
 

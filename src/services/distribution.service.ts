@@ -760,7 +760,7 @@ export class DistributionService {
     const { data, error } = await supabase
       .from('beneficiaries')
       .select('id, full_name, national_id, category')
-      .eq('status', 'active')
+      .in('status', ['نشط', 'active'])
       .order('full_name');
     if (error) throw error;
     return data || [];

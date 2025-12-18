@@ -405,3 +405,38 @@ export function getApprovalStatusLabel(status: string | null | undefined): strin
   if (!status) return "غير محدد";
   return APPROVAL_STATUS_LABELS[status.toLowerCase()] || APPROVAL_STATUS_LABELS[status] || status;
 }
+
+// === Status Matching Mappings ===
+const STATUS_MAPPINGS: Record<string, string[]> = {
+  'active': ['نشط', 'active'],
+  'نشط': ['نشط', 'active'],
+  'pending': ['معلق', 'pending', 'قيد المراجعة'],
+  'معلق': ['معلق', 'pending', 'قيد المراجعة'],
+  'completed': ['مكتمل', 'completed', 'paid', 'مدفوع'],
+  'مكتمل': ['مكتمل', 'completed', 'paid', 'مدفوع'],
+  'paid': ['مدفوع', 'paid', 'مكتمل', 'completed'],
+  'مدفوع': ['مدفوع', 'paid', 'مكتمل', 'completed'],
+  'draft': ['مسودة', 'draft'],
+  'مسودة': ['مسودة', 'draft'],
+  'cancelled': ['ملغي', 'cancelled'],
+  'ملغي': ['ملغي', 'cancelled'],
+  'approved': ['موافق عليه', 'approved', 'معتمد'],
+  'موافق عليه': ['موافق عليه', 'approved', 'معتمد'],
+};
+
+/**
+ * دالة للمقارنة الآمنة بين القيم العربية والإنجليزية
+ * Helper function for safe comparison between Arabic and English status values
+ */
+export function matchesStatus(
+  value: string | null | undefined,
+  ...expectedStatuses: string[]
+): boolean {
+  if (!value) return false;
+  const normalizedValue = value.toLowerCase();
+  
+  return expectedStatuses.some(expected => {
+    const mappings = STATUS_MAPPINGS[expected.toLowerCase()] || [expected];
+    return mappings.some(m => normalizedValue === m.toLowerCase());
+  });
+}

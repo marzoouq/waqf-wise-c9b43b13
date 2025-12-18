@@ -34,7 +34,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
       }
 
       // حساب التسليم في الوقت المحدد
-      if (dist.status === 'completed') {
+      if (dist.status === 'completed' || dist.status === 'مكتمل') {
         const totalTime = new Date(dist.executed_at || dist.updated_at).getTime() - new Date(dist.created_at).getTime();
         const totalDays = totalTime / (1000 * 60 * 60 * 24);
         if (totalDays <= 7) {

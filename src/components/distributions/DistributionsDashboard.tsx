@@ -38,8 +38,8 @@ export function DistributionsDashboard() {
     }).length,
     totalAmount: distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0),
     avgAmount: 0,
-    completed: distributions.filter(d => d.status === 'completed').length,
-    pending: distributions.filter(d => d.status === 'pending' || d.status === 'draft').length,
+    completed: distributions.filter(d => d.status === 'completed' || d.status === 'مكتمل').length,
+    pending: distributions.filter(d => d.status === 'pending' || d.status === 'draft' || d.status === 'معلق' || d.status === 'مسودة').length,
   };
 
   stats.avgAmount = stats.total > 0 ? stats.totalAmount / stats.total : 0;
@@ -59,10 +59,10 @@ export function DistributionsDashboard() {
 
   // تحليل حسب الحالة
   const statusData = [
-    { name: 'مكتمل', value: distributions.filter(d => d.status === 'completed').length },
-    { name: 'قيد المراجعة', value: distributions.filter(d => d.status === 'pending').length },
-    { name: 'مسودة', value: distributions.filter(d => d.status === 'draft').length },
-    { name: 'ملغي', value: distributions.filter(d => d.status === 'cancelled').length },
+    { name: 'مكتمل', value: distributions.filter(d => d.status === 'completed' || d.status === 'مكتمل').length },
+    { name: 'قيد المراجعة', value: distributions.filter(d => d.status === 'pending' || d.status === 'معلق').length },
+    { name: 'مسودة', value: distributions.filter(d => d.status === 'draft' || d.status === 'مسودة').length },
+    { name: 'ملغي', value: distributions.filter(d => d.status === 'cancelled' || d.status === 'ملغي').length },
   ].filter(s => s.value > 0);
 
   // تحليل حسب النوع
@@ -241,7 +241,7 @@ export function DistributionsDashboard() {
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">التوزيعات الملغاة</div>
               <div className="text-2xl font-bold text-destructive">
-                {distributions.filter(d => d.status === 'cancelled').length}
+                {distributions.filter(d => d.status === 'cancelled' || d.status === 'ملغي').length}
               </div>
             </Card>
           </div>
