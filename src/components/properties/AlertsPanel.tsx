@@ -3,14 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, Clock, CheckCircle2, XCircle, Brain } from "lucide-react";
+import { AlertCircle, Clock, CheckCircle2, XCircle, Brain, RefreshCw, Loader2 } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { AIAssistantDialog } from "./AIAssistantDialog";
 import { useSystemAlerts } from "@/hooks/property/useSystemAlerts";
+import { PropertyService } from "@/services/property.service";
+import { toast } from "sonner";
 import type { SystemAlert, SeverityConfig } from "@/types/alerts";
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   // استخدام hook موحد بدلاً من useQuery مباشرة
   const { alerts, criticalAlerts, isLoading, resolveAlert } = useSystemAlerts();
@@ -35,11 +38,30 @@ export function AlertsPanel() {
     }
   };
 
+  const handleGenerateAlerts = async () => {
+    setIsGenerating(true);
+    try {
+      const result = await PropertyService.generateSmartAlerts();
+      if (result.success) {
+        toast.success(`تم توليد ${result.alerts_generated} تنبيه جديد`);
+      } else {
+        toast.error('فشل في توليد التنبيهات');
+      }
+    } catch (error) {
+      toast.error('حدث خطأ أثناء توليد التنبيهات');
+      if (import.meta.env.DEV) {
+        console.error('Error generating alerts:', error);
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <>
       <Card className={criticalAlerts.length > 0 ? "border-destructive" : ""}>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
@@ -55,14 +77,29 @@ export function AlertsPanel() {
                 )}
               </CardDescription>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setAiDialogOpen(true)}
-            >
-              <Brain className="h-4 w-4 ms-2" />
-              تحليل ذكي
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleGenerateAlerts}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 ms-2" />
+                )}
+                توليد التنبيهات
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setAiDialogOpen(true)}
+              >
+                <Brain className="h-4 w-4 ms-2" />
+                تحليل ذكي
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -8536,6 +8536,72 @@ export type Database = {
           },
         ]
       }
+      property_alerts: {
+        Row: {
+          action_url: string | null
+          alert_type: string
+          contract_id: string | null
+          created_at: string | null
+          id: string
+          is_resolved: boolean | null
+          message: string
+          metadata: Json | null
+          property_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          alert_type: string
+          contract_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          message: string
+          metadata?: Json | null
+          property_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          alert_type?: string
+          contract_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          message?: string
+          metadata?: Json | null
+          property_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_alerts_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_alerts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_units: {
         Row: {
           amenities: Json | null
