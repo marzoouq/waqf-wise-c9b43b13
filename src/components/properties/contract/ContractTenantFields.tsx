@@ -51,7 +51,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>العقار *</Label>
           <Select
@@ -95,7 +95,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>المستأجر *</Label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               variant={searchMode === 'select' ? 'default' : 'outline'}
@@ -142,7 +142,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
             </SelectContent>
           </Select>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>اسم المستأجر *</Label>
               <Input
@@ -165,7 +165,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
 
       {/* عرض بيانات المستأجر المحدد */}
       {formData.tenant_name && (
-        <div className="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">اسم المستأجر</Label>
             <p className="text-sm font-medium">{formData.tenant_name}</p>
@@ -177,7 +177,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>رقم الجوال *</Label>
           <Input

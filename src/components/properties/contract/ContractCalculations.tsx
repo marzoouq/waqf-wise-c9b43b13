@@ -34,7 +34,7 @@ export function ContractCalculations({
         معلومات العقد الأساسية
       </h3>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>تاريخ بداية العقد *</Label>
           <Input
@@ -78,7 +78,7 @@ export function ContractCalculations({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>المبلغ الإجمالي للعقد (ر.س) *</Label>
           <Input
@@ -149,7 +149,7 @@ export function ContractCalculations({
             <CheckCircle2 className="h-4 w-4" />
             الحسابات التلقائية:
           </p>
-          <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
             <div>
               <span className="text-muted-foreground">تاريخ النهاية:</span>
               <p className="font-semibold text-success-foreground">
