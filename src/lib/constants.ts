@@ -273,3 +273,135 @@ export const CHART_CONSTANTS = {
   ANIMATION_DURATION: 300,
   LEGEND_POSITION: "bottom",
 } as const;
+
+// === Unit Type Labels (ترجمة نوع الوحدة) ===
+export const UNIT_TYPE_LABELS: Record<string, string> = {
+  "apartment": "شقة",
+  "villa": "فيلا",
+  "shop": "محل تجاري",
+  "office": "مكتب",
+  "warehouse": "مستودع",
+  "other": "أخرى",
+  "شقة": "شقة",
+  "فيلا": "فيلا",
+  "محل تجاري": "محل تجاري",
+  "محل": "محل تجاري",
+  "مكتب": "مكتب",
+  "مستودع": "مستودع",
+  "أخرى": "أخرى",
+};
+
+// === Unit Status Labels (ترجمة حالة الوحدة) ===
+export const UNIT_STATUS_LABELS: Record<string, string> = {
+  "available": "متاح",
+  "occupied": "مشغول",
+  "maintenance": "صيانة",
+  "unavailable": "غير متاح",
+  "متاح": "متاح",
+  "مشغول": "مشغول",
+  "صيانة": "صيانة",
+  "غير متاح": "غير متاح",
+};
+
+// === Payment Status Labels (ترجمة حالة الدفع) ===
+export const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  "completed": "مكتمل",
+  "pending": "معلق",
+  "cancelled": "ملغي",
+  "paid": "مدفوع",
+  "overdue": "متأخر",
+  "partial": "مدفوع جزئياً",
+  "under_collection": "تحت التحصيل",
+  "مكتمل": "مكتمل",
+  "معلق": "معلق",
+  "ملغي": "ملغي",
+  "مدفوع": "مدفوع",
+  "متأخر": "متأخر",
+  "مدفوع جزئياً": "مدفوع جزئياً",
+  "تحت التحصيل": "تحت التحصيل",
+};
+
+// === Account Type Labels (ترجمة نوع الحساب) ===
+export const ACCOUNT_TYPE_LABELS: Record<string, string> = {
+  "asset": "أصول",
+  "liability": "التزامات",
+  "equity": "حقوق ملكية",
+  "revenue": "إيرادات",
+  "expense": "مصروفات",
+  "أصول": "أصول",
+  "التزامات": "التزامات",
+  "حقوق ملكية": "حقوق ملكية",
+  "إيرادات": "إيرادات",
+  "مصروفات": "مصروفات",
+};
+
+// === Journal Entry Type Labels (ترجمة نوع القيد) ===
+export const JOURNAL_ENTRY_TYPE_LABELS: Record<string, string> = {
+  "manual": "يدوي",
+  "auto": "تلقائي",
+  "يدوي": "يدوي",
+  "تلقائي": "تلقائي",
+};
+
+// === Invoice Status Labels (ترجمة حالة الفاتورة) ===
+export const INVOICE_STATUS_LABELS: Record<string, string> = {
+  "draft": "مسودة",
+  "sent": "مُرسل",
+  "paid": "مدفوع",
+  "cancelled": "ملغي",
+};
+
+// === Journal Entry Status Labels (ترجمة حالة القيد) ===
+export const JOURNAL_ENTRY_STATUS_LABELS: Record<string, string> = {
+  "draft": "مسودة",
+  "posted": "مُرحّل",
+  "cancelled": "ملغي",
+};
+
+// === Approval Status Labels (ترجمة حالة الاعتماد) ===
+export const APPROVAL_STATUS_LABELS: Record<string, string> = {
+  "pending": "معلق",
+  "approved": "معتمد",
+  "rejected": "مرفوض",
+};
+
+// === Helper Functions (دوال الترجمة المساعدة) ===
+export function getUnitTypeLabel(type: string | null | undefined): string {
+  if (!type) return "غير محدد";
+  return UNIT_TYPE_LABELS[type.toLowerCase()] || UNIT_TYPE_LABELS[type] || type;
+}
+
+export function getUnitStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return UNIT_STATUS_LABELS[status.toLowerCase()] || UNIT_STATUS_LABELS[status] || status;
+}
+
+export function getPaymentStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return PAYMENT_STATUS_LABELS[status.toLowerCase()] || PAYMENT_STATUS_LABELS[status] || status;
+}
+
+export function getAccountTypeLabel(type: string | null | undefined): string {
+  if (!type) return "غير محدد";
+  return ACCOUNT_TYPE_LABELS[type.toLowerCase()] || ACCOUNT_TYPE_LABELS[type] || type;
+}
+
+export function getJournalEntryTypeLabel(type: string | null | undefined): string {
+  if (!type) return "غير محدد";
+  return JOURNAL_ENTRY_TYPE_LABELS[type.toLowerCase()] || JOURNAL_ENTRY_TYPE_LABELS[type] || type;
+}
+
+export function getInvoiceStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return INVOICE_STATUS_LABELS[status.toLowerCase()] || INVOICE_STATUS_LABELS[status] || status;
+}
+
+export function getJournalEntryStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return JOURNAL_ENTRY_STATUS_LABELS[status.toLowerCase()] || JOURNAL_ENTRY_STATUS_LABELS[status] || status;
+}
+
+export function getApprovalStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return APPROVAL_STATUS_LABELS[status.toLowerCase()] || APPROVAL_STATUS_LABELS[status] || status;
+}

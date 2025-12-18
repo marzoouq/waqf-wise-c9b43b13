@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
+import { getUnitTypeLabel } from "@/lib/constants";
 
 interface PropertyUnitsDisplayProps {
   propertyId: string;
@@ -60,7 +61,7 @@ export function PropertyUnitsDisplay({ propertyId }: PropertyUnitsDisplayProps) 
                   </Badge>
                 </div>
                 <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs text-muted-foreground">
-                  <p className="truncate">النوع: {unit.unit_type || "غير محدد"}</p>
+                  <p className="truncate">النوع: {getUnitTypeLabel(unit.unit_type)}</p>
                   {unit.floor_number && <p>الطابق: {unit.floor_number}</p>}
                   {unit.area && <p>المساحة: {unit.area} م²</p>}
                   {unit.annual_rent && (

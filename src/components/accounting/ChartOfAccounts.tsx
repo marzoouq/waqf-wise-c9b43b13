@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Account, AccountType, AccountNature } from '@/types/accounting';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { getAccountTypeLabel } from '@/lib/constants';
 
 /**
  * مكون شجرة الحسابات
@@ -123,16 +124,7 @@ export function ChartOfAccounts() {
       });
   };
 
-  const getAccountTypeLabel = (type: AccountType): string => {
-    const labels: Record<AccountType, string> = {
-      asset: 'أصول',
-      liability: 'خصوم',
-      equity: 'حقوق ملكية',
-      revenue: 'إيرادات',
-      expense: 'مصروفات',
-    };
-    return labels[type];
-  };
+  // استخدام getAccountTypeLabel من constants.ts
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل شجرة الحسابات..." />;

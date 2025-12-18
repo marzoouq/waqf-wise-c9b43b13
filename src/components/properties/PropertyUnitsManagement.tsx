@@ -43,6 +43,7 @@ import { EnhancedEmptyState } from "@/components/shared";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { useToast } from "@/hooks/ui/use-toast";
 import type { Database } from "@/integrations/supabase/types";
+import { getUnitTypeLabel } from "@/lib/constants";
 
 type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
@@ -243,7 +244,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                       <TableCell className="font-medium text-xs sm:text-sm">{unit.unit_number}</TableCell>
                       <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{unit.unit_name || '-'}</TableCell>
                       <TableCell className="text-xs sm:text-sm">
-                        <Badge variant="outline">{unit.unit_type}</Badge>
+                        <Badge variant="outline">{getUnitTypeLabel(unit.unit_type)}</Badge>
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden md:table-cell">{unit.floor_number || '-'}</TableCell>
                       <TableCell className="text-xs sm:text-sm hidden lg:table-cell">

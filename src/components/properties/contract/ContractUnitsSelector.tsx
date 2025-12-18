@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import type { Database } from "@/integrations/supabase/types";
+import { getUnitTypeLabel } from "@/lib/constants";
 
 type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
@@ -44,7 +45,7 @@ export function ContractUnitsSelector({ units, selectedUnits, onToggleUnit, isLo
                 <p className="font-medium text-sm">{unit.unit_name}</p>
                 <p className="text-xs text-muted-foreground">{unit.unit_number}</p>
                 <div className="flex gap-1 mt-1">
-                  <Badge variant="outline" className="text-xs">{unit.unit_type}</Badge>
+                  <Badge variant="outline" className="text-xs">{getUnitTypeLabel(unit.unit_type)}</Badge>
                   {unit.floor_number && <Badge variant="secondary" className="text-xs">طابق {unit.floor_number}</Badge>}
                 </div>
               </div>
