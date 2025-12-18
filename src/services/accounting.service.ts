@@ -322,7 +322,7 @@ export class AccountingService {
         *,
         journal_entry:journal_entries(*)
       `)
-      .eq("status", "pending")
+      .in("status", ["pending", "معلق"])
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -340,7 +340,7 @@ export class AccountingService {
         *,
         approval_steps (*)
       `)
-      .eq("status", "pending")
+      .in("status", ["pending", "معلق"])
       .order("started_at", { ascending: false });
     
     if (error) throw error;

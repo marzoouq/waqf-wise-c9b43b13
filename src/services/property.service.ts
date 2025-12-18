@@ -649,7 +649,7 @@ export class PropertyService {
       if (expiringError) throw expiringError;
 
       const totalProperties = properties?.length || 0;
-      const activeProperties = properties?.filter(p => p.status === "مؤجر" || p.status === "active").length || 0;
+      const activeProperties = properties?.filter(p => p.status === "نشط" || p.status === "active").length || 0;
       
       const totalUnits = units?.length || 0;
       const occupiedUnits = units?.filter(u => u.occupancy_status === 'مشغول').length || 0;
