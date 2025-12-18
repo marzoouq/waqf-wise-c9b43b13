@@ -29,7 +29,7 @@ export default function NotificationSettings() {
   }
 
   return (
-    <div className="container-custom py-6 space-y-6">
+    <div className="container-custom py-6 space-y-6 w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="إعدادات الإشعارات"
         description="تخصيص طريقة استلام الإشعارات والتنبيهات"
