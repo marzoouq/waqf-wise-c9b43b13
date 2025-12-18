@@ -197,10 +197,26 @@ export const KPIService = {
     const totalRevenue = completedPayments
       .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
 
-    // تصحيح: حساب المصروفات الفعلية
-    // المصروفات هي المبالغ المدينة في حسابات المصروفات وليس كل المبالغ الدائنة
-    // حالياً لا توجد مصروفات فعلية مسجلة - الإيرادات محولة من البنك للمستفيدين
-    const totalExpenses = 0; // سيتم حسابها من حسابات المصروفات لاحقاً
+    // حساب المصروفات الفعلية من حسابات المصروفات
+    let totalExpenses = 0;
+    try {
+      const { data: expenseAccounts } = await supabase
+        .from("accounts")
+        .select("id")
+        .eq("account_type", "expense");
+      
+      if (expenseAccounts && expenseAccounts.length > 0) {
+        const accountIds = expenseAccounts.map(a => a.id);
+        const { data: expenseEntries } = await supabase
+          .from("journal_entry_lines")
+          .select("debit_amount")
+          .in("account_id", accountIds);
+        
+        totalExpenses = expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
+      }
+    } catch (error) {
+      console.error("Error calculating expenses:", error);
+    }
 
     const netIncome = totalRevenue - totalExpenses;
     const availableBudget = netIncome > 0 ? netIncome : 0;
@@ -316,16 +332,34 @@ export const KPIService = {
         return total > 0 ? (completed / total) * 100 : 0;
       }
 
-      case "occupancy_rate":
-        return 85;
+      case "occupancy_rate": {
+        // حساب نسبة الإشغال الفعلية من العقود النشطة والعقارات
+        const [contractsRes, propertiesRes] = await Promise.all([
+          supabase.from("contracts").select("property_id").eq("status", "نشط"),
+          supabase.from("properties").select("id", { count: "exact", head: true })
+        ]);
+        const occupiedCount = new Set(contractsRes.data?.map(c => c.property_id)).size;
+        const totalProperties = propertiesRes.count || 1;
+        return Math.round((occupiedCount / totalProperties) * 100);
+      }
 
-      case "collection_rate":
-        return 92;
+      case "collection_rate": {
+        // حساب نسبة التحصيل الفعلية من دفعات الإيجار
+        const { data: payments } = await supabase
+          .from("rental_payments")
+          .select("amount_due, amount_paid, status");
+        const totalDue = payments?.reduce((sum, p) => sum + (p.amount_due || 0), 0) || 1;
+        const totalPaid = payments
+          ?.filter(p => p.status === 'مدفوع')
+          .reduce((sum, p) => sum + (p.amount_paid || 0), 0) || 0;
+        return Math.round((totalPaid / totalDue) * 100);
+      }
 
       case "approval_time":
         return 2.5;
 
       case "beneficiary_satisfaction":
+        // لا يوجد نظام تقييم حالياً - قيمة ثابتة
         return 88;
 
       case "pending_requests": {
@@ -350,16 +384,48 @@ export const KPIService = {
       }
 
       case "monthly_expenses": {
+        // حساب المصروفات الشهرية من القيود المحاسبية
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
         
-        const { data } = await supabase
-          .from("payments")
-          .select("amount")
-          .eq("payment_type", "voucher")
-          .gte("payment_date", startOfMonth.toISOString());
-        return data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+        // جلب حسابات المصروفات
+        const { data: expenseAccounts } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("account_type", "expense");
+        
+        if (!expenseAccounts || expenseAccounts.length === 0) return 0;
+        
+        const accountIds = expenseAccounts.map(a => a.id);
+        
+        // جلب بنود القيود لهذه الحسابات
+        const { data: entries } = await supabase
+          .from("journal_entry_lines")
+          .select("debit_amount, account_id, created_at")
+          .in("account_id", accountIds)
+          .gte("created_at", startOfMonth.toISOString());
+        
+        return entries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
+      }
+
+      case "total_expenses": {
+        // حساب إجمالي المصروفات من القيود المحاسبية
+        const { data: expenseAccounts } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("account_type", "expense");
+        
+        if (!expenseAccounts || expenseAccounts.length === 0) return 0;
+        
+        const accountIds = expenseAccounts.map(a => a.id);
+        
+        const { data: entries } = await supabase
+          .from("journal_entry_lines")
+          .select("debit_amount")
+          .in("account_id", accountIds);
+        
+        return entries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
 
       default:

@@ -2,14 +2,17 @@
  * Archive Documents Tab Component
  * تبويب المستندات في الأرشيف
  */
+import { useState } from "react";
 import { Database } from "@/integrations/supabase/types";
-import { Plus, Upload, FileText, Search, Eye, Download, Trash2 } from "lucide-react";
+import { Plus, Upload, FileText, Search, Eye, Download, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
+import { StorageService } from "@/services/storage.service";
+import { toast } from "sonner";
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -36,6 +39,38 @@ export function ArchiveDocumentsTab({
   onPreviewDocument,
   onDeleteDocument,
 }: ArchiveDocumentsTabProps) {
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownload = async (doc: Document) => {
+    if (!doc.file_path) {
+      toast.error("لا يوجد ملف مرتبط بهذا المستند");
+      return;
+    }
+
+    setDownloadingId(doc.id);
+    try {
+      const blob = await StorageService.downloadFile("documents", doc.file_path);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = doc.name || "document";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success("تم تنزيل الملف بنجاح");
+      } else {
+        toast.error("فشل في تنزيل الملف");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("حدث خطأ أثناء تنزيل الملف");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   const columns: Column<Document>[] = [
     {
       key: 'name',
@@ -142,10 +177,18 @@ export function ArchiveDocumentsTab({
             <Button
               size="sm"
               variant="ghost"
-              disabled
-              title="وظيفة التنزيل قيد التطوير"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownload(doc);
+              }}
+              disabled={downloadingId === doc.id || !doc.file_path}
+              title={doc.file_path ? "تنزيل" : "لا يوجد ملف"}
             >
-              <Download className="h-4 w-4" />
+              {downloadingId === doc.id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
             </Button>
           </div>
         )}
