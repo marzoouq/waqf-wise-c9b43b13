@@ -366,7 +366,7 @@ export const KPIService = {
         const { count } = await supabase
           .from("beneficiary_requests")
           .select("*", { count: "exact", head: true })
-          .eq("status", "pending");
+          .in("status", ["معلق", "pending", "قيد المراجعة"]);
         return count || 0;
       }
 

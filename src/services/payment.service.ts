@@ -174,7 +174,7 @@ export class PaymentService {
     const [receipts, payments, pending] = await Promise.all([
       supabase.from("payments").select("amount").eq("payment_type", "receipt"),
       supabase.from("payments").select("amount").eq("payment_type", "payment"),
-      supabase.from("payments").select("id", { count: 'exact' }).eq("status", "pending"),
+      supabase.from("payments").select("id", { count: 'exact' }).in("status", ["معلق", "pending"]),
     ]);
 
     return {

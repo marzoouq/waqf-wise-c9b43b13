@@ -256,7 +256,7 @@ export class VoucherService {
     const { data: beneficiaries, error: beneficiariesError } = await supabase
       .from("beneficiaries")
       .select("id, full_name, iban, bank_name, category")
-      .eq("status", "active")
+      .in("status", ["نشط", "active"])
       .limit(100);
 
     if (beneficiariesError) throw beneficiariesError;

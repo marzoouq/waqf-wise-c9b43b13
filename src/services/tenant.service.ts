@@ -151,7 +151,7 @@ export class TenantService {
     const { data: tenants, error: tenantsError } = await supabase
       .from('tenants')
       .select('id, full_name')
-      .eq('status', 'active');
+      .in('status', ['نشط', 'active']);
 
     if (tenantsError) throw tenantsError;
     if (!tenants?.length) return [];
