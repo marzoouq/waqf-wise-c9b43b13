@@ -137,3 +137,6 @@ verify_jwt = true
 
 [functions.weekly-maintenance]
 verify_jwt = false
+
+[functions.db-performance-stats]
+verify_jwt = true

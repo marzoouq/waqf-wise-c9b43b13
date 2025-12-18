@@ -12445,6 +12445,26 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_cache_hit_ratio: {
+        Args: never
+        Returns: {
+          cache_hit_ratio: number
+        }[]
+      }
+      get_connection_stats: {
+        Args: never
+        Returns: {
+          count: number
+          max_idle_seconds: number
+          state: string
+        }[]
+      }
+      get_database_size: {
+        Args: never
+        Returns: {
+          size_mb: number
+        }[]
+      }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
       get_heir_beneficiary_id: { Args: never; Returns: string }
       get_pos_daily_stats: {
@@ -12484,6 +12504,17 @@ export type Database = {
           total_collections: number
           total_payments: number
           variance: number
+        }[]
+      }
+      get_table_scan_stats: {
+        Args: never
+        Returns: {
+          dead_rows: number
+          idx_scan: number
+          live_rows: number
+          seq_pct: number
+          seq_scan: number
+          table_name: string
         }[]
       }
       get_user_permissions: {

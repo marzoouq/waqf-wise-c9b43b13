@@ -14,6 +14,7 @@ import {
   SystemErrorLogs,
   SecurityDashboard,
   PerformanceDashboard,
+  DatabasePerformanceDashboard,
   IntegrationsManagement,
   AIInsights,
   AdvancedSettings,
@@ -92,6 +93,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <PerformanceDashboard />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="db-performance"
+    path="/db-performance" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+        <DatabasePerformanceDashboard />
       </ProtectedRoute>
     } 
   />,
