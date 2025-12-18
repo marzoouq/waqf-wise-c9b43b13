@@ -1,11 +1,11 @@
 /**
  * مولّد تقرير PDF للسنة المالية
- * @version 2.9.42
+ * @version 2.9.74
  */
 
 import type { FiscalYearClosing } from "@/types/fiscal-year-closing";
 import { logger } from "@/lib/logger";
-import { loadArabicFontToPDF, WAQF_COLORS } from "./pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
 
 type JsPDF = import('jspdf').jsPDF;
 
@@ -44,15 +44,15 @@ export const generateFiscalYearPDF = async (
     doc.setFontSize(28);
     doc.setTextColor(255, 255, 255);
     doc.setFont(fontName, "bold");
-    doc.text(`تقرير السنة المالية`, 105, 35, { align: "center" });
+    doc.text(processArabicText("تقرير السنة المالية"), 105, 35, { align: "center" });
     
     doc.setFontSize(20);
-    doc.text(fiscalYearName, 105, 50, { align: "center" });
+    doc.text(processArabicText(fiscalYearName), 105, 50, { align: "center" });
     
     doc.setFontSize(14);
     doc.setTextColor(33, 37, 41);
-    doc.text(`تاريخ الإقفال: ${new Date(closing.closing_date).toLocaleDateString('ar-SA')}`, 105, 80, { align: "center" });
-    doc.text(`نوع الإقفال: ${closing.closing_type === 'automatic' ? 'تلقائي' : 'يدوي'}`, 105, 90, { align: "center" });
+    doc.text(processArabicText(`تاريخ الإقفال: ${new Date(closing.closing_date).toLocaleDateString('ar-SA')}`), 105, 80, { align: "center" });
+    doc.text(processArabicText(`نوع الإقفال: ${closing.closing_type === 'automatic' ? 'تلقائي' : 'يدوي'}`), 105, 90, { align: "center" });
 
     // صفحة الملخص التنفيذي
     doc.addPage();
@@ -66,19 +66,19 @@ export const generateFiscalYearPDF = async (
     doc.setFontSize(18);
     doc.setTextColor(33, 37, 41);
     doc.setFont(fontName, "bold");
-    doc.text("الملخص التنفيذي", 105, yPos, { align: "center" });
+    doc.text(processArabicText("الملخص التنفيذي"), 105, yPos, { align: "center" });
     yPos += 15;
 
-    const summaryData = [
+    const summaryData = processArabicTableData([
       ["إجمالي الإيرادات", `${closing.total_revenues.toLocaleString()} ر.س`],
       ["إجمالي المصروفات", `${closing.total_expenses.toLocaleString()} ر.س`],
       ["صافي الدخل", `${closing.net_income.toLocaleString()} ر.س`],
       ["رقبة الوقف (الفائض)", `${closing.waqf_corpus.toLocaleString()} ر.س`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["البيان", "المبلغ"]],
+      head: [processArabicHeaders(["البيان", "المبلغ"])],
       body: summaryData,
       theme: 'grid',
       styles: { 
@@ -103,18 +103,18 @@ export const generateFiscalYearPDF = async (
     // الحصص والاستقطاعات
     doc.setFontSize(14);
     doc.setFont(fontName, "bold");
-    doc.text("الحصص والاستقطاعات", 190, yPos, { align: "right" });
+    doc.text(processArabicText("الحصص والاستقطاعات"), 190, yPos, { align: "right" });
     yPos += 8;
 
-    const sharesData = [
+    const sharesData = processArabicTableData([
       ["حصة الناظر", `${closing.nazer_share.toLocaleString()} ر.س`, `${closing.nazer_percentage}%`],
       ["حصة الواقف", `${closing.waqif_share.toLocaleString()} ر.س`, `${closing.waqif_percentage}%`],
       ["توزيعات المستفيدين", `${closing.total_beneficiary_distributions.toLocaleString()} ر.س`, "-"],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["النوع", "المبلغ", "النسبة"]],
+      head: [processArabicHeaders(["النوع", "المبلغ", "النسبة"])],
       body: sharesData,
       theme: 'grid',
       styles: { 
@@ -139,20 +139,20 @@ export const generateFiscalYearPDF = async (
     // المصروفات التفصيلية
     doc.setFontSize(14);
     doc.setFont(fontName, "bold");
-    doc.text("تفصيل المصروفات", 190, yPos, { align: "right" });
+    doc.text(processArabicText("تفصيل المصروفات"), 190, yPos, { align: "right" });
     yPos += 8;
 
-    const expensesData = [
+    const expensesData = processArabicTableData([
       ["مصروفات إدارية", `${closing.administrative_expenses.toLocaleString()} ر.س`],
       ["مصروفات صيانة", `${closing.maintenance_expenses.toLocaleString()} ر.س`],
       ["مصروفات تطوير", `${closing.development_expenses.toLocaleString()} ر.س`],
       ["مصروفات أخرى", `${closing.other_expenses.toLocaleString()} ر.س`],
       ["الإجمالي", `${closing.total_expenses.toLocaleString()} ر.س`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["نوع المصروف", "المبلغ"]],
+      head: [processArabicHeaders(["نوع المصروف", "المبلغ"])],
       body: expensesData,
       theme: 'grid',
       styles: { 
@@ -183,19 +183,19 @@ export const generateFiscalYearPDF = async (
     
     doc.setFontSize(18);
     doc.setFont(fontName, "bold");
-    doc.text("الضرائب والزكاة", 105, yPos, { align: "center" });
+    doc.text(processArabicText("الضرائب والزكاة"), 105, yPos, { align: "center" });
     yPos += 15;
 
-    const taxData = [
+    const taxData = processArabicTableData([
       ["ضريبة القيمة المضافة المحصلة", `${closing.total_vat_collected.toLocaleString()} ر.س`],
       ["ضريبة القيمة المضافة المدفوعة", `${closing.total_vat_paid.toLocaleString()} ر.س`],
       ["صافي الضريبة", `${closing.net_vat.toLocaleString()} ر.س`],
       ["الزكاة", `${closing.zakat_amount.toLocaleString()} ر.س`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["البيان", "المبلغ"]],
+      head: [processArabicHeaders(["البيان", "المبلغ"])],
       body: taxData,
       theme: 'grid',
       styles: { 
@@ -221,19 +221,19 @@ export const generateFiscalYearPDF = async (
       
       doc.setFontSize(14);
       doc.setFont(fontName, "bold");
-      doc.text("توزيعات الورثة", 190, yPos, { align: "right" });
+      doc.text(processArabicText("توزيعات الورثة"), 190, yPos, { align: "right" });
       yPos += 8;
 
-      const heirsData = closing.heir_distributions.map(heir => [
+      const heirsData = processArabicTableData(closing.heir_distributions.map(heir => [
         heir.heir_name,
         heir.heir_type,
         `${heir.share_amount.toLocaleString()} ر.س`,
         heir.share_percentage ? `${heir.share_percentage}%` : "-"
-      ]);
+      ]));
 
       autoTable(doc, {
         startY: yPos,
-        head: [["الاسم", "نوع الوارث", "المبلغ", "النسبة"]],
+        head: [processArabicHeaders(["الاسم", "نوع الوارث", "المبلغ", "النسبة"])],
         body: heirsData,
         theme: 'grid',
         styles: { 
@@ -265,19 +265,19 @@ export const generateFiscalYearPDF = async (
     
     doc.setFontSize(18);
     doc.setFont(fontName, "bold");
-    doc.text("المركز المالي الختامي", 105, yPos, { align: "center" });
+    doc.text(processArabicText("المركز المالي الختامي"), 105, yPos, { align: "center" });
     yPos += 15;
 
-    const balanceData = [
+    const balanceData = processArabicTableData([
       ["الرصيد الافتتاحي", `${closing.opening_balance.toLocaleString()} ر.س`],
       ["إجمالي الإيرادات", `${closing.total_revenues.toLocaleString()} ر.س`],
       ["إجمالي المصروفات", `${closing.total_expenses.toLocaleString()} ر.س`],
       ["الرصيد الختامي", `${closing.closing_balance.toLocaleString()} ر.س`],
-    ];
+    ]);
 
     autoTable(doc, {
       startY: yPos,
-      head: [["البيان", "المبلغ"]],
+      head: [processArabicHeaders(["البيان", "المبلغ"])],
       body: balanceData,
       theme: 'grid',
       styles: { 
@@ -311,13 +311,13 @@ export const generateFiscalYearPDF = async (
       doc.line(20, 280, 190, 280);
       
       doc.text(
-        `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
+        processArabicText(`تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`),
         105,
         285,
         { align: "center" }
       );
       doc.text(
-        `صفحة ${i} من ${pageCount}`,
+        processArabicText(`صفحة ${i} من ${pageCount}`),
         105,
         290,
         { align: "center" }
