@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileCheck, Printer } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { loadArabicFontToPDF, addWaqfFooter, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, addWaqfFooter, WAQF_COLORS, processArabicText } from "@/lib/pdf/arabic-pdf-utils";
 import { WAQF_IDENTITY } from "@/lib/waqf-identity";
 
 interface BeneficiaryCertificateProps {
@@ -55,47 +55,47 @@ export function BeneficiaryCertificate({
     doc.setFont(fontName, "bold");
     doc.setFontSize(18);
     doc.setTextColor(...WAQF_COLORS.primary);
-    doc.text(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`, pageWidth / 2, 35, { align: "center" });
+    doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, 35, { align: "center" });
 
     // العنوان الرئيسي
     doc.setFontSize(24);
-    doc.text("شهادة استحقاق", pageWidth / 2, 55, { align: "center" });
+    doc.text(processArabicText("شهادة استحقاق"), pageWidth / 2, 55, { align: "center" });
 
     // العنوان الفرعي
     doc.setFont(fontName, "normal");
     doc.setFontSize(14);
     doc.setTextColor(...WAQF_COLORS.muted);
-    doc.text("من منصة إدارة الوقف الإلكترونية", pageWidth / 2, 68, { align: "center" });
+    doc.text(processArabicText("من منصة إدارة الوقف الإلكترونية"), pageWidth / 2, 68, { align: "center" });
 
     // المحتوى الرئيسي
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
     const startY = 90;
     
-    doc.text("تشهد منصة إدارة الوقف أن:", pageWidth / 2, startY, { align: "center" });
+    doc.text(processArabicText("تشهد منصة إدارة الوقف أن:"), pageWidth / 2, startY, { align: "center" });
     
     // اسم المستفيد
     doc.setFont(fontName, "bold");
     doc.setFontSize(20);
     doc.setTextColor(...WAQF_COLORS.primary);
-    doc.text(beneficiaryName, pageWidth / 2, startY + 20, { align: "center" });
+    doc.text(processArabicText(beneficiaryName), pageWidth / 2, startY + 20, { align: "center" });
     
     // رقم الهوية
     doc.setFont(fontName, "normal");
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text(`رقم الهوية: ${nationalId}`, pageWidth / 2, startY + 35, { align: "center" });
+    doc.text(processArabicText(`رقم الهوية: ${nationalId}`), pageWidth / 2, startY + 35, { align: "center" });
     
     // النص
     doc.text(
-      "هو من المستفيدين المسجلين لدى الوقف",
+      processArabicText("هو من المستفيدين المسجلين لدى الوقف"),
       pageWidth / 2,
       startY + 55,
       { align: "center" }
     );
     
     doc.text(
-      "وله الحق في الانتفاع من غلة الوقف حسب الشروط",
+      processArabicText("وله الحق في الانتفاع من غلة الوقف حسب الشروط"),
       pageWidth / 2,
       startY + 70,
       { align: "center" }
@@ -104,15 +104,15 @@ export function BeneficiaryCertificate({
     // الفئة والحالة
     doc.setFont(fontName, "bold");
     doc.setTextColor(...WAQF_COLORS.secondary);
-    doc.text(`الفئة: ${category}`, pageWidth / 2, startY + 95, { align: "center" });
-    doc.text(`الحالة: ${status}`, pageWidth / 2, startY + 110, { align: "center" });
+    doc.text(processArabicText(`الفئة: ${category}`), pageWidth / 2, startY + 95, { align: "center" });
+    doc.text(processArabicText(`الحالة: ${status}`), pageWidth / 2, startY + 110, { align: "center" });
 
     // تاريخ الإصدار
     doc.setFont(fontName, "normal");
     doc.setFontSize(12);
     doc.setTextColor(...WAQF_COLORS.muted);
     doc.text(
-      `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`,
+      processArabicText(`تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`),
       pageWidth / 2,
       startY + 135,
       { align: "center" }
@@ -121,10 +121,10 @@ export function BeneficiaryCertificate({
     // منطقة التوقيع
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("الناظر", 50, 240);
+    doc.text(processArabicText("الناظر"), 50, 240);
     doc.line(30, 245, 80, 245);
     
-    doc.text("الختم الرسمي", 150, 240);
+    doc.text(processArabicText("الختم الرسمي"), 150, 240);
     doc.setDrawColor(...WAQF_COLORS.primary);
     doc.circle(150, 255, 15);
 

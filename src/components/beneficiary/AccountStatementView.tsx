@@ -6,7 +6,7 @@ import { Download, FileText, Calendar } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicTableData } from "@/lib/pdf/arabic-pdf-utils";
 
 interface PaymentRecord {
   id: string;
@@ -55,29 +55,29 @@ export function AccountStatementView({
       doc.setFont(fontName, 'normal');
       doc.setFontSize(11);
       doc.setTextColor(0, 0, 0);
-      doc.text(`اسم المستفيد: ${beneficiaryName}`, pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`اسم المستفيد: ${beneficiaryName}`), pageWidth - 20, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`رقم المستفيد: ${beneficiaryId}`, pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`رقم المستفيد: ${beneficiaryId}`), pageWidth - 20, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`), pageWidth - 20, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`عدد المدفوعات: ${payments.length}`, pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`عدد المدفوعات: ${payments.length}`), pageWidth - 20, yPos, { align: 'right' });
       yPos += 10;
 
       // الجدول
-      const tableData = payments.map((payment) => [
+      const tableData = processArabicTableData(payments.map((payment) => [
         format(new Date(payment.date), "dd/MM/yyyy", { locale: ar }),
         payment.type,
         payment.description,
         `${payment.amount.toLocaleString()} ر.س`,
         payment.status,
-      ]);
+      ]));
 
       const tableStyles = getDefaultTableStyles(fontName);
 
       (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         startY: yPos,
-        head: [["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]],
+        head: [processArabicTableData([["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]])[0]],
         body: tableData,
         ...tableStyles,
         headStyles: {
