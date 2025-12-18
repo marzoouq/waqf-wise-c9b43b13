@@ -12521,6 +12521,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_full_read_access: { Args: never; Returns: boolean }
       has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -12532,6 +12533,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_staff_access: { Args: never; Returns: boolean }
       is_accountant: { Args: never; Returns: boolean }
       is_admin_or_nazer: { Args: never; Returns: boolean }
       is_archivist: { Args: never; Returns: boolean }
