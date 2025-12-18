@@ -4,11 +4,19 @@
  */
 
 declare module 'js-arabic-reshaper' {
-  const ArabicShaper: {
-    convertArabic(text: string): string;
-    convertArabicBack(text: string): string;
-  };
-  
-  export { ArabicShaper };
-  export default { ArabicShaper };
+  /**
+   * Shapes Arabic letters for proper joining/ligatures.
+   * The library exports a `reshape` function (not `ArabicShaper.convertArabic`).
+   */
+  export function reshape(
+    text: string,
+    options?: {
+      delete_harakat?: boolean;
+      ligatures?: boolean;
+    }
+  ): string;
+
+  // Some builds also expose these constants; keep them loosely typed.
+  export const LETTERS: Record<string, unknown>;
+  export const LIGATURES: unknown[];
 }
