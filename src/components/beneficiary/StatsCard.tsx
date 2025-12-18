@@ -14,7 +14,7 @@ export function StatsCard({ title, value, icon: Icon, trend, colorClass = "text-
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-s-4" 
           style={{ borderInlineStartColor: `hsl(var(--primary))` }}>
-      <CardContent className="p-6">
+      <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1 flex-1">
             <p className="text-sm font-medium text-muted-foreground">{title}</p>

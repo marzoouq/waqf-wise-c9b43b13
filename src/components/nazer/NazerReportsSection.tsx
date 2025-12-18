@@ -110,7 +110,7 @@ export function NazerReportsSection() {
         <CardDescription>وصول سريع لجميع التقارير المالية والإدارية</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {reportCategories.map((category) => (
             <div 
               key={category.title}
@@ -144,7 +144,7 @@ export function NazerReportsSection() {
         </div>
 
         {/* أزرار التصدير السريع */}
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+        <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
           <Button variant="outline" size="sm" className="gap-2">
             <Download className="h-4 w-4" />
             تصدير شامل

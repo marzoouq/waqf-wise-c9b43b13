@@ -166,7 +166,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
           </CardHeader>
         <CardContent className="space-y-6">
           {/* إدخال البيانات */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="total-amount">إجمالي المبلغ (ر.س)</Label>
               <Input
@@ -235,7 +235,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
           {/* الملخص */}
           {results.length > 0 && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground mb-1">المبلغ الإجمالي</p>
                   <p className="text-lg font-bold text-primary">
