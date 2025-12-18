@@ -21,6 +21,7 @@ import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivi
 import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBeneficiaryButton";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
+import { ManualTasksCard } from "@/components/nazer/ManualTasksCard";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
@@ -177,6 +178,9 @@ export default function NazerDashboard() {
           {/* تبويب التحكم - تحميل كسول */}
           <LazyTabContent isActive={activeTab === "settings"}>
             <div className="space-y-6">
+              <Suspense fallback={<SectionSkeleton />}>
+                <ManualTasksCard />
+              </Suspense>
               <Suspense fallback={<SectionSkeleton />}>
                 <BeneficiaryControlSection />
               </Suspense>

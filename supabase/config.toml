@@ -128,3 +128,6 @@ verify_jwt = true
 
 [functions.publish-fiscal-year]
 verify_jwt = true
+
+[functions.weekly-report]
+verify_jwt = true
