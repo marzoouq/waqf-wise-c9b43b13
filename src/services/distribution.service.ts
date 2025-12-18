@@ -506,7 +506,7 @@ export class DistributionService {
     try {
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('id, full_name, iban')
+        .select('id, full_name, iban, category')
         .eq('status', query.status || 'active')
         .order('full_name');
 
@@ -514,7 +514,7 @@ export class DistributionService {
       
       let filtered = data || [];
       if (query.category) {
-        filtered = filtered.filter(b => true); // category filter would go here
+        filtered = filtered.filter(b => b.category === query.category);
       }
       if (query.hasBank) {
         filtered = filtered.filter(b => !!b.iban);

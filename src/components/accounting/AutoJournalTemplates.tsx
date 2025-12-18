@@ -12,12 +12,48 @@ import {
 import { useAutoJournalTemplates, type AutoJournalTemplate } from "@/hooks/accounting/useAutoJournalTemplates";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { AutoJournalTemplateForm } from "./AutoJournalTemplateForm";
 
 export function AutoJournalTemplates() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<AutoJournalTemplate | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { templates, isLoading, error, refetch, toggleActive, deleteTemplate } = useAutoJournalTemplates();
+  const { 
+    templates, 
+    isLoading, 
+    error, 
+    refetch, 
+    toggleActive, 
+    deleteTemplate,
+    createTemplate,
+    updateTemplate,
+  } = useAutoJournalTemplates();
+
+  const handleSubmit = async (data: Parameters<typeof createTemplate>[0]) => {
+    setIsSubmitting(true);
+    try {
+      if (editingTemplate) {
+        await updateTemplate({ id: editingTemplate.id, ...data });
+      } else {
+        await createTemplate(data);
+      }
+      setIsDialogOpen(false);
+      setEditingTemplate(null);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenDialog = (template?: AutoJournalTemplate) => {
+    setEditingTemplate(template || null);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setEditingTemplate(null);
+  };
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قوالب القيود..." />;
@@ -33,7 +69,7 @@ export function AutoJournalTemplates() {
         <h2 className="text-2xl font-bold">قوالب القيود التلقائية</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={() => handleOpenDialog()}>
               <Plus className="ms-2 h-4 w-4" />
               قالب جديد
             </Button>
@@ -44,7 +80,12 @@ export function AutoJournalTemplates() {
                 {editingTemplate ? "تعديل القالب" : "قالب جديد"}
               </DialogTitle>
             </DialogHeader>
-            {/* Form content would go here */}
+            <AutoJournalTemplateForm
+              template={editingTemplate}
+              onSubmit={handleSubmit}
+              onCancel={handleCloseDialog}
+              isSubmitting={isSubmitting}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -94,10 +135,7 @@ export function AutoJournalTemplates() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    setEditingTemplate(template);
-                    setIsDialogOpen(true);
-                  }}
+                  onClick={() => handleOpenDialog(template)}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -112,6 +150,12 @@ export function AutoJournalTemplates() {
             </div>
           </Card>
         ))}
+
+        {templates?.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            لا توجد قوالب قيود تلقائية. انقر على "قالب جديد" للبدء.
+          </div>
+        )}
       </div>
     </div>
   );
