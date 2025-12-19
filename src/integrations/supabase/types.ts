@@ -12703,6 +12703,7 @@ export type Database = {
       }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
       get_heir_beneficiary_id: { Args: never; Returns: string }
+      get_performance_health: { Args: never; Returns: Json }
       get_pos_daily_stats: {
         Args: { p_date?: string }
         Returns: {
@@ -12753,6 +12754,14 @@ export type Database = {
           table_name: string
         }[]
       }
+      get_tables_with_high_dead_rows: {
+        Args: never
+        Returns: {
+          dead_ratio: number
+          table_name: string
+        }[]
+      }
+      get_unused_indexes_count: { Args: never; Returns: number }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
@@ -12894,6 +12903,7 @@ export type Database = {
         Returns: undefined
       }
       reset_performance_stats: { Args: never; Returns: Json }
+      run_full_cleanup: { Args: never; Returns: Json }
       run_scheduled_cleanup: { Args: never; Returns: Json }
       run_vacuum_analyze: { Args: never; Returns: Json }
       search_beneficiaries_advanced:
