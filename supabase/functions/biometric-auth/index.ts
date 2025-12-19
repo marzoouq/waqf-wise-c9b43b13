@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
       return errorResponse("User not found", 404);
     }
 
-    console.log("User found:", userData.user.email);
+    console.log("User found for biometric auth");
 
     // Generate a magic link for the user
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({

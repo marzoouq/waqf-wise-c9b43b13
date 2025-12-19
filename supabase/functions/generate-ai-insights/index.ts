@@ -65,7 +65,7 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية لإنشاء تحليلات ذكية. مطلوب دور مدير أو ناظر أو محاسب.');
     }
 
-    console.log(`Authorized AI insights by: ${user.email}`);
+    console.log(`Authorized AI insights by user: ${user.id}`);
 
     const { reportType, dataQuery, filters } = await req.json();
 

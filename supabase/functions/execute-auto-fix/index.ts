@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       return rateLimitResponse('يرجى الانتظار دقيقة واحدة قبل المحاولة مرة أخرى');
     }
 
-    console.log(`🔧 Starting auto-fix execution by user: ${user.email}...`);
+    console.log(`🔧 Starting auto-fix execution by user: ${user.id}...`);
 
     // ✅ تحميل الإعدادات من قاعدة البيانات
     const { data: settings } = await supabase

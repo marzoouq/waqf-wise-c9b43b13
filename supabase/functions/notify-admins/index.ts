@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية لإرسال الإشعارات');
     }
 
-    console.log('✅ Authorized notification request from:', { userId: user.id, email: user.email });
+    console.log('✅ Authorized notification request from:', { userId: user.id });
 
     const payload: NotificationPayload = await req.json();
     console.log('📨 Received notification request:', payload);

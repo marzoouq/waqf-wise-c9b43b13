@@ -39,7 +39,7 @@ serve(async (req) => {
       throw new Error('معرف الملف مطلوب');
     }
 
-    console.log(`🔓 طلب فك تشفير ملف: ${fileId} من المستخدم: ${user.email}`);
+    console.log(`🔓 طلب فك تشفير ملف: ${fileId} من المستخدم: ${user.id}`);
 
     // التحقق من وجود الملف
     const { data: fileRecord, error: fileError } = await supabase
