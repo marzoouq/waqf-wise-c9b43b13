@@ -109,7 +109,13 @@ export class BankReconciliationService {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
-        .select('*, journal_entry_lines(*, accounts(*))')
+        .select(`
+          *, 
+          journal_entry_lines!fk_jel_journal_entry(
+            *, 
+            accounts:accounts!fk_jel_account(id, code, name_ar, account_type)
+          )
+        `)
         .eq('status', 'posted');
 
       if (error) throw error;
