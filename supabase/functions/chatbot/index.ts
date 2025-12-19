@@ -55,7 +55,7 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية للوصول لهذه الخدمة');
     }
 
-    console.log('✅ Authorized chatbot request from:', { userId: user.id, email: user.email, roles: userRoles, isStaff, isBeneficiary });
+    console.log('✅ Authorized chatbot request from:', { userId: user.id, roles: userRoles, isStaff, isBeneficiary });
 
     const { message, userId, quickReplyId } = await req.json();
 

@@ -62,7 +62,7 @@ serve(async (req) => {
     }
 
     // ============ تنفيذ النسخ الاحتياطي ============
-    console.log(`Authorized backup by: ${user.email}`);
+    console.log(`Authorized backup by user: ${user.id}`);
 
     const { backupType = 'manual', tablesIncluded = [] } = await req.json().catch(() => ({}));
     

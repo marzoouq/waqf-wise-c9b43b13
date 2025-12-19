@@ -93,8 +93,7 @@ serve(async (req) => {
 
     console.log('✅ Admin manage password request:', { 
       action, 
-      beneficiaryId, 
-      nationalId,
+      beneficiaryId,
       adminId: user.id
     });
 

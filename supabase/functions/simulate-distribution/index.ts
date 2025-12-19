@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     }
 
     // ============ تنفيذ المحاكاة ============
-    console.log(`Authorized distribution simulation by: ${user.email}`);
+    console.log(`Authorized distribution simulation by user: ${user.id}`);
 
     const params: SimulationParams = await req.json();
 

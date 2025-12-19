@@ -73,7 +73,7 @@ serve(async (req) => {
     }
 
     // ============ تنفيذ الاستعادة ============
-    console.log(`⚠️ Database restore initiated by ADMIN: ${user.email}`);
+    console.log(`⚠️ Database restore initiated by ADMIN: ${user.id}`);
 
     const { backupData, mode = 'replace' } = await req.json();
     

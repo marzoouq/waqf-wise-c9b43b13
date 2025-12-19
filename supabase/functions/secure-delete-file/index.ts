@@ -46,7 +46,7 @@ serve(async (req) => {
       return errorResponse('معرف الملف مطلوب', 400);
     }
 
-    console.log(`🗑️ طلب حذف ملف: ${fileId} من المستخدم: ${user.email}`);
+    console.log(`🗑️ طلب حذف ملف: ${fileId} من المستخدم: ${user.id}`);
 
     // التحقق من صلاحية المستخدم
     const { data: roles } = await supabase

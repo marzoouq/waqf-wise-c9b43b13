@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
     }
 
     // ============ تنفيذ الإقفال ============
-    console.log(`Authorized fiscal year close by: ${user.email}`);
+    console.log(`Authorized fiscal year close by user: ${user.id}`);
 
     const { fiscal_year_id, preview_only = false }: ClosingRequest = await req.json();
 
