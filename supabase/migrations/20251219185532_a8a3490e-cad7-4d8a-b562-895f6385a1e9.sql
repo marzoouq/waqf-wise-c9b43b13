@@ -1,0 +1,118 @@
+
+-- ====================================
+-- المرحلة الخامسة: Views + Functions
+-- ====================================
+
+-- 1. View الحسابات مع التسلسل الهرمي
+CREATE OR REPLACE VIEW public.accounts_hierarchy AS
+SELECT a.id, a.code, a.name_ar, a.name_en, a.account_type, a.account_nature,
+  a.is_header, a.is_active, a.current_balance, a.parent_id,
+  p.name_ar as parent_name, p.code as parent_code,
+  (SELECT COUNT(*) FROM accounts c WHERE c.parent_id = a.id) as children_count
+FROM accounts a LEFT JOIN accounts p ON a.parent_id = p.id;
+
+-- 2. View ملخص التوزيعات
+CREATE OR REPLACE VIEW public.distributions_summary AS
+SELECT d.id, d.distribution_date, d.total_amount, d.status, d.beneficiaries_count,
+  d.distribution_type, d.waqf_name, d.nazer_share, d.waqif_charity, d.waqf_corpus, d.distributable_amount,
+  COALESCE((SELECT COUNT(*) FROM distribution_details dd WHERE dd.distribution_id = d.id), 0) as details_count,
+  COALESCE((SELECT SUM(allocated_amount) FROM distribution_details dd WHERE dd.distribution_id = d.id), 0) as total_allocated,
+  COALESCE((SELECT COUNT(*) FROM distribution_details dd WHERE dd.distribution_id = d.id AND dd.payment_status = 'paid'), 0) as paid_count
+FROM distributions d;
+
+-- 3. View ملخص العقارات
+CREATE OR REPLACE VIEW public.properties_overview AS
+SELECT p.id, p.name, p.type, p.location, p.status, p.total_units, p.occupied_units,
+  p.available_units, p.occupancy_percentage, p.monthly_revenue,
+  (SELECT COUNT(*) FROM contracts c WHERE c.property_id = p.id AND c.status = 'نشط') as active_contracts,
+  (SELECT COALESCE(SUM(monthly_rent), 0) FROM contracts c WHERE c.property_id = p.id AND c.status = 'نشط') as total_monthly_rent
+FROM properties p;
+
+-- 4. View ملخص المستفيدين
+CREATE OR REPLACE VIEW public.beneficiaries_overview AS
+SELECT b.id, b.full_name, b.national_id, b.phone, b.category, b.status, b.relationship, b.gender,
+  b.account_balance, b.total_received, b.total_payments,
+  (SELECT COUNT(*) FROM distribution_details dd WHERE dd.beneficiary_id = b.id) as distributions_count,
+  (SELECT COALESCE(SUM(allocated_amount), 0) FROM distribution_details dd WHERE dd.beneficiary_id = b.id) as total_distributions,
+  (SELECT COUNT(*) FROM loans l WHERE l.beneficiary_id = b.id AND l.status = 'نشط') as active_loans
+FROM beneficiaries b;
+
+-- 5. View القيود اليومية
+CREATE OR REPLACE VIEW public.journal_entries_with_lines AS
+SELECT je.id, je.entry_number, je.entry_date, je.description, je.status, je.reference_type, je.reference_id,
+  fy.name as fiscal_year,
+  (SELECT COALESCE(SUM(debit_amount), 0) FROM journal_entry_lines jel WHERE jel.journal_entry_id = je.id) as total_debit,
+  (SELECT COALESCE(SUM(credit_amount), 0) FROM journal_entry_lines jel WHERE jel.journal_entry_id = je.id) as total_credit,
+  (SELECT COUNT(*) FROM journal_entry_lines jel WHERE jel.journal_entry_id = je.id) as lines_count
+FROM journal_entries je LEFT JOIN fiscal_years fy ON je.fiscal_year_id = fy.id;
+
+-- 6. View ملخص القروض (using paid_amount instead of total_paid)
+CREATE OR REPLACE VIEW public.loans_summary AS
+SELECT l.id, l.loan_number, l.loan_amount, l.remaining_balance, l.paid_amount, l.status, l.start_date as loan_date,
+  b.full_name as beneficiary_name, b.national_id as beneficiary_national_id,
+  (SELECT COUNT(*) FROM loan_installments li WHERE li.loan_id = l.id) as total_installments,
+  (SELECT COUNT(*) FROM loan_installments li WHERE li.loan_id = l.id AND li.status = 'مدفوع') as paid_installments
+FROM loans l LEFT JOIN beneficiaries b ON l.beneficiary_id = b.id;
+
+-- 7. View ملخص الفواتير
+CREATE OR REPLACE VIEW public.invoices_summary AS
+SELECT i.id, i.invoice_number, i.invoice_date, i.customer_name, i.total_amount, i.tax_amount,
+  i.status, i.invoice_type, i.is_zatca_compliant,
+  (SELECT COUNT(*) FROM invoice_lines il WHERE il.invoice_id = i.id) as lines_count
+FROM invoices i;
+
+-- 8. Function ميزان المراجعة
+CREATE OR REPLACE FUNCTION public.get_trial_balance(p_fiscal_year_id UUID DEFAULT NULL)
+RETURNS TABLE (account_id UUID, account_code TEXT, account_name TEXT, account_type account_type, debit_balance NUMERIC, credit_balance NUMERIC) AS $$
+BEGIN
+  RETURN QUERY SELECT a.id, a.code, a.name_ar, a.account_type,
+    CASE WHEN a.account_nature IN ('debit', 'مدين') THEN ABS(a.current_balance) ELSE 0::NUMERIC END,
+    CASE WHEN a.account_nature IN ('credit', 'دائن') THEN ABS(a.current_balance) ELSE 0::NUMERIC END
+  FROM accounts a WHERE a.is_active = true AND a.is_header = false ORDER BY a.code;
+END; $$ LANGUAGE plpgsql STABLE SET search_path = public;
+
+-- 9. Function ملخص الإيرادات والمصروفات
+CREATE OR REPLACE FUNCTION public.get_income_summary(p_start_date DATE DEFAULT NULL, p_end_date DATE DEFAULT NULL)
+RETURNS TABLE (total_revenues NUMERIC, total_expenses NUMERIC, net_income NUMERIC) AS $$
+DECLARE v_start DATE := COALESCE(p_start_date, DATE_TRUNC('year', CURRENT_DATE)); v_end DATE := COALESCE(p_end_date, CURRENT_DATE);
+BEGIN
+  RETURN QUERY SELECT 
+    COALESCE(SUM(CASE WHEN a.account_type = 'revenue' THEN jel.credit_amount - jel.debit_amount ELSE 0 END), 0::NUMERIC),
+    COALESCE(SUM(CASE WHEN a.account_type = 'expense' THEN jel.debit_amount - jel.credit_amount ELSE 0 END), 0::NUMERIC),
+    COALESCE(SUM(CASE WHEN a.account_type = 'revenue' THEN jel.credit_amount - jel.debit_amount ELSE 0 END), 0::NUMERIC) -
+    COALESCE(SUM(CASE WHEN a.account_type = 'expense' THEN jel.debit_amount - jel.credit_amount ELSE 0 END), 0::NUMERIC)
+  FROM journal_entry_lines jel
+  JOIN journal_entries je ON jel.journal_entry_id = je.id
+  JOIN accounts a ON jel.account_id = a.id
+  WHERE je.status = 'posted' AND je.entry_date BETWEEN v_start AND v_end;
+END; $$ LANGUAGE plpgsql STABLE SET search_path = public;
+
+-- 10. Function إحصائيات لوحة التحكم
+CREATE OR REPLACE FUNCTION public.get_dashboard_stats()
+RETURNS TABLE (total_beneficiaries BIGINT, active_beneficiaries BIGINT, total_properties BIGINT, active_contracts BIGINT, total_bank_balance NUMERIC, pending_distributions BIGINT, active_loans BIGINT, pending_approvals BIGINT) AS $$
+BEGIN
+  RETURN QUERY SELECT
+    (SELECT COUNT(*) FROM beneficiaries),
+    (SELECT COUNT(*) FROM beneficiaries WHERE status = 'نشط'),
+    (SELECT COUNT(*) FROM properties),
+    (SELECT COUNT(*) FROM contracts WHERE status = 'نشط'),
+    (SELECT COALESCE(SUM(current_balance), 0) FROM bank_accounts WHERE is_active = true),
+    (SELECT COUNT(*) FROM distributions WHERE status = 'معلق'),
+    (SELECT COUNT(*) FROM loans WHERE status = 'نشط'),
+    (SELECT COUNT(*) FROM approval_status WHERE status = 'pending');
+END; $$ LANGUAGE plpgsql STABLE SET search_path = public;
+
+-- 11. View المعاملات البنكية غير المطابقة
+CREATE OR REPLACE VIEW public.unmatched_bank_transactions AS
+SELECT bt.id, bt.transaction_date, bt.description, bt.amount, bt.transaction_type, bt.reference_number,
+  bs.statement_date, ba.bank_name, ba.account_number
+FROM bank_transactions bt
+JOIN bank_statements bs ON bt.statement_id = bs.id
+JOIN bank_accounts ba ON bs.bank_account_id = ba.id
+WHERE bt.is_matched = false;
+
+-- 12. View الموافقات المعلقة
+CREATE OR REPLACE VIEW public.pending_approvals_view AS
+SELECT ast.id, ast.entity_type, ast.entity_id, ast.status, ast.current_level, ast.total_levels, ast.created_at, aw.workflow_name
+FROM approval_status ast LEFT JOIN approval_workflows aw ON ast.workflow_id = aw.id
+WHERE ast.status = 'pending' ORDER BY ast.created_at;
