@@ -16,21 +16,60 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // قائمة الجداول التي تحتاج تنظيف
+    // قائمة شاملة لجميع الجداول التي تحتوي على صفوف ميتة
     const tables = [
-      'system_alerts',
-      'contracts',
-      'journal_entries',
-      'rental_payments',
-      'beneficiaries',
-      'notifications',
+      // الجداول الأساسية
       'accounts',
-      'user_roles',
-      'fiscal_years',
+      'beneficiaries',
+      'contracts',
+      'distributions',
       'families',
+      'fiscal_years',
+      'invoices',
+      'journal_entries',
+      'journal_entry_lines',
+      'loans',
+      'notifications',
       'payments',
+      'payment_vouchers',
       'profiles',
-      'journal_entry_lines'
+      'properties',
+      'rental_payments',
+      'tenants',
+      'user_roles',
+      
+      // الجداول المالية
+      'bank_accounts',
+      'bank_statements',
+      'bank_transactions',
+      'bank_reconciliation_matches',
+      'opening_balances',
+      'pos_transactions',
+      'tenant_ledger',
+      
+      // جداول المستفيدين
+      'beneficiary_attachments',
+      'beneficiary_requests',
+      'beneficiary_activity_log',
+      'beneficiary_changes_log',
+      'beneficiary_tags',
+      'distribution_details',
+      
+      // جداول النظام
+      'system_alerts',
+      'audit_logs',
+      'approval_status',
+      'approval_steps',
+      'documents',
+      'maintenance_requests',
+      'support_tickets',
+      
+      // جداول أخرى
+      'annual_disclosures',
+      'fiscal_year_closings',
+      'waqf_distribution_settings',
+      'historical_invoices',
+      'zatca_submission_log'
     ];
 
     const results = [];
