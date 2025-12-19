@@ -7,6 +7,12 @@ import {
   unauthorizedResponse,
   forbiddenResponse 
 } from '../_shared/cors.ts';
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIdentifier,
+  RATE_LIMITS
+} from '../_shared/rate-limiter.ts';
 
 // 🔐 SECURITY: Generate secure random password
 function generateSecurePassword(): string {
@@ -21,11 +27,23 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = checkRateLimit(clientId, {
+      ...RATE_LIMITS.SENSITIVE,
+      keyPrefix: 'create-beneficiary-accounts'
+    });
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`⚠️ Rate limit exceeded for create-beneficiary-accounts: ${clientId}`);
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول', req);
     }
 
     const supabaseAdmin = createClient(
@@ -45,7 +63,7 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return unauthorizedResponse('رمز المصادقة غير صحيح');
+      return unauthorizedResponse('رمز المصادقة غير صحيح', req);
     }
 
     // 🔐 SECURITY: Check if user has admin or nazer role
@@ -56,7 +74,7 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500, undefined, req);
     }
 
     const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
@@ -75,12 +93,11 @@ serve(async (req) => {
         user_agent: req.headers.get('User-Agent')
       });
 
-      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
     }
 
     console.log('✅ Authorized user creating beneficiary accounts:', { 
-      userId: user.id,
-      email: user.email 
+      userId: user.id
     });
 
     // استلام قائمة IDs المحددة من الطلب
@@ -110,8 +127,6 @@ serve(async (req) => {
         // 🔐 SECURITY: Use secure random password generation
         const internalEmail = `${beneficiary.national_id}@waqf.internal`;
         const tempPassword = generateSecurePassword();
-
-        console.log('🔐 Creating account with secure password for:', beneficiary.national_id);
 
         // إنشاء حساب Supabase Auth
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -166,7 +181,7 @@ serve(async (req) => {
                 national_id: beneficiary.national_id,
                 status: 'updated',
                 user_id: existingUser.id,
-                password: tempPassword, // للعرض مرة واحدة
+                // 🔐 لا نعيد كلمة المرور في الاستجابة - سيتم إرسالها بطريقة آمنة
               });
               continue;
             }
@@ -187,7 +202,7 @@ serve(async (req) => {
 
         if (updateError) throw updateError;
 
-        // إنشاء profile و role - تحقق من عدم وجود profile مسبقاً
+        // إنشاء profile و role
         try {
           const { data: existingProfile } = await supabaseAdmin
             .from('profiles')
@@ -196,7 +211,6 @@ serve(async (req) => {
             .maybeSingle();
 
           if (!existingProfile) {
-            // إنشاء profile يدوياً بدلاً من استخدام RPC
             await supabaseAdmin.from('profiles').insert({
               user_id: authData.user!.id,
               full_name: beneficiary.full_name,
@@ -204,7 +218,6 @@ serve(async (req) => {
             });
           }
 
-          // إنشاء role
           const { data: existingRole } = await supabaseAdmin
             .from('user_roles')
             .select('id')
@@ -219,7 +232,6 @@ serve(async (req) => {
           }
         } catch (roleError) {
           console.error('Error creating profile/role (non-critical):', roleError);
-          // لا نفشل العملية بأكملها إذا فشل إنشاء profile/role
         }
 
         // 📝 Audit log
@@ -239,7 +251,7 @@ serve(async (req) => {
           national_id: beneficiary.national_id,
           status: 'created',
           user_id: authData.user?.id,
-          password: tempPassword, // للعرض مرة واحدة
+          // 🔐 لا نعيد كلمة المرور في الاستجابة
         });
       } catch (error) {
         errors.push({
@@ -257,12 +269,14 @@ serve(async (req) => {
       failed: errors.length,
       results,
       errors,
-    });
+    }, 200, req);
   } catch (error) {
     console.error('❌ Error in create-beneficiary-accounts:', error);
     return errorResponse(
       error instanceof Error ? error.message : 'Unknown error',
-      400
+      400,
+      undefined,
+      req
     );
   }
 });

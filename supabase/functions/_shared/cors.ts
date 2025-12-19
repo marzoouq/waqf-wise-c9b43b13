@@ -1,6 +1,6 @@
 /**
- * CORS Headers المشتركة لجميع Edge Functions
- * Shared CORS Headers for all Edge Functions
+ * CORS Headers المحسنة لجميع Edge Functions
+ * Enhanced CORS Headers for all Edge Functions
  * 
  * @example
  * import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
@@ -18,11 +18,70 @@
  * });
  */
 
+// النطاقات المسموح بها
+const ALLOWED_ORIGINS = [
+  // Production
+  'https://waqf-platform.lovable.app',
+  'https://zsacuvrcohmraoldilph.lovable.app',
+  // Development
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:8080',
+  // Lovable preview domains
+  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+  /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
+  /^https:\/\/preview--[a-z0-9-]+\.lovable\.app$/,
+];
+
+/**
+ * التحقق من أن Origin مسموح به
+ */
+function isOriginAllowed(origin: string | null): boolean {
+  if (!origin) return false;
+  
+  return ALLOWED_ORIGINS.some(allowed => {
+    if (typeof allowed === 'string') {
+      return origin === allowed;
+    }
+    // RegExp
+    return allowed.test(origin);
+  });
+}
+
+/**
+ * الحصول على Origin المسموح به للاستجابة
+ */
+function getAllowedOrigin(req: Request): string {
+  const origin = req.headers.get('Origin');
+  
+  if (origin && isOriginAllowed(origin)) {
+    return origin;
+  }
+  
+  // في حالة عدم وجود Origin أو غير مسموح، نستخدم أول نطاق إنتاجي
+  return 'https://waqf-platform.lovable.app';
+}
+
+/**
+ * إنشاء CORS Headers ديناميكية
+ */
+export function getCorsHeaders(req: Request): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin': getAllowedOrigin(req),
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Credentials': 'true',
+    // رؤوس أمان إضافية
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+  };
+}
+
+// الحفاظ على التوافق مع الكود الحالي
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  // رؤوس أمان إضافية
   'X-Content-Type-Options': 'nosniff',
   'Cache-Control': 'no-cache, no-store, must-revalidate',
 };
@@ -30,10 +89,11 @@ export const corsHeaders = {
 /**
  * إنشاء Response للـ OPTIONS requests (CORS preflight)
  */
-export function createCorsResponse(): Response {
+export function createCorsResponse(req?: Request): Response {
+  const headers = req ? getCorsHeaders(req) : corsHeaders;
   return new Response(null, { 
     status: 204,
-    headers: corsHeaders 
+    headers 
   });
 }
 
@@ -44,7 +104,7 @@ export function createCorsResponse(): Response {
  */
 export function handleCors(req: Request): Response | null {
   if (req.method === 'OPTIONS') {
-    return createCorsResponse();
+    return createCorsResponse(req);
   }
   return null;
 }
@@ -54,12 +114,14 @@ export function handleCors(req: Request): Response | null {
  */
 export function jsonResponse<T>(
   data: T, 
-  status: number = 200
+  status: number = 200,
+  req?: Request
 ): Response {
+  const headers = req ? getCorsHeaders(req) : corsHeaders;
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      ...corsHeaders,
+      ...headers,
       'Content-Type': 'application/json',
     },
   });
@@ -70,13 +132,14 @@ export function jsonResponse<T>(
  */
 export function successResponse<T>(
   data: T,
-  message?: string
+  message?: string,
+  req?: Request
 ): Response {
   return jsonResponse({
     success: true,
     message,
     ...data,
-  });
+  }, 200, req);
 }
 
 /**
@@ -85,8 +148,10 @@ export function successResponse<T>(
 export function errorResponse(
   message: string, 
   status: number = 400,
-  details?: unknown
+  details?: unknown,
+  req?: Request
 ): Response {
+  const headers = req ? getCorsHeaders(req) : corsHeaders;
   return new Response(JSON.stringify({ 
     success: false,
     error: message,
@@ -94,7 +159,7 @@ export function errorResponse(
   }), {
     status,
     headers: {
-      ...corsHeaders,
+      ...headers,
       'Content-Type': 'application/json',
     },
   });
@@ -103,34 +168,34 @@ export function errorResponse(
 /**
  * إنشاء Unauthorized Response
  */
-export function unauthorizedResponse(message: string = 'غير مصرح'): Response {
-  return errorResponse(message, 401);
+export function unauthorizedResponse(message: string = 'غير مصرح', req?: Request): Response {
+  return errorResponse(message, 401, undefined, req);
 }
 
 /**
  * إنشاء Forbidden Response
  */
-export function forbiddenResponse(message: string = 'ليس لديك صلاحية'): Response {
-  return errorResponse(message, 403);
+export function forbiddenResponse(message: string = 'ليس لديك صلاحية', req?: Request): Response {
+  return errorResponse(message, 403, undefined, req);
 }
 
 /**
  * إنشاء Not Found Response
  */
-export function notFoundResponse(message: string = 'غير موجود'): Response {
-  return errorResponse(message, 404);
+export function notFoundResponse(message: string = 'غير موجود', req?: Request): Response {
+  return errorResponse(message, 404, undefined, req);
 }
 
 /**
  * إنشاء Rate Limit Response
  */
-export function rateLimitResponse(message: string = 'تجاوزت الحد المسموح'): Response {
-  return errorResponse(message, 429);
+export function rateLimitResponse(message: string = 'تجاوزت الحد المسموح', req?: Request): Response {
+  return errorResponse(message, 429, undefined, req);
 }
 
 /**
  * إنشاء Server Error Response
  */
-export function serverErrorResponse(message: string = 'حدث خطأ في الخادم'): Response {
-  return errorResponse(message, 500);
+export function serverErrorResponse(message: string = 'حدث خطأ في الخادم', req?: Request): Response {
+  return errorResponse(message, 500, undefined, req);
 }

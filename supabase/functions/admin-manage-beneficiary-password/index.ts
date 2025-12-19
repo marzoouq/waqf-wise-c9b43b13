@@ -8,17 +8,35 @@ import {
   forbiddenResponse,
   notFoundResponse 
 } from '../_shared/cors.ts';
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIdentifier,
+  RATE_LIMITS
+} from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = checkRateLimit(clientId, {
+      ...RATE_LIMITS.SENSITIVE,
+      keyPrefix: 'admin-manage-password'
+    });
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`⚠️ Rate limit exceeded for admin-manage-beneficiary-password: ${clientId}`);
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول', req);
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -38,7 +56,7 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return unauthorizedResponse('رمز المصادقة غير صحيح');
+      return unauthorizedResponse('رمز المصادقة غير صحيح', req);
     }
 
     // 🔐 SECURITY: Check if user has admin or nazer role
@@ -49,7 +67,7 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500, undefined, req);
     }
 
     const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
@@ -68,7 +86,7 @@ serve(async (req) => {
         user_agent: req.headers.get('User-Agent')
       });
 
-      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
     }
 
     const { action, beneficiaryId, nationalId, newPassword } = await req.json();
@@ -77,8 +95,7 @@ serve(async (req) => {
       action, 
       beneficiaryId, 
       nationalId,
-      adminId: user.id,
-      adminEmail: user.email 
+      adminId: user.id
     });
 
     if (action === 'reset-password') {
@@ -91,11 +108,11 @@ serve(async (req) => {
 
       if (beneficiaryError || !beneficiary) {
         console.error('Beneficiary not found:', beneficiaryError);
-        return notFoundResponse('المستفيد غير موجود');
+        return notFoundResponse('المستفيد غير موجود', req);
       }
 
       if (!beneficiary.user_id) {
-        return errorResponse('المستفيد لا يملك حساب مفعل', 400);
+        return errorResponse('المستفيد لا يملك حساب مفعل', 400, undefined, req);
       }
 
       // تحديث كلمة المرور مباشرة باستخدام Admin API
@@ -106,7 +123,7 @@ serve(async (req) => {
 
       if (updateError) {
         console.error('Error updating password:', updateError);
-        return errorResponse('فشل تحديث كلمة المرور: ' + updateError.message, 400);
+        return errorResponse('فشل تحديث كلمة المرور: ' + updateError.message, 400, undefined, req);
       }
 
       console.log('✅ Password updated successfully for user:', beneficiary.user_id);
@@ -133,16 +150,18 @@ serve(async (req) => {
           full_name: beneficiary.full_name,
           national_id: beneficiary.national_id
         }
-      });
+      }, 200, req);
     }
 
-    return errorResponse('عملية غير معروفة', 400);
+    return errorResponse('عملية غير معروفة', 400, undefined, req);
 
   } catch (error) {
     console.error('Error in admin-manage-beneficiary-password:', error);
     return errorResponse(
       error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-      500
+      500,
+      undefined,
+      req
     );
   }
 });

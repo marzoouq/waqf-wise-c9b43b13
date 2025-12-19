@@ -72,16 +72,31 @@ export class BeneficiaryCoreService {
 
   /**
    * جلب مستفيد واحد بالـ ID
+   * 🔐 SECURITY: RLS يتحقق من صلاحية الوصول على مستوى قاعدة البيانات
    */
-  static async getById(id: string): Promise<Beneficiary | null> {
+  static async getById(id: string, options?: { skipAuthCheck?: boolean }): Promise<Beneficiary | null> {
     try {
+      // التحقق من صحة UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        productionLogger.warn('Invalid beneficiary ID format', { id });
+        return null;
+      }
+
       const { data, error } = await supabase
         .from('beneficiaries')
         .select('*')
         .eq('id', id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // إذا كان الخطأ بسبب RLS، نعيد null بدلاً من رمي خطأ
+        if (error.code === 'PGRST116' || error.message?.includes('permission')) {
+          productionLogger.warn('Access denied to beneficiary', { id });
+          return null;
+        }
+        throw error;
+      }
       return data as Beneficiary | null;
     } catch (error) {
       productionLogger.error('Error fetching beneficiary', error);
