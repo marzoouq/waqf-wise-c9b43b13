@@ -14072,10 +14072,56 @@ export type Database = {
           total_properties: number
         }[]
       }
+      get_database_health_summary: {
+        Args: never
+        Returns: {
+          cache_hit_ratio: number
+          db_size_mb: number
+          duplicate_indexes: number
+          duplicate_policies: number
+          tables_with_dead_rows: number
+          total_dead_rows: number
+          total_indexes: number
+          total_tables: number
+        }[]
+      }
       get_database_size: {
         Args: never
         Returns: {
           size_mb: number
+        }[]
+      }
+      get_dead_rows_percentage: {
+        Args: never
+        Returns: {
+          dead_pct: number
+          dead_rows: number
+          last_autovacuum: string
+          last_vacuum: string
+          live_rows: number
+          table_name: string
+        }[]
+      }
+      get_duplicate_indexes: {
+        Args: never
+        Returns: {
+          column_definition: string
+          index1: string
+          index1_size: string
+          index2: string
+          index2_size: string
+          table_name: string
+        }[]
+      }
+      get_duplicate_rls_policies: {
+        Args: never
+        Returns: {
+          command: string
+          policy1: string
+          policy1_qual: string
+          policy2: string
+          policy2_qual: string
+          table_name: string
         }[]
       }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
@@ -14120,6 +14166,17 @@ export type Database = {
           property_id: string
           property_name: string
           total_units: number
+        }[]
+      }
+      get_recent_query_errors: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          error_message: string
+          error_stack: string
+          error_type: string
+          id: string
+          severity: string
         }[]
       }
       get_shift_stats: {
