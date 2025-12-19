@@ -12829,6 +12829,11 @@ export type Database = {
       is_fiscal_year_published: { Args: { fy_id: string }; Returns: boolean }
       is_heir: { Args: never; Returns: boolean }
       is_heir_own_data: { Args: { _beneficiary_id: string }; Returns: boolean }
+      is_own_activity: { Args: { p_beneficiary_id: string }; Returns: boolean }
+      is_own_beneficiary: {
+        Args: { p_beneficiary_id: string }
+        Returns: boolean
+      }
       is_pos_user: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
