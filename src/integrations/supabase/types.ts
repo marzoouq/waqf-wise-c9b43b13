@@ -2890,6 +2890,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contracts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "contracts_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -7539,6 +7546,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "maintenance_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "maintenance_requests_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
@@ -7708,6 +7722,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedules_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
             referencedColumns: ["id"]
           },
           {
@@ -9326,6 +9347,13 @@ export type Database = {
             referencedRelation: "properties_overview"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "property_alerts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
         ]
       }
       property_units: {
@@ -9476,6 +9504,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_units_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
             referencedColumns: ["id"]
           },
         ]
@@ -11603,6 +11638,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tenant_ledger_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tenant_ledger_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -12691,6 +12733,16 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_alerts: {
+        Row: {
+          alert_date: string | null
+          alert_title: string | null
+          alert_type: string | null
+          reference: string | null
+          related_entity: string | null
+        }
+        Relationships: []
+      }
       general_ledger: {
         Row: {
           account_id: string | null
@@ -13142,6 +13194,45 @@ export type Database = {
           occupied_units?: number | null
           status?: string | null
           total_monthly_rent?: never
+          total_units?: number | null
+          type?: string | null
+        }
+        Relationships: []
+      }
+      property_performance: {
+        Row: {
+          active_contracts_count: number | null
+          contracted_monthly_revenue: number | null
+          current_monthly_revenue: number | null
+          id: string | null
+          name: string | null
+          occupancy_rate: number | null
+          occupied_units: number | null
+          pending_maintenance: number | null
+          total_units: number | null
+          type: string | null
+        }
+        Insert: {
+          active_contracts_count?: never
+          contracted_monthly_revenue?: never
+          current_monthly_revenue?: never
+          id?: string | null
+          name?: string | null
+          occupancy_rate?: never
+          occupied_units?: number | null
+          pending_maintenance?: never
+          total_units?: number | null
+          type?: string | null
+        }
+        Update: {
+          active_contracts_count?: never
+          contracted_monthly_revenue?: never
+          current_monthly_revenue?: never
+          id?: string | null
+          name?: string | null
+          occupancy_rate?: never
+          occupied_units?: number | null
+          pending_maintenance?: never
           total_units?: number | null
           type?: string | null
         }
@@ -13693,6 +13784,14 @@ export type Database = {
         }[]
       }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
+      get_financial_report: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: {
+          amount: number
+          description: string
+          report_section: string
+        }[]
+      }
       get_heir_beneficiary_id: { Args: never; Returns: string }
       get_income_summary: {
         Args: { p_end_date?: string; p_start_date?: string }
@@ -13796,6 +13895,14 @@ export type Database = {
         }[]
       }
       get_waqf_public_stats: { Args: never; Returns: Json }
+      get_waqf_summary: {
+        Args: never
+        Returns: {
+          metric_name: string
+          metric_unit: string
+          metric_value: number
+        }[]
+      }
       grant_user_permission: {
         Args: {
           p_expires_at?: string
@@ -13926,6 +14033,7 @@ export type Database = {
         }[]
       }
       refresh_financial_views: { Args: never; Returns: undefined }
+      refresh_table_statistics: { Args: never; Returns: undefined }
       refresh_user_profile_cache: {
         Args: { p_user_id: string }
         Returns: undefined
