@@ -1,0 +1,29 @@
+-- حذف الفهارس غير المستخدمة والمكررة (الدفعة 2)
+-- تجنب الفهارس الجديدة والفريدة
+
+DROP INDEX IF EXISTS idx_journal_entries_fiscal_year;
+DROP INDEX IF EXISTS idx_payments_reference_type_id;
+DROP INDEX IF EXISTS idx_tasks_assigned_to;
+DROP INDEX IF EXISTS idx_journal_entries_date;
+DROP INDEX IF EXISTS idx_families_tribe;
+DROP INDEX IF EXISTS idx_user_roles_audit_user_id;
+DROP INDEX IF EXISTS idx_beneficiary_visibility_audit_changed_at;
+DROP INDEX IF EXISTS idx_profiles_active;
+DROP INDEX IF EXISTS idx_user_roles_role;
+DROP INDEX IF EXISTS idx_kb_articles_published_at;
+DROP INDEX IF EXISTS idx_payments_payer_name;
+DROP INDEX IF EXISTS idx_user_roles_audit_role;
+DROP INDEX IF EXISTS idx_payments_status;
+DROP INDEX IF EXISTS idx_fiscal_years_active;
+DROP INDEX IF EXISTS idx_families_head;
+DROP INDEX IF EXISTS idx_beneficiaries_tribe;
+DROP INDEX IF EXISTS idx_beneficiaries_priority;
+DROP INDEX IF EXISTS idx_beneficiaries_username;
+DROP INDEX IF EXISTS idx_beneficiaries_phone;
+DROP INDEX IF EXISTS idx_beneficiaries_verification;
+DROP INDEX IF EXISTS idx_beneficiaries_verification_status;
+DROP INDEX IF EXISTS idx_support_tickets_category;
+DROP INDEX IF EXISTS idx_support_tickets_priority;
+DROP INDEX IF EXISTS idx_support_tickets_assigned_to;
+DROP INDEX IF EXISTS idx_tasks_due_date;
+DROP INDEX IF EXISTS idx_audit_logs_action;
