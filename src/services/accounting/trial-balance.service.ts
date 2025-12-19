@@ -237,7 +237,7 @@ export class TrialBalanceService {
       .from("journal_entry_lines")
       .select(`
         *,
-        journal_entry:journal_entries!inner(
+        journal_entry:journal_entries!fk_jel_journal_entry(
           entry_number,
           entry_date,
           description,
@@ -245,8 +245,7 @@ export class TrialBalanceService {
         )
       `)
       .eq("account_id", params.accountId)
-      .eq("journal_entry.status", "posted")
-      .order("journal_entry(entry_date)", { ascending: true });
+      .order("created_at", { ascending: true });
 
     if (params.dateFrom) {
       query = query.gte("journal_entry.entry_date", params.dateFrom);

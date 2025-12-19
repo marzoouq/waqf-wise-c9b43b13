@@ -50,9 +50,9 @@ export class JournalEntryService {
         .from('journal_entries')
         .select(`
           *,
-          journal_entry_lines (
+          journal_entry_lines!fk_jel_journal_entry (
             *,
-            accounts (code, name_ar)
+            accounts!fk_jel_account (code, name_ar, account_type)
           )
         `)
         .order('entry_date', { ascending: false });
@@ -325,7 +325,7 @@ export class JournalEntryService {
       .from("journal_entry_lines")
       .select(`
         *,
-        account:accounts(code, name_ar)
+        account:accounts!fk_jel_account(code, name_ar)
       `)
       .eq("journal_entry_id", entryId)
       .order("line_number");
@@ -383,7 +383,7 @@ export class JournalEntryService {
       .from('journal_entry_lines')
       .select(`
         *,
-        journal_entries!inner(
+        journal_entries:journal_entries!fk_jel_journal_entry(
           entry_number,
           entry_date,
           description,
@@ -391,8 +391,7 @@ export class JournalEntryService {
         )
       `)
       .eq('account_id', accountId)
-      .eq('journal_entries.status', 'posted')
-      .order('journal_entries(entry_date)', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (options?.startDate) {
       query = query.gte('journal_entries.entry_date', options.startDate);

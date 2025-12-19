@@ -82,15 +82,17 @@ export const ChartsService = {
       .select(`
         credit_amount,
         debit_amount,
-        accounts!inner(name_ar)
+        accounts:accounts!fk_jel_account(name_ar, account_type)
       `)
-      .eq('accounts.account_type', 'revenue')
       .limit(50);
 
     const revenueByType: { [key: string]: number } = {};
 
     if (revenueData) {
-      revenueData.forEach(line => {
+      revenueData.forEach((line: { accounts: { name_ar: string; account_type: string } | null; credit_amount: number; debit_amount: number }) => {
+        // Filter only revenue accounts
+        if (line.accounts?.account_type !== 'revenue') return;
+        
         const accountName = line.accounts?.name_ar || 'غير محدد';
         const amount = (line.credit_amount || 0) - (line.debit_amount || 0);
         
@@ -152,15 +154,15 @@ export const ChartsService = {
       .select(`
         debit_amount,
         credit_amount,
-        journal_entries!inner (
+        journal_entries:journal_entries!fk_jel_journal_entry (
           entry_date
         ),
-        accounts!inner (
+        accounts:accounts!fk_jel_account (
           account_type,
           account_nature
         )
       `)
-      .order('journal_entries(entry_date)', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
 
