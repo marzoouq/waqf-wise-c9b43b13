@@ -6,12 +6,30 @@ import {
   unauthorizedResponse,
   forbiddenResponse 
 } from '../_shared/cors.ts';
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIdentifier,
+  RATE_LIMITS
+} from '../_shared/rate-limiter.ts';
 
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = checkRateLimit(clientId, {
+      ...RATE_LIMITS.SENSITIVE,
+      keyPrefix: 'update-email'
+    });
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`⚠️ Rate limit exceeded for update-user-email: ${clientId}`);
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -26,7 +44,7 @@ Deno.serve(async (req) => {
     // التحقق من المستخدم الحالي
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return unauthorizedResponse("غير مصرح");
+      return unauthorizedResponse("غير مصرح", req);
     }
 
     // إنشاء عميل للتحقق من المستخدم الحالي
@@ -37,7 +55,7 @@ Deno.serve(async (req) => {
     const { data: { user: currentUser }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !currentUser) {
       console.error("Auth error:", authError);
-      return unauthorizedResponse("غير مصرح - يرجى تسجيل الدخول");
+      return unauthorizedResponse("غير مصرح - يرجى تسجيل الدخول", req);
     }
 
     // التحقق من صلاحيات المستخدم الحالي
@@ -48,27 +66,39 @@ Deno.serve(async (req) => {
 
     if (rolesError) {
       console.error("Roles error:", rolesError);
-      return errorResponse("خطأ في التحقق من الصلاحيات", 500);
+      return errorResponse("خطأ في التحقق من الصلاحيات", 500, undefined, req);
     }
 
     const allowedRoles = ["nazer", "admin"];
     const hasPermission = userRoles?.some((r) => allowedRoles.includes(r.role));
 
     if (!hasPermission) {
-      return forbiddenResponse("ليس لديك صلاحية تعديل البريد الإلكتروني");
+      // تسجيل المحاولة غير المصرح بها
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: currentUser.id,
+        user_email: currentUser.email,
+        action_type: 'UNAUTHORIZED_ACCESS_ATTEMPT',
+        table_name: 'profiles',
+        severity: 'warning',
+        description: 'محاولة غير مصرح بها لتعديل البريد الإلكتروني',
+        ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+        user_agent: req.headers.get('User-Agent')
+      });
+
+      return forbiddenResponse("ليس لديك صلاحية تعديل البريد الإلكتروني", req);
     }
 
     // قراءة البيانات من الطلب
     const { userId, newEmail } = await req.json();
 
     if (!userId || !newEmail) {
-      return errorResponse("البيانات المطلوبة غير مكتملة", 400);
+      return errorResponse("البيانات المطلوبة غير مكتملة", 400, undefined, req);
     }
 
     // التحقق من صحة البريد الإلكتروني
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
-      return errorResponse("البريد الإلكتروني غير صحيح", 400);
+      return errorResponse("البريد الإلكتروني غير صحيح", 400, undefined, req);
     }
 
     // التحقق من عدم وجود البريد الإلكتروني مسبقاً
@@ -80,10 +110,10 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existingUser) {
-      return errorResponse("البريد الإلكتروني مستخدم بالفعل", 400);
+      return errorResponse("البريد الإلكتروني مستخدم بالفعل", 400, undefined, req);
     }
 
-    console.log(`Updating email for user ${userId} to ${newEmail}`);
+    console.log(`Updating email for user ${userId}`);
 
     // تحديث البريد في auth.users
     const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
@@ -93,7 +123,7 @@ Deno.serve(async (req) => {
 
     if (authUpdateError) {
       console.error("Auth update error:", authUpdateError);
-      return errorResponse(`خطأ في تحديث البريد: ${authUpdateError.message}`, 500);
+      return errorResponse(`خطأ في تحديث البريد: ${authUpdateError.message}`, 500, undefined, req);
     }
 
     // تحديث البريد في profiles
@@ -107,7 +137,7 @@ Deno.serve(async (req) => {
 
     if (profileUpdateError) {
       console.error("Profile update error:", profileUpdateError);
-      return errorResponse(`خطأ في تحديث الملف الشخصي: ${profileUpdateError.message}`, 500);
+      return errorResponse(`خطأ في تحديث الملف الشخصي: ${profileUpdateError.message}`, 500, undefined, req);
     }
 
     // تسجيل العملية في سجل المراجعة
@@ -117,16 +147,18 @@ Deno.serve(async (req) => {
       user_email: currentUser.email,
       record_id: userId,
       table_name: "profiles",
-      description: `تم تحديث البريد الإلكتروني للمستخدم ${userId} إلى ${newEmail}`,
+      description: `تم تحديث البريد الإلكتروني للمستخدم`,
       new_values: { email: newEmail },
       severity: "info",
+      ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+      user_agent: req.headers.get('User-Agent')
     });
 
     console.log(`Successfully updated email for user ${userId}`);
 
-    return jsonResponse({ success: true, message: "تم تحديث البريد الإلكتروني بنجاح" });
+    return jsonResponse({ success: true, message: "تم تحديث البريد الإلكتروني بنجاح" }, 200, req);
   } catch (error) {
     console.error("Unexpected error:", error);
-    return errorResponse("حدث خطأ غير متوقع", 500);
+    return errorResponse("حدث خطأ غير متوقع", 500, undefined, req);
   }
 });

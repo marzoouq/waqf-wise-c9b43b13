@@ -7,12 +7,30 @@ import {
   unauthorizedResponse,
   forbiddenResponse 
 } from '../_shared/cors.ts';
+import {
+  checkRateLimit,
+  createRateLimitResponse,
+  getClientIdentifier,
+  RATE_LIMITS
+} from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = checkRateLimit(clientId, {
+      ...RATE_LIMITS.SENSITIVE,
+      keyPrefix: 'reset-password'
+    });
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`⚠️ Rate limit exceeded for reset-user-password: ${clientId}`);
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     // إنشاء عميل Supabase بصلاحيات Admin
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -21,12 +39,16 @@ serve(async (req) => {
     );
 
     // الحصول على المستخدم الحالي من JWT
-    const authHeader = req.headers.get('Authorization')!;
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return unauthorizedResponse('غير مصرح', req);
+    }
+
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
-      return unauthorizedResponse('غير مصرح');
+      return unauthorizedResponse('غير مصرح', req);
     }
 
     // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
@@ -38,18 +60,30 @@ serve(async (req) => {
     const hasPermission = roles?.some(r => r.role === 'admin' || r.role === 'nazer');
     
     if (!hasPermission) {
-      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
+      // تسجيل المحاولة غير المصرح بها
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_ACCESS_ATTEMPT',
+        table_name: 'auth.users',
+        severity: 'warning',
+        description: 'محاولة غير مصرح بها لإعادة تعيين كلمة مرور',
+        ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+        user_agent: req.headers.get('User-Agent')
+      });
+
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
     }
 
     // قراءة البيانات من الطلب
     const { user_id, new_password } = await req.json();
 
     if (!user_id || !new_password) {
-      return errorResponse('البيانات المطلوبة ناقصة', 400);
+      return errorResponse('البيانات المطلوبة ناقصة', 400, undefined, req);
     }
 
     if (new_password.length < 8) {
-      return errorResponse('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400);
+      return errorResponse('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400, undefined, req);
     }
 
     // تحديث كلمة المرور
@@ -70,11 +104,13 @@ serve(async (req) => {
     await supabaseAdmin.from('audit_logs').insert({
       user_id: user.id,
       user_email: user.email,
-      action_type: 'UPDATE',
+      action_type: 'PASSWORD_RESET',
       table_name: 'auth.users',
       record_id: user_id,
       description: `تم تعيين كلمة مرور مؤقتة للمستخدم: ${targetProfile?.full_name || user_id}`,
-      severity: 'warning'
+      severity: 'warning',
+      ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+      user_agent: req.headers.get('User-Agent')
     });
 
     // إرسال إشعار للمستخدم المستهدف
@@ -89,13 +125,15 @@ serve(async (req) => {
     return jsonResponse({ 
       success: true,
       message: 'تم تحديث كلمة المرور بنجاح'
-    });
+    }, 200, req);
 
   } catch (error) {
     console.error('Error in reset-user-password:', error);
     return errorResponse(
       error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-      500
+      500,
+      undefined,
+      req
     );
   }
 });
