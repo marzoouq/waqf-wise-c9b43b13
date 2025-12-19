@@ -6,37 +6,6 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
 
-// ✅ DEV_BYPASS_AUTH: تجاوز المصادقة للاختبار في وضع التطوير فقط
-// لتفعيله: أضف VITE_DEV_BYPASS_AUTH=true في ملف .env.local
-const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
-
-// ✅ مستخدم وهمي للاختبار عند تفعيل DEV_BYPASS_AUTH
-const DEV_MOCK_USER: User | null = DEV_BYPASS_AUTH ? {
-  id: 'dev-test-user-uuid',
-  email: 'dev-nazer@test.local',
-  aud: 'authenticated',
-  role: 'authenticated',
-  app_metadata: {},
-  user_metadata: { full_name: 'مستخدم اختباري - ناظر' },
-  created_at: new Date().toISOString(),
-} as User : null;
-
-const DEV_MOCK_ROLES: string[] = DEV_BYPASS_AUTH ? ['nazer', 'admin'] : [];
-
-const DEV_MOCK_PROFILE: Profile | null = DEV_BYPASS_AUTH ? {
-  id: 'dev-profile-uuid',
-  user_id: 'dev-test-user-uuid',
-  email: 'dev-nazer@test.local',
-  full_name: 'مستخدم اختباري - ناظر',
-  avatar_url: null,
-  phone: '0500000000',
-  position: 'ناظر',
-  is_active: true,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  last_login_at: new Date().toISOString(),
-} : null;
-
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
@@ -56,74 +25,39 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // ✅ استخدام البيانات الوهمية عند تفعيل DEV_BYPASS_AUTH
-  const [user, setUser] = useState<User | null>(DEV_MOCK_USER);
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(DEV_MOCK_PROFILE);
-  const [roles, setRoles] = useState<string[]>(DEV_MOCK_ROLES);
-  const [isLoading, setIsLoading] = useState(DEV_BYPASS_AUTH ? false : true);
-  const [rolesLoading, setRolesLoading] = useState(DEV_BYPASS_AUTH ? false : true);
-  const [isInitialized, setIsInitialized] = useState(DEV_BYPASS_AUTH ? true : false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
   const initRef = useRef(false);
+  // ✅ استخدام useRef بدلاً من localStorage للأمان
   const rolesCache = useRef<string[]>([]);
-  const ROLES_CACHE_KEY = 'waqf_user_roles';
 
-  // استرجاع الأدوار من الـ cache
-  const getCachedRoles = useCallback((userId: string): string[] | null => {
-    try {
-      const cached = localStorage.getItem(ROLES_CACHE_KEY);
-      if (cached) {
-        const { userId: cachedUserId, roles: cachedRoles, timestamp } = JSON.parse(cached);
-        if (cachedUserId === userId && Date.now() - timestamp < 5 * 60 * 1000) {
-          return cachedRoles;
-        }
-      }
-    } catch {
-      // تجاهل أخطاء localStorage
-    }
-    return null;
-  }, []);
-
-  // حفظ الأدوار في الـ cache
-  const setCachedRoles = useCallback((userId: string, newRoles: string[]) => {
-    try {
-      localStorage.setItem(ROLES_CACHE_KEY, JSON.stringify({
-        userId,
-        roles: newRoles,
-        timestamp: Date.now()
-      }));
-    } catch {
-      // تجاهل أخطاء localStorage
-    }
-  }, []);
-
-  // جلب أدوار المستخدم من قاعدة البيانات
-  const fetchUserRoles = useCallback(async (userId: string, forceRefresh = false): Promise<string[]> => {
-    // ✅ استخدام الـ cache فقط إذا لم يكن force refresh
-    if (!forceRefresh) {
-      const cached = getCachedRoles(userId);
-      if (cached && cached.length > 0) {
-        rolesCache.current = cached;
-        setRoles(cached);
-        setRolesLoading(false);
-        // جلب الأدوار في الخلفية للتحديث
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .then(({ data }) => {
-            if (data) {
-              const freshRoles = data.map(r => r.role);
-              if (JSON.stringify(freshRoles) !== JSON.stringify(cached)) {
-                rolesCache.current = freshRoles;
-                setRoles(freshRoles);
-                setCachedRoles(userId, freshRoles);
-              }
+  // جلب أدوار المستخدم من قاعدة البيانات مباشرة (بدون localStorage)
+  const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
+    // ✅ استخدام الـ cache المؤقت في الذاكرة فقط
+    if (rolesCache.current.length > 0) {
+      setRoles(rolesCache.current);
+      setRolesLoading(false);
+      // جلب الأدوار في الخلفية للتحديث
+      supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .then(({ data }) => {
+          if (data) {
+            const freshRoles = data.map(r => r.role);
+            if (JSON.stringify(freshRoles) !== JSON.stringify(rolesCache.current)) {
+              rolesCache.current = freshRoles;
+              setRoles(freshRoles);
             }
-          });
-        return cached;
-      }
+          }
+        });
+      return rolesCache.current;
     }
 
     // ✅ جلب الأدوار من قاعدة البيانات مباشرة
@@ -143,7 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const fetchedRoles = (data || []).map(r => r.role);
       rolesCache.current = fetchedRoles;
       setRoles(fetchedRoles);
-      setCachedRoles(userId, fetchedRoles);
       setRolesLoading(false);
       return fetchedRoles;
     } catch (err) {
@@ -151,13 +84,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRolesLoading(false);
       return [];
     }
-  }, [getCachedRoles, setCachedRoles]);
+  }, []);
 
   // تنظيف الجلسات التالفة
   const cleanupInvalidSession = useCallback(async () => {
     try {
       const keysToClean = Object.keys(localStorage).filter(key => 
-        key.includes('supabase') || key.includes('sb-') || key === ROLES_CACHE_KEY
+        key.includes('supabase') || key.includes('sb-')
       );
       keysToClean.forEach(key => localStorage.removeItem(key));
       
@@ -207,12 +140,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // جلب البيانات بشكل متوازي
-  // forceRefresh = true يجبر جلب الأدوار من قاعدة البيانات (للصفحات المحمية عند التحديث)
-  const fetchUserData = useCallback(async (userId: string, forceRefresh = false) => {
+  const fetchUserData = useCallback(async (userId: string) => {
     try {
       await Promise.all([
         fetchProfile(userId),
-        fetchUserRoles(userId, forceRefresh)
+        fetchUserRoles(userId)
       ]);
     } finally {
       setIsLoading(false);
@@ -263,15 +195,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const isPublic = isCurrentRoutePublic();
           
           if (!isPublic) {
-            // ✅ صفحة محمية: جلب البيانات فوراً من قاعدة البيانات (تجاهل الـ cache)
-            await fetchUserData(currentSession.user.id, true);
+            // ✅ صفحة محمية: جلب البيانات فوراً من قاعدة البيانات
+            await fetchUserData(currentSession.user.id);
           } else {
-            // ✅ صفحة عامة: استخدام الـ cache فقط بدون طلبات جديدة
-            const cachedRoles = getCachedRoles(currentSession.user.id);
-            if (cachedRoles && cachedRoles.length > 0) {
-              rolesCache.current = cachedRoles;
-              setRoles(cachedRoles);
-            }
+            // ✅ صفحة عامة: لا نجلب البيانات
             setIsLoading(false);
             setRolesLoading(false);
           }
@@ -329,7 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(true);
           }
           setTimeout(() => {
-            fetchUserData(newSession.user.id, true); // ✅ force refresh للحصول على الأدوار الحقيقية
+            fetchUserData(newSession.user.id);
           }, 0);
         }
       }
@@ -343,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
-  }, [fetchUserData, cleanupInvalidSession, isCurrentRoutePublic, getCachedRoles]);
+  }, [fetchUserData, cleanupInvalidSession, isCurrentRoutePublic]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
