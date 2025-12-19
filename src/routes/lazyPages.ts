@@ -104,6 +104,7 @@ export const SystemErrorLogs = lazyWithRetry(() => import("@/pages/SystemErrorLo
 export const SecurityDashboard = lazyWithRetry(() => import("@/pages/SecurityDashboard"));
 export const PerformanceDashboard = lazyWithRetry(() => import("@/pages/PerformanceDashboard"));
 export const DatabasePerformanceDashboard = lazyWithRetry(() => import("@/pages/DatabasePerformanceDashboard"));
+export const DatabaseHealthDashboard = lazyWithRetry(() => import("@/pages/DatabaseHealthDashboard"));
 export const IntegrationsManagement = lazyWithRetry(() => import("@/pages/IntegrationsManagement"));
 
 // ==================== الذكاء الاصطناعي ====================

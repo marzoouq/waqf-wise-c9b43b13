@@ -35,31 +35,32 @@ export default function DatabaseHealthDashboard() {
       <PageHeader
         title="لوحة صحة قاعدة البيانات"
         description="مراقبة شاملة لصحة قاعدة البيانات: الفهارس المكررة، سياسات RLS، الصفوف الميتة، وأخطاء الاستعلامات"
-      >
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => refetch()}
-            disabled={isLoading}
-          >
-            <RefreshCw className={`h-4 w-4 ml-2 ${isLoading ? 'animate-spin' : ''}`} />
-            تحديث
-          </Button>
-          <Button 
-            onClick={() => runVacuumAll()}
-            disabled={isRunningVacuumAll}
-          >
-            <RefreshCw className={`h-4 w-4 ml-2 ${isRunningVacuumAll ? 'animate-spin' : ''}`} />
-            VACUUM ANALYZE
-          </Button>
-        </div>
-      </PageHeader>
+        action={
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => refetch()}
+              disabled={isLoading}
+            >
+              <RefreshCw className={`h-4 w-4 ml-2 ${isLoading ? 'animate-spin' : ''}`} />
+              تحديث
+            </Button>
+            <Button 
+              onClick={() => runVacuumAll()}
+              disabled={isRunningVacuumAll}
+            >
+              <RefreshCw className={`h-4 w-4 ml-2 ${isRunningVacuumAll ? 'animate-spin' : ''}`} />
+              VACUUM ANALYZE
+            </Button>
+          </div>
+        }
+      />
 
       {/* نتيجة الصحة + KPIs */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <HealthScoreCard 
           score={healthScore} 
-          status={healthStatus}
+          status={healthStatus as 'excellent' | 'good' | 'warning' | 'critical'}
           isLoading={isLoading}
         />
         <div className="lg:col-span-3">
