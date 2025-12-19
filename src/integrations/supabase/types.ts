@@ -6941,6 +6941,13 @@ export type Database = {
             foreignKeyName: "loan_approvals_loan_id_fkey"
             columns: ["loan_id"]
             isOneToOne: false
+            referencedRelation: "active_loans_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_approvals_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
             referencedRelation: "loans"
             referencedColumns: ["id"]
           },
@@ -6997,6 +7004,13 @@ export type Database = {
           total_amount?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "loan_installments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "active_loans_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "loan_installments_loan_id_fkey"
             columns: ["loan_id"]
@@ -7076,6 +7090,13 @@ export type Database = {
             foreignKeyName: "loan_payments_loan_id_fkey"
             columns: ["loan_id"]
             isOneToOne: false
+            referencedRelation: "active_loans_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
             referencedRelation: "loans"
             referencedColumns: ["id"]
           },
@@ -7135,6 +7156,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "loan_schedules_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "active_loans_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "loan_schedules_loan_id_fkey"
             columns: ["loan_id"]
@@ -12458,6 +12486,31 @@ export type Database = {
           },
         ]
       }
+      active_loans_summary: {
+        Row: {
+          beneficiary_name: string | null
+          id: string | null
+          loan_amount: number | null
+          loan_number: string | null
+          monthly_installment: number | null
+          next_due_date: string | null
+          paid_amount: number | null
+          pending_installments: number | null
+          remaining_balance: number | null
+          status: string | null
+        }
+        Relationships: []
+      }
+      beneficiaries_by_category: {
+        Row: {
+          active_count: number | null
+          avg_received: number | null
+          category: string | null
+          total_count: number | null
+          total_received: number | null
+        }
+        Relationships: []
+      }
       beneficiaries_overview: {
         Row: {
           account_balance: number | null
@@ -12815,6 +12868,16 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      monthly_financial_summary: {
+        Row: {
+          entries_count: number | null
+          month: string | null
+          net_income: number | null
+          total_expenses: number | null
+          total_revenues: number | null
+        }
+        Relationships: []
       }
       payment_vouchers_with_details: {
         Row: {
@@ -13220,6 +13283,10 @@ export type Database = {
         Args: { account_uuid: string }
         Returns: number
       }
+      calculate_beneficiary_balance: {
+        Args: { p_beneficiary_id: string }
+        Returns: number
+      }
       calculate_disclosure_balances: {
         Args: {
           p_fiscal_year_id: string
@@ -13363,6 +13430,18 @@ export type Database = {
         }
         Returns: string
       }
+      create_distribution_with_details: {
+        Args: {
+          p_charity_percentage?: number
+          p_corpus_percentage?: number
+          p_distribution_date: string
+          p_distribution_type: string
+          p_nazer_percentage?: number
+          p_total_amount: number
+          p_waqf_name: string
+        }
+        Returns: string
+      }
       create_loan_installments: {
         Args: {
           p_loan_id: string
@@ -13461,6 +13540,16 @@ export type Database = {
         Returns: string
       }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
+      get_approval_summary: {
+        Args: never
+        Returns: {
+          approved_count: number
+          avg_approval_hours: number
+          entity_type: string
+          pending_count: number
+          rejected_count: number
+        }[]
+      }
       get_available_recipients: {
         Args: { current_user_id: string }
         Returns: {
@@ -13567,6 +13656,15 @@ export type Database = {
           cache_hit_ratio: number
         }[]
       }
+      get_cash_flow_report: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: {
+          category: string
+          inflows: number
+          net_flow: number
+          outflows: number
+        }[]
+      }
       get_connection_stats: {
         Args: never
         Returns: {
@@ -13615,6 +13713,19 @@ export type Database = {
           total_payments: number
           transactions_count: number
           transfer_amount: number
+        }[]
+      }
+      get_property_stats: {
+        Args: { p_property_id?: string }
+        Returns: {
+          active_contracts: number
+          annual_revenue: number
+          monthly_revenue: number
+          occupancy_rate: number
+          occupied_units: number
+          property_id: string
+          property_name: string
+          total_units: number
         }[]
       }
       get_shift_stats: {
