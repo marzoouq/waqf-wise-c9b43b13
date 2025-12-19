@@ -140,3 +140,6 @@ verify_jwt = false
 
 [functions.db-performance-stats]
 verify_jwt = true
+
+[functions.db-health-check]
+verify_jwt = true
