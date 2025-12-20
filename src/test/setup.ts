@@ -58,11 +58,14 @@ if (typeof navigator !== 'undefined') {
 
 // Force Intl.NumberFormat to default to en-US when no locale provided
 const _OriginalNumberFormat = Intl.NumberFormat;
-// @ts-ignore
-Intl.NumberFormat = function (locales?: any, options?: any) {
-  if (!locales) locales = 'en-US';
-  return new _OriginalNumberFormat(locales, options);
-} as any;
+
+Object.defineProperty(Intl, 'NumberFormat', {
+  writable: true,
+  configurable: true,
+  value: function (locales?: string | string[], options?: Intl.NumberFormatOptions): Intl.NumberFormat {
+    return new _OriginalNumberFormat(locales || 'en-US', options);
+  }
+});
 
 // Mock scrollIntoView for Radix UI components (Select, etc.)
 Element.prototype.scrollIntoView = vi.fn();

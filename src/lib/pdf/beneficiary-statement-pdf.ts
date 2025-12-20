@@ -2,7 +2,7 @@
  * نظام تصدير كشف حساب المستفيد الاحترافي
  * Professional Beneficiary Statement PDF Export
  * 
- * @version 2.9.42
+ * @version 2.9.43
  */
 
 import jsPDF from "jspdf";
@@ -10,6 +10,11 @@ import autoTable from "jspdf-autotable";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles } from "./arabic-pdf-utils";
 import { formatCurrency } from "@/lib/utils";
 import { logger } from "@/lib/logger";
+
+// Type extension for jsPDF with autoTable
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
+}
 
 interface Payment {
   id: string;
@@ -296,8 +301,8 @@ const addPaymentsTable = (
     },
   });
   
-  // @ts-ignore - autoTable adds this property
-  return doc.lastAutoTable?.finalY || startY + 50;
+  // autoTable adds lastAutoTable property to the document
+  return (doc as JsPDFWithAutoTable).lastAutoTable?.finalY || startY + 50;
 };
 
 /**
