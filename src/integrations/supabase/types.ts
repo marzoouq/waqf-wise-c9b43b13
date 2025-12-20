@@ -14443,6 +14443,18 @@ export type Database = {
               tribe: string
             }[]
           }
+      secure_audit_log: {
+        Args: {
+          p_action_type: string
+          p_description?: string
+          p_new_values?: Json
+          p_old_values?: Json
+          p_record_id?: string
+          p_severity?: string
+          p_table_name?: string
+        }
+        Returns: string
+      }
       seed_demo_data: { Args: never; Returns: Json }
       seed_journal_entries: { Args: never; Returns: Json }
       setup_demo_accounts: {
