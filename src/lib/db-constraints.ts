@@ -164,6 +164,109 @@ export const SEVERITY_RULES = {
 } as const;
 
 // =====================================================
+// أسماء الأعمدة المتغيرة (Deprecated → Current)
+// =====================================================
+
+/**
+ * قائمة الأعمدة التي تم تغيير أسمائها
+ * المفتاح: الاسم القديم (الممنوع)
+ * القيمة: الاسم الجديد (الصحيح) + الجدول المتأثر
+ */
+export const DEPRECATED_COLUMNS = {
+  // properties: address تم تغييره إلى location
+  address: {
+    tables: ['properties'],
+    correctName: 'location',
+    reason: 'تم توحيد أسماء الأعمدة - استخدم location بدلاً من address',
+  },
+  
+  // أمثلة إضافية للأعمدة المتغيرة
+  property_type: {
+    tables: ['properties'],
+    correctName: 'type',
+    reason: 'تم اختصار الاسم - استخدم type بدلاً من property_type في جدول properties',
+  },
+} as const;
+
+/**
+ * قائمة الأعمدة الصحيحة لكل جدول
+ */
+export const TABLE_COLUMNS = {
+  properties: [
+    'id', 'name', 'type', 'location', 'units', 'occupied', 'monthly_revenue',
+    'status', 'description', 'created_at', 'updated_at', 'waqf_unit_id',
+    'total_units', 'occupied_units', 'available_units', 'occupancy_percentage',
+    'tax_percentage', 'shop_count', 'apartment_count', 'revenue_type', 'floors'
+  ] as const,
+  
+  beneficiaries: [
+    'id', 'full_name', 'national_id', 'phone', 'email', 'category', 'family_name',
+    'relationship', 'status', 'notes', 'created_at', 'updated_at', 'user_id',
+    'tribe', 'priority_level', 'marital_status', 'nationality', 'city', 'address',
+    'date_of_birth', 'gender', 'bank_name', 'bank_account_number', 'iban',
+    'monthly_income', 'family_size', 'is_head_of_family', 'parent_beneficiary_id',
+    'tags', 'number_of_sons', 'number_of_daughters', 'number_of_wives',
+    'employment_status', 'housing_type', 'notification_preferences',
+    'last_notification_at', 'can_login', 'username', 'last_login_at',
+    'login_enabled_at', 'beneficiary_number', 'beneficiary_type', 'account_balance',
+    'total_received', 'pending_requests', 'family_id', 'verification_status',
+    'verified_at', 'verified_by', 'last_activity_at', 'total_payments',
+    'pending_amount', 'verification_documents', 'verification_notes',
+    'last_verification_date', 'verification_method', 'risk_score',
+    'eligibility_status', 'eligibility_notes', 'last_review_date',
+    'next_review_date', 'social_status_details', 'income_sources',
+    'disabilities', 'medical_conditions'
+  ] as const,
+  
+  contracts: [
+    'id', 'contract_number', 'property_id', 'tenant_name', 'tenant_phone',
+    'tenant_id_number', 'tenant_email', 'contract_type', 'start_date', 'end_date',
+    'monthly_rent', 'security_deposit', 'payment_frequency', 'status',
+    'is_renewable', 'auto_renew', 'renewal_notice_days', 'terms_and_conditions',
+    'notes', 'created_at', 'updated_at', 'created_by', 'units_count',
+    'tenant_id', 'tax_percentage'
+  ] as const,
+} as const;
+
+// =====================================================
+// قواعد فحص أسماء الأعمدة
+// =====================================================
+
+export const COLUMN_RULES = {
+  // الأعمدة الممنوعة لكل جدول
+  forbiddenColumns: {
+    properties: ['address', 'property_type'],
+  },
+  
+  // التصحيحات المقترحة
+  corrections: {
+    properties: {
+      address: 'location',
+      property_type: 'type',
+    },
+  },
+} as const;
+
+/**
+ * التحقق مما إذا كان اسم العمود صحيحاً للجدول المحدد
+ */
+export function isValidColumn(table: keyof typeof TABLE_COLUMNS, column: string): boolean {
+  const columns = TABLE_COLUMNS[table];
+  return columns ? columns.includes(column as any) : true;
+}
+
+/**
+ * الحصول على الاسم الصحيح للعمود
+ */
+export function getCorrectColumnName(table: string, deprecatedColumn: string): string | null {
+  const corrections = COLUMN_RULES.corrections[table as keyof typeof COLUMN_RULES.corrections];
+  if (corrections && deprecatedColumn in corrections) {
+    return corrections[deprecatedColumn as keyof typeof corrections];
+  }
+  return null;
+}
+
+// =====================================================
 // معلومات للتوثيق
 // =====================================================
 
