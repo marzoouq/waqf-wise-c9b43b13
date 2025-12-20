@@ -17,6 +17,7 @@ import {
 } from './report/index';
 import type { ReportTemplate, ReportFilters } from "@/types/reports/index";
 import { supabase } from "@/integrations/supabase/client";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 // Re-export types
 export type { ReportTemplate, CashFlowData, PropertyWithContracts, OperationRecord };
@@ -209,7 +210,7 @@ export const CustomReportsService = {
     const { data, error, count } = await query;
     
     if (error) {
-      console.error('Error executing report:', error);
+      productionLogger.error('Error executing report:', error);
       return { data: [], total: 0, totalCount: 0, columns: [], generatedAt: new Date().toISOString() };
     }
     
@@ -247,7 +248,7 @@ export const CustomReportsService = {
       .order('code');
     
     if (error) {
-      console.error('Error fetching trial balance:', error);
+      productionLogger.error('Error fetching trial balance:', error);
       return [];
     }
     
@@ -273,7 +274,7 @@ export const CustomReportsService = {
       .order('due_date');
     
     if (error) {
-      console.error('Error fetching aging report:', error);
+      productionLogger.error('Error fetching aging report:', error);
       return { items: [], summary: { current: 0, '1-30': 0, '31-60': 0, '61-90': 0, 'over90': 0, total: 0 } };
     }
     
@@ -346,7 +347,7 @@ export class ReportService {
       .limit(100);
     
     if (error) {
-      console.error('Error fetching unlinked operations:', error);
+      productionLogger.error('Error fetching unlinked operations:', error);
       return [];
     }
     

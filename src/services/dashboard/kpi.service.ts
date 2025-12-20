@@ -4,6 +4,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS } from "@/lib/constants";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -215,7 +216,7 @@ export const KPIService = {
         totalExpenses = expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
     } catch (error) {
-      console.error("Error calculating expenses:", error);
+      productionLogger.error("Error calculating expenses:", error);
     }
 
     const netIncome = totalRevenue - totalExpenses;
