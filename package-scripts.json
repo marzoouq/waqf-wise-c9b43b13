@@ -14,6 +14,9 @@
     "test:visual:update": "playwright test --grep @visual --update-snapshots",
     "test:visual:report": "playwright show-report",
     "test:responsive": "playwright test --grep @responsive",
-    "test:theme": "playwright test --grep @theme"
+    "test:theme": "playwright test --grep @theme",
+    "test:dashboard": "playwright test --grep @dashboard",
+    "test:role": "playwright test --grep @role",
+    "test:portal": "playwright test --grep @portal"
   }
 }

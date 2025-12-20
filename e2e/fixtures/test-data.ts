@@ -31,10 +31,27 @@ export const testRoutes = {
   landing: '/',
   login: '/login',
   dashboard: '/dashboard',
+  nazerDashboard: '/nazer-dashboard',
+  accountantDashboard: '/accountant-dashboard',
+  cashierDashboard: '/cashier-dashboard',
   beneficiaries: '/beneficiaries',
   properties: '/properties',
   accounting: '/accounting',
   beneficiaryPortal: '/beneficiary-portal',
+  journalEntries: '/journal-entries',
+  trialBalance: '/trial-balance',
+  approvals: '/approvals',
+  governance: '/governance',
+  reports: '/reports',
+  settings: '/settings',
+};
+
+export const roleRoutes = {
+  admin: ['/dashboard', '/beneficiaries', '/properties', '/accounting', '/reports', '/settings'],
+  nazer: ['/nazer-dashboard', '/approvals', '/governance'],
+  accountant: ['/accountant-dashboard', '/journal-entries', '/trial-balance'],
+  cashier: ['/cashier-dashboard', '/payments', '/receipts'],
+  beneficiary: ['/beneficiary-portal'],
 };
 
 export const dynamicSelectors = [
