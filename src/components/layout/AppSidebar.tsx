@@ -23,6 +23,7 @@ import {
   HandCoins,
   Sparkles,
   Bot,
+  ScanSearch,
   Vote,
   MessageSquare,
   Headphones,
@@ -118,6 +119,7 @@ const menuGroups = [
       { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"], id: "reports-view" },
       { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"], id: "ai-insights" },
+      { icon: ScanSearch, label: "الفحص الذكي", path: "/ai-audit", roles: ["admin", "nazer"], id: "ai-audit" },
       { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], id: "chatbot" },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"], id: "audit-logs" },
     ]

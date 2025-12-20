@@ -109,6 +109,7 @@ export const IntegrationsManagement = lazyWithRetry(() => import("@/pages/Integr
 
 // ==================== الذكاء الاصطناعي ====================
 export const AIInsights = lazyWithRetry(() => import("@/pages/AIInsights"));
+export const AISystemAudit = lazyWithRetry(() => import("@/pages/AISystemAudit"));
 export const Chatbot = lazyWithRetry(() => import("@/pages/Chatbot"));
 
 // ==================== نقطة البيع ====================
