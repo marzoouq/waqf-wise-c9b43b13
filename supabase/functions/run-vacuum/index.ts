@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     for (const table of tables) {
       try {
         // تشغيل ANALYZE فقط (VACUUM يتطلب صلاحيات خاصة)
-        const { error } = await supabase.rpc('analyze_table', { table_name: table });
+        const { error } = await supabase.rpc('analyze_table', { p_table_name: table });
         
         if (error) {
           results.push({ table, status: 'skipped', reason: error.message });
