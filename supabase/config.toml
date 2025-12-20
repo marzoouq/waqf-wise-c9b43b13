@@ -143,3 +143,9 @@ verify_jwt = false
 
 [functions.db-health-check]
 verify_jwt = false
+
+[functions.ai-system-audit]
+verify_jwt = true
+
+[functions.send-slack-alert]
+verify_jwt = true

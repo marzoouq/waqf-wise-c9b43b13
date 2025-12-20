@@ -108,6 +108,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_system_audits: {
+        Row: {
+          ai_analysis: string | null
+          audit_type: string
+          auto_fixes_applied: Json | null
+          categories: Json | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          findings: Json
+          fixed_issues: number | null
+          id: string
+          pending_fixes: Json | null
+          severity_summary: Json | null
+          slack_notified: boolean | null
+          total_issues: number | null
+        }
+        Insert: {
+          ai_analysis?: string | null
+          audit_type?: string
+          auto_fixes_applied?: Json | null
+          categories?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          findings?: Json
+          fixed_issues?: number | null
+          id?: string
+          pending_fixes?: Json | null
+          severity_summary?: Json | null
+          slack_notified?: boolean | null
+          total_issues?: number | null
+        }
+        Update: {
+          ai_analysis?: string | null
+          audit_type?: string
+          auto_fixes_applied?: Json | null
+          categories?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          findings?: Json
+          fixed_issues?: number | null
+          id?: string
+          pending_fixes?: Json | null
+          severity_summary?: Json | null
+          slack_notified?: boolean | null
+          total_issues?: number | null
+        }
+        Relationships: []
+      }
       annual_disclosures: {
         Row: {
           administrative_expenses: number | null
@@ -9024,6 +9075,68 @@ export type Database = {
             columns: ["rental_payment_id"]
             isOneToOne: false
             referencedRelation: "rental_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pending_system_fixes: {
+        Row: {
+          applied_at: string | null
+          approved_by: string | null
+          audit_id: string | null
+          auto_fixable: boolean | null
+          category: string
+          created_at: string | null
+          description: string | null
+          error_message: string | null
+          fix_sql: string
+          fix_type: string
+          id: string
+          rollback_sql: string | null
+          rolled_back_at: string | null
+          severity: string | null
+          status: string | null
+        }
+        Insert: {
+          applied_at?: string | null
+          approved_by?: string | null
+          audit_id?: string | null
+          auto_fixable?: boolean | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          error_message?: string | null
+          fix_sql: string
+          fix_type: string
+          id?: string
+          rollback_sql?: string | null
+          rolled_back_at?: string | null
+          severity?: string | null
+          status?: string | null
+        }
+        Update: {
+          applied_at?: string | null
+          approved_by?: string | null
+          audit_id?: string | null
+          auto_fixable?: boolean | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          error_message?: string | null
+          fix_sql?: string
+          fix_type?: string
+          id?: string
+          rollback_sql?: string | null
+          rolled_back_at?: string | null
+          severity?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_system_fixes_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "ai_system_audits"
             referencedColumns: ["id"]
           },
         ]
