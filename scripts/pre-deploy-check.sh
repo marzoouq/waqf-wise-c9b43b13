@@ -102,6 +102,23 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# 11. DB Constraints Compatibility
+echo ""
+echo -e "${BLUE}▶ فحص: DB Constraints Compatibility${NC}"
+if [ -f "scripts/check-severity-constraints.js" ]; then
+    if node scripts/check-severity-constraints.js > /dev/null 2>&1; then
+        echo -e "${GREEN}  ✅ توافق severity مع DB constraints${NC}"
+        PASSED=$((PASSED + 1))
+    else
+        echo -e "${RED}  ❌ مشاكل توافق severity مع DB constraints${NC}"
+        echo -e "${YELLOW}     تفاصيل: node scripts/check-severity-constraints.js${NC}"
+        FAILED=$((FAILED + 1))
+    fi
+else
+    echo -e "${YELLOW}  ⚠️  سكريبت الفحص غير موجود${NC}"
+    FAILED=$((FAILED + 1))
+fi
+
 # النتيجة النهائية
 echo ""
 echo "========================================"
