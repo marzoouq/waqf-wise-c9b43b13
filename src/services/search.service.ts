@@ -5,6 +5,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper لتهريب SQL wildcards لمنع التلاعب بالبحث
+const escapeWildcards = (query: string): string => query.replace(/[%_]/g, '\\$&');
+
 interface SearchFilters {
   [key: string]: string | number | boolean | null | undefined | { gte: string; lte: string } | string[];
 }
@@ -71,7 +74,7 @@ export const SearchService = {
     const { data, error } = await supabase
       .from('beneficiaries')
       .select('id, full_name, national_id, phone, category')
-      .or(`full_name.ilike.%${query}%,national_id.ilike.%${query}%,phone.ilike.%${query}%`)
+      .or(`full_name.ilike.%${escapeWildcards(query)}%,national_id.ilike.%${escapeWildcards(query)}%,phone.ilike.%${escapeWildcards(query)}%`)
       .limit(5);
     
     if (error) throw error;
@@ -87,7 +90,7 @@ export const SearchService = {
     const { data, error } = await supabase
       .from('properties')
       .select('id, name, location, status')
-      .or(`name.ilike.%${query}%,location.ilike.%${query}%`)
+      .or(`name.ilike.%${escapeWildcards(query)}%,location.ilike.%${escapeWildcards(query)}%`)
       .limit(5);
     
     if (error) throw error;
@@ -103,7 +106,7 @@ export const SearchService = {
     const { data, error } = await supabase
       .from('loans')
       .select('id, loan_number, loan_amount, beneficiaries(full_name)')
-      .or(`loan_number.ilike.%${query}%`)
+      .or(`loan_number.ilike.%${escapeWildcards(query)}%`)
       .limit(5);
     
     if (error) throw error;
@@ -119,7 +122,7 @@ export const SearchService = {
     const { data, error } = await supabase
       .from('documents')
       .select('id, name, category, file_type')
-      .ilike('name', `%${query}%`)
+      .ilike('name', `%${escapeWildcards(query)}%`)
       .limit(5);
     
     if (error) throw error;
@@ -169,7 +172,7 @@ export const SearchService = {
     // Apply text search
     if (query) {
       const searchColumns = ['full_name', 'national_id', 'phone', 'email', 'notes'];
-      const orConditions = searchColumns.map(col => `${col}.ilike.%${query}%`).join(',');
+      const orConditions = searchColumns.map(col => `${col}.ilike.%${escapeWildcards(query)}%`).join(',');
       url += `&or=(${encodeURIComponent(orConditions)})`;
     }
 

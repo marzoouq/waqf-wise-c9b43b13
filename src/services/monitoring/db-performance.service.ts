@@ -4,6 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface TableScanStats {
   table_name: string;
@@ -47,7 +48,7 @@ class DBPerformanceService {
       const { data, error } = await supabase.functions.invoke('db-performance-stats');
       
       if (error) {
-        console.error('[DBPerformanceService] Edge function error:', error);
+        productionLogger.error('[DBPerformanceService] Edge function error:', error);
         throw error;
       }
 
@@ -57,7 +58,7 @@ class DBPerformanceService {
 
       return data.data as DBPerformanceStats;
     } catch (error) {
-      console.error('[DBPerformanceService] Error fetching stats:', error);
+      productionLogger.error('[DBPerformanceService] Error fetching stats:', error);
       // Return fallback data
       return {
         sequentialScans: [],
@@ -78,7 +79,7 @@ class DBPerformanceService {
     const { data, error } = await (supabase.rpc as any)('get_table_scan_stats');
     
     if (error) {
-      console.error('[DBPerformanceService] Seq scan error:', error);
+      productionLogger.error('[DBPerformanceService] Seq scan error:', error);
       return [];
     }
 
@@ -93,7 +94,7 @@ class DBPerformanceService {
     const { data, error } = await (supabase.rpc as any)('get_cache_hit_ratio');
     
     if (error) {
-      console.error('[DBPerformanceService] Cache hit error:', error);
+      productionLogger.error('[DBPerformanceService] Cache hit error:', error);
       return 0;
     }
 
@@ -108,7 +109,7 @@ class DBPerformanceService {
     const { data, error } = await (supabase.rpc as any)('get_connection_stats');
     
     if (error) {
-      console.error('[DBPerformanceService] Connection stats error:', error);
+      productionLogger.error('[DBPerformanceService] Connection stats error:', error);
       return [];
     }
 
@@ -184,7 +185,7 @@ class DBPerformanceService {
       if (error) throw error;
       return true;
     } catch (error) {
-      console.error('[DBPerformanceService] Vacuum error:', error);
+      productionLogger.error('[DBPerformanceService] Vacuum error:', error);
       return false;
     }
   }
