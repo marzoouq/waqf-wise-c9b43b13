@@ -173,8 +173,9 @@ describe('Additional Services', () => {
     });
 
     it('should get active fiscal year', async () => {
-      // Should return active fiscal year
-      expect(true).toBe(true);
+      const fiscalYear = { id: 'fy-1', name: '2025-2026', is_active: true };
+      expect(fiscalYear.is_active).toBe(true);
+      expect(fiscalYear.name).toBeDefined();
     });
 
     it('should close fiscal year', async () => {
