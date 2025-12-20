@@ -1,14 +1,37 @@
 # 🔐 سياسات الأمان | Security Policies
 
-**الإصدار:** 2.8.73 | **آخر تحديث:** 2025-12-10
+**الإصدار:** 2.9.89 | **آخر تحديث:** 2025-12-20
 
 ---
 
 ## 📊 نظرة عامة
 
 - **تغطية RLS:** 100%
-- **عدد السياسات:** 650 (موحدة)
+- **عدد السياسات:** 650+ (موحدة بدون تعارضات)
 - **الأدوار المحمية:** 7
+- **Audit Logging:** ✅ مفعّل على الجداول الحساسة
+
+---
+
+## 🆕 إصلاحات الأمان الأخيرة (2025-12-20)
+
+### تعارضات تم إصلاحها
+
+| الجدول | المشكلة | الحل |
+|--------|---------|------|
+| `user_roles` | 7 سياسات متعارضة (تضارب بين `check_is_admin_direct` و `is_admin`) | تقليص إلى 2 سياسات واضحة |
+| `beneficiaries` | سياستان SELECT متداخلتان | توحيد في سياسة واحدة |
+| `tenants` | 6 سياسات متداخلة + `archivist` لديه ALL | تقليص إلى 3 سياسات + منع archivist من التعديل |
+
+### Audit Logging المُفعّل
+
+```sql
+-- Triggers مفعّلة على:
+✅ beneficiaries (audit_beneficiaries_changes)
+✅ bank_accounts (audit_bank_accounts_changes)  
+✅ tenants (audit_tenants_changes)
+✅ journal_entries, properties, distributions, contracts, loans, funds, families, user_roles
+```
 
 ---
 
@@ -42,9 +65,9 @@ FOR ALL USING (public.has_role(auth.uid(), 'nazer'));
 
 ### admin (المدير)
 ```sql
--- إدارة المستخدمين والإعدادات
-CREATE POLICY "admin_manage_users" ON profiles
-FOR ALL USING (public.has_role(auth.uid(), 'admin'));
+-- إدارة المستخدمين والإعدادات (admin فقط - ليس nazer)
+CREATE POLICY "admin_manage_user_roles" ON user_roles
+FOR ALL USING (public.is_admin(auth.uid()));
 ```
 
 ### accountant (المحاسب)
@@ -56,7 +79,7 @@ FOR ALL USING (public.has_role(auth.uid(), 'accountant'));
 
 ### cashier (أمين الصندوق)
 ```sql
--- إدارة المدفوعات
+-- إدارة المدفوعات فقط (ليس المستأجرين)
 CREATE POLICY "cashier_payments_access" ON payments
 FOR ALL USING (public.has_role(auth.uid(), 'cashier'));
 ```
@@ -70,179 +93,154 @@ FOR SELECT USING (user_id = auth.uid());
 
 ### waqf_heir (وريث الوقف)
 ```sql
--- شفافية كاملة للقراءة
+-- شفافية كاملة للقراءة فقط
 CREATE POLICY "heir_transparency" ON distributions
 FOR SELECT USING (public.has_role(auth.uid(), 'waqf_heir'));
 ```
 
 ---
 
-## 📋 سياسات الجداول الرئيسية
+## 📋 سياسات الجداول الرئيسية (بعد التوحيد)
 
-### beneficiaries
+### user_roles (2 سياسات فقط)
 ```sql
--- المستفيدون يرون بياناتهم فقط
-CREATE POLICY "beneficiaries_select_own"
-ON beneficiaries FOR SELECT
-USING (
-  user_id = auth.uid() OR
-  public.is_staff(auth.uid()) OR
-  public.has_role(auth.uid(), 'waqf_heir')
+-- السياسة 1: المدير يدير جميع الأدوار
+CREATE POLICY "admin_manage_user_roles" ON user_roles
+FOR ALL USING (public.is_admin(auth.uid()));
+
+-- السياسة 2: المستخدم يرى دوره فقط
+CREATE POLICY "users_read_own_role_secure" ON user_roles
+FOR SELECT USING (
+  user_id = auth.uid() OR public.is_admin(auth.uid())
 );
-
--- الموظفون فقط يمكنهم الإضافة
-CREATE POLICY "beneficiaries_insert_staff"
-ON beneficiaries FOR INSERT
-WITH CHECK (public.is_staff(auth.uid()));
-
--- الموظفون فقط يمكنهم التعديل
-CREATE POLICY "beneficiaries_update_staff"
-ON beneficiaries FOR UPDATE
-USING (public.is_staff(auth.uid()));
 ```
 
-### distributions
+### beneficiaries (سياسة SELECT موحدة)
 ```sql
--- الجميع يمكنهم رؤية التوزيعات
-CREATE POLICY "distributions_select"
-ON distributions FOR SELECT
+-- سياسة واحدة تغطي جميع الحالات
+CREATE POLICY "beneficiaries_select_unified"
+ON beneficiaries FOR SELECT
 USING (
-  public.is_staff(auth.uid()) OR
-  public.has_role(auth.uid(), 'waqf_heir')
+  public.is_staff_only(auth.uid()) OR
+  public.has_role(auth.uid(), 'waqf_heir') OR
+  user_id = auth.uid()
 );
+```
 
--- الناظر والمحاسب فقط يمكنهم الإنشاء
-CREATE POLICY "distributions_insert"
-ON distributions FOR INSERT
-WITH CHECK (
+### tenants (3 سياسات)
+```sql
+-- 1. الناظر والمحاسب: وصول كامل
+CREATE POLICY "Nazer and Accountant full access to tenants" ON tenants
+FOR ALL USING (
   public.has_role(auth.uid(), 'nazer') OR
   public.has_role(auth.uid(), 'accountant')
 );
-```
 
-### journal_entries
-```sql
--- المحاسب والناظر يمكنهم الوصول
-CREATE POLICY "journal_entries_access"
-ON journal_entries FOR ALL
-USING (
-  public.has_role(auth.uid(), 'accountant') OR
-  public.has_role(auth.uid(), 'nazer')
-);
-```
+-- 2. الموظفون: إضافة فقط
+CREATE POLICY "Staff can insert tenants" ON tenants
+FOR INSERT WITH CHECK (public.is_staff_only(auth.uid()));
 
-### rental_payments
-```sql
--- الموظفون يرون جميع المدفوعات
-CREATE POLICY "rental_payments_staff"
-ON rental_payments FOR SELECT
-USING (public.is_staff(auth.uid()));
-
--- الورثة يرون المدفوعات للشفافية
-CREATE POLICY "rental_payments_heirs"
-ON rental_payments FOR SELECT
-USING (public.has_role(auth.uid(), 'waqf_heir'));
+-- 3. الورثة: قراءة للشفافية
+CREATE POLICY "tenants_waqf_heir_view" ON tenants
+FOR SELECT USING (public.has_role(auth.uid(), 'waqf_heir'));
 ```
 
 ---
 
-## 🔧 دوال التحقق
-
-### is_staff
-```sql
-CREATE OR REPLACE FUNCTION is_staff(user_id UUID)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_roles 
-    WHERE user_id = $1 
-    AND role IN ('nazer', 'admin', 'accountant', 'cashier', 'archivist')
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
-
-### is_admin_or_nazer
-```sql
-CREATE OR REPLACE FUNCTION is_admin_or_nazer(user_id UUID)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_roles 
-    WHERE user_id = $1 
-    AND role IN ('nazer', 'admin')
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+## 🔧 دوال التحقق (SECURITY DEFINER)
 
 ### has_role
 ```sql
 CREATE OR REPLACE FUNCTION has_role(user_id UUID, role_name TEXT)
 RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
+  SELECT EXISTS (
     SELECT 1 FROM user_roles 
     WHERE user_id = $1 AND role = $2
   );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 ```
 
-### has_permission
+### is_admin
 ```sql
-CREATE OR REPLACE FUNCTION has_permission(user_id UUID, permission_name TEXT)
+CREATE OR REPLACE FUNCTION is_admin(user_id UUID)
 RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_roles ur
-    JOIN role_permissions rp ON ur.role = rp.role
-    JOIN permissions p ON rp.permission_id = p.id
-    WHERE ur.user_id = $1 AND p.name = $2
+  SELECT EXISTS (
+    SELECT 1 FROM user_roles 
+    WHERE user_id = $1 AND role = 'admin'
   );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
+```
+
+### is_staff_only
+```sql
+CREATE OR REPLACE FUNCTION is_staff_only(user_id UUID)
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM user_roles 
+    WHERE user_id = $1 
+    AND role IN ('nazer', 'admin', 'accountant', 'cashier', 'archivist')
+  );
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
+```
+
+### is_financial_staff
+```sql
+CREATE OR REPLACE FUNCTION is_financial_staff(user_id UUID)
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM user_roles 
+    WHERE user_id = $1 
+    AND role IN ('nazer', 'accountant', 'cashier')
+  );
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 ```
 
 ---
 
-## 🚫 القيود الأمنية
+## 📝 Audit Logging (تسجيل العمليات)
 
-### منع التعديل على السنوات المغلقة
+### دالة log_table_changes
 ```sql
-CREATE OR REPLACE FUNCTION prevent_closed_year_changes()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM fiscal_years 
-    WHERE id = NEW.fiscal_year_id AND is_closed = true
-  ) THEN
-    RAISE EXCEPTION 'Cannot modify entries in closed fiscal year';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER check_fiscal_year_closed
-BEFORE INSERT OR UPDATE ON journal_entries
-FOR EACH ROW EXECUTE FUNCTION prevent_closed_year_changes();
-```
-
-### تسجيل العمليات الحساسة
-```sql
-CREATE OR REPLACE FUNCTION log_sensitive_action()
+CREATE OR REPLACE FUNCTION log_table_changes()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO audit_logs (
-    user_id, action_type, table_name, record_id, old_values, new_values
+    user_id, user_email, action_type, table_name, 
+    record_id, old_values, new_values, description, severity
   ) VALUES (
-    auth.uid(), TG_OP, TG_TABLE_NAME, NEW.id, 
-    to_jsonb(OLD), to_jsonb(NEW)
+    auth.uid(),
+    (SELECT email FROM auth.users WHERE id = auth.uid()),
+    TG_OP,
+    TG_TABLE_NAME,
+    COALESCE(NEW.id, OLD.id)::text,
+    CASE WHEN TG_OP IN ('UPDATE', 'DELETE') THEN to_jsonb(OLD) ELSE NULL END,
+    CASE WHEN TG_OP IN ('INSERT', 'UPDATE') THEN to_jsonb(NEW) ELSE NULL END,
+    'Automated audit: ' || TG_OP || ' on ' || TG_TABLE_NAME,
+    CASE 
+      WHEN TG_TABLE_NAME = 'bank_accounts' THEN 'warning'
+      WHEN TG_OP = 'DELETE' THEN 'warning'
+      ELSE 'info'
+    END
   );
-  RETURN NEW;
+  RETURN COALESCE(NEW, OLD);
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 ```
+
+### الجداول المُراقبة
+| الجدول | Trigger | Severity |
+|--------|---------|----------|
+| `beneficiaries` | `audit_beneficiaries_changes` | info/warning |
+| `bank_accounts` | `audit_bank_accounts_changes` | warning |
+| `tenants` | `audit_tenants_changes` | info/warning |
+| `journal_entries` | `audit_journal_entries_changes` | info/warning |
+| `properties` | `audit_properties_changes` | info/warning |
+| `distributions` | `audit_distributions_changes` | info/warning |
+| `contracts` | `audit_contracts_changes` | info/warning |
+| `loans` | `audit_loans_changes` | info/warning |
+| `funds` | `audit_funds_changes` | info/warning |
+| `user_roles` | `audit_user_roles_changes` | warning |
+| `families` | `audit_families_changes` | info/warning |
 
 ---
 
@@ -250,12 +248,26 @@ $$ LANGUAGE plpgsql;
 
 - [x] RLS مفعل على جميع الجداول
 - [x] دوال التحقق محمية بـ SECURITY DEFINER
-- [x] تسجيل العمليات الحساسة
+- [x] **Audit Logging مفعّل على الجداول الحساسة**
+- [x] **لا توجد سياسات متعارضة**
 - [x] منع التعديل على البيانات التاريخية
 - [x] فصل الصلاحيات حسب الأدوار
-- [x] تشفير البيانات الحساسة
+- [x] **منع archivist من تعديل tenants**
+- [x] **admin فقط يدير user_roles (وليس nazer)**
 - [x] تعطيل التسجيل العام
 
 ---
 
-**الحالة:** ✅ آمن | **الإصدار:** 2.6.32
+## 🔒 ملخص الأمان
+
+| المقياس | القيمة |
+|---------|--------|
+| سياسات RLS النشطة | 650+ |
+| تعارضات السياسات | 0 ✅ |
+| Audit Triggers | 11 trigger نشط |
+| دوال SECURITY DEFINER | 10+ دوال |
+| جداول بدون RLS | 0 ✅ |
+
+---
+
+**الحالة:** ✅ آمن ومحدّث | **الإصدار:** 2.9.89

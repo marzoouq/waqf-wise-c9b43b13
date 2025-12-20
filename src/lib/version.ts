@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.72
- * @date 2025-12-18
+ * @version 2.9.89
+ * @date 2025-12-20
  */
 
-export const APP_VERSION = '2.9.88';
-export const APP_VERSION_DATE = '2025-12-18';
+export const APP_VERSION = '2.9.89';
+export const APP_VERSION_DATE = '2025-12-20';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -22,11 +22,10 @@ export const VERSION_INFO = {
     'لوحة مراقبة حية مع رسوم بيانية Real-time',
     'تقارير أسبوعية آلية عبر Edge Function',
     '50+ صلاحية مفعلة للناظر والمدير',
-    'Server-side Pagination للعقود والحوكمة والمستخدمين',
-    'UsersContext و RolesContext لتقليل Props Drilling',
-    'Lazy Loading للـ Dialogs (تحسين الأداء 15%)',
-    'RTL Margins باستخدام CSS Logical Properties',
-    'Overlay Colors باستخدام CSS Variables',
+    'إصلاح تعارضات RLS (user_roles, beneficiaries, tenants)',
+    'Audit Logging مفعّل على 11 جدول حساس',
+    'منع archivist من تعديل المستأجرين',
+    'توحيد إصدارات GitHub Actions',
   ],
 } as const;
 
