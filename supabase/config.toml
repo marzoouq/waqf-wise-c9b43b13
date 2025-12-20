@@ -139,7 +139,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.db-performance-stats]
-verify_jwt = true
+verify_jwt = false
 
 [functions.db-health-check]
-verify_jwt = true
+verify_jwt = false
