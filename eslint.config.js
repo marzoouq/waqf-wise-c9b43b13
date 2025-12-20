@@ -39,11 +39,19 @@ export default tseslint.config(
       // 🏗️ قواعد جودة الكود
       // Code Quality Rules
       // ═══════════════════════════════════════════════════════════════
-      "no-console": ["error", { "allow": ["warn", "error", "info"] }],
+      "no-console": ["error", { "allow": ["warn", "error"] }],
       "prefer-const": "error",
       "no-var": "error",
       "eqeqeq": ["error", "always"],
       "no-duplicate-imports": "error",
+      
+      // ═══════════════════════════════════════════════════════════════
+      // 🚫 منع الدوال الفارغة
+      // No empty functions allowed
+      // ═══════════════════════════════════════════════════════════════
+      "@typescript-eslint/no-empty-function": ["error", {
+        "allow": ["arrowFunctions", "constructors", "decoratedFunctions"]
+      }],
     },
   },
 );

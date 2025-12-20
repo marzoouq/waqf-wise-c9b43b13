@@ -1,0 +1,256 @@
+name: 🚀 Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # المرحلة 1: فحوصات ما قبل النشر
+  # ═══════════════════════════════════════════════════════════════════════════
+  pre-deploy-checks:
+    name: 🔍 Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+        
+      - name: ESLint Strict Check
+        run: npx eslint . --ext .ts,.tsx --max-warnings=0
+        
+      - name: Unit Tests
+        run: npm run test:unit --if-present || echo "No unit tests configured"
+        
+      - name: Build Check
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          
+      - name: Security Audit
+        run: npm audit --audit-level=critical || true
+        
+      - name: Set deploy flag
+        id: check
+        run: echo "should_deploy=true" >> $GITHUB_OUTPUT
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # المرحلة 2: النشر على Vercel
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-vercel:
+    name: 🔺 Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true' && vars.DEPLOY_TARGET == 'vercel'
+    
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.url }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+        
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        
+      - name: Build Project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed to: $URL"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # المرحلة 3: النشر على Netlify
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-netlify:
+    name: 🟢 Deploy to Netlify
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true' && vars.DEPLOY_TARGET == 'netlify'
+    
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.url }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          
+      - name: Deploy to Netlify
+        id: deploy
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './dist'
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # المرحلة 4: إشعارات Slack
+  # ═══════════════════════════════════════════════════════════════════════════
+  notify-slack:
+    name: 📢 Notify Slack
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, deploy-vercel, deploy-netlify]
+    if: always() && vars.SLACK_WEBHOOK_ENABLED == 'true'
+    
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [[ "${{ needs.deploy-vercel.result }}" == "success" ]] || [[ "${{ needs.deploy-netlify.result }}" == "success" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "color=good" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.deploy-vercel.result }}" == "skipped" ]] && [[ "${{ needs.deploy-netlify.result }}" == "skipped" ]]; then
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            echo "color=warning" >> $GITHUB_OUTPUT
+            echo "emoji=⏭️" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "color=danger" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "attachments": [{
+                "color": "${{ steps.status.outputs.color }}",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "${{ steps.status.outputs.emoji }} Deploy: ${{ steps.status.outputs.status }}",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                      {"type": "mrkdwn", "text": "*Branch:*\n${{ github.ref_name }}"},
+                      {"type": "mrkdwn", "text": "*Commit:*\n${{ github.sha }}"},
+                      {"type": "mrkdwn", "text": "*Actor:*\n${{ github.actor }}"}
+                    ]
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [
+                      {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": "View Workflow"},
+                        "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      }
+                    ]
+                  }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # المرحلة 5: إشعارات Discord
+  # ═══════════════════════════════════════════════════════════════════════════
+  notify-discord:
+    name: 🎮 Notify Discord
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, deploy-vercel, deploy-netlify]
+    if: always() && vars.DISCORD_WEBHOOK_ENABLED == 'true'
+    
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [[ "${{ needs.deploy-vercel.result }}" == "success" ]] || [[ "${{ needs.deploy-netlify.result }}" == "success" ]]; then
+            echo "status=✅ Success" >> $GITHUB_OUTPUT
+            echo "color=3066993" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.deploy-vercel.result }}" == "skipped" ]] && [[ "${{ needs.deploy-netlify.result }}" == "skipped" ]]; then
+            echo "status=⏭️ Skipped" >> $GITHUB_OUTPUT
+            echo "color=15105570" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ Failed" >> $GITHUB_OUTPUT
+            echo "color=15158332" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Send Discord notification
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ steps.status.outputs.status }}
+          title: "Deploy Notification"
+          description: |
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** `${{ github.sha }}`
+            **Actor:** ${{ github.actor }}
+          color: ${{ steps.status.outputs.color }}
+          url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -3,6 +3,8 @@
 ## 📋 جدول المحتويات
 - [البداية](#البداية)
 - [معايير الكود](#معايير-الكود)
+- [قواعد ESLint](#قواعد-eslint)
+- [Pre-commit Hooks](#pre-commit-hooks)
 - [عملية التطوير](#عملية-التطوير)
 - [الاختبارات](#الاختبارات)
 - [Pull Requests](#pull-requests)
@@ -131,6 +133,89 @@ try {
     severity: 'high',
   });
 }
+```
+
+## 🔧 قواعد ESLint
+
+### القواعد الصارمة المفعّلة
+
+| القاعدة | المستوى | الوصف |
+|---------|---------|-------|
+| `@typescript-eslint/no-explicit-any` | `error` | ممنوع استخدام `any` نهائياً |
+| `@typescript-eslint/no-empty-function` | `error` | ممنوع الدوال الفارغة |
+| `no-console` | `error` | ممنوع `console.log` (مسموح `warn`, `error` فقط) |
+| `prefer-const` | `error` | استخدم `const` للمتغيرات الثابتة |
+| `no-var` | `error` | ممنوع استخدام `var` |
+| `eqeqeq` | `error` | استخدم `===` بدلاً من `==` |
+| `no-duplicate-imports` | `error` | ممنوع استيراد نفس الملف مرتين |
+
+### أمثلة على الأخطاء الشائعة
+
+```typescript
+// ❌ أخطاء سيتم رفضها
+function doNothing() {}                    // no-empty-function
+console.log('debug');                      // no-console
+let x = 5;                                 // no-var / prefer-const
+if (value == null) {}                      // eqeqeq
+const data: any = {};                      // no-explicit-any
+
+// ✅ الطريقة الصحيحة
+function handleEvent(_e: Event) { /* intentionally empty */ }
+productionLogger.debug('debug');
+const x = 5;
+if (value === null) {}
+const data: unknown = {};
+```
+
+### تشغيل ESLint
+
+```bash
+# فحص عادي
+npm run lint
+
+# فحص صارم (بدون تحذيرات)
+npm run lint:strict
+
+# إصلاح تلقائي
+npm run lint -- --fix
+```
+
+## 🔒 Pre-commit Hooks
+
+### ما يحدث عند كل commit
+
+عند تنفيذ `git commit`، يتم تشغيل الفحوصات التالية تلقائياً:
+
+```
+1. 📘 TypeScript Check    → tsc --noEmit
+2. 🧪 Quick Tests         → npm run test:unit
+3. ✨ Lint + Format       → eslint --fix --max-warnings=0 + prettier
+```
+
+### سلوك الفحوصات
+
+| الفحص | يوقف الـ commit؟ | ملاحظات |
+|-------|-----------------|---------|
+| TypeScript | ✅ نعم | أي خطأ type يمنع الـ commit |
+| ESLint | ✅ نعم | أي خطأ أو تحذير يمنع الـ commit |
+| Prettier | ❌ لا | يتم الإصلاح التلقائي |
+| Unit Tests | ⚠️ تحذير | يستمر حتى لو فشلت |
+
+### تجاوز الفحوصات (للطوارئ فقط!)
+
+```bash
+# ⚠️ استخدم فقط في حالات الطوارئ
+git commit --no-verify -m "fix: urgent hotfix"
+```
+
+### تشغيل الفحوصات يدوياً
+
+```bash
+# فحص TypeScript
+npm run typecheck
+
+# فحص كامل قبل النشر
+npm run deploy:check
 ```
 
 ## 🔄 عملية التطوير
