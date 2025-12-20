@@ -22,8 +22,6 @@ interface BeneficiarySidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   beneficiaryName?: string;
-  mobileOpen?: boolean;
-  onMobileOpenChange?: (open: boolean) => void;
 }
 
 /**
