@@ -72,6 +72,10 @@ const Archive = () => {
   const { stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useArchiveStats();
   const { deleteDocumentWithFile } = useDocumentUpload();
 
+  // Placeholder functions for non-managers (dialogs always closed)
+  const noOpSetState = () => {};
+  const noOpAsync = async () => {};
+
   const isLoading = documentsLoading || foldersLoading || statsLoading;
   const error = documentsError || foldersError || statsError;
   const refetch = () => {
@@ -286,17 +290,17 @@ const Archive = () => {
           {!canManageArchive && canPreview && previewDialogOpen && selectedDocument && (
             <ArchiveDialogs
               uploadDialogOpen={false}
-              setUploadDialogOpen={() => {}}
+              setUploadDialogOpen={noOpSetState}
               folderDialogOpen={false}
-              setFolderDialogOpen={() => {}}
+              setFolderDialogOpen={noOpSetState}
               previewDialogOpen={previewDialogOpen}
               setPreviewDialogOpen={setPreviewDialogOpen}
               deleteDialogOpen={false}
-              setDeleteDialogOpen={() => {}}
+              setDeleteDialogOpen={noOpSetState}
               selectedDocument={selectedDocument}
               documentToDelete={null}
-              onCreateFolder={async () => {}}
-              onDeleteConfirm={async () => {}}
+              onCreateFolder={noOpAsync}
+              onDeleteConfirm={noOpAsync}
             />
           )}
         </div>
