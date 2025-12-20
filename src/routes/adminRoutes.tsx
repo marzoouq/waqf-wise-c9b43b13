@@ -18,6 +18,7 @@ import {
   DatabaseHealthDashboard,
   IntegrationsManagement,
   AIInsights,
+  AISystemAudit,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -130,6 +131,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <AIInsights />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="ai-system-audit"
+    path="/ai-audit" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+        <AISystemAudit />
       </ProtectedRoute>
     } 
   />,
