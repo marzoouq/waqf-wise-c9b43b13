@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { abortableFetch } from '@/lib/utils/abortable-fetch';
 
 // Helper لتهريب SQL wildcards لمنع التلاعب بالبحث
 const escapeWildcards = (query: string): string => query.replace(/[%_]/g, '\\$&');
@@ -189,19 +190,14 @@ export const SearchService = {
       }
     });
 
-    const response = await fetch(url, {
+    return abortableFetch<unknown[]>(url, {
       headers: {
         'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 15000, // 15 ثانية للبحث
     });
-
-    if (!response.ok) {
-      throw new Error(`Search failed: ${response.status}`);
-    }
-
-    return response.json();
   },
 
   /**

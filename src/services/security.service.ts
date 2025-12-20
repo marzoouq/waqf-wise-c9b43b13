@@ -4,6 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { abortableFetch } from "@/lib/utils/abortable-fetch";
 import type { Database } from "@/integrations/supabase/types";
 
 type SecurityEventRow = Database['public']['Tables']['security_events_log']['Row'];
@@ -127,13 +128,13 @@ export class SecurityService {
 
   /**
    * حفظ نتيجة فحص كلمة المرور المسربة
+   * @note Using abortableFetch for timeout support
    */
   static async saveLeakedPasswordCheck(userId: string, passwordHash: string, isLeaked: boolean) {
-    // Table not in generated types - using raw fetch
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
     
-    const response = await fetch(`${supabaseUrl}/rest/v1/leaked_password_checks`, {
+    await abortableFetch(`${supabaseUrl}/rest/v1/leaked_password_checks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -145,11 +146,8 @@ export class SecurityService {
         password_hash: passwordHash,
         is_leaked: isLeaked,
       }),
+      timeout: 10000, // 10 ثواني
     });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to save leaked password check: ${response.statusText}`);
-    }
   }
 
   /**

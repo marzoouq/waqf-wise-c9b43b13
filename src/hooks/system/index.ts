@@ -18,3 +18,4 @@ export { useAuditLogs } from './useAuditLogs';
 export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
 export { useSelfHealingStats } from './useSelfHealingStats';
+export { useAbortableEdgeFunction } from './useAbortableEdgeFunction';
