@@ -36,7 +36,7 @@ serve(async (req) => {
         properties (
           name,
           type,
-          address
+          location
         )
       `)
       .eq('status', 'active')
@@ -75,15 +75,21 @@ serve(async (req) => {
         .single();
 
       if (!existingAlert) {
+        // جلب المسؤولين (admin/nazer) لإرسال الإشعارات
+        const { data: admins } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .in('role', ['admin', 'nazer']);
+
         // إنشاء تنبيه جديد
         const alertTitle = daysRemaining <= 7 
           ? `⚠️ عقد ينتهي خلال ${daysRemaining} يوم!`
           : `📅 تنبيه: عقد ينتهي خلال ${daysRemaining} يوم`;
 
-      const props = contract.properties as { name?: string; type?: string; address?: string }[] | { name?: string; type?: string; address?: string } | null;
-      const propertyName = Array.isArray(props) ? props[0]?.name : props?.name;
+        const props = contract.properties as { name?: string; type?: string; location?: string }[] | { name?: string; type?: string; location?: string } | null;
+        const propertyName = Array.isArray(props) ? props[0]?.name : props?.name;
         
-      const alertMessage = `
+        const alertMessage = `
 العقد رقم: ${contract.contract_number}
 المستأجر: ${contract.tenant_name}
 العقار: ${propertyName || 'غير محدد'}
@@ -91,20 +97,26 @@ serve(async (req) => {
 الإيجار الشهري: ${contract.monthly_rent?.toLocaleString('ar-SA')} ريال
         `.trim();
 
-        // إضافة إشعار للناظر
-        const { error: notifError } = await supabase
-          .from('notifications')
-          .insert({
-            title: alertTitle,
-            message: alertMessage,
-            type: daysRemaining <= 7 ? 'warning' : 'info',
-            priority: daysRemaining <= 7 ? 'high' : 'medium',
-            reference_type: 'contract_expiry',
-            reference_id: contract.id,
-            is_read: false
-          });
+        // إرسال إشعار لكل مسؤول (admin/nazer)
+        let alertSentSuccessfully = false;
+        for (const admin of admins || []) {
+          const { error: notifError } = await supabase
+            .from('notifications')
+            .insert({
+              user_id: admin.user_id, // ✅ إضافة user_id المطلوب
+              title: alertTitle,
+              message: alertMessage,
+              type: daysRemaining <= 7 ? 'warning' : 'info',
+              priority: daysRemaining <= 7 ? 'high' : 'medium',
+              reference_type: 'contract_expiry',
+              reference_id: contract.id,
+              is_read: false
+            });
+          
+          if (!notifError) alertSentSuccessfully = true;
+        }
 
-        // إضافة تنبيه ذكي
+        // إضافة تنبيه ذكي (لا يحتاج user_id)
         await supabase
           .from('smart_alerts')
           .insert({
@@ -130,10 +142,10 @@ serve(async (req) => {
           propertyName: propertyName || 'غير محدد',
           endDate: contract.end_date,
           daysRemaining,
-          alertSent: !notifError
+          alertSent: alertSentSuccessfully
         });
 
-        console.log(`Alert created for contract ${contract.contract_number}`);
+        console.log(`Alert created for contract ${contract.contract_number}, notified ${admins?.length || 0} admins`);
       }
     }
 
