@@ -119,6 +119,23 @@ else
     FAILED=$((FAILED + 1))
 fi
 
+# 12. Column Names Compatibility
+echo ""
+echo -e "${BLUE}▶ فحص: Column Names Compatibility${NC}"
+if [ -f "scripts/check-column-names.js" ]; then
+    if node scripts/check-column-names.js > /dev/null 2>&1; then
+        echo -e "${GREEN}  ✅ أسماء الأعمدة صحيحة${NC}"
+        PASSED=$((PASSED + 1))
+    else
+        echo -e "${RED}  ❌ مشاكل في أسماء الأعمدة${NC}"
+        echo -e "${YELLOW}     تفاصيل: node scripts/check-column-names.js${NC}"
+        FAILED=$((FAILED + 1))
+    fi
+else
+    echo -e "${YELLOW}  ⚠️  سكريبت فحص أسماء الأعمدة غير موجود${NC}"
+    FAILED=$((FAILED + 1))
+fi
+
 # النتيجة النهائية
 echo ""
 echo "========================================"
