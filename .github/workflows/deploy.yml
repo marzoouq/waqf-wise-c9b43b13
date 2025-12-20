@@ -176,46 +176,43 @@ jobs:
           fi
           
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v1.25.0
         with:
-          status: custom
-          custom_payload: |
+          payload: |
             {
-              "attachments": [{
-                "color": "${{ steps.status.outputs.color }}",
-                "blocks": [
-                  {
-                    "type": "header",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "${{ steps.status.outputs.emoji }} Deploy: ${{ steps.status.outputs.status }}",
-                      "emoji": true
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "fields": [
-                      {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
-                      {"type": "mrkdwn", "text": "*Branch:*\n${{ github.ref_name }}"},
-                      {"type": "mrkdwn", "text": "*Commit:*\n${{ github.sha }}"},
-                      {"type": "mrkdwn", "text": "*Actor:*\n${{ github.actor }}"}
-                    ]
-                  },
-                  {
-                    "type": "actions",
-                    "elements": [
-                      {
-                        "type": "button",
-                        "text": {"type": "plain_text", "text": "View Workflow"},
-                        "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                      }
-                    ]
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.status.outputs.emoji }} Deploy: ${{ steps.status.outputs.status }}",
+                    "emoji": true
                   }
-                ]
-              }]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {"type": "mrkdwn", "text": "*Repository:*\n${{ github.repository }}"},
+                    {"type": "mrkdwn", "text": "*Branch:*\n${{ github.ref_name }}"},
+                    {"type": "mrkdwn", "text": "*Commit:*\n`${{ github.sha }}`"},
+                    {"type": "mrkdwn", "text": "*Actor:*\n${{ github.actor }}"}
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {"type": "plain_text", "text": "View Workflow"},
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   # ═══════════════════════════════════════════════════════════════════════════
   # المرحلة 5: إشعارات Discord
