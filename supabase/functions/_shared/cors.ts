@@ -77,14 +77,10 @@ export function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
-// الحفاظ على التوافق مع الكود الحالي
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'X-Content-Type-Options': 'nosniff',
-  'Cache-Control': 'no-cache, no-store, must-revalidate',
-};
+// ⚠️ DEPRECATED: استخدم getCorsHeaders(req) بدلاً من corsHeaders
+// الحفاظ على التوافق مع الكود الحالي - لكن مع تحذير
+/** @deprecated Use getCorsHeaders(req) instead for better security */
+export const corsHeaders = getCorsHeaders(new Request('https://waqf-platform.lovable.app'));
 
 /**
  * إنشاء Response للـ OPTIONS requests (CORS preflight)
