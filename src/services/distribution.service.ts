@@ -8,6 +8,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { NotificationService } from './notification.service';
+import { abortableFetch } from '@/lib/utils/abortable-fetch';
 import type { Database } from '@/integrations/supabase/types';
 
 // استخدام Types من Supabase مباشرة
@@ -536,23 +537,19 @@ export class DistributionService {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       
-      const response = await fetch(
+      const data = await abortableFetch<DistributionRow[]>(
         `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/distributions?fiscal_year_id=eq.${fiscalYearId}&order=distribution_date.desc`,
         {
           headers: {
             'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 30000, // 30 ثانية للتوزيعات
         }
       );
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch distributions: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return data as DistributionRow[];
+      return data;
     } catch (error) {
       productionLogger.error('Error fetching fiscal year distributions', error);
       throw error;
