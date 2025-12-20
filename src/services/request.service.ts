@@ -382,33 +382,43 @@ export class RequestService {
 
   // ==================== التعليقات ====================
   static async getComments(requestId: string) {
-    const { data, error } = await supabase
+    // جلب التعليقات
+    const { data: comments, error } = await supabase
       .from("request_comments")
       .select("*")
       .eq("request_id", requestId)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
+    if (!comments || comments.length === 0) return [];
 
-    const commentsWithProfiles = await Promise.all(
-      (data || []).map(async (comment) => {
-        if (comment.user_id) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name, email")
-            .eq("user_id", comment.user_id)
-            .maybeSingle();
+    // جمع جميع user_ids الفريدة
+    const userIds = [...new Set(comments.filter(c => c.user_id).map(c => c.user_id))];
+    
+    // استعلام واحد لجلب جميع الملفات الشخصية (بدلاً من N استعلام)
+    let profilesMap: Record<string, { full_name: string; email: string }> = {};
+    
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .in("user_id", userIds);
+      
+      if (profiles) {
+        profilesMap = profiles.reduce((acc, p) => {
+          acc[p.user_id] = { full_name: p.full_name || "مستخدم", email: p.email || "" };
+          return acc;
+        }, {} as Record<string, { full_name: string; email: string }>);
+      }
+    }
 
-          return {
-            ...comment,
-            profiles: profile || { full_name: "مستخدم", email: "" },
-          };
-        }
-        return { ...comment, profiles: { full_name: "مستخدم", email: "" } };
-      })
-    );
-
-    return commentsWithProfiles;
+    // دمج البيانات
+    return comments.map((comment) => ({
+      ...comment,
+      profiles: comment.user_id && profilesMap[comment.user_id] 
+        ? profilesMap[comment.user_id] 
+        : { full_name: "مستخدم", email: "" },
+    }));
   }
 
   static async addComment(requestId: string, comment: string, isInternal = false) {
