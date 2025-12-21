@@ -4,6 +4,7 @@
  * 
  * ✅ AuthProvider يغلف كل شيء - متاح دائماً
  * ✅ لا إعادة تهيئة عند التنقل بين الصفحات
+ * ✅ نظام إشعار التحديثات التلقائي
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,6 +16,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 // ✅ استيراد خفيف للصفحة الترحيبية (بدون Radix UI)
 import LandingPageLight from "@/pages/LandingPageLight";
 import { LightErrorBoundary } from "./components/shared/LightErrorBoundary";
+import { UpdateNotification } from "./components/shared/UpdateNotification";
 
 // ✅ Lazy load لباقي المسارات
 const AppRoutes = lazy(() => import("./components/layout/AppRoutes"));
@@ -85,6 +87,9 @@ const App = () => {
               />
             </Routes>
           </BrowserRouter>
+          
+          {/* ✅ إشعار التحديث المتاح */}
+          <UpdateNotification />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
