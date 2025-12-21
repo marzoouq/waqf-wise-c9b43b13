@@ -5,12 +5,23 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export type CheckType = 'ping' | 'json-required' | 'formdata';
+export type FunctionCategory = 'ai' | 'database' | 'notification' | 'backup' | 'security' | 'utility';
+
+// ✅ حدود زمنية مختلفة حسب نوع الوظيفة
+export const RESPONSE_TIME_THRESHOLDS: Record<FunctionCategory, { healthy: number; degraded: number }> = {
+  ai: { healthy: 8000, degraded: 20000 },           // AI: بطيئة طبيعياً (cold start + AI calls)
+  database: { healthy: 2000, degraded: 5000 },      // DB: متوسطة السرعة
+  notification: { healthy: 3000, degraded: 8000 },  // إشعارات: قد تتأخر قليلاً
+  backup: { healthy: 15000, degraded: 45000 },      // نسخ احتياطي: بطيء جداً طبيعياً
+  security: { healthy: 3000, degraded: 8000 },      // أمان: متوسطة
+  utility: { healthy: 5000, degraded: 12000 },      // أدوات: متنوعة
+};
 
 export interface EdgeFunctionInfo {
   name: string;
   description: string;
   requiresAuth: boolean;
-  category: 'ai' | 'database' | 'notification' | 'backup' | 'security' | 'utility';
+  category: FunctionCategory;
   checkType: CheckType;
   requiredFields?: string[];
 }
@@ -25,6 +36,7 @@ export interface EdgeFunctionHealth {
   isProtected?: boolean;
   statusReason?: string;
   recommendation?: string;
+  categoryThreshold?: { healthy: number; degraded: number };
 }
 
 export interface HealthCheckResult {
@@ -144,40 +156,54 @@ function generateDummyData(fields: string[]): Record<string, any> {
 }
 
 /**
- * الحصول على سبب الحالة والتوصية
+ * الحصول على الحدود الزمنية للوظيفة
+ */
+export function getThresholdsForFunction(funcInfo?: EdgeFunctionInfo): { healthy: number; degraded: number } {
+  const category = funcInfo?.category || 'utility';
+  return RESPONSE_TIME_THRESHOLDS[category];
+}
+
+/**
+ * الحصول على سبب الحالة والتوصية - مع حدود ديناميكية حسب نوع الوظيفة
  */
 export function getStatusDetails(result: HealthCheckResult, funcInfo?: EdgeFunctionInfo): { 
   reason: string; 
   recommendation: string 
 } {
-  // محمية (401/403)
+  const thresholds = getThresholdsForFunction(funcInfo);
+  const categoryName = funcInfo?.category ? getCategoryLabel(funcInfo.category) : 'عامة';
+  
+  // محمية (401/403) - تعمل بشكل صحيح!
   if (result.isProtected) {
     return {
-      reason: 'الوظيفة تتطلب مصادقة JWT وترفض الطلبات غير المصرح بها - هذا سلوك طبيعي وآمن',
-      recommendation: 'لا يلزم إجراء - الوظيفة تعمل بشكل صحيح وتحمي النظام من الوصول غير المصرح'
+      reason: `✓ الوظيفة محمية وتعمل بشكل صحيح - ترفض الطلبات غير المصرح بها (${result.responseTime}ms)`,
+      recommendation: 'لا يلزم إجراء - هذا السلوك المتوقع للوظائف المحمية'
     };
   }
   
-  // صحية
-  if (result.success && (result.responseTime || 0) < 1000) {
+  const time = result.responseTime || 0;
+  
+  // صحية - ضمن الحدود الطبيعية لنوع الوظيفة
+  if (result.success && time < thresholds.healthy) {
     return {
-      reason: 'الوظيفة تستجيب بسرعة وتعمل بشكل طبيعي',
+      reason: `✓ الوظيفة تعمل بشكل ممتاز (${time}ms) - ضمن الحدود الطبيعية لوظائف ${categoryName}`,
       recommendation: 'لا يلزم إجراء - استمر في المراقبة الدورية'
     };
   }
   
-  // بطيئة
-  if (result.success && (result.responseTime || 0) >= 1000) {
-    const time = result.responseTime || 0;
-    if (time >= 5000) {
-      return {
-        reason: `زمن الاستجابة بطيء جداً (${time}ms) - قد يكون هناك مشكلة في الأداء أو cold start`,
-        recommendation: 'راجع كود الوظيفة للتحسين - تحقق من استعلامات قاعدة البيانات وAPI calls الخارجية'
-      };
-    }
+  // مقبولة - بطيئة قليلاً لكن ضمن الحدود
+  if (result.success && time < thresholds.degraded) {
     return {
-      reason: `زمن الاستجابة أعلى من المثالي (${time}ms) - قد يكون cold start أو حمل مؤقت`,
-      recommendation: 'راقب الأداء - إذا استمر البطء، راجع الكود للتحسين'
+      reason: `✓ الوظيفة تعمل (${time}ms) - مقبولة لوظائف ${categoryName} (الحد: ${thresholds.degraded}ms)`,
+      recommendation: 'الأداء مقبول - قد يتحسن بعد إعادة التشغيل (cold start)'
+    };
+  }
+  
+  // بطيئة جداً - تجاوزت الحدود
+  if (result.success && time >= thresholds.degraded) {
+    return {
+      reason: `⚠ استجابة بطيئة (${time}ms) - تجاوزت الحد المتوقع لوظائف ${categoryName} (${thresholds.degraded}ms)`,
+      recommendation: 'راجع كود الوظيفة للتحسين - تحقق من استعلامات DB وAPI calls الخارجية'
     };
   }
   
@@ -187,31 +213,31 @@ export function getStatusDetails(result: HealthCheckResult, funcInfo?: EdgeFunct
     
     if (error.includes('500')) {
       return {
-        reason: 'خطأ داخلي في الخادم (500) - مشكلة في كود الوظيفة',
+        reason: '✗ خطأ داخلي في الخادم (500) - مشكلة في كود الوظيفة',
         recommendation: 'راجع logs الوظيفة للعثور على الخطأ وإصلاحه'
       };
     }
     if (error.includes('502') || error.includes('503')) {
       return {
-        reason: 'الوظيفة غير متاحة (502/503) - قد تكون معطلة أو في وضع الصيانة',
+        reason: '✗ الوظيفة غير متاحة (502/503) - قد تكون معطلة أو في وضع الصيانة',
         recommendation: 'تأكد من نشر الوظيفة بشكل صحيح وأنها لا تحتوي على أخطاء syntax'
       };
     }
     if (error.includes('timeout') || error.includes('ETIMEDOUT')) {
       return {
-        reason: 'انتهت مهلة الاتصال - الوظيفة لا تستجيب',
+        reason: '✗ انتهت مهلة الاتصال - الوظيفة لا تستجيب',
         recommendation: 'تحقق من أن الوظيفة لا تحتوي على infinite loops أو عمليات طويلة'
       };
     }
     if (error.includes('network') || error.includes('fetch') || error.includes('Failed')) {
       return {
-        reason: 'مشكلة في الاتصال بالشبكة',
+        reason: '✗ مشكلة في الاتصال بالشبكة',
         recommendation: 'تأكد من اتصال الإنترنت وأن Supabase متاح'
       };
     }
     
     return {
-      reason: `فشل الفحص: ${error}`,
+      reason: `✗ فشل الفحص: ${error}`,
       recommendation: 'راجع Edge Function logs للحصول على تفاصيل الخطأ'
     };
   }
@@ -220,6 +246,21 @@ export function getStatusDetails(result: HealthCheckResult, funcInfo?: EdgeFunct
     reason: 'لم يتم الفحص بعد',
     recommendation: 'اضغط على زر الفحص للتحقق من حالة الوظيفة'
   };
+}
+
+/**
+ * الحصول على اسم الفئة بالعربية
+ */
+function getCategoryLabel(category: FunctionCategory): string {
+  const labels: Record<FunctionCategory, string> = {
+    ai: 'الذكاء الاصطناعي',
+    database: 'قاعدة البيانات',
+    notification: 'الإشعارات',
+    backup: 'النسخ الاحتياطي',
+    security: 'الأمان',
+    utility: 'الأدوات العامة',
+  };
+  return labels[category];
 }
 
 export class EdgeFunctionsHealthService {
@@ -439,7 +480,7 @@ export class EdgeFunctionsHealthService {
   }
 
   /**
-   * الحصول على ملخص الصحة
+   * الحصول على ملخص الصحة - مع حدود ديناميكية حسب نوع الوظيفة
    */
   static calculateHealthSummary(results: HealthCheckResult[]): {
     total: number;
@@ -450,8 +491,22 @@ export class EdgeFunctionsHealthService {
     avgResponseTime: number;
   } {
     const protectedCount = results.filter(r => r.isProtected).length;
-    const healthy = results.filter(r => r.success && !r.isProtected && (r.responseTime || 0) < 1000).length;
-    const degraded = results.filter(r => r.success && !r.isProtected && (r.responseTime || 0) >= 1000).length;
+    
+    // حساب صحية/بطيئة بناءً على حدود كل فئة
+    const healthy = results.filter(r => {
+      if (!r.success || r.isProtected) return false;
+      const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === r.function);
+      const thresholds = getThresholdsForFunction(funcInfo);
+      return (r.responseTime || 0) < thresholds.degraded; // مقبولة = صحية
+    }).length;
+    
+    const degraded = results.filter(r => {
+      if (!r.success || r.isProtected) return false;
+      const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === r.function);
+      const thresholds = getThresholdsForFunction(funcInfo);
+      return (r.responseTime || 0) >= thresholds.degraded; // تجاوزت الحد = بطيئة
+    }).length;
+    
     const unhealthy = results.filter(r => !r.success).length;
     
     const successfulResults = results.filter(r => r.success);
@@ -470,16 +525,24 @@ export class EdgeFunctionsHealthService {
   }
 
   /**
-   * تحويل نتيجة الفحص إلى حالة صحية
+   * تحويل نتيجة الفحص إلى حالة صحية - مع حدود ديناميكية
    */
   static resultToHealth(result: HealthCheckResult): EdgeFunctionHealth {
     const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === result.function);
+    const thresholds = getThresholdsForFunction(funcInfo);
     let status: EdgeFunctionHealth['status'] = 'unknown';
     
     if (result.isProtected || result.note === 'protected') {
+      // ✅ الوظيفة المحمية = تعمل بشكل صحيح!
       status = 'protected';
     } else if (result.success) {
-      status = (result.responseTime || 0) < 1000 ? 'healthy' : 'degraded';
+      const time = result.responseTime || 0;
+      // ✅ استخدام الحدود الديناميكية حسب نوع الوظيفة
+      if (time < thresholds.degraded) {
+        status = 'healthy'; // ضمن الحدود المقبولة
+      } else {
+        status = 'degraded'; // تجاوزت الحدود
+      }
     } else {
       status = 'unhealthy';
     }
@@ -496,7 +559,8 @@ export class EdgeFunctionsHealthService {
       consecutiveFailures: result.success ? 0 : 1,
       isProtected: result.isProtected,
       statusReason: result.statusReason || details.reason,
-      recommendation: result.recommendation || details.recommendation
+      recommendation: result.recommendation || details.recommendation,
+      categoryThreshold: thresholds
     };
   }
 
