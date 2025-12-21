@@ -38,9 +38,11 @@ export const FloatingChatButton = memo(function FloatingChatButton() {
       <Button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed z-50 rounded-full shadow-xl",
+          "fixed rounded-full shadow-xl cursor-pointer",
           "bg-gradient-to-br from-primary to-primary/80",
           "border-2 border-primary-foreground/20",
+          // z-index عالي جداً لضمان الظهور فوق كل شيء
+          "z-[9999]",
           // موقع مختلف للجوال لتجنب التداخل مع شريط التنقل
           isMobile 
             ? "bottom-20 left-4 h-12 w-12" 
@@ -49,13 +51,14 @@ export const FloatingChatButton = memo(function FloatingChatButton() {
         size="icon"
         aria-label="فتح المساعد الذكي"
         title="المساعد الذكي"
+        type="button"
       >
         <Bot className={cn(
-          "text-primary-foreground",
+          "text-primary-foreground pointer-events-none",
           isMobile ? "h-5 w-5" : "h-6 w-6"
         )} />
         {/* مؤشر أخضر صغير بدون حركة */}
-        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-success border-2 border-background" />
+        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-success border-2 border-background pointer-events-none" />
       </Button>
 
       {/* نافذة الشات */}
