@@ -20,6 +20,21 @@ const handler = async (req: Request): Promise<Response> => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[send-invoice-email] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'send-invoice-email',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     const {
       invoiceId,
       customerEmail,

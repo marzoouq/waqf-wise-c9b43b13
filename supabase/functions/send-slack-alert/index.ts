@@ -20,6 +20,21 @@ serve(async (req) => {
   }
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[send-slack-alert] Health check received');
+          return new Response(JSON.stringify({
+            status: 'healthy',
+            function: 'send-slack-alert',
+            timestamp: new Date().toISOString()
+          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
     
     if (!slackWebhookUrl) {

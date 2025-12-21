@@ -13,6 +13,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[send-push-notification] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'send-push-notification',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // التحقق من JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {

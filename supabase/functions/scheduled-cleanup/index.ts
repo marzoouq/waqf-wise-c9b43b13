@@ -32,6 +32,21 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[scheduled-cleanup] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'scheduled-cleanup',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // يمكن استدعاؤها بدون مصادقة للـ Cron Jobs
     // أو مع مصادقة للاستدعاء اليدوي
     const authHeader = req.headers.get('authorization');

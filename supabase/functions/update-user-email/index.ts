@@ -18,6 +18,21 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[update-user-email] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'update-user-email',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
     const clientId = getClientIdentifier(req);
     const rateLimitResult = checkRateLimit(clientId, {

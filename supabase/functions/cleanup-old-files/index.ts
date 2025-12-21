@@ -20,6 +20,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[cleanup-old-files] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'cleanup-old-files',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // 1. التحقق من المصادقة والصلاحيات
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
