@@ -400,4 +400,123 @@ export class NotificationService {
       throw error;
     }
   }
+  /**
+   * إرسال إشعار جماعي لمجموعة من المستخدمين
+   */
+  static async sendBroadcast(params: {
+    title: string;
+    message: string;
+    targetType: 'all' | 'role' | 'beneficiaries' | 'staff';
+    targetValue?: string;
+    type?: 'info' | 'success' | 'warning' | 'error';
+    priority?: 'low' | 'medium' | 'high';
+    actionUrl?: string;
+    senderName?: string;
+  }): Promise<{ success: boolean; recipientCount: number; error?: string }> {
+    try {
+      // 1. الحصول على المستخدمين المستهدفين
+      const { data: users, error: usersError } = await supabase.rpc('get_users_by_target', {
+        p_target_type: params.targetType,
+        p_target_value: params.targetValue || null,
+      });
+
+      if (usersError) throw usersError;
+
+      if (!users || users.length === 0) {
+        return { success: false, recipientCount: 0, error: 'لا يوجد مستخدمين في الفئة المحددة' };
+      }
+
+      // 2. إنشاء الإشعارات لجميع المستخدمين
+      const notifications: NotificationData[] = users.map((u: { user_id: string; full_name: string }) => ({
+        user_id: u.user_id,
+        title: params.title,
+        message: params.message,
+        type: params.type || 'info',
+        priority: params.priority || 'medium',
+        action_url: params.actionUrl,
+        reference_type: 'broadcast',
+      }));
+
+      // 3. إرسال الإشعارات
+      const result = await this.sendBulk(notifications);
+
+      if (!result.success) {
+        throw new Error('فشل في إرسال الإشعارات');
+      }
+
+      // 4. تسجيل الإشعار الجماعي في سجل البث
+      const { data: currentUser } = await supabase.auth.getUser();
+      
+      await supabase.from('broadcast_notifications').insert({
+        title: params.title,
+        message: params.message,
+        type: params.type || 'info',
+        priority: params.priority || 'medium',
+        target_type: params.targetType,
+        target_value: params.targetValue,
+        recipient_count: users.length,
+        sent_by: currentUser?.user?.id,
+        sent_by_name: params.senderName || 'النظام',
+        action_url: params.actionUrl,
+      });
+
+      productionLogger.info(`Broadcast notification sent to ${users.length} users (${params.targetType})`);
+
+      return { success: true, recipientCount: users.length };
+    } catch (error) {
+      productionLogger.error('Error sending broadcast notification', error, {
+        context: 'notification_service',
+      });
+      return { success: false, recipientCount: 0, error: String(error) };
+    }
+  }
+
+  /**
+   * الحصول على عدد المستخدمين المستهدفين (للمعاينة قبل الإرسال)
+   */
+  static async getTargetUserCount(
+    targetType: 'all' | 'role' | 'beneficiaries' | 'staff',
+    targetValue?: string
+  ): Promise<number> {
+    try {
+      const { data, error } = await supabase.rpc('count_users_by_target', {
+        p_target_type: targetType,
+        p_target_value: targetValue || null,
+      });
+
+      if (error) throw error;
+      return data || 0;
+    } catch (error) {
+      productionLogger.error('Error counting target users', error);
+      return 0;
+    }
+  }
+
+  /**
+   * جلب سجل الإشعارات الجماعية
+   */
+  static async getBroadcastHistory(limit: number = 20): Promise<{
+    id: string;
+    title: string;
+    message: string;
+    target_type: string;
+    target_value: string | null;
+    recipient_count: number;
+    sent_by_name: string | null;
+    created_at: string;
+  }[]> {
+    try {
+      const { data, error } = await supabase
+        .from('broadcast_notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching broadcast history', error);
+      return [];
+    }
+  }
 }
