@@ -5,6 +5,7 @@ import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/ui/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
+import { AuthService } from '@/services/auth.service';
 
 interface AuthContextType {
   user: User | null;
@@ -37,44 +38,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ✅ استخدام useRef بدلاً من localStorage للأمان
   const rolesCache = useRef<string[]>([]);
 
-  // جلب أدوار المستخدم من قاعدة البيانات مباشرة (بدون localStorage)
+  // جلب أدوار المستخدم باستخدام AuthService
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
     // ✅ استخدام الـ cache المؤقت في الذاكرة فقط
     if (rolesCache.current.length > 0) {
       setRoles(rolesCache.current);
       setRolesLoading(false);
       // جلب الأدوار في الخلفية للتحديث
-      supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .then(({ data }) => {
-          if (data) {
-            const freshRoles = data.map(r => r.role);
-            if (JSON.stringify(freshRoles) !== JSON.stringify(rolesCache.current)) {
-              rolesCache.current = freshRoles;
-              setRoles(freshRoles);
-            }
+      AuthService.getUserRoles(userId)
+        .then((freshRoles) => {
+          if (JSON.stringify(freshRoles) !== JSON.stringify(rolesCache.current)) {
+            rolesCache.current = freshRoles;
+            setRoles(freshRoles);
           }
-        });
+        })
+        .catch(() => {});
       return rolesCache.current;
     }
 
-    // ✅ جلب الأدوار من قاعدة البيانات مباشرة
+    // ✅ جلب الأدوار باستخدام AuthService
     setRolesLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
-
-      if (error) {
-        productionLogger.error('Error fetching user roles', error);
-        setRolesLoading(false);
-        return [];
-      }
-
-      const fetchedRoles = (data || []).map(r => r.role);
+      const fetchedRoles = await AuthService.getUserRoles(userId);
       rolesCache.current = fetchedRoles;
       setRoles(fetchedRoles);
       setRolesLoading(false);
@@ -107,32 +92,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // جلب الملف الشخصي
+  // جلب الملف الشخصي باستخدام AuthService
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        productionLogger.error('Error fetching profile', error);
-      }
+      const data = await AuthService.getProfile(userId);
       
       if (!data) {
         // ✅ إعادة المحاولة فوراً بدون تأخير
-        const { data: retryData } = await supabase
-          .from('profiles')
-          .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
-          .eq('user_id', userId)
-          .maybeSingle();
-        
+        const retryData = await AuthService.getProfile(userId);
         if (retryData) {
-          setProfile(retryData);
+          setProfile(retryData as Profile);
         }
       } else {
-        setProfile(data);
+        setProfile(data as Profile);
       }
     } catch (error) {
       productionLogger.error('Exception fetching profile', error);
