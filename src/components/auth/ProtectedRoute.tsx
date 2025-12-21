@@ -2,8 +2,9 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { checkPermission, type Permission } from '@/config/permissions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { AppRole } from '@/types/roles';
+import { debugLog } from '@/lib/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,31 +16,46 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
   const { user, isLoading: authLoading, roles, rolesLoading } = useAuth();
   const [loadingTooLong, setLoadingTooLong] = useState(false);
+  const lastLoggedDecision = useRef<string>('');
 
-  console.log('🛡️ [ProtectedRoute] حالة:', { 
-    authLoading, 
-    rolesLoading, 
-    hasUser: !!user, 
-    roles,
-    path: window.location.pathname 
-  });
-
-  // ✅ Timeout احتياطي لمنع التعليق
+  // ✅ Log الحالة عند التغيير فقط
   useEffect(() => {
+    debugLog('ProtectedRoute', 'تحديث الحالة', { 
+      authLoading, 
+      rolesLoading, 
+      hasUser: !!user, 
+      roles,
+      path: window.location.pathname 
+    });
+  }, [authLoading, rolesLoading, user, roles]);
+
+  // ✅ Timeout مُحسَّن - يتوقف عند اكتمال التحميل
+  useEffect(() => {
+    // لا حاجة للـ timer إذا انتهى التحميل
+    if (!authLoading && !rolesLoading) return;
+    
     const timer = setTimeout(() => {
-      console.log('🛡️ [ProtectedRoute] ⏰ Timeout - تجاوز التحميل');
+      debugLog('ProtectedRoute', '⏰ Timeout - تجاوز وقت التحميل');
       setLoadingTooLong(true);
-    }, 3000); // 3 ثواني كحد أقصى
+    }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [authLoading, rolesLoading]);
 
   // التحميل فقط عند الضرورة
   const isLoading = authLoading || (!!user && rolesLoading);
 
+  // ✅ Helper لتسجيل القرار مرة واحدة فقط
+  const logDecision = (decision: string) => {
+    if (decision !== lastLoggedDecision.current) {
+      lastLoggedDecision.current = decision;
+      debugLog('ProtectedRoute', `قرار: ${decision}`);
+    }
+  };
+
   // ✅ إذا استمر التحميل لأكثر من المدة المحددة، تجاوز التحميل
   if (isLoading && !loadingTooLong) {
-    console.log('🛡️ [ProtectedRoute] قرار: عرض Loader');
+    logDecision('عرض Loader');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -48,11 +64,11 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
   }
 
   if (!user) {
-    console.log('🛡️ [ProtectedRoute] قرار: توجيه للدخول');
+    logDecision('توجيه للدخول');
     return <Navigate to="/login" replace />;
   }
   
-  console.log('🛡️ [ProtectedRoute] قرار: السماح');
+  logDecision('السماح');
 
   // ✅ استخدام الأدوار من السياق فقط (بدون localStorage)
   const effectiveRoles = roles;

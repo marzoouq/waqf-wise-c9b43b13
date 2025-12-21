@@ -23,9 +23,10 @@ import {
   coreRoutes,
   beneficiaryProtectedRoutes,
 } from "@/routes";
+import { debugLog } from '@/lib/logger';
 
 export default function AppShell() {
-  console.log('🏗️ [AppShell] تحميل الهيكل');
+  debugLog('AppShell', 'تحميل الهيكل');
   
   return (
     <SettingsProvider>
