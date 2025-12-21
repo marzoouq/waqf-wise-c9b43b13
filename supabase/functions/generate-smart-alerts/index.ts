@@ -115,18 +115,23 @@ serve(async (req) => {
       });
     }
 
-    // 5. توصيات ذكية بناءً على البيانات
-    const { data: activeContracts, count: activeCount } = await supabase
-      .from('contracts')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'نشط');
-
-    const { data: allProperties, count: propertiesCount } = await supabase
+    // 5. توصيات ذكية بناءً على البيانات - حساب معدل الإشغال الصحيح
+    const { data: propertiesData } = await supabase
       .from('properties')
-      .select('*', { count: 'exact', head: true });
+      .select('total_units, occupied_units');
 
-    const occupancyRate = propertiesCount && activeCount 
-      ? ((activeCount / propertiesCount) * 100).toFixed(1) 
+    let totalUnits = 0;
+    let occupiedUnits = 0;
+    
+    if (propertiesData && propertiesData.length > 0) {
+      propertiesData.forEach(prop => {
+        totalUnits += Number(prop.total_units) || 0;
+        occupiedUnits += Number(prop.occupied_units) || 0;
+      });
+    }
+
+    const occupancyRate = totalUnits > 0 
+      ? ((occupiedUnits / totalUnits) * 100).toFixed(1) 
       : 0;
 
     if (Number(occupancyRate) < 70) {
@@ -134,9 +139,9 @@ serve(async (req) => {
         alert_type: 'recommendation',
         severity: 'info',
         title: `معدل الإشغال: ${occupancyRate}%`,
-        description: `معدل الإشغال منخفض. يُنصح بتفعيل حملة تسويقية لزيادة الإيجارات.`,
+        description: `معدل الإشغال منخفض (${occupiedUnits}/${totalUnits} وحدة). يُنصح بتفعيل حملة تسويقية لزيادة الإيجارات.`,
         action_url: '/properties',
-        data: { occupancy_rate: occupancyRate, type: 'low_occupancy' }
+        data: { occupancy_rate: occupancyRate, occupied: occupiedUnits, total: totalUnits, type: 'low_occupancy' }
       });
     }
 
@@ -147,14 +152,30 @@ serve(async (req) => {
       .delete()
       .lt('created_at', thirtyDaysAgo);
 
-    // إدراج التنبيهات الجديدة
-    if (alerts.length > 0) {
+    // التحقق من التنبيهات المكررة قبل الإدراج
+    const today = new Date().toISOString().split('T')[0];
+    const { data: existingAlerts } = await supabase
+      .from('smart_alerts')
+      .select('title, alert_type')
+      .gte('created_at', today);
+
+    const existingTitles = new Set(existingAlerts?.map(a => `${a.alert_type}:${a.title}`) || []);
+
+    // فلترة التنبيهات المكررة
+    const newAlerts = alerts.filter(alert => 
+      !existingTitles.has(`${alert.alert_type}:${alert.title}`)
+    );
+
+    // إدراج التنبيهات الجديدة فقط
+    if (newAlerts.length > 0) {
       const { error: insertError } = await supabase
         .from('smart_alerts')
-        .insert(alerts);
+        .insert(newAlerts);
 
       if (insertError) throw insertError;
     }
+
+    console.log(`[generate-smart-alerts] Generated: ${alerts.length}, New: ${newAlerts.length}, Skipped duplicates: ${alerts.length - newAlerts.length}`);
 
     return jsonResponse({ 
       success: true, 
