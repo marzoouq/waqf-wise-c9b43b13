@@ -55,7 +55,7 @@ function FeatureCard({ icon: Icon, title, description }: {
         <Icon className="w-6 h-6 text-primary" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+      <p className="text-muted-foreground text-sm leading-relaxed font-medium">{description}</p>
     </div>
   );
 }
@@ -86,7 +86,7 @@ function StatItem({
           <span>{value.toLocaleString("ar-SA")}</span>
           <span className="text-primary">{suffix}</span>
         </div>
-        <p className="text-muted-foreground text-sm sm:text-base">{label}</p>
+        <p className="text-muted-foreground text-sm sm:text-base font-medium">{label}</p>
       </div>
     </div>
   );
@@ -217,17 +217,17 @@ export default function LandingPageLight() {
 
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50" role="list" aria-label="مؤشرات الثقة">
-                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                <div className="flex items-center gap-2 text-foreground/80" role="listitem">
                   <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <span className="text-sm font-medium">آمن ومشفر</span>
+                  <span className="text-sm font-semibold">آمن ومشفر</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                <div className="flex items-center gap-2 text-foreground/80" role="listitem">
                   <Users className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <span className="text-sm font-medium">+1000 مستفيد</span>
+                  <span className="text-sm font-semibold">+1000 مستفيد</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                <div className="flex items-center gap-2 text-foreground/80" role="listitem">
                   <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
-                  <span className="text-sm font-medium">+50 عقار مُدار</span>
+                  <span className="text-sm font-semibold">+50 عقار مُدار</span>
                 </div>
               </div>
             </div>
@@ -322,7 +322,7 @@ export default function LandingPageLight() {
                     {item.step}
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  <p className="text-sm text-muted-foreground font-medium">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -356,12 +356,12 @@ export default function LandingPageLight() {
               <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
               <span className="font-semibold text-foreground">منصة الوقف</span>
             </div>
-            <nav className="flex items-center gap-4 text-sm" aria-label="روابط التذييل">
-              <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">سياسة الخصوصية</Link>
-              <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">الشروط والأحكام</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">اتصل بنا</Link>
+            <nav className="flex items-center gap-4 text-sm font-medium" aria-label="روابط التذييل">
+              <Link to="/privacy" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">سياسة الخصوصية</Link>
+              <Link to="/terms" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">الشروط والأحكام</Link>
+              <Link to="/contact" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">اتصل بنا</Link>
             </nav>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground/70 font-medium">
               © {new Date().getFullYear()} منصة الوقف. جميع الحقوق محفوظة
             </p>
           </div>
