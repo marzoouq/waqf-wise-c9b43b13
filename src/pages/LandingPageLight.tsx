@@ -7,7 +7,7 @@
  * ✅ لا تستخدم AuthContext - تستخدم useLightAuth الخفيف
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Shield, 
@@ -133,18 +133,46 @@ const stats = [
 ];
 
 export default function LandingPageLight() {
+  console.log('🏠 [LandingPageLight] تحميل الصفحة');
+  
   // ✅ استخدام useLightAuth بدلاً من useAuth الثقيل
   const { isLoggedIn, isLoading, redirectPath } = useLightAuth();
   const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  console.log('🏠 [LandingPageLight] حالة Auth:', { isLoading, isLoggedIn, redirectPath });
 
   // ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      console.log('🏠 [LandingPageLight] ⏳ انتظار التحميل...');
+      return;
+    }
     
     if (isLoggedIn && redirectPath) {
-      navigate(redirectPath, { replace: true });
+      console.log('🏠 [LandingPageLight] ⏳ بدء التوجيه...');
+      setIsRedirecting(true);
+      
+      // تأخير 100ms للسماح بتحميل AppRoutes
+      const timer = setTimeout(() => {
+        console.log('🏠 [LandingPageLight] ➡️ تنفيذ التوجيه إلى:', redirectPath);
+        navigate(redirectPath, { replace: true });
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [isLoggedIn, isLoading, redirectPath, navigate]);
+
+  // ✅ عرض spinner أثناء التوجيه بدلاً من الصفحة البيضاء
+  if (isRedirecting) {
+    console.log('🏠 [LandingPageLight] 🔄 عرض spinner التوجيه');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <span className="sr-only">جاري التحميل...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">

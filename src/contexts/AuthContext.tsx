@@ -138,9 +138,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isMounted = true;
 
     const initializeAuth = async () => {
+      console.log('🔐 [AuthContext] بدء التهيئة...');
+      console.log('🔐 [AuthContext] المسار:', window.location.pathname);
+      
       try {
         // ✅ جلب الجلسة الحالية
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        console.log('🔐 [AuthContext] نتيجة getSession:', { hasSession: !!currentSession });
         
         if (!isMounted) return;
 
@@ -179,10 +184,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setRolesLoading(false);
         }
         
+        console.log('🔐 [AuthContext] انتهاء التهيئة');
         setIsInitialized(true);
       } catch (err) {
         if (!isMounted) return;
         productionLogger.error('Unexpected error getting session', err);
+        console.log('🔐 [AuthContext] خطأ:', err);
         await cleanupInvalidSession();
         setIsLoading(false);
         setIsInitialized(true);

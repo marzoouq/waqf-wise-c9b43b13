@@ -16,9 +16,18 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
   const { user, isLoading: authLoading, roles, rolesLoading } = useAuth();
   const [loadingTooLong, setLoadingTooLong] = useState(false);
 
+  console.log('🛡️ [ProtectedRoute] حالة:', { 
+    authLoading, 
+    rolesLoading, 
+    hasUser: !!user, 
+    roles,
+    path: window.location.pathname 
+  });
+
   // ✅ Timeout احتياطي لمنع التعليق
   useEffect(() => {
     const timer = setTimeout(() => {
+      console.log('🛡️ [ProtectedRoute] ⏰ Timeout - تجاوز التحميل');
       setLoadingTooLong(true);
     }, 3000); // 3 ثواني كحد أقصى
 
@@ -30,6 +39,7 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
 
   // ✅ إذا استمر التحميل لأكثر من المدة المحددة، تجاوز التحميل
   if (isLoading && !loadingTooLong) {
+    console.log('🛡️ [ProtectedRoute] قرار: عرض Loader');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -38,8 +48,11 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
   }
 
   if (!user) {
+    console.log('🛡️ [ProtectedRoute] قرار: توجيه للدخول');
     return <Navigate to="/login" replace />;
   }
+  
+  console.log('🛡️ [ProtectedRoute] قرار: السماح');
 
   // ✅ استخدام الأدوار من السياق فقط (بدون localStorage)
   const effectiveRoles = roles;

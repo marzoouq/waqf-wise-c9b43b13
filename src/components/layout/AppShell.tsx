@@ -25,22 +25,25 @@ import {
 } from "@/routes";
 
 export default function AppShell() {
+  console.log('🏗️ [AppShell] تحميل الهيكل');
+  
   return (
     <SettingsProvider>
       <TooltipProvider>
         <LazyErrorBoundary>
-          <Routes>
-            {/* صفحة التوجيه الذكي */}
-            <Route path="/redirect" element={<RoleBasedRedirect />} />
-            
-            {/* مسارات المستفيد المستقلة */}
-            {beneficiaryStandaloneRoutes}
-            
-            {/* ✅ المسارات المحمية داخل Suspense */}
-            <Route
-              path="/*"
-              element={
-                <Suspense fallback={<LoadingState size="lg" fullScreen />}>
+          {/* ✅ Suspense واحدة في أعلى مستوى */}
+          <Suspense fallback={<LoadingState size="lg" fullScreen />}>
+            <Routes>
+              {/* صفحة التوجيه الذكي */}
+              <Route path="/redirect" element={<RoleBasedRedirect />} />
+              
+              {/* مسارات المستفيد المستقلة */}
+              {beneficiaryStandaloneRoutes}
+              
+              {/* ✅ المسارات المحمية - بدون Suspense إضافية */}
+              <Route
+                path="/*"
+                element={
                   <ProtectedRoute>
                     <MainLayout>
                       <Routes>
@@ -58,10 +61,10 @@ export default function AppShell() {
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>
-                </Suspense>
-              }
-            />
-          </Routes>
+                }
+              />
+            </Routes>
+          </Suspense>
         </LazyErrorBoundary>
       </TooltipProvider>
     </SettingsProvider>

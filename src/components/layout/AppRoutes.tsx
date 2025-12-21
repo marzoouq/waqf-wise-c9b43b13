@@ -30,34 +30,32 @@ const LightFallback = () => (
 );
 
 const AppRoutes = () => {
+  console.log('📍 [AppRoutes] تحميل المسارات');
+  
   return (
     <GlobalErrorBoundary>
       <AuthProvider>
         <Sonner />
-        <Routes>
-          {/* ✅ صفحات المصادقة */}
-          <Route path="/login" element={<Suspense fallback={<LightFallback />}><Login /></Suspense>} />
-          <Route path="/signup" element={<Suspense fallback={<LightFallback />}><Signup /></Suspense>} />
-          
-          {/* ✅ الصفحات العامة الثانوية */}
-          <Route path="/install" element={<Suspense fallback={<LightFallback />}><Install /></Suspense>} />
-          <Route path="/unauthorized" element={<Suspense fallback={<LightFallback />}><Unauthorized /></Suspense>} />
-          <Route path="/privacy" element={<Suspense fallback={<LightFallback />}><PrivacyPolicy /></Suspense>} />
-          <Route path="/terms" element={<Suspense fallback={<LightFallback />}><TermsOfUse /></Suspense>} />
-          <Route path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />
-          <Route path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />
-          <Route path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />
-          
-          {/* ✅ جميع المسارات المحمية */}
-          <Route
-            path="/*"
-            element={
-              <Suspense fallback={<LightFallback />}>
-                <AppShell />
-              </Suspense>
-            }
-          />
-        </Routes>
+        {/* ✅ Suspense واحدة تغطي جميع المسارات - بدلاً من Suspense متعددة */}
+        <Suspense fallback={<LightFallback />}>
+          <Routes>
+            {/* ✅ صفحات المصادقة - بدون Suspense إضافية */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            
+            {/* ✅ الصفحات العامة الثانوية - بدون Suspense إضافية */}
+            <Route path="/install" element={<Install />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="/security-policy" element={<SecurityPolicyPage />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* ✅ جميع المسارات المحمية */}
+            <Route path="/*" element={<AppShell />} />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </GlobalErrorBoundary>
   );
