@@ -4,7 +4,6 @@ import { Download, Building2 } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/ui/use-toast";
 import {
   Table,
@@ -22,7 +21,9 @@ export function PropertiesReports() {
   const { toast } = useToast();
   const { properties, isLoading, isRefetching, lastUpdated, handleRefresh, error } = usePropertiesReport();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
+    const { exportToPDF } = await import("@/lib/exportHelpers");
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
     const data = properties.map((p) => {
       const activeContract = p.contracts?.find((c) => c.status === "نشط");
@@ -45,7 +46,9 @@ export function PropertiesReports() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
+    const { exportToExcel } = await import("@/lib/exportHelpers");
     const data = properties.map((p) => {
       const activeContract = p.contracts?.find((c) => c.status === "نشط");
       return {

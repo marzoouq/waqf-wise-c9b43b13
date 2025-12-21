@@ -1,4 +1,10 @@
 import { createRoot } from "react-dom/client";
+
+// ✅ تحميل الخطوط بشكل متزامن مع font-display: swap (لا تحظر FCP + تمنع CLS)
+import "@fontsource/cairo/400.css";
+import "@fontsource/cairo/600.css";
+import "@fontsource/cairo/700.css";
+
 import App from "./App.tsx";
 import "./index.css";
 import { checkAndUpdateVersion } from "./lib/versionCheck";
@@ -17,10 +23,3 @@ checkAndUpdateVersion().catch(console.error);
 // عرض التطبيق فوراً لتحسين FCP
 rootElement.innerHTML = '';
 createRoot(rootElement).render(<App />);
-
-// ✅ تحميل الخطوط بعد عرض التطبيق (لا تحظر FCP)
-setTimeout(() => {
-  import("@fontsource/cairo/400.css");
-  import("@fontsource/cairo/600.css");
-  import("@fontsource/cairo/700.css");
-}, 0);

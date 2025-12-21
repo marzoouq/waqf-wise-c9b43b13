@@ -53,8 +53,16 @@ export default defineConfig(({ mode }) => {
     sourcemap: false,
     reportCompressedSize: false,
     assetsInlineLimit: 4096,
+    // ✅ منع modulePreload للمكتبات الثقيلة (PDF, Excel, Supabase)
     modulePreload: {
       polyfill: false,
+      resolveDependencies: (filename: string, deps: string[]) => {
+        return deps.filter(dep => 
+          !dep.includes('pdf-lib') && 
+          !dep.includes('excel-lib') &&
+          !dep.includes('supabase')
+        );
+      },
     },
     
     rollupOptions: {
