@@ -149,3 +149,6 @@ verify_jwt = true
 
 [functions.send-slack-alert]
 verify_jwt = true
+
+[functions.test-auth]
+verify_jwt = false
