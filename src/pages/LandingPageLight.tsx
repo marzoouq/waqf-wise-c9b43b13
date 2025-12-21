@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-// ✅ مكون زر خفيف بدون Radix UI
+// ✅ مكون زر خفيف بدون Radix UI - مع دعم إمكانية الوصول
 function LightButton({ 
   children, 
   variant = "primary", 
@@ -30,7 +30,7 @@ function LightButton({
   variant?: "primary" | "outline";
   className?: string;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const baseStyles = "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 px-6 py-3 text-base min-h-[48px] select-none";
+  const baseStyles = "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 px-6 py-3 text-base min-h-[48px] select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
   const variants = {
     primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl",
     outline: "border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -141,42 +141,54 @@ export default function LandingPageLight() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
+      {/* Skip to main content - للتنقل السريع بلوحة المفاتيح */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        تخطي إلى المحتوى الرئيسي
+      </a>
+
       {/* Header */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/50" role="banner">
+        <nav className="container mx-auto px-4 sm:px-6 lg:px-8" aria-label="التنقل الرئيسي">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg"
+              aria-label="منصة الوقف - الصفحة الرئيسية"
+            >
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center" aria-hidden="true">
                 <Building2 className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-bold text-lg text-foreground">وقف</span>
-            </div>
+            </Link>
             <Link 
               to="/login"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               تسجيل الدخول
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
-        </div>
+        </nav>
       </header>
 
-      <main>
+      <main id="main-content" role="main">
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center pt-20">
+        <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20" aria-labelledby="hero-title">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
             <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 sm:mb-8">
-                <span className="relative flex h-2 w-2">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 sm:mb-8" role="status">
+                <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
                 نظام متكامل لإدارة الأوقاف الإسلامية
               </div>
 
               {/* Main Heading - LCP Element */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6">
+              <h1 id="hero-title" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6">
                 منصة إدارة{" "}
                 <span className="text-primary">الوقف الإلكترونية</span>
               </h1>
@@ -188,34 +200,34 @@ export default function LandingPageLight() {
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto" role="group" aria-label="إجراءات سريعة">
                 <Link to="/login" className="w-full sm:w-auto">
                   <LightButton variant="primary" className="w-full sm:w-auto">
                     تسجيل الدخول
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                   </LightButton>
                 </Link>
                 <a href="#features" className="w-full sm:w-auto">
                   <LightButton variant="outline" className="w-full sm:w-auto">
-                    <Play className="w-4 h-4" />
+                    <Play className="w-4 h-4" aria-hidden="true" />
                     اكتشف المزيد
                   </LightButton>
                 </a>
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Shield className="w-5 h-5 text-primary" />
-                  <span className="text-sm">آمن ومشفر</span>
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50" role="list" aria-label="مؤشرات الثقة">
+                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                  <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <span className="text-sm font-medium">آمن ومشفر</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="w-5 h-5 text-primary" />
-                  <span className="text-sm">+1000 مستفيد</span>
+                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                  <Users className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <span className="text-sm font-medium">+1000 مستفيد</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Building2 className="w-5 h-5 text-primary" />
-                  <span className="text-sm">+50 عقار مُدار</span>
+                <div className="flex items-center gap-2 text-muted-foreground" role="listitem">
+                  <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <span className="text-sm font-medium">+50 عقار مُدار</span>
                 </div>
               </div>
             </div>
@@ -337,18 +349,18 @@ export default function LandingPageLight() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border bg-background">
+      <footer className="py-8 border-t border-border bg-background" role="contentinfo">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-primary" />
+              <Building2 className="w-5 h-5 text-primary" aria-hidden="true" />
               <span className="font-semibold text-foreground">منصة الوقف</span>
             </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <Link to="/privacy" className="hover:text-foreground transition-colors">سياسة الخصوصية</Link>
-              <Link to="/terms" className="hover:text-foreground transition-colors">الشروط والأحكام</Link>
-              <Link to="/contact" className="hover:text-foreground transition-colors">اتصل بنا</Link>
-            </div>
+            <nav className="flex items-center gap-4 text-sm" aria-label="روابط التذييل">
+              <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">سياسة الخصوصية</Link>
+              <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">الشروط والأحكام</Link>
+              <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">اتصل بنا</Link>
+            </nav>
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} منصة الوقف. جميع الحقوق محفوظة
             </p>
