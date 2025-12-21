@@ -51,6 +51,7 @@ const LightFallback = () => (
 );
 
 const App = () => {
+  console.log('🚀 [App] تحميل المكون الرئيسي');
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
