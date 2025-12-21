@@ -7,6 +7,8 @@ import {
   unauthorizedResponse 
 } from '../_shared/cors.ts';
 
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
 interface NotificationRequest {
   userId: string;
   title: string;
@@ -21,6 +23,115 @@ interface NotificationPreferences {
   email?: boolean;
   sms?: boolean;
   [key: string]: unknown;
+}
+
+// قالب البريد الإلكتروني الاحترافي بالعربية
+function getEmailTemplate(title: string, message: string, type: string, actionUrl?: string): string {
+  const typeColors: Record<string, { bg: string; border: string; icon: string }> = {
+    info: { bg: '#EBF5FF', border: '#3B82F6', icon: 'ℹ️' },
+    success: { bg: '#ECFDF5', border: '#10B981', icon: '✅' },
+    warning: { bg: '#FFFBEB', border: '#F59E0B', icon: '⚠️' },
+    error: { bg: '#FEF2F2', border: '#EF4444', icon: '🚨' },
+  };
+
+  const colors = typeColors[type] || typeColors.info;
+
+  return `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background-color: #f4f4f5; direction: rtl;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" max-width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">
+                نظام إدارة الوقف
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #cbd5e1; font-size: 14px;">
+                إشعار جديد
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Alert Box -->
+          <tr>
+            <td style="padding: 30px;">
+              <div style="background-color: ${colors.bg}; border-right: 4px solid ${colors.border}; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="width: 40px; vertical-align: top; font-size: 24px;">
+                      ${colors.icon}
+                    </td>
+                    <td>
+                      <h2 style="margin: 0 0 10px 0; color: #1f2937; font-size: 18px; font-weight: 600;">
+                        ${title}
+                      </h2>
+                      <p style="margin: 0; color: #4b5563; font-size: 15px; line-height: 1.6;">
+                        ${message}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              ${actionUrl ? `
+              <!-- Action Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="${actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">
+                      عرض التفاصيل
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+              <!-- Divider -->
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+              
+              <!-- Info -->
+              <p style="margin: 0; color: #9ca3af; font-size: 13px; text-align: center;">
+                تم إرسال هذا الإشعار في ${new Date().toLocaleDateString('ar-SA', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 13px;">
+                هذه رسالة آلية من نظام إدارة الوقف
+              </p>
+              <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                إذا لم تكن ترغب في استلام هذه الإشعارات، يمكنك تعديل إعدادات الإشعارات من حسابك
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
 }
 
 serve(async (req) => {
@@ -100,7 +211,7 @@ serve(async (req) => {
       }
     }
 
-    // 2. إرسال بريد إلكتروني (إذا طُلب)
+    // 2. إرسال بريد إلكتروني فعلي عبر Resend
     if (channel === 'email' || channel === 'all') {
       const { data: profile } = await supabase
         .from('profiles')
@@ -108,28 +219,67 @@ serve(async (req) => {
         .eq('user_id', userId)
         .single();
 
-      // التحقق من تفضيلات المستخدم
       const preferences = profile?.notification_preferences as NotificationPreferences | null;
       const emailEnabled = preferences?.email !== false;
 
-      if (profile?.email && emailEnabled) {
+      if (profile?.email && emailEnabled && RESEND_API_KEY) {
         try {
-          // يمكن إضافة تكامل مع Resend أو SendGrid هنا
-          console.log(`📧 Email notification queued for ${profile.email}`);
-          results.email = true;
-          
-          // تسجيل في جدول الإشعارات
+          const emailHtml = getEmailTemplate(title, message, type, actionUrl);
+
+          const emailResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: "نظام إدارة الوقف <onboarding@resend.dev>",
+              to: [profile.email],
+              subject: title,
+              html: emailHtml,
+            }),
+          });
+
+          const emailResult = await emailResponse.json();
+
+          if (emailResponse.ok) {
+            results.email = true;
+            console.log(`📧 Email sent successfully to ${profile.email}`, emailResult);
+            
+            // تسجيل في جدول الإشعارات كـ sent
+            await supabase.from('notifications').insert({
+              user_id: userId,
+              title,
+              message,
+              type,
+              channel: 'email',
+              delivery_status: 'sent',
+            });
+          } else {
+            console.error('📧 Email send failed:', emailResult);
+            // تسجيل كـ failed
+            await supabase.from('notifications').insert({
+              user_id: userId,
+              title,
+              message,
+              type,
+              channel: 'email',
+              delivery_status: 'failed',
+            });
+          }
+        } catch (error) {
+          console.error('📧 Email send error:', error);
           await supabase.from('notifications').insert({
             user_id: userId,
             title,
             message,
             type,
             channel: 'email',
-            delivery_status: 'pending',
+            delivery_status: 'failed',
           });
-        } catch (error) {
-          console.error('Email send error:', error);
         }
+      } else if (!RESEND_API_KEY) {
+        console.warn('⚠️ RESEND_API_KEY not configured');
       }
     }
 
