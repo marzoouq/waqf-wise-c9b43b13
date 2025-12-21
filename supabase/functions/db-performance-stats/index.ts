@@ -6,8 +6,25 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// الـ schemas النظامية التي يجب استبعادها من الإحصائيات
+const SYSTEM_SCHEMAS = [
+  'auth',
+  'realtime', 
+  'storage',
+  'net',
+  'vault',
+  'supabase_functions',
+  'supabase_migrations',
+  'extensions',
+  'graphql',
+  'graphql_public',
+  'pgsodium',
+  'pgsodium_masks',
+];
+
 interface TableStats {
   table_name: string;
+  schema_name?: string;
   seq_scan: number;
   idx_scan: number;
   seq_pct: number;
@@ -28,6 +45,9 @@ interface DBPerformanceStats {
   totalDeadRows: number;
   dbSizeMb: number;
   timestamp: string;
+  filteredSchemas?: string[];
+  originalTableCount?: number;
+  filteredTableCount?: number;
 }
 
 serve(async (req) => {
@@ -68,13 +88,23 @@ serve(async (req) => {
     // Get database size
     const { data: sizeData, error: sizeError } = await supabase.rpc('get_database_size');
 
+    // فلترة الجداول النظامية
+    const filteredTableStats = (tableStats || []).filter((t: TableStats) => {
+      const schemaName = t.schema_name || 'public';
+      return !SYSTEM_SCHEMAS.includes(schemaName);
+    });
+
     const stats: DBPerformanceStats = {
-      sequentialScans: tableStats || [],
+      sequentialScans: filteredTableStats,
       cacheHitRatio: cacheData?.[0]?.cache_hit_ratio || 0,
       connections: connData || [],
-      totalDeadRows: tableStats?.reduce((sum: number, t: TableStats) => sum + (t.dead_rows || 0), 0) || 0,
+      totalDeadRows: filteredTableStats.reduce((sum: number, t: TableStats) => sum + (t.dead_rows || 0), 0),
       dbSizeMb: sizeData?.[0]?.size_mb || 0,
       timestamp: new Date().toISOString(),
+      // إضافة معلومات الفلترة للشفافية
+      filteredSchemas: SYSTEM_SCHEMAS,
+      originalTableCount: tableStats?.length || 0,
+      filteredTableCount: filteredTableStats.length,
     };
 
     console.log('[db-performance-stats] Stats fetched successfully:', {

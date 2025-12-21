@@ -6,8 +6,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from '@/lib/logger/production-logger';
 
+// الـ schemas النظامية التي يجب استبعادها
+const SYSTEM_SCHEMAS = [
+  'auth', 'realtime', 'storage', 'net', 'vault',
+  'supabase_functions', 'supabase_migrations', 'extensions',
+  'graphql', 'graphql_public', 'pgsodium', 'pgsodium_masks',
+];
+
 export interface TableScanStats {
   table_name: string;
+  schema_name?: string;
   seq_scan: number;
   idx_scan: number;
   seq_pct: number;
@@ -28,6 +36,9 @@ export interface DBPerformanceStats {
   totalDeadRows: number;
   dbSizeMb: number;
   timestamp: string;
+  filteredSchemas?: string[];
+  originalTableCount?: number;
+  filteredTableCount?: number;
 }
 
 export interface PerformanceAlert {
@@ -117,56 +128,63 @@ class DBPerformanceService {
   }
 
   /**
-   * تحليل التنبيهات بناءً على الإحصائيات
+   * تحليل التنبيهات بناءً على الإحصائيات - مع عتبات محسّنة
    */
   analyzeAlerts(stats: DBPerformanceStats): PerformanceAlert[] {
     const alerts: PerformanceAlert[] = [];
 
-    // تحذير Cache Hit منخفض
-    if (stats.cacheHitRatio < 95 && stats.cacheHitRatio > 0) {
+    // تحذير Cache Hit منخفض (فقط إذا كانت أقل من 90%)
+    if (stats.cacheHitRatio < 90 && stats.cacheHitRatio > 0) {
       alerts.push({
         id: 'low-cache-hit',
-        type: stats.cacheHitRatio < 90 ? 'critical' : 'warning',
+        type: stats.cacheHitRatio < 80 ? 'critical' : 'warning',
         message: `نسبة Cache Hit منخفضة: ${stats.cacheHitRatio.toFixed(2)}%`,
         value: stats.cacheHitRatio,
-        threshold: 95,
+        threshold: 90,
       });
     }
 
-    // تحذير Sequential Scans عالية
-    stats.sequentialScans.forEach(table => {
-      if (table.seq_pct > 80 && table.seq_scan > 1000) {
-        alerts.push({
-          id: `high-seq-scan-${table.table_name}`,
-          type: table.seq_pct > 90 ? 'critical' : 'warning',
-          message: `نسبة Sequential Scan عالية في ${table.table_name}: ${table.seq_pct.toFixed(1)}%`,
-          value: table.seq_pct,
-          threshold: 80,
-          table: table.table_name,
-        });
-      }
-    });
+    // تحذير Sequential Scans عالية - فقط للجداول الكبيرة (أكثر من 5000 scan)
+    stats.sequentialScans
+      .filter(table => {
+        // استبعاد الجداول النظامية (احتياطي إضافي)
+        const schema = table.schema_name || 'public';
+        return !SYSTEM_SCHEMAS.includes(schema);
+      })
+      .forEach(table => {
+        // فقط إذا كانت النسبة عالية + عدد الـ scans كبير
+        if (table.seq_pct > 90 && table.seq_scan > 5000) {
+          alerts.push({
+            id: `high-seq-scan-${table.table_name}`,
+            type: 'warning',
+            message: `نسبة Sequential Scan عالية في ${table.table_name}: ${table.seq_pct.toFixed(1)}%`,
+            value: table.seq_pct,
+            threshold: 90,
+            table: table.table_name,
+          });
+        }
+      });
 
-    // تحذير Dead Rows كثيرة
-    if (stats.totalDeadRows > 10000) {
+    // تحذير Dead Rows - رفع العتبة إلى 50,000 (كانت 10,000)
+    if (stats.totalDeadRows > 50000) {
       alerts.push({
         id: 'high-dead-rows',
-        type: stats.totalDeadRows > 50000 ? 'critical' : 'warning',
+        type: stats.totalDeadRows > 100000 ? 'critical' : 'warning',
         message: `عدد Dead Rows مرتفع: ${stats.totalDeadRows.toLocaleString()}`,
         value: stats.totalDeadRows,
-        threshold: 10000,
+        threshold: 50000,
       });
     }
 
-    // تحذير اتصالات خاملة طويلة
+    // تحذير اتصالات خاملة طويلة جداً (أكثر من 48 ساعة بدلاً من 24)
     const idleConn = stats.connections.find(c => c.state === 'idle');
-    if (idleConn && idleConn.max_idle_seconds > 86400) { // أكثر من 24 ساعة
+    if (idleConn && idleConn.max_idle_seconds > 172800) { // 48 ساعة
       alerts.push({
         id: 'long-idle-connections',
         type: 'warning',
         message: `اتصالات خاملة لأكثر من ${Math.floor(idleConn.max_idle_seconds / 3600)} ساعة`,
         value: idleConn.max_idle_seconds,
-        threshold: 86400,
+        threshold: 172800,
       });
     }
 
