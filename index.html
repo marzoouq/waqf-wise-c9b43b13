@@ -41,16 +41,11 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://waqf.lovable.app/" />
     
-    <!-- Performance: Preconnect to external domains (HIGH PRIORITY) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Performance: Preconnect to Supabase API only -->
     <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
     
-    <!-- Performance: System font fallback for instant FCP, then load Cairo -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" as="style" fetchpriority="low">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" media="print" id="cairo-font">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"></noscript>
+    <!-- ✅ الخط محمّل محلياً عبر @fontsource/cairo في main.tsx -->
     
     <!-- Critical CSS inline for faster FCP -->
     <style>

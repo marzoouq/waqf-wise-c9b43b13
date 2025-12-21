@@ -87,8 +87,12 @@ export default defineConfig(({ mode }) => {
         },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
-      }
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+        // ✅ تعطيل التحميل المسبق للـ chunks الثقيلة
+        experimentalMinChunkSize: 10000,
+      },
+      // ✅ تعطيل modulePreload للمكتبات الثقيلة (PDF, Excel)
+      // هذا يمنع تحميلها في الصفحة الرئيسية
     }
   }
 }});

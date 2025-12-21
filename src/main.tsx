@@ -1,4 +1,10 @@
 import { createRoot } from "react-dom/client";
+
+// ✅ استضافة خط Cairo محلياً - أسرع من Google Fonts CDN
+import "@fontsource/cairo/400.css";
+import "@fontsource/cairo/600.css";
+import "@fontsource/cairo/700.css";
+
 import App from "./App.tsx";
 import "./index.css";
 import { checkAndUpdateVersion } from "./lib/versionCheck";
