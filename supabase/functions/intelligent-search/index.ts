@@ -7,6 +7,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    try {
+      const bodyClone = await req.clone().json();
+      if (bodyClone.ping || bodyClone.healthCheck) {
+        console.log('[INTELLIGENT-SEARCH] Health check received');
+        return jsonResponse({
+          status: 'healthy',
+          function: 'intelligent-search',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch {
+      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    }
+
     // ✅ التحقق من المصادقة - إصلاح أمني
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {

@@ -28,6 +28,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    try {
+      const bodyClone = await req.clone().json();
+      if (bodyClone.ping || bodyClone.healthCheck) {
+        console.log('[SEND-NOTIFICATION] Health check received');
+        return jsonResponse({
+          status: 'healthy',
+          function: 'send-notification',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch {
+      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    }
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return unauthorizedResponse('Missing authorization header');

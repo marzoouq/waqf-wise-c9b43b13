@@ -13,6 +13,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    try {
+      const bodyClone = await req.clone().json();
+      if (bodyClone.ping || bodyClone.healthCheck) {
+        console.log('[CHATBOT] Health check received');
+        return jsonResponse({
+          status: 'healthy',
+          function: 'chatbot',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch {
+      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    }
+
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -251,7 +266,7 @@ ${articles?.map(art => `📖 ${art.title}:\n${art.content}`).join('\n\n') || ''}
     }
     
     const contextData: ContextData = {};
-    const messageText = message.toLowerCase();
+    const messageText = (message || '').toLowerCase();
     
     // جلب بيانات المستفيدين
     if (quickReplyId === 'balance' || messageText.includes('رصيد') || messageText.includes('مستفيد')) {

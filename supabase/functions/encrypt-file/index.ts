@@ -16,6 +16,24 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support for FormData functions
+    const contentType = req.headers.get('content-type') || '';
+    if (!contentType.includes('multipart/form-data')) {
+      try {
+        const body = await req.json();
+        if (body.ping || body.healthCheck) {
+          console.log('[ENCRYPT-FILE] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'encrypt-file',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch {
+        // ليس JSON، استمر للتحقق من FormData
+      }
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

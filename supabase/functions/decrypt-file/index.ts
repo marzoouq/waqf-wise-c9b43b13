@@ -16,6 +16,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    try {
+      const bodyClone = await req.clone().json();
+      if (bodyClone.ping || bodyClone.healthCheck) {
+        console.log('[DECRYPT-FILE] Health check received');
+        return jsonResponse({
+          status: 'healthy',
+          function: 'decrypt-file',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch {
+      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

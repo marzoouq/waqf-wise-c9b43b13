@@ -13,6 +13,24 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support for FormData functions
+    const contentType = req.headers.get('content-type') || '';
+    if (!contentType.includes('multipart/form-data')) {
+      try {
+        const body = await req.json();
+        if (body.ping || body.healthCheck) {
+          console.log('[OCR-DOCUMENT] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'ocr-document',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch {
+        // ليس JSON، استمر للتحقق من FormData
+      }
+    }
+
     // التحقق من JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -67,8 +85,8 @@ serve(async (req) => {
     const fileBlob = await fileResponse.blob();
     const fileBase64 = btoa(String.fromCharCode(...new Uint8Array(await fileBlob.arrayBuffer())));
 
-    // استخدام Lovable AI لـ OCR
-    const aiResponse = await fetch('https://api.lovable.app/v1/ai/chat/completions', {
+    // استخدام Lovable AI لـ OCR - إصلاح الرابط
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
