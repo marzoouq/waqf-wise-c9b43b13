@@ -2,11 +2,11 @@
  * نظام تصدير كشف حساب المستفيد الاحترافي
  * Professional Beneficiary Statement PDF Export
  * 
- * @version 2.9.43
+ * @version 2.9.44
+ * @description تم تحويل الاستيرادات إلى Dynamic Import لتحسين الأداء
  */
 
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import type jsPDF from "jspdf";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles } from "./arabic-pdf-utils";
 import { formatCurrency } from "@/lib/utils";
 import { logger } from "@/lib/logger";
@@ -60,6 +60,12 @@ export const exportBeneficiaryStatementPDF = async (options: ExportOptions): Pro
   const { beneficiary, payments, summary, dateRange } = options;
   
   try {
+    // ✅ Dynamic Import - يُحمّل عند الحاجة فقط
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -87,7 +93,7 @@ export const exportBeneficiaryStatementPDF = async (options: ExportOptions): Pro
     
     // جدول المدفوعات
     if (payments.length > 0) {
-      yPosition = addPaymentsTable(doc, fontName, payments, yPosition);
+      yPosition = addPaymentsTable(doc, fontName, payments, yPosition, autoTable);
     } else {
       doc.setFont(fontName, "normal");
       doc.setFontSize(12);
@@ -258,7 +264,8 @@ const addPaymentsTable = (
   doc: jsPDF, 
   fontName: string, 
   payments: Payment[], 
-  startY: number
+  startY: number,
+  autoTable: typeof import('jspdf-autotable').default
 ): number => {
   const tableStyles = getDefaultTableStyles(fontName);
   
