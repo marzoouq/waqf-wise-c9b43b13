@@ -2,10 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, PieChart as PieChartIcon } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/ui/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
@@ -16,9 +14,11 @@ export function FundsPerformanceReport() {
   const { toast } = useToast();
   const { fundPerformance, categoryDistribution, totals, isLoading } = useFundsPerformanceReport();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
     if (!fundPerformance) return;
 
+    const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['اسم المصرف', 'الفئة', 'المخصص', 'المنفق', 'المستفيدون', 'نسبة الاستخدام'];
     const data = fundPerformance.map(f => [
       f.fund_name,
@@ -37,9 +37,11 @@ export function FundsPerformanceReport() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
     if (!fundPerformance) return;
 
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = fundPerformance.map(f => ({
       'اسم المصرف': f.fund_name,
       'الفئة': f.category,

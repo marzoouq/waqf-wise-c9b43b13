@@ -2,10 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Wrench } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/ui/use-toast';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMaintenanceCostReport } from '@/hooks/reports/useMaintenanceCostReport';
@@ -16,9 +14,11 @@ export function MaintenanceCostReport() {
   const { toast } = useToast();
   const { maintenanceData, typeAnalysis, totals, isLoading } = useMaintenanceCostReport();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
     if (!maintenanceData) return;
 
+    const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['العقار', 'التكلفة الإجمالية', 'العمليات المكتملة', 'العمليات المعلقة', 'متوسط التكلفة'];
     const data = maintenanceData.map(m => [
       m.property_name,
@@ -36,9 +36,11 @@ export function MaintenanceCostReport() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
     if (!maintenanceData) return;
 
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = maintenanceData.map(m => ({
       'العقار': m.property_name,
       'التكلفة الإجمالية': m.total_cost,

@@ -45,20 +45,40 @@
     <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
     
-    <!-- ✅ الخط محمّل محلياً عبر @fontsource/cairo في main.tsx -->
+    <!-- ✅ Preload Cairo fonts for faster LCP -->
+    <link rel="preload" href="/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/node_modules/@fontsource/cairo/files/cairo-arabic-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
     
     <!-- Critical CSS inline for faster FCP -->
     <style>
       /* Reset and base styles */
       *, *::before, *::after { box-sizing: border-box; }
+      
+      /* Font-display: swap to prevent FOIT */
+      @font-face {
+        font-family: 'Cairo';
+        font-style: normal;
+        font-display: swap;
+        src: local('Cairo');
+      }
+      
       body { 
         margin: 0; 
-        font-family: Cairo, system-ui, -apple-system, sans-serif;
+        font-family: Cairo, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         background: hsl(48 20% 97%);
         color: hsl(150 25% 15%);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
+      
+      /* Critical Tailwind classes for landing page */
+      .text-primary { color: hsl(142.1 76.2% 36.3%); }
+      .bg-primary { background-color: hsl(142.1 76.2% 36.3%); }
+      .text-foreground { color: hsl(150 25% 15%); }
+      .text-muted-foreground { color: hsl(240 3.8% 46.1%); }
+      .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+      
       #root {
         min-height: 100vh;
       }

@@ -4,7 +4,6 @@ import { Download, TrendingUp } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/ui/use-toast';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
 import { useDistributionAnalysisReport } from '@/hooks/reports/useDistributionAnalysisReport';
@@ -22,9 +21,11 @@ export function DistributionAnalysisReport() {
     error 
   } = useDistributionAnalysisReport();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
     if (!distributionTrends) return;
 
+    const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['الشهر', 'المبلغ الإجمالي', 'عدد المستفيدين', 'المتوسط للمستفيد'];
     const data = distributionTrends.map(d => [
       d.month,
@@ -41,9 +42,11 @@ export function DistributionAnalysisReport() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
     if (!distributionTrends) return;
 
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = distributionTrends.map(d => ({
       'الشهر': d.month,
       'المبلغ الإجمالي': d.totalAmount,

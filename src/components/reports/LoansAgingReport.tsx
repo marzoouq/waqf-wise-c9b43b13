@@ -4,7 +4,6 @@ import { Download, AlertTriangle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/ui/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLoansAgingReport } from '@/hooks/reports/useLoansAgingReport';
@@ -15,9 +14,11 @@ export function LoansAgingReport() {
   const { agingData, agingByCategory, isLoading } = useLoansAgingReport();
   const isMobile = useIsMobile();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
     if (!agingData) return;
 
+    const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['رقم القرض', 'المستفيد', 'المبلغ الأصلي', 'المدفوع', 'المتبقي', 'أيام التأخير', 'الفئة'];
     const data = agingData.map(l => [
       l.loan_number,
@@ -37,9 +38,11 @@ export function LoansAgingReport() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
     if (!agingData) return;
 
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = agingData.map(l => ({
       'رقم القرض': l.loan_number,
       'اسم المستفيد': l.beneficiary_name,

@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useToast } from "@/hooks/ui/use-toast";
-import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 import { 
   PDFTableData, 
   ExcelRowData, 
@@ -31,8 +30,11 @@ interface ExcelExportOptions extends ExportOptions {
 export function useExport() {
   const { toast } = useToast();
 
-  const exportData = useCallback((options: PDFExportOptions | ExcelExportOptions) => {
+  const exportData = useCallback(async (options: PDFExportOptions | ExcelExportOptions) => {
     try {
+      // ✅ Dynamic import - يُحمّل فقط عند الحاجة
+      const { exportToPDF, exportToExcel } = await import("@/lib/exportHelpers");
+      
       if (options.format === "pdf") {
         const { title, headers, data, filename } = options as PDFExportOptions;
         exportToPDF(title, headers, data, filename);

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Printer, CheckCircle, XCircle, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { exportFinancialStatementToPDF } from "@/lib/exportHelpers";
 
 export function EnhancedBalanceSheet() {
   const { balanceSheet, isLoading } = useFinancialReports();
@@ -28,7 +27,9 @@ export function EnhancedBalanceSheet() {
     window.print();
   };
 
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
+    const { exportFinancialStatementToPDF } = await import("@/lib/exportHelpers");
     const sections = [
       {
         title: 'الأصول',

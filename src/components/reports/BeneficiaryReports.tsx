@@ -3,7 +3,6 @@ import { Download, Users } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
@@ -23,7 +22,9 @@ export function BeneficiaryReports() {
     error,
   } = useBeneficiaryReportsData();
 
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
+    const { exportToPDF } = await import("@/lib/exportHelpers");
     const headers = ["الاسم الكامل", "رقم الهوية", "الفئة", "الحالة", "المدينة"];
     const data = beneficiaries.map((b) => [
       b.full_name,
@@ -41,7 +42,9 @@ export function BeneficiaryReports() {
     });
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
+    const { exportToExcel } = await import("@/lib/exportHelpers");
     const data = beneficiaries.map((b) => ({
       "الاسم الكامل": b.full_name,
       "رقم الهوية": b.national_id,

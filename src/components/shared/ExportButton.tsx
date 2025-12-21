@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { toast } from "@/hooks/ui/use-toast";
-import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 
 interface ExportButtonProps<T extends object> {
   data: T[];
@@ -28,8 +27,10 @@ export const ExportButton = <T extends object>({
   size = "sm",
   className,
 }: ExportButtonProps<T>) => {
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportPDF = async () => {
     try {
+      const { exportToPDF } = await import("@/lib/exportHelpers");
       const tableData = data.map(item => 
         headers.map(header => String((item as Record<string, unknown>)[header] ?? "-"))
       );
@@ -47,8 +48,10 @@ export const ExportButton = <T extends object>({
     }
   };
 
-  const handleExportExcel = () => {
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
+  const handleExportExcel = async () => {
     try {
+      const { exportToExcel } = await import("@/lib/exportHelpers");
       // Safe cast - T extends object so it's compatible with Record
       exportToExcel(data as unknown as Record<string, unknown>[], `${filename}.xlsx`, title);
       toast({

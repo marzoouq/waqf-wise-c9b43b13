@@ -27,7 +27,6 @@ import {
 import { useToast } from "@/hooks/ui/use-toast";
 import { useCustomReports, type ReportResult } from "@/hooks/reports/useCustomReports";
 import { ReportResultsPreview } from "./ReportResultsPreview";
-import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/exportHelpers";
 import type { CustomReportFilter } from "@/types/reports/index";
 import { ReportService } from "@/services";
 
@@ -166,10 +165,11 @@ export function CustomReportBuilder() {
     setReportResult(null);
   };
 
-  // دوال التصدير
-  const handleExportPDF = () => {
+  // ✅ Dynamic import - دوال التصدير تُحمّل فقط عند الحاجة
+  const handleExportPDF = async () => {
     if (!reportResult) return;
     
+    const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = reportResult.columns.map(c => c.label);
     const rows = reportResult.data.map(row => 
       reportResult.columns.map(col => String(row[col.key] ?? '—'))
@@ -185,9 +185,10 @@ export function CustomReportBuilder() {
     toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة PDF" });
   };
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (!reportResult) return;
     
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = reportResult.data.map(row => {
       const obj: Record<string, unknown> = {};
       reportResult.columns.forEach(col => {
@@ -200,9 +201,10 @@ export function CustomReportBuilder() {
     toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة Excel" });
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     if (!reportResult) return;
     
+    const { exportToCSV } = await import('@/lib/exportHelpers');
     const headers = reportResult.columns.map(c => c.label);
     const rows = reportResult.data.map(row => 
       reportResult.columns.map(col => String(row[col.key] ?? ''))

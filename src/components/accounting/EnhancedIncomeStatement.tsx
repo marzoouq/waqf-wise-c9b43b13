@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { FileText, Printer, TrendingUp, TrendingDown } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { Progress } from "@/components/ui/progress";
-import { exportFinancialStatementToPDF } from "@/lib/exportHelpers";
 
 export function EnhancedIncomeStatement() {
   const { incomeStatement, isLoading } = useFinancialReports();
@@ -28,7 +27,9 @@ export function EnhancedIncomeStatement() {
     window.print();
   };
 
+  // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
+    const { exportFinancialStatementToPDF } = await import("@/lib/exportHelpers");
     const sections = [
       {
         title: 'الإيرادات',
