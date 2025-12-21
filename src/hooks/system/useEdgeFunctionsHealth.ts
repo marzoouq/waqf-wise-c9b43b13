@@ -21,7 +21,7 @@ export function useEdgeFunctionsHealth() {
   // الحصول على قائمة Edge Functions
   const functions = ALL_EDGE_FUNCTIONS;
 
-  // تصنيف الـ functions
+  // تصنيف الـ functions حسب الفئة
   const functionsByCategory = {
     ai: functions.filter(f => f.category === 'ai'),
     database: functions.filter(f => f.category === 'database'),
@@ -29,6 +29,13 @@ export function useEdgeFunctionsHealth() {
     backup: functions.filter(f => f.category === 'backup'),
     security: functions.filter(f => f.category === 'security'),
     utility: functions.filter(f => f.category === 'utility'),
+  };
+
+  // تصنيف الـ functions حسب نوع الفحص
+  const functionsByCheckType = {
+    ping: functions.filter(f => f.checkType === 'ping'),
+    'json-required': functions.filter(f => f.checkType === 'json-required'),
+    formdata: functions.filter(f => f.checkType === 'formdata'),
   };
 
   // فحص function واحدة
@@ -120,6 +127,7 @@ export function useEdgeFunctionsHealth() {
     // البيانات
     functions,
     functionsByCategory,
+    functionsByCheckType,
     lastResults,
     healthStatuses,
     healthSummary,
