@@ -2,20 +2,21 @@
  * المكون الرئيسي للتطبيق - محسّن للأداء
  * Main Application Component - Performance Optimized
  * 
- * ✅ الصفحة الترحيبية تُحمَّل بدون AuthProvider أو Sonner أو GlobalErrorBoundary
- * ✅ المكونات الثقيلة تُحمَّل فقط للصفحات المحمية
+ * ✅ AuthProvider يغلف كل شيء - متاح دائماً
+ * ✅ لا إعادة تهيئة عند التنقل بين الصفحات
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // ✅ استيراد خفيف للصفحة الترحيبية (بدون Radix UI)
 import LandingPageLight from "@/pages/LandingPageLight";
 import { LightErrorBoundary } from "./components/shared/LightErrorBoundary";
 
-// ✅ Lazy load لباقي المسارات (تحتوي على GlobalErrorBoundary و AuthProvider و Sonner)
+// ✅ Lazy load لباقي المسارات
 const AppRoutes = lazy(() => import("./components/layout/AppRoutes"));
 
 // Configure QueryClient
@@ -51,38 +52,40 @@ const LightFallback = () => (
 );
 
 const App = () => {
-  console.log('🚀 [App] تحميل المكون الرئيسي');
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
-          <Routes>
-            {/* ✅ الصفحة الترحيبية - مع LightErrorBoundary فقط (بدون Radix UI) */}
-            <Route 
-              path="/" 
-              element={
-                <LightErrorBoundary>
-                  <LandingPageLight />
-                </LightErrorBoundary>
-              } 
-            />
-            
-            {/* ✅ باقي المسارات - مع GlobalErrorBoundary و AuthProvider و Sonner */}
-            <Route
-              path="/*"
-              element={
-                <Suspense fallback={<LightFallback />}>
-                  <AppRoutes />
-                </Suspense>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
+        {/* ✅ AuthProvider يغلف كل شيء - يُهيأ مرة واحدة فقط */}
+        <AuthProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <Routes>
+              {/* ✅ الصفحة الترحيبية */}
+              <Route 
+                path="/" 
+                element={
+                  <LightErrorBoundary>
+                    <LandingPageLight />
+                  </LightErrorBoundary>
+                } 
+              />
+              
+              {/* ✅ باقي المسارات */}
+              <Route
+                path="/*"
+                element={
+                  <Suspense fallback={<LightFallback />}>
+                    <AppRoutes />
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
