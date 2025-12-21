@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Beneficiary } from "@/types/beneficiary";
 import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { useSavedSearches } from "@/hooks/ui/useSavedSearches";
 import { useBeneficiariesFilters } from "@/hooks/beneficiary/useBeneficiariesFilters";
+import { useBeneficiariesPageState } from "@/hooks/beneficiary/useBeneficiariesPageState";
 import { SearchCriteria } from "@/components/beneficiary/admin/AdvancedSearchDialog";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
@@ -24,16 +25,30 @@ const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;
 const Beneficiaries = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
-  const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
-  const [activityLogDialogOpen, setActivityLogDialogOpen] = useState(false);
-  const [enableLoginDialogOpen, setEnableLoginDialogOpen] = useState(false);
-  const [tribeManagementDialogOpen, setTribeManagementDialogOpen] = useState(false);
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
+  
+  // ✅ استخدام Hook موحد لإدارة حالة الصفحة
+  const {
+    searchQuery,
+    setSearchQuery,
+    dialogOpen,
+    setDialogOpen,
+    advancedSearchOpen,
+    setAdvancedSearchOpen,
+    attachmentsDialogOpen,
+    setAttachmentsDialogOpen,
+    activityLogDialogOpen,
+    setActivityLogDialogOpen,
+    enableLoginDialogOpen,
+    setEnableLoginDialogOpen,
+    tribeManagementDialogOpen,
+    setTribeManagementDialogOpen,
+    selectedBeneficiary,
+    setSelectedBeneficiary,
+    currentPage,
+    setCurrentPage,
+    advancedCriteria,
+    setAdvancedCriteria,
+  } = useBeneficiariesPageState();
 
   const { beneficiaries, totalCount, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
   const { searches } = useSavedSearches();
@@ -74,12 +89,12 @@ const Beneficiaries = () => {
   const handleAddBeneficiary = useCallback(() => {
     setSelectedBeneficiary(null);
     setDialogOpen(true);
-  }, []);
+  }, [setSelectedBeneficiary, setDialogOpen]);
 
   const handleEditBeneficiary = useCallback((beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setDialogOpen(true);
-  }, []);
+  }, [setSelectedBeneficiary, setDialogOpen]);
 
   const handleSaveBeneficiary = async (data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>) => {
     if (selectedBeneficiary) {
@@ -96,12 +111,10 @@ const Beneficiaries = () => {
 
   const handleAdvancedSearch = (criteria: SearchCriteria) => {
     setAdvancedCriteria(criteria);
-    setCurrentPage(1);
   };
 
   const handleLoadSavedSearch = (search: { search_criteria: unknown }) => {
     setAdvancedCriteria(search.search_criteria as SearchCriteria);
-    setCurrentPage(1);
   };
 
   return (
