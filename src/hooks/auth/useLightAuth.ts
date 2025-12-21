@@ -63,7 +63,9 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
 
   useEffect(() => {
     let isMounted = true;
-    console.log('🔑 [useLightAuth] بدء جلب الجلسة...');
+    if (import.meta.env.DEV) {
+      console.log('🔑 [useLightAuth] بدء جلب الجلسة...');
+    }
 
     const checkSession = async () => {
       try {
@@ -72,12 +74,18 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
         if (!isMounted) return;
 
         if (session?.user) {
-          console.log('🔑 [useLightAuth] نتيجة:', { hasSession: true, userId: session.user.id });
+          if (import.meta.env.DEV) {
+            console.log('🔑 [useLightAuth] نتيجة:', { hasSession: true, userId: session.user.id });
+          }
           // المستخدم مسجل دخوله - تحديد المسار من الـ cache
           const cachedRoles = getCachedRoles(session.user.id);
-          console.log('🔑 [useLightAuth] الأدوار المخزنة:', cachedRoles);
+          if (import.meta.env.DEV) {
+            console.log('🔑 [useLightAuth] الأدوار المخزنة:', cachedRoles);
+          }
           const dashboard = cachedRoles ? getDashboardPath(cachedRoles) : '/dashboard';
-          console.log('🔑 [useLightAuth] المسار المحدد:', dashboard);
+          if (import.meta.env.DEV) {
+            console.log('🔑 [useLightAuth] المسار المحدد:', dashboard);
+          }
           
           setState({
             isLoggedIn: true,
@@ -86,7 +94,9 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
           });
           setRedirectPath(dashboard);
         } else {
-          console.log('🔑 [useLightAuth] نتيجة:', { hasSession: false });
+          if (import.meta.env.DEV) {
+            console.log('🔑 [useLightAuth] نتيجة:', { hasSession: false });
+          }
           setState({
             isLoggedIn: false,
             isLoading: false,
@@ -95,7 +105,9 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
           setRedirectPath(null);
         }
       } catch (error) {
-        console.log('🔑 [useLightAuth] خطأ:', error);
+        if (import.meta.env.DEV) {
+          console.log('🔑 [useLightAuth] خطأ:', error);
+        }
         if (isMounted) {
           setState({
             isLoggedIn: false,
