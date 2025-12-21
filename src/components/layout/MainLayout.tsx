@@ -248,10 +248,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <AppVersionFooter />
             </div>
           </SidebarInset>
-          
-          {/* Floating Chat Button */}
-          <FloatingChatButton />
         </div>
+        
+        {/* Floating Chat Button - Outside flex container for proper z-index */}
+        <FloatingChatButton />
         
         {/* Mobile Bottom Navigation */}
         <div className="md:hidden">
