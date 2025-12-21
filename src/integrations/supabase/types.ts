@@ -2361,6 +2361,51 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          message: string
+          priority: string | null
+          recipient_count: number | null
+          sent_by: string | null
+          sent_by_name: string | null
+          target_type: string
+          target_value: string | null
+          title: string
+          type: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          priority?: string | null
+          recipient_count?: number | null
+          sent_by?: string | null
+          sent_by_name?: string | null
+          target_type: string
+          target_value?: string | null
+          title: string
+          type?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          priority?: string | null
+          recipient_count?: number | null
+          sent_by?: string | null
+          sent_by_name?: string | null
+          target_type?: string
+          target_value?: string | null
+          title?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
       budget_items: {
         Row: {
           account_id: string | null
@@ -13920,6 +13965,10 @@ export type Database = {
       cleanup_old_chatbot_conversations: { Args: never; Returns: undefined }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
       cleanup_old_records: { Args: never; Returns: undefined }
+      count_users_by_target: {
+        Args: { p_target_type: string; p_target_value?: string }
+        Returns: number
+      }
       create_auto_journal_entry: {
         Args: {
           p_amount: number
@@ -14449,6 +14498,13 @@ export type Database = {
           permission_id: string
           permission_name: string
           source: string
+        }[]
+      }
+      get_users_by_target: {
+        Args: { p_target_type: string; p_target_value?: string }
+        Returns: {
+          full_name: string
+          user_id: string
         }[]
       }
       get_waqf_public_stats: { Args: never; Returns: Json }
