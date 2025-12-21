@@ -13,6 +13,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[property-ai-assistant] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'property-ai-assistant',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // ✅ التحقق من المصادقة - إصلاح أمني
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {

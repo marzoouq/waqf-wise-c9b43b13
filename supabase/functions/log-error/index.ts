@@ -66,6 +66,21 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[log-error] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'log-error',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // 🔒 1. التحقق من API Key + Rate Limiting
     const apiKey = req.headers.get('apikey');
     if (!apiKey || !apiKey.startsWith('eyJ')) {

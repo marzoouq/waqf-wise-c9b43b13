@@ -45,6 +45,21 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[biometric-auth] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'biometric-auth',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     const { credentialId, userId, challenge } = await req.json();
     
     console.log("Biometric auth request:", { credentialId: credentialId?.substring(0, 20), userId });

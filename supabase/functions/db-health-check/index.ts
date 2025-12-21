@@ -74,6 +74,21 @@ serve(async (req) => {
   }
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[db-health-check] Health check received');
+          return new Response(JSON.stringify({
+            status: 'healthy',
+            function: 'db-health-check',
+            timestamp: new Date().toISOString()
+          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     console.log('[db-health-check] Starting health check...');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

@@ -20,6 +20,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[admin-manage-beneficiary-password] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'admin-manage-beneficiary-password',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
     const clientId = getClientIdentifier(req);
     const rateLimitResult = checkRateLimit(clientId, {

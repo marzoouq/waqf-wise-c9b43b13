@@ -25,6 +25,21 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check Support
+    const bodyClone = await req.clone().text();
+    if (bodyClone) {
+      try {
+        const parsed = JSON.parse(bodyClone);
+        if (parsed.ping || parsed.healthCheck) {
+          console.log('[generate-distribution-summary] Health check received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'generate-distribution-summary',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
     const { period_start, period_end, distribution_type = 'شهري', waqf_corpus_percentage = 0 } = await req.json();
 
     const supabase = createClient(
