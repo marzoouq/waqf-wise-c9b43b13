@@ -45,12 +45,16 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, any> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        bodyData = JSON.parse(bodyText);
+        
+        // ✅ Health Check Support
+        if (bodyData.ping || bodyData.healthCheck) {
           console.log('[biometric-auth] Health check received');
           return jsonResponse({
             status: 'healthy',
@@ -58,9 +62,13 @@ Deno.serve(async (req) => {
             timestamp: new Date().toISOString()
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        // ليس JSON - تجاهل
+      }
     }
-    const { credentialId, userId, challenge } = await req.json();
+
+    // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
+    const { credentialId, userId, challenge } = bodyData;
     
     console.log("Biometric auth request:", { credentialId: credentialId?.substring(0, 20), userId });
 

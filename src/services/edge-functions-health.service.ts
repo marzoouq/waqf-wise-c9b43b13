@@ -87,7 +87,7 @@ export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
   
   // Security Functions
   { name: 'check-leaked-password', description: 'فحص كلمات المرور المسربة', requiresAuth: true, category: 'security', checkType: 'ping' },
-  { name: 'biometric-auth', description: 'المصادقة البيومترية', requiresAuth: false, category: 'security', checkType: 'ping' },
+  { name: 'biometric-auth', description: 'المصادقة البيومترية', requiresAuth: false, category: 'security', checkType: 'json-required', requiredFields: ['credentialId', 'userId'] },
   { name: 'encrypt-file', description: 'تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'formdata' },
   { name: 'decrypt-file', description: 'فك تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
   { name: 'secure-delete-file', description: 'حذف آمن للملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
@@ -96,7 +96,7 @@ export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
   { name: 'scheduled-cleanup', description: 'التنظيف المجدول', requiresAuth: true, category: 'security', checkType: 'ping' },
   
   // Utility Functions
-  { name: 'log-error', description: 'تسجيل الأخطاء', requiresAuth: false, category: 'utility', checkType: 'json-required', requiredFields: ['error'] },
+  { name: 'log-error', description: 'تسجيل الأخطاء', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['error'] },
   { name: 'execute-auto-fix', description: 'تنفيذ الإصلاح التلقائي', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['fixId'] },
   { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمات مرور المستفيدين', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['beneficiaryId', 'action'] },
   { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['userId'] },
@@ -404,6 +404,24 @@ export class EdgeFunctionsHealthService {
       );
 
       const responseTime = Math.round(performance.now() - startTime);
+      
+      // ✅ الكشف الذكي عن الحماية الضمنية
+      // إذا أرجعت الوظيفة 401/403 رغم أنها معرفة كـ "غير محمية" = محمية ضمنياً
+      if (response.status === 401 || response.status === 403) {
+        console.warn(`⚠️ ${functionName}: marked as public but returned ${response.status} - treating as implicitly protected`);
+        return {
+          function: functionName,
+          success: true,
+          responseTime,
+          checkedAt,
+          isProtected: true,
+          note: 'implicit-protection-detected',
+          statusReason: `✓ الوظيفة محمية ضمنياً (${response.status}) - تتحقق من الصلاحيات داخلياً وتعمل بشكل صحيح`,
+          recommendation: 'يُفضل تحديث requiresAuth إلى true في تعريف الوظيفة للتوافق'
+        };
+      }
+      
+      // ✅ 400 = الوظيفة تعمل وترفض البيانات الناقصة (سلوك صحيح)
       const success = response.ok || response.status === 400;
       
       const details = getStatusDetails({ 

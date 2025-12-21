@@ -66,12 +66,16 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط في البداية
+    const bodyText = await req.text();
+    let rawData: Record<string, unknown> = {};
+    
+    if (bodyText && bodyText.trim() !== '') {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        rawData = JSON.parse(bodyText);
+        
+        // ✅ Health Check Support - قبل أي عمليات أخرى
+        if (rawData.ping || rawData.healthCheck) {
           console.log('[log-error] Health check received');
           return jsonResponse({
             status: 'healthy',
@@ -79,8 +83,23 @@ Deno.serve(async (req) => {
             timestamp: new Date().toISOString()
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch (parseError) {
+        console.error('❌ Failed to parse JSON:', parseError);
+        return jsonResponse({
+          success: true,
+          message: 'Invalid JSON received - ignored',
+          stored: false,
+        });
+      }
+    } else {
+      console.warn('⚠️ Empty request body received');
+      return jsonResponse({
+        success: true,
+        message: 'Empty body received - ignored',
+        stored: false,
+      });
     }
+
     // 🔒 1. التحقق من API Key + Rate Limiting
     const apiKey = req.headers.get('apikey');
     if (!apiKey || !apiKey.startsWith('eyJ')) {
@@ -112,28 +131,6 @@ Deno.serve(async (req) => {
           return rateLimitResponse('Rate limit exceeded. Maximum 100 errors per minute.');
         }
       }
-    }
-
-    // ✅ 2. قراءة البيانات مع معالجة آمنة
-    let rawData: Record<string, unknown> = {};
-    try {
-      const bodyText = await req.text();
-      if (!bodyText || bodyText.trim() === '') {
-        console.warn('⚠️ Empty request body received');
-        return jsonResponse({
-          success: true,
-          message: 'Empty body received - ignored',
-          stored: false,
-        });
-      }
-      rawData = JSON.parse(bodyText);
-    } catch (parseError) {
-      console.error('❌ Failed to parse JSON:', parseError);
-      return jsonResponse({
-        success: true,
-        message: 'Invalid JSON received - ignored',
-        stored: false,
-      });
     }
 
     console.log('📥 Received data keys:', Object.keys(rawData));
@@ -498,14 +495,12 @@ async function attemptAutoFix(supabase: SupabaseClient, errorLog: ErrorLog, erro
 
     await supabase.from('auto_fix_attempts').insert({
       error_log_id: errorLog.id,
-      fix_strategy: fixStrategy,
-      attempt_number: 1,
-      max_attempts: 3,
+      fix_type: fixStrategy,
       status: 'pending',
-      result: 'Strategy determined based on error type',
+      details: { error_type: errorReport.error_type },
     });
 
-    console.log(`🔧 Auto-fix strategy determined: ${fixStrategy}`);
+    console.log(`✅ Auto-fix attempt logged: ${fixStrategy}`);
   } catch (error) {
     console.error('Failed to attempt auto-fix:', error);
   }
@@ -513,18 +508,18 @@ async function attemptAutoFix(supabase: SupabaseClient, errorLog: ErrorLog, erro
 
 async function recordPerformanceMetric(supabase: SupabaseClient, errorReport: ErrorReport) {
   try {
-    if (errorReport.error_type.includes('performance') || errorReport.error_type === 'layout_shift') {
-      const additionalData = errorReport.additional_data as Record<string, unknown> | undefined;
-      await supabase.from('performance_metrics').insert({
-        metric_type: errorReport.error_type,
-        metric_name: errorReport.error_message,
-        value: (additionalData?.duration as number) || (additionalData?.value as number) || 0,
-        unit: errorReport.error_type === 'layout_shift' ? 'score' : 'ms',
-        url: errorReport.url,
-        user_id: errorReport.user_id,
-        metadata: errorReport.additional_data,
-      });
-    }
+    // فقط للأخطاء المتعلقة بالأداء
+    if (!errorReport.error_type.includes('performance')) return;
+
+    await supabase.from('performance_metrics').insert({
+      metric_type: 'error_rate',
+      metric_name: errorReport.error_type,
+      value: 1,
+      url: errorReport.url,
+      additional_data: errorReport.additional_data,
+    });
+
+    console.log('✅ Performance metric recorded');
   } catch (error) {
     console.error('Failed to record performance metric:', error);
   }
@@ -532,9 +527,9 @@ async function recordPerformanceMetric(supabase: SupabaseClient, errorReport: Er
 
 function getSeverityLabel(severity: string): string {
   const labels: Record<string, string> = {
-    low: 'منخفض الخطورة',
-    medium: 'متوسط الخطورة',
-    high: 'عالي الخطورة',
+    low: 'منخفض',
+    medium: 'متوسط',
+    high: 'عالي',
     critical: 'حرج',
   };
   return labels[severity] || severity;
