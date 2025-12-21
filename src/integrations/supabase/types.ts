@@ -14256,6 +14256,17 @@ export type Database = {
           total_revenues: number
         }[]
       }
+      get_indexes: {
+        Args: never
+        Returns: {
+          index_definition: string
+          index_name: string
+          is_primary: boolean
+          is_unique: boolean
+          size_bytes: number
+          table_name: string
+        }[]
+      }
       get_performance_health: { Args: never; Returns: Json }
       get_pos_daily_stats: {
         Args: { p_date?: string }
@@ -14293,6 +14304,18 @@ export type Database = {
           severity: string
         }[]
       }
+      get_rls_policies: {
+        Args: never
+        Returns: {
+          cmd: string
+          permissive: string
+          policyname: string
+          qual: string
+          roles: string[]
+          tablename: string
+          with_check: string
+        }[]
+      }
       get_shift_stats: {
         Args: { p_shift_id: string }
         Returns: {
@@ -14318,6 +14341,17 @@ export type Database = {
           total_collections: number
           total_payments: number
           variance: number
+        }[]
+      }
+      get_system_stats: { Args: never; Returns: Json }
+      get_table_info: {
+        Args: never
+        Returns: {
+          has_rls: boolean
+          row_count: number
+          size_bytes: number
+          table_name: string
+          table_schema: string
         }[]
       }
       get_table_scan_stats: {
