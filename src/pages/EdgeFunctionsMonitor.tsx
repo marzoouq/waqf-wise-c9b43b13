@@ -44,7 +44,11 @@ const checkTypeConfig: Record<CheckType, { color: string; label: string; icon: R
 
 export default function EdgeFunctionsMonitor() {
   const {
-    functions, functionsByCategory, functionsByCheckType, healthStatuses, healthSummary,
+    functions = [], 
+    functionsByCategory = {}, 
+    functionsByCheckType = {}, 
+    healthStatuses = [], 
+    healthSummary,
     isChecking, checkProgress, checkAllFunctions, checkCategory, checkSingleFunction
   } = useEdgeFunctionsHealth();
 
@@ -56,9 +60,11 @@ export default function EdgeFunctionsMonitor() {
     return healthStatuses.find(h => h.name === funcName);
   };
 
+  // حماية من القيم الفارغة
+  const safeCategory = functionsByCategory || {};
   let displayFunctions = activeCategory === 'all' 
     ? functions 
-    : functionsByCategory[activeCategory as keyof typeof functionsByCategory] || [];
+    : safeCategory[activeCategory as keyof typeof safeCategory] || [];
 
   // تطبيق فلتر نوع الفحص
   if (checkTypeFilter !== 'all') {
@@ -103,17 +109,19 @@ export default function EdgeFunctionsMonitor() {
               🎯 تصنيف حسب نوع الفحص
             </h3>
             <div className="flex gap-2 flex-wrap">
-              {(Object.entries(functionsByCheckType) as [CheckType, typeof functions][]).map(([type, funcs]) => {
-                const config = checkTypeConfig[type];
+              {Object.entries(functionsByCheckType || {}).map(([type, funcs]) => {
+                const config = checkTypeConfig[type as CheckType];
+                if (!config) return null;
                 const Icon = config.icon;
+                const funcArray = Array.isArray(funcs) ? funcs : [];
                 return (
                   <Badge 
                     key={type} 
                     className={`${config.color} cursor-pointer hover:opacity-80 transition-opacity`}
-                    onClick={() => setCheckTypeFilter(checkTypeFilter === type ? 'all' : type)}
+                    onClick={() => setCheckTypeFilter(checkTypeFilter === type ? 'all' : type as CheckType)}
                   >
                     <Icon className="h-3 w-3 ml-1" />
-                    {config.labelAr} ({funcs.length})
+                    {config.labelAr} ({funcArray.length})
                   </Badge>
                 );
               })}
@@ -177,19 +185,21 @@ export default function EdgeFunctionsMonitor() {
         >
           الكل ({functions.length})
         </Button>
-        {(Object.entries(functionsByCheckType) as [CheckType, typeof functions][]).map(([type, funcs]) => {
-          const config = checkTypeConfig[type];
+        {Object.entries(functionsByCheckType || {}).map(([type, funcs]) => {
+          const config = checkTypeConfig[type as CheckType];
+          if (!config) return null;
           const Icon = config.icon;
+          const funcArray = Array.isArray(funcs) ? funcs : [];
           return (
             <Button 
               key={type}
               variant={checkTypeFilter === type ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setCheckTypeFilter(type)}
+              onClick={() => setCheckTypeFilter(type as CheckType)}
               className="gap-1"
             >
               <Icon className="h-4 w-4" />
-              {config.labelAr} ({funcs.length})
+              {config.labelAr} ({funcArray.length})
             </Button>
           );
         })}
@@ -199,11 +209,14 @@ export default function EdgeFunctionsMonitor() {
       <Tabs value={activeCategory} onValueChange={setActiveCategory}>
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="all">الكل ({functions.length})</TabsTrigger>
-          {Object.entries(functionsByCategory).map(([cat, funcs]) => (
-            <TabsTrigger key={cat} value={cat}>
-              {CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]} {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]} ({funcs.length})
-            </TabsTrigger>
-          ))}
+          {Object.entries(functionsByCategory || {}).map(([cat, funcs]) => {
+            const funcArray = Array.isArray(funcs) ? funcs : [];
+            return (
+              <TabsTrigger key={cat} value={cat}>
+                {CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]} {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]} ({funcArray.length})
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value={activeCategory} className="mt-4">
