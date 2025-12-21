@@ -55,15 +55,13 @@ const ROLE_ORDER: Record<string, number> = {
 
 export class MessageService {
   /**
-   * جلب الرسائل الواردة باستخدام view موحد
+   * جلب الرسائل الواردة باستخدام دالة SECURITY DEFINER
+   * تتجاوز RLS لجلب أسماء المرسلين بشكل صحيح
    */
   static async getInboxMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
       const { data, error } = await supabase
-        .from('messages_with_users')
-        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
-        .eq('receiver_id', userId)
-        .order('created_at', { ascending: false });
+        .rpc('get_inbox_messages', { p_user_id: userId });
 
       if (error) throw error;
       return (data || []) as MessageWithUsers[];
@@ -74,15 +72,12 @@ export class MessageService {
   }
 
   /**
-   * جلب الرسائل المرسلة باستخدام view موحد
+   * جلب الرسائل المرسلة باستخدام دالة SECURITY DEFINER
    */
   static async getSentMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
       const { data, error } = await supabase
-        .from('messages_with_users')
-        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
-        .eq('sender_id', userId)
-        .order('created_at', { ascending: false });
+        .rpc('get_sent_messages', { p_user_id: userId });
 
       if (error) throw error;
       return (data || []) as MessageWithUsers[];
@@ -93,18 +88,15 @@ export class MessageService {
   }
 
   /**
-   * جلب جميع رسائل المستخدم (واردة ومرسلة)
+   * جلب جميع رسائل المستخدم (واردة ومرسلة) باستخدام دالة SECURITY DEFINER
    */
   static async getAllMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
       const { data, error } = await supabase
-        .from('messages_with_users')
-        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
-        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-        .order('created_at', { ascending: false });
+        .rpc('get_user_messages', { p_user_id: userId });
 
       if (error) throw error;
-      return data as MessageWithUsers[];
+      return (data || []) as MessageWithUsers[];
     } catch (error) {
       productionLogger.error('Error fetching all messages', error);
       throw error;
