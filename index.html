@@ -98,9 +98,6 @@
   </head>
 
   <body>
-    <!-- ❌ إزالة Service Workers و Workbox Caches فوراً قبل تحميل React -->
-    <script src="/sw-cleanup.js"></script>
-    
     <div id="root">
       <!-- Instant loading - shown immediately before React loads (LCP element) -->
       <div id="app-loading" class="loading-container">
@@ -110,6 +107,11 @@
         </div>
       </div>
     </div>
+    
+    <!-- Main App -->
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- تنظيف Service Workers - مؤجل لنهاية التحميل لتحسين LCP -->
+    <script src="/sw-cleanup.js" defer></script>
   </body>
 </html>
