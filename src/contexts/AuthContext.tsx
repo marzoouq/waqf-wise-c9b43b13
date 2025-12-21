@@ -123,13 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [fetchProfile, fetchUserRoles]);
 
-  // ✅ قائمة المسارات العامة - Lazy Auth: لا نجلب البيانات إلا عند الحاجة
-  const PUBLIC_ROUTES_FOR_LAZY = ['/', '/login', '/signup', '/install', '/unauthorized', '/privacy', '/terms', '/security-policy', '/faq', '/contact'];
-  
-  const isCurrentRoutePublic = useCallback(() => {
-    if (typeof window === 'undefined') return false;
-    return PUBLIC_ROUTES_FOR_LAZY.includes(window.location.pathname);
-  }, []);
+  // ✅ إزالة Lazy Auth - نجلب البيانات دائماً عند وجود جلسة
 
   useEffect(() => {
     if (initRef.current) return;
@@ -167,18 +161,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
-        // ✅ LAZY AUTH: جلب البيانات فقط للصفحات المحمية
+        // ✅ جلب البيانات دائماً عند وجود جلسة
         if (currentSession?.user) {
-          const isPublic = isCurrentRoutePublic();
-          
-          if (!isPublic) {
-            // ✅ صفحة محمية: جلب البيانات فوراً من قاعدة البيانات
-            await fetchUserData(currentSession.user.id);
-          } else {
-            // ✅ صفحة عامة: لا نجلب البيانات
-            setIsLoading(false);
-            setRolesLoading(false);
-          }
+          await fetchUserData(currentSession.user.id);
         } else {
           setIsLoading(false);
           setRolesLoading(false);
@@ -249,7 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
-  }, [fetchUserData, cleanupInvalidSession, isCurrentRoutePublic]);
+  }, [fetchUserData, cleanupInvalidSession]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

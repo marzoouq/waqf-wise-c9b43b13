@@ -1,12 +1,10 @@
 /**
  * مكون المسارات المحمية والثانوية
- * يحتوي على GlobalErrorBoundary و AuthProvider و Sonner
- * ✅ يُحمَّل فقط للصفحات غير الترحيبية (Lazy loaded)
+ * ✅ AuthProvider موجود في App.tsx - لا حاجة لإعادته هنا
  */
 
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { GlobalErrorBoundary } from "@/components/shared/GlobalErrorBoundary";
 
@@ -30,33 +28,29 @@ const LightFallback = () => (
 );
 
 const AppRoutes = () => {
-  console.log('📍 [AppRoutes] تحميل المسارات');
-  
   return (
     <GlobalErrorBoundary>
-      <AuthProvider>
-        <Sonner />
-        {/* ✅ Suspense واحدة تغطي جميع المسارات - بدلاً من Suspense متعددة */}
-        <Suspense fallback={<LightFallback />}>
-          <Routes>
-            {/* ✅ صفحات المصادقة - بدون Suspense إضافية */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            
-            {/* ✅ الصفحات العامة الثانوية - بدون Suspense إضافية */}
-            <Route path="/install" element={<Install />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfUse />} />
-            <Route path="/security-policy" element={<SecurityPolicyPage />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            
-            {/* ✅ جميع المسارات المحمية */}
-            <Route path="/*" element={<AppShell />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+      {/* ✅ AuthProvider أُزيل - موجود الآن في App.tsx */}
+      <Sonner />
+      <Suspense fallback={<LightFallback />}>
+        <Routes>
+          {/* صفحات المصادقة */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          
+          {/* الصفحات العامة */}
+          <Route path="/install" element={<Install />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfUse />} />
+          <Route path="/security-policy" element={<SecurityPolicyPage />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          
+          {/* المسارات المحمية */}
+          <Route path="/*" element={<AppShell />} />
+        </Routes>
+      </Suspense>
     </GlobalErrorBoundary>
   );
 };

@@ -1,10 +1,6 @@
 /**
- * صفحة ترحيبية خفيفة - بدون تبعيات ثقيلة
- * Lightweight Landing Page - No heavy dependencies
- * هذه الصفحة تتجنب استيراد أي مكونات من Radix UI أو مكتبات ثقيلة أخرى
- * 
- * ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم الخاصة بهم
- * ✅ لا تستخدم AuthContext - تستخدم useLightAuth الخفيف
+ * صفحة ترحيبية خفيفة
+ * ✅ تستخدم useAuth مباشرة لأن AuthProvider متاح في App.tsx
  */
 
 import { useEffect, useState } from "react";
@@ -21,7 +17,7 @@ import {
   Banknote,
   CalendarDays
 } from "lucide-react";
-import { useLightAuth } from "@/hooks/auth/useLightAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ✅ مكون زر خفيف بدون Radix UI
 function LightButton({ 
@@ -64,7 +60,7 @@ function FeatureCard({ icon: Icon, title, description }: {
   );
 }
 
-// ✅ مكون إحصائية غني مع أيقونات ملونة
+// ✅ مكون إحصائية
 function StatItem({ 
   icon: Icon, 
   value, 
@@ -81,20 +77,15 @@ function StatItem({
   return (
     <div className="relative group">
       <div className="flex flex-col items-center text-center p-6 sm:p-8">
-        {/* Icon with gradient background */}
         <div
           className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${color} mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
         >
           <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
         </div>
-
-        {/* Value */}
         <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
           <span>{value.toLocaleString("ar-SA")}</span>
           <span className="text-primary">{suffix}</span>
         </div>
-
-        {/* Label */}
         <p className="text-muted-foreground text-sm sm:text-base">{label}</p>
       </div>
     </div>
@@ -102,74 +93,48 @@ function StatItem({
 }
 
 const stats = [
-  {
-    icon: Users,
-    value: 1000,
-    suffix: "+",
-    label: "مستفيد مسجل",
-    color: "bg-gradient-to-br from-blue-500 to-blue-600",
-  },
-  {
-    icon: Building2,
-    value: 50,
-    suffix: "+",
-    label: "عقار مُدار",
-    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
-  },
-  {
-    icon: Banknote,
-    value: 5,
-    suffix: "M+",
-    label: "ريال موزعة",
-    color: "bg-gradient-to-br from-amber-500 to-amber-600",
-  },
-  {
-    icon: CalendarDays,
-    value: 10,
-    suffix: "+",
-    label: "سنوات خبرة",
-    color: "bg-gradient-to-br from-violet-500 to-violet-600",
-  },
+  { icon: Users, value: 1000, suffix: "+", label: "مستفيد مسجل", color: "bg-gradient-to-br from-blue-500 to-blue-600" },
+  { icon: Building2, value: 50, suffix: "+", label: "عقار مُدار", color: "bg-gradient-to-br from-emerald-500 to-emerald-600" },
+  { icon: Banknote, value: 5, suffix: "M+", label: "ريال موزعة", color: "bg-gradient-to-br from-amber-500 to-amber-600" },
+  { icon: CalendarDays, value: 10, suffix: "+", label: "سنوات خبرة", color: "bg-gradient-to-br from-violet-500 to-violet-600" },
 ];
 
 export default function LandingPageLight() {
-  console.log('🏠 [LandingPageLight] تحميل الصفحة');
-  
-  // ✅ استخدام useLightAuth بدلاً من useAuth الثقيل
-  const { isLoggedIn, isLoading, redirectPath } = useLightAuth();
+  // ✅ استخدام useAuth مباشرة - AuthProvider متاح في App.tsx
+  const { user, isLoading, roles } = useAuth();
   const navigate = useNavigate();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  console.log('🏠 [LandingPageLight] حالة Auth:', { isLoading, isLoggedIn, redirectPath });
+  // تحديد المسار بناءً على الأدوار
+  const getRedirectPath = () => {
+    if (roles.includes('admin')) return '/admin';
+    if (roles.includes('nazer')) return '/nazer';
+    if (roles.includes('accountant')) return '/accountant';
+    if (roles.includes('cashier')) return '/cashier';
+    if (roles.includes('archivist')) return '/archive';
+    if (roles.includes('waqf_heir') || roles.includes('beneficiary')) return '/beneficiary';
+    return '/dashboard';
+  };
 
-  // ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم
+  // ✅ توجيه تلقائي للمستخدمين المسجلين
   useEffect(() => {
-    if (isLoading) {
-      console.log('🏠 [LandingPageLight] ⏳ انتظار التحميل...');
-      return;
-    }
+    if (isLoading) return;
     
-    if (isLoggedIn && redirectPath) {
-      console.log('🏠 [LandingPageLight] ⏳ بدء التوجيه...');
+    if (user) {
       setIsRedirecting(true);
-      
-      // تأخير 100ms للسماح بتحميل AppRoutes
       const timer = setTimeout(() => {
-        console.log('🏠 [LandingPageLight] ➡️ تنفيذ التوجيه إلى:', redirectPath);
-        navigate(redirectPath, { replace: true });
-      }, 100);
+        navigate(getRedirectPath(), { replace: true });
+      }, 50); // تأخير قصير لأن البيانات جاهزة
       
       return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, isLoading, redirectPath, navigate]);
+  }, [user, isLoading, roles, navigate]);
 
-  // ✅ عرض spinner أثناء التوجيه بدلاً من الصفحة البيضاء
+  // ✅ عرض spinner أثناء التوجيه
   if (isRedirecting) {
-    console.log('🏠 [LandingPageLight] 🔄 عرض spinner التوجيه');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <span className="sr-only">جاري التحميل...</span>
       </div>
     );
   }
