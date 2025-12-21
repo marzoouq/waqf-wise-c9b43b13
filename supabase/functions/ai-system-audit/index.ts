@@ -326,19 +326,60 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
     const content = result.choices?.[0]?.message?.content || '[]';
     console.log('[AI-SYSTEM-AUDIT] AI response received, parsing...');
     
-    // استخراج JSON من الرد
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (jsonMatch) {
-      const aiFindings = JSON.parse(jsonMatch[0]);
-      console.log(`[AI-SYSTEM-AUDIT] AI found ${aiFindings.length} issues`);
-      return aiFindings.map((f: any) => ({
-        ...f,
-        categoryLabel: CATEGORY_LABELS[f.category] || f.category,
-        fixed: false
-      }));
+    // ✅ إضافة logging للرد الخام
+    console.log('[AI-SYSTEM-AUDIT] AI raw response length:', content.length);
+    console.log('[AI-SYSTEM-AUDIT] AI response preview:', content.substring(0, 500));
+
+    // ✅ محاولة 1: parse مباشر (إذا كان الرد JSON صافي)
+    try {
+      const directParse = JSON.parse(content.trim());
+      if (Array.isArray(directParse)) {
+        console.log(`[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`);
+        return directParse.map((f: any) => ({
+          ...f,
+          categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+          fixed: false
+        }));
+      }
+    } catch (e) {
+      console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
     }
 
-    console.log('[AI-SYSTEM-AUDIT] Could not parse AI response, using local analysis');
+    // ✅ محاولة 2: استخراج array باستخدام regex غير جشع
+    const jsonMatch = content.match(/\[[\s\S]*?\]/);
+    if (jsonMatch) {
+      try {
+        const aiFindings = JSON.parse(jsonMatch[0]);
+        console.log(`[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`);
+        return aiFindings.map((f: any) => ({
+          ...f,
+          categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+          fixed: false
+        }));
+      } catch (parseError) {
+        console.error('[AI-SYSTEM-AUDIT] Failed to parse extracted JSON:', parseError);
+      }
+    }
+
+    // ✅ محاولة 3: البحث عن JSON بين code blocks
+    const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      try {
+        const aiFindings = JSON.parse(codeBlockMatch[1].trim());
+        if (Array.isArray(aiFindings)) {
+          console.log(`[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`);
+          return aiFindings.map((f: any) => ({
+            ...f,
+            categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+            fixed: false
+          }));
+        }
+      } catch (e) {
+        console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
+      }
+    }
+
+    console.log('[AI-SYSTEM-AUDIT] All parsing attempts failed, using local analysis');
     return performEnhancedLocalAnalysis(systemData, categories);
 
   } catch (error) {

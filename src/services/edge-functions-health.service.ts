@@ -4,11 +4,15 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+export type CheckType = 'ping' | 'json-required' | 'formdata';
+
 export interface EdgeFunctionInfo {
   name: string;
   description: string;
   requiresAuth: boolean;
   category: 'ai' | 'database' | 'notification' | 'backup' | 'security' | 'utility';
+  checkType: CheckType;
+  requiredFields?: string[];
 }
 
 export interface EdgeFunctionHealth {
@@ -26,72 +30,112 @@ export interface HealthCheckResult {
   responseTime: number;
   error?: string;
   checkedAt: string;
+  note?: string;
 }
 
-// قائمة جميع Edge Functions في النظام
+// قائمة جميع Edge Functions في النظام مع تصنيف نوع الفحص
 export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
   // AI Functions
-  { name: 'ai-system-audit', description: 'الفحص الذكي للنظام', requiresAuth: true, category: 'ai' },
-  { name: 'chatbot', description: 'المساعد الذكي', requiresAuth: true, category: 'ai' },
-  { name: 'generate-ai-insights', description: 'توليد الرؤى الذكية', requiresAuth: true, category: 'ai' },
-  { name: 'generate-smart-alerts', description: 'توليد التنبيهات الذكية', requiresAuth: true, category: 'ai' },
-  { name: 'intelligent-search', description: 'البحث الذكي', requiresAuth: true, category: 'ai' },
-  { name: 'property-ai-assistant', description: 'مساعد العقارات الذكي', requiresAuth: true, category: 'ai' },
-  { name: 'ocr-document', description: 'التعرف على النصوص', requiresAuth: true, category: 'ai' },
-  { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', requiresAuth: true, category: 'ai' },
-  { name: 'auto-classify-document', description: 'تصنيف المستندات تلقائياً', requiresAuth: true, category: 'ai' },
+  { name: 'ai-system-audit', description: 'الفحص الذكي للنظام', requiresAuth: true, category: 'ai', checkType: 'ping' },
+  { name: 'chatbot', description: 'المساعد الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['message'] },
+  { name: 'generate-ai-insights', description: 'توليد الرؤى الذكية', requiresAuth: true, category: 'ai', checkType: 'ping' },
+  { name: 'generate-smart-alerts', description: 'توليد التنبيهات الذكية', requiresAuth: true, category: 'ai', checkType: 'ping' },
+  { name: 'intelligent-search', description: 'البحث الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['query'] },
+  { name: 'property-ai-assistant', description: 'مساعد العقارات الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['message'] },
+  { name: 'ocr-document', description: 'التعرف على النصوص', requiresAuth: true, category: 'ai', checkType: 'formdata' },
+  { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', requiresAuth: true, category: 'ai', checkType: 'ping' },
+  { name: 'auto-classify-document', description: 'تصنيف المستندات تلقائياً', requiresAuth: true, category: 'ai', checkType: 'ping' },
   
   // Database Functions
-  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: false, category: 'database' },
-  { name: 'db-performance-stats', description: 'إحصائيات الأداء', requiresAuth: false, category: 'database' },
-  { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', requiresAuth: false, category: 'database' },
-  { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', requiresAuth: false, category: 'database' },
+  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: false, category: 'database', checkType: 'ping' },
+  { name: 'db-performance-stats', description: 'إحصائيات الأداء', requiresAuth: false, category: 'database', checkType: 'ping' },
+  { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', requiresAuth: false, category: 'database', checkType: 'ping' },
+  { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', requiresAuth: false, category: 'database', checkType: 'ping' },
   
   // Backup Functions
-  { name: 'backup-database', description: 'نسخ قاعدة البيانات', requiresAuth: true, category: 'backup' },
-  { name: 'restore-database', description: 'استعادة قاعدة البيانات', requiresAuth: true, category: 'backup' },
-  { name: 'enhanced-backup', description: 'النسخ المحسن', requiresAuth: true, category: 'backup' },
-  { name: 'daily-backup', description: 'النسخ اليومي', requiresAuth: true, category: 'backup' },
+  { name: 'backup-database', description: 'نسخ قاعدة البيانات', requiresAuth: true, category: 'backup', checkType: 'ping' },
+  { name: 'restore-database', description: 'استعادة قاعدة البيانات', requiresAuth: true, category: 'backup', checkType: 'json-required', requiredFields: ['backupId'] },
+  { name: 'daily-backup', description: 'النسخ اليومي', requiresAuth: true, category: 'backup', checkType: 'ping' },
   
   // Notification Functions
-  { name: 'send-notification', description: 'إرسال إشعار', requiresAuth: true, category: 'notification' },
-  { name: 'send-push-notification', description: 'إشعار فوري', requiresAuth: true, category: 'notification' },
-  { name: 'send-slack-alert', description: 'تنبيه Slack', requiresAuth: true, category: 'notification' },
-  { name: 'send-invoice-email', description: 'إرسال فاتورة بالبريد', requiresAuth: true, category: 'notification' },
-  { name: 'notify-admins', description: 'إشعار المديرين', requiresAuth: true, category: 'notification' },
-  { name: 'notify-disclosure-published', description: 'إشعار نشر الإفصاح', requiresAuth: true, category: 'notification' },
-  { name: 'daily-notifications', description: 'الإشعارات اليومية', requiresAuth: true, category: 'notification' },
-  { name: 'daily-notifications-full', description: 'الإشعارات اليومية الكاملة', requiresAuth: true, category: 'notification' },
-  { name: 'contract-renewal-alerts', description: 'تنبيهات تجديد العقود', requiresAuth: false, category: 'notification' },
+  { name: 'send-notification', description: 'إرسال إشعار', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['userId', 'title', 'message'] },
+  { name: 'send-push-notification', description: 'إشعار فوري', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['userId', 'title'] },
+  { name: 'send-slack-alert', description: 'تنبيه Slack', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['message'] },
+  { name: 'send-invoice-email', description: 'إرسال فاتورة بالبريد', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['invoiceId'] },
+  { name: 'notify-admins', description: 'إشعار المديرين', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['message'] },
+  { name: 'notify-disclosure-published', description: 'إشعار نشر الإفصاح', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['disclosureId'] },
+  { name: 'daily-notifications', description: 'الإشعارات اليومية', requiresAuth: true, category: 'notification', checkType: 'ping' },
+  { name: 'contract-renewal-alerts', description: 'تنبيهات تجديد العقود', requiresAuth: false, category: 'notification', checkType: 'ping' },
   
   // Security Functions
-  { name: 'check-leaked-password', description: 'فحص كلمات المرور المسربة', requiresAuth: true, category: 'security' },
-  { name: 'biometric-auth', description: 'المصادقة البيومترية', requiresAuth: false, category: 'security' },
-  { name: 'encrypt-file', description: 'تشفير الملفات', requiresAuth: true, category: 'security' },
-  { name: 'decrypt-file', description: 'فك تشفير الملفات', requiresAuth: true, category: 'security' },
-  { name: 'secure-delete-file', description: 'حذف آمن للملفات', requiresAuth: true, category: 'security' },
-  { name: 'cleanup-old-files', description: 'تنظيف الملفات القديمة', requiresAuth: true, category: 'security' },
-  { name: 'cleanup-sensitive-files', description: 'تنظيف الملفات الحساسة', requiresAuth: true, category: 'security' },
-  { name: 'scheduled-cleanup', description: 'التنظيف المجدول', requiresAuth: true, category: 'security' },
+  { name: 'check-leaked-password', description: 'فحص كلمات المرور المسربة', requiresAuth: true, category: 'security', checkType: 'ping' },
+  { name: 'biometric-auth', description: 'المصادقة البيومترية', requiresAuth: false, category: 'security', checkType: 'ping' },
+  { name: 'encrypt-file', description: 'تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'formdata' },
+  { name: 'decrypt-file', description: 'فك تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
+  { name: 'secure-delete-file', description: 'حذف آمن للملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
+  { name: 'cleanup-old-files', description: 'تنظيف الملفات القديمة', requiresAuth: true, category: 'security', checkType: 'ping' },
+  { name: 'cleanup-sensitive-files', description: 'تنظيف الملفات الحساسة', requiresAuth: true, category: 'security', checkType: 'ping' },
+  { name: 'scheduled-cleanup', description: 'التنظيف المجدول', requiresAuth: true, category: 'security', checkType: 'ping' },
   
   // Utility Functions
-  { name: 'log-error', description: 'تسجيل الأخطاء', requiresAuth: false, category: 'utility' },
-  { name: 'execute-auto-fix', description: 'تنفيذ الإصلاح التلقائي', requiresAuth: true, category: 'utility' },
-  { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمات مرور المستفيدين', requiresAuth: true, category: 'utility' },
-  { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', requiresAuth: true, category: 'utility' },
-  { name: 'update-user-email', description: 'تحديث البريد الإلكتروني', requiresAuth: true, category: 'utility' },
-  { name: 'create-beneficiary-accounts', description: 'إنشاء حسابات المستفيدين', requiresAuth: true, category: 'utility' },
-  { name: 'simulate-distribution', description: 'محاكاة التوزيع', requiresAuth: true, category: 'utility' },
-  { name: 'distribute-revenue', description: 'توزيع الإيرادات', requiresAuth: true, category: 'utility' },
-  { name: 'generate-distribution-summary', description: 'ملخص التوزيع', requiresAuth: true, category: 'utility' },
-  { name: 'auto-create-journal', description: 'إنشاء القيود تلقائياً', requiresAuth: true, category: 'utility' },
-  { name: 'generate-scheduled-report', description: 'التقارير المجدولة', requiresAuth: true, category: 'utility' },
-  { name: 'weekly-report', description: 'التقرير الأسبوعي', requiresAuth: true, category: 'utility' },
-  { name: 'publish-fiscal-year', description: 'نشر السنة المالية', requiresAuth: true, category: 'utility' },
-  { name: 'support-auto-escalate', description: 'تصعيد التذاكر تلقائياً', requiresAuth: true, category: 'utility' },
-  { name: 'zatca-submit', description: 'إرسال لـ ZATCA', requiresAuth: true, category: 'utility' },
-  { name: 'backfill-rental-documents', description: 'استكمال وثائق الإيجار', requiresAuth: true, category: 'utility' },
+  { name: 'log-error', description: 'تسجيل الأخطاء', requiresAuth: false, category: 'utility', checkType: 'json-required', requiredFields: ['error'] },
+  { name: 'execute-auto-fix', description: 'تنفيذ الإصلاح التلقائي', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['fixId'] },
+  { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمات مرور المستفيدين', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['beneficiaryId', 'action'] },
+  { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['userId'] },
+  { name: 'update-user-email', description: 'تحديث البريد الإلكتروني', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['userId', 'newEmail'] },
+  { name: 'create-beneficiary-accounts', description: 'إنشاء حسابات المستفيدين', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'simulate-distribution', description: 'محاكاة التوزيع', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'distribute-revenue', description: 'توزيع الإيرادات', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['distributionId'] },
+  { name: 'generate-distribution-summary', description: 'ملخص التوزيع', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['distributionId'] },
+  { name: 'auto-create-journal', description: 'إنشاء القيود تلقائياً', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['entryData'] },
+  { name: 'generate-scheduled-report', description: 'التقارير المجدولة', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'weekly-report', description: 'التقرير الأسبوعي', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'publish-fiscal-year', description: 'نشر السنة المالية', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['fiscalYearId'] },
+  { name: 'support-auto-escalate', description: 'تصعيد التذاكر تلقائياً', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'zatca-submit', description: 'إرسال لـ ZATCA', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  { name: 'backfill-rental-documents', description: 'استكمال وثائق الإيجار', requiresAuth: true, category: 'utility', checkType: 'ping' },
 ];
+
+// دالة توليد البيانات الوهمية للفحص
+function generateDummyData(fields: string[]): Record<string, any> {
+  const data: Record<string, any> = {};
+  for (const field of fields) {
+    switch (field) {
+      case 'message':
+      case 'query':
+      case 'error':
+        data[field] = 'health check test';
+        break;
+      case 'userId':
+      case 'beneficiaryId':
+      case 'fileId':
+      case 'fixId':
+      case 'invoiceId':
+      case 'disclosureId':
+      case 'distributionId':
+      case 'fiscalYearId':
+      case 'backupId':
+        data[field] = '00000000-0000-0000-0000-000000000000';
+        break;
+      case 'title':
+        data[field] = 'Health Check';
+        break;
+      case 'email':
+      case 'newEmail':
+        data[field] = 'test@healthcheck.local';
+        break;
+      case 'action':
+        data[field] = 'check';
+        break;
+      case 'entryData':
+        data[field] = { test: true };
+        break;
+      default:
+        data[field] = 'test';
+    }
+  }
+  return data;
+}
 
 export class EdgeFunctionsHealthService {
   /**
@@ -100,13 +144,52 @@ export class EdgeFunctionsHealthService {
   static async checkFunction(functionName: string): Promise<HealthCheckResult> {
     const startTime = performance.now();
     const checkedAt = new Date().toISOString();
+    const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === functionName);
 
     try {
-      // للـ functions التي لا تتطلب مصادقة، نستخدم fetch مباشرة
-      const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === functionName);
+      // ✅ FormData functions - فحص أساسي فقط
+      if (funcInfo?.checkType === 'formdata') {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ping: true, healthCheck: true }),
+            }
+          );
+          
+          const responseTime = Math.round(performance.now() - startTime);
+          
+          // نقبل أي رد (حتى 400/401) كدليل على أن الوظيفة تعمل
+          return {
+            function: functionName,
+            success: response.status !== 500 && response.status !== 502 && response.status !== 503,
+            responseTime,
+            checkedAt,
+            note: 'FormData function - basic connectivity check',
+            error: response.status >= 400 ? `HTTP ${response.status}` : undefined
+          };
+        } catch (err: any) {
+          return {
+            function: functionName,
+            success: false,
+            responseTime: Math.round(performance.now() - startTime),
+            checkedAt,
+            error: err.message
+          };
+        }
+      }
+
+      // ✅ JSON Required - إرسال بيانات وهمية مع ping
+      let body: Record<string, any> = { ping: true, healthCheck: true };
       
+      if (funcInfo?.checkType === 'json-required' && funcInfo.requiredFields) {
+        body = { ...body, ...generateDummyData(funcInfo.requiredFields) };
+      }
+      
+      // للـ functions التي لا تتطلب مصادقة، نستخدم fetch مباشرة
       if (!funcInfo?.requiresAuth) {
-        // استخدام ping بسيط
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`,
           {
@@ -114,7 +197,7 @@ export class EdgeFunctionsHealthService {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ ping: true }),
+            body: JSON.stringify(body),
           }
         );
 
@@ -122,7 +205,7 @@ export class EdgeFunctionsHealthService {
         
         return {
           function: functionName,
-          success: response.ok || response.status === 400, // 400 يعني الـ function تعمل لكن البيانات خاطئة
+          success: response.ok || response.status === 400,
           responseTime,
           checkedAt,
           error: response.ok ? undefined : `HTTP ${response.status}`
@@ -131,7 +214,7 @@ export class EdgeFunctionsHealthService {
 
       // للـ functions التي تتطلب مصادقة
       const { data, error } = await supabase.functions.invoke(functionName, {
-        body: { ping: true, healthCheck: true }
+        body
       });
 
       const responseTime = Math.round(performance.now() - startTime);
@@ -177,6 +260,14 @@ export class EdgeFunctionsHealthService {
    */
   static async checkByCategory(category: EdgeFunctionInfo['category']): Promise<HealthCheckResult[]> {
     const functions = ALL_EDGE_FUNCTIONS.filter(f => f.category === category);
+    return this.checkMultipleFunctions(functions.map(f => f.name));
+  }
+
+  /**
+   * فحص Edge Functions حسب نوع الفحص
+   */
+  static async checkByCheckType(checkType: CheckType): Promise<HealthCheckResult[]> {
+    const functions = ALL_EDGE_FUNCTIONS.filter(f => f.checkType === checkType);
     return this.checkMultipleFunctions(functions.map(f => f.name));
   }
 
@@ -227,6 +318,17 @@ export class EdgeFunctionsHealthService {
       lastChecked: result.checkedAt,
       lastError: result.error,
       consecutiveFailures: result.success ? 0 : 1
+    };
+  }
+
+  /**
+   * الحصول على الوظائف حسب نوع الفحص
+   */
+  static getFunctionsByCheckType(): Record<CheckType, EdgeFunctionInfo[]> {
+    return {
+      ping: ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'ping'),
+      'json-required': ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'json-required'),
+      formdata: ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'formdata'),
     };
   }
 }

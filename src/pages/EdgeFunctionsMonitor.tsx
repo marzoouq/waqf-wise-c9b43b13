@@ -6,9 +6,10 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEdgeFunctionsHealth, CATEGORY_LABELS, CATEGORY_ICONS } from '@/hooks/system/useEdgeFunctionsHealth';
+import { CheckType } from '@/services/edge-functions-health.service';
 import { 
   Activity, RefreshCw, CheckCircle, XCircle, AlertTriangle,
-  Clock, Zap, Server
+  Clock, Zap, Server, FileJson, Upload, Radio
 } from 'lucide-react';
 
 const statusConfig = {
@@ -18,21 +19,48 @@ const statusConfig = {
   unknown: { color: 'bg-muted', label: 'غير معروف', icon: Clock }
 };
 
+const checkTypeConfig: Record<CheckType, { color: string; label: string; icon: React.ElementType; labelAr: string }> = {
+  ping: { 
+    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', 
+    label: 'Ping', 
+    icon: Radio,
+    labelAr: 'فحص سريع'
+  },
+  'json-required': { 
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', 
+    label: 'JSON', 
+    icon: FileJson,
+    labelAr: 'يحتاج بيانات'
+  },
+  formdata: { 
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', 
+    label: 'FormData', 
+    icon: Upload,
+    labelAr: 'ملفات'
+  }
+};
+
 export default function EdgeFunctionsMonitor() {
   const {
-    functions, functionsByCategory, healthStatuses, healthSummary,
+    functions, functionsByCategory, functionsByCheckType, healthStatuses, healthSummary,
     isChecking, checkProgress, checkAllFunctions, checkCategory, checkSingleFunction
   } = useEdgeFunctionsHealth();
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [checkTypeFilter, setCheckTypeFilter] = useState<CheckType | 'all'>('all');
 
   const getHealthStatus = (funcName: string) => {
     return healthStatuses.find(h => h.name === funcName);
   };
 
-  const displayFunctions = activeCategory === 'all' 
+  let displayFunctions = activeCategory === 'all' 
     ? functions 
     : functionsByCategory[activeCategory as keyof typeof functionsByCategory] || [];
+
+  // تطبيق فلتر نوع الفحص
+  if (checkTypeFilter !== 'all') {
+    displayFunctions = displayFunctions.filter(f => f.checkType === checkTypeFilter);
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
@@ -61,6 +89,33 @@ export default function EdgeFunctionsMonitor() {
           </CardContent>
         </Card>
       )}
+
+      {/* ملخص نوع الفحص */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h3 className="font-medium text-lg flex items-center gap-2">
+              🎯 تصنيف حسب نوع الفحص
+            </h3>
+            <div className="flex gap-2 flex-wrap">
+              {(Object.entries(functionsByCheckType) as [CheckType, typeof functions][]).map(([type, funcs]) => {
+                const config = checkTypeConfig[type];
+                const Icon = config.icon;
+                return (
+                  <Badge 
+                    key={type} 
+                    className={`${config.color} cursor-pointer hover:opacity-80 transition-opacity`}
+                    onClick={() => setCheckTypeFilter(checkTypeFilter === type ? 'all' : type)}
+                  >
+                    <Icon className="h-3 w-3 ml-1" />
+                    {config.labelAr} ({funcs.length})
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* ملخص الصحة */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -101,6 +156,33 @@ export default function EdgeFunctionsMonitor() {
         </Card>
       </div>
 
+      {/* فلتر نوع الفحص */}
+      <div className="flex gap-2 flex-wrap">
+        <Button 
+          variant={checkTypeFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setCheckTypeFilter('all')}
+        >
+          الكل ({functions.length})
+        </Button>
+        {(Object.entries(functionsByCheckType) as [CheckType, typeof functions][]).map(([type, funcs]) => {
+          const config = checkTypeConfig[type];
+          const Icon = config.icon;
+          return (
+            <Button 
+              key={type}
+              variant={checkTypeFilter === type ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setCheckTypeFilter(type)}
+              className="gap-1"
+            >
+              <Icon className="h-4 w-4" />
+              {config.labelAr} ({funcs.length})
+            </Button>
+          );
+        })}
+      </div>
+
       {/* فلتر الفئات */}
       <Tabs value={activeCategory} onValueChange={setActiveCategory}>
         <TabsList className="flex-wrap h-auto gap-1">
@@ -115,7 +197,7 @@ export default function EdgeFunctionsMonitor() {
         <TabsContent value={activeCategory} className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>الوظائف</CardTitle>
+              <CardTitle>الوظائف ({displayFunctions.length})</CardTitle>
               {activeCategory !== 'all' && (
                 <Button 
                   size="sm" 
@@ -135,6 +217,8 @@ export default function EdgeFunctionsMonitor() {
                     const health = getHealthStatus(func.name);
                     const config = health ? statusConfig[health.status] : statusConfig.unknown;
                     const Icon = config.icon;
+                    const checkConfig = checkTypeConfig[func.checkType];
+                    const CheckIcon = checkConfig.icon;
 
                     return (
                       <div 
@@ -144,8 +228,22 @@ export default function EdgeFunctionsMonitor() {
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full ${config.color}`} />
                           <div>
-                            <p className="font-medium text-sm">{func.name}</p>
-                            <p className="text-xs text-muted-foreground">{func.description}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm">{func.name}</p>
+                              {/* Badge نوع الفحص */}
+                              <Badge variant="outline" className={`text-xs ${checkConfig.color}`}>
+                                <CheckIcon className="h-3 w-3 ml-1" />
+                                {checkConfig.label}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-muted-foreground">{func.description}</p>
+                              {func.checkType === 'json-required' && func.requiredFields && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({func.requiredFields.join(', ')})
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
