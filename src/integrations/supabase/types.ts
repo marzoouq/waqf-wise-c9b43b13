@@ -14248,6 +14248,25 @@ export type Database = {
         }[]
       }
       get_heir_beneficiary_id: { Args: never; Returns: string }
+      get_inbox_messages: {
+        Args: { p_user_id: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          parent_message_id: string
+          priority: string
+          read_at: string
+          receiver_id: string
+          receiver_name: string
+          request_id: string
+          sender_id: string
+          sender_name: string
+          subject: string
+          updated_at: string
+        }[]
+      }
       get_income_summary: {
         Args: { p_end_date?: string; p_start_date?: string }
         Returns: {
@@ -14314,6 +14333,25 @@ export type Database = {
           roles: string[]
           tablename: string
           with_check: string
+        }[]
+      }
+      get_sent_messages: {
+        Args: { p_user_id: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          parent_message_id: string
+          priority: string
+          read_at: string
+          receiver_id: string
+          receiver_name: string
+          request_id: string
+          sender_id: string
+          sender_name: string
+          subject: string
+          updated_at: string
         }[]
       }
       get_shift_stats: {
@@ -14384,6 +14422,25 @@ export type Database = {
         }[]
       }
       get_unused_indexes_count: { Args: never; Returns: number }
+      get_user_messages: {
+        Args: { p_user_id: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          parent_message_id: string
+          priority: string
+          read_at: string
+          receiver_id: string
+          receiver_name: string
+          request_id: string
+          sender_id: string
+          sender_name: string
+          subject: string
+          updated_at: string
+        }[]
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
