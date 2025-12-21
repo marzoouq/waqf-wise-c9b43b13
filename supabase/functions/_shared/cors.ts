@@ -27,10 +27,12 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:8080',
-  // Lovable preview domains
+// Lovable preview domains - دعم جميع الأنماط
   /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+  // دعم أي نمط: xxx--yyy.lovable.app (مثل id-preview--xxx, preview--xxx)
+  /^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/,
+  // دعم subdomains عادية: xxx.lovable.app
   /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
-  /^https:\/\/preview--[a-z0-9-]+\.lovable\.app$/,
 ];
 
 /**
