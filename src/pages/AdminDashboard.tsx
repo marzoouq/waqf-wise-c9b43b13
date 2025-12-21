@@ -1,6 +1,6 @@
 import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { SystemHealthMonitor } from "@/components/dashboard/admin/SystemHealthMonitor";
@@ -22,13 +22,26 @@ import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/das
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("system");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // تفعيل التحديثات المباشرة الموحدة
   useAdminDashboardRealtime();
   const { refreshAll } = useAdminDashboardRefresh();
 
-  const handleRefresh = () => {
-    refreshAll();
+  // تعيين وقت التحديث عند تحميل الصفحة
+  useEffect(() => {
+    setLastUpdated(new Date());
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshAll();
+      setLastUpdated(new Date());
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -36,7 +49,11 @@ export default function AdminDashboard() {
       role="admin"
       actions={
         <div className="flex items-center gap-2">
-          <LastSyncIndicator onRefresh={handleRefresh} />
+          <LastSyncIndicator 
+            lastUpdated={lastUpdated} 
+            onRefresh={handleRefresh} 
+            isRefreshing={isRefreshing}
+          />
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
             <Mail className="h-4 w-4" />
             <span className="hidden sm:inline">إرسال رسالة</span>
