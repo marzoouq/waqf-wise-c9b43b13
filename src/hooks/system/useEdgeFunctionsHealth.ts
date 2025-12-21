@@ -3,7 +3,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { 
   EdgeFunctionsHealthService, 
   ALL_EDGE_FUNCTIONS,
@@ -53,7 +52,9 @@ export function useEdgeFunctionsHealth() {
         return [...prev, result];
       });
 
-      if (result.success) {
+      if (result.isProtected) {
+        toastSuccess(`${functionName}: محمية ✓ (${result.responseTime}ms)`);
+      } else if (result.success) {
         toastSuccess(`${functionName}: ${result.responseTime}ms`);
       } else {
         toastError(`${functionName}: ${result.error}`);
@@ -88,9 +89,9 @@ export function useEdgeFunctionsHealth() {
     if (summary.unhealthy > 0) {
       toastError(`${summary.unhealthy} وظائف غير متاحة من ${summary.total}`);
     } else if (summary.degraded > 0) {
-      toastSuccess(`${summary.healthy} صحية، ${summary.degraded} بطيئة`);
+      toastSuccess(`${summary.healthy} صحية، ${summary.protected} محمية، ${summary.degraded} بطيئة`);
     } else {
-      toastSuccess(`جميع الوظائف (${summary.total}) تعمل بشكل طبيعي`);
+      toastSuccess(`${summary.healthy} صحية، ${summary.protected} محمية - الكل يعمل ✓`);
     }
 
     return results;
