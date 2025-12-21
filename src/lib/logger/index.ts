@@ -6,10 +6,11 @@
  * ```typescript
  * import { logger } from '@/lib/logger';
  * 
- * logger.debug('Debug message', { data: 'value' });
- * logger.info('Info message');
- * logger.warn('Warning message');
- * logger.error('Error message', error);
+ * // النمط الجديد
+ * logger.error('Error message', error, { context: 'test' });
+ * 
+ * // النمط القديم (متوافق)
+ * logger.error(error, { context: 'test' });
  * ```
  */
 
@@ -21,7 +22,7 @@ const MODE = (import.meta.env.MODE as string) || 'development';
 const IS_DEV = MODE !== 'production';
 
 // اختيار الـ Logger المناسب حسب البيئة
-export const logger = IS_DEV ? devLogger : productionLogger;
+export const logger: ILogger = IS_DEV ? devLogger : productionLogger;
 
 // إعادة تصدير الأنواع
 export type { ILogger, LogOptions, LogLevel, Severity, LogEntry };
@@ -32,8 +33,7 @@ export { productionLogger } from './production-logger';
 
 // Helper function للتوافق مع الكود القديم
 export function logAppError(error: Error | unknown, context?: string): void {
-  const message = error instanceof Error ? error.message : String(error);
-  logger.error(message, error, { context, severity: 'medium' });
+  logger.error(error, { context, severity: 'medium' });
 }
 
 // تنظيف عند إغلاق الصفحة
@@ -41,8 +41,6 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
     if (logger.cleanup) {
       logger.cleanup();
-    } else if (logger.flush) {
-      logger.flush();
     }
   });
 }

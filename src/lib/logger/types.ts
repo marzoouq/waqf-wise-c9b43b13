@@ -1,5 +1,8 @@
 /**
  * Logger Types - أنواع نظام الـ Logging
+ * يدعم نمطين من الاستخدام:
+ * - النمط الجديد: logger.error('message', error, options)
+ * - النمط القديم: logger.error(error, options)
  */
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -23,7 +26,8 @@ export interface ILogger {
   debug(message: string, data?: unknown): void;
   info(message: string, data?: unknown): void;
   warn(message: string, data?: unknown, options?: LogOptions): void;
-  error(message: string, error?: unknown, options?: LogOptions): void;
+  // دعم نمطين: (message, error, options) أو (error, options)
+  error(messageOrError: string | Error | unknown, errorOrOptions?: unknown | LogOptions, options?: LogOptions): void;
   success?(message: string, data?: unknown): void;
   flush?(): void;
   cleanup?(): void;

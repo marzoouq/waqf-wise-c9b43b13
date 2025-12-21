@@ -1,25 +1,11 @@
 /**
  * نظام Logging احترافي للإنتاج
  * يدعم مستويات مختلفة من الـ logging مع إمكانية التكامل مع خدمات التتبع
+ * يدعم نمطين من الاستخدام للـ error
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-type Severity = 'low' | 'medium' | 'high' | 'critical';
-
-interface LogOptions {
-  context?: string;
-  metadata?: Record<string, unknown>;
-  severity?: Severity;
-}
-
-interface LogEntry {
-  level: LogLevel;
-  message: string;
-  data?: unknown;
-  timestamp: string;
-}
+import type { ILogger, LogOptions, LogLevel, Severity, LogEntry } from './types';
 
 const MODE = (import.meta.env.MODE as string) || 'development';
 const IS_DEV = MODE !== 'production';
@@ -61,7 +47,29 @@ function mapLevelToErrorType(level: LogLevel): string {
   }
 }
 
-class ProductionLogger {
+/**
+ * فحص إذا كان الـ object هو LogOptions
+ */
+function isLogOptions(obj: unknown): obj is LogOptions {
+  if (!obj || typeof obj !== 'object') return false;
+  const keys = Object.keys(obj);
+  const validKeys = ['context', 'userId', 'severity', 'metadata'];
+  return keys.some(key => validKeys.includes(key));
+}
+
+/**
+ * استخراج رسالة من Error أو أي نوع آخر
+ */
+function extractMessage(value: unknown): string {
+  if (value instanceof Error) return value.message;
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'message' in value) {
+    return String((value as { message: unknown }).message);
+  }
+  return String(value);
+}
+
+class ProductionLogger implements ILogger {
   private queue: LogEntry[] = [];
   private flushInterval: ReturnType<typeof setInterval> | null = null;
   private isProcessing = false;
@@ -79,7 +87,6 @@ class ProductionLogger {
     if (IS_DEV) {
       console.log(`🐛 ${message}`, data !== undefined ? data : '');
     }
-    // Debug للتطوير فقط - لا ترسل للسيرفر
   }
 
   /**
@@ -89,7 +96,6 @@ class ProductionLogger {
     if (IS_DEV) {
       console.info(`ℹ️ ${message}`, data !== undefined ? data : '');
     }
-    // لا ترسل info للسيرفر - معلومات فقط وليست أخطاء
   }
 
   /**
@@ -99,19 +105,46 @@ class ProductionLogger {
     if (IS_DEV) {
       console.warn(`⚠️ ${message}`, data !== undefined ? data : '');
     }
-    // ✅ لا نضيف للـ queue - فقط إرسال مباشر للتحذيرات الحرجة
     if (IS_PROD && options?.severity === 'high') {
       this.sendToServer('warn', message, data, options);
     }
   }
 
   /**
-   * تسجيل خطأ (يُرسل دائماً للسيرفر في الإنتاج)
+   * تسجيل خطأ - يدعم نمطين:
+   * - النمط الجديد: error('message', errorObject, options)
+   * - النمط القديم: error(errorObject, options)
    */
-  error(message: string, error?: unknown, options?: LogOptions): void {
-    const errorData = error instanceof Error 
-      ? { message: error.message, stack: error.stack, name: error.name }
-      : error;
+  error(
+    messageOrError: string | Error | unknown,
+    errorOrOptions?: unknown | LogOptions,
+    options?: LogOptions
+  ): void {
+    let message: string;
+    let errorData: unknown;
+    let finalOptions: LogOptions | undefined;
+
+    // فحص النمط المستخدم
+    if (typeof messageOrError === 'string') {
+      // النمط الجديد: error('message', error, options)
+      message = messageOrError;
+      if (errorOrOptions instanceof Error) {
+        errorData = { message: errorOrOptions.message, stack: errorOrOptions.stack, name: errorOrOptions.name };
+      } else if (errorOrOptions && !isLogOptions(errorOrOptions)) {
+        errorData = errorOrOptions;
+      }
+      finalOptions = options;
+    } else {
+      // النمط القديم: error(error, options)
+      message = extractMessage(messageOrError);
+      if (messageOrError instanceof Error) {
+        errorData = { message: messageOrError.message, stack: messageOrError.stack, name: messageOrError.name };
+      } else {
+        errorData = messageOrError;
+      }
+      // المعامل الثاني هو options في النمط القديم
+      finalOptions = isLogOptions(errorOrOptions) ? errorOrOptions : undefined;
+    }
 
     if (IS_DEV) {
       console.error(`❌ ${message}`, errorData !== undefined ? errorData : '');
@@ -120,7 +153,7 @@ class ProductionLogger {
     this.addToQueue('error', message, errorData);
 
     if (IS_PROD) {
-      this.sendToServer('error', message, errorData, options);
+      this.sendToServer('error', message, errorData, finalOptions);
     }
   }
 
@@ -131,7 +164,6 @@ class ProductionLogger {
     if (IS_DEV) {
       console.log(`✅ ${message}`, data !== undefined ? data : '');
     }
-    // لا ترسل success للسيرفر - معلومات فقط
   }
 
   /**
@@ -139,7 +171,6 @@ class ProductionLogger {
    */
   private addToQueue(level: LogLevel, message: string, data?: unknown): void {
     if (IS_PROD) {
-      // تجاهل الرسائل الفارغة
       if (!message || typeof message !== 'string' || message.trim() === '') {
         return;
       }
@@ -151,7 +182,6 @@ class ProductionLogger {
         timestamp: new Date().toISOString(),
       });
 
-      // إذا تجاوز الـ queue 50 رسالة، اطرد فوراً
       if (this.queue.length >= 50) {
         this.flush();
       }
@@ -164,14 +194,13 @@ class ProductionLogger {
   private startFlushInterval(): void {
     this.flushInterval = setInterval(() => {
       this.flush();
-    }, 30000); // كل 30 ثانية
+    }, 30000);
   }
 
   /**
-   * إرسال جميع الـ logs المتراكمة - بالتنسيق الصحيح
+   * إرسال جميع الـ logs المتراكمة
    */
-  private async flush(): Promise<void> {
-    // تعطيل في بيئة التطوير
+  flush(): void {
     if (IS_DEV) {
       this.queue = [];
       return;
@@ -183,31 +212,28 @@ class ProductionLogger {
     const logsToSend = [...this.queue];
     this.queue = [];
 
+    this.processLogs(logsToSend).finally(() => {
+      this.isProcessing = false;
+    });
+  }
+
+  private async processLogs(logsToSend: LogEntry[]): Promise<void> {
     try {
-      // ✅ فلترة: إرسال الأخطاء فقط (errors only)
       const errorsOnly = logsToSend.filter(log => log.level === 'error');
       
-      // إرسال الـ logs بالتنسيق الصحيح
       for (const log of errorsOnly.slice(0, 10)) {
-        // تجاهل logs بدون رسالة صالحة
         if (!log.message || typeof log.message !== 'string' || log.message.trim() === '') {
           continue;
         }
 
         try {
-          const errorType = mapLevelToErrorType(log.level) || 'unknown';
-          const errorMessage = log.message.trim() || 'No message';
-          const severity = mapLevelToSeverity(log.level) || 'low';
-          const url = (typeof window !== 'undefined' ? window.location.href : 'server') || 'unknown';
-          const userAgent = (typeof navigator !== 'undefined' ? navigator.userAgent : 'server') || 'unknown';
-
           await supabase.functions.invoke('log-error', {
             body: {
-              error_type: errorType,
-              error_message: errorMessage,
-              severity: severity,
-              url: url,
-              user_agent: userAgent,
+              error_type: mapLevelToErrorType(log.level) || 'unknown',
+              error_message: log.message.trim() || 'No message',
+              severity: mapLevelToSeverity(log.level) || 'low',
+              url: (typeof window !== 'undefined' ? window.location.href : 'server') || 'unknown',
+              user_agent: (typeof navigator !== 'undefined' ? navigator.userAgent : 'server') || 'unknown',
               additional_data: {
                 original_level: log.level,
                 timestamp: log.timestamp,
@@ -216,20 +242,16 @@ class ProductionLogger {
             },
           });
         } catch (logError) {
-          // تسجيل فشل الإرسال في console فقط في DEV
           if (IS_DEV) {
             console.warn('Failed to send log to server:', logError);
           }
         }
       }
     } catch (error) {
-      // في حالة فشل الإرسال الكامل، أعد الـ logs للـ queue
       this.queue.unshift(...logsToSend);
       if (IS_DEV) {
         console.warn('Failed to flush logs:', error);
       }
-    } finally {
-      this.isProcessing = false;
     }
   }
 
@@ -242,7 +264,6 @@ class ProductionLogger {
     data?: unknown,
     options?: LogOptions
   ): Promise<void> {
-    // تعطيل في بيئة التطوير
     if (IS_DEV) return;
 
     try {
@@ -265,7 +286,6 @@ class ProductionLogger {
         },
       });
     } catch (error) {
-      // تسجيل فشل الإرسال - لكن لا نريد أن يؤثر على التطبيق
       if (IS_DEV) {
         console.warn('Failed to send error to server:', error);
       }
@@ -284,10 +304,8 @@ class ProductionLogger {
   }
 }
 
-// Singleton instance
 export const productionLogger = new ProductionLogger();
 
-// تنظيف عند إغلاق الصفحة
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
     productionLogger.cleanup();
