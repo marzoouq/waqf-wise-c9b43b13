@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
 
     console.log('Starting scheduled cleanup...');
 
-    // استدعاء دالة التنظيف المخزنة
+    // 1. استدعاء دالة التنظيف المخزنة
     const { data, error } = await supabase.rpc('run_scheduled_cleanup');
 
     if (error) {
@@ -76,12 +76,45 @@ Deno.serve(async (req) => {
     
     console.log('Cleanup completed:', JSON.stringify(result));
 
-    // تسجيل في audit_logs (الدالة تسجل تلقائياً، لكن نضيف ملخص إضافي)
-    if (result.total_deleted > 0) {
+    // 2. أرشفة سجلات التدقيق القديمة (أكثر من 7 أيام)
+    const { data: archivedData, error: archiveError } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .lt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+
+    let archivedCount = 0;
+    if (!archiveError && archivedData && archivedData.length > 0) {
+      // نقل إلى جدول الأرشيف
+      const { error: insertError } = await supabase
+        .from('audit_logs_archive')
+        .insert(archivedData.map(log => ({ ...log, archived_at: new Date().toISOString() })));
+      
+      if (!insertError) {
+        // حذف من الجدول الأصلي
+        const ids = archivedData.map(log => log.id);
+        await supabase.from('audit_logs').delete().in('id', ids);
+        archivedCount = archivedData.length;
+        console.log(`Archived ${archivedCount} audit logs`);
+      }
+    }
+
+    // 3. تعليم الإشعارات القديمة كمقروءة (أكثر من 3 أيام)
+    const { error: notifError } = await supabase
+      .from('notifications')
+      .update({ is_read: true, read_at: new Date().toISOString() })
+      .eq('is_read', false)
+      .lt('created_at', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString());
+
+    if (notifError) {
+      console.error('Notification cleanup error:', notifError);
+    }
+
+    // تسجيل في audit_logs
+    if (result.total_deleted > 0 || archivedCount > 0) {
       await supabase.from('audit_logs').insert({
         action_type: 'SCHEDULED_CLEANUP',
         table_name: 'multiple',
-        description: `تنظيف مجدول: حذف ${result.total_deleted} سجل (health_checks: ${result.details?.health_checks || 0}, error_logs: ${result.details?.error_logs || 0}, alerts: ${result.details?.alerts || 0})`,
+        description: `تنظيف مجدول: حذف ${result.total_deleted} سجل، أرشفة ${archivedCount} سجل تدقيق`,
         severity: 'info',
       });
     }
@@ -89,8 +122,9 @@ Deno.serve(async (req) => {
     return jsonResponse({
       success: true,
       total_deleted: result.total_deleted,
+      archived_audit_logs: archivedCount,
       details: result.details,
-      message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف`,
+      message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف، ${archivedCount} سجل مؤرشف`,
     });
 
   } catch (error) {
