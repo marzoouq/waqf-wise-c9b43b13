@@ -19,6 +19,8 @@ import {
   IntegrationsManagement,
   AIInsights,
   AISystemAudit,
+  EdgeFunctionTest,
+  EdgeFunctionsMonitor,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -140,6 +142,24 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <AISystemAudit />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="edge-function-test"
+    path="/edge-test" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <EdgeFunctionTest />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="edge-functions-monitor"
+    path="/edge-monitor" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <EdgeFunctionsMonitor />
       </ProtectedRoute>
     } 
   />,
