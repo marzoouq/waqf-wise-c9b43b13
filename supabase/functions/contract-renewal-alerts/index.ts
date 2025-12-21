@@ -7,12 +7,16 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, any> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        bodyData = JSON.parse(bodyText);
+        
+        // ✅ Health Check Support
+        if (bodyData.ping || bodyData.healthCheck) {
           console.log('[contract-renewal-alerts] Health check received');
           return jsonResponse({
             status: 'healthy',
@@ -20,14 +24,18 @@ serve(async (req) => {
             timestamp: new Date().toISOString()
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        // ليس JSON - تجاهل
+      }
     }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { daysBeforeExpiry = 30 } = await req.json().catch(() => ({}));
+    // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
+    const { daysBeforeExpiry = 30 } = bodyData;
 
     console.log(`Checking contracts expiring in ${daysBeforeExpiry} days...`);
 
@@ -118,7 +126,7 @@ serve(async (req) => {
           const { error: notifError } = await supabase
             .from('notifications')
             .insert({
-              user_id: admin.user_id, // ✅ إضافة user_id المطلوب
+              user_id: admin.user_id,
               title: alertTitle,
               message: alertMessage,
               type: daysRemaining <= 7 ? 'warning' : 'info',
