@@ -580,6 +580,57 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs_archive: {
+        Row: {
+          action_type: string
+          archived_at: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          severity: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          archived_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          severity?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          archived_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          severity?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       auto_journal_log: {
         Row: {
           amount: number
