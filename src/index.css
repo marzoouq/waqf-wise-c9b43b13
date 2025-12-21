@@ -32,9 +32,9 @@
     --secondary: 150 25% 92%;
     --secondary-foreground: 150 45% 25%;
 
-    /* ألوان خافتة */
+    /* ألوان خافتة - تباين محسّن WCAG 2.1 */
     --muted: 48 15% 94%;
-    --muted-foreground: 150 10% 45%;
+    --muted-foreground: 215.4 16.3% 36.9%;
 
     /* لون التمييز */
     --accent: 43 90% 55%;
@@ -149,7 +149,7 @@
     --secondary-foreground: 150 15% 95%;
 
     --muted: 150 15% 18%;
-    --muted-foreground: 150 10% 65%;
+    --muted-foreground: 215.4 16.3% 75%;
 
     --accent: 43 85% 60%;
     --accent-foreground: 150 20% 15%;
