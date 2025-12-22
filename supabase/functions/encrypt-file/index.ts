@@ -51,6 +51,21 @@ serve(async (req) => {
       return unauthorizedResponse('فشل التحقق من الهوية');
     }
 
+    // ✅ التحقق من الصلاحيات - فقط الموظفين يمكنهم تشفير الملفات
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const userRoles = roles?.map(r => r.role) || [];
+    const allowedRoles = ['admin', 'nazer', 'accountant', 'staff'];
+    const hasPermission = userRoles.some(role => allowedRoles.includes(role));
+
+    if (!hasPermission) {
+      console.warn(`⚠️ محاولة تشفير ملف بدون صلاحية: ${user.id}`);
+      return errorResponse('ليس لديك صلاحية لتشفير الملفات', 403);
+    }
+
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const fileCategory = formData.get('category') as string || 'general';
