@@ -181,7 +181,7 @@ npx playwright test      # اختبارات E2E
 - **React Query DevTools**: مراقبة الاستعلامات
 - **TypeScript**: نظام الأنواع
 - **ESLint + Prettier**: تنسيق الكود
-- **Vitest**: اختبارات الوحدة (408+ اختبار)
+- **Vitest**: اختبارات الوحدة (11,000+ اختبار)
 - **Playwright**: اختبارات E2E
 
 ## 📝 معايير الكود
@@ -228,4 +228,4 @@ export function Component({ ... }: Props) {
 - مراجعة [`docs/ARCHITECTURE_RULES.md`](docs/ARCHITECTURE_RULES.md) - قواعد صارمة
 - مراجعة `src/hooks/README.md` للـ Hooks
 - مراجعة `src/services/README.md` للـ Services
-- مراجعة `src/lib/query-keys.ts` للـ Query Keys (370+)
+- مراجعة `src/lib/query-keys/` للـ Query Keys (400+ في 8 ملفات)
