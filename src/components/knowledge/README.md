@@ -67,5 +67,5 @@ import { KnowledgeDownloadsTab } from '@/components/knowledge';
 
 ---
 
-**آخر تحديث:** 2025-12-03
-**الإصدار:** 2.6.4
+**آخر تحديث:** 2025-12-22
+**الإصدار:** 2.9.90

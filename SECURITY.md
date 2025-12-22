@@ -76,22 +76,23 @@
 
 ## تحديثات الأمان
 
-### آخر تحديث: 28 نوفمبر 2025 (النسخة 2.5.0)
+### آخر تحديث: 22 ديسمبر 2025 (النسخة 2.9.90)
 
 #### التحديثات المنفذة:
-- ✅ **تأمين Edge Functions الحرجة** (4 دوال)
-- ✅ **عزل المستفيدين** (14 مستفيد)
-- ✅ **تشديد RLS** (8 جداول)
+- ✅ **675 سياسة RLS** محسّنة ومحدثة
+- ✅ **50 Edge Function** مؤمنة
+- ✅ **231 جدول** مع حماية RLS كاملة
+- ✅ **200 Trigger** للأمان والتدقيق
 - ✅ **Audit Logging شامل**
 - ✅ **كلمات مرور آمنة** باستخدام `crypto.getRandomValues()`
 
-انظر [SECURITY_UPDATES_LOG.md](./SECURITY_UPDATES_LOG.md) للتفاصيل الكاملة.
+انظر [docs/security/edge-functions-security-report.md](./docs/security/edge-functions-security-report.md) للتفاصيل الكاملة.
 
 سننشر تحديثات الأمان في:
 1. GitHub Security Advisories
 2. Release Notes
 3. إشعارات البريد الإلكتروني (للمستخدمين المسجلين)
-4. [SECURITY_UPDATES_LOG.md](./SECURITY_UPDATES_LOG.md) - سجل مفصل
+4. [docs/security/edge-functions-security-report.md](./docs/security/edge-functions-security-report.md) - سجل مفصل
 
 ## Contact
 

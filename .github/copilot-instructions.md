@@ -16,13 +16,13 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 
 ```
 src/
-├── components/     # UI components only - NO business logic
-├── hooks/          # 170+ hooks in 25 feature folders (see src/hooks/README.md)
-├── services/       # 51+ services for ALL data operations (see src/services/README.md)
+├── components/     # UI components only - NO business logic (600+ in 44 folders)
+├── hooks/          # 300+ hooks in 38 feature folders (see src/hooks/README.md)
+├── services/       # 60+ services for ALL data operations (see src/services/README.md)
 ├── types/          # TypeScript types - NEVER use `any`
 ├── lib/            # Utilities: QUERY_KEYS, errors, query-invalidation
 ├── pages/          # Route pages - use hooks for data
-└── routes/         # Route definitions in 6 files (see src/routes/README.md)
+└── routes/         # Route definitions in 7 files (see src/routes/README.md)
 ```
 
 ## Critical Rules
@@ -49,8 +49,8 @@ const { data } = await supabase.from('users').select('*').eq('id', id).maybeSing
 ```typescript
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
-// 370+ keys organized by domain
-useQuery({ 
+// 400+ keys organized by domain in 8 files
+useQuery({
   queryKey: QUERY_KEYS.BENEFICIARIES, 
   queryFn: () => BeneficiaryService.getAll(),
   ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus
@@ -181,7 +181,7 @@ const [beneficiaries, properties, payments] = await Promise.all([
 
 ### Commands
 ```bash
-npx vitest run          # Run all tests (408+ tests)
+npx vitest run          # Run all tests (11,000+ tests)
 npx vitest              # Interactive watch mode
 npx vitest --ui         # UI mode
 ```
@@ -217,6 +217,10 @@ const createWrapper = () => ({ children }) => (
 - `src/services/README.md` - Service layer documentation  
 - `src/hooks/README.md` - Hooks organization
 - `src/routes/README.md` - Routing structure
-- `src/lib/query-keys.ts` - All query keys (370+)
+- `src/lib/query-keys/` - All query keys (400+ in 8 files)
 - `src/lib/query-invalidation.ts` - Batched cache invalidation
 - `src/lib/errors/index.ts` - Error handling utilities
+
+---
+
+**آخر تحديث:** 2025-12-22 | **الإصدار:** 2.9.90
