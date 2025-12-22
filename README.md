@@ -193,6 +193,8 @@ npm run dev
 
 | الوثيقة | المحتوى |
 |---------|---------|
+| [`ROLES_AND_PERMISSIONS.md`](docs/ROLES_AND_PERMISSIONS.md) | 🔐 **نظام الصلاحيات والأدوار الشامل** |
+| [`SECURITY_GUIDELINES.md`](docs/SECURITY_GUIDELINES.md) | 🛡️ **إرشادات الأمان للمطورين** |
 | [`ARCHITECTURE_RULES.md`](docs/ARCHITECTURE_RULES.md) | قواعد الهيكل المعماري الصارمة |
 | [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل |
 | [`PERFORMANCE.md`](docs/PERFORMANCE.md) | تقرير الأداء |
