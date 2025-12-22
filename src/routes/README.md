@@ -137,4 +137,5 @@ export const NewPage = lazyWithRetry(() => import("@/pages/NewPage"));
 
 ---
 
-**آخر تحديث:** 2025-11-29
+**آخر تحديث:** 2025-12-22
+**الإصدار:** 2.9.90

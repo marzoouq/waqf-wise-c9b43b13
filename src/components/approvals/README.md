@@ -23,9 +23,4 @@ import { ApprovalWorkflowBuilder } from '@/components/accounting/ApprovalWorkflo
 
 ---
 
-## التطوير المستقبلي
-
-### الأولويات:
-- [ ] إضافة واجهة التحرير التفاعلية
-- [ ] إضافة CRUD operations كاملة
-- [ ] تحسين واجهة المستخدم
+**آخر تحديث:** 2025-12-22 | **الإصدار:** 2.9.90
