@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -35,6 +35,58 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // 🔐 التحقق من المصادقة - يدعم طريقتين:
+    // 1. JWT token للاستدعاء من التطبيق
+    // 2. INTERNAL_SECRET للاستدعاء من Edge Functions الأخرى
+    const authHeader = req.headers.get('Authorization');
+    const internalSecret = req.headers.get('X-Internal-Secret');
+    const expectedInternalSecret = Deno.env.get('INTERNAL_SECRET');
+
+    let isAuthorized = false;
+
+    // طريقة 1: التحقق من INTERNAL_SECRET للاستدعاءات الداخلية
+    if (internalSecret && expectedInternalSecret && internalSecret === expectedInternalSecret) {
+      isAuthorized = true;
+      console.log('[send-slack-alert] ✅ Authorized via INTERNAL_SECRET');
+    }
+    // طريقة 2: التحقق من JWT token
+    else if (authHeader) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (!authError && user) {
+        // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        const hasAccess = roles?.some((r: { role: string }) => ['admin', 'nazer'].includes(r.role));
+        if (hasAccess) {
+          isAuthorized = true;
+          console.log('[send-slack-alert] ✅ Authorized via JWT:', { userId: user.id });
+        }
+      }
+    }
+
+    // رفض الاستدعاء غير المصرح
+    if (!isAuthorized) {
+      console.error('[send-slack-alert] ❌ Unauthorized access attempt');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'غير مصرح - يجب تسجيل الدخول كمسؤول'
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
     
     if (!slackWebhookUrl) {
