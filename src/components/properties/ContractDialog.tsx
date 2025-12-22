@@ -50,7 +50,8 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         setSelectedUnits([]);
       }
     }
-  }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.property_id, contract]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
