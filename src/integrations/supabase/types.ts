@@ -14066,6 +14066,13 @@ export type Database = {
       cleanup_old_chatbot_conversations: { Args: never; Returns: undefined }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
       cleanup_old_records: { Args: never; Returns: undefined }
+      cleanup_test_data: {
+        Args: never
+        Returns: {
+          deleted_count: number
+          table_name: string
+        }[]
+      }
       count_users_by_target: {
         Args: { p_target_type: string; p_target_value?: string }
         Returns: number
