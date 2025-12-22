@@ -155,7 +155,7 @@ export function DistributionAnalysisReport() {
                   <YAxis />
                   <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                   <Legend />
-                  <Bar dataKey="totalAmount" fill="#8884d8" name="المبلغ الإجمالي" />
+                  <Bar dataKey="totalAmount" fill="hsl(var(--primary))" name="المبلغ الإجمالي" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -170,7 +170,7 @@ export function DistributionAnalysisReport() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="beneficiariesCount" stroke="#82ca9d" name="عدد المستفيدين" />
+                  <Line type="monotone" dataKey="beneficiariesCount" stroke="hsl(var(--status-success))" name="عدد المستفيدين" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -185,7 +185,7 @@ export function DistributionAnalysisReport() {
                   <YAxis />
                   <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                   <Legend />
-                  <Line type="monotone" dataKey="avgPerBeneficiary" stroke="#ffc658" name="متوسط النصيب" />
+                  <Line type="monotone" dataKey="avgPerBeneficiary" stroke="hsl(var(--status-warning))" name="متوسط النصيب" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -206,7 +206,7 @@ export function DistributionAnalysisReport() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="value" fill="#00C49F" name="العدد" />
+              <Bar dataKey="value" fill="hsl(var(--status-success))" name="العدد" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

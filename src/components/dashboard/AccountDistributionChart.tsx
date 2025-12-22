@@ -13,6 +13,9 @@ const COLORS = [
   'hsl(var(--chart-5))',
 ];
 
+// Default fill for Pie charts (overridden by Cell)
+const DEFAULT_FILL = 'hsl(var(--primary))';
+
 const AccountDistributionChart = () => {
   const { data, isLoading, error, refetch } = useAccountDistribution();
   const isMobile = useIsMobile();
@@ -57,7 +60,7 @@ const AccountDistributionChart = () => {
                 return `${name} ${(percent * 100).toFixed(0)}%`;
               } : false}
               outerRadius={outerRadius}
-              fill="#8884d8"
+              fill={DEFAULT_FILL}
               dataKey="value"
             >
               {(data || []).map((entry, index) => (

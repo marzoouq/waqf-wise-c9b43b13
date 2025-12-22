@@ -7,7 +7,14 @@ import { ErrorState } from "@/components/shared/ErrorState";
 export default function RevenueDistributionChart() {
   const { data, isLoading, error, refetch } = useRevenueDistribution();
 
-  const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
+  const COLORS = [
+    'hsl(var(--primary))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--status-success))',
+    'hsl(var(--status-warning))',
+    'hsl(var(--status-error))',
+    'hsl(var(--chart-5))',
+  ];
 
   if (isLoading) {
     return <ChartSkeleton title="توزيع الإيرادات" />;
@@ -49,7 +56,7 @@ export default function RevenueDistributionChart() {
                 return `${name}: ${(percent * 100).toFixed(1)}%`;
               }}
               outerRadius={100}
-              fill="#8884d8"
+              fill="hsl(var(--primary))"
               dataKey="value"
             >
               {data.map((entry, index) => (

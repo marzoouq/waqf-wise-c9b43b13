@@ -93,8 +93,8 @@ export function LoansAgingReport() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#8884d8" name="عدد القروض" />
-              <Bar dataKey="amount" fill="#82ca9d" name="المبلغ المتبقي" />
+              <Bar dataKey="count" fill="hsl(var(--primary))" name="عدد القروض" />
+              <Bar dataKey="amount" fill="hsl(var(--status-success))" name="المبلغ المتبقي" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))', 'hsl(var(--chart-5))'];
 
 export function FundsPerformanceReport() {
   const { toast } = useToast();
@@ -125,8 +125,8 @@ export function FundsPerformanceReport() {
                 <YAxis />
                 <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                 <Legend />
-                <Bar dataKey="allocated_amount" fill="#8884d8" name="المخصص" />
-                <Bar dataKey="spent_amount" fill="#82ca9d" name="المنفق" />
+                <Bar dataKey="allocated_amount" fill="hsl(var(--primary))" name="المخصص" />
+                <Bar dataKey="spent_amount" fill="hsl(var(--status-success))" name="المنفق" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

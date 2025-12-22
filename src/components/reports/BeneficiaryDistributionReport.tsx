@@ -204,7 +204,7 @@ export function BeneficiaryDistributionReport({
                 labelLine={false}
                 label={(entry) => `${entry.name}: ${entry.value}`}
                 outerRadius={80}
-                fill="#8884d8"
+                fill="hsl(var(--primary))"
                 dataKey="value"
               >
                 {typeData.map((entry, index) => (

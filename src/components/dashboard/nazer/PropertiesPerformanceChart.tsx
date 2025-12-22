@@ -48,9 +48,9 @@ export default function PropertiesPerformanceChart() {
               formatter={(value: number) => `${value.toLocaleString('ar-SA')} ر.س`}
             />
             <Legend />
-            <Bar dataKey="الإيرادات الكلية" fill="#8b5cf6" />
-            <Bar dataKey="المدفوع" fill="#10b981" />
-            <Bar dataKey="المعلق" fill="#f59e0b" />
+            <Bar dataKey="الإيرادات الكلية" fill="hsl(var(--primary))" />
+            <Bar dataKey="المدفوع" fill="hsl(var(--status-success))" />
+            <Bar dataKey="المعلق" fill="hsl(var(--status-warning))" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
