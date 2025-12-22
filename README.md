@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.9.2-blue.svg)
+![Version](https://img.shields.io/badge/version-2.9.90-blue.svg)
 ![Type Safety](https://img.shields.io/badge/type--safety-99.5%25-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
