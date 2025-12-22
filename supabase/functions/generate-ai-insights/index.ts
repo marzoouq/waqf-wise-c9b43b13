@@ -11,6 +11,30 @@ import {
 // ============ الأدوار المسموح لها بالتحليل الذكي ============
 const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 
+// ============ Rate Limiting Configuration ============
+const RATE_LIMIT = {
+  maxRequests: 10,    // 10 تحليلات
+  windowMs: 3600000   // في الساعة
+};
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
+  }
+  
+  if (userLimit.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  userLimit.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -80,7 +104,20 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية لإنشاء تحليلات ذكية. مطلوب دور مدير أو ناظر أو محاسب.');
     }
 
-    console.log(`Authorized AI insights by user: ${user.id}`);
+    // 🔐 SECURITY: Rate Limiting
+    const rateCheck = checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      console.warn('⚠️ Rate limit exceeded for user:', user.id);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للتحليلات (10/ساعة). يرجى الانتظار.'
+      }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    console.log(`Authorized AI insights by user: ${user.id}, Rate limit remaining: ${rateCheck.remaining}`);
 
     const { reportType, dataQuery, filters } = await req.json();
 

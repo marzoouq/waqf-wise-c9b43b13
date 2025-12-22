@@ -8,6 +8,31 @@ import {
   rateLimitResponse 
 } from '../_shared/cors.ts';
 
+// ============ Rate Limiting & Role Configuration ============
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
+const RATE_LIMIT = {
+  maxRequests: 20,    // 20 تحليل
+  windowMs: 60000     // في الدقيقة
+};
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
+  }
+  
+  if (userLimit.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  userLimit.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -49,7 +74,37 @@ serve(async (req) => {
       return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
     }
 
-    console.log('Authenticated user for property AI:', user.id);
+    // 🔐 SECURITY: Check user role
+    const supabaseService = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { data: userRoles } = await supabaseService
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
+    if (!hasPermission) {
+      console.error('❌ Unauthorized role for property AI:', { userId: user.id, roles: userRoles });
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'ليس لديك صلاحية لاستخدام المساعد الذكي للعقارات'
+      }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    // 🔐 SECURITY: Rate Limiting
+    const rateCheck = checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      console.warn('⚠️ Rate limit exceeded for user:', user.id);
+      return rateLimitResponse('تم تجاوز الحد الأقصى للتحليل (20/دقيقة). يرجى الانتظار.');
+    }
+
+    console.log('Authenticated user for property AI:', user.id, 'Rate limit remaining:', rateCheck.remaining);
 
     const { action, data } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

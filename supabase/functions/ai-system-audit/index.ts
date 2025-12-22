@@ -49,6 +49,30 @@ interface AuditFinding {
   fixed: boolean;
 }
 
+// ============ Rate Limiting Configuration ============
+const RATE_LIMIT = {
+  maxRequests: 5,     // 5 فحوصات
+  windowMs: 3600000   // في الساعة (لأنها عملية ثقيلة)
+};
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
+  }
+  
+  if (userLimit.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  userLimit.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -114,7 +138,20 @@ serve(async (req) => {
       });
     }
 
-    console.log('[AI-SYSTEM-AUDIT] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
+    // 🔐 SECURITY: Rate Limiting
+    const rateCheck = checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      console.warn('[AI-SYSTEM-AUDIT] ⚠️ Rate limit exceeded for user:', user.id);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للفحوصات (5/ساعة). يرجى الانتظار.'
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log('[AI-SYSTEM-AUDIT] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role), rateLimitRemaining: rateCheck.remaining });
 
     const { auditType = 'full', categories = AUDIT_CATEGORIES } = await req.json();
 

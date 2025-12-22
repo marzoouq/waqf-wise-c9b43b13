@@ -2,6 +2,30 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
 
+// ============ Rate Limiting Configuration ============
+const RATE_LIMIT = {
+  maxRequests: 60,    // 60 بحث
+  windowMs: 60000     // في الدقيقة
+};
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
+  }
+  
+  if (userLimit.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  userLimit.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -43,7 +67,20 @@ serve(async (req) => {
       return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
     }
 
-    console.log('Authenticated user for search:', user.id);
+    // 🔐 SECURITY: Rate Limiting
+    const rateCheck = checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      console.warn('⚠️ Rate limit exceeded for user:', user.id);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للبحث (60 بحث/دقيقة). يرجى الانتظار.'
+      }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    console.log('Authenticated user for search:', user.id, 'Rate limit remaining:', rateCheck.remaining);
 
     // استخدام service role للبحث
     const supabase = createClient(
