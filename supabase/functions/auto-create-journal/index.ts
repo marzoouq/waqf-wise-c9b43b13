@@ -36,10 +36,41 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // 🔐 التحقق من المصادقة
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('[auto-create-journal] ❌ No authorization header');
+      return errorResponse('غير مصرح - يجب تسجيل الدخول', 401);
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // 🔐 التحقق من صحة التوكن والصلاحيات
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('[auto-create-journal] ❌ Invalid token:', authError);
+      return errorResponse('رمز المصادقة غير صحيح', 401);
+    }
+
+    // 🔐 التحقق من صلاحيات المستخدم (admin, nazer, accountant)
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant'].includes(r.role));
+    if (!hasAccess) {
+      console.error('[auto-create-journal] ❌ Unauthorized role:', { userId: user.id, roles });
+      return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
+    }
+
+    console.log('[auto-create-journal] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
 
     const { trigger_event, reference_id, reference_type, amount, metadata }: AutoJournalRequest = await req.json();
 
