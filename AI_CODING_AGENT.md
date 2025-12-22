@@ -1,7 +1,7 @@
 # Waqf Management System - AI Coding Agent Instructions
 
-> **Version**: 2.9.2  
-> **Last Updated**: 2025-12-13
+> **Version**: 2.9.30  
+> **Last Updated**: 2025-12-22
 
 ## Architecture Overview
 
@@ -19,13 +19,13 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 
 ```
 src/
-├── components/     # UI components only - NO business logic
-├── hooks/          # 170+ hooks in 25 feature folders (see src/hooks/README.md)
-├── services/       # 51+ services for ALL data operations (see src/services/README.md)
+├── components/     # UI components only - NO business logic (~600 in 44 folders)
+├── hooks/          # 300+ hooks in 38 feature folders (see src/hooks/README.md)
+├── services/       # 60+ services for ALL data operations (see src/services/README.md)
 ├── types/          # TypeScript types - NEVER use `any`
-├── lib/            # Utilities: QUERY_KEYS, errors, query-invalidation
-├── pages/          # Route pages - use hooks for data
-└── routes/         # Route definitions in 6 files (see src/routes/README.md)
+├── lib/            # Utilities: QUERY_KEYS (350+ in 8 files), errors, query-invalidation
+├── pages/          # Route pages - use hooks for data (~60 pages)
+└── routes/         # Route definitions in 7 files (see src/routes/README.md)
 ```
 
 ## Critical Rules
@@ -52,9 +52,9 @@ const { data } = await supabase.from('users').select('*').eq('id', id).maybeSing
 ```typescript
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
-// 370+ keys organized by domain
+// 350+ keys organized in 8 domain files
 useQuery({ 
-  queryKey: QUERY_KEYS.BENEFICIARIES, 
+  queryKey: QUERY_KEYS.BENEFICIARIES,
   queryFn: () => BeneficiaryService.getAll(),
   ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus
 });
