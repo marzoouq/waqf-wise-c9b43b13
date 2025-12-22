@@ -6,6 +6,28 @@ import {
   errorResponse 
 } from '../_shared/cors.ts';
 
+// ============ Rate Limiting - 5 تشغيلات/ساعة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 /**
  * Unified Daily Notifications System
  * نظام الإشعارات اليومية الموحد
@@ -78,6 +100,13 @@ serve(async (req) => {
         if (hasAccess) {
           isAuthorized = true;
           authMethod = 'jwt';
+          
+          // ✅ Rate Limiting للمستخدمين (ليس للمهام المجدولة)
+          if (!checkRateLimit(user.id)) {
+            console.warn(`[daily-notifications] Rate limit exceeded for user: ${user.id}`);
+            return errorResponse('تجاوزت الحد المسموح (5 تشغيلات/ساعة). يرجى الانتظار.', 429);
+          }
+          
           console.log('[daily-notifications] ✅ Authorized via JWT:', { userId: user.id });
         }
       }

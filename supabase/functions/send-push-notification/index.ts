@@ -8,6 +8,28 @@ import {
   forbiddenResponse 
 } from '../_shared/cors.ts';
 
+// ============ Rate Limiting - 100 إشعار/دقيقة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 100;
+const RATE_WINDOW = 60 * 1000; // 1 minute
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -56,6 +78,12 @@ serve(async (req) => {
     
     if (!isAdmin) {
       return forbiddenResponse('Unauthorized - Admin access required');
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`[send-push-notification] Rate limit exceeded for user: ${user.id}`);
+      return errorResponse('تجاوزت الحد المسموح (100 إشعار/دقيقة). يرجى الانتظار.', 429);
     }
 
     const { userId, title, body, icon, badge, data, actionUrl } = await req.json();
