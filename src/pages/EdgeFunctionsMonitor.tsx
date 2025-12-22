@@ -84,7 +84,7 @@ export default function EdgeFunctionsMonitor() {
           <p className="text-muted-foreground mt-1">{functions.length} وظيفة خادم</p>
         </div>
         <Button onClick={checkAllFunctions} disabled={isChecking} size="lg">
-          {isChecking ? <RefreshCw className="ml-2 h-5 w-5 animate-spin" /> : <Zap className="ml-2 h-5 w-5" />}
+          {isChecking ? <RefreshCw className="ms-2 h-5 w-5 animate-spin" /> : <Zap className="ms-2 h-5 w-5" />}
           {isChecking ? 'جاري الفحص...' : 'فحص الكل'}
         </Button>
       </div>
@@ -120,7 +120,7 @@ export default function EdgeFunctionsMonitor() {
                     className={`${config.color} cursor-pointer hover:opacity-80 transition-opacity`}
                     onClick={() => setCheckTypeFilter(checkTypeFilter === type ? 'all' : type as CheckType)}
                   >
-                    <Icon className="h-3 w-3 ml-1" />
+                    <Icon className="h-3 w-3 ms-1" />
                     {config.labelAr} ({funcArray.length})
                   </Badge>
                 );
@@ -230,7 +230,7 @@ export default function EdgeFunctionsMonitor() {
                   onClick={() => checkCategory(activeCategory as any)}
                   disabled={isChecking}
                 >
-                  <RefreshCw className={`h-4 w-4 ml-1 ${isChecking ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-4 w-4 ms-1 ${isChecking ? 'animate-spin' : ''}`} />
                   فحص الفئة
                 </Button>
               )}
@@ -257,13 +257,13 @@ export default function EdgeFunctionsMonitor() {
                               <p className="font-medium text-sm">{func.name}</p>
                               {/* Badge نوع الفحص */}
                               <Badge variant="outline" className={`text-xs ${checkConfig.color}`}>
-                                <CheckIcon className="h-3 w-3 ml-1" />
+                                <CheckIcon className="h-3 w-3 ms-1" />
                                 {checkConfig.label}
                               </Badge>
                               {/* Badge JWT للوظائف المحمية */}
                               {func.requiresAuth && (
                                 <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                  <Shield className="h-3 w-3 ml-1" />
+                                  <Shield className="h-3 w-3 ms-1" />
                                   JWT
                                 </Badge>
                               )}
@@ -283,7 +283,7 @@ export default function EdgeFunctionsMonitor() {
                             <Badge variant="outline">{health.responseTime}ms</Badge>
                           )}
                           <Badge className={`${config.color} text-white`}>
-                            <Icon className="h-3 w-3 ml-1" />
+                            <Icon className="h-3 w-3 ms-1" />
                             {config.label}
                           </Badge>
                           {/* زر التفاصيل */}
@@ -329,7 +329,7 @@ export default function EdgeFunctionsMonitor() {
             <div className="flex items-center gap-2">
               <span className="font-medium">الحالة:</span>
               <Badge className={`${statusConfig[selectedHealth?.status || 'unknown'].color} text-white`}>
-                {React.createElement(statusConfig[selectedHealth?.status || 'unknown'].icon, { className: 'h-3 w-3 ml-1' })}
+                {React.createElement(statusConfig[selectedHealth?.status || 'unknown'].icon, { className: 'h-3 w-3 ms-1' })}
                 {statusConfig[selectedHealth?.status || 'unknown'].label}
               </Badge>
             </div>
@@ -345,7 +345,7 @@ export default function EdgeFunctionsMonitor() {
               <div className="flex items-center gap-2">
                 <span className="font-medium">نوع الفحص:</span>
                 <Badge className={checkTypeConfig[selectedFunction.checkType].color}>
-                  {React.createElement(checkTypeConfig[selectedFunction.checkType].icon, { className: 'h-3 w-3 ml-1' })}
+                  {React.createElement(checkTypeConfig[selectedFunction.checkType].icon, { className: 'h-3 w-3 ms-1' })}
                   {checkTypeConfig[selectedFunction.checkType].labelAr}
                 </Badge>
               </div>
@@ -356,7 +356,7 @@ export default function EdgeFunctionsMonitor() {
               <span className="font-medium">المصادقة:</span>
               {selectedFunction?.requiresAuth ? (
                 <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  <Shield className="h-3 w-3 ml-1" />
+                  <Shield className="h-3 w-3 ms-1" />
                   تتطلب JWT
                 </Badge>
               ) : (
@@ -415,7 +415,7 @@ export default function EdgeFunctionsMonitor() {
                 checkSingleFunction(selectedFunction.name);
               }
             }} disabled={isChecking}>
-              <RefreshCw className={`h-4 w-4 ml-1 ${isChecking ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 ms-1 ${isChecking ? 'animate-spin' : ''}`} />
               إعادة الفحص
             </Button>
           </DialogFooter>
