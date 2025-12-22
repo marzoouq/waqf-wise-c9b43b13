@@ -130,10 +130,10 @@ const beneficiaries = await BeneficiaryService.getAll();
 ### 4. طبقة البيانات (Data Layer)
 **المسؤولية**: Supabase + PostgreSQL
 
-- **231 جدول** في قاعدة البيانات
+- **202 جدول** في قاعدة البيانات
 - **675 سياسة RLS** لحماية البيانات
 - **50 Edge Function** للعمليات المعقدة
-- **200 Database Trigger** للأتمتة
+- **189 Database Trigger** للأتمتة
 
 ---
 
