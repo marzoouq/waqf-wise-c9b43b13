@@ -5,6 +5,7 @@
  * تُستخدم فقط في CI/CD للاختبارات
  * 
  * @security - تقبل فقط بريد @test.local
+ * @security - تتطلب CI_SECRET للتشغيل
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -12,7 +13,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-ci-secret',
 };
 
 serve(async (req) => {
@@ -24,6 +25,33 @@ serve(async (req) => {
   console.log('[test-auth] Request received');
 
   try {
+    // ✅ SECURITY: التحقق من CI_SECRET - مطلوب دائماً
+    const ciSecret = req.headers.get('X-CI-Secret');
+    const expectedCiSecret = Deno.env.get('CI_SECRET');
+    
+    // إذا لم يكن CI_SECRET مُعدّاً في البيئة، نرفض جميع الطلبات
+    if (!expectedCiSecret) {
+      console.error('[test-auth] CI_SECRET not configured - function disabled');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Test auth function is disabled in this environment',
+          hint: 'CI_SECRET must be configured to use this function'
+        }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!ciSecret || ciSecret !== expectedCiSecret) {
+      console.error('[test-auth] Invalid or missing CI_SECRET');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unauthorized - Invalid CI secret',
+          hint: 'This function requires a valid X-CI-Secret header'
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { email, password, action } = await req.json();
 
     // Health check endpoint
