@@ -52,7 +52,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     }
   }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // التحقق من الوحدات
@@ -118,13 +118,18 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       tax_percentage: parseFloat(formData.tax_percentage) || 0,
     };
 
-    if (contract) {
-      updateContract.mutate({ id: contract.id, ...contractData });
-    } else {
-      addContract.mutate(contractData);
+    try {
+      if (contract) {
+        await updateContract.mutateAsync({ id: contract.id, ...contractData });
+      } else {
+        await addContract.mutateAsync(contractData);
+      }
+      onOpenChange(false);
+      resetForm();
+    } catch (error) {
+      // الخطأ يُعالج في onError داخل useMutation
+      console.error('Error saving contract:', error);
     }
-    onOpenChange(false);
-    resetForm();
   };
 
   return (
