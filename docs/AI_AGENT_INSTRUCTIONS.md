@@ -14,13 +14,13 @@ Never call Supabase directly from components/pages.
 
 ```
 src/
-├── components/     # UI only, no business logic
-├── hooks/          # 175+ hooks in 36 feature folders
-├── services/       # 55+ services for all data operations
+├── components/     # UI only, no business logic (600+ in 44 folders)
+├── hooks/          # 300+ hooks in 38 feature folders
+├── services/       # 60+ services for all data operations
 ├── types/          # Strict TypeScript types, no `any`
 ├── lib/            # QUERY_KEYS, errors, query-invalidation
-├── pages/          # Route pages using hooks
-└── routes/         # Route definitions
+├── pages/          # Route pages using hooks (~60 pages)
+└── routes/         # Route definitions (7 files)
 ```
 
 ---
@@ -172,4 +172,4 @@ const { data } = useQuery({
 
 ---
 
-**Version:** 2.9.3 | **Last Updated:** 2025-12-13
+**Version:** 2.9.90 | **Last Updated:** 2025-12-22
