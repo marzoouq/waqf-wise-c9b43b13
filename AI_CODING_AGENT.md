@@ -1,6 +1,6 @@
 # Waqf Management System - AI Coding Agent Instructions
 
-> **Version**: 3.0.0  
+> **Version**: 3.1.0  
 > **Last Updated**: 2025-12-22
 
 ## Architecture Overview
