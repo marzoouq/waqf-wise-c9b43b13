@@ -30,10 +30,19 @@ export class PageErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error(error, { 
-      context: `page_error_boundary_${this.props.pageName || 'unknown'}`, 
+    // مهم: نطبع للكونسول حتى نلتقط السبب الحقيقي في سجلات Lovable
+    console.error('PageErrorBoundary caught error:', {
+      pageName: this.props.pageName,
+      message: error?.message,
+      name: error?.name,
+      stack: error?.stack,
+      errorInfo,
+    });
+
+    logger.error(error, {
+      context: `page_error_boundary_${this.props.pageName || 'unknown'}`,
       severity: 'high',
-      metadata: { errorInfo, pageName: this.props.pageName }
+      metadata: { errorInfo, pageName: this.props.pageName },
     });
   }
 
@@ -56,9 +65,15 @@ export class PageErrorBoundary extends Component<Props, State> {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                عذراً، حدث خطأ أثناء تحميل {this.props.pageName || 'هذه الصفحة'}.
+            <p className="text-muted-foreground">
+              عذراً، حدث خطأ أثناء تحميل {this.props.pageName || 'هذه الصفحة'}.
+            </p>
+
+            {this.state.error?.message && (
+              <p className="text-xs text-muted-foreground">
+                السبب: {this.state.error.message}
               </p>
+            )}
 
               {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="p-4 bg-muted rounded-lg">
