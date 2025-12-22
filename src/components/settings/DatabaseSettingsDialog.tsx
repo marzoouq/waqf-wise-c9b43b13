@@ -4,11 +4,24 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { Database, Download, Upload, AlertCircle, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Database, Download, Upload, AlertCircle, Clock, CheckCircle2, XCircle, ShieldAlert } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBackup } from "@/hooks/system/useBackup";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Badge } from "@/components/ui/badge";
+import { useUserRole } from "@/hooks/auth/useUserRole";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface DatabaseSettingsDialogProps {
   open: boolean;
@@ -22,6 +35,13 @@ export function DatabaseSettingsDialog({
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  
+  const { hasRole } = useUserRole();
+  const canBackup = hasRole('admin') || hasRole('nazer');
+  const canRestore = hasRole('admin'); // Only admin can restore
+  
   const { 
     backupLogs, 
     backupSchedules,
@@ -60,7 +80,7 @@ export function DatabaseSettingsDialog({
     }
   };
 
-  const handleRestoreData = async () => {
+  const handleRestoreRequest = () => {
     if (!selectedFile) {
       toast({
         title: "خطأ",
@@ -69,9 +89,31 @@ export function DatabaseSettingsDialog({
       });
       return;
     }
+    
+    if (!canRestore) {
+      toast({
+        title: "غير مصرح",
+        description: "استعادة البيانات متاحة فقط للمدير",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setShowRestoreConfirm(true);
+  };
+
+  const handleRestoreData = async () => {
+    if (confirmText !== "استعادة") {
+      toast({
+        title: "خطأ",
+        description: "يرجى كتابة 'استعادة' للتأكيد",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
-      const fileContent = await selectedFile.text();
+      const fileContent = await selectedFile!.text();
       const backupData = JSON.parse(fileContent);
       
       await restoreBackup({ 
@@ -80,6 +122,8 @@ export function DatabaseSettingsDialog({
       });
       
       setSelectedFile(null);
+      setShowRestoreConfirm(false);
+      setConfirmText("");
       onOpenChange(false);
     } catch (error) {
       productionLogger.error('Restore error:', error);
@@ -131,13 +175,22 @@ export function DatabaseSettingsDialog({
               </p>
 
               <div className="space-y-3">
-                <Button
-                  onClick={handleExportData}
-                  disabled={isExporting || isCreatingBackup}
-                  className="w-full"
-                >
-                  {isExporting || isCreatingBackup ? "جاري التصدير..." : "تصدير نسخة احتياطية الآن"}
-                </Button>
+                {!canBackup ? (
+                  <Alert variant="destructive">
+                    <ShieldAlert className="h-4 w-4" />
+                    <AlertDescription>
+                      ليس لديك صلاحية للنسخ الاحتياطي. مطلوب دور مدير أو ناظر.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Button
+                    onClick={handleExportData}
+                    disabled={isExporting || isCreatingBackup}
+                    className="w-full"
+                  >
+                    {isExporting || isCreatingBackup ? "جاري التصدير..." : "تصدير نسخة احتياطية الآن"}
+                  </Button>
+                )}
 
                 {latestBackup && (
                   <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
@@ -202,39 +255,48 @@ export function DatabaseSettingsDialog({
                 </AlertDescription>
               </Alert>
 
-              <div className="space-y-3">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="backup-file-input"
-                />
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={() => document.getElementById('backup-file-input')?.click()}
-                >
-                  اختيار ملف النسخة الاحتياطية
-                </Button>
+              {!canRestore ? (
+                <Alert variant="destructive">
+                  <ShieldAlert className="h-4 w-4" />
+                  <AlertDescription>
+                    استعادة البيانات متاحة فقط للمدير. لا يمكنك تنفيذ هذه العملية.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="backup-file-input"
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    onClick={() => document.getElementById('backup-file-input')?.click()}
+                  >
+                    اختيار ملف النسخة الاحتياطية
+                  </Button>
 
-                {selectedFile && (
-                  <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
-                    <p className="font-medium">الملف المختار:</p>
-                    <p className="text-xs mt-1">{selectedFile.name}</p>
-                    <p className="text-xs">الحجم: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                  </div>
-                )}
+                  {selectedFile && (
+                    <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                      <p className="font-medium">الملف المختار:</p>
+                      <p className="text-xs mt-1">{selectedFile.name}</p>
+                      <p className="text-xs">الحجم: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  )}
 
-                <Button 
-                  className="w-full" 
-                  disabled={!selectedFile || isRestoring}
-                  onClick={handleRestoreData}
-                  variant="destructive"
-                >
-                  {isRestoring ? "جاري الاستعادة..." : "استعادة البيانات"}
-                </Button>
-              </div>
+                  <Button 
+                    className="w-full" 
+                    disabled={!selectedFile || isRestoring}
+                    onClick={handleRestoreRequest}
+                    variant="destructive"
+                  >
+                    {isRestoring ? "جاري الاستعادة..." : "استعادة البيانات"}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -285,6 +347,52 @@ export function DatabaseSettingsDialog({
             </CardContent>
           </Card>
         </div>
+
+        {/* حوار تأكيد الاستعادة */}
+        <AlertDialog open={showRestoreConfirm} onOpenChange={setShowRestoreConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-destructive flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5" />
+                تأكيد استعادة البيانات
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-3">
+                <p className="font-semibold text-destructive">
+                  ⚠️ هذه العملية ستحذف جميع البيانات الحالية وتستبدلها بالنسخة الاحتياطية!
+                </p>
+                <p>
+                  هذا الإجراء لا يمكن التراجع عنه. تأكد من أنك تريد المتابعة.
+                </p>
+                <div className="pt-2">
+                  <Label htmlFor="confirm-restore">اكتب "استعادة" للتأكيد:</Label>
+                  <Input
+                    id="confirm-restore"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder="استعادة"
+                    className="mt-2"
+                    dir="rtl"
+                  />
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                setConfirmText("");
+                setShowRestoreConfirm(false);
+              }}>
+                إلغاء
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleRestoreData}
+                disabled={confirmText !== "استعادة" || isRestoring}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isRestoring ? "جاري الاستعادة..." : "تأكيد الاستعادة"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
     </ResponsiveDialog>
   );
 }
