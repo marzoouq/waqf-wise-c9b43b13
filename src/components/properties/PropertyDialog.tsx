@@ -81,7 +81,7 @@ export function PropertyDialog({
         apartment_count: 0,
       });
     }
-  }, [property, form]);
+  }, [property, form.reset]);
 
   const handleSubmit = (data: PropertyFormValues) => {
     onSave(data);
