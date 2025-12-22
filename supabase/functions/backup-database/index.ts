@@ -10,6 +10,28 @@ import {
 // الأدوار المسموح لها بالنسخ الاحتياطي
 const ALLOWED_ROLES = ['admin', 'nazer'];
 
+// Rate limiting: 5 backups per hour per user
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -74,6 +96,20 @@ serve(async (req) => {
         severity: 'error'
       });
       return forbiddenResponse('ليس لديك صلاحية للنسخ الاحتياطي. مطلوب دور مدير أو ناظر.');
+    }
+
+    // ============ Rate Limiting ============
+    if (!checkRateLimit(user.id)) {
+      console.warn(`Rate limit exceeded for backup by user: ${user.id}`);
+      await supabaseClient.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'BACKUP_RATE_LIMIT_EXCEEDED',
+        table_name: 'system',
+        description: `تجاوز حد النسخ الاحتياطي (${RATE_LIMIT}/ساعة) من ${user.email}`,
+        severity: 'warn'
+      });
+      return errorResponse('تجاوزت الحد المسموح للنسخ الاحتياطي. حاول بعد ساعة.', 429);
     }
 
     // ============ تنفيذ النسخ الاحتياطي ============
