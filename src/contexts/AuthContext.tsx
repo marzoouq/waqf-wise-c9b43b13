@@ -250,6 +250,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     });
 
+    // تسجيل محاولة تسجيل الدخول
+    try {
+      await supabase.rpc('log_login_attempt', {
+        p_email: email,
+        p_ip_address: 'client',
+        p_success: !error,
+        p_user_agent: navigator.userAgent
+      });
+    } catch (logError) {
+      // لا نوقف تسجيل الدخول إذا فشل التسجيل
+      console.warn('Failed to log login attempt:', logError);
+    }
+
     if (error) throw error;
   };
 

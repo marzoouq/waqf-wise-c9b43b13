@@ -232,10 +232,20 @@ export class MonitoringService {
   }
 
   /**
-   * جلب التنبيهات الذكية
+   * جلب التنبيهات الذكية من الجدول + توليد تنبيهات جديدة
    */
   static async getSmartAlerts(): Promise<SmartAlert[]> {
     const today = new Date();
+    
+    // 1. جلب التنبيهات الموجودة في الجدول
+    const { data: existingAlerts } = await supabase
+      .from('smart_alerts')
+      .select('*')
+      .eq('is_dismissed', false)
+      .order('triggered_at', { ascending: false })
+      .limit(10);
+
+    // 2. توليد تنبيهات جديدة من البيانات الحية
     const [
       expiringContractsResult,
       overduePaymentsResult,
@@ -268,9 +278,22 @@ export class MonitoringService {
         .limit(5)
     ]);
 
-    if (expiringContractsResult.error) throw expiringContractsResult.error;
-
     const allAlerts: SmartAlert[] = [];
+
+    // تحويل التنبيهات الموجودة
+    if (existingAlerts) {
+      existingAlerts.forEach(alert => {
+        allAlerts.push({
+          id: alert.id,
+          type: alert.alert_type as SmartAlert['type'],
+          title: alert.title || '',
+          description: alert.description || '',
+          severity: (alert.severity as 'high' | 'medium' | 'low') || 'medium',
+          date: new Date(alert.triggered_at || alert.created_at || Date.now()),
+          actionUrl: alert.action_url || '/'
+        });
+      });
+    }
 
     // عقود قرب الانتهاء
     interface ContractWithProperty {
@@ -282,18 +305,33 @@ export class MonitoringService {
     }
     
     if (expiringContractsResult.data) {
-      (expiringContractsResult.data as ContractWithProperty[]).forEach(contract => {
+      for (const contract of expiringContractsResult.data as ContractWithProperty[]) {
         const daysRemaining = Math.floor((new Date(contract.end_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        const severity = daysRemaining <= 30 ? 'high' : 'medium';
+        
+        // حفظ في الجدول (تجاهل الأخطاء)
+        try {
+          await supabase.rpc('save_smart_alert' as never, {
+            p_alert_type: 'contract_expiring',
+            p_title: `عقد ${contract.contract_number} قارب الانتهاء`,
+            p_description: `عقد ${contract.tenant_name} - ${contract.properties?.name || 'عقار'} ينتهي خلال ${daysRemaining} يوم`,
+            p_severity: severity,
+            p_entity_id: contract.id,
+            p_entity_type: 'contract',
+            p_action_url: '/properties?tab=contracts'
+          } as never);
+        } catch {}
+        
         allAlerts.push({
           id: contract.id,
           type: 'contract_expiring',
           title: `عقد ${contract.contract_number} قارب الانتهاء`,
           description: `عقد ${contract.tenant_name} - ${contract.properties?.name || 'عقار'} ينتهي خلال ${daysRemaining} يوم`,
-          severity: daysRemaining <= 30 ? 'high' : 'medium',
+          severity,
           date: new Date(contract.end_date),
           actionUrl: '/properties?tab=contracts'
         });
-      });
+      }
     }
 
     // إيجارات متأخرة
@@ -306,18 +344,32 @@ export class MonitoringService {
     }
     
     if (overduePaymentsResult.data) {
-      (overduePaymentsResult.data as PaymentWithContract[]).forEach(payment => {
+      for (const payment of overduePaymentsResult.data as PaymentWithContract[]) {
         const daysOverdue = Math.floor((today.getTime() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24));
+        const severity = daysOverdue > 30 ? 'high' : 'medium';
+        
+        try {
+          await supabase.rpc('save_smart_alert' as never, {
+            p_alert_type: 'rent_overdue',
+            p_title: `دفعة إيجار متأخرة - ${payment.payment_number}`,
+            p_description: `${payment.contracts?.tenant_name || 'مستأجر'} - متأخر ${daysOverdue} يوم`,
+            p_severity: severity,
+            p_entity_id: payment.id,
+            p_entity_type: 'payment',
+            p_action_url: '/properties?tab=payments'
+          } as never);
+        } catch {}
+        
         allAlerts.push({
           id: payment.id,
           type: 'rent_overdue',
           title: `دفعة إيجار متأخرة - ${payment.payment_number}`,
           description: `${payment.contracts?.tenant_name || 'مستأجر'} - متأخر ${daysOverdue} يوم`,
-          severity: daysOverdue > 30 ? 'high' : 'medium',
+          severity,
           date: new Date(payment.due_date),
           actionUrl: '/properties?tab=payments'
         });
-      });
+      }
     }
 
     // قروض مستحقة
@@ -332,19 +384,33 @@ export class MonitoringService {
     }
     
     if (dueLoansResult.data) {
-      (dueLoansResult.data as LoanInstallmentWithLoan[]).forEach(installment => {
+      for (const installment of dueLoansResult.data as LoanInstallmentWithLoan[]) {
         const daysUntilDue = Math.floor((new Date(installment.due_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         const isOverdue = installment.status === 'overdue' || daysUntilDue < 0;
+        const severity = isOverdue || daysUntilDue <= 7 ? 'high' : 'medium';
+        
+        try {
+          await supabase.rpc('save_smart_alert' as never, {
+            p_alert_type: 'loan_due',
+            p_title: isOverdue ? `قسط قرض متأخر` : `قسط قرض مستحق قريبًا`,
+            p_description: `قرض ${installment.loans?.loan_number || ''}`,
+            p_severity: severity,
+            p_entity_id: installment.id,
+            p_entity_type: 'loan_installment',
+            p_action_url: '/loans'
+          } as never);
+        } catch {}
+        
         allAlerts.push({
           id: installment.id,
           type: 'loan_due',
           title: isOverdue ? `قسط قرض متأخر` : `قسط قرض مستحق قريبًا`,
           description: `قرض ${installment.loans?.loan_number || ''}`,
-          severity: isOverdue || daysUntilDue <= 7 ? 'high' : 'medium',
+          severity,
           date: new Date(installment.due_date),
           actionUrl: '/loans'
         });
-      });
+      }
     }
 
     // طلبات متأخرة
@@ -356,7 +422,19 @@ export class MonitoringService {
     }
     
     if (overdueRequestsResult.data) {
-      (overdueRequestsResult.data as RequestWithBeneficiary[]).forEach(request => {
+      for (const request of overdueRequestsResult.data as RequestWithBeneficiary[]) {
+        try {
+          await supabase.rpc('save_smart_alert' as never, {
+            p_alert_type: 'request_overdue',
+            p_title: `طلب متأخر - ${request.request_number || ''}`,
+            p_description: `طلب ${request.beneficiaries?.full_name || 'مستفيد'} تجاوز الوقت المحدد`,
+            p_severity: 'high',
+            p_entity_id: request.id,
+            p_entity_type: 'request',
+            p_action_url: '/requests'
+          } as never);
+        } catch {}
+        
         allAlerts.push({
           id: request.id,
           type: 'request_overdue',
@@ -366,10 +444,15 @@ export class MonitoringService {
           date: new Date(request.sla_due_at || Date.now()),
           actionUrl: '/requests'
         });
-      });
+      }
     }
 
-    return allAlerts.sort((a, b) => {
+    // إزالة التكرارات بناءً على id
+    const uniqueAlerts = allAlerts.filter((alert, index, self) =>
+      index === self.findIndex(a => a.id === alert.id)
+    );
+
+    return uniqueAlerts.sort((a, b) => {
       const severityOrder = { high: 3, medium: 2, low: 1 };
       if (severityOrder[a.severity] !== severityOrder[b.severity]) {
         return severityOrder[b.severity] - severityOrder[a.severity];
