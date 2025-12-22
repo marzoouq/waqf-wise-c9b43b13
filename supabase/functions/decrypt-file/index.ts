@@ -4,8 +4,32 @@ import {
   handleCors, 
   jsonResponse, 
   errorResponse, 
-  unauthorizedResponse 
+  unauthorizedResponse,
+  rateLimitResponse 
 } from '../_shared/cors.ts';
+
+// ✅ Rate Limiting للحماية من Brute Force
+const rateLimitMap = new Map<string, { count: number; lastAttempt: number }>();
+const MAX_ATTEMPTS = 10;
+const WINDOW_MS = 60 * 1000; // دقيقة واحدة
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(userId);
+  
+  if (!record || now - record.lastAttempt > WINDOW_MS) {
+    rateLimitMap.set(userId, { count: 1, lastAttempt: now });
+    return true;
+  }
+  
+  if (record.count >= MAX_ATTEMPTS) {
+    return false;
+  }
+  
+  record.count++;
+  record.lastAttempt = now;
+  return true;
+}
 
 /**
  * Edge Function لفك تشفير الملفات
@@ -46,6 +70,12 @@ serve(async (req) => {
     
     if (authError || !user) {
       return unauthorizedResponse('فشل التحقق من الهوية');
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`⚠️ Rate limit exceeded for decrypt: ${user.id}`);
+      return rateLimitResponse('تم تجاوز حد المحاولات. انتظر دقيقة');
     }
 
     const { fileId, accessReason } = await req.json();

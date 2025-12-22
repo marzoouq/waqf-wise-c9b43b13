@@ -5,8 +5,32 @@ import {
   jsonResponse, 
   errorResponse, 
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
+  rateLimitResponse 
 } from '../_shared/cors.ts';
+
+// ✅ Rate Limiting للحماية من إساءة الاستخدام
+const rateLimitMap = new Map<string, { count: number; lastAttempt: number }>();
+const MAX_ATTEMPTS = 30;
+const WINDOW_MS = 60 * 1000; // دقيقة واحدة
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(userId);
+  
+  if (!record || now - record.lastAttempt > WINDOW_MS) {
+    rateLimitMap.set(userId, { count: 1, lastAttempt: now });
+    return true;
+  }
+  
+  if (record.count >= MAX_ATTEMPTS) {
+    return false;
+  }
+  
+  record.count++;
+  record.lastAttempt = now;
+  return true;
+}
 
 /**
  * Edge Function للحذف الآمن للملفات
@@ -47,6 +71,12 @@ serve(async (req) => {
     
     if (authError || !user) {
       return unauthorizedResponse('فشل التحقق من الهوية');
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`⚠️ Rate limit exceeded for file deletion: ${user.id}`);
+      return rateLimitResponse('تم تجاوز حد المحاولات. انتظر دقيقة');
     }
 
     const { 

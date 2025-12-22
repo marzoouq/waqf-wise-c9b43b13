@@ -3,8 +3,33 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { 
   handleCors, 
   jsonResponse, 
-  errorResponse 
+  errorResponse,
+  unauthorizedResponse,
+  rateLimitResponse 
 } from '../_shared/cors.ts';
+
+// ✅ Rate Limiting للحماية من إساءة الاستخدام
+const rateLimitMap = new Map<string, { count: number; lastAttempt: number }>();
+const MAX_ATTEMPTS = 20;
+const WINDOW_MS = 60 * 1000; // دقيقة واحدة
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now - record.lastAttempt > WINDOW_MS) {
+    rateLimitMap.set(identifier, { count: 1, lastAttempt: now });
+    return true;
+  }
+  
+  if (record.count >= MAX_ATTEMPTS) {
+    return false;
+  }
+  
+  record.count++;
+  record.lastAttempt = now;
+  return true;
+}
 
 /**
  * Edge Function للتحقق من كلمات المرور المسربة
@@ -30,6 +55,31 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // ✅ JWT Authentication - إلزامي
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return unauthorizedResponse('يجب تسجيل الدخول للتحقق من كلمة المرور');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return unauthorizedResponse('فشل التحقق من الهوية');
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`⚠️ Rate limit exceeded for password check: ${user.id}`);
+      return rateLimitResponse('تم تجاوز حد المحاولات. انتظر دقيقة');
+    }
+
     const { password } = await req.json();
 
     if (!password || password.length < 6) {
@@ -70,24 +120,11 @@ serve(async (req) => {
     }
 
     // حفظ النتيجة في قاعدة البيانات
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    const authHeader = req.headers.get('Authorization');
-    if (authHeader) {
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      
-      if (user) {
-        await supabase.from('leaked_password_checks').insert({
-          user_id: user.id,
-          password_hash: sha1Hash,
-          is_leaked: isLeaked,
-        });
-      }
-    }
+    await supabase.from('leaked_password_checks').insert({
+      user_id: user.id,
+      password_hash: sha1Hash,
+      is_leaked: isLeaked,
+    });
 
     return jsonResponse({ 
       isLeaked, 
