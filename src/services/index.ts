@@ -93,3 +93,25 @@ export {
 // Additional Services (previously missing exports)
 export { BiometricService, type BiometricCredential } from './biometric.service';
 export { TranslationService, type Translation } from './translation.service';
+
+// AI & Monitoring Services
+export { 
+  AISystemAuditService, 
+  type AuditFinding, 
+  type SeveritySummary, 
+  type SystemAudit, 
+  type PendingFix,
+  AUDIT_CATEGORIES 
+} from './ai-system-audit.service';
+export { 
+  EdgeFunctionsHealthService, 
+  type EdgeFunctionInfo, 
+  type EdgeFunctionHealth, 
+  type HealthCheckResult,
+  type CheckType,
+  type FunctionCategory,
+  ALL_EDGE_FUNCTIONS,
+  RESPONSE_TIME_THRESHOLDS,
+  getThresholdsForFunction,
+  getStatusDetails
+} from './edge-functions-health.service';
