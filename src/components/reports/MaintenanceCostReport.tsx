@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMaintenanceCostReport } from '@/hooks/reports/useMaintenanceCostReport';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))'];
 
 export function MaintenanceCostReport() {
   const { toast } = useToast();
@@ -109,7 +109,7 @@ export function MaintenanceCostReport() {
                 <YAxis />
                 <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                 <Legend />
-                <Bar dataKey="total_cost" fill="#8884d8" name="التكلفة" />
+                <Bar dataKey="total_cost" fill="hsl(var(--primary))" name="التكلفة" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

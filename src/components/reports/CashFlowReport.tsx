@@ -91,9 +91,9 @@ export function CashFlowReport() {
                 labelStyle={{ textAlign: "right" }}
               />
               <Legend />
-              <Bar dataKey="income" name="الإيرادات" fill="#22c55e" />
-              <Bar dataKey="expense" name="المصروفات" fill="#ef4444" />
-              <Bar dataKey="net" name="الصافي" fill="#3b82f6" />
+              <Bar dataKey="income" name="الإيرادات" fill="hsl(var(--status-success))" />
+              <Bar dataKey="expense" name="المصروفات" fill="hsl(var(--status-error))" />
+              <Bar dataKey="net" name="الصافي" fill="hsl(var(--primary))" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
