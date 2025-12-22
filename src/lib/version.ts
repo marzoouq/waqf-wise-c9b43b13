@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.90
+ * @version 3.1.0
  * @date 2025-12-22
  */
 
-export const APP_VERSION = '2.9.90';
+export const APP_VERSION = '3.1.0';
 export const APP_VERSION_DATE = '2025-12-22';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -19,14 +19,14 @@ export const VERSION_INFO = {
     '60+ خدمة متكاملة في طبقة الخدمات',
     '300+ hooks منظمة في 38 مجلد',
     '600+ مكون UI في 44 مجلد',
-    '231 جدول قاعدة بيانات',
+    '202 جدول قاعدة بيانات',
     '675 سياسة RLS موحدة',
-    '200 Database Trigger',
+    '189 Database Trigger',
     '50 Edge Function نشطة',
     '350+ Query Key في 8 ملفات منظمة',
     'نظام إشعارات متكامل مع Database Triggers',
     'لوحة مراقبة حية مع رسوم بيانية Real-time',
-    '29 مرحلة فحص منهجي مكتملة',
+    '31 مرحلة فحص منهجي مكتملة',
   ],
 } as const;
 
@@ -59,9 +59,9 @@ export const ARCHITECTURE_STATUS = {
     description: 'QUERY_KEYS موحد في src/lib/query-keys/ (8 ملفات)',
   },
   database: {
-    tables: 231,
+    tables: 202,
     rlsPolicies: 675,
-    triggers: 200,
+    triggers: 189,
     status: 'complete',
     description: 'قاعدة بيانات كاملة مع RLS وTriggers',
   },
