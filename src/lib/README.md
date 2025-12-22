@@ -97,4 +97,4 @@ import { generateBankTransferFile } from '@/lib/banking/bankTransferGenerator';
 ---
 
 **آخر تحديث:** 2025-12-22
-**الإصدار:** 2.9.90
+**الإصدار:** 3.0.0
