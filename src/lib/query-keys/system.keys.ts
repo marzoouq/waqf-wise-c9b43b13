@@ -93,4 +93,16 @@ export const SYSTEM_KEYS = {
   
   // Tasks
   TASKS: ['tasks'] as const,
+
+  // Waqf Units
+  WAQF_UNITS: ['waqf_units'] as const,
+  WAQF_UNIT: (id: string) => ['waqf_unit', id] as const,
+
+  // Live Performance & Monitoring
+  LIVE_PERFORMANCE: ['live-performance'] as const,
+  LIVE_METRICS: ['live-metrics'] as const,
+
+  // Saved Filters (Factory Pattern)
+  SAVED_FILTERS: (type: string) => ['saved-filters', type] as const,
+  SAVED_FILTER: (type: string, id: string) => ['saved-filter', type, id] as const,
 } as const;

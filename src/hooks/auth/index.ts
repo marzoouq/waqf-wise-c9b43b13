@@ -14,3 +14,5 @@ export { useIdleTimeout } from './useIdleTimeout';
 export { useSessionCleanup, cleanupSession, checkPendingCleanup } from './useSessionCleanup';
 export { useProfile, type Profile } from './useProfile';
 export { useResetPassword } from './useResetPassword';
+export { useChangePassword } from './useChangePassword';
+export { useLightAuth } from './useLightAuth';
