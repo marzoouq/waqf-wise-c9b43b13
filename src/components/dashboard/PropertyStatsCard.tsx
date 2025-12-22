@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, TrendingUp, Home, Landmark, Receipt, Wallet } from "lucide-react";
+import { Building, TrendingUp, Home, Landmark, Receipt, Wallet, AlertCircle, RefreshCw } from "lucide-react";
 import { useProperties } from "@/hooks/property/useProperties";
 import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import { usePropertyRevenueStats } from "@/hooks/dashboard/usePropertyRevenueStats";
@@ -7,11 +7,60 @@ import { safeFilter, safeLength } from '@/lib/utils/array-safe';
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const PropertyStatsCard = () => {
-  const { properties } = useProperties();
-  const { units: propertyUnits } = usePropertyUnits();
-  const { data: payments } = usePropertyRevenueStats();
+  const { properties, isLoading: propertiesLoading, error: propertiesError, refetch: refetchProperties } = useProperties();
+  const { units: propertyUnits, isLoading: unitsLoading } = usePropertyUnits();
+  const { data: payments, isLoading: paymentsLoading } = usePropertyRevenueStats();
+
+  const isLoading = propertiesLoading || unitsLoading || paymentsLoading;
+
+  // عرض حالة التحميل
+  if (isLoading) {
+    return (
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building className="h-5 w-5" />
+            إحصائيات العقارات والإيجارات
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-24" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // عرض حالة الخطأ
+  if (propertiesError) {
+    return (
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building className="h-5 w-5" />
+            إحصائيات العقارات والإيجارات
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-4">تعذر تحميل بيانات العقارات</p>
+            <Button variant="outline" onClick={() => refetchProperties()} className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              إعادة المحاولة
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // حساب إحصائيات العقارات
   const totalProperties = safeLength(properties);
