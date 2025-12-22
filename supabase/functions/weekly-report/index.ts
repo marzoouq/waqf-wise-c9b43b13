@@ -164,10 +164,11 @@ serve(async (req) => {
   try {
     // ✅ Health Check Support
     const bodyClone = await req.clone().text();
+    let requestBody: Record<string, unknown> = {};
     if (bodyClone) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        requestBody = JSON.parse(bodyClone);
+        if (requestBody.ping || requestBody.healthCheck) {
           console.log('[weekly-report] Health check received');
           return new Response(JSON.stringify({
             status: 'healthy',
@@ -177,6 +178,26 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // ✅ CRON_SECRET Authentication Support (for scheduled jobs)
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    const providedSecret = requestBody.cron_secret || req.headers.get("x-cron-secret");
+    const authHeader = req.headers.get("authorization");
+    
+    // السماح بالوصول إذا كان هناك JWT صالح أو CRON_SECRET صحيح
+    const hasValidCronSecret = cronSecret && providedSecret === cronSecret;
+    const hasAuthHeader = authHeader && authHeader.startsWith("Bearer ");
+    
+    if (!hasValidCronSecret && !hasAuthHeader) {
+      console.log('[weekly-report] Unauthorized: No valid JWT or CRON_SECRET');
+      return new Response(
+        JSON.stringify({ error: "Unauthorized", message: "يتطلب JWT أو CRON_SECRET صالح" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`[weekly-report] Authenticated via ${hasValidCronSecret ? 'CRON_SECRET' : 'JWT'}`);
+    
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
