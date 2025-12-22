@@ -1,31 +1,149 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+/**
+ * Edge Function للصيانة الأسبوعية الشاملة
+ * Comprehensive Weekly Maintenance Edge Function
+ * 
+ * ✅ محمي بـ: CRON_SECRET + JWT + Role Check (admin) + Rate Limiting
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse, 
+  forbiddenResponse 
+} from '../_shared/cors.ts';
+
+// ============ Rate Limiting ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_CRON = 2;  // 2 تشغيلات/أسبوع للمهام المجدولة
+const RATE_LIMIT_USER = 1;  // 1 تشغيل/أسبوع للمستخدمين
+const RATE_WINDOW = 7 * 24 * 60 * 60 * 1000; // أسبوع واحد
+
+function checkRateLimit(identifier: string, limit: number): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_WINDOW });
+    return { allowed: true, remaining: limit - 1, resetIn: RATE_WINDOW };
+  }
+  
+  if (record.count >= limit) {
+    return { allowed: false, remaining: 0, resetIn: record.resetTime - now };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: limit - record.count, resetIn: record.resetTime - now };
+}
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        bodyData = JSON.parse(bodyText);
+        
+        // ✅ Health Check Support
+        if (bodyData.ping || bodyData.healthCheck) {
           console.log('[weekly-maintenance] Health check received');
-          return new Response(JSON.stringify({
+          return jsonResponse({
             status: 'healthy',
             function: 'weekly-maintenance',
             timestamp: new Date().toISOString()
-          }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          });
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // ============ المصادقة والتفويض ============
+    let isAuthorized = false;
+    let authMethod: 'cron' | 'jwt' = 'jwt';
+    let authorizedUserId: string | null = null;
+
+    // 1️⃣ فحص CRON_SECRET للمهام المجدولة
+    const cronSecret = req.headers.get('x-cron-secret');
+    const expectedCronSecret = Deno.env.get('CRON_SECRET');
+    
+    if (cronSecret && expectedCronSecret && cronSecret === expectedCronSecret) {
+      isAuthorized = true;
+      authMethod = 'cron';
+      console.log('[weekly-maintenance] ✅ Authorized via CRON_SECRET');
+      
+      // Rate limiting للمهام المجدولة
+      const rateLimitResult = checkRateLimit('cron_weekly_maint', RATE_LIMIT_CRON);
+      if (!rateLimitResult.allowed) {
+        const daysRemaining = Math.ceil(rateLimitResult.resetIn / (24 * 60 * 60 * 1000));
+        console.warn('[weekly-maintenance] Rate limit exceeded for CRON');
+        return errorResponse(`تجاوز الحد المسموح. يرجى الانتظار ${daysRemaining} يوم.`, 429);
+      }
+    }
+
+    // 2️⃣ فحص JWT للمستخدمين
+    if (!isAuthorized) {
+      const authHeader = req.headers.get('Authorization');
+      
+      if (!authHeader) {
+        console.warn('[weekly-maintenance] ❌ No authentication provided');
+        return unauthorizedResponse('المصادقة مطلوبة - يرجى تسجيل الدخول');
+      }
+
+      const token = authHeader.replace('Bearer ', '');
+      
+      const supabaseAuth = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      );
+
+      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+      
+      if (authError || !user) {
+        console.warn('[weekly-maintenance] ❌ Invalid token:', authError?.message);
+        return unauthorizedResponse('جلسة غير صالحة - يرجى إعادة تسجيل الدخول');
+      }
+
+      // فحص الصلاحيات - admin فقط (صيانة خطيرة)
+      const supabaseService = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+
+      const { data: roles, error: rolesError } = await supabaseService
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+
+      if (rolesError) {
+        console.error('[weekly-maintenance] Error fetching roles:', rolesError);
+        return errorResponse('خطأ في التحقق من الصلاحيات', 500);
+      }
+
+      const hasAccess = roles?.some(r => r.role === 'admin');
+
+      if (!hasAccess) {
+        console.warn(`[weekly-maintenance] ❌ Forbidden - User ${user.id} is not admin`);
+        return forbiddenResponse('ليس لديك صلاحية لتشغيل الصيانة الأسبوعية - يتطلب صلاحية مدير');
+      }
+
+      isAuthorized = true;
+      authorizedUserId = user.id;
+      console.log(`[weekly-maintenance] ✅ Authorized via JWT - Admin: ${user.id}`);
+
+      // Rate limiting للمستخدمين (مرة واحدة في الأسبوع)
+      const rateLimitResult = checkRateLimit(`user_${user.id}`, RATE_LIMIT_USER);
+      if (!rateLimitResult.allowed) {
+        const daysRemaining = Math.ceil(rateLimitResult.resetIn / (24 * 60 * 60 * 1000));
+        console.warn(`[weekly-maintenance] Rate limit exceeded for user: ${user.id}`);
+        return errorResponse(`تجاوزت الحد المسموح (مرة واحدة/أسبوع). يرجى الانتظار ${daysRemaining} يوم.`, 429);
+      }
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     
@@ -33,9 +151,9 @@ Deno.serve(async (req) => {
 
     console.log("[weekly-maintenance] بدء الصيانة الأسبوعية الشاملة");
 
-    const cleanupResults = [];
-    const performanceResults = [];
-    const monitoringResults = [];
+    const cleanupResults: Array<{ table: string; status: string; error?: string }> = [];
+    const performanceResults: Array<{ operation: string; status: string; result?: unknown; error?: string }> = [];
+    const monitoringResults: Array<{ check: string; status: string; result?: unknown; count?: number; tables?: unknown; error?: string }> = [];
 
     // ===== المرحلة 1: تنظيف البيانات القديمة =====
     
@@ -145,7 +263,6 @@ Deno.serve(async (req) => {
     // ===== المرحلة 5: مراقبة الأداء =====
     console.log("[weekly-maintenance] بدء مراقبة الأداء");
 
-    // فحص صحة الأداء العام
     const { data: performanceHealth, error: healthCheckError } = await supabase
       .rpc('get_performance_health');
     
@@ -156,7 +273,6 @@ Deno.serve(async (req) => {
       error: healthCheckError?.message
     });
 
-    // عدد الفهارس غير المستخدمة
     const { data: unusedIndexes, error: unusedIndexesError } = await supabase
       .rpc('get_unused_indexes_count');
     
@@ -167,7 +283,6 @@ Deno.serve(async (req) => {
       error: unusedIndexesError?.message
     });
 
-    // الجداول ذات Dead Rows العالية
     const { data: highDeadRows, error: deadRowsError } = await supabase
       .rpc('get_tables_with_high_dead_rows');
     
@@ -178,76 +293,69 @@ Deno.serve(async (req) => {
       error: deadRowsError?.message
     });
 
-    // ===== المرحلة 6: إنشاء تنبيهات الأداء إذا لزم الأمر =====
-    const healthStatus = performanceHealth?.status || 'unknown';
+    // ===== المرحلة 6: إنشاء تنبيهات الأداء =====
+    const healthStatus = (performanceHealth as { status?: string })?.status || 'unknown';
     
     if (healthStatus === 'warning' || healthStatus === 'critical') {
       await supabase.from('system_alerts').insert({
         alert_type: 'performance_warning',
         severity: healthStatus === 'critical' ? 'high' : 'medium',
         title: `تنبيه أداء: ${healthStatus === 'critical' ? 'حالة حرجة' : 'تحذير'}`,
-        description: `الفهارس غير المستخدمة: ${performanceHealth?.unused_indexes || 0}, الجداول ذات Dead Rows العالية: ${performanceHealth?.tables_with_high_dead_rows || 0}, نسبة Cache: ${performanceHealth?.cache_hit_ratio || 0}%`,
+        description: `الصيانة الأسبوعية اكتشفت مشاكل في الأداء`,
         status: 'active',
         metadata: performanceHealth
       });
     }
 
-    // إنشاء تنبيه إذا كان عدد الفهارس غير المستخدمة كبير
-    if (unusedIndexes && unusedIndexes > 50) {
-      await supabase.from('system_alerts').insert({
-        alert_type: 'unused_indexes_high',
-        severity: unusedIndexes > 100 ? 'high' : 'medium',
-        title: `عدد كبير من الفهارس غير المستخدمة: ${unusedIndexes}`,
-        description: `يوجد ${unusedIndexes} فهرس غير مستخدم. يُنصح بمراجعتها وحذف غير الضرورية منها.`,
-        status: 'active'
-      });
-    }
+    // تسجيل نتيجة الصيانة
+    await supabase.from('audit_logs').insert({
+      action_type: 'weekly_maintenance',
+      user_id: authorizedUserId,
+      description: `اكتملت الصيانة الأسبوعية (${authMethod})`,
+      new_values: {
+        cleanup: cleanupResults.filter(r => r.status === 'cleaned').length,
+        analyzed: performanceResults.filter(r => r.status === 'completed').length,
+        health_status: healthStatus
+      }
+    });
 
-    // ===== تسجيل نتيجة الصيانة النهائية =====
     await supabase.from('system_alerts').insert({
       alert_type: 'maintenance_completed',
       severity: 'info',
       title: 'اكتملت الصيانة الأسبوعية الشاملة',
-      description: `تم تنظيف ${cleanupResults.filter(r => r.status === 'cleaned').length} جداول. تم تحليل ${performanceResults.filter(r => r.status === 'completed').length} جدول. حالة الأداء: ${healthStatus}`,
+      description: `تم تنظيف ${cleanupResults.filter(r => r.status === 'cleaned').length} جداول. حالة الأداء: ${healthStatus}`,
       status: 'resolved',
       metadata: {
-        performance_health: performanceHealth,
-        unused_indexes: unusedIndexes,
-        high_dead_rows_tables: highDeadRows?.length || 0
+        auth_method: authMethod,
+        performed_by: authorizedUserId,
+        performance_health: performanceHealth
       }
     });
 
-    console.log("[weekly-maintenance] اكتملت الصيانة:", { 
-      cleanupResults, 
-      performanceResults, 
-      monitoringResults 
-    });
+    console.log("[weekly-maintenance] اكتملت الصيانة بنجاح");
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'اكتملت الصيانة الأسبوعية الشاملة',
-        cleanup: cleanupResults,
-        performance: performanceResults,
-        monitoring: monitoringResults,
-        summary: {
-          tablesCleared: cleanupResults.filter(r => r.status === 'cleaned').length,
-          tablesAnalyzed: performanceResults.filter(r => r.status === 'completed').length,
-          performanceStatus: healthStatus,
-          unusedIndexesCount: unusedIndexes,
-          highDeadRowsTables: highDeadRows?.length || 0
-        },
-        timestamp: new Date().toISOString()
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ 
+      success: true, 
+      message: 'اكتملت الصيانة الأسبوعية الشاملة',
+      cleanup: cleanupResults,
+      performance: performanceResults,
+      monitoring: monitoringResults,
+      summary: {
+        tablesCleared: cleanupResults.filter(r => r.status === 'cleaned').length,
+        tablesAnalyzed: performanceResults.filter(r => r.status === 'completed').length,
+        performanceStatus: healthStatus,
+        unusedIndexesCount: unusedIndexes,
+        highDeadRowsTables: (highDeadRows as unknown[])?.length || 0,
+        authMethod
+      },
+      timestamp: new Date().toISOString()
+    });
 
   } catch (error) {
     console.error("[weekly-maintenance] خطأ:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    return errorResponse(
+      error instanceof Error ? error.message : String(error),
+      500
     );
   }
 });
