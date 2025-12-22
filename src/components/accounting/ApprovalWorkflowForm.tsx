@@ -168,7 +168,7 @@ export function ApprovalWorkflowForm({
 
         <div className="space-y-2">
           {levels.map((level, index) => (
-            <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+            <div key={`level-${level.level}`} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
               <span className="text-sm font-medium min-w-[80px]">
                 المستوى {level.level}
               </span>

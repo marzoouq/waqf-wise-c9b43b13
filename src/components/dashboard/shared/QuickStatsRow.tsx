@@ -27,8 +27,8 @@ export function QuickStatsRow({ stats, className }: QuickStatsRowProps) {
       "flex flex-wrap gap-4 p-4 bg-muted/30 rounded-lg border",
       className
     )}>
-      {stats.map((stat, index) => (
-        <div key={index} className="flex items-center gap-3 flex-1 min-w-[140px]">
+      {stats.map((stat) => (
+        <div key={stat.label} className="flex items-center gap-3 flex-1 min-w-[140px]">
           <div className={cn(
             "p-2 rounded-full",
             colorStyles[stat.color || "primary"]
