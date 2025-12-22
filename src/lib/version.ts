@@ -6,7 +6,7 @@
  * @date 2025-12-22
  */
 
-export const APP_VERSION = '3.1.2';
+export const APP_VERSION = '3.1.3';
 export const APP_VERSION_DATE = '2025-12-22';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -65,11 +65,11 @@ export const ARCHITECTURE_STATUS = {
     tables: 202,
     rlsPolicies: 675,
     triggers: 189,
-    indexes: 537,
+    indexes: 521,
     functions: 258,
     views: 29,
     status: 'complete',
-    description: 'قاعدة بيانات كاملة مع 258 Function و29 View و537 Index',
+    description: 'قاعدة بيانات كاملة مع 258 Function و29 View و521 Index (محسّن)',
   },
   databaseFunctions: {
     total: 258,
