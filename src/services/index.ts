@@ -89,3 +89,7 @@ export {
   type HistoricalRentalMonthlySummary,
   type CreateHistoricalRentalInput 
 } from './historical-rental.service';
+
+// Additional Services (previously missing exports)
+export { BiometricService, type BiometricCredential } from './biometric.service';
+export { TranslationService, type Translation } from './translation.service';
