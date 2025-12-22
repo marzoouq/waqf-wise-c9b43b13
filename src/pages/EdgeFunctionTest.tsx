@@ -15,8 +15,8 @@ import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 // قائمة Edge Functions المتاحة للاختبار
 const EDGE_FUNCTIONS = [
   { name: 'ai-system-audit', description: 'الفحص الذكي للنظام', requiresAuth: true },
-  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: false },
-  { name: 'db-performance-stats', description: 'إحصائيات أداء قاعدة البيانات', requiresAuth: false },
+  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: true },
+  { name: 'db-performance-stats', description: 'إحصائيات أداء قاعدة البيانات', requiresAuth: true },
   { name: 'chatbot', description: 'المساعد الذكي', requiresAuth: true },
   { name: 'generate-ai-insights', description: 'توليد الرؤى الذكية', requiresAuth: true },
   { name: 'generate-smart-alerts', description: 'توليد التنبيهات الذكية', requiresAuth: true },

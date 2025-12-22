@@ -23,14 +23,17 @@ interface TestResult {
 
 const testResults: TestResult[] = [];
 
-// Public functions that don't require JWT
+// Public functions that don't require JWT (note: most DB functions now require auth)
 const PUBLIC_FUNCTIONS = [
-  { name: 'db-health-check', method: 'POST', body: {} },
-  { name: 'db-performance-stats', method: 'POST', body: {} },
-  { name: 'run-vacuum', method: 'POST', body: { dryRun: true } },
-  { name: 'weekly-maintenance', method: 'POST', body: { dryRun: true } },
+  // These functions have been secured and now require authentication:
+  // - db-health-check (requires admin/nazer role)
+  // - db-performance-stats (requires admin/nazer role)
+  // - run-vacuum (requires admin role)
+  // - weekly-maintenance (requires admin role)
+  // - contract-renewal-alerts (requires admin/nazer role)
+  
+  // Functions that still work without full JWT (basic health checks only):
   { name: 'biometric-auth', method: 'POST', body: { action: 'health-check' } },
-  { name: 'contract-renewal-alerts', method: 'POST', body: { dryRun: true } },
   { name: 'log-error', method: 'POST', body: { error: 'test', context: 'integration-test' } },
 ];
 
@@ -82,66 +85,63 @@ describe('Edge Functions - Public Integration Tests', () => {
     console.log('');
   });
 
-  describe('Database Health Functions', () => {
-    it('should connect to db-health-check', async () => {
+  describe('Database Health Functions (Secured - Require Auth)', () => {
+    it('should reject unauthenticated requests to db-health-check with 401', async () => {
       const result = await callFunction('db-health-check', 'POST', {});
       
       testResults.push({
         function: 'db-health-check',
         status: result.status,
         responseTime: result.responseTime,
-        success: result.status !== 502 && result.status !== 503,
+        success: result.status === 401,
         error: result.error,
       });
 
-      expect(result.status).not.toBe(502);
-      expect(result.status).not.toBe(503);
+      // Should return 401 Unauthorized without valid authentication
+      expect(result.status).toBe(401);
       expect(result.responseTime).toBeLessThan(REAL_TIMEOUT);
     }, REAL_TIMEOUT);
 
-    it('should connect to db-performance-stats', async () => {
+    it('should reject unauthenticated requests to db-performance-stats with 401', async () => {
       const result = await callFunction('db-performance-stats', 'POST', {});
       
       testResults.push({
         function: 'db-performance-stats',
         status: result.status,
         responseTime: result.responseTime,
-        success: result.status !== 502 && result.status !== 503,
+        success: result.status === 401,
         error: result.error,
       });
 
-      expect(result.status).not.toBe(502);
-      expect(result.status).not.toBe(503);
+      expect(result.status).toBe(401);
     }, REAL_TIMEOUT);
 
-    it('should connect to run-vacuum with dryRun', async () => {
+    it('should reject unauthenticated requests to run-vacuum with 401', async () => {
       const result = await callFunction('run-vacuum', 'POST', { dryRun: true });
       
       testResults.push({
         function: 'run-vacuum',
         status: result.status,
         responseTime: result.responseTime,
-        success: result.status !== 502 && result.status !== 503,
+        success: result.status === 401,
         error: result.error,
       });
 
-      expect(result.status).not.toBe(502);
-      expect(result.status).not.toBe(503);
+      expect(result.status).toBe(401);
     }, REAL_TIMEOUT);
 
-    it('should connect to weekly-maintenance with dryRun', async () => {
+    it('should reject unauthenticated requests to weekly-maintenance with 401', async () => {
       const result = await callFunction('weekly-maintenance', 'POST', { dryRun: true });
       
       testResults.push({
         function: 'weekly-maintenance',
         status: result.status,
         responseTime: result.responseTime,
-        success: result.status !== 502 && result.status !== 503,
+        success: result.status === 401,
         error: result.error,
       });
 
-      expect(result.status).not.toBe(502);
-      expect(result.status).not.toBe(503);
+      expect(result.status).toBe(401);
     }, REAL_TIMEOUT);
   });
 

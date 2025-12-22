@@ -64,11 +64,11 @@ export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
   { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', requiresAuth: true, category: 'ai', checkType: 'ping' },
   { name: 'auto-classify-document', description: 'تصنيف المستندات تلقائياً', requiresAuth: true, category: 'ai', checkType: 'ping' },
   
-  // Database Functions
-  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: false, category: 'database', checkType: 'ping' },
-  { name: 'db-performance-stats', description: 'إحصائيات الأداء', requiresAuth: false, category: 'database', checkType: 'ping' },
-  { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', requiresAuth: false, category: 'database', checkType: 'ping' },
-  { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', requiresAuth: false, category: 'database', checkType: 'ping' },
+  // Database Functions (تتطلب مصادقة admin/nazer)
+  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: true, category: 'database', checkType: 'ping' },
+  { name: 'db-performance-stats', description: 'إحصائيات الأداء', requiresAuth: true, category: 'database', checkType: 'ping' },
+  { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', requiresAuth: true, category: 'database', checkType: 'ping' },
+  { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', requiresAuth: true, category: 'database', checkType: 'ping' },
   
   // Backup Functions
   { name: 'backup-database', description: 'نسخ قاعدة البيانات', requiresAuth: true, category: 'backup', checkType: 'ping' },
