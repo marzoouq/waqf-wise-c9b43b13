@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function ContractUnitsSelector({ units, selectedUnits, onToggleUnit, isLoading }: Props) {
-  const availableUnits = units?.filter(u => u.status === 'available') || [];
+  const availableUnits = units?.filter(u => u.status === 'متاح') || [];
 
   return (
     <div className="space-y-3 border border-border rounded-lg p-4">

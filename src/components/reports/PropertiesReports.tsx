@@ -90,9 +90,21 @@ export function PropertiesReports() {
     );
   }
 
-  const totalRent = properties.reduce((sum, p) => {
+  // حساب الإيجار الشهري الموحد (تحويل السنوي والربع سنوي إلى شهري)
+  const totalMonthlyRent = properties.reduce((sum, p) => {
     const activeContract = p.contracts?.find((c) => c.status === "نشط");
-    return sum + (activeContract ? Number(activeContract.monthly_rent) : 0);
+    if (!activeContract) return sum;
+    
+    const rent = Number(activeContract.monthly_rent) || 0;
+    const frequency = activeContract.payment_frequency;
+    
+    // تحويل إلى قيمة شهرية موحدة
+    if (frequency === 'سنوي' || frequency === 'annual') {
+      return sum + (rent / 12);
+    } else if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
+      return sum + (rent / 3);
+    }
+    return sum + rent; // شهري
   }, 0);
 
   return (
@@ -172,7 +184,7 @@ export function PropertiesReports() {
           </span>
           <span className="font-semibold">
             إجمالي الإيجارات الشهرية:{" "}
-            {totalRent.toLocaleString("ar-SA")} ريال
+            {totalMonthlyRent.toLocaleString("ar-SA")} ريال
           </span>
         </div>
       </CardContent>

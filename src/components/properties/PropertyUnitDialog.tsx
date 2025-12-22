@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -72,23 +72,7 @@ export function PropertyUnitDialog({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: unit ? {
-      unit_number: unit.unit_number,
-      unit_name: unit.unit_name || "",
-      unit_type: unit.unit_type,
-      floor_number: unit.floor_number || undefined,
-      area: unit.area || undefined,
-      rooms: unit.rooms,
-      bathrooms: unit.bathrooms,
-      has_kitchen: unit.has_kitchen,
-      has_parking: unit.has_parking,
-      parking_spaces: unit.parking_spaces,
-      monthly_rent: unit.monthly_rent || undefined,
-      status: unit.status,
-      occupancy_status: unit.occupancy_status,
-      description: unit.description || "",
-      notes: unit.notes || "",
-    } : {
+    defaultValues: {
       unit_number: "",
       unit_name: "",
       unit_type: "شقة",
@@ -101,6 +85,42 @@ export function PropertyUnitDialog({
       occupancy_status: "شاغر",
     },
   });
+
+  // إعادة تعيين النموذج عند تغيّر الوحدة (للتعديل أو الإضافة)
+  useEffect(() => {
+    if (unit) {
+      form.reset({
+        unit_number: unit.unit_number,
+        unit_name: unit.unit_name || "",
+        unit_type: unit.unit_type,
+        floor_number: unit.floor_number || undefined,
+        area: unit.area || undefined,
+        rooms: unit.rooms,
+        bathrooms: unit.bathrooms,
+        has_kitchen: unit.has_kitchen,
+        has_parking: unit.has_parking,
+        parking_spaces: unit.parking_spaces,
+        monthly_rent: unit.monthly_rent || undefined,
+        status: unit.status,
+        occupancy_status: unit.occupancy_status,
+        description: unit.description || "",
+        notes: unit.notes || "",
+      });
+    } else {
+      form.reset({
+        unit_number: "",
+        unit_name: "",
+        unit_type: "شقة",
+        rooms: 2,
+        bathrooms: 1,
+        has_kitchen: true,
+        has_parking: false,
+        parking_spaces: 0,
+        status: "متاح",
+        occupancy_status: "شاغر",
+      });
+    }
+  }, [unit, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
