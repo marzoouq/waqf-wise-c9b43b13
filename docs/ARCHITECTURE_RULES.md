@@ -1,8 +1,8 @@
 # قواعد الهيكل المعماري الصارمة
 # Strict Architecture Rules
 
-> **الإصدار**: 2.9.4  
-> **آخر تحديث**: 2025-12-14
+> **الإصدار**: 2.9.30  
+> **آخر تحديث**: 2025-12-22
 
 ---
 
@@ -81,15 +81,15 @@ interface PaymentResult {
 
 ```
 src/
-├── components/          # مكونات UI فقط
-├── hooks/               # Hooks منظمة في 36 مجلد
+├── components/          # مكونات UI فقط (~600 مكون في 44 مجلد)
+├── hooks/               # Hooks منظمة في 38 مجلد (~300 hook)
 │   ├── auth/
 │   ├── beneficiary/
 │   ├── accounting/
 │   └── ...
-├── services/            # 54 خدمة لاستعلامات البيانات
+├── services/            # 60+ خدمة لاستعلامات البيانات
 ├── types/               # أنواع TypeScript
-└── lib/                 # أدوات مساعدة
+└── lib/                 # أدوات مساعدة (query-keys في 8 ملفات)
 ```
 
 ---
@@ -131,12 +131,13 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 | استخدامات `any` في الخدمات | 0 | ✅ |
 | Components تستدعي Supabase | 0 | ✅ |
 | Pages تستدعي Supabase | 0 | ✅ |
-| Hooks تستخدم Services | 170+ | ✅ |
-| الخدمات الإجمالية | 51+ | ✅ |
+| Hooks تستخدم Services | 300+ | ✅ |
+| الخدمات الإجمالية | 60+ | ✅ |
 | استخدام `.maybeSingle()` | 474+ | ✅ |
-| QUERY_KEYS موحد | 390+ | ✅ |
-| RLS Policies | 646 | ✅ |
-| Database Triggers | 178 | ✅ |
+| QUERY_KEYS موحد | 350+ في 8 ملفات | ✅ |
+| RLS Policies | 675 | ✅ |
+| Database Triggers | 200 | ✅ |
+| Database Tables | 231 | ✅ |
 
 ---
 
