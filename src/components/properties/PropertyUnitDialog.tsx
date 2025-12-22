@@ -120,7 +120,7 @@ export function PropertyUnitDialog({
         occupancy_status: "شاغر",
       });
     }
-  }, [unit, form]);
+  }, [unit, form.reset]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
