@@ -10,6 +10,28 @@ import {
 // فقط المدير يمكنه استعادة قاعدة البيانات (عملية خطيرة جداً)
 const ALLOWED_ROLES = ['admin'];
 
+// Rate limiting: 3 restores per day per user (very restrictive)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 3;
+const RATE_WINDOW = 24 * 60 * 60 * 1000; // 24 hours
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -85,6 +107,21 @@ serve(async (req) => {
 
       console.error(`CRITICAL: Unauthorized restore attempt by user: ${user.email} (${user.id})`);
       return forbiddenResponse('استعادة قاعدة البيانات متاحة فقط للمدير. هذه المحاولة تم تسجيلها.');
+    }
+
+    // ============ Rate Limiting (strict: 3 per day) ============
+    if (!checkRateLimit(user.id)) {
+      console.error(`CRITICAL: Rate limit exceeded for restore by admin: ${user.id}`);
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'RESTORE_RATE_LIMIT_EXCEEDED',
+        table_name: 'system',
+        description: `⚠️ تجاوز حد الاستعادة (${RATE_LIMIT}/يوم) من ${user.email}`,
+        severity: 'error',
+        ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip')
+      });
+      return errorResponse('تجاوزت الحد المسموح للاستعادة (3 مرات يومياً). حاول غداً.', 429);
     }
 
     // ============ تنفيذ الاستعادة ============
