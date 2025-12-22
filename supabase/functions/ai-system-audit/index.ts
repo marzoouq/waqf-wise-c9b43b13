@@ -70,13 +70,53 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // 🔐 التحقق من المصادقة
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('[AI-SYSTEM-AUDIT] ❌ No authorization header');
+      return new Response(JSON.stringify({ success: false, error: 'غير مصرح - يجب تسجيل الدخول' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { auditType = 'full', categories = AUDIT_CATEGORIES, userId } = await req.json();
+    // 🔐 التحقق من صحة التوكن والصلاحيات
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('[AI-SYSTEM-AUDIT] ❌ Invalid token:', authError);
+      return new Response(JSON.stringify({ success: false, error: 'رمز المصادقة غير صحيح' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 🔐 التحقق من صلاحيات المستخدم (admin أو nazer فقط)
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasAccess = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+    if (!hasAccess) {
+      console.error('[AI-SYSTEM-AUDIT] ❌ Unauthorized role:', { userId: user.id, roles });
+      return new Response(JSON.stringify({ success: false, error: 'ليس لديك صلاحية للوصول لهذه الخدمة' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log('[AI-SYSTEM-AUDIT] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
+
+    const { auditType = 'full', categories = AUDIT_CATEGORIES } = await req.json();
 
     console.log(`[AI-SYSTEM-AUDIT] Starting ${auditType} audit for categories:`, categories);
     console.log(`[AI-SYSTEM-AUDIT] LOVABLE_API_KEY available: ${!!lovableApiKey}`);
@@ -87,7 +127,7 @@ serve(async (req) => {
       .insert({
         audit_type: auditType,
         categories: categories,
-        created_by: userId,
+        created_by: user.id,
         severity_summary: { critical: 0, warning: 0, info: 0, success: 0 }
       })
       .select()
@@ -247,9 +287,9 @@ async function gatherSystemData(supabase: any, categories: string[]) {
     data.recentAlerts = alerts;
   }
 
-  // جمع سجلات الأخطاء
+  // جمع سجلات الأخطاء من الجدول الصحيح
   const { data: errorLogs } = await supabase
-    .from('error_logs')
+    .from('system_error_logs')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100);

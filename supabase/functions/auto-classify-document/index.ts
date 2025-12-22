@@ -58,10 +58,41 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // 🔐 التحقق من المصادقة
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('[auto-classify-document] ❌ No authorization header');
+      return errorResponse('غير مصرح - يجب تسجيل الدخول', 401);
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // 🔐 التحقق من صحة التوكن والصلاحيات
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('[auto-classify-document] ❌ Invalid token:', authError);
+      return errorResponse('رمز المصادقة غير صحيح', 401);
+    }
+
+    // 🔐 التحقق من صلاحيات المستخدم (admin, nazer, archivist)
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasAccess = roles?.some(r => ['admin', 'nazer', 'archivist'].includes(r.role));
+    if (!hasAccess) {
+      console.error('[auto-classify-document] ❌ Unauthorized role:', { userId: user.id, roles });
+      return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
+    }
+
+    console.log('[auto-classify-document] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
 
     const { documentId, useAI = false } = await req.json();
 
@@ -80,9 +111,9 @@ serve(async (req) => {
       return errorResponse('المستند غير موجود', 404);
     }
 
-    // جلب محتوى OCR إن وجد
+    // جلب محتوى OCR إن وجد من الجدول الصحيح
     const { data: ocrData } = await supabase
-      .from('document_ocr_results')
+      .from('document_ocr_content')
       .select('extracted_text')
       .eq('document_id', documentId)
       .single();

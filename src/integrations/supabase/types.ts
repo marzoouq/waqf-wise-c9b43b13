@@ -8487,6 +8487,56 @@ export type Database = {
         }
         Relationships: []
       }
+      ocr_processing_log: {
+        Row: {
+          attachment_id: string | null
+          completed_at: string | null
+          confidence_score: number | null
+          created_at: string | null
+          document_id: string | null
+          error_message: string | null
+          extracted_text: string | null
+          id: string
+          processed_by: string | null
+          processing_time_ms: number | null
+          status: string
+        }
+        Insert: {
+          attachment_id?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          id?: string
+          processed_by?: string | null
+          processing_time_ms?: number | null
+          status?: string
+        }
+        Update: {
+          attachment_id?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          id?: string
+          processed_by?: string | null
+          processing_time_ms?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_processing_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opening_balances: {
         Row: {
           account_id: string | null
