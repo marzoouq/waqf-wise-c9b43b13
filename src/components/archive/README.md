@@ -60,4 +60,4 @@ import { ArchiveDialogs } from '@/components/archive';
 ---
 
 **آخر تحديث:** 2025-12-22
-**الإصدار:** 3.0.0
+**الإصدار:** 3.1.0
