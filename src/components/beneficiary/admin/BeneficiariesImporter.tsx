@@ -209,7 +209,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
                         </thead>
                         <tbody>
                           {previewData.slice(0, 10).map((row, i) => (
-                            <tr key={i} className="border-t">
+                            <tr key={row.national_id || `row-${i}`} className="border-t">
                               <td className="p-2">{row.full_name}</td>
                               <td className="p-2">{row.national_id}</td>
                               <td className="p-2">{row.relationship}</td>
