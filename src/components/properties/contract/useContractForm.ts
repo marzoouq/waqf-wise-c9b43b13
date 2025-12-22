@@ -64,14 +64,21 @@ export function useContractForm(contract?: Contract | null) {
 
   // منع إعادة الحساب المتكررة
   const prevCalcInputs = useRef<string>('');
+  // تخزين start_date منفصلاً لتجنب التبعية على formData
+  const startDateRef = useRef<string>('');
 
-  // حساب تلقائي للتفاصيل - بدون تبعيات على formData
+  // تحديث ref عند تغير start_date
+  useEffect(() => {
+    startDateRef.current = formData.start_date;
+  }, [formData.start_date]);
+
+  // حساب تلقائي للتفاصيل - بدون تبعية على formData.start_date مباشرة
   useEffect(() => {
     // تخطي الحساب في وضع التعديل
     if (contract) return;
     
     // التحقق من وجود جميع المدخلات
-    const startDateValue = formData.start_date;
+    const startDateValue = startDateRef.current;
     if (!startDateValue || !totalAmount || !contractDuration) return;
     
     // إنشاء مفتاح للمدخلات الحالية
@@ -97,7 +104,7 @@ export function useContractForm(contract?: Contract | null) {
       end_date: newEndDate,
       monthly_rent: newMonthlyRent,
     }));
-  }, [contract, formData.start_date, totalAmount, contractDuration, durationUnit]);
+  }, [contract, totalAmount, contractDuration, durationUnit]);
 
   // تعبئة البيانات عند التعديل فقط
   useEffect(() => {
