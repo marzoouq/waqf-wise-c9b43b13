@@ -40,12 +40,56 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    // 🔐 التحقق من المصادقة - يدعم طريقتين:
+    // 1. JWT token للاستدعاء من التطبيق
+    // 2. CRON_SECRET للاستدعاء من المهام المجدولة
+    const authHeader = req.headers.get('Authorization');
+    const cronSecret = req.headers.get('X-Cron-Secret');
+    const expectedCronSecret = Deno.env.get('CRON_SECRET');
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log('🚀 بدء تشغيل نظام الإشعارات اليومية الموحد...');
+    // التحقق من صحة الاستدعاء
+    let isAuthorized = false;
+    let authMethod = '';
+
+    // طريقة 1: التحقق من CRON_SECRET للمهام المجدولة
+    if (cronSecret && expectedCronSecret && cronSecret === expectedCronSecret) {
+      isAuthorized = true;
+      authMethod = 'cron_secret';
+      console.log('[daily-notifications] ✅ Authorized via CRON_SECRET');
+    }
+    // طريقة 2: التحقق من JWT token
+    else if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (!authError && user) {
+        // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        const hasAccess = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+        if (hasAccess) {
+          isAuthorized = true;
+          authMethod = 'jwt';
+          console.log('[daily-notifications] ✅ Authorized via JWT:', { userId: user.id });
+        }
+      }
+    }
+
+    // رفض الاستدعاء غير المصرح
+    if (!isAuthorized) {
+      console.error('[daily-notifications] ❌ Unauthorized access attempt');
+      return errorResponse('غير مصرح - يجب تسجيل الدخول كمسؤول أو استخدام CRON_SECRET', 401);
+    }
+
+    console.log(`🚀 بدء تشغيل نظام الإشعارات اليومية الموحد... (auth: ${authMethod})`);
 
     const results = {
       invoices: false,
