@@ -8,6 +8,30 @@ import {
   forbiddenResponse 
 } from '../_shared/cors.ts';
 
+// ============ Rate Limiting Configuration ============
+const RATE_LIMIT = {
+  maxRequests: 30,    // 30 رسالة
+  windowMs: 60000     // في الدقيقة
+};
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
+    return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
+  }
+  
+  if (userLimit.count >= RATE_LIMIT.maxRequests) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  userLimit.count++;
+  return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -49,6 +73,19 @@ serve(async (req) => {
       return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
+    // 🔐 SECURITY: Rate Limiting
+    const rateCheck = checkRateLimit(user.id);
+    if (!rateCheck.allowed) {
+      console.warn('⚠️ Rate limit exceeded for user:', user.id);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للرسائل (30 رسالة/دقيقة). يرجى الانتظار.'
+      }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
     // 🔐 SECURITY: Check user role
     const { data: roles, error: roleError } = await supabase
       .from('user_roles')
@@ -70,7 +107,7 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية للوصول لهذه الخدمة');
     }
 
-    console.log('✅ Authorized chatbot request from:', { userId: user.id, roles: userRoles, isStaff, isBeneficiary });
+    console.log('✅ Authorized chatbot request from:', { userId: user.id, roles: userRoles, isStaff, isBeneficiary, rateLimitRemaining: rateCheck.remaining });
 
     const { message, userId, quickReplyId } = await req.json();
 
