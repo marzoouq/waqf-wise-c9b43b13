@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 3.1.0
+ * @version 3.1.2
  * @date 2025-12-22
  */
 
-export const APP_VERSION = '3.1.1';
+export const APP_VERSION = '3.1.2';
 export const APP_VERSION_DATE = '2025-12-22';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -22,6 +22,9 @@ export const VERSION_INFO = {
     '202 جدول قاعدة بيانات',
     '675 سياسة RLS موحدة',
     '189 Database Trigger',
+    '258 Database Function',
+    '29 Database View',
+    '537 Database Index',
     '50 Edge Function نشطة',
     '350+ Query Key في 8 ملفات منظمة',
     'نظام إشعارات متكامل مع Database Triggers',
@@ -63,8 +66,42 @@ export const ARCHITECTURE_STATUS = {
     rlsPolicies: 675,
     triggers: 189,
     indexes: 537,
+    functions: 258,
+    views: 29,
     status: 'complete',
-    description: 'قاعدة بيانات كاملة مع RLS وTriggers و537 Index',
+    description: 'قاعدة بيانات كاملة مع 258 Function و29 View و537 Index',
+  },
+  databaseFunctions: {
+    total: 258,
+    securityDefiner: 241,
+    securityInvoker: 17,
+    categories: {
+      dataRetrieval: 45,
+      updateTriggers: 52,
+      permissions: 28,
+      calculations: 35,
+      automation: 22,
+      creation: 18,
+      generation: 15,
+      validation: 20,
+      notifications: 12,
+      cleanup: 8,
+      other: 3,
+    },
+    status: 'complete',
+    description: '258 دالة قاعدة بيانات (93.4% SECURITY DEFINER)',
+  },
+  databaseViews: {
+    total: 29,
+    categories: {
+      statistics: 8,
+      reports: 7,
+      dashboards: 5,
+      lookups: 6,
+      security: 3,
+    },
+    status: 'complete',
+    description: '29 View للإحصائيات والتقارير ولوحات التحكم',
   },
   edgeFunctions: {
     total: 50,
@@ -83,6 +120,60 @@ export const ARCHITECTURE_STATUS = {
     status: 'complete',
     description: 'CSS Variables للألوان بدلاً من القيم الثابتة',
   },
+} as const;
+
+/**
+ * Database Functions Summary - ملخص دوال قاعدة البيانات
+ */
+export const DATABASE_FUNCTIONS_SUMMARY = {
+  // دوال استرجاع البيانات
+  dataRetrieval: [
+    'get_dashboard_stats', 'get_beneficiary_statistics', 'get_distribution_summary',
+    'get_financial_report', 'get_property_stats', 'get_fund_balance',
+    'get_loan_summary', 'get_approval_stats', 'get_user_permissions',
+  ],
+  // دوال التحديث التلقائي (Triggers)
+  updateTriggers: [
+    'update_updated_at_column', 'update_account_balance', 'update_distribution_totals',
+    'update_beneficiary_totals', 'update_property_occupancy', 'update_fund_balance',
+    'update_loan_balance', 'update_contract_status', 'update_payment_status',
+  ],
+  // دوال الصلاحيات
+  permissions: [
+    'is_admin', 'is_nazer', 'is_accountant', 'is_beneficiary_manager',
+    'has_permission', 'check_user_role', 'get_user_role', 'can_approve',
+  ],
+  // دوال الحسابات
+  calculations: [
+    'calculate_account_balance', 'calculate_distribution_share', 'calculate_loan_interest',
+    'calculate_property_revenue', 'calculate_fund_performance', 'calculate_beneficiary_share',
+  ],
+  // دوال الأتمتة
+  automation: [
+    'auto_approve_distribution', 'auto_create_journal_entry', 'auto_generate_voucher',
+    'auto_update_fiscal_year', 'auto_archive_old_records', 'auto_cleanup_sessions',
+  ],
+} as const;
+
+/**
+ * Database Views Summary - ملخص Views قاعدة البيانات
+ */
+export const DATABASE_VIEWS_SUMMARY = {
+  statistics: [
+    'beneficiary_statistics', 'distribution_statistics', 'property_statistics',
+    'fund_statistics', 'loan_statistics', 'payment_statistics',
+  ],
+  reports: [
+    'journal_entries_with_lines', 'general_ledger', 'accounts_hierarchy',
+    'distributions_summary', 'beneficiaries_overview', 'pending_approvals_view',
+  ],
+  dashboards: [
+    'dashboard_kpis', 'financial_dashboard', 'property_dashboard',
+    'beneficiary_dashboard', 'approval_dashboard',
+  ],
+  security: [
+    'beneficiaries_masked', 'payment_vouchers_masked', 'unmatched_bank_transactions',
+  ],
 } as const;
 
 /**
