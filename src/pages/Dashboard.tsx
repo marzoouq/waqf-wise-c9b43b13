@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
+import { SEOHead } from "@/components/shared/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 
@@ -16,7 +17,12 @@ const Dashboard = () => {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   return (
-    <UnifiedDashboardLayout 
+    <>
+      <SEOHead 
+        title="لوحة التحكم" 
+        description="لوحة التحكم الرئيسية - إدارة الوقف والمستفيدين والعقارات"
+      />
+      <UnifiedDashboardLayout
       role="user"
       actions={
         <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
@@ -42,6 +48,7 @@ const Dashboard = () => {
         setMessageDialogOpen={setMessageDialogOpen}
       />
     </UnifiedDashboardLayout>
+    </>
   );
 };
 

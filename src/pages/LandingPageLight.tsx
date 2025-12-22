@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { SEOHead } from "@/components/shared/SEOHead";
 import { 
   Shield, 
   Users, 
@@ -141,6 +142,10 @@ export default function LandingPageLight() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
+      <SEOHead 
+        title="الصفحة الرئيسية"
+        description="منصة متكاملة لإدارة الأوقاف والمستفيدين - نظام حديث لإدارة العقارات والتوزيعات والمحاسبة"
+      />
       {/* Skip to main content - للتنقل السريع بلوحة المفاتيح */}
       <a 
         href="#main-content" 

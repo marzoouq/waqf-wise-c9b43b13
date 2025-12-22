@@ -5,12 +5,14 @@
  * ✅ AuthProvider يغلف كل شيء - متاح دائماً
  * ✅ لا إعادة تهيئة عند التنقل بين الصفحات
  * ✅ نظام إشعار التحديثات التلقائي
+ * ✅ SEO مع react-helmet-async
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 // ✅ استيراد خفيف للصفحة الترحيبية (بدون Radix UI)
@@ -55,8 +57,9 @@ const LightFallback = () => (
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         {/* ✅ AuthProvider يغلف كل شيء - يُهيأ مرة واحدة فقط */}
         <AuthProvider>
           <BrowserRouter
@@ -93,6 +96,7 @@ const App = () => {
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 
