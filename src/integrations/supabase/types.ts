@@ -14654,6 +14654,10 @@ export type Database = {
         Returns: boolean
       }
       has_staff_access: { Args: never; Returns: boolean }
+      increment_field: {
+        Args: { field_name: string; increment_value: number; row_id: string }
+        Returns: number
+      }
       is_accountant: { Args: never; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_admin_or_nazer: { Args: never; Returns: boolean }
