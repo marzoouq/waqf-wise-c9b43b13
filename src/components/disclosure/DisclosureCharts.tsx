@@ -13,10 +13,24 @@ interface DisclosureChartsProps {
   disclosure: AnnualDisclosure;
 }
 
-// ألوان متناسقة مع التصميم
-const REVENUE_COLORS = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0'];
-const EXPENSE_COLORS = ['#ef4444', '#f87171', '#fca5a5', '#fecaca'];
-const HEIR_COLORS = ['#3b82f6', '#ec4899', '#f59e0b'];
+// ألوان متناسقة مع التصميم - semantic tokens
+const REVENUE_COLORS = [
+  'hsl(var(--status-success))',
+  'hsl(142 76% 56%)',
+  'hsl(152 76% 70%)',
+  'hsl(152 76% 80%)',
+];
+const EXPENSE_COLORS = [
+  'hsl(var(--status-error))',
+  'hsl(0 84% 70%)',
+  'hsl(0 84% 78%)',
+  'hsl(0 84% 86%)',
+];
+const HEIR_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--status-warning))',
+];
 
 const formatCurrency = (value: number): string => {
   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;

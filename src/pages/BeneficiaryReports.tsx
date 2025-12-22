@@ -13,7 +13,13 @@ import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useBeneficiaryPersonalReportsData } from '@/hooks/beneficiary/useBeneficiaryPersonalReportsData';
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles } from '@/lib/pdf/arabic-pdf-utils';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--status-success))',
+  'hsl(var(--status-warning))',
+  'hsl(var(--status-error))',
+  'hsl(var(--chart-5))',
+];
 
 export default function BeneficiaryReports() {
   const { toast } = useToast();
@@ -309,7 +315,7 @@ export default function BeneficiaryReports() {
                   labelLine={false}
                   label={(entry) => `${entry.name}: ${entry.value}`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="hsl(var(--primary))"
                   dataKey="value"
                 >
                   {requestsStatusData.map((entry, index) => (
