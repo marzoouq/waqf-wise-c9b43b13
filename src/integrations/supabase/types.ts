@@ -14760,6 +14760,18 @@ export type Database = {
       run_full_cleanup: { Args: never; Returns: Json }
       run_scheduled_cleanup: { Args: never; Returns: Json }
       run_vacuum_analyze: { Args: never; Returns: Json }
+      save_smart_alert: {
+        Args: {
+          p_action_url: string
+          p_alert_type: string
+          p_description: string
+          p_entity_id: string
+          p_entity_type: string
+          p_severity: string
+          p_title: string
+        }
+        Returns: string
+      }
       search_beneficiaries_advanced:
         | {
             Args: {
