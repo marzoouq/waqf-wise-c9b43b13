@@ -2,6 +2,28 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
+// ============ Rate Limiting - 30 قيد/دقيقة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 30;
+const RATE_WINDOW = 60 * 1000; // 1 minute
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 interface AccountTemplate {
   account_id?: string;
   percentage?: number;
@@ -68,6 +90,12 @@ serve(async (req) => {
     if (!hasAccess) {
       console.error('[auto-create-journal] ❌ Unauthorized role:', { userId: user.id, roles });
       return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`[auto-create-journal] Rate limit exceeded for user: ${user.id}`);
+      return errorResponse('تجاوزت الحد المسموح (30 قيد/دقيقة). يرجى الانتظار.', 429);
     }
 
     console.log('[auto-create-journal] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
