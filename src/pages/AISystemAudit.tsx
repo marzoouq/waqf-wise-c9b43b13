@@ -50,7 +50,7 @@ export default function AISystemAudit() {
           <p className="text-muted-foreground mt-1">فحص شامل بالذكاء الاصطناعي مع إصلاح تلقائي</p>
         </div>
         <Button onClick={handleRunAudit} disabled={isAuditing} size="lg">
-          {isAuditing ? <RefreshCw className="ml-2 h-5 w-5 animate-spin" /> : <Play className="ml-2 h-5 w-5" />}
+          {isAuditing ? <RefreshCw className="ms-2 h-5 w-5 animate-spin" /> : <Play className="ms-2 h-5 w-5" />}
           {isAuditing ? 'جاري الفحص...' : 'بدء فحص جديد'}
         </Button>
       </div>
@@ -175,18 +175,18 @@ export default function AISystemAudit() {
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
                               <Badge className={config.color}>
-                                <Icon className="h-3 w-3 ml-1" />
+                                <Icon className="h-3 w-3 ms-1" />
                                 {config.label}
                               </Badge>
                               <span className="font-medium">{fix.category}</span>
                             </div>
                             <div className="flex gap-2">
                               <Button size="sm" onClick={() => approveFix(fix.id)} disabled={isApproving}>
-                                <CheckCircle className="h-4 w-4 ml-1" />
+                                <CheckCircle className="h-4 w-4 ms-1" />
                                 تطبيق
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => rejectFix(fix.id)} disabled={isRejecting}>
-                                <XCircle className="h-4 w-4 ml-1" />
+                                <XCircle className="h-4 w-4 ms-1" />
                                 رفض
                               </Button>
                               {fix.rollback_sql && (

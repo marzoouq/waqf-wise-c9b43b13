@@ -201,12 +201,12 @@ export default function EdgeFunctionTest() {
             >
               {isLoading ? (
                 <>
-                  <RefreshCw className="ml-2 h-5 w-5 animate-spin" />
+                  <RefreshCw className="ms-2 h-5 w-5 animate-spin" />
                   جاري الاختبار...
                 </>
               ) : (
                 <>
-                  <Play className="ml-2 h-5 w-5" />
+                  <Play className="ms-2 h-5 w-5" />
                   تشغيل الاختبار
                 </>
               )}
@@ -266,7 +266,7 @@ export default function EdgeFunctionTest() {
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium">Response</label>
                       <Button size="sm" variant="ghost" onClick={copyResponse}>
-                        <Copy className="h-4 w-4 ml-1" />
+                        <Copy className="h-4 w-4 ms-1" />
                         نسخ
                       </Button>
                     </div>

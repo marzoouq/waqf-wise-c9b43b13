@@ -42,14 +42,14 @@ export default function DatabaseHealthDashboard() {
               onClick={() => refetch()}
               disabled={isLoading}
             >
-              <RefreshCw className={`h-4 w-4 ml-2 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 ms-2 ${isLoading ? 'animate-spin' : ''}`} />
               تحديث
             </Button>
             <Button 
               onClick={() => runVacuumAll()}
               disabled={isRunningVacuumAll}
             >
-              <RefreshCw className={`h-4 w-4 ml-2 ${isRunningVacuumAll ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 ms-2 ${isRunningVacuumAll ? 'animate-spin' : ''}`} />
               VACUUM ANALYZE
             </Button>
           </div>
