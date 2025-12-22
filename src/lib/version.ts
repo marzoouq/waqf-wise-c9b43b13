@@ -6,7 +6,7 @@
  * @date 2025-12-22
  */
 
-export const APP_VERSION = '3.1.0';
+export const APP_VERSION = '3.1.1';
 export const APP_VERSION_DATE = '2025-12-22';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -62,8 +62,9 @@ export const ARCHITECTURE_STATUS = {
     tables: 202,
     rlsPolicies: 675,
     triggers: 189,
+    indexes: 537,
     status: 'complete',
-    description: 'قاعدة بيانات كاملة مع RLS وTriggers',
+    description: 'قاعدة بيانات كاملة مع RLS وTriggers و537 Index',
   },
   edgeFunctions: {
     total: 50,
