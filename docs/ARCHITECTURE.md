@@ -23,13 +23,13 @@ src/
 │   ├── reports/         # التقارير
 │   └── ui/              # مكونات shadcn/ui
 │
-├── hooks/               # React Hooks منظمة حسب الميزة
+├── hooks/               # React Hooks منظمة حسب الميزة (300+ hook)
 │   ├── accounting/      # hooks المحاسبة
 │   ├── auth/            # hooks المصادقة
 │   ├── beneficiary/     # hooks المستفيدين
 │   ├── dashboard/       # hooks لوحات التحكم
 │   ├── distributions/   # hooks التوزيعات
-│   └── ...              # 25 مجلد فرعي
+│   └── ...              # 38 مجلد فرعي
 │
 ├── services/            # طبقة الخدمات (Business Logic)
 │   ├── accounting.service.ts
@@ -37,7 +37,7 @@ src/
 │   ├── distribution.service.ts
 │   ├── dashboard.service.ts
 │   ├── reports.service.ts
-│   └── ...              # 42 service
+│   └── ...              # 60+ خدمة
 │
 ├── types/               # TypeScript Types
 ├── lib/                 # Utilities & Helpers
@@ -56,8 +56,8 @@ src/
 Pages → Components → UI Components
 ```
 
-- **Pages**: صفحات التطبيق الرئيسية (74 صفحة)
-- **Components**: مكونات قابلة لإعادة الاستخدام (~350 مكون)
+- **Pages**: صفحات التطبيق الرئيسية (~60 صفحة)
+- **Components**: مكونات قابلة لإعادة الاستخدام (600+ مكون في 44 مجلد)
 - **UI**: مكونات shadcn/ui الأساسية
 
 ### 2. طبقة المنطق (Logic Layer)
@@ -67,7 +67,7 @@ Pages → Components → UI Components
 Hooks ← React Query ← Services
 ```
 
-- **Hooks**: 170+ hook منظمة في 25 مجلد
+- **Hooks**: 300+ hook منظمة في 38 مجلد
 - **React Query**: caching, invalidation, real-time updates
 - **State Management**: React Context للحالة العامة
 
@@ -81,7 +81,7 @@ import { BeneficiaryService } from '@/services';
 const beneficiaries = await BeneficiaryService.getAll();
 ```
 
-**Services المتوفرة (51 service):**
+**Services المتوفرة (60+ خدمة):**
 
 | Service | الوظيفة |
 |---------|---------|
@@ -130,9 +130,10 @@ const beneficiaries = await BeneficiaryService.getAll();
 ### 4. طبقة البيانات (Data Layer)
 **المسؤولية**: Supabase + PostgreSQL
 
-- **170+ جدول** في قاعدة البيانات
-- **650 سياسة RLS** لحماية البيانات (موحدة)
-- **Edge Functions** للعمليات المعقدة
+- **231 جدول** في قاعدة البيانات
+- **675 سياسة RLS** لحماية البيانات
+- **50 Edge Function** للعمليات المعقدة
+- **200 Database Trigger** للأتمتة
 
 ---
 
@@ -304,5 +305,5 @@ const QUERY_CONFIG = {
 
 ---
 
-**الإصدار**: 2.9.14  
-**آخر تحديث**: 2025-12-14
+**الإصدار**: 2.9.90  
+**آخر تحديث**: 2025-12-22
