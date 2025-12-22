@@ -7663,7 +7663,7 @@ export type Database = {
           created_at: string | null
           failure_reason: string | null
           id: string
-          ip_address: unknown
+          ip_address: string | null
           location: Json | null
           success: boolean | null
           user_agent: string | null
@@ -7673,7 +7673,7 @@ export type Database = {
           created_at?: string | null
           failure_reason?: string | null
           id?: string
-          ip_address: unknown
+          ip_address?: string | null
           location?: Json | null
           success?: boolean | null
           user_agent?: string | null
@@ -7683,7 +7683,7 @@ export type Database = {
           created_at?: string | null
           failure_reason?: string | null
           id?: string
-          ip_address?: unknown
+          ip_address?: string | null
           location?: Json | null
           success?: boolean | null
           user_agent?: string | null
