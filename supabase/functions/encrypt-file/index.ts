@@ -4,12 +4,62 @@ import {
   handleCors, 
   jsonResponse, 
   errorResponse, 
-  unauthorizedResponse 
+  unauthorizedResponse,
+  forbiddenResponse
 } from '../_shared/cors.ts';
+
+// ============ Rate Limiting - 20 ملف/دقيقة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 20;
+const RATE_WINDOW = 60 * 1000; // 1 minute
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(userId);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return { allowed: true, remaining: RATE_LIMIT - 1, resetIn: RATE_WINDOW };
+  }
+  
+  if (record.count >= RATE_LIMIT) {
+    return { allowed: false, remaining: 0, resetIn: record.resetTime - now };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: RATE_LIMIT - record.count, resetIn: record.resetTime - now };
+}
+
+// ============ Input Validation ============
+function validateFileSize(size: number): { valid: boolean; error?: string } {
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+  if (size > MAX_FILE_SIZE) {
+    return { valid: false, error: `حجم الملف يتجاوز الحد المسموح (${MAX_FILE_SIZE / (1024 * 1024)} MB)` };
+  }
+  return { valid: true };
+}
+
+function validateExpiresInDays(value: string | null): { valid: boolean; value: number; error?: string } {
+  if (!value) return { valid: true, value: 0 };
+  
+  const numValue = parseInt(value, 10);
+  if (isNaN(numValue)) {
+    return { valid: false, value: 0, error: 'expiresInDays يجب أن يكون رقماً' };
+  }
+  if (numValue < 0) {
+    return { valid: false, value: 0, error: 'expiresInDays لا يمكن أن يكون سالباً' };
+  }
+  if (numValue > 365) {
+    return { valid: false, value: 0, error: 'expiresInDays لا يمكن أن يتجاوز 365 يوم' };
+  }
+  return { valid: true, value: numValue };
+}
 
 /**
  * Edge Function لتشفير الملفات قبل تخزينها
  * يستخدم AES-256-GCM للتشفير
+ * 
+ * ✅ محمي بـ: JWT + Role Check + Rate Limiting + Input Validation
  */
 serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -22,7 +72,7 @@ serve(async (req) => {
       try {
         const body = await req.json();
         if (body.ping || body.healthCheck) {
-          console.log('[ENCRYPT-FILE] Health check received');
+          console.log('[encrypt-file] Health check received');
           return jsonResponse({
             status: 'healthy',
             function: 'encrypt-file',
@@ -34,48 +84,84 @@ serve(async (req) => {
       }
     }
 
+    // ============ المصادقة ============
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.warn('[encrypt-file] ❌ No authentication provided');
+      return unauthorizedResponse('غير مصرح بالوصول - يرجى تسجيل الدخول');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.warn('[encrypt-file] ❌ Invalid token:', authError?.message);
+      return unauthorizedResponse('فشل التحقق من الهوية - يرجى إعادة تسجيل الدخول');
+    }
+
+    // ============ فحص الصلاحيات ============
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return unauthorizedResponse('غير مصرح بالوصول');
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      return unauthorizedResponse('فشل التحقق من الهوية');
-    }
-
-    // ✅ التحقق من الصلاحيات - فقط الموظفين يمكنهم تشفير الملفات
-    const { data: roles } = await supabase
+    const { data: roles, error: rolesError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id);
+
+    if (rolesError) {
+      console.error('[encrypt-file] Error fetching roles:', rolesError);
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
+    }
 
     const userRoles = roles?.map(r => r.role) || [];
     const allowedRoles = ['admin', 'nazer', 'accountant', 'staff'];
     const hasPermission = userRoles.some(role => allowedRoles.includes(role));
 
     if (!hasPermission) {
-      console.warn(`⚠️ محاولة تشفير ملف بدون صلاحية: ${user.id}`);
-      return errorResponse('ليس لديك صلاحية لتشفير الملفات', 403);
+      console.warn(`[encrypt-file] ❌ Forbidden - User ${user.id} lacks required role (has: ${userRoles.join(', ') || 'none'})`);
+      return forbiddenResponse('ليس لديك صلاحية لتشفير الملفات');
     }
 
+    // ============ Rate Limiting ============
+    const rateLimitResult = checkRateLimit(user.id);
+    if (!rateLimitResult.allowed) {
+      console.warn(`[encrypt-file] Rate limit exceeded for user: ${user.id}`);
+      return errorResponse(`تجاوزت الحد المسموح (${RATE_LIMIT} ملف/دقيقة). يرجى الانتظار ${Math.ceil(rateLimitResult.resetIn / 1000)} ثانية.`, 429);
+    }
+
+    console.log(`[encrypt-file] ✅ Authorized - User: ${user.id}, Roles: ${userRoles.join(', ')}, Remaining: ${rateLimitResult.remaining}`);
+
+    // ============ قراءة ومعالجة الملف ============
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const fileCategory = formData.get('category') as string || 'general';
-    const expiresInDays = parseInt(formData.get('expiresInDays') as string || '0');
+    const expiresInDaysRaw = formData.get('expiresInDays') as string;
 
     if (!file) {
-      throw new Error('لم يتم إرفاق ملف');
+      return errorResponse('لم يتم إرفاق ملف', 400);
     }
 
-    console.log(`🔐 تشفير ملف: ${file.name} (${file.size} bytes)`);
+    // ============ التحقق من المدخلات ============
+    const fileSizeValidation = validateFileSize(file.size);
+    if (!fileSizeValidation.valid) {
+      return errorResponse(fileSizeValidation.error!, 400);
+    }
+
+    const expiresValidation = validateExpiresInDays(expiresInDaysRaw);
+    if (!expiresValidation.valid) {
+      return errorResponse(expiresValidation.error!, 400);
+    }
+    const expiresInDays = expiresValidation.value;
+
+    console.log(`[encrypt-file] 🔐 تشفير ملف: ${file.name} (${file.size} bytes)`);
 
     // قراءة محتوى الملف
     const fileBuffer = await file.arrayBuffer();
@@ -186,7 +272,22 @@ serve(async (req) => {
       was_granted: true
     });
 
-    console.log(`✅ تم تشفير الملف بنجاح: ${fileRecord.id}`);
+    // تسجيل في audit_logs
+    await supabase.from('audit_logs').insert({
+      action_type: 'file_encryption',
+      user_id: user.id,
+      user_email: user.email,
+      description: `تم تشفير ملف: ${file.name}`,
+      new_values: {
+        file_id: fileRecord.id,
+        file_name: file.name,
+        file_size: file.size,
+        category: fileCategory,
+        expires_at: expiresAt
+      }
+    });
+
+    console.log(`[encrypt-file] ✅ تم تشفير الملف بنجاح: ${fileRecord.id}`);
 
     return jsonResponse({
       success: true,
@@ -200,10 +301,10 @@ serve(async (req) => {
       }
     });
   } catch (error) {
-    console.error('❌ خطأ في تشفير الملف:', error);
+    console.error('[encrypt-file] ❌ خطأ في تشفير الملف:', error);
     
     // تسجيل تفاصيل كاملة للمطورين
-    console.error('Full error details:', {
+    console.error('[encrypt-file] Full error details:', {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString()
