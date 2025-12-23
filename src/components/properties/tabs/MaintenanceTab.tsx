@@ -3,19 +3,23 @@ import { Search, Edit, Trash2 } from "lucide-react";
 import { useMaintenanceRequests } from "@/hooks/property/useMaintenanceRequests";
 import { useMaintenanceSchedules } from "@/hooks/property/useMaintenanceSchedules";
 import { useTableSort } from "@/hooks/ui/useTableSort";
+import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
 import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
 import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
+import { toast } from "sonner";
 
 // تعريف الفلاتر
 const maintenanceFilterConfigs: FilterConfig[] = [
@@ -127,6 +131,45 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   const endIndex = Math.min(startIndex + pageSize, totalItems);
   const paginatedData = sortedData.slice(startIndex, endIndex);
 
+  // Bulk Selection - must be after paginatedData
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(paginatedData);
+
+  // Bulk delete state
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  const handleBulkDelete = async () => {
+    for (const id of selectedIds) {
+      deleteRequest.mutate(id);
+    }
+    clearSelection();
+    setBulkDeleteDialogOpen(false);
+    toast.success(`تم حذف ${selectedIds.length} طلب صيانة بنجاح`);
+  };
+
+  const handleBulkExport = () => {
+    const selectedData = paginatedData
+      .filter(r => selectedIds.includes(r.id))
+      .map(r => ({
+        'رقم الطلب': r.request_number,
+        'العقار': r.properties?.name || '-',
+        'العنوان': r.title,
+        'الفئة': r.category,
+        'الأولوية': r.priority,
+        'التاريخ': format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
+        'التكلفة المقدرة': (r.estimated_cost || 0).toLocaleString(),
+        'الحالة': r.status,
+      }));
+    return selectedData;
+  };
+
   // Reset page when filters change
   useMemo(() => {
     setCurrentPage(1);
@@ -228,6 +271,24 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       <UnifiedDataTable
         title="طلبات الصيانة"
         columns={[
+          {
+            key: "select",
+            label: (
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleAll}
+                aria-label="تحديد الكل"
+              />
+            ),
+            render: (_: unknown, row: MaintenanceRequest) => (
+              <Checkbox
+                checked={isSelected(row.id)}
+                onCheckedChange={() => toggleSelection(row.id)}
+                aria-label={`تحديد ${row.request_number}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ),
+          },
           {
             key: "request_number",
             label: "رقم الطلب",
@@ -350,6 +411,28 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
         description="هل أنت متأكد من حذف هذا الطلب؟"
         itemName={requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.title}` : ""}
         isLoading={deleteRequest.isPending}
+      />
+
+      {/* Bulk Delete Dialog */}
+      <DeleteConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        title="حذف طلبات الصيانة المحددة"
+        description={`هل أنت متأكد من حذف ${selectedCount} طلب صيانة؟`}
+        itemName={`${selectedCount} طلب صيانة`}
+        isDestructive={true}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onDelete={() => setBulkDeleteDialogOpen(true)}
+        onExport={() => {
+          const data = handleBulkExport();
+          toast.success(`تم تجهيز ${data.length} طلب صيانة للتصدير`);
+        }}
       />
     </div>
   );

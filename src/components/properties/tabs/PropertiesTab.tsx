@@ -2,17 +2,21 @@ import { useState, useMemo } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
 import { useProperties, type Property } from "@/hooks/property/useProperties";
 import { useTableSort } from "@/hooks/ui/useTableSort";
+import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { StatCard } from "@/components/dashboard/DashboardStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
+import { toast } from "sonner";
 
 // تعريف الفلاتر
 const propertiesFilterConfigs: FilterConfig[] = [
@@ -50,7 +54,6 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { properties, isLoading, deleteProperty } = useProperties();
-
   const {
     confirmDelete,
     isOpen: isDeleteOpen,
@@ -113,6 +116,45 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
   const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // Bulk Selection - must be after paginatedData
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(paginatedData);
+
+  // Bulk delete state
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  const handleBulkDelete = async () => {
+    for (const id of selectedIds) {
+      deleteProperty(id);
+    }
+    clearSelection();
+    setBulkDeleteDialogOpen(false);
+    toast.success(`تم حذف ${selectedIds.length} عقار بنجاح`);
+  };
+
+  const handleBulkExport = () => {
+    const selectedData = paginatedData
+      .filter(p => selectedIds.includes(p.id))
+      .map(p => ({
+        'اسم العقار': p.name,
+        'النوع': p.type,
+        'الموقع': p.location,
+        'الوحدات الكلية': p.units,
+        'الوحدات المشغولة': p.occupied,
+        'الوحدات الشاغرة': p.units - p.occupied,
+        'الإيراد الشهري': Number(p.monthly_revenue || 0).toLocaleString(),
+        'الحالة': p.status,
+      }));
+    return selectedData;
+  };
 
   // Reset page when filters change
   useMemo(() => {
@@ -212,6 +254,24 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
       <UnifiedDataTable
         title="العقارات"
         columns={[
+          {
+            key: "select",
+            label: (
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleAll}
+                aria-label="تحديد الكل"
+              />
+            ),
+            render: (_: unknown, row: Property) => (
+              <Checkbox
+                checked={isSelected(row.id)}
+                onCheckedChange={() => toggleSelection(row.id)}
+                aria-label={`تحديد ${row.name}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ),
+          },
           {
             key: "name",
             label: "اسم العقار",
@@ -348,6 +408,28 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
         itemName={itemName}
         isLoading={isDeleting}
         isDestructive={true}
+      />
+
+      {/* Bulk Delete Dialog */}
+      <DeleteConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        title="حذف العقارات المحددة"
+        description={`هل أنت متأكد من حذف ${selectedCount} عقار؟`}
+        itemName={`${selectedCount} عقار`}
+        isDestructive={true}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onDelete={() => setBulkDeleteDialogOpen(true)}
+        onExport={() => {
+          const data = handleBulkExport();
+          toast.success(`تم تجهيز ${data.length} عقار للتصدير`);
+        }}
       />
     </div>
   );

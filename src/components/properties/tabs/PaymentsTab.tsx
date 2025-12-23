@@ -3,18 +3,22 @@ import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
 import { useRentalPayments, type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { useDocumentViewer } from "@/hooks/payments/useDocumentViewer";
 import { useTableSort } from "@/hooks/ui/useTableSort";
+import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
 import { ArrearsReport } from "@/components/rental/ArrearsReport";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
+import { toast } from "sonner";
 
 // تعريف الفلاتر
 const paymentsFilterConfigs: FilterConfig[] = [
@@ -141,6 +145,44 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   const endIndex = Math.min(startIndex + pageSize, totalItems);
   const paginatedData = sortedData.slice(startIndex, endIndex);
 
+  // Bulk Selection - must be after paginatedData
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(paginatedData);
+
+  // Bulk delete state
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  const handleBulkDelete = async () => {
+    for (const id of selectedIds) {
+      deletePayment.mutate(id);
+    }
+    clearSelection();
+    setBulkDeleteDialogOpen(false);
+    toast.success(`تم حذف ${selectedIds.length} دفعة بنجاح`);
+  };
+
+  const handleBulkExport = () => {
+    const selectedData = paginatedData
+      .filter(p => selectedIds.includes(p.id))
+      .map(p => ({
+        'رقم الدفعة': p.payment_number,
+        'رقم العقد': p.contracts?.contract_number || '-',
+        'المستأجر': p.contracts?.tenant_name || '-',
+        'تاريخ الاستحقاق': format(new Date(p.due_date), 'yyyy/MM/dd', { locale: ar }),
+        'المستحق': Number(p.amount_due).toLocaleString(),
+        'المدفوع': Number(p.amount_paid).toLocaleString(),
+        'الحالة': getPaymentStatus(p).status,
+      }));
+    return selectedData;
+  };
+
   // Reset page when filters change
   useMemo(() => {
     setCurrentPage(1);
@@ -238,6 +280,24 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       <UnifiedDataTable
         title="الدفعات"
         columns={[
+          {
+            key: "select",
+            label: (
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleAll}
+                aria-label="تحديد الكل"
+              />
+            ),
+            render: (_: unknown, row: RentalPayment) => (
+              <Checkbox
+                checked={isSelected(row.id)}
+                onCheckedChange={() => toggleSelection(row.id)}
+                aria-label={`تحديد ${row.payment_number}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ),
+          },
           {
             key: "payment_number",
             label: "رقم الدفعة",
@@ -389,6 +449,28 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         description="هل أنت متأكد من حذف هذه الدفعة؟ سيتم حذف القيد المحاسبي المرتبط بها."
         itemName={paymentToDelete ? `${paymentToDelete.payment_number} - ${paymentToDelete.amount_due} ر.س` : ""}
         isLoading={deletePayment.isPending}
+      />
+
+      {/* Bulk Delete Dialog */}
+      <DeleteConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        title="حذف الدفعات المحددة"
+        description={`هل أنت متأكد من حذف ${selectedCount} دفعة؟`}
+        itemName={`${selectedCount} دفعة`}
+        isDestructive={true}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onDelete={() => setBulkDeleteDialogOpen(true)}
+        onExport={() => {
+          const data = handleBulkExport();
+          toast.success(`تم تجهيز ${data.length} دفعة للتصدير`);
+        }}
       />
     </div>
   );

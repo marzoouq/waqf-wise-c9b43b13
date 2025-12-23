@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 /** Column definition for UnifiedDataTable with improved type safety for row parameter */
 export interface Column<T = Record<string, unknown>> {
   key: string;
-  label: string;
+  label: string | ReactNode;
   /** Render function receives the cell value and the typed row */
   render?: (value: ReactNode, row: T) => ReactNode;
   align?: "right" | "left" | "center";

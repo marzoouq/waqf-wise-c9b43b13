@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
 import { Search, Printer, Edit, Trash2 } from "lucide-react";
 import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
+import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
 import { type Contract } from "@/hooks/property/useContracts";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { usePrint } from "@/hooks/ui/usePrint";
 import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
 import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
@@ -17,6 +20,7 @@ import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+import { toast } from "sonner";
 
 // تعريف الفلاتر
 const contractsFilterConfigs: FilterConfig[] = [
@@ -132,6 +136,45 @@ export const ContractsTab = ({ onEdit }: Props) => {
     return result;
   }, [contracts, searchQuery, advancedFilters]);
 
+  // Bulk Selection
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(filteredContracts as Contract[]);
+
+  // Bulk delete state
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  const handleBulkDelete = async () => {
+    for (const id of selectedIds) {
+      await deleteContract.mutateAsync(id);
+    }
+    clearSelection();
+    setBulkDeleteDialogOpen(false);
+    toast.success(`تم حذف ${selectedIds.length} عقد بنجاح`);
+  };
+
+  const handleBulkExport = () => {
+    const selectedData = (filteredContracts as Contract[])
+      .filter(c => selectedIds.includes(c.id))
+      .map(c => ({
+        'رقم العقد': c.contract_number,
+        'العقار': c.properties?.name || '-',
+        'المستأجر': c.tenant_name,
+        'النوع': c.contract_type,
+        'تاريخ البداية': format(new Date(c.start_date), 'yyyy/MM/dd'),
+        'تاريخ النهاية': format(new Date(c.end_date), 'yyyy/MM/dd'),
+        'الإيجار الشهري': Number(c.monthly_rent).toLocaleString(),
+        'الحالة': c.status,
+      }));
+    return selectedData;
+  };
+
   const exportData = filteredContracts.map(c => ({
     'رقم العقد': c.contract_number,
     'العقار': c.properties?.name || '-',
@@ -209,6 +252,24 @@ export const ContractsTab = ({ onEdit }: Props) => {
       <UnifiedDataTable
         title="العقود"
         columns={[
+          {
+            key: "select",
+            label: (
+              <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={toggleAll}
+                aria-label="تحديد الكل"
+              />
+            ),
+            render: (_: unknown, row: Contract) => (
+              <Checkbox
+                checked={isSelected(row.id)}
+                onCheckedChange={() => toggleSelection(row.id)}
+                aria-label={`تحديد ${row.contract_number}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ),
+          },
           {
             key: "contract_number",
             label: "رقم العقد",
@@ -338,6 +399,28 @@ export const ContractsTab = ({ onEdit }: Props) => {
         itemName={itemName}
         isLoading={isDeleting}
         isDestructive={true}
+      />
+
+      {/* Bulk Delete Dialog */}
+      <DeleteConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        title="حذف العقود المحددة"
+        description={`هل أنت متأكد من حذف ${selectedCount} عقد؟`}
+        itemName={`${selectedCount} عقد`}
+        isDestructive={true}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onDelete={() => setBulkDeleteDialogOpen(true)}
+        onExport={() => {
+          const data = handleBulkExport();
+          toast.success(`تم تجهيز ${data.length} عقد للتصدير`);
+        }}
       />
     </div>
   );
