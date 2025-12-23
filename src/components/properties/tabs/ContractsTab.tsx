@@ -106,7 +106,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
       {/* Search and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="البحث عن عقد..."
             value={searchQuery}

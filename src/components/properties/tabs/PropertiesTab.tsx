@@ -91,7 +91,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
     <div className="space-y-6">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           placeholder="البحث عن عقار..."
           value={searchQuery}
