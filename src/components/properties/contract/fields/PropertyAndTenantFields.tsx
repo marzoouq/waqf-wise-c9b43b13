@@ -108,24 +108,26 @@ export function PropertyAndTenantFields({ form, properties, isEditing }: Props) 
       </div>
 
       {/* اختيار المستأجر */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label>المستأجر *</Label>
-          <div className="flex flex-wrap gap-2">
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <Label className="shrink-0">المستأجر *</Label>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               type="button"
               variant={searchMode === 'select' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSearchMode('select')}
+              className="justify-center text-xs sm:text-sm h-9 sm:h-8"
             >
               <Search className="h-4 w-4 ms-1" />
-              اختيار من القائمة
+              <span className="hidden xs:inline">اختيار من</span> القائمة
             </Button>
             <Button
               type="button"
               variant={searchMode === 'manual' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSearchMode('manual')}
+              className="justify-center text-xs sm:text-sm h-9 sm:h-8"
             >
               إدخال يدوي
             </Button>
@@ -134,9 +136,10 @@ export function PropertyAndTenantFields({ form, properties, isEditing }: Props) 
               variant="outline"
               size="sm"
               onClick={() => setShowTenantDialog(true)}
+              className="justify-center text-xs sm:text-sm h-9 sm:h-8"
             >
               <UserPlus className="h-4 w-4 ms-1" />
-              مستأجر جديد
+              <span className="hidden xs:inline">مستأجر</span> جديد
             </Button>
           </div>
         </div>

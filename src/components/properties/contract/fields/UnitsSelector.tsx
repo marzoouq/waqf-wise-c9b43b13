@@ -38,7 +38,7 @@ export function UnitsSelector({ form }: Props) {
               <p>لا توجد وحدات متاحة في هذا العقار</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
               {availableUnits.map((unit) => {
                 const isSelected = field.value.includes(unit.id);
                 
