@@ -77,7 +77,7 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
         <CardTitle className="flex items-center gap-2">
           <img 
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Coat_of_arms_of_Saudi_Arabia.svg/120px-Coat_of_arms_of_Saudi_Arabia.svg.png" 
-            alt="ZATCA Logo" 
+            alt="شعار هيئة الزكاة والضريبة والجمارك" 
             className="w-8 h-8"
           />
           رمز QR للفاتورة الإلكترونية

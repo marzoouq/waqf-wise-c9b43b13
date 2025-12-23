@@ -42,7 +42,7 @@ export function HeroSection() {
                 className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl transition-shadow text-sm sm:text-base h-10 sm:h-11"
               >
                 تسجيل الدخول
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               </Button>
             </Link>
             <a href="#how-it-works" className="w-full sm:w-auto">
@@ -51,7 +51,7 @@ export function HeroSection() {
                 size="default"
                 className="w-full sm:w-auto gap-2 border-2 text-sm sm:text-base h-10 sm:h-11"
               >
-                <Play className="w-4 h-4" />
+                <Play className="w-4 h-4" aria-hidden="true" />
                 شاهد كيف يعمل
               </Button>
             </a>
@@ -60,15 +60,15 @@ export function HeroSection() {
           {/* Trust Indicators */}
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-8 mt-8 sm:mt-16 pt-6 sm:pt-12 border-t border-border/50 px-2 sm:px-0">
             <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" aria-hidden="true" />
               <span className="text-xs sm:text-sm">آمن ومشفر</span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" aria-hidden="true" />
               <span className="text-xs sm:text-sm">+1000 مستفيد</span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" aria-hidden="true" />
               <span className="text-xs sm:text-sm">+50 عقار مُدار</span>
             </div>
           </div>
