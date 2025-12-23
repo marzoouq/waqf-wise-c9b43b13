@@ -47,7 +47,22 @@ export default defineConfig(({ mode }) => {
   
   build: {
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
-    minify: 'esbuild',
+    // ✅ ترقية إلى Terser للضغط الأقوى في الإنتاج
+    minify: isProduction ? 'terser' : 'esbuild',
+    terserOptions: isProduction ? {
+      compress: {
+        drop_console: true,  // ✅ إزالة console.log في الإنتاج
+        drop_debugger: true,
+        passes: 2,           // ✅ ضغط مضاعف
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+      mangle: {
+        safari10: true,
+      },
+      format: {
+        comments: false,
+      },
+    } : undefined,
     chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
     sourcemap: false,
@@ -66,9 +81,24 @@ export default defineConfig(({ mode }) => {
     },
     
     rollupOptions: {
+      // ✅ تحسين Tree Shaking
+      treeshake: {
+        moduleSideEffects: (id) => {
+          // الملفات التي لها آثار جانبية (CSS, main entry)
+          if (id.endsWith('.css') || id.endsWith('.scss')) return true;
+          if (id.includes('main.tsx') || id.includes('index.css')) return true;
+          return false;
+        },
+        propertyReadSideEffects: false,
+      },
       output: {
         // ✅ manualChunks آمن - فقط المكتبات المستقلة التي لا تعتمد على React
         manualChunks: (id) => {
+          // ✅ Lucide Icons - فصل منفصل للأيقونات (439 استيراد)
+          if (id.includes('lucide-react')) {
+            return 'icon-vendor';
+          }
+          
           // ✅ مكتبات PDF - مستقلة، آمنة للفصل
           if (id.includes('jspdf') || id.includes('autotable')) {
             return 'pdf-lib';
