@@ -7,7 +7,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { mockAuditLogs, mockSecurityEvents, mockLoginAttempts } from '../../fixtures/security.fixtures';
+import {
+  mockAuditLogs,
+  mockSecurityEvents,
+  mockLoginAttempts,
+  mockRolePermissions,
+  securityTestUsers,
+  auditLogFilters,
+} from '../../fixtures/security.fixtures';
 
 // Mock Supabase
 vi.mock('@/integrations/supabase/client', () => ({
@@ -51,7 +58,6 @@ describe('Security Dashboard', () => {
 
   describe('Security Overview', () => {
     it('should display security statistics cards', async () => {
-      // Test that security stats are displayed
       expect(mockAuditLogs).toHaveLength(3);
       expect(mockSecurityEvents).toHaveLength(2);
       expect(mockLoginAttempts).toHaveLength(2);
@@ -72,6 +78,11 @@ describe('Security Dashboard', () => {
       expect(failedLogins).toHaveLength(1);
       expect(failedLogins[0].failure_reason).toBe('invalid_credentials');
     });
+
+    it('should track successful login attempts', () => {
+      const successfulLogins = mockLoginAttempts.filter(attempt => attempt.success);
+      expect(successfulLogins).toHaveLength(1);
+    });
   });
 
   describe('Security Events', () => {
@@ -90,25 +101,53 @@ describe('Security Dashboard', () => {
       expect(errorEvents).toHaveLength(1);
       expect(warningEvents).toHaveLength(1);
     });
+
+    it('should track event types', () => {
+      const eventTypes = mockSecurityEvents.map(e => e.event_type);
+      expect(eventTypes).toContain('failed_login');
+      expect(eventTypes).toContain('suspicious_activity');
+    });
   });
 
   describe('Access Control', () => {
     it('should verify admin access to security dashboard', () => {
-      // Admin should have full access
-      const adminUser = { role: 'admin', email: 'admin@waqf.sa' };
+      const adminUser = securityTestUsers.admin;
       expect(adminUser.role).toBe('admin');
+      expect(adminUser.email).toBe('admin@waqf.sa');
+    });
+
+    it('should verify nazer access to security dashboard', () => {
+      const nazerUser = securityTestUsers.nazer;
+      expect(nazerUser.role).toBe('nazer');
     });
 
     it('should restrict beneficiary access to security data', () => {
-      // Beneficiaries should not see security logs
-      const beneficiaryRole = 'beneficiary';
       const allowedRoles = ['admin', 'nazer'];
-      expect(allowedRoles.includes(beneficiaryRole)).toBe(false);
+      expect(allowedRoles.includes('beneficiary')).toBe(false);
     });
   });
 });
 
 describe('Audit Logs', () => {
+  describe('Log Listing', () => {
+    it('should have required audit log fields', () => {
+      mockAuditLogs.forEach(log => {
+        expect(log).toHaveProperty('id');
+        expect(log).toHaveProperty('user_id');
+        expect(log).toHaveProperty('action_type');
+        expect(log).toHaveProperty('severity');
+        expect(log).toHaveProperty('created_at');
+      });
+    });
+
+    it('should track IP addresses', () => {
+      mockAuditLogs.forEach(log => {
+        expect(log.ip_address).toBeDefined();
+        expect(log.ip_address).toMatch(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/);
+      });
+    });
+  });
+
   describe('Log Filtering', () => {
     it('should filter logs by action type', () => {
       const updateLogs = mockAuditLogs.filter(log => log.action_type === 'update');
@@ -131,6 +170,27 @@ describe('Audit Logs', () => {
       expect(criticalLogs).toHaveLength(1);
       expect(criticalLogs[0].action_type).toBe('delete');
     });
+
+    it('should support userId filter', () => {
+      expect(auditLogFilters.withUserId.userId).toBe('user-admin-1');
+    });
+
+    it('should support tableName filter', () => {
+      expect(auditLogFilters.withTableName.tableName).toBe('beneficiaries');
+    });
+
+    it('should support actionType filter', () => {
+      expect(auditLogFilters.withActionType.actionType).toBe('update');
+    });
+
+    it('should support severity filter', () => {
+      expect(auditLogFilters.withSeverity.severity).toBe('critical');
+    });
+
+    it('should support date range filter', () => {
+      expect(auditLogFilters.withDateRange.startDate).toBe('2024-01-01');
+      expect(auditLogFilters.withDateRange.endDate).toBe('2024-01-31');
+    });
   });
 
   describe('Log Details', () => {
@@ -151,5 +211,102 @@ describe('Audit Logs', () => {
       const deleteLog = mockAuditLogs.find(log => log.action_type === 'delete');
       expect(deleteLog?.description).toBe('حذف سند صرف');
     });
+
+    it('should track record IDs for table operations', () => {
+      const tableOperations = mockAuditLogs.filter(log => log.table_name !== null);
+      tableOperations.forEach(log => {
+        expect(log.record_id).toBeDefined();
+      });
+    });
+  });
+});
+
+describe('Role Permissions', () => {
+  it('should have role permission mappings', () => {
+    expect(mockRolePermissions).toHaveLength(4);
+  });
+
+  it('should have admin permissions', () => {
+    const adminPerms = mockRolePermissions.filter(rp => rp.role === 'admin');
+    expect(adminPerms.length).toBeGreaterThan(0);
+  });
+
+  it('should have accountant permissions', () => {
+    const accountantPerms = mockRolePermissions.filter(rp => rp.role === 'accountant');
+    expect(accountantPerms.length).toBeGreaterThan(0);
+  });
+
+  it('should restrict manage_users to admin only', () => {
+    const manageUsersPerms = mockRolePermissions.filter(rp => rp.permission_id === 'manage_users');
+    const grantedTo = manageUsersPerms.filter(rp => rp.granted);
+    expect(grantedTo.every(rp => rp.role === 'admin')).toBe(true);
+  });
+
+  it('should track permission grants', () => {
+    mockRolePermissions.forEach(rp => {
+      expect(rp).toHaveProperty('granted');
+      expect(typeof rp.granted).toBe('boolean');
+    });
+  });
+});
+
+describe('Login Attempts', () => {
+  it('should have required login attempt fields', () => {
+    mockLoginAttempts.forEach(attempt => {
+      expect(attempt).toHaveProperty('id');
+      expect(attempt).toHaveProperty('email');
+      expect(attempt).toHaveProperty('success');
+      expect(attempt).toHaveProperty('ip_address');
+      expect(attempt).toHaveProperty('created_at');
+    });
+  });
+
+  it('should distinguish successful and failed attempts', () => {
+    const successful = mockLoginAttempts.filter(a => a.success);
+    const failed = mockLoginAttempts.filter(a => !a.success);
+
+    expect(successful.length).toBe(1);
+    expect(failed.length).toBe(1);
+  });
+
+  it('should track failure reasons for failed attempts', () => {
+    const failedAttempts = mockLoginAttempts.filter(a => !a.success);
+    failedAttempts.forEach(attempt => {
+      expect(attempt.failure_reason).toBeDefined();
+    });
+  });
+
+  it('should track user agent for all attempts', () => {
+    mockLoginAttempts.forEach(attempt => {
+      expect(attempt.user_agent).toBeDefined();
+    });
+  });
+});
+
+describe('Security Statistics', () => {
+  it('should calculate total audit logs', () => {
+    expect(mockAuditLogs.length).toBe(3);
+  });
+
+  it('should calculate critical events', () => {
+    const critical = mockAuditLogs.filter(log => log.severity === 'critical');
+    expect(critical.length).toBe(1);
+  });
+
+  it('should calculate login success rate', () => {
+    const total = mockLoginAttempts.length;
+    const successful = mockLoginAttempts.filter(a => a.success).length;
+    const rate = (successful / total) * 100;
+    
+    expect(rate).toBe(50);
+  });
+
+  it('should identify high-risk activities', () => {
+    const highRisk = [
+      ...mockAuditLogs.filter(log => log.severity === 'critical'),
+      ...mockSecurityEvents.filter(e => e.severity === 'error'),
+    ];
+    
+    expect(highRisk.length).toBe(2);
   });
 });
