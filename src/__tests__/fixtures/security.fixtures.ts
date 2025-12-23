@@ -97,31 +97,16 @@ export const mockLoginAttempts = [
 ];
 
 export const mockRolePermissions = [
-  {
-    id: 'rp-1',
-    role: 'admin',
-    permission_id: 'view_all_beneficiaries',
-    granted: true,
-  },
-  {
-    id: 'rp-2',
-    role: 'admin',
-    permission_id: 'manage_users',
-    granted: true,
-  },
-  {
-    id: 'rp-3',
-    role: 'accountant',
-    permission_id: 'view_financial_reports',
-    granted: true,
-  },
-  {
-    id: 'rp-4',
-    role: 'accountant',
-    permission_id: 'manage_users',
-    granted: false,
-  },
+  { id: 'rp-1', role: 'admin', permission_id: 'view_all_beneficiaries', granted: true },
+  { id: 'rp-2', role: 'admin', permission_id: 'manage_users', granted: true },
+  { id: 'rp-3', role: 'accountant', permission_id: 'view_financial_reports', granted: true },
+  { id: 'rp-4', role: 'accountant', permission_id: 'manage_users', granted: false },
 ];
+
+export const securityTestUsers = {
+  admin: { id: 'admin-1', email: 'admin@waqf.sa', role: 'admin' },
+  nazer: { id: 'nazer-1', email: 'nazer@waqf.test', role: 'nazer' },
+};
 
 export const auditLogFilters = {
   withUserId: { userId: 'user-admin-1' },
