@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger';
 
 export type CheckType = 'ping' | 'json-required' | 'formdata';
 export type FunctionCategory = 'ai' | 'database' | 'notification' | 'backup' | 'security' | 'utility';
@@ -115,8 +116,8 @@ export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
 ];
 
 // دالة توليد البيانات الوهمية للفحص
-function generateDummyData(fields: string[]): Record<string, any> {
-  const data: Record<string, any> = {};
+function generateDummyData(fields: string[]): Record<string, string | boolean | Record<string, boolean>> {
+  const data: Record<string, string | boolean | Record<string, boolean>> = {};
   for (const field of fields) {
     switch (field) {
       case 'message':
@@ -296,19 +297,20 @@ export class EdgeFunctionsHealthService {
             note: 'FormData function - basic connectivity check',
             error: response.status >= 400 ? `HTTP ${response.status}` : undefined
           };
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const error = err as Error;
           return {
             function: functionName,
             success: false,
             responseTime: Math.round(performance.now() - startTime),
             checkedAt,
-            error: err.message
+            error: error.message
           };
         }
       }
 
       // ✅ JSON Required - إرسال بيانات وهمية مع ping
-      let body: Record<string, any> = { ping: true, healthCheck: true };
+      let body: Record<string, string | boolean | Record<string, boolean>> = { ping: true, healthCheck: true };
       
       if (funcInfo?.checkType === 'json-required' && funcInfo.requiredFields) {
         body = { ...body, ...generateDummyData(funcInfo.requiredFields) };
@@ -369,14 +371,15 @@ export class EdgeFunctionsHealthService {
             statusReason: details.reason,
             recommendation: details.recommendation
           };
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const error = err as Error;
           const responseTime = Math.round(performance.now() - startTime);
           const details = getStatusDetails({ 
             function: functionName, 
             success: false, 
             responseTime, 
             checkedAt,
-            error: err.message
+            error: error.message
           }, funcInfo);
           
           return {
@@ -384,7 +387,7 @@ export class EdgeFunctionsHealthService {
             success: false,
             responseTime,
             checkedAt,
-            error: err.message,
+            error: error.message,
             statusReason: details.reason,
             recommendation: details.recommendation
           };
@@ -408,7 +411,10 @@ export class EdgeFunctionsHealthService {
       // ✅ الكشف الذكي عن الحماية الضمنية
       // إذا أرجعت الوظيفة 401/403 رغم أنها معرفة كـ "غير محمية" = محمية ضمنياً
       if (response.status === 401 || response.status === 403) {
-        console.warn(`⚠️ ${functionName}: marked as public but returned ${response.status} - treating as implicitly protected`);
+        productionLogger.warn(`${functionName}: marked as public but returned ${response.status} - treating as implicitly protected`, { 
+          context: 'EdgeFunctionsHealth.checkFunction',
+          severity: 'low'
+        });
         return {
           function: functionName,
           success: true,
@@ -441,22 +447,29 @@ export class EdgeFunctionsHealthService {
         statusReason: details.reason,
         recommendation: details.recommendation
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       const responseTime = Math.round(performance.now() - startTime);
       const details = getStatusDetails({ 
         function: functionName, 
         success: false, 
         responseTime, 
         checkedAt,
-        error: err.message
+        error: error.message
       }, funcInfo);
+      
+      productionLogger.error(error, { 
+        context: 'EdgeFunctionsHealth.checkFunction', 
+        severity: 'medium',
+        functionName 
+      });
       
       return {
         function: functionName,
         success: false,
         responseTime,
         checkedAt,
-        error: err.message,
+        error: error.message,
         statusReason: details.reason,
         recommendation: details.recommendation
       };
