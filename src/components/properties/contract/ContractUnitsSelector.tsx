@@ -39,7 +39,7 @@ export function ContractUnitsSelector({ units, selectedUnits, onToggleUnit, isLo
             >
               <Checkbox
                 checked={selectedUnits.includes(unit.id)}
-                onCheckedChange={() => onToggleUnit(unit.id)}
+                className="pointer-events-none"
               />
               <div className="flex-1">
                 <p className="font-medium text-sm">{unit.unit_name}</p>
