@@ -10,6 +10,25 @@ import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+
+// تعريف الفلاتر
+const paymentsFilterConfigs: FilterConfig[] = [
+  {
+    key: 'status',
+    label: 'الحالة',
+    type: 'select',
+    options: [
+      { value: 'مدفوع', label: 'مدفوع' },
+      { value: 'معلق', label: 'معلق' },
+      { value: 'متأخر', label: 'متأخر' },
+      { value: 'تحت التحصيل', label: 'تحت التحصيل' },
+    ],
+  },
+  { key: 'due_date_from', label: 'من تاريخ', type: 'date' },
+  { key: 'due_date_to', label: 'إلى تاريخ', type: 'date' },
+];
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -17,6 +36,7 @@ interface Props {
 
 export const PaymentsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<RentalPayment | null>(null);
   
@@ -48,17 +68,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     }
   };
 
-  const filteredPayments = useMemo(() => {
-    if (!searchQuery) return payments;
-    
-    const query = searchQuery.toLowerCase();
-    return payments?.filter(
-      (p) =>
-        p.payment_number.toLowerCase().includes(query) ||
-        p.contracts?.tenant_name.toLowerCase().includes(query)
-    ) || [];
-  }, [payments, searchQuery]);
-
+  // دالة مساعدة لحساب حالة الدفعة
   const getPaymentStatus = (payment: RentalPayment) => {
     if (payment.status === 'تحت التحصيل') {
       return { status: 'تحت التحصيل', color: 'bg-warning-light text-warning border-warning/30' };
@@ -78,6 +88,41 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     return { status: 'معلق', color: 'bg-info-light text-info border-info/30' };
   };
 
+  const filteredPayments = useMemo(() => {
+    let result = payments || [];
+    
+    // فلترة بالبحث
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.payment_number.toLowerCase().includes(query) ||
+          p.contracts?.tenant_name.toLowerCase().includes(query)
+      );
+    }
+    
+    // فلترة بالحالة
+    if (advancedFilters.status) {
+      result = result.filter(p => {
+        const status = getPaymentStatus(p).status;
+        return status === advancedFilters.status;
+      });
+    }
+    
+    // فلترة بالتاريخ
+    if (advancedFilters.due_date_from) {
+      const fromDate = new Date(String(advancedFilters.due_date_from));
+      result = result.filter(p => new Date(p.due_date) >= fromDate);
+    }
+    if (advancedFilters.due_date_to) {
+      const toDate = new Date(String(advancedFilters.due_date_to));
+      result = result.filter(p => new Date(p.due_date) <= toDate);
+    }
+    
+    return result;
+  }, [payments, searchQuery, advancedFilters]);
+
+
   const totalPaid = payments?.filter(p => p.status === 'مدفوع' || p.payment_date).reduce((sum, p) => sum + Number(p.amount_paid), 0) || 0;
   const underCollectionPayments = payments?.filter(p => p.status === 'تحت التحصيل').reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
   const totalDue = payments?.filter(p => p.status !== 'مدفوع' && !p.payment_date && p.status !== 'تحت التحصيل').reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
@@ -94,17 +139,44 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     contract_number: p.contracts?.contract_number,
   }));
 
+  // بيانات التصدير
+  const exportData = filteredPayments.map(p => ({
+    'رقم الدفعة': p.payment_number,
+    'رقم العقد': p.contracts?.contract_number || '-',
+    'المستأجر': p.contracts?.tenant_name || '-',
+    'تاريخ الاستحقاق': format(new Date(p.due_date), 'yyyy/MM/dd', { locale: ar }),
+    'المستحق': Number(p.amount_due).toLocaleString(),
+    'المدفوع': Number(p.amount_paid).toLocaleString(),
+    'المتبقي': (Number(p.amount_due) - Number(p.amount_paid)).toLocaleString(),
+    'الحالة': getPaymentStatus(p).status,
+  }));
+
   return (
     <div className="space-y-6">
       <ArrearsReport payments={paymentsWithTenant} />
 
-      <div className="relative">
-        <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن دفعة..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pe-10"
+      {/* Search, Filters, and Export */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="البحث عن دفعة..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pe-10"
+          />
+        </div>
+        <AdvancedFiltersDialog
+          filters={paymentsFilterConfigs}
+          activeFilters={advancedFilters}
+          onApplyFilters={setAdvancedFilters}
+          onClearFilters={() => setAdvancedFilters({})}
+        />
+        <ExportButton
+          data={exportData}
+          filename="الدفعات"
+          title="دفعات الإيجار"
+          headers={['رقم الدفعة', 'رقم العقد', 'المستأجر', 'تاريخ الاستحقاق', 'المستحق', 'المدفوع', 'المتبقي', 'الحالة']}
         />
       </div>
 
