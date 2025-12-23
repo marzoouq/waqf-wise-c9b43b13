@@ -24,7 +24,7 @@ vi.mock('@/contexts/AuthContext', async () => {
     ...actual,
     useAuth: vi.fn(() => ({
       user: { id: adminUser.id, email: adminUser.email },
-      profile: { full_name: adminUser.profile.full_name },
+      profile: { full_name: adminUser.fullName },
       roles: adminUser.roles,
       isAuthenticated: true,
       isLoading: false,
