@@ -3,6 +3,8 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger';
+import type { AutoFixEntry, PendingFixEntry } from '@/types/edge-functions';
 
 export interface AuditFinding {
   id: string;
@@ -30,8 +32,8 @@ export interface SystemAudit {
   audit_type: 'full' | 'category' | 'scheduled';
   categories: string[];
   findings: AuditFinding[];
-  auto_fixes_applied: any[];
-  pending_fixes: string[];
+  auto_fixes_applied: AutoFixEntry[];
+  pending_fixes: PendingFixEntry[];
   ai_analysis: string | null;
   severity_summary: SeveritySummary;
   slack_notified: boolean;
@@ -96,9 +98,10 @@ export class AISystemAuditService {
       if (error) throw error;
 
       return { success: true, auditId: data.auditId };
-    } catch (error: any) {
-      console.error('[AISystemAudit] Error running audit:', error);
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.runAudit', severity: 'high' });
+      return { success: false, error: err.message };
     }
   }
 
@@ -179,9 +182,10 @@ export class AISystemAuditService {
       if (updateError) throw updateError;
 
       return { success: true };
-    } catch (error: any) {
-      console.error('[AISystemAudit] Error approving fix:', error);
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.approveFix', severity: 'medium' });
+      return { success: false, error: err.message };
     }
   }
 
@@ -202,8 +206,10 @@ export class AISystemAuditService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.rejectFix', severity: 'low' });
+      return { success: false, error: err.message };
     }
   }
 
@@ -236,8 +242,10 @@ export class AISystemAuditService {
       if (updateError) throw updateError;
 
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.rollbackFix', severity: 'medium' });
+      return { success: false, error: err.message };
     }
   }
 
@@ -258,8 +266,10 @@ export class AISystemAuditService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.sendSlackAlert', severity: 'low' });
+      return { success: false, error: err.message };
     }
   }
 
@@ -275,8 +285,10 @@ export class AISystemAuditService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const err = error as Error;
+      productionLogger.error(err, { context: 'AISystemAudit.deleteAudit', severity: 'low' });
+      return { success: false, error: err.message };
     }
   }
 }
