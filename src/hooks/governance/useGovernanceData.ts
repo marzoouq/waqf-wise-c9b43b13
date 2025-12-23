@@ -18,7 +18,7 @@ export function useGovernanceData() {
       const { data, error } = await supabase
         .from('governance_meetings')
         .select('*')
-        .order('meeting_date', { ascending: false });
+        .order('scheduled_date', { ascending: false });
       if (error) throw error;
       return data || [];
     },
