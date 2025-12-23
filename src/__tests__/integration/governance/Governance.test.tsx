@@ -4,9 +4,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 import {
   mockGovernanceDecisions,
   mockDecisionVotes,
@@ -16,50 +13,6 @@ import {
   mockGovernanceStats,
   governanceTestUsers,
 } from '../../fixtures/governance.fixtures';
-
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn((table) => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => Promise.resolve({ 
-          data: table === 'governance_decisions' ? mockGovernanceDecisions : mockAnnualDisclosures, 
-          error: null 
-        })),
-        eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: mockGovernanceDecisions[0], error: null })),
-          order: vi.fn(() => Promise.resolve({ data: mockDecisionVotes, error: null })),
-        })),
-      })),
-      insert: vi.fn(() => Promise.resolve({ data: mockGovernanceDecisions[0], error: null })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ data: mockGovernanceDecisions[0], error: null })),
-      })),
-    })),
-    auth: {
-      getUser: vi.fn(() => Promise.resolve({ 
-        data: { user: governanceTestUsers.nazer }, 
-        error: null 
-      })),
-    },
-  },
-}));
-
-const createTestQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-    },
-  });
-
-const renderWithProviders = (component: React.ReactNode) => {
-  const queryClient = createTestQueryClient();
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{component}</BrowserRouter>
-    </QueryClientProvider>
-  );
-};
 
 describe('Governance Decisions', () => {
   beforeEach(() => {
@@ -158,7 +111,7 @@ describe('Governance Decisions', () => {
       const rejectCount = mockDecisionVotes.filter(v => v.vote === 'reject').length;
       const totalVotes = mockDecisionVotes.length;
 
-      expect(approveCount / totalVotes).toBeGreaterThan(0.5); // Majority approved
+      expect(approveCount / totalVotes).toBeGreaterThan(0.5);
     });
   });
 });
@@ -180,7 +133,7 @@ describe('Annual Disclosures', () => {
     it('should order disclosures by year', () => {
       const years = mockAnnualDisclosures.map(d => d.year);
       const sortedYears = [...years].sort((a, b) => b - a);
-      expect(years[0]).toBe(sortedYears[0]); // Most recent first
+      expect(years[0]).toBe(sortedYears[0]);
     });
   });
 
@@ -214,7 +167,6 @@ describe('Annual Disclosures', () => {
       const disclosure = mockAnnualDisclosures[0];
       const totalPercentage = disclosure.nazer_percentage + disclosure.charity_percentage + disclosure.corpus_percentage;
       
-      // Remaining goes to beneficiaries
       expect(100 - totalPercentage).toBe(60);
     });
   });
