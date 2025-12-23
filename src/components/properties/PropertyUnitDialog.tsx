@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Loader2 } from "lucide-react";
 import { PropertyService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 
 type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
@@ -70,6 +71,14 @@ export function PropertyUnitDialog({
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // جلب الرقم التالي للوحدة عند إضافة وحدة جديدة
+  const { data: nextUnitNumber, isLoading: isLoadingNextNumber } = useQuery({
+    queryKey: ['next-unit-number', propertyId],
+    queryFn: () => PropertyService.getNextUnitNumber(propertyId),
+    enabled: open && !unit && !!propertyId,
+    staleTime: 0,
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -106,9 +115,9 @@ export function PropertyUnitDialog({
         description: unit.description || "",
         notes: unit.notes || "",
       });
-    } else {
+    } else if (nextUnitNumber) {
       form.reset({
-        unit_number: "",
+        unit_number: nextUnitNumber,
         unit_name: "",
         unit_type: "شقة",
         rooms: 2,
@@ -120,7 +129,7 @@ export function PropertyUnitDialog({
         occupancy_status: "شاغر",
       });
     }
-  }, [unit, form.reset]);
+  }, [unit, nextUnitNumber, form.reset]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -195,7 +204,18 @@ export function PropertyUnitDialog({
                   <FormItem>
                     <FormLabel>رقم الوحدة *</FormLabel>
                     <FormControl>
-                      <Input placeholder="101" {...field} />
+                      <div className="relative">
+                        <Input 
+                          placeholder="101" 
+                          {...field} 
+                          disabled={isLoadingNextNumber && !unit}
+                        />
+                        {isLoadingNextNumber && !unit && (
+                          <div className="absolute start-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

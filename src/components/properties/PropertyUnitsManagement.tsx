@@ -169,12 +169,12 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
         <CardContent className="space-y-4">
           {/* بحث */}
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="بحث برقم أو اسم الوحدة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pe-10"
+              className="ps-10"
             />
           </div>
 

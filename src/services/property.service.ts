@@ -262,6 +262,40 @@ export class PropertyService {
   }
 
   /**
+   * جلب الرقم التالي للوحدة
+   */
+  static async getNextUnitNumber(propertyId: string): Promise<string> {
+    try {
+      const { data: units, error } = await supabase
+        .from('property_units')
+        .select('unit_number')
+        .eq('property_id', propertyId)
+        .order('unit_number', { ascending: false });
+
+      if (error) throw error;
+
+      if (!units || units.length === 0) {
+        return '101';
+      }
+
+      // البحث عن أعلى رقم وزيادته
+      const numbers = units
+        .map(u => parseInt(u.unit_number.replace(/\D/g, ''), 10))
+        .filter(n => !isNaN(n));
+
+      if (numbers.length === 0) {
+        return '101';
+      }
+
+      const maxNumber = Math.max(...numbers);
+      return String(maxNumber + 1);
+    } catch (error) {
+      productionLogger.error('Error getting next unit number', error);
+      return '101';
+    }
+  }
+
+  /**
    * إنشاء وحدة جديدة
    */
   static async createUnit(unit: Database['public']['Tables']['property_units']['Insert']): Promise<Database['public']['Tables']['property_units']['Row']> {
