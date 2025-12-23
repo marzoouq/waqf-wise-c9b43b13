@@ -73,6 +73,20 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
 
   // إرسال النموذج
   const onSubmit = async (data: ContractFormValues) => {
+    // التحقق من اختيار الوحدات عند الإضافة الجديدة
+    if (!isEditing && data.unit_ids.length === 0) {
+      form.setError('unit_ids', { 
+        type: 'manual', 
+        message: 'اختر وحدة واحدة على الأقل' 
+      });
+      toast({
+        title: "خطأ في البيانات",
+        description: "يرجى اختيار وحدة واحدة على الأقل",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // حساب القيم المشتقة
     const durationInMonths = data.duration_unit === 'سنوات' 
       ? data.duration_value * 12 
