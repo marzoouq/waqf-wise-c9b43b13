@@ -76,7 +76,7 @@
 
 ## تحديثات الأمان
 
-### آخر تحديث: 22 ديسمبر 2025 (النسخة 3.1.0)
+### آخر تحديث: 23 ديسمبر 2025 (النسخة 2.9.25)
 
 #### التحديثات المنفذة:
 - ✅ **675 سياسة RLS** محسّنة ومحدثة
@@ -85,8 +85,32 @@
 - ✅ **189 Trigger** للأمان والتدقيق
 - ✅ **Audit Logging شامل**
 - ✅ **كلمات مرور آمنة** باستخدام `crypto.getRandomValues()`
+- ✅ **اختبارات RLS تكاملية** (156 اختبار)
+- ✅ **اختبارات انحدار الصلاحيات** (63 سيناريو)
+- ✅ **CI/CD أمني** مع GitHub Actions
+- ✅ **لوحة المطور** للمراقبة الأمنية
 
-انظر [docs/security/edge-functions-security-report.md](./docs/security/edge-functions-security-report.md) للتفاصيل الكاملة.
+## التوثيق الأمني
+
+| الملف | الوصف |
+|-------|-------|
+| [RLS_POLICIES.md](./docs/security/RLS_POLICIES.md) | سياسات Row Level Security |
+| [TESTING_GUIDE.md](./docs/security/TESTING_GUIDE.md) | دليل اختبارات الأمان |
+| [INCIDENT_RESPONSE.md](./docs/security/INCIDENT_RESPONSE.md) | خطة الاستجابة للحوادث |
+| [edge-functions-security-report.md](./docs/security/edge-functions-security-report.md) | تقرير أمان Edge Functions |
+
+## لوحة المطور
+
+للوصول لمؤشرات الأمان المباشرة:
+```
+/developer → لوحة المطور (للمسؤولين فقط)
+```
+
+تشمل:
+- تغطية RLS (90%+)
+- صحة النظام
+- الأحداث الأمنية
+- حالة CI/CD
 
 سننشر تحديثات الأمان في:
 1. GitHub Security Advisories
