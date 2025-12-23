@@ -66,6 +66,8 @@ export function useContractForm(contract?: Contract | null) {
   const prevCalcInputs = useRef<string>('');
   // تخزين start_date منفصلاً لتجنب التبعية على formData
   const startDateRef = useRef<string>('');
+  // تشخيص: عدّاد استدعاءات toggleUnit
+  const toggleUnitCallsRef = useRef(0);
 
   // تحديث ref عند تغير start_date
   useEffect(() => {
@@ -168,11 +170,31 @@ export function useContractForm(contract?: Contract | null) {
   }, []);
 
   const toggleUnit = useCallback((unitId: string) => {
-    setSelectedUnits(prev => 
-      prev.includes(unitId) 
-        ? prev.filter(id => id !== unitId)
-        : [...prev, unitId]
-    );
+    if (import.meta.env.DEV) {
+      toggleUnitCallsRef.current += 1;
+      console.debug("[Contract] toggleUnit call", {
+        call: toggleUnitCallsRef.current,
+        unitId,
+      });
+    }
+
+    setSelectedUnits((prev) => {
+      const next = prev.includes(unitId)
+        ? prev.filter((id) => id !== unitId)
+        : [...prev, unitId];
+
+      if (import.meta.env.DEV) {
+        console.debug("[Contract] toggleUnit state", {
+          unitId,
+          before: prev.length,
+          after: next.length,
+          beforeIds: prev,
+          afterIds: next,
+        });
+      }
+
+      return next;
+    });
   }, []);
 
   return {
