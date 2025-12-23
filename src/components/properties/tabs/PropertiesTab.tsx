@@ -8,7 +8,33 @@ import { StatCard } from "@/components/dashboard/DashboardStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 
+// تعريف الفلاتر
+const propertiesFilterConfigs: FilterConfig[] = [
+  {
+    key: 'type',
+    label: 'نوع العقار',
+    type: 'select',
+    options: [
+      { value: 'سكني', label: 'سكني' },
+      { value: 'تجاري', label: 'تجاري' },
+      { value: 'مختلط', label: 'مختلط' },
+    ],
+  },
+  {
+    key: 'status',
+    label: 'الحالة',
+    type: 'select',
+    options: [
+      { value: 'مؤجر', label: 'مؤجر' },
+      { value: 'شاغر', label: 'شاغر' },
+      { value: 'صيانة', label: 'تحت الصيانة' },
+    ],
+  },
+  { key: 'location', label: 'الموقع', type: 'text' },
+];
 
 interface Props {
   onEdit: (property: Property) => void;
@@ -17,6 +43,7 @@ interface Props {
 
 export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const { properties, isLoading, deleteProperty } = useProperties();
 
   const {
@@ -39,16 +66,34 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   });
 
   const filteredProperties = useMemo(() => {
-    if (!searchQuery) return properties;
+    let result = properties || [];
     
-    const query = searchQuery.toLowerCase();
-    return properties?.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.type.toLowerCase().includes(query) ||
-        p.location.toLowerCase().includes(query)
-    ) || [];
-  }, [properties, searchQuery]);
+    // فلترة بالبحث
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.type.toLowerCase().includes(query) ||
+          p.location.toLowerCase().includes(query)
+      );
+    }
+    
+    // فلترة بالفلاتر المتقدمة
+    if (advancedFilters.type) {
+      result = result.filter(p => p.type === advancedFilters.type);
+    }
+    if (advancedFilters.status) {
+      result = result.filter(p => p.status === advancedFilters.status);
+    }
+    if (advancedFilters.location) {
+      result = result.filter(p => 
+        p.location.toLowerCase().includes(String(advancedFilters.location).toLowerCase())
+      );
+    }
+    
+    return result;
+  }, [properties, searchQuery, advancedFilters]);
 
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
@@ -87,16 +132,42 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
     confirmDelete(id, name);
   };
 
+  // بيانات التصدير
+  const exportData = filteredProperties.map(p => ({
+    'اسم العقار': p.name,
+    'النوع': p.type,
+    'الموقع': p.location,
+    'الوحدات الكلية': p.units,
+    'الوحدات المشغولة': p.occupied,
+    'الوحدات الشاغرة': p.units - p.occupied,
+    'الإيراد الشهري': Number(p.monthly_revenue || 0).toLocaleString(),
+    'الحالة': p.status,
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن عقار..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pe-10"
+      {/* Search, Filters, and Export */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="البحث عن عقار..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pe-10"
+          />
+        </div>
+        <AdvancedFiltersDialog
+          filters={propertiesFilterConfigs}
+          activeFilters={advancedFilters}
+          onApplyFilters={setAdvancedFilters}
+          onClearFilters={() => setAdvancedFilters({})}
+        />
+        <ExportButton
+          data={exportData}
+          filename="العقارات"
+          title="العقارات"
+          headers={['اسم العقار', 'النوع', 'الموقع', 'الوحدات الكلية', 'الوحدات المشغولة', 'الوحدات الشاغرة', 'الإيراد الشهري', 'الحالة']}
         />
       </div>
 

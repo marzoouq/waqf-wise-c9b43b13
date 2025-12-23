@@ -12,6 +12,45 @@ import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+
+// تعريف الفلاتر
+const maintenanceFilterConfigs: FilterConfig[] = [
+  {
+    key: 'status',
+    label: 'الحالة',
+    type: 'select',
+    options: [
+      { value: 'جديد', label: 'جديد' },
+      { value: 'قيد المراجعة', label: 'قيد المراجعة' },
+      { value: 'قيد التنفيذ', label: 'قيد التنفيذ' },
+      { value: 'مكتمل', label: 'مكتمل' },
+      { value: 'ملغي', label: 'ملغي' },
+    ],
+  },
+  {
+    key: 'priority',
+    label: 'الأولوية',
+    type: 'select',
+    options: [
+      { value: 'عاجلة', label: 'عاجلة' },
+      { value: 'عالية', label: 'عالية' },
+      { value: 'عادية', label: 'عادية' },
+      { value: 'منخفضة', label: 'منخفضة' },
+    ],
+  },
+  {
+    key: 'category',
+    label: 'الفئة',
+    type: 'select',
+    options: [
+      { value: 'كهرباء', label: 'كهرباء' },
+      { value: 'سباكة', label: 'سباكة' },
+      { value: 'تكييف', label: 'تكييف' },
+      { value: 'عام', label: 'عام' },
+    ],
+  },
+];
 
 interface Props {
   onEdit: (request: MaintenanceRequest) => void;
@@ -19,6 +58,7 @@ interface Props {
 
 export const MaintenanceTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<MaintenanceRequest | null>(null);
   const { requests, isLoading, deleteRequest } = useMaintenanceRequests();
@@ -26,7 +66,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   const handleDeleteClick = (request: MaintenanceRequest) => {
     if (request.status !== "جديد" && request.status !== "ملغي") {
-      return; // يمكن حذف فقط الطلبات الجديدة أو الملغاة
+      return;
     }
     setRequestToDelete(request);
     setDeleteDialogOpen(true);
@@ -41,16 +81,32 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   };
 
   const filteredRequests = useMemo(() => {
-    if (!searchQuery) return requests;
+    let result = requests || [];
     
-    const query = searchQuery.toLowerCase();
-    return requests?.filter(
-      (r) =>
-        r.request_number.toLowerCase().includes(query) ||
-        r.title.toLowerCase().includes(query) ||
-        r.properties?.name.toLowerCase().includes(query)
-    ) || [];
-  }, [requests, searchQuery]);
+    // فلترة بالبحث
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (r) =>
+          r.request_number.toLowerCase().includes(query) ||
+          r.title.toLowerCase().includes(query) ||
+          r.properties?.name.toLowerCase().includes(query)
+      );
+    }
+    
+    // فلترة بالفلاتر المتقدمة
+    if (advancedFilters.status) {
+      result = result.filter(r => r.status === advancedFilters.status);
+    }
+    if (advancedFilters.priority) {
+      result = result.filter(r => r.priority === advancedFilters.priority);
+    }
+    if (advancedFilters.category) {
+      result = result.filter(r => r.category === advancedFilters.category);
+    }
+    
+    return result;
+  }, [requests, searchQuery, advancedFilters]);
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -83,7 +139,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       {/* Maintenance Schedule Calendar */}
       <MaintenanceScheduleCalendar schedules={schedules} />
 
-      {/* Search and Export */}
+      {/* Search, Filters, and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -94,6 +150,12 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             className="pe-10"
           />
         </div>
+        <AdvancedFiltersDialog
+          filters={maintenanceFilterConfigs}
+          activeFilters={advancedFilters}
+          onApplyFilters={setAdvancedFilters}
+          onClearFilters={() => setAdvancedFilters({})}
+        />
         {filteredRequests.length > 0 && (
           <ExportButton
             data={filteredRequests.map(r => ({

@@ -16,6 +16,32 @@ import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+
+// تعريف الفلاتر
+const contractsFilterConfigs: FilterConfig[] = [
+  {
+    key: 'status',
+    label: 'حالة العقد',
+    type: 'select',
+    options: [
+      { value: 'نشط', label: 'نشط' },
+      { value: 'منتهي', label: 'منتهي' },
+      { value: 'ملغي', label: 'ملغي' },
+    ],
+  },
+  {
+    key: 'contract_type',
+    label: 'نوع العقد',
+    type: 'select',
+    options: [
+      { value: 'سكني', label: 'سكني' },
+      { value: 'تجاري', label: 'تجاري' },
+    ],
+  },
+  { key: 'start_date', label: 'تاريخ البداية (من)', type: 'date' },
+  { key: 'end_date', label: 'تاريخ النهاية (إلى)', type: 'date' },
+];
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -23,6 +49,7 @@ interface Props {
 
 export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [printContract, setPrintContract] = useState<Contract | null>(null);
   
   const { 
@@ -71,18 +98,39 @@ export const ContractsTab = ({ onEdit }: Props) => {
     }, 100);
   };
 
-  // البحث المحلي في الصفحة الحالية
+  // البحث والفلترة المحلية
   const filteredContracts = useMemo(() => {
-    if (!searchQuery) return contracts;
+    let result = contracts || [];
     
-    const query = searchQuery.toLowerCase();
-    return contracts?.filter(
-      (c) =>
-        c.contract_number.toLowerCase().includes(query) ||
-        c.tenant_name.toLowerCase().includes(query) ||
-        c.properties?.name?.toLowerCase().includes(query)
-    ) || [];
-  }, [contracts, searchQuery]);
+    // فلترة بالبحث
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.contract_number.toLowerCase().includes(query) ||
+          c.tenant_name.toLowerCase().includes(query) ||
+          c.properties?.name?.toLowerCase().includes(query)
+      );
+    }
+    
+    // فلترة بالفلاتر المتقدمة
+    if (advancedFilters.status) {
+      result = result.filter(c => c.status === advancedFilters.status);
+    }
+    if (advancedFilters.contract_type) {
+      result = result.filter(c => c.contract_type === advancedFilters.contract_type);
+    }
+    if (advancedFilters.start_date) {
+      const startDate = new Date(String(advancedFilters.start_date));
+      result = result.filter(c => new Date(c.start_date) >= startDate);
+    }
+    if (advancedFilters.end_date) {
+      const endDate = new Date(String(advancedFilters.end_date));
+      result = result.filter(c => new Date(c.end_date) <= endDate);
+    }
+    
+    return result;
+  }, [contracts, searchQuery, advancedFilters]);
 
   const exportData = filteredContracts.map(c => ({
     'رقم العقد': c.contract_number,
@@ -103,7 +151,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
       {/* Contract Expiry Alerts */}
       <ContractExpiryAlert contracts={contracts as Contract[]} />
 
-      {/* Search and Export */}
+      {/* Search, Filters, and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -114,6 +162,12 @@ export const ContractsTab = ({ onEdit }: Props) => {
             className="pe-10"
           />
         </div>
+        <AdvancedFiltersDialog
+          filters={contractsFilterConfigs}
+          activeFilters={advancedFilters}
+          onApplyFilters={setAdvancedFilters}
+          onClearFilters={() => setAdvancedFilters({})}
+        />
         <ExportButton
           data={exportData}
           filename="العقود"
