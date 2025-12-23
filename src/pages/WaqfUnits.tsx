@@ -225,12 +225,12 @@ export default function WaqfUnits() {
       <Card className="p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="بحث بالاسم، الكود، أو الموقع..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pe-10"
+              className="ps-10"
             />
           </div>
           <AdvancedFiltersDialog
