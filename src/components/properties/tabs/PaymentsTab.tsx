@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
 import { useRentalPayments, type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { useDocumentViewer } from "@/hooks/payments/useDocumentViewer";
+import { useTableSort } from "@/hooks/ui/useTableSort";
 import { Input } from "@/components/ui/input";
 import { ArrearsReport } from "@/components/rental/ArrearsReport";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,8 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
 
 // تعريف الفلاتر
 const paymentsFilterConfigs: FilterConfig[] = [
@@ -39,6 +42,8 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<RentalPayment | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   
   const { payments, isLoading, deletePayment } = useRentalPayments();
   const { viewInvoice, viewReceipt } = useDocumentViewer();
@@ -122,6 +127,24 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     return result;
   }, [payments, searchQuery, advancedFilters]);
 
+  // Sorting
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredPayments,
+    defaultSortKey: 'due_date',
+    defaultDirection: 'desc',
+  });
+
+  // Pagination
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, advancedFilters]);
 
   const totalPaid = payments?.filter(p => p.status === 'مدفوع' || p.payment_date).reduce((sum, p) => sum + Number(p.amount_paid), 0) || 0;
   const underCollectionPayments = payments?.filter(p => p.status === 'تحت التحصيل').reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
@@ -284,7 +307,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
             )
           }
         ]}
-        data={filteredPayments}
+        data={paginatedData}
         loading={isLoading}
         emptyMessage="لا توجد دفعات"
         actions={(payment: RentalPayment) => (
@@ -333,6 +356,30 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         )}
         showMobileScrollHint={true}
       />
+
+      {/* Pagination Controls */}
+      {totalItems > 0 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+          startIndex={startIndex + 1}
+          endIndex={endIndex}
+          canGoNext={currentPage < totalPages}
+          canGoPrev={currentPage > 1}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+          onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+          onPrev={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onFirst={() => setCurrentPage(1)}
+          onLast={() => setCurrentPage(totalPages)}
+        />
+      )}
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}

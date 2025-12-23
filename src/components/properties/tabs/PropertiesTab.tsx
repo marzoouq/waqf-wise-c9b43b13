@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
 import { useProperties, type Property } from "@/hooks/property/useProperties";
+import { useTableSort } from "@/hooks/ui/useTableSort";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
 
 // تعريف الفلاتر
 const propertiesFilterConfigs: FilterConfig[] = [
@@ -44,6 +47,8 @@ interface Props {
 export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { properties, isLoading, deleteProperty } = useProperties();
 
   const {
@@ -94,6 +99,25 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
     
     return result;
   }, [properties, searchQuery, advancedFilters]);
+
+  // Sorting
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredProperties,
+    defaultSortKey: 'name',
+    defaultDirection: 'asc',
+  });
+
+  // Pagination
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, advancedFilters]);
 
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
@@ -252,7 +276,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
             )
           }
         ]}
-        data={filteredProperties}
+        data={paginatedData}
         loading={isLoading}
         emptyMessage="لا توجد عقارات"
         actions={(property: Property) => (
@@ -290,6 +314,30 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
         )}
         showMobileScrollHint={true}
       />
+
+      {/* Pagination Controls */}
+      {totalItems > 0 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+          startIndex={startIndex + 1}
+          endIndex={endIndex}
+          canGoNext={currentPage < totalPages}
+          canGoPrev={currentPage > 1}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+          onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+          onPrev={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onFirst={() => setCurrentPage(1)}
+          onLast={() => setCurrentPage(totalPages)}
+        />
+      )}
 
       <DeleteConfirmDialog
         open={isDeleteOpen}
