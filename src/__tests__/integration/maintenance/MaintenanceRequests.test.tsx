@@ -4,52 +4,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 import {
   mockMaintenanceRequests,
   mockMaintenanceProviders,
   mockMaintenanceSchedules,
   mockMaintenanceStats,
 } from '../../fixtures/maintenance.fixtures';
-
-// Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn((table) => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => Promise.resolve({ 
-          data: table === 'maintenance_requests' ? mockMaintenanceRequests : mockMaintenanceProviders, 
-          error: null 
-        })),
-        eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: mockMaintenanceRequests[0], error: null })),
-        })),
-      })),
-      insert: vi.fn(() => Promise.resolve({ data: mockMaintenanceRequests[0], error: null })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ data: mockMaintenanceRequests[0], error: null })),
-      })),
-    })),
-  },
-}));
-
-const createTestQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-    },
-  });
-
-const renderWithProviders = (component: React.ReactNode) => {
-  const queryClient = createTestQueryClient();
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{component}</BrowserRouter>
-    </QueryClientProvider>
-  );
-};
 
 describe('Maintenance Requests', () => {
   beforeEach(() => {
@@ -198,7 +158,6 @@ describe('Maintenance Service', () => {
         request_type: 'hvac',
       };
 
-      // Validate required fields
       expect(newRequest.title).toBeDefined();
       expect(newRequest.property_id).toBeDefined();
       expect(newRequest.priority).toBeDefined();
@@ -206,7 +165,7 @@ describe('Maintenance Service', () => {
 
     it('should validate request data before creation', () => {
       const invalidRequest = {
-        title: '', // Empty title should fail
+        title: '',
         property_id: 'prop-1',
       };
 
