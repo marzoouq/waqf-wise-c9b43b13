@@ -12,6 +12,7 @@ import {
   AuditLogs,
   SystemMonitoring,
   SystemErrorLogs,
+  DeveloperDashboard,
   SecurityDashboard,
   PerformanceDashboard,
   DatabasePerformanceDashboard,
@@ -79,6 +80,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <SystemErrorLogs />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="developer-dashboard"
+    path="/developer" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <DeveloperDashboard />
       </ProtectedRoute>
     } 
   />,
