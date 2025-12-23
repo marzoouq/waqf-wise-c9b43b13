@@ -68,14 +68,14 @@ describe('useChatbot Hook', () => {
   describe('تحميل المحادثات', () => {
     it('يجب تحميل المحادثات عند بدء التشغيل', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
-      await ChatbotService.getConversations();
+      await ChatbotService.getConversations('user-1');
       
-      expect(ChatbotService.getConversations).toHaveBeenCalled();
+      expect(ChatbotService.getConversations).toHaveBeenCalledWith('user-1');
     });
 
     it('يجب إرجاع قائمة الرسائل', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
-      const messages = await ChatbotService.getConversations();
+      const messages = await ChatbotService.getConversations('user-1');
       
       expect(messages).toEqual(mockChatMessages);
       expect(messages).toHaveLength(4);
@@ -106,15 +106,15 @@ describe('useChatbot Hook', () => {
   describe('إرسال الرسائل', () => {
     it('يجب إرسال رسالة بنجاح', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
-      const response = await ChatbotService.sendMessage('سؤال اختباري');
+      const response = await ChatbotService.sendMessage('user-1', 'سؤال اختباري');
       
-      expect(ChatbotService.sendMessage).toHaveBeenCalledWith('سؤال اختباري');
+      expect(ChatbotService.sendMessage).toHaveBeenCalledWith('user-1', 'سؤال اختباري');
       expect(response.role).toBe('assistant');
     });
 
     it('يجب استلام رد من المساعد', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
-      const response = await ChatbotService.sendMessage('ما هو رصيدي؟');
+      const response = await ChatbotService.sendMessage('user-1', 'ما هو رصيدي؟');
       
       expect(response.content).toBeDefined();
       expect(response.content).toBe('إجابة المساعد الذكي');
@@ -129,7 +129,7 @@ describe('useChatbot Hook', () => {
   describe('مسح المحادثات', () => {
     it('يجب مسح المحادثات بنجاح', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
-      const result = await ChatbotService.clearConversations();
+      const result = await ChatbotService.clearConversations('user-1');
       
       expect(result).toBe(true);
     });
@@ -176,14 +176,14 @@ describe('useChatbot Hook', () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
       vi.mocked(ChatbotService.sendMessage).mockRejectedValueOnce(new Error('Send error'));
       
-      await expect(ChatbotService.sendMessage('test')).rejects.toThrow('Send error');
+      await expect(ChatbotService.sendMessage('user-1', 'test')).rejects.toThrow('Send error');
     });
 
     it('يجب التعامل مع خطأ في تحميل المحادثات', async () => {
       const { ChatbotService } = await import('@/services/chatbot.service');
       vi.mocked(ChatbotService.getConversations).mockRejectedValueOnce(new Error('Load error'));
       
-      await expect(ChatbotService.getConversations()).rejects.toThrow('Load error');
+      await expect(ChatbotService.getConversations('user-1')).rejects.toThrow('Load error');
     });
   });
 

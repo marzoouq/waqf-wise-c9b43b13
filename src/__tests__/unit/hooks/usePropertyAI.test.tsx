@@ -58,13 +58,13 @@ describe('usePropertyAI Hook', () => {
 
     it('يجب إرجاع نتيجة التحليل', async () => {
       const { EdgeFunctionService } = await import('@/services');
-      const result = await EdgeFunctionService.invoke('property-ai-assistant', {
+      const result = await EdgeFunctionService.invoke<{ analysis: string }>('property-ai-assistant', {
         action: 'analyze_property',
         data: { id: 'prop-1' },
       });
       
       expect(result.success).toBe(true);
-      expect(result.data.analysis).toBeDefined();
+      expect(result.data?.analysis).toBeDefined();
     });
 
     it('يجب عرض معدل الإشغال في التحليل', () => {
