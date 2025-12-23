@@ -20,14 +20,16 @@
 
 // النطاقات المسموح بها
 const ALLOWED_ORIGINS = [
-  // Production
-  'https://waqf-platform.lovable.app',
+  // Production - النطاق الرئيسي
+  'https://waqf-ba7r.store',
+  'https://www.waqf-ba7r.store',
+  // Lovable staging
   'https://zsacuvrcohmraoldilph.lovable.app',
   // Development
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:8080',
-// Lovable preview domains - دعم جميع الأنماط
+  // Lovable preview domains - دعم جميع الأنماط
   /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
   // دعم أي نمط: xxx--yyy.lovable.app (مثل id-preview--xxx, preview--xxx)
   /^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/,
@@ -60,8 +62,8 @@ function getAllowedOrigin(req: Request): string {
     return origin;
   }
   
-  // في حالة عدم وجود Origin أو غير مسموح، نستخدم أول نطاق إنتاجي
-  return 'https://waqf-platform.lovable.app';
+  // في حالة عدم وجود Origin أو غير مسموح، نستخدم النطاق الرئيسي
+  return 'https://waqf-ba7r.store';
 }
 
 /**
@@ -82,7 +84,7 @@ export function getCorsHeaders(req: Request): Record<string, string> {
 // ⚠️ DEPRECATED: استخدم getCorsHeaders(req) بدلاً من corsHeaders
 // الحفاظ على التوافق مع الكود الحالي - لكن مع تحذير
 /** @deprecated Use getCorsHeaders(req) instead for better security */
-export const corsHeaders = getCorsHeaders(new Request('https://waqf-platform.lovable.app'));
+export const corsHeaders = getCorsHeaders(new Request('https://waqf-ba7r.store'));
 
 /**
  * إنشاء Response للـ OPTIONS requests (CORS preflight)

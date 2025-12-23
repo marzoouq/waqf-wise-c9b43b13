@@ -24,7 +24,7 @@ export const WAQF_IDENTITY = {
   confidential: 'سري وخاص - للاستخدام الداخلي فقط',
   
   // معلومات الاتصال
-  website: 'waqf.lovable.app',
+  website: 'waqf-ba7r.store',
   
   // الألوان (ARGB للـ Excel, Hex للـ PDF/CSS)
   colors: {
