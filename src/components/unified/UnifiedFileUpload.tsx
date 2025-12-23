@@ -179,7 +179,7 @@ export function UnifiedFileUpload({
           onDrop={handleDrop}
         >
           {currentFile?.preview ? (
-            <img src={currentFile.preview} alt="Avatar" className="w-full h-full object-cover" />
+            <img src={currentFile.preview} alt="صورة الملف المحمل" className="w-full h-full object-cover" />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
               <Upload className="h-8 w-8 text-muted-foreground" />

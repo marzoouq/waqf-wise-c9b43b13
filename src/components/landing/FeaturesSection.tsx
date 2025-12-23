@@ -80,7 +80,7 @@ export function FeaturesSection() {
               <div
                 className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br ${feature.color} shadow-lg mb-3 sm:mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300`}
               >
-                <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary-foreground" />
+                <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary-foreground" aria-hidden="true" />
               </div>
 
               {/* Content */}
