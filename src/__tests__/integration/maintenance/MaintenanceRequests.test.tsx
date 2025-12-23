@@ -84,12 +84,12 @@ describe('Maintenance Requests', () => {
       const plumbingProviders = mockMaintenanceProviders.filter(p => 
         p.specialties.includes('سباكة')
       );
-      const electricalProviders = mockMaintenanceProviders.filter(p => 
-        p.specialties.includes('كهرباء')
+      const hvacProviders = mockMaintenanceProviders.filter(p => 
+        p.specialties.includes('تكييف')
       );
 
       expect(plumbingProviders).toHaveLength(1);
-      expect(electricalProviders).toHaveLength(1);
+      expect(hvacProviders).toHaveLength(1);
     });
 
     it('should display provider ratings', () => {
