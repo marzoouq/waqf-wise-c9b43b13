@@ -56,6 +56,79 @@ export {
   mockRentalPayments,
 } from './financial.fixtures';
 
+// المستخدمين والأدوار
+export {
+  testUsers,
+  testUserRoles,
+  testProfiles,
+  getUserByRole,
+  getAllTestUsers,
+  getRolesForUser,
+  userHasRole,
+  getExpectedDashboard,
+  loginScenarios,
+  permissionScenarios,
+  unauthorizedAccessScenarios,
+  createAuthContextMock,
+  nazerUser,
+  adminUser,
+  accountantUser,
+  cashierUser,
+  archivistUser,
+  mohamedMarzouq,
+} from './users.fixtures';
+
+// الأدوار والصلاحيات
+export {
+  systemRoles,
+  samplePermissions,
+  permissionCategories,
+  rolePermissionMappings,
+  roleAssignmentScenarios,
+  getPermissionsForRole,
+  roleHasPermission,
+  getRolesWithPermission,
+  getPermissionsByCategory,
+} from './roles.fixtures';
+
+// الدعم الفني
+export {
+  mockSupportTickets,
+  mockTicketComments,
+  mockTicketRatings,
+  mockSupportStats,
+  mockAgentAvailability,
+  mockAgentStats,
+  mockKnowledgeArticles,
+  supportFilters,
+} from './support.fixtures';
+
+// الإعدادات
+export {
+  mockLandingSettings,
+  mockZATCASettings,
+  mockNotificationSettings,
+  mockIntegrations,
+  mockBankIntegrations,
+  mockTransparencySettings,
+  mockSavedFilters,
+  mockAdvancedSettings,
+  updateSettingInput,
+  saveFilterInput,
+} from './settings.fixtures';
+
+// الحوكمة
+export * from './governance.fixtures';
+
+// الصيانة
+export * from './maintenance.fixtures';
+
+// نقطة البيع
+export * from './pos.fixtures';
+
+// الأمان
+export * from './security.fixtures';
+
 // ==================== KPIs الموحدة ====================
 import { beneficiaryStats } from './beneficiaries.fixtures';
 import { propertyStats, contractStats } from './properties.fixtures';
