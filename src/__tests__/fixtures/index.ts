@@ -129,6 +129,30 @@ export * from './pos.fixtures';
 // الأمان
 export * from './security.fixtures';
 
+// الأرشيف
+export * from './archive.fixtures';
+
+// الرسائل
+export * from './messages.fixtures';
+
+// قاعدة المعرفة
+export * from './knowledge.fixtures';
+
+// الإفصاحات
+export * from './disclosures.fixtures';
+
+// القروض
+export * from './loans.fixtures';
+
+// الصناديق
+export * from './funds.fixtures';
+
+// سندات الصرف
+export * from './vouchers.fixtures';
+
+// الوقف
+export * from './waqf.fixtures';
+
 // ==================== KPIs الموحدة ====================
 import { beneficiaryStats } from './beneficiaries.fixtures';
 import { propertyStats, contractStats } from './properties.fixtures';

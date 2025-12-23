@@ -1,0 +1,158 @@
+/**
+ * Disclosures Test Fixtures - بيانات اختبار الإفصاحات
+ * @version 1.0.0
+ */
+
+export const mockDisclosures = [
+  {
+    id: 'disclosure-1',
+    year: 2024,
+    fiscal_year_id: 'fy-2024',
+    waqf_name: 'وقف العائلة',
+    disclosure_date: '2024-03-31',
+    status: 'published',
+    published_at: '2024-04-01T10:00:00Z',
+    published_by: 'nazer-1',
+    total_revenues: 5000000,
+    total_expenses: 1500000,
+    net_income: 3500000,
+    total_beneficiaries: 150,
+    sons_count: 45,
+    daughters_count: 55,
+    wives_count: 10,
+    nazer_percentage: 10,
+    nazer_share: 350000,
+    corpus_percentage: 20,
+    corpus_share: 700000,
+    charity_percentage: 5,
+    charity_share: 175000,
+    opening_balance: 2000000,
+    closing_balance: 4825000,
+    administrative_expenses: 300000,
+    maintenance_expenses: 500000,
+    development_expenses: 200000,
+    other_expenses: 500000,
+    vat_amount: 75000,
+    created_at: '2024-03-30T10:00:00Z',
+    updated_at: '2024-04-01T10:00:00Z',
+  },
+  {
+    id: 'disclosure-2',
+    year: 2023,
+    fiscal_year_id: 'fy-2023',
+    waqf_name: 'وقف العائلة',
+    disclosure_date: '2023-03-31',
+    status: 'published',
+    published_at: '2023-04-01T10:00:00Z',
+    published_by: 'nazer-1',
+    total_revenues: 4500000,
+    total_expenses: 1200000,
+    net_income: 3300000,
+    total_beneficiaries: 145,
+    sons_count: 43,
+    daughters_count: 53,
+    wives_count: 9,
+    nazer_percentage: 10,
+    nazer_share: 330000,
+    corpus_percentage: 20,
+    corpus_share: 660000,
+    charity_percentage: 5,
+    charity_share: 165000,
+    opening_balance: 1500000,
+    closing_balance: 3645000,
+    administrative_expenses: 250000,
+    maintenance_expenses: 450000,
+    development_expenses: 150000,
+    other_expenses: 350000,
+    vat_amount: 67500,
+    created_at: '2023-03-30T10:00:00Z',
+    updated_at: '2023-04-01T10:00:00Z',
+  },
+  {
+    id: 'disclosure-3',
+    year: 2024,
+    fiscal_year_id: 'fy-2024-draft',
+    waqf_name: 'وقف العائلة',
+    disclosure_date: '2024-06-30',
+    status: 'draft',
+    published_at: null,
+    published_by: null,
+    total_revenues: 2500000,
+    total_expenses: 750000,
+    net_income: 1750000,
+    total_beneficiaries: 152,
+    sons_count: 46,
+    daughters_count: 56,
+    wives_count: 10,
+    nazer_percentage: 10,
+    nazer_share: 175000,
+    corpus_percentage: 20,
+    corpus_share: 350000,
+    charity_percentage: 5,
+    charity_share: 87500,
+    opening_balance: 4825000,
+    closing_balance: 5962500,
+    administrative_expenses: 150000,
+    maintenance_expenses: 250000,
+    development_expenses: 100000,
+    other_expenses: 250000,
+    vat_amount: 37500,
+    created_at: '2024-06-25T10:00:00Z',
+    updated_at: '2024-06-28T10:00:00Z',
+  },
+];
+
+export const mockDisclosureBeneficiaries = [
+  {
+    disclosure_id: 'disclosure-1',
+    beneficiary_id: 'ben-1',
+    beneficiary_name: 'محمد عبدالله',
+    relationship: 'ابن',
+    share_percentage: 2.5,
+    share_amount: 87500,
+    status: 'active',
+  },
+  {
+    disclosure_id: 'disclosure-1',
+    beneficiary_id: 'ben-2',
+    beneficiary_name: 'فاطمة عبدالله',
+    relationship: 'ابنة',
+    share_percentage: 1.875,
+    share_amount: 65625,
+    status: 'active',
+  },
+];
+
+export const mockRevenueBreakdown = [
+  { source: 'إيجارات عقارية', amount: 4000000, percentage: 80 },
+  { source: 'عوائد استثمارية', amount: 750000, percentage: 15 },
+  { source: 'أخرى', amount: 250000, percentage: 5 },
+];
+
+export const mockExpensesBreakdown = [
+  { category: 'مصاريف إدارية', amount: 300000, percentage: 20 },
+  { category: 'صيانة', amount: 500000, percentage: 33.33 },
+  { category: 'تطوير', amount: 200000, percentage: 13.33 },
+  { category: 'أخرى', amount: 500000, percentage: 33.33 },
+];
+
+export const mockMonthlyData = [
+  { month: 'يناير', revenues: 400000, expenses: 120000 },
+  { month: 'فبراير', revenues: 420000, expenses: 130000 },
+  { month: 'مارس', revenues: 450000, expenses: 125000 },
+];
+
+export const disclosureFilters = {
+  byYear: { year: 2024 },
+  byStatus: { status: 'published' },
+  byFiscalYear: { fiscalYearId: 'fy-2024' },
+  draftsOnly: { status: 'draft' },
+};
+
+export const mockDisclosureStats = {
+  total_disclosures: 5,
+  published_count: 4,
+  draft_count: 1,
+  total_distributed: 15000000,
+  average_beneficiaries: 148,
+};
