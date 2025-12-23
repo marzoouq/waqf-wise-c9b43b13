@@ -4,13 +4,12 @@ import { useRentalPayments, type RentalPayment } from "@/hooks/property/useRenta
 import { useDocumentViewer } from "@/hooks/payments/useDocumentViewer";
 import { Input } from "@/components/ui/input";
 import { ArrearsReport } from "@/components/rental/ArrearsReport";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
-
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -109,132 +108,159 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">إجمالي المدفوع</div>
-          <div className="text-2xl font-bold text-success">
-            {totalPaid.toLocaleString('ar-SA')} ر.س
+      {/* إحصائيات متجاوبة - 2 أعمدة على الجوال */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">إجمالي المدفوع</div>
+          <div className="text-lg sm:text-2xl font-bold text-success">
+            {totalPaid.toLocaleString('ar-SA')} <span className="text-xs sm:text-sm">ر.س</span>
           </div>
         </Card>
         
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">تحت التحصيل</div>
-          <div className="text-2xl font-bold text-warning">
-            {underCollectionPayments.toLocaleString('ar-SA')} ر.س
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">تحت التحصيل</div>
+          <div className="text-lg sm:text-2xl font-bold text-warning">
+            {underCollectionPayments.toLocaleString('ar-SA')} <span className="text-xs sm:text-sm">ر.س</span>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">معلق</div>
-          <div className="text-2xl font-bold text-info">
-            {totalDue.toLocaleString('ar-SA')} ر.س
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">معلق</div>
+          <div className="text-lg sm:text-2xl font-bold text-info">
+            {totalDue.toLocaleString('ar-SA')} <span className="text-xs sm:text-sm">ر.س</span>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">المتأخرات</div>
-          <div className="text-2xl font-bold text-destructive">
-            {overduePayments.toLocaleString('ar-SA')} ر.س
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">المتأخرات</div>
+          <div className="text-lg sm:text-2xl font-bold text-destructive">
+            {overduePayments.toLocaleString('ar-SA')} <span className="text-xs sm:text-sm">ر.س</span>
           </div>
         </Card>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">جاري التحميل...</div>
-      ) : filteredPayments.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">لا توجد دفعات</div>
-      ) : (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم الدفعة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقد</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">المستأجر</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">المبلغ المستحق</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">المبلغ المدفوع</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">المتبقي</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPayments.map((payment, index) => (
-                <TableRow 
-                  key={payment.id}
-                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
-                >
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{payment.payment_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{payment.contracts?.contract_number || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{payment.contracts?.tenant_name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
-                    {format(new Date(payment.due_date), 'yyyy/MM/dd', { locale: ar })}
-                  </TableCell>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden md:table-cell">
-                    {Number(payment.amount_due).toLocaleString()} ر.س
-                  </TableCell>
-                  <TableCell className="font-bold text-success text-xs sm:text-sm whitespace-nowrap py-3 px-4">
-                    {Number(payment.amount_paid).toLocaleString()} ر.س
-                  </TableCell>
-                  <TableCell className="font-bold text-warning text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden lg:table-cell">
-                    {(Number(payment.amount_due) - Number(payment.amount_paid)).toLocaleString()} ر.س
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <Badge className={getPaymentStatus(payment).color}>
-                      {getPaymentStatus(payment).status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <div className="flex gap-1">
-                      {payment.invoice_id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewInvoice(payment)}
-                          title="عرض الفاتورة"
-                          className="text-info hover:text-info/80 hover:bg-info/10"
-                        >
-                          <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                      )}
-                      {payment.receipt_id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewReceipt(payment)}
-                          title="عرض سند القبض"
-                          className="text-success hover:text-success/80 hover:bg-success/10"
-                        >
-                          <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(payment)}
-                        title="تعديل الدفعة"
-                        className="hover:bg-primary/10"
-                      >
-                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteClick(payment)}
-                        title="حذف الدفعة"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      {/* جدول الدفعات باستخدام UnifiedDataTable */}
+      <UnifiedDataTable
+        title="الدفعات"
+        columns={[
+          {
+            key: "payment_number",
+            label: "رقم الدفعة",
+            render: (value: string) => <span className="font-medium">{value}</span>
+          },
+          {
+            key: "contract",
+            label: "العقد",
+            hideOnMobile: true,
+            hideOnTablet: true,
+            render: (_: unknown, row: RentalPayment) => row.contracts?.contract_number || '-'
+          },
+          {
+            key: "tenant",
+            label: "المستأجر",
+            hideOnMobile: true,
+            render: (_: unknown, row: RentalPayment) => row.contracts?.tenant_name || '-'
+          },
+          {
+            key: "due_date",
+            label: "تاريخ الاستحقاق",
+            hideOnMobile: true,
+            hideOnTablet: true,
+            render: (_: unknown, row: RentalPayment) => (
+              <span className="whitespace-nowrap">
+                {format(new Date(row.due_date), 'yyyy/MM/dd', { locale: ar })}
+              </span>
+            )
+          },
+          {
+            key: "amount_due",
+            label: "المستحق",
+            hideOnMobile: true,
+            render: (value: number) => (
+              <span className="font-medium whitespace-nowrap">
+                {Number(value).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "amount_paid",
+            label: "المدفوع",
+            render: (value: number) => (
+              <span className="font-bold text-success whitespace-nowrap">
+                {Number(value).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "remaining",
+            label: "المتبقي",
+            hideOnMobile: true,
+            hideOnTablet: true,
+            render: (_: unknown, row: RentalPayment) => (
+              <span className="font-bold text-warning whitespace-nowrap">
+                {(Number(row.amount_due) - Number(row.amount_paid)).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "status",
+            label: "الحالة",
+            render: (_: unknown, row: RentalPayment) => (
+              <Badge className={getPaymentStatus(row).color}>
+                {getPaymentStatus(row).status}
+              </Badge>
+            )
+          }
+        ]}
+        data={filteredPayments}
+        loading={isLoading}
+        emptyMessage="لا توجد دفعات"
+        actions={(payment: RentalPayment) => (
+          <div className="flex gap-1">
+            {payment.invoice_id && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleViewInvoice(payment)}
+                title="عرض الفاتورة"
+                className="text-info hover:text-info/80 hover:bg-info/10 h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-2"
+              >
+                <FileText className="h-4 w-4" />
+              </Button>
+            )}
+            {payment.receipt_id && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleViewReceipt(payment)}
+                title="عرض سند القبض"
+                className="text-success hover:text-success/80 hover:bg-success/10 h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-2"
+              >
+                <Receipt className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(payment)}
+              title="تعديل الدفعة"
+              className="hover:bg-primary/10 h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-2"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDeleteClick(payment)}
+              title="حذف الدفعة"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-2"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        showMobileScrollHint={true}
+      />
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}

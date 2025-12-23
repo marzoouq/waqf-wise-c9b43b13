@@ -117,23 +117,23 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">إجمالي الطلبات</div>
-          <div className="text-2xl font-bold">{requests?.length || 0}</div>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">إجمالي الطلبات</div>
+          <div className="text-lg sm:text-2xl font-bold">{requests?.length || 0}</div>
         </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">مكتملة</div>
-          <div className="text-2xl font-bold text-success">{completed}</div>
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">مكتملة</div>
+          <div className="text-lg sm:text-2xl font-bold text-success">{completed}</div>
         </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">قيد التنفيذ</div>
-          <div className="text-2xl font-bold text-warning">{pending}</div>
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">قيد التنفيذ</div>
+          <div className="text-lg sm:text-2xl font-bold text-warning">{pending}</div>
         </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">التكلفة الإجمالية</div>
-          <div className="text-2xl font-bold text-primary">
-            {totalCost.toLocaleString()} ر.س
+        <Card className="p-3 sm:p-4">
+          <div className="text-xs sm:text-sm text-muted-foreground">التكلفة الإجمالية</div>
+          <div className="text-lg sm:text-2xl font-bold text-primary">
+            {totalCost.toLocaleString()} <span className="text-xs sm:text-sm">ر.س</span>
           </div>
         </Card>
       </div>

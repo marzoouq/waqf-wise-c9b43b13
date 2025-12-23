@@ -189,11 +189,20 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
 
           <RenewalFields form={form} />
 
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end pt-4 border-t">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm"
+            >
               إلغاء
             </Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button 
+              type="submit" 
+              disabled={form.formState.isSubmitting}
+              className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm"
+            >
               {contract ? "تحديث" : "إضافة"}
             </Button>
           </div>
