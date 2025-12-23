@@ -44,14 +44,22 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
 
   // تحديث العقار المحدد فوراً عند التغيير
   useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.debug("[ContractDialog] sync property", {
+        formPropertyId: formData.property_id,
+        selectedPropertyId,
+        isEditing: !!contract,
+        selectedUnitsCount: selectedUnits.length,
+      });
+    }
+
     if (formData.property_id && formData.property_id !== selectedPropertyId) {
       setSelectedPropertyId(formData.property_id);
       if (!contract) {
         setSelectedUnits([]);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.property_id, contract]);
+  }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits, selectedUnits.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
