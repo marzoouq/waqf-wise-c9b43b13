@@ -1,15 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- الصفحة الرئيسية -->
   <url>
     <loc>https://waqf-ba7r.store/</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  
+  <!-- صفحة تسجيل الدخول -->
   <url>
     <loc>https://waqf-ba7r.store/login</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <!-- صفحة التسجيل -->
+  <url>
+    <loc>https://waqf-ba7r.store/signup</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- الأسئلة الشائعة -->
+  <url>
+    <loc>https://waqf-ba7r.store/faq</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- اتصل بنا -->
+  <url>
+    <loc>https://waqf-ba7r.store/contact</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- دليل حوكمة الوقف -->
+  <url>
+    <loc>https://waqf-ba7r.store/waqf-governance-guide</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- سياسة الخصوصية -->
+  <url>
+    <loc>https://waqf-ba7r.store/privacy-policy</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- شروط الاستخدام -->
+  <url>
+    <loc>https://waqf-ba7r.store/terms-of-use</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- سياسة الأمان -->
+  <url>
+    <loc>https://waqf-ba7r.store/security-policy</loc>
+    <lastmod>2025-12-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>
