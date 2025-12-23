@@ -33,6 +33,18 @@ import {
   TrendingUp,
   Calendar,
   Store,
+  Code,
+  ShieldCheck,
+  Gauge,
+  Database,
+  TestTube,
+  Plug,
+  HeartHandshake,
+  Clock,
+  Palette,
+  Eye,
+  BellRing,
+  Zap,
 } from "lucide-react";
 import {
   Sidebar,
@@ -77,6 +89,7 @@ const menuGroups = [
       { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: CheckSquare, label: "إدارة الطلبات", path: "/staff/requests", roles: ["admin", "accountant", "nazer"] },
+      { icon: HeartHandshake, label: "المساعدات الطارئة", path: "/emergency-aid", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
       { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
@@ -97,6 +110,7 @@ const menuGroups = [
       { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
       { icon: HandCoins, label: "القروض", path: "/loans", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "التحويلات البنكية", path: "/bank-transfers", roles: ["admin", "accountant", "nazer"] },
+      { icon: Clock, label: "تقرير أعمار المستأجرين", path: "/tenants/aging-report", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
@@ -120,7 +134,7 @@ const menuGroups = [
       { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"], id: "ai-insights" },
       { icon: ScanSearch, label: "الفحص الذكي", path: "/ai-audit", roles: ["admin", "nazer"], id: "ai-audit" },
-      { icon: Activity, label: "مراقبة Edge", path: "/edge-monitor", roles: ["admin"], id: "edge-monitor" },
+      { icon: Zap, label: "مراقبة Edge", path: "/edge-monitor", roles: ["admin", "nazer"], id: "edge-monitor" },
       { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], id: "chatbot" },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"], id: "audit-logs" },
     ]
@@ -145,22 +159,41 @@ const menuGroups = [
       { icon: Mail, label: "الرسائل الداخلية", path: "/messages", roles: ["all"] },
       { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
       { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
-      { icon: BookOpen, label: "قاعدة المعرفة", path: "/support#knowledge", roles: ["all"] },
+      { icon: BookOpen, label: "قاعدة المعرفة", path: "/knowledge-base", roles: ["all"] },
     ]
   },
   {
     id: "system",
     label: "إدارة النظام",
     icon: Settings,
-    roles: ["admin"],
+    roles: ["admin", "nazer"],
     subItems: [
       { icon: Shield, label: "المستخدمون", path: "/users", roles: ["admin", "nazer"] },
       { icon: Shield, label: "الأدوار", path: "/settings/roles", roles: ["admin", "nazer"] },
       { icon: Shield, label: "الصلاحيات", path: "/settings/permissions", roles: ["admin", "nazer"] },
       { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
+      { icon: BellRing, label: "إعدادات الإشعارات", path: "/notifications/settings", roles: ["all"] },
       { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
       { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
+      { icon: Palette, label: "إعدادات الصفحة الرئيسية", path: "/settings/landing-page", roles: ["admin", "nazer"] },
+      { icon: Eye, label: "إعدادات الشفافية", path: "/transparency-settings", roles: ["nazer"] },
+      { icon: Settings, label: "الإعدادات المتقدمة", path: "/advanced-settings", roles: ["admin"] },
       { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
+    ]
+  },
+  {
+    id: "developer-tools",
+    label: "أدوات المطور",
+    icon: Code,
+    roles: ["admin", "nazer"],
+    subItems: [
+      { icon: LayoutDashboard, label: "لوحة المطور", path: "/developer", roles: ["admin", "nazer"] },
+      { icon: ShieldCheck, label: "لوحة الأمان", path: "/security", roles: ["admin", "nazer"] },
+      { icon: Gauge, label: "لوحة الأداء", path: "/performance", roles: ["admin", "nazer"] },
+      { icon: Database, label: "صحة قاعدة البيانات", path: "/db-health", roles: ["admin", "nazer"] },
+      { icon: BarChart3, label: "أداء قاعدة البيانات", path: "/db-performance", roles: ["admin", "nazer"] },
+      { icon: Plug, label: "إدارة التكاملات", path: "/integrations", roles: ["admin", "nazer"] },
+      { icon: TestTube, label: "اختبار Edge", path: "/edge-test", roles: ["admin"] },
     ]
   },
 ];

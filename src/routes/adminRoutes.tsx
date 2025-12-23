@@ -87,7 +87,7 @@ export const adminRoutes = [
     key="developer-dashboard"
     path="/developer" 
     element={
-      <ProtectedRoute requiredRoles={["admin"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <DeveloperDashboard />
       </ProtectedRoute>
     } 
@@ -168,7 +168,7 @@ export const adminRoutes = [
     key="edge-functions-monitor"
     path="/edge-monitor" 
     element={
-      <ProtectedRoute requiredRoles={["admin"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <EdgeFunctionsMonitor />
       </ProtectedRoute>
     } 
