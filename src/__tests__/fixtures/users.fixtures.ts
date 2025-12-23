@@ -414,4 +414,13 @@ export const createAuthContextMock = (user: TestUser) => ({
   hasRole: (role: string) => user.roles.includes(role as AppRole),
 });
 
+// ==================== تصدير المستخدمين بشكل فردي ====================
+
+export const nazerUser = testUsers.nazer;
+export const adminUser = testUsers.admin;
+export const accountantUser = testUsers.accountant;
+export const cashierUser = testUsers.cashier;
+export const archivistUser = testUsers.archivist;
+export const mohamedMarzouq = testUsers.mohamedMarzouq;
+
 export default testUsers;
