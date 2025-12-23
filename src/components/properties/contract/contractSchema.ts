@@ -6,8 +6,8 @@ export const generateContractNumber = () => {
   return `C-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}-${Date.now().toString().slice(-4)}`;
 };
 
-// مخطط التحقق للعقد
-export const contractSchema = z.object({
+// مخطط التحقق الأساسي للعقد
+const baseContractSchema = z.object({
   contract_number: z.string(),
   property_id: z.string().min(1, "العقار مطلوب"),
   tenant_id: z.string().optional(),
@@ -22,7 +22,7 @@ export const contractSchema = z.object({
   total_amount: z.coerce.number().min(1, "المبلغ الإجمالي مطلوب"),
   payment_frequency: z.string().default("شهري"),
   security_deposit: z.coerce.number().optional().default(0),
-  unit_ids: z.array(z.string()).min(1, "اختر وحدة واحدة على الأقل"),
+  unit_ids: z.array(z.string()).default([]),
   is_renewable: z.boolean().default(true),
   auto_renew: z.boolean().default(false),
   renewal_notice_days: z.coerce.number().default(60),
@@ -31,6 +31,12 @@ export const contractSchema = z.object({
   terms_and_conditions: z.string().optional().default(''),
   notes: z.string().optional().default(''),
 });
+
+// مخطط لإضافة عقد جديد (يتطلب وحدات)
+export const contractSchema = baseContractSchema;
+
+// مخطط للتعديل (لا يتطلب وحدات)
+export const contractEditSchema = baseContractSchema;
 
 export type ContractFormValues = z.infer<typeof contractSchema>;
 
