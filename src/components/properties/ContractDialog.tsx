@@ -42,24 +42,20 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   
   const { units, isLoading: unitsLoading } = usePropertyUnits(selectedPropertyId);
 
-  // تحديث العقار المحدد فوراً عند التغيير
+  // تحديث العقار المحدد فوراً عند التغيير - يتحقق من property_id فقط
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.debug("[ContractDialog] sync property", {
-        formPropertyId: formData.property_id,
-        selectedPropertyId,
-        isEditing: !!contract,
-        selectedUnitsCount: selectedUnits.length,
-      });
+    // تخطي إذا لم يتغير property_id
+    if (!formData.property_id || formData.property_id === selectedPropertyId) {
+      return;
     }
-
-    if (formData.property_id && formData.property_id !== selectedPropertyId) {
-      setSelectedPropertyId(formData.property_id);
-      if (!contract) {
-        setSelectedUnits([]);
-      }
+    
+    setSelectedPropertyId(formData.property_id);
+    
+    // إعادة تعيين الوحدات فقط عند إضافة عقد جديد
+    if (!contract) {
+      setSelectedUnits([]);
     }
-  }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits, selectedUnits.length]);
+  }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
