@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, Edit, Trash2 } from "lucide-react";
 import { useMaintenanceRequests } from "@/hooks/property/useMaintenanceRequests";
 import { useMaintenanceSchedules } from "@/hooks/property/useMaintenanceSchedules";
+import { useTableSort } from "@/hooks/ui/useTableSort";
 import { Input } from "@/components/ui/input";
 import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,8 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
 
 // تعريف الفلاتر
 const maintenanceFilterConfigs: FilterConfig[] = [
@@ -61,6 +64,8 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<MaintenanceRequest | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { requests, isLoading, deleteRequest } = useMaintenanceRequests();
   const { schedules } = useMaintenanceSchedules();
 
@@ -107,6 +112,25 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
     
     return result;
   }, [requests, searchQuery, advancedFilters]);
+
+  // Sorting
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredRequests,
+    defaultSortKey: 'requested_date',
+    defaultDirection: 'desc',
+  });
+
+  // Pagination
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalItems);
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, advancedFilters]);
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -264,7 +288,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             )
           }
         ]}
-        data={filteredRequests}
+        data={paginatedData}
         loading={isLoading}
         emptyMessage="لا توجد طلبات صيانة"
         actions={(request: MaintenanceRequest) => (
@@ -293,6 +317,30 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
         )}
         showMobileScrollHint={true}
       />
+
+      {/* Pagination Controls */}
+      {totalItems > 0 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+          startIndex={startIndex + 1}
+          endIndex={endIndex}
+          canGoNext={currentPage < totalPages}
+          canGoPrev={currentPage > 1}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+          onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+          onPrev={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onFirst={() => setCurrentPage(1)}
+          onLast={() => setCurrentPage(totalPages)}
+        />
+      )}
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}
