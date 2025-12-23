@@ -60,9 +60,9 @@ describe('useBankTransfers Hook', () => {
       expect(completed).toHaveLength(2);
     });
 
-    it('يجب عرض التحويلات المعلقة', () => {
-      const pending = mockBankTransfers.filter(t => t.status === 'pending');
-      expect(pending).toHaveLength(0);
+    it('يجب التحقق من وجود حالات معلقة', () => {
+      const pendingCount = mockBankTransfers.filter(t => t.status !== 'completed').length;
+      expect(pendingCount).toBe(0);
     });
   });
 

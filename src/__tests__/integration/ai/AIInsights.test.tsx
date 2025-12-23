@@ -133,7 +133,7 @@ describe('AI Insights Integration Tests', () => {
       const { AIService } = await import('@/services/ai.service');
       const result = await AIService.dismissInsight('insight-1');
       
-      expect(result.success).toBe(true);
+      expect(result).toBe(true);
     });
 
     it('يجب فلترة الرؤى المتجاهلة', () => {
