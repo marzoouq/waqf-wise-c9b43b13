@@ -1,8 +1,11 @@
 /**
  * useKPIs Hook
- * Hook لجلب مؤشرات الأداء الرئيسية
- * يستخدم DashboardService + RealtimeService
- * @version 2.9.2
+ * Hook لجلب مؤشرات الأداء الرئيسية من kpi_definitions
+ * 
+ * @deprecated استخدم useUnifiedKPIs للـ Dashboard KPIs العامة
+ * هذا الـ Hook مخصص فقط لـ KPIDashboard component
+ * 
+ * @version 2.9.3
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";

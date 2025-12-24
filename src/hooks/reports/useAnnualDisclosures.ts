@@ -85,15 +85,5 @@ export function useAnnualDisclosures() {
   };
 }
 
-export function useDisclosureBeneficiaries(disclosureId?: string) {
-  const { data: beneficiaries = [], isLoading } = useQuery({
-    queryKey: QUERY_KEYS.DISCLOSURE_BENEFICIARIES(disclosureId),
-    queryFn: () => disclosureId ? ReportService.getDisclosureBeneficiaries(disclosureId) : [],
-    enabled: !!disclosureId,
-  });
-
-  return {
-    beneficiaries: beneficiaries as DisclosureBeneficiary[],
-    isLoading,
-  };
-}
+// تم نقل useDisclosureBeneficiaries إلى src/hooks/reports/useDisclosureBeneficiaries.ts
+// استخدم: import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';

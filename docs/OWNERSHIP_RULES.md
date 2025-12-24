@@ -17,6 +17,13 @@
 ❌ لا تُنشئ hook جديد للـ KPIs - استخدم `useUnifiedKPIs`
 ❌ لا تستورد من `@/lib/queryOptimization` (deprecated)
 
+## Hooks مُوقّفة (Deprecated)
+
+| Hook | البديل | السبب |
+|------|--------|-------|
+| `useDashboardKPIs` | `useUnifiedKPIs` | توحيد مصادر البيانات |
+| `useKPIs` | مخصص لـ `KPIDashboard` فقط | استخدام محدود |
+
 ## Checklist قبل إنشاء Hook جديد
 
 - [ ] هل يوجد hook مشابه؟ (ابحث أولاً)
@@ -25,3 +32,21 @@
 - [ ] هل يستخدم `QUERY_KEYS` من `@/lib/query-keys`؟
 - [ ] هل يستخدم `QUERY_CONFIG` من `@/infrastructure/react-query`؟
 - [ ] هل تم تحديث `index.ts` للمجلد؟
+
+## هيكل المجلدات
+
+```
+src/
+├── infrastructure/          # البنية التحتية (React Query, etc.)
+│   └── react-query/
+│       ├── queryConfig.ts   # إعدادات الاستعلامات
+│       ├── cacheTimes.ts    # أوقات الكاش
+│       └── index.ts         # التصدير المركزي
+├── lib/                     # Pure JS utilities فقط
+│   ├── query-keys/          # مفاتيح الاستعلامات
+│   └── queryOptimization.ts # (deprecated) - utilities فقط
+├── hooks/                   # React Hooks
+│   └── dashboard/
+│       └── useUnifiedKPIs.ts # المصدر الرسمي للـ KPIs
+└── services/                # Business logic + API calls
+```
