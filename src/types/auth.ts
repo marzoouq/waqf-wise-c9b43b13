@@ -87,13 +87,5 @@ export interface LoginResult {
   error?: string;
 }
 
-/** @deprecated استخدم AppRole بدلاً من RoleName */
-export type RoleName = 
-  | 'nazer' 
-  | 'admin' 
-  | 'accountant' 
-  | 'cashier'
-  | 'archivist' 
-  | 'user'
-  | 'beneficiary'
-  | 'waqf_heir';
+// تم نقل RoleName إلى src/config/permissions.ts - استخدم AppRole أو استورد من هناك
+export type { RoleName } from '@/config/permissions';
