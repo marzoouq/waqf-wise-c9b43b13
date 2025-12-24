@@ -234,7 +234,7 @@ import { useUnifiedKPIs, useCashierStats } from '@/hooks/dashboard';
 | Hook | الوظيفة |
 |------|---------|
 | `useDashboardConfigs` | إعدادات اللوحات |
-| `useDashboardKPIs` | مؤشرات الأداء |
+| ~~`useDashboardKPIs`~~ | **محذوف** - استخدم `useUnifiedKPIs` |
 | `useKPIs` | المؤشرات |
 | `useUnifiedKPIs` | **المصدر الموحد لجميع KPIs** ✅ |
 | `useNazerSystemOverview` | إحصائيات النظام الشاملة 🆕 |
