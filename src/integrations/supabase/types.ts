@@ -14406,6 +14406,17 @@ export type Database = {
         }[]
       }
       get_heir_beneficiary_id: { Args: never; Returns: string }
+      get_idle_connections: {
+        Args: never
+        Returns: {
+          application_name: string
+          client_addr: string
+          idle_hours: number
+          pid: number
+          query_start: string
+          state: string
+        }[]
+      }
       get_inbox_messages: {
         Args: { p_user_id: string }
         Returns: {

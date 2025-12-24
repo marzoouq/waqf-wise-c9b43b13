@@ -293,6 +293,35 @@ Deno.serve(async (req) => {
       error: deadRowsError?.message
     });
 
+    // ===== مراقبة الاتصالات الخاملة =====
+    console.log("[weekly-maintenance] فحص الاتصالات الخاملة");
+    
+    const { data: idleConnections, error: idleError } = await supabase
+      .rpc('get_idle_connections');
+
+    monitoringResults.push({
+      check: 'idle_connections',
+      status: idleError ? 'error' : 'completed',
+      count: idleConnections?.length || 0,
+      result: idleConnections,
+      error: idleError?.message
+    });
+
+    // إنشاء تنبيه إذا كان هناك اتصالات خاملة كثيرة (أكثر من 20)
+    if (idleConnections && idleConnections.length > 20) {
+      await supabase.from('system_alerts').insert({
+        alert_type: 'idle_connections_warning',
+        severity: 'medium',
+        title: `تحذير: ${idleConnections.length} اتصال خامل`,
+        description: `تم اكتشاف ${idleConnections.length} اتصال خامل لأكثر من 30 دقيقة`,
+        status: 'active',
+        metadata: { 
+          count: idleConnections.length,
+          oldest_idle_hours: idleConnections[0]?.idle_hours 
+        }
+      });
+    }
+
     // ===== المرحلة 6: إنشاء تنبيهات الأداء =====
     const healthStatus = (performanceHealth as { status?: string })?.status || 'unknown';
     
@@ -346,6 +375,7 @@ Deno.serve(async (req) => {
         performanceStatus: healthStatus,
         unusedIndexesCount: unusedIndexes,
         highDeadRowsTables: (highDeadRows as unknown[])?.length || 0,
+        idleConnectionsCount: idleConnections?.length || 0,
         authMethod
       },
       timestamp: new Date().toISOString()
