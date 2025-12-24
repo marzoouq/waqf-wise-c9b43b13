@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { DistributionService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
-import { QUERY_CONFIG } from '@/lib/queryOptimization';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DistributionTrendData {

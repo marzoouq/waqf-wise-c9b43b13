@@ -12,7 +12,7 @@ export { CustomReportBuilder } from './CustomReportBuilder';
 export { ReportResultsPreview } from './ReportResultsPreview';
 export { ScheduledReportsManager } from './ScheduledReportsManager';
 export { ReportBuilder } from './ReportBuilder';
-export { KPIDashboard } from './KPIDashboard';
+// KPIDashboard removed - use InteractiveDashboard or custom implementation
 export { InteractiveDashboard } from './InteractiveDashboard';
 export { ReportRefreshIndicator } from './ReportRefreshIndicator';
 

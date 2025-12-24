@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useAISystemAudit, AUDIT_CATEGORIES } from '@/hooks/ai/useAISystemAudit';
 import { 
   Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, 
@@ -43,6 +44,7 @@ export default function AISystemAudit() {
   };
 
   return (
+    <PageErrorBoundary pageName="الفحص الذكي للنظام">
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
@@ -262,5 +264,6 @@ export default function AISystemAudit() {
         </TabsContent>
       </Tabs>
     </div>
+    </PageErrorBoundary>
   );
 }

@@ -2,11 +2,9 @@
  * Query Optimization Utilities
  * Helpers for optimizing Supabase queries
  * 
- * @deprecated QUERY_CONFIG و CACHE_TIMES انتقلوا إلى @/infrastructure/react-query
+ * @note QUERY_CONFIG و CACHE_TIMES متوفرة في @/infrastructure/react-query
+ * @version 3.0.0
  */
-
-// إعادة تصدير من المصدر الجديد للتوافق
-export { QUERY_CONFIG, CACHE_TIMES } from '@/infrastructure/react-query';
 
 /**
  * Creates optimized select query for related tables

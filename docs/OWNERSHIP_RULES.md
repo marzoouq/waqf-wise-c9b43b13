@@ -1,4 +1,12 @@
 # قواعد الملكية المعمارية - Ownership Rules
+## @version 3.0.0 | @lastUpdate 2025-12-24
+
+## الملفات المحذوفة (Deleted Files)
+
+| الملف | السبب | التاريخ |
+|-------|-------|---------|
+| `src/hooks/dashboard/useDashboardKPIs.ts` | استخدم `useUnifiedKPIs` | 2025-12-24 |
+| `src/components/reports/KPIDashboard.tsx` | غير مستخدم | 2025-12-24 |
 
 ## من أين نستورد ماذا؟
 
@@ -21,8 +29,8 @@
 
 | Hook | البديل | السبب |
 |------|--------|-------|
-| `useDashboardKPIs` | `useUnifiedKPIs` | توحيد مصادر البيانات |
-| `useKPIs` | مخصص لـ `KPIDashboard` فقط | استخدام محدود |
+| `useDashboardKPIs` | `useUnifiedKPIs` | **محذوف** - توحيد مصادر البيانات |
+| `useKPIs` | `useUnifiedKPIs` | مخصص لتقارير KPI فقط |
 
 ## Checklist قبل إنشاء Hook جديد
 

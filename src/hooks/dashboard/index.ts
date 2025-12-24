@@ -5,7 +5,7 @@
 
 // ==================== Core Dashboard Hooks ====================
 export { useDashboardConfigs, useSaveDashboardConfig, useUpdateDashboardConfig, useDeleteDashboardConfig, type DashboardConfig, type DashboardWidget } from './useDashboardConfig';
-export { useDashboardKPIs, type DashboardKPIs } from './useDashboardKPIs';
+// useDashboardKPIs removed - use useUnifiedKPIs directly
 export { useKPIs, type KPI } from './useKPIs';
 export { useUnifiedKPIs, type UnifiedKPIsData } from './useUnifiedKPIs';
 export { useNazerSystemOverview, type SystemOverviewStats } from './useNazerSystemOverview';
