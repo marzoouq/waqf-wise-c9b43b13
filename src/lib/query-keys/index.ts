@@ -54,27 +54,9 @@ export const QUERY_KEYS = {
   BENEFICIARY_PROFILE_REQUESTS: BENEFICIARY_KEYS.BENEFICIARY_PORTAL_REQUESTS,
 } as const;
 
-// Query Config with default settings
-export const QUERY_CONFIG = {
-  DEFAULT: {
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-  },
-  REPORTS: {
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
-    refetchInterval: 5 * 60 * 1000, // 5 minutes
-  },
-  REALTIME: {
-    staleTime: 30 * 1000, // 30 seconds
-    refetchOnWindowFocus: true,
-  },
-  STATIC: {
-    staleTime: 30 * 60 * 1000, // 30 minutes
-    refetchOnWindowFocus: false,
-  },
-} as const;
+// Query Config - إعادة تصدير من المصدر الجديد
+// @deprecated استخدم @/infrastructure/react-query بدلاً من ذلك
+export { QUERY_CONFIG } from '@/infrastructure/react-query';
 
 // Type helpers
 export type QueryKeyType = typeof QUERY_KEYS[keyof typeof QUERY_KEYS];

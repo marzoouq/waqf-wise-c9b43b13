@@ -5,7 +5,7 @@
  * @version 2.6.36
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { useCallback } from "react";
 import { DashboardService, type UnifiedKPIsData } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";

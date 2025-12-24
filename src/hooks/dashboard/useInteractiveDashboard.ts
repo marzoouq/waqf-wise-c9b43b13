@@ -6,9 +6,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useDashboardKPIs } from '@/hooks/dashboard/useDashboardKPIs';
+import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
 import { ChartDataPoint } from '@/components/unified/UnifiedChart';
-import { QUERY_CONFIG } from '@/lib/queryOptimization';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
 import { BeneficiaryService, PropertyService } from '@/services';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -122,8 +122,8 @@ export function useInteractiveDashboard() {
     },
   });
 
-  // KPIs الرئيسية
-  const { data: kpis, isLoading: loadingKPIs, isRefetching: isRefetchingKPIs } = useDashboardKPIs();
+  // KPIs الرئيسية - استخدام الـ hook الموحد
+  const { data: kpis, isLoading: loadingKPIs, isRefetching: isRefetchingKPIs } = useUnifiedKPIs();
 
   const isLoading = loadingBeneficiaries || loadingPayments || loadingProperties || loadingKPIs;
   const isRefetching = isRefetchingPayments || isRefetchingProperties || isRefetchingKPIs;

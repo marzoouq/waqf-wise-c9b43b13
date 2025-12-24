@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UIService } from "@/services/ui.service";
 import { useToast } from "@/hooks/ui/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

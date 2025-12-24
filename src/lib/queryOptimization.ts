@@ -1,7 +1,12 @@
 /**
  * Query Optimization Utilities
  * Helpers for optimizing Supabase queries
+ * 
+ * @deprecated QUERY_CONFIG و CACHE_TIMES انتقلوا إلى @/infrastructure/react-query
  */
+
+// إعادة تصدير من المصدر الجديد للتوافق
+export { QUERY_CONFIG, CACHE_TIMES } from '@/infrastructure/react-query';
 
 /**
  * Creates optimized select query for related tables
@@ -16,85 +21,6 @@ export const createOptimizedSelect = (fields: Record<string, string[]>): string 
     )
     .join(', ');
 };
-
-/**
- * Cache times for different data types (in milliseconds)
- */
-export const CACHE_TIMES = {
-  STATIC: 60 * 60 * 1000,      // 1 hour - for rarely changing data
-  STANDARD: 5 * 60 * 1000,     // 5 minutes - for standard data
-  DYNAMIC: 1 * 60 * 1000,      // 1 minute - for frequently changing data
-  REALTIME: 0,                 // No cache - for real-time data
-} as const;
-
-/**
- * Query configuration presets
- */
-export const QUERY_CONFIG = {
-  DASHBOARD_KPIS: {
-    staleTime: 2 * 60 * 1000, // 2 minutes - للتحديث السريع
-    gcTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000, // تحديث كل 5 دقائق
-    refetchOnWindowFocus: true, // تحديث عند العودة للنافذة
-    retry: 2,
-  },
-  ADMIN_KPIS: {
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
-    refetchOnWindowFocus: true,
-    retry: 2,
-  },
-  REPORTS: {
-    staleTime: 2 * 60 * 1000, // 2 minutes - للتقارير
-    gcTime: 10 * 60 * 1000,
-    refetchInterval: false, // يدوي فقط
-    refetchOnWindowFocus: true,
-    retry: 2,
-  },
-  APPROVALS: {
-    staleTime: CACHE_TIMES.STANDARD, // 5 minutes
-    gcTime: CACHE_TIMES.STANDARD * 2,
-    refetchInterval: false, // Disabled - manual refetch on user action
-    refetchOnWindowFocus: true,
-    retry: 2,
-  },
-  ALERTS: {
-    staleTime: CACHE_TIMES.STANDARD, // 5 minutes
-    gcTime: CACHE_TIMES.STANDARD * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: true,
-    retry: 2,
-  },
-  CHARTS: {
-    staleTime: CACHE_TIMES.STATIC, // 1 hour
-    gcTime: CACHE_TIMES.STATIC * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: false,
-    retry: 1,
-  },
-  ACTIVITIES: {
-    staleTime: CACHE_TIMES.STANDARD, // 5 minutes
-    gcTime: CACHE_TIMES.STANDARD * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: false,
-    retry: 2,
-  },
-  TASKS: {
-    staleTime: CACHE_TIMES.STANDARD, // 5 minutes
-    gcTime: CACHE_TIMES.STANDARD * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: true,
-    retry: 2,
-  },
-  LOANS: {
-    staleTime: CACHE_TIMES.STATIC, // 1 hour
-    gcTime: CACHE_TIMES.STATIC * 2,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: 2,
-  },
-} as const;
 
 /**
  * Creates date range filter for queries

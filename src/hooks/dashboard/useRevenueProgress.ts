@@ -7,7 +7,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useActiveFiscalYear } from "@/hooks/fiscal-years";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { DashboardService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

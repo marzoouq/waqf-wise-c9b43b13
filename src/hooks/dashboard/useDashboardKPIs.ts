@@ -1,14 +1,15 @@
 /**
  * Dashboard KPIs Hook - خطاف مؤشرات الأداء
- * @version 2.8.42
+ * @version 2.8.43
+ * 
+ * @description
+ * يستخدم useUnifiedKPIs داخلياً ويوفر واجهة مبسطة
+ * للحفاظ على التوافق مع الكود القديم
+ * 
+ * @deprecated استخدم useUnifiedKPIs مباشرة للحصول على بيانات أكثر شمولية
  */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { QUERY_CONFIG } from '@/lib/queryOptimization';
-import { useEffect } from 'react';
-import { DashboardService } from '@/services';
-import { QUERY_KEYS } from '@/lib/query-keys';
+import { useUnifiedKPIs } from './useUnifiedKPIs';
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -17,40 +18,23 @@ export interface DashboardKPIs {
   activeContracts: number;
 }
 
+/**
+ * @deprecated استخدم useUnifiedKPIs مباشرة
+ */
 export function useDashboardKPIs() {
-  const queryClient = useQueryClient();
+  const query = useUnifiedKPIs();
 
-  const query = useQuery({
-    queryKey: QUERY_KEYS.DASHBOARD_KPIS,
-    queryFn: () => DashboardService.getDashboardKPIs(),
-    ...QUERY_CONFIG.DASHBOARD_KPIS,
-  });
-
-  // Real-time subscriptions
-  useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-kpis-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // تحويل البيانات الموحدة للصيغة القديمة
+  const data: DashboardKPIs | undefined = query.data ? {
+    beneficiaries: query.data.totalBeneficiaries || 0,
+    properties: query.data.totalProperties || 0,
+    totalPayments: query.data.totalRevenue || 0,
+    activeContracts: query.data.activeProperties || 0, // استخدام activeProperties كبديل
+  } : undefined;
 
   return {
     ...query,
-    refresh: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS }),
+    data,
+    refresh: query.refresh,
   };
 }
