@@ -18,6 +18,9 @@ import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
+import { LoginAttemptsSection } from "@/components/dashboard/admin/LoginAttemptsSection";
+import { PermissionsOverviewCard } from "@/components/dashboard/admin/PermissionsOverviewCard";
+import { SecuritySettingsQuickAccess } from "@/components/dashboard/admin/SecuritySettingsQuickAccess";
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -127,16 +130,13 @@ export default function AdminDashboard() {
                 <SystemHealthMonitor />
               </Suspense>
             </AdminDashboardErrorBoundary>
-            <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل التنبيهات الأمنية">
+            <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل سجلات التدقيق">
               <Suspense fallback={<ChartSkeleton />}>
-                <SecurityAlertsSection />
+                <AuditLogsPreview />
               </Suspense>
             </AdminDashboardErrorBoundary>
           </div>
 
-          <Suspense fallback={<ChartSkeleton />}>
-            <AuditLogsPreview />
-          </Suspense>
         </TabsContent>
 
         {/* Users Tab - Lazy Load */}
@@ -152,10 +152,33 @@ export default function AdminDashboard() {
         {/* Security Tab - Lazy Load */}
         <TabsContent value="security" className="space-y-6 mt-6">
           <LazyTabContent isActive={activeTab === "security"}>
-            <Suspense fallback={<ChartSkeleton />}>
-              <SecurityAlertsSection />
-            </Suspense>
-            {/* AuditLogsPreview متاح في تبويب النظام */}
+            {/* الصف الأول: محاولات الدخول + ملخص الأدوار */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل محاولات الدخول">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <LoginAttemptsSection />
+                </Suspense>
+              </AdminDashboardErrorBoundary>
+              <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل ملخص الأدوار">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <PermissionsOverviewCard />
+                </Suspense>
+              </AdminDashboardErrorBoundary>
+            </div>
+
+            {/* الصف الثاني: التنبيهات الأمنية + إعدادات الأمان السريعة */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل التنبيهات الأمنية">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SecurityAlertsSection />
+                </Suspense>
+              </AdminDashboardErrorBoundary>
+              <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل إعدادات الأمان">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SecuritySettingsQuickAccess />
+                </Suspense>
+              </AdminDashboardErrorBoundary>
+            </div>
           </LazyTabContent>
         </TabsContent>
 
