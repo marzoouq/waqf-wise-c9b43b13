@@ -78,7 +78,7 @@ export function PermissionsOverviewCard() {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => navigate("/roles-management")}
+          onClick={() => navigate("/settings/roles")}
           className="gap-2"
         >
           <Settings className="h-4 w-4" />
@@ -130,7 +130,7 @@ export function PermissionsOverviewCard() {
           <Button 
             variant="ghost" 
             className="w-full justify-between text-muted-foreground hover:text-foreground"
-            onClick={() => navigate("/permissions-management")}
+            onClick={() => navigate("/settings/permissions")}
           >
             <span>إدارة الصلاحيات التفصيلية</span>
             <ExternalLink className="h-4 w-4" />

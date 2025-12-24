@@ -69,7 +69,7 @@ export function SecuritySettingsQuickAccess() {
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => navigate("/security-dashboard")}
+          onClick={() => navigate("/security")}
           className="gap-2"
         >
           <Shield className="h-4 w-4" />
