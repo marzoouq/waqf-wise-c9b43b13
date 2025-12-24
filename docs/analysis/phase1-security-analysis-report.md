@@ -227,16 +227,83 @@
 
 ---
 
+## ✅ المرحلة الرابعة: فحص hooks المستفيدين والعقارات - مكتملة
+
+### تاريخ الإنجاز: 2025-12-24
+
+### الـ Hooks التي تم فحصها (54+ hook):
+
+#### 1. hooks المستفيدين (36 hook):
+| المجموعة | الحالة | الملاحظات |
+|----------|--------|-----------|
+| `useBeneficiaries` | ✅ سليم | CRUD كامل مع React Query + Service Layer |
+| `useBeneficiaryProfile` | ✅ سليم | جلب الملف الشخصي بأمان |
+| `useBeneficiaryPortalData` | ✅ سليم | يدعم وضع المعاينة للناظر بتحقق الأدوار |
+| `useBeneficiarySession` | ✅ سليم | تتبع الجلسات مع تنظيف تلقائي |
+| `useIdentityVerification` | ✅ سليم | التحقق من الهوية عبر Service |
+| `useEligibilityAssessment` | ✅ سليم | تقييم الأهلية مع invalidation صحيح |
+| `useBeneficiaryLoans` | ✅ سليم | قروض المستفيد مع إحصائيات |
+| `useBeneficiaryEmergencyAid` | ✅ سليم | المساعدات الطارئة |
+| `useBeneficiaryAttachments` | ✅ سليم | رفع/حذف المستندات بأمان |
+| `useMyBeneficiaryRequests` | ✅ سليم | طلبات المستفيد من البوابة |
+| `useFamilies` / `useFamilyMembers` | ✅ سليم | إدارة العائلات مع Realtime |
+
+#### 2. hooks التوزيعات (13 hook):
+| المجموعة | الحالة | الملاحظات |
+|----------|--------|-----------|
+| `useDistributions` | ✅ سليم | Realtime + Edge Functions |
+| `useDistributeRevenue` | ✅ سليم | توزيع الغلة عبر Edge Function |
+| `usePublishFiscalYear` | ✅ سليم | نشر السنة المالية |
+| `useDistributionEngine` | ✅ سليم | محرك التوزيع الشرعي |
+| `useDistributionApprovals` | ✅ سليم | موافقات التوزيع بمستويات |
+| `useFunds` | ✅ سليم | إدارة الصناديق مع Realtime |
+| `useWaqfUnits` | ✅ سليم | أقلام الوقف مع تسجيل النشاط |
+| `useBeneficiarySelector` | ✅ سليم | اختيار المستفيد للتوزيع |
+| `useBankTransfersData` | ✅ سليم | بيانات التحويلات البنكية |
+
+#### 3. hooks العقارات (15 hook):
+| المجموعة | الحالة | الملاحظات |
+|----------|--------|-----------|
+| `useProperties` | ✅ سليم | CRUD + Realtime + Activity Log |
+| `useContracts` | ✅ سليم | إدارة العقود مع invalidation شامل |
+| `useRentalPayments` | ✅ سليم | دفعات الإيجار + فواتير + أرشفة |
+| `useMaintenanceRequests` | ✅ سليم | طلبات الصيانة + قيود محاسبية آلية |
+| `useTenantContracts` | ✅ سليم | عقود المستأجر |
+| `useWaqfProperties` | ✅ سليم | عقارات الوقف مع ربط/إلغاء |
+| `useLinkProperty` | ✅ سليم | ربط العقارات بأقلام الوقف |
+
+#### 4. hooks الناظر (5 hooks):
+| المجموعة | الحالة | الملاحظات |
+|----------|--------|-----------|
+| `useNazerBeneficiariesQuick` | ✅ سليم | قائمة سريعة للمستفيدين |
+| `useBeneficiaryActivitySessions` | ✅ سليم | مراقبة جلسات المستفيدين الحية |
+| `useDistributeRevenue` | ✅ سليم | توزيع الغلة |
+| `usePublishFiscalYear` | ✅ سليم | نشر السنة المالية |
+
+### الأنماط الجيدة المُطبّقة:
+1. ✅ **React Query**: جميع الـ hooks تستخدم `useQuery` و `useMutation` بشكل صحيح
+2. ✅ **Service Layer**: فصل كامل بين الـ hooks وقاعدة البيانات
+3. ✅ **QUERY_KEYS**: مفاتيح استعلام موحدة من `@/lib/query-keys`
+4. ✅ **RealtimeService**: تحديث حي للبيانات
+5. ✅ **Error Handling**: معالجة أخطاء عبر `createMutationErrorHandler`
+6. ✅ **Activity Logging**: تسجيل النشاط للعمليات المهمة
+7. ✅ **Query Invalidation**: إبطال الاستعلامات المرتبطة بشكل صحيح
+
+### النتيجة: ✅ جميع hooks المستفيدين والعقارات تعمل بشكل صحيح وآمن
+
+---
+
 ## ✅ الخلاصة
 
-**الحالة بعد المرحلة الثالثة:** ✅ تم إكمال 3 مراحل بنجاح
+**الحالة بعد المرحلة الرابعة:** ✅ تم إكمال 4 مراحل بنجاح
 
 **ما تم إنجازه:**
 1. ✅ المرحلة 1: تحليل شامل للأمان وقاعدة البيانات
 2. ✅ المرحلة 2: إصلاح 5 سياسات RLS متساهلة
 3. ✅ المرحلة 3: فحص 13 hook للمصادقة والأمان - جميعها سليمة
+4. ✅ المرحلة 4: فحص 54+ hook للمستفيدين والعقارات - جميعها سليمة
 
-**الخطوة التالية:** المرحلة الرابعة - فحص hooks المستفيدين والعقارات
+**الخطوة التالية:** المرحلة الخامسة - فحص hooks المحاسبة والمالية
 
 ---
 
