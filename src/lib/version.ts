@@ -2,18 +2,18 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 3.1.5
- * @date 2025-12-22
+ * @version 3.1.0
+ * @date 2025-12-24
  * 
- * @changelog 3.1.5
- * - إصلاح create_system_alert_from_error (أعمدة خاطئة)
- * - إصلاح log_security_event (metadata → event_data)
- * - إصلاح نوع ip_address في login_attempts_log (inet → text)
- * - إصلاح RLS على audit_logs_archive (تأمين للمسؤولين فقط)
+ * @changelog 3.1.0
+ * - إضافة قسم "أدوات المطور" في القائمة الجانبية (7 صفحات)
+ * - إصلاح صلاحيات الناظر في القائمة الجانبية وإدارة النظام
+ * - إضافة صفحة المساعدات الطارئة وتقرير أعمار المستأجرين
+ * - تحديث الوثائق وتوحيد رقم الإصدار
  */
 
-export const APP_VERSION = '3.1.5';
-export const APP_VERSION_DATE = '2025-12-22';
+export const APP_VERSION = '3.1.0';
+export const APP_VERSION_DATE = '2025-12-24';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
