@@ -4,7 +4,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { ApprovalService } from "@/services";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PendingApproval {

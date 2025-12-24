@@ -4,7 +4,7 @@ import { useActivities } from "@/hooks/ui/useActivities";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { logger } from "@/lib/logger";
 import { LoansService, RealtimeService } from "@/services";
 

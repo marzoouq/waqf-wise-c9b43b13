@@ -71,25 +71,25 @@ export function InteractiveDashboard() {
       <UnifiedStatsGrid columns={4}>
         <UnifiedKPICard
           title="إجمالي المستفيدين"
-          value={kpis?.beneficiaries.toLocaleString('ar-SA') || '0'}
+          value={kpis?.totalBeneficiaries?.toLocaleString('ar-SA') || '0'}
           icon={Users}
           variant="default"
         />
         <UnifiedKPICard
           title="العقارات"
-          value={kpis?.properties.toLocaleString('ar-SA') || '0'}
+          value={kpis?.totalProperties?.toLocaleString('ar-SA') || '0'}
           icon={Building2}
           variant="success"
         />
         <UnifiedKPICard
-          title="إجمالي المدفوعات"
-          value={`${kpis?.totalPayments.toLocaleString('ar-SA') || '0'} ريال`}
+          title="إجمالي الإيرادات"
+          value={`${kpis?.totalRevenue?.toLocaleString('ar-SA') || '0'} ريال`}
           icon={DollarSign}
           variant="warning"
         />
         <UnifiedKPICard
-          title="العقود النشطة"
-          value={kpis?.activeContracts.toLocaleString('ar-SA') || '0'}
+          title="العقارات النشطة"
+          value={kpis?.activeProperties?.toLocaleString('ar-SA') || '0'}
           icon={Calendar}
           variant="default"
         />

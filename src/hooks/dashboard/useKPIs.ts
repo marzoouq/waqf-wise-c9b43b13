@@ -6,7 +6,7 @@
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { DashboardService, RealtimeService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

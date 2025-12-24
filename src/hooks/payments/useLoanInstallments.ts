@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { LoansService } from "@/services/loans.service";
 import { RealtimeService } from "@/services/realtime.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
