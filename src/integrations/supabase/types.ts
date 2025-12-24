@@ -13924,6 +13924,7 @@ export type Database = {
       }
       auto_escalate_overdue_tickets: { Args: never; Returns: undefined }
       auto_update_expired_contracts: { Args: never; Returns: undefined }
+      cache_user_roles: { Args: never; Returns: undefined }
       calculate_account_balance: {
         Args: { account_uuid: string }
         Returns: number

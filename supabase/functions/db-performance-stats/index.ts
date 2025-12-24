@@ -193,6 +193,15 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // ✅ تخزين أدوار المستخدم في الجلسة للكاش (تحسين الأداء)
+    if (authorizedUserId) {
+      try {
+        await supabase.rpc('cache_user_roles');
+      } catch {
+        console.log('[db-performance-stats] cache_user_roles skipped (service role)');
+      }
+    }
+
     // Get all stats in parallel
     const [tableStats, cacheData, connData, sizeData] = await Promise.all([
       supabase.rpc('get_table_scan_stats'),
