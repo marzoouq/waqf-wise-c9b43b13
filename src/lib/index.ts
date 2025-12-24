@@ -22,7 +22,6 @@ export { lazyWithRetry } from './lazyWithRetry';
 export { generateDisclosurePDF } from './generateDisclosurePDF';
 export { generateInvoicePDF } from './generateInvoicePDF';
 export { generateReceiptPDF } from './generateReceiptPDF';
-export { generateFiscalYearPDF } from './generateFiscalYearPDF';
 
 // ==================== Banking & ZATCA ====================
 export * from './bankFileGenerators';
@@ -41,4 +40,3 @@ export * from './filters';
 // Role labels moved to src/types/roles.ts
 export * from './design-tokens';
 export * from './version';
-export * from './mutationHelpers';

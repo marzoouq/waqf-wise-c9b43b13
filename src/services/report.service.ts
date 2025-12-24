@@ -8,13 +8,13 @@
 
 import { 
   ReportTemplateService, 
-  DisclosureService, 
   FinancialReportService, 
   AnalysisService,
   type CashFlowData,
   type PropertyWithContracts,
   type OperationRecord,
 } from './report/index';
+import { DisclosureService } from './disclosure.service';
 import type { ReportTemplate, ReportFilters } from "@/types/reports/index";
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from '@/lib/logger/production-logger';

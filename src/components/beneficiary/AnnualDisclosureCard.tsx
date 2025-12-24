@@ -14,7 +14,7 @@ import {
 import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/beneficiary/useDisclosureBeneficiaries";
+import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
 
 export const AnnualDisclosureCard = () => {
   const { disclosures, isLoading } = useAnnualDisclosures();
