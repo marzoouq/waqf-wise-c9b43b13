@@ -17,7 +17,11 @@ export const mockPOSStats = {
     total_transactions: 0,
     total_collected: 0,
     total_disbursed: 0,
-    by_payment_method: {},
+    by_payment_method: {
+      cash: 0,
+      card: 0,
+      bank_transfer: 0,
+    },
   },
   this_month: {
     total_transactions: 0,
@@ -36,6 +40,10 @@ export const mockDailyStats = {
   transfer_amount: 0,
 };
 
-export const posTestUsers = {};
+export const posTestUsers: Record<string, { id: string; email: string; role: string }> = {
+  cashier: { id: 'cashier-1', email: 'cashier@waqf.sa', role: 'cashier' },
+  admin: { id: 'admin-1', email: 'admin@waqf.sa', role: 'admin' },
+};
+
 export const mockQuickCollectionInput = {};
 export const mockQuickPaymentInput = {};

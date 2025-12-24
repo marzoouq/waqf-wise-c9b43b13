@@ -26,6 +26,28 @@ export const contractStats = {
   totalAmount: 0,
 };
 
+// AI-related property analysis - structured to match test expectations
+export const mockPropertyAnalysis = {
+  results: {
+    occupancy_rate: 85,
+    revenue_trend: 'increasing',
+    recommendations: [] as string[],
+    predicted_revenue: {
+      next_year: 560000,
+      next_quarter: 140000,
+      next_month: 45000,
+    },
+    maintenance_score: 72,
+  },
+};
+
+export const mockRevenuePrediction = {
+  predictions: [] as any[],
+  factors: [] as string[],
+};
+
+export const mockMaintenanceSuggestions: any[] = [];
+
 // Helper functions
 export const getActiveProperties = () => [];
 export const getPropertyById = (id: string) => undefined;
