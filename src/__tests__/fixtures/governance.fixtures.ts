@@ -23,7 +23,12 @@ export const mockGovernanceStats = {
   active_policies: 0,
 };
 
-export const governanceTestUsers = {};
+export const governanceTestUsers: Record<string, { id: string; email: string; role: string }> = {
+  nazer: { id: 'nazer-1', email: 'nazer@waqf.sa', role: 'nazer' },
+  admin: { id: 'admin-1', email: 'admin@waqf.sa', role: 'admin' },
+  boardMember: { id: 'board-1', email: 'board@waqf.sa', role: 'board_member' },
+};
+
 export const mockOrganizationSettings = {};
 export const mockVisibilitySettings = {};
 export const createDecisionInput = {};

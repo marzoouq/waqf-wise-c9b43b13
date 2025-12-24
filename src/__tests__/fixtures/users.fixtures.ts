@@ -65,23 +65,58 @@ export function getExpectedDashboard(roles: AppRole[]): string {
 
 // سيناريوهات الاختبار
 export const loginScenarios = {
-  successfulLogins: [],
-  failedLogins: [],
+  successfulLogins: [] as any[],
+  failedLogins: [] as any[],
 };
 
+// Permission scenarios with typed capabilities
 export const permissionScenarios = {
-  nazerPermissions: {},
-  accountantPermissions: {},
-  beneficiaryPermissions: {},
+  nazerPermissions: {
+    canAccessNazerDashboard: true,
+    canManageUsers: true,
+    canPublishFiscalYear: true,
+  },
+  accountantPermissions: {
+    canAccessNazerDashboard: false,
+    canAccessAccountantDashboard: true,
+    canManageJournalEntries: true,
+  },
+  beneficiaryPermissions: {
+    canAccessNazerDashboard: false,
+    canAccessBeneficiaryPortal: true,
+    canManageOtherBeneficiaries: false,
+  },
 };
 
-export const unauthorizedAccessScenarios: any[] = [];
+// Sample unauthorized access scenario
+export const unauthorizedAccessScenarios = [
+  {
+    name: 'Beneficiary accessing admin dashboard',
+    user: { roles: ['beneficiary'] },
+    targetRoute: '/admin-dashboard',
+    shouldBeBlocked: true,
+  },
+];
 
 export const setupUsersMockData = (
   setMockTableData: <T>(table: string, data: T[]) => void
 ) => {};
 
-export const createAuthContextMock = (user: TestUser) => ({});
+// Create mock with required methods for auth context
+export const createAuthContextMock = (user: TestUser | undefined) => ({
+  user: user || null,
+  roles: user?.roles || [],
+  hasRole: (role: AppRole) => user?.roles?.includes(role) || false,
+  checkPermissionSync: (permission: string) => true,
+  hasPermission: async (permission: string) => true,
+  isRole: (role: AppRole) => user?.roles?.includes(role) || false,
+  isLoading: false,
+  rolesLoading: false,
+  isAuthenticated: !!user,
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
+  signOut: async () => {},
+});
 
 // تصديرات المستخدمين الفردية
 export const nazerUser: TestUser | undefined = undefined;
