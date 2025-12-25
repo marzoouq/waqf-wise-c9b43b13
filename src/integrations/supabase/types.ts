@@ -631,6 +631,47 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_fix_attempts: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_id: string | null
+          error_message: string | null
+          fix_strategy: string
+          id: string
+          result: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_id?: string | null
+          error_message?: string | null
+          fix_strategy: string
+          id?: string
+          result?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_id?: string | null
+          error_message?: string | null
+          fix_strategy?: string
+          id?: string
+          result?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_fix_attempts_error_id_fkey"
+            columns: ["error_id"]
+            isOneToOne: false
+            referencedRelation: "system_error_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auto_journal_log: {
         Row: {
           amount: number
@@ -14492,6 +14533,7 @@ export type Database = {
           severity: string
         }[]
       }
+      get_rls_coverage: { Args: never; Returns: Json }
       get_rls_policies: {
         Args: never
         Returns: {
