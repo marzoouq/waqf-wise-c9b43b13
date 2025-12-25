@@ -50,6 +50,12 @@ const LazyBudgetsTab = lazy(() =>
 const LazyLoansOverviewTab = lazy(() => 
   import("@/components/beneficiary/tabs/LoansOverviewTab").then(m => ({ default: m.LoansOverviewTab }))
 );
+const LazyBeneficiaryRequestsTab = lazy(() => 
+  import("@/components/beneficiary/tabs/BeneficiaryRequestsTab").then(m => ({ default: m.BeneficiaryRequestsTab }))
+);
+const LazyBeneficiaryDocumentsTab = lazy(() => 
+  import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab").then(m => ({ default: m.BeneficiaryDocumentsTab }))
+);
 
 interface TabConfig {
   key: string;
@@ -62,9 +68,11 @@ interface TabConfig {
 
 const TAB_CONFIGS: TabConfig[] = [
   { key: "profile", settingKey: "show_profile", component: LazyBeneficiaryProfileTab, requiresBeneficiary: true },
+  { key: "requests", settingKey: "show_requests", component: LazyBeneficiaryRequestsTab, requiresBeneficiaryId: true },
   { key: "distributions", settingKey: "show_distributions", component: LazyBeneficiaryDistributionsTab, requiresBeneficiaryId: true },
   { key: "statements", settingKey: "show_statements", component: LazyBeneficiaryStatementsTab, requiresBeneficiaryId: true },
   { key: "properties", settingKey: "show_properties", component: LazyBeneficiaryPropertiesTab },
+  { key: "documents", settingKey: "show_documents", component: LazyBeneficiaryDocumentsTab, requiresBeneficiaryId: true },
   { key: "waqf", settingKey: "show_waqf", component: LazyWaqfSummaryTab, alwaysVisible: true },
   { key: "family", settingKey: "show_family_tree", component: LazyFamilyTreeTab, requiresBeneficiaryId: true },
   { key: "bank", settingKey: "show_bank_accounts", component: LazyBankAccountsTab },
@@ -128,9 +136,11 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
   // Get tab name for error boundary
   const tabNames: Record<string, string> = {
     profile: "الملف الشخصي",
+    requests: "الطلبات",
     distributions: "التوزيعات",
     statements: "كشف الحساب",
     properties: "العقارات",
+    documents: "المستندات",
     waqf: "الوقف",
     family: "شجرة العائلة",
     bank: "الحسابات البنكية",

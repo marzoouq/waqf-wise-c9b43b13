@@ -29,9 +29,11 @@ export interface SidebarItem {
 export const sidebarItems: SidebarItem[] = [
   { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview", visibilityKey: "show_overview" },
   { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile", visibilityKey: "show_profile" },
+  { id: "requests", label: "الطلبات", icon: MessageSquare, tab: "requests", visibilityKey: "show_requests" },
   { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions", visibilityKey: "show_distributions" },
   { id: "statements", label: "كشف الحساب", icon: CreditCard, tab: "statements", visibilityKey: "show_statements" },
   { id: "properties", label: "العقارات", icon: Building2, tab: "properties", visibilityKey: "show_properties" },
+  { id: "documents", label: "المستندات", icon: BarChart3, tab: "documents", visibilityKey: "show_documents" },
   { id: "family", label: "العائلة", icon: Users, tab: "family", visibilityKey: "show_family_tree" },
   { id: "waqf", label: "الوقف", icon: Landmark, tab: "waqf" },
   { id: "governance", label: "الحوكمة", icon: Shield, tab: "governance", visibilityKey: "show_governance" },
