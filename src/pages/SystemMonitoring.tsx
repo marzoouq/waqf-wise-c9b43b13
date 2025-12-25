@@ -23,10 +23,12 @@ import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
 import { SystemHealthDashboard } from "@/components/system/SystemHealthDashboard";
 import { LivePerformanceChart } from "@/components/system/LivePerformanceChart";
+import { MonitoringSettingsDialog } from "@/components/system/MonitoringSettingsDialog";
 import { useSystemMonitoring } from "@/hooks/system/useSystemMonitoring";
 
 export default function SystemMonitoring() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   const {
     stats,
@@ -62,7 +64,12 @@ export default function SystemMonitoring() {
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">تحديث</span>
             </Button>
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1"
+              onClick={() => setSettingsDialogOpen(true)}
+            >
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">الإعدادات</span>
             </Button>
@@ -329,6 +336,12 @@ export default function SystemMonitoring() {
             <SelfHealingToolsPanel />
           </TabsContent>
         </Tabs>
+
+        {/* Settings Dialog */}
+        <MonitoringSettingsDialog
+          open={settingsDialogOpen}
+          onOpenChange={setSettingsDialogOpen}
+        />
       </div>
     </PageErrorBoundary>
   );
