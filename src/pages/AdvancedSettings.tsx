@@ -6,8 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PushNotificationsSetup } from '@/components/settings/PushNotificationsSetup';
 import { ScheduledReportsManager } from '@/components/reports/ScheduledReportsManager';
+import { RestoreBackupDialog } from '@/components/settings/RestoreBackupDialog';
+import { BackupSettingsDialog } from '@/components/settings/BackupSettingsDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useBackup } from '@/hooks/system/useBackup';
+import { useSecurityStats } from '@/hooks/system/useSecurityStats';
+import { formatRelative } from '@/lib/date';
 import {
   Bell,
   Calendar,
@@ -16,11 +21,52 @@ import {
   Settings,
   Download,
   Upload,
+  Loader2,
 } from 'lucide-react';
 
 export default function AdvancedSettings() {
-  const [activeBackups, setActiveBackups] = useState(2);
-  const [lastBackup, setLastBackup] = useState('2024-11-16 03:00 AM');
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+
+  const {
+    backupLogs,
+    backupSchedules,
+    createBackup,
+    restoreBackup,
+    isCreatingBackup,
+    isRestoring,
+    refetch,
+  } = useBackup();
+
+  const {
+    failedLogins,
+    sensitiveOperations,
+    twoFaUsers,
+    totalUsers,
+  } = useSecurityStats();
+
+  // Get active schedules count
+  const activeSchedulesCount = backupSchedules?.filter((s) => s.is_active).length || 0;
+
+  // Get last successful backup
+  const lastSuccessfulBackup = backupLogs?.find((log) => log.status === 'completed');
+  const lastBackupDate = lastSuccessfulBackup?.completed_at
+    ? formatRelative(lastSuccessfulBackup.completed_at)
+    : 'لا يوجد';
+  const lastBackupSize = lastSuccessfulBackup?.file_size
+    ? `${(lastSuccessfulBackup.file_size / (1024 * 1024)).toFixed(1)} MB`
+    : 'غير معروف';
+
+  // Get next scheduled backup
+  const nextSchedule = backupSchedules?.find((s) => s.is_active && s.next_backup_at);
+  const nextBackupDate = nextSchedule?.next_backup_at
+    ? formatRelative(nextSchedule.next_backup_at)
+    : 'غير مجدول';
+
+  const handleRestore = (data: string, mode: 'merge' | 'replace') => {
+    restoreBackup({ backupData: JSON.parse(data), mode });
+    setRestoreDialogOpen(false);
+  };
 
   return (
     <PageErrorBoundary pageName="الإعدادات المتقدمة">
@@ -145,11 +191,11 @@ export default function AdvancedSettings() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">النسخ النشطة</span>
-                          <Badge>{activeBackups}</Badge>
+                          <Badge>{activeSchedulesCount}</Badge>
                         </div>
-                        <p className="text-2xl font-bold">{activeBackups} جدولة</p>
+                        <p className="text-2xl font-bold">{activeSchedulesCount} جدولة</p>
                         <p className="text-xs text-muted-foreground">
-                          يومي وأسبوعي
+                          من إجمالي {backupSchedules?.length || 0}
                         </p>
                       </div>
                     </CardContent>
@@ -160,11 +206,13 @@ export default function AdvancedSettings() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">آخر نسخة</span>
-                          <Badge variant="default">نجح</Badge>
+                          <Badge variant={lastSuccessfulBackup ? "default" : "secondary"}>
+                            {lastSuccessfulBackup ? "نجح" : "لا يوجد"}
+                          </Badge>
                         </div>
-                        <p className="text-sm font-bold">{lastBackup}</p>
+                        <p className="text-sm font-bold">{lastBackupDate}</p>
                         <p className="text-xs text-muted-foreground">
-                          نسخة كاملة - 250 MB
+                          حجم: {lastBackupSize}
                         </p>
                       </div>
                     </CardContent>
@@ -177,9 +225,9 @@ export default function AdvancedSettings() {
                           <span className="text-sm font-medium">النسخة القادمة</span>
                           <Badge variant="secondary">مجدولة</Badge>
                         </div>
-                        <p className="text-sm font-bold">اليوم 11:00 PM</p>
+                        <p className="text-sm font-bold">{nextBackupDate}</p>
                         <p className="text-xs text-muted-foreground">
-                          نسخة تدريجية
+                          {nextSchedule?.backup_type || "نسخة كاملة"}
                         </p>
                       </div>
                     </CardContent>
@@ -189,53 +237,51 @@ export default function AdvancedSettings() {
                 <div className="space-y-4">
                   <h4 className="font-medium">الجداول المجدولة</h4>
                   
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h5 className="font-medium">نسخ احتياطي يومي كامل</h5>
-                          <p className="text-sm text-muted-foreground">
-                            نسخة كاملة لجميع البيانات - يومياً الساعة 3:00 صباحاً
-                          </p>
-                          <div className="flex gap-2 mt-2">
-                            <Badge variant="outline">يومي</Badge>
-                            <Badge variant="outline">30 يوم احتفاظ</Badge>
+                  {backupSchedules?.map((schedule) => (
+                    <Card key={schedule.id}>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h5 className="font-medium">{schedule.schedule_name}</h5>
+                            <p className="text-sm text-muted-foreground">
+                              نوع: {schedule.backup_type} - التكرار: {schedule.frequency}
+                            </p>
+                            <div className="flex gap-2 mt-2">
+                              <Badge variant="outline">{schedule.frequency}</Badge>
+                              <Badge variant="outline">{schedule.retention_days} يوم احتفاظ</Badge>
+                            </div>
                           </div>
+                          <Badge variant={schedule.is_active ? "default" : "secondary"}>
+                            {schedule.is_active ? "نشط" : "غير نشط"}
+                          </Badge>
                         </div>
-                        <Badge variant="default">نشط</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  ))}
 
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h5 className="font-medium">نسخ احتياطي أسبوعي شامل</h5>
-                          <p className="text-sm text-muted-foreground">
-                            نسخة شاملة مع المرفقات - كل يوم جمعة
-                          </p>
-                          <div className="flex gap-2 mt-2">
-                            <Badge variant="outline">أسبوعي</Badge>
-                            <Badge variant="outline">90 يوم احتفاظ</Badge>
-                          </div>
-                        </div>
-                        <Badge variant="default">نشط</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {(!backupSchedules || backupSchedules.length === 0) && (
+                    <Card>
+                      <CardContent className="pt-6">
+                        <p className="text-center text-muted-foreground">لا توجد جداول نسخ احتياطي</p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
-                  <Button>
-                    <Download className="h-4 w-4 ms-2" />
-                    تنزيل آخر نسخة
+                  <Button onClick={() => createBackup("full")} disabled={isCreatingBackup}>
+                    {isCreatingBackup ? (
+                      <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 ms-2" />
+                    )}
+                    {isCreatingBackup ? "جاري الإنشاء..." : "تنزيل نسخة احتياطية"}
                   </Button>
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={() => setRestoreDialogOpen(true)}>
                     <Upload className="h-4 w-4 ms-2" />
                     استعادة من نسخة
                   </Button>
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={() => setSettingsDialogOpen(true)}>
                     <Settings className="h-4 w-4 ms-2" />
                     إعدادات النسخ
                   </Button>
@@ -310,15 +356,15 @@ export default function AdvancedSettings() {
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">محاولات تسجيل فاشلة</p>
-                      <p className="text-2xl font-bold">12</p>
+                      <p className="text-2xl font-bold">{failedLogins.toLocaleString()}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">عمليات حساسة مسجلة</p>
-                      <p className="text-2xl font-bold">1,247</p>
+                      <p className="text-2xl font-bold">{sensitiveOperations.toLocaleString()}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">مستخدمون بـ 2FA</p>
-                      <p className="text-2xl font-bold">8/12</p>
+                      <p className="text-2xl font-bold">{twoFaUsers}/{totalUsers}</p>
                     </div>
                   </div>
                 </div>
@@ -326,6 +372,21 @@ export default function AdvancedSettings() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialogs */}
+        <RestoreBackupDialog
+          open={restoreDialogOpen}
+          onOpenChange={setRestoreDialogOpen}
+          onRestore={handleRestore}
+          isRestoring={isRestoring}
+        />
+
+        <BackupSettingsDialog
+          open={settingsDialogOpen}
+          onOpenChange={setSettingsDialogOpen}
+          schedules={backupSchedules || []}
+          onUpdate={refetch}
+        />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
