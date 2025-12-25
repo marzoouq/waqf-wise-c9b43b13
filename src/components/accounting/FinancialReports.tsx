@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { FileText, Download, TrendingUp, TrendingDown } from 'lucide-react';
+import { FileText, Download, TrendingUp, TrendingDown, Building, Wallet, Scale } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Badge } from '@/components/ui/badge';
 import { useFinancialReportsData } from '@/hooks/accounting/useFinancialReportsData';
+import { AccountingService } from '@/services/accounting.service';
 
 /**
  * مكون التقارير المالية
@@ -24,6 +26,12 @@ export function FinancialReports() {
     error,
     refetch
   } = useFinancialReportsData();
+
+  // جلب الميزانية العمومية
+  const { data: balanceSheet, isLoading: isLoadingBalance } = useQuery({
+    queryKey: ['balance-sheet'],
+    queryFn: () => AccountingService.getBalanceSheet(),
+  });
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل التقارير المالية..." />;
@@ -208,12 +216,131 @@ export function FinancialReports() {
         <TabsContent value="balance-sheet">
           <Card>
             <CardHeader>
-              <CardTitle>الميزانية العمومية</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Scale className="h-5 w-5" />
+                الميزانية العمومية
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-center py-8">
-                قريباً: عرض الأصول والخصوم وحقوق الملكية
-              </p>
+              {isLoadingBalance ? (
+                <div className="text-center py-8 text-muted-foreground">جاري تحميل الميزانية...</div>
+              ) : balanceSheet ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* الأصول */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg flex items-center gap-2 text-primary">
+                      <Building className="h-5 w-5" />
+                      الأصول
+                    </h3>
+                    
+                    <Card className="bg-muted/30">
+                      <CardContent className="pt-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">الأصول المتداولة</span>
+                          <span className="font-mono font-medium">
+                            {balanceSheet.assets.current.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">الأصول الثابتة</span>
+                          <span className="font-mono font-medium">
+                            {balanceSheet.assets.fixed.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                        <div className="border-t pt-3 flex justify-between items-center font-bold">
+                          <span>إجمالي الأصول</span>
+                          <span className="font-mono text-primary">
+                            {balanceSheet.assets.total.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* الخصوم وحقوق الملكية */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg flex items-center gap-2 text-destructive">
+                      <Wallet className="h-5 w-5" />
+                      الخصوم وحقوق الملكية
+                    </h3>
+                    
+                    <Card className="bg-muted/30">
+                      <CardContent className="pt-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">الخصوم المتداولة</span>
+                          <span className="font-mono font-medium">
+                            {balanceSheet.liabilities.current.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">الخصوم طويلة الأجل</span>
+                          <span className="font-mono font-medium">
+                            {balanceSheet.liabilities.longTerm.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center border-t pt-3">
+                          <span className="font-medium">إجمالي الخصوم</span>
+                          <span className="font-mono">
+                            {balanceSheet.liabilities.total.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                        
+                        <div className="border-t pt-3 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">رأس المال</span>
+                            <span className="font-mono font-medium">
+                              {balanceSheet.equity.capital.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">الاحتياطيات</span>
+                            <span className="font-mono font-medium">
+                              {balanceSheet.equity.reserves.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                            </span>
+                          </div>
+                          {balanceSheet.retainedEarnings !== 0 && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">الأرباح المحتجزة</span>
+                              <span className={`font-mono font-medium ${balanceSheet.retainedEarnings >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                {balanceSheet.retainedEarnings.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="border-t pt-3 flex justify-between items-center font-bold">
+                          <span>إجمالي الخصوم وحقوق الملكية</span>
+                          <span className="font-mono text-primary">
+                            {(balanceSheet.liabilities.total + balanceSheet.equity.total + balanceSheet.retainedEarnings).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  لا توجد بيانات متاحة
+                </div>
+              )}
+              
+              {/* ملخص التوازن */}
+              {balanceSheet && (
+                <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">التحقق من التوازن</span>
+                    {Math.abs(balanceSheet.assets.total - (balanceSheet.liabilities.total + balanceSheet.equity.total + balanceSheet.retainedEarnings)) < 0.01 ? (
+                      <Badge className="bg-success text-success-foreground">
+                        الميزانية متوازنة ✓
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive">
+                        هناك فرق: {(balanceSheet.assets.total - (balanceSheet.liabilities.total + balanceSheet.equity.total + balanceSheet.retainedEarnings)).toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
