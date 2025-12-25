@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 
 export default function DeveloperDashboard() {
-  const { data, isLoading } = useDeveloperDashboardData();
+  const { data, isLoading, refetch } = useDeveloperDashboardData();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل لوحة المطور..." />;
@@ -66,7 +66,7 @@ export default function DeveloperDashboard() {
           description="مراقبة شاملة للأمان والأداء وجودة الكود"
           icon={<Terminal className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
           actions={
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={refetch}>
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">تحديث</span>
             </Button>

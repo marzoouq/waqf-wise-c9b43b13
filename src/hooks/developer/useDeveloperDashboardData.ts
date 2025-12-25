@@ -1,12 +1,14 @@
 /**
  * useDeveloperDashboardData Hook
  * بيانات لوحة تحكم المطور الشاملة
- * @version 1.0.0
+ * @version 1.1.0
  */
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MonitoringService, SecurityService } from "@/services";
 import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { supabase } from "@/integrations/supabase/client";
+import { useCallback } from "react";
 
 export interface SecurityMetrics {
   rlsEnabledTables: number;
@@ -61,6 +63,25 @@ export interface DeveloperDashboardData {
 }
 
 export function useDeveloperDashboardData() {
+  const queryClient = useQueryClient();
+
+  // جلب تغطية RLS من قاعدة البيانات
+  const {
+    data: rlsCoverage,
+    isLoading: rlsLoading,
+  } = useQuery({
+    queryKey: ['rls-coverage'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_rls_coverage');
+      if (error) {
+        console.error('Error fetching RLS coverage:', error);
+        return { total_tables: 0, rls_enabled: 0, coverage: 0 };
+      }
+      return data as { total_tables: number; rls_enabled: number; coverage: number };
+    },
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
+  });
+
   // جلب الأحداث الأمنية
   const {
     data: securityEvents = [],
@@ -110,11 +131,11 @@ export function useDeveloperDashboardData() {
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
-  // حساب مقاييس الأمان
+  // حساب مقاييس الأمان - استخدام القيم الديناميكية من RLS
   const securityMetrics: SecurityMetrics = {
-    rlsEnabledTables: 45, // من اختبارات RLS
-    totalTables: 50,
-    rlsCoverage: 90,
+    rlsEnabledTables: rlsCoverage?.rls_enabled || 0,
+    totalTables: rlsCoverage?.total_tables || 0,
+    rlsCoverage: rlsCoverage?.coverage || 0,
     openSecurityIssues: securityEvents.filter((e: { resolved?: boolean }) => !e.resolved).length,
     criticalIssues: securityEvents.filter((e: { severity?: string; resolved?: boolean }) => 
       e.severity === 'critical' && !e.resolved
@@ -155,7 +176,7 @@ export function useDeveloperDashboardData() {
     buildStatus: 'success',
   };
 
-  const isLoading = securityLoading || loginLoading || statsLoading || errorsLoading;
+  const isLoading = securityLoading || loginLoading || statsLoading || errorsLoading || rlsLoading;
 
   const dashboardData: DeveloperDashboardData = {
     security: securityMetrics,
@@ -179,11 +200,19 @@ export function useDeveloperDashboardData() {
     })),
   };
 
+  // دالة التحديث الحقيقية
+  const refetch = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SECURITY_EVENTS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOGIN_ATTEMPTS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_STATS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RECENT_ERRORS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_ALERTS });
+    queryClient.invalidateQueries({ queryKey: ['rls-coverage'] });
+  }, [queryClient]);
+
   return {
     data: dashboardData,
     isLoading,
-    refetch: () => {
-      // سيتم إعادة الجلب تلقائياً
-    },
+    refetch,
   };
 }
