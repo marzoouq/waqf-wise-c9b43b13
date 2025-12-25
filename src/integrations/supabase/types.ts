@@ -6606,6 +6606,7 @@ export type Database = {
       }
       invoices: {
         Row: {
+          contract_id: string | null
           created_at: string
           customer_address: string | null
           customer_city: string | null
@@ -6648,6 +6649,7 @@ export type Database = {
           zatca_uuid: string | null
         }
         Insert: {
+          contract_id?: string | null
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
@@ -6690,6 +6692,7 @@ export type Database = {
           zatca_uuid?: string | null
         }
         Update: {
+          contract_id?: string | null
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
@@ -6732,6 +6735,13 @@ export type Database = {
           zatca_uuid?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
