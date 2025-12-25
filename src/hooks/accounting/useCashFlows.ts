@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { QUERY_KEYS } from "@/lib/query-keys";
@@ -29,18 +30,29 @@ export function useCashFlows(fiscalYearId?: string) {
   });
 
   const calculateCashFlow = useMutation({
-    mutationFn: (params: { fiscalYearId: string; periodStart: string; periodEnd: string }) =>
-      AccountingService.calculateCashFlow(params),
-    onSuccess: () => {
+    mutationFn: async (params: { fiscalYearId: string; periodStart: string; periodEnd: string }) => {
+      // استدعاء Edge Function لحساب التدفقات النقدية
+      const { data, error } = await supabase.functions.invoke('calculate-cash-flow', {
+        body: {
+          fiscal_year_id: params.fiscalYearId,
+          period_start: params.periodStart,
+          period_end: params.periodEnd,
+        }
+      });
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASH_FLOWS() });
       toast({
         title: "تم الحساب بنجاح",
-        description: "تم حساب قائمة التدفقات النقدية",
+        description: `تم حساب التدفقات النقدية - صافي التدفق: ${data?.data?.net_cash_flow?.toLocaleString('ar-SA') || 0} ر.س`,
       });
     },
     onError: createMutationErrorHandler({
       context: 'calculate_cash_flow',
-      toastTitle: 'خطأ في الحساب',
+      toastTitle: 'خطأ في حساب التدفقات النقدية',
     }),
   });
 
@@ -48,5 +60,6 @@ export function useCashFlows(fiscalYearId?: string) {
     cashFlows,
     isLoading,
     calculateCashFlow: calculateCashFlow.mutateAsync,
+    isCalculating: calculateCashFlow.isPending,
   };
 }

@@ -82,7 +82,35 @@ export class VoucherService {
 
       if (insertError) throw insertError;
 
-      // 3. تسجيل النشاط
+      // 3. ربط السند بقيد محاسبي تلقائياً
+      if (data.voucher_type === 'payment') {
+        try {
+          const { error: linkError } = await supabase.functions.invoke('link-voucher-journal', {
+            body: { 
+              voucher_id: voucher.id, 
+              create_journal: true 
+            }
+          });
+          
+          if (linkError) {
+            logger.error(linkError, {
+              context: 'auto_link_voucher_journal',
+              severity: 'medium',
+              metadata: { voucher_id: voucher.id },
+            });
+          } else {
+            console.log('[VoucherService] ✅ تم ربط السند بقيد محاسبي:', voucher.voucher_number);
+          }
+        } catch (linkErr) {
+          // تسجيل الخطأ لكن لا نوقف العملية
+          logger.error(linkErr, {
+            context: 'auto_link_voucher_journal',
+            severity: 'medium',
+          });
+        }
+      }
+
+      // 4. تسجيل النشاط
       await this.logActivity(
         `تم إنشاء ${data.voucher_type === "receipt" ? "سند قبض" : "سند صرف"} رقم ${voucher.voucher_number} - ${data.amount} ريال`
       );
@@ -101,10 +129,32 @@ export class VoucherService {
   }
 
   /**
-   * تحديث حالة السند إلى مدفوع (سينشئ قيد محاسبي تلقائياً)
+   * تحديث حالة السند إلى مدفوع (سينشئ قيد محاسبي تلقائياً إذا لم يكن موجوداً)
    */
   static async markAsPaid(voucherId: string) {
     try {
+      // جلب السند للتحقق من وجود قيد
+      const { data: existingVoucher } = await supabase
+        .from("payment_vouchers")
+        .select("id, voucher_number, journal_entry_id, voucher_type")
+        .eq("id", voucherId)
+        .single();
+
+      // إنشاء قيد إذا لم يكن موجوداً
+      if (existingVoucher && !existingVoucher.journal_entry_id && existingVoucher.voucher_type === 'payment') {
+        try {
+          await supabase.functions.invoke('link-voucher-journal', {
+            body: { voucher_id: voucherId, create_journal: true }
+          });
+          console.log('[VoucherService] ✅ تم إنشاء قيد للسند:', existingVoucher.voucher_number);
+        } catch (linkErr) {
+          logger.error(linkErr, {
+            context: 'mark_paid_link_journal',
+            severity: 'medium',
+          });
+        }
+      }
+
       const { data: voucher, error: updateError } = await supabase
         .from("payment_vouchers")
         .update({ 
