@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,20 +25,50 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: waqfUnit?.name || "",
-    description: waqfUnit?.description || "",
-    waqf_type: waqfUnit?.waqf_type || ("عقار" as "عقار" | "نقدي" | "أسهم" | "مشروع"),
-    location: waqfUnit?.location || "",
-    acquisition_value: waqfUnit?.acquisition_value || 0,
-    current_value: waqfUnit?.current_value || 0,
-    annual_return: waqfUnit?.annual_return || 0,
-    is_active: waqfUnit?.is_active !== undefined ? waqfUnit.is_active : true,
-    notes: waqfUnit?.notes || "",
+    name: "",
+    description: "",
+    waqf_type: "عقار" as "عقار" | "نقدي" | "أسهم" | "مشروع",
+    location: "",
+    acquisition_value: 0,
+    current_value: 0,
+    annual_return: 0,
+    is_active: true,
+    notes: "",
   });
 
-  const [acquisitionDate, setAcquisitionDate] = useState<Date | undefined>(
-    waqfUnit?.acquisition_date ? new Date(waqfUnit.acquisition_date) : undefined
-  );
+  const [acquisitionDate, setAcquisitionDate] = useState<Date | undefined>(undefined);
+
+  // تحديث بيانات النموذج عند تغيير القلم المحدد
+  useEffect(() => {
+    if (waqfUnit) {
+      setFormData({
+        name: waqfUnit.name || "",
+        description: waqfUnit.description || "",
+        waqf_type: (waqfUnit.waqf_type as "عقار" | "نقدي" | "أسهم" | "مشروع") || "عقار",
+        location: waqfUnit.location || "",
+        acquisition_value: waqfUnit.acquisition_value || 0,
+        current_value: waqfUnit.current_value || 0,
+        annual_return: waqfUnit.annual_return || 0,
+        is_active: waqfUnit.is_active !== undefined ? waqfUnit.is_active : true,
+        notes: waqfUnit.notes || "",
+      });
+      setAcquisitionDate(waqfUnit.acquisition_date ? new Date(waqfUnit.acquisition_date) : undefined);
+    } else {
+      // إعادة تعيين النموذج عند الإضافة
+      setFormData({
+        name: "",
+        description: "",
+        waqf_type: "عقار",
+        location: "",
+        acquisition_value: 0,
+        current_value: 0,
+        annual_return: 0,
+        is_active: true,
+        notes: "",
+      });
+      setAcquisitionDate(undefined);
+    }
+  }, [waqfUnit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
