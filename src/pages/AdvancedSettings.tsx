@@ -269,7 +269,7 @@ export default function AdvancedSettings() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button onClick={() => createBackup("full")} disabled={isCreatingBackup}>
+                  <Button onClick={() => createBackup({})} disabled={isCreatingBackup}>
                     {isCreatingBackup ? (
                       <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                     ) : (

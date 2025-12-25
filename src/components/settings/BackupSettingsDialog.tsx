@@ -21,16 +21,7 @@ import {
 import { Settings, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-interface BackupSchedule {
-  id: string;
-  schedule_name: string;
-  frequency: string;
-  backup_type: string;
-  is_active: boolean | null;
-  retention_days: number | null;
-  include_storage: boolean | null;
-}
+import type { BackupSchedule } from "@/services/system.service";
 
 interface BackupSettingsDialogProps {
   open: boolean;
