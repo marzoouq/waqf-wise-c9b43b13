@@ -116,6 +116,26 @@ export class FundService {
   }
 
   static async deleteWaqfUnit(id: string): Promise<void> {
+    // التحقق من وجود عقارات مرتبطة
+    const { count: propertiesCount } = await supabase
+      .from('properties')
+      .select('*', { count: 'exact', head: true })
+      .eq('waqf_unit_id', id);
+
+    if (propertiesCount && propertiesCount > 0) {
+      throw new Error(`لا يمكن حذف قلم الوقف لأنه مرتبط بـ ${propertiesCount} عقار. يرجى إلغاء ربط العقارات أولاً.`);
+    }
+
+    // التحقق من وجود صناديق مرتبطة
+    const { count: fundsCount } = await supabase
+      .from('funds')
+      .select('*', { count: 'exact', head: true })
+      .eq('waqf_unit_id', id);
+
+    if (fundsCount && fundsCount > 0) {
+      throw new Error(`لا يمكن حذف قلم الوقف لأنه مرتبط بـ ${fundsCount} صندوق. يرجى إلغاء ربط الصناديق أولاً.`);
+    }
+
     const { error } = await supabase.from('waqf_units').delete().eq('id', id);
     if (error) throw error;
   }
