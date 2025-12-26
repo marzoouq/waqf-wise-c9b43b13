@@ -33,6 +33,7 @@ import {
 import { TenantDialog } from '@/components/tenants/TenantDialog';
 import { useTenants } from '@/hooks/property/useTenants';
 import { formatCurrency } from '@/lib/utils';
+import { ExportButton } from '@/components/shared/ExportButton';
 import {
   Users,
   Plus,
@@ -111,15 +112,33 @@ export default function Tenants() {
             قائمة المستأجرين وحساباتهم
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setSelectedTenant(null);
-            setDialogOpen(true);
-          }}
-        >
-          <Plus className="ms-2 h-4 w-4" />
-          إضافة مستأجر
-        </Button>
+        <div className="flex gap-2">
+          {tenants.length > 0 && (
+            <ExportButton
+              data={tenants.map(t => ({
+                'رقم المستأجر': t.tenant_number || '-',
+                'الاسم': t.full_name,
+                'رقم الهوية': t.id_number,
+                'الجوال': t.phone || '-',
+                'البريد': t.email || '-',
+                'الحالة': statusLabels[t.status]?.label || t.status,
+                'الرصيد': formatCurrency(t.current_balance),
+              }))}
+              filename="المستأجرين"
+              title="تقرير المستأجرين"
+              headers={['رقم المستأجر', 'الاسم', 'رقم الهوية', 'الجوال', 'البريد', 'الحالة', 'الرصيد']}
+            />
+          )}
+          <Button
+            onClick={() => {
+              setSelectedTenant(null);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="ms-2 h-4 w-4" />
+            إضافة مستأجر
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

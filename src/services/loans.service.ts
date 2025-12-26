@@ -269,6 +269,18 @@ export class LoansService {
   }
 
   /**
+   * حذف فزعة طارئة
+   */
+  static async deleteEmergencyAid(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('emergency_aid')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+
+  /**
    * جلب جميع القروض مع بيانات المستفيد
    */
   static async getAllWithBeneficiary() {
