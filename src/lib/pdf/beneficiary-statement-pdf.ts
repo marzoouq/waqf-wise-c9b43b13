@@ -7,7 +7,7 @@
  */
 
 import type jsPDF from "jspdf";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles } from "./arabic-pdf-utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles, processArabicText } from "./arabic-pdf-utils";
 import { formatCurrency } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 
@@ -98,7 +98,7 @@ export const exportBeneficiaryStatementPDF = async (options: ExportOptions): Pro
       doc.setFont(fontName, "normal");
       doc.setFontSize(12);
       doc.setTextColor(...WAQF_COLORS.muted);
-      doc.text("لا توجد مدفوعات في هذه الفترة", pageWidth / 2, yPosition + 10, { align: "center" });
+      doc.text(processArabicText("لا توجد مدفوعات في هذه الفترة"), pageWidth / 2, yPosition + 10, { align: "center" });
     }
     
     // إضافة تذييل الوقف
@@ -138,7 +138,7 @@ const addBeneficiaryInfo = (
   doc.setFont(fontName, "bold");
   doc.setFontSize(11);
   doc.setTextColor(...WAQF_COLORS.text);
-  doc.text("معلومات المستفيد", pageWidth - 20, yPosition, { align: "right" });
+  doc.text(processArabicText("معلومات المستفيد"), pageWidth - 20, yPosition, { align: "right" });
   
   yPosition += 7;
   
@@ -146,33 +146,33 @@ const addBeneficiaryInfo = (
   doc.setFontSize(10);
   
   // الاسم
-  doc.text(`الاسم: ${beneficiary.full_name}`, pageWidth - 20, yPosition, { align: "right" });
+  doc.text(processArabicText(`الاسم: ${beneficiary.full_name}`), pageWidth - 20, yPosition, { align: "right" });
   
   // رقم الهوية
-  doc.text(`رقم الهوية: ${beneficiary.national_id}`, pageWidth / 2, yPosition, { align: "right" });
+  doc.text(processArabicText(`رقم الهوية: ${beneficiary.national_id}`), pageWidth / 2, yPosition, { align: "right" });
   
   yPosition += 6;
   
   // رقم الجوال
   if (beneficiary.phone) {
-    doc.text(`الجوال: ${beneficiary.phone}`, pageWidth - 20, yPosition, { align: "right" });
+    doc.text(processArabicText(`الجوال: ${beneficiary.phone}`), pageWidth - 20, yPosition, { align: "right" });
   }
   
   // التصنيف
   if (beneficiary.category) {
-    doc.text(`التصنيف: ${beneficiary.category}`, pageWidth / 2, yPosition, { align: "right" });
+    doc.text(processArabicText(`التصنيف: ${beneficiary.category}`), pageWidth / 2, yPosition, { align: "right" });
   }
   
   yPosition += 6;
   
   // الحالة
   if (beneficiary.status) {
-    doc.text(`الحالة: ${beneficiary.status}`, pageWidth - 20, yPosition, { align: "right" });
+    doc.text(processArabicText(`الحالة: ${beneficiary.status}`), pageWidth - 20, yPosition, { align: "right" });
   }
   
   // رقم المستفيد
   if (beneficiary.beneficiary_number) {
-    doc.text(`رقم المستفيد: ${beneficiary.beneficiary_number}`, pageWidth / 2, yPosition, { align: "right" });
+    doc.text(processArabicText(`رقم المستفيد: ${beneficiary.beneficiary_number}`), pageWidth / 2, yPosition, { align: "right" });
   }
   
   return startY + 42;
@@ -192,7 +192,7 @@ const addDateRange = (
   doc.setFontSize(10);
   doc.setTextColor(...WAQF_COLORS.muted);
   doc.text(
-    `الفترة من ${dateRange.from} إلى ${dateRange.to}`, 
+    processArabicText(`الفترة من ${dateRange.from} إلى ${dateRange.to}`), 
     pageWidth / 2, 
     startY, 
     { align: "center" }
@@ -216,7 +216,7 @@ const addAccountSummary = (
   doc.setFont(fontName, "bold");
   doc.setFontSize(12);
   doc.setTextColor(...WAQF_COLORS.text);
-  doc.text("ملخص الحساب", pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText("ملخص الحساب"), pageWidth / 2, yPosition, { align: "center" });
   
   yPosition += 8;
   
@@ -244,14 +244,14 @@ const addAccountSummary = (
     doc.setFont(fontName, "normal");
     doc.setFontSize(8);
     doc.setTextColor(...WAQF_COLORS.muted);
-    doc.text(item.label, x + boxWidth / 2, yPosition + 6, { align: "center" });
+    doc.text(processArabicText(item.label), x + boxWidth / 2, yPosition + 6, { align: "center" });
     
     // القيمة
     doc.setFont(fontName, "bold");
     doc.setFontSize(10);
     doc.setTextColor(...item.color);
     const valueText = item.isCount ? String(item.value) : formatCurrency(item.value);
-    doc.text(valueText, x + boxWidth / 2, yPosition + 14, { align: "center" });
+    doc.text(processArabicText(valueText), x + boxWidth / 2, yPosition + 14, { align: "center" });
   });
   
   return yPosition + boxHeight + 10;
@@ -269,19 +269,29 @@ const addPaymentsTable = (
 ): number => {
   const tableStyles = getDefaultTableStyles(fontName);
   
-  // تحويل البيانات للجدول
+  // تحويل البيانات للجدول - مع معالجة النصوص العربية
   const tableData = payments.map((payment, index) => [
-    payment.status === 'completed' || payment.status === 'مكتمل' ? '✓' : '○',
-    formatCurrency(payment.amount),
-    payment.method || payment.type || '-',
-    payment.payer_name || '-',
-    new Date(payment.payment_date).toLocaleDateString('ar-SA'),
-    String(index + 1),
+    processArabicText(payment.status === 'completed' || payment.status === 'مكتمل' ? '✓' : '○'),
+    processArabicText(formatCurrency(payment.amount)),
+    processArabicText(payment.method || payment.type || '-'),
+    processArabicText(payment.payer_name || '-'),
+    processArabicText(new Date(payment.payment_date).toLocaleDateString('ar-SA')),
+    processArabicText(String(index + 1)),
   ]);
+  
+  // معالجة رؤوس الجدول
+  const headers = [
+    processArabicText('الحالة'), 
+    processArabicText('المبلغ'), 
+    processArabicText('طريقة الدفع'), 
+    processArabicText('المصدر'), 
+    processArabicText('التاريخ'), 
+    processArabicText('#')
+  ];
   
   autoTable(doc, {
     startY: startY,
-    head: [['الحالة', 'المبلغ', 'طريقة الدفع', 'المصدر', 'التاريخ', '#']],
+    head: [headers],
     body: tableData,
     ...tableStyles,
     columnStyles: {
@@ -300,7 +310,7 @@ const addPaymentsTable = (
       doc.setFontSize(8);
       doc.setTextColor(...WAQF_COLORS.muted);
       doc.text(
-        `صفحة ${data.pageNumber} من ${pageCount}`,
+        processArabicText(`صفحة ${data.pageNumber} من ${pageCount}`),
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 30,
         { align: 'center' }
