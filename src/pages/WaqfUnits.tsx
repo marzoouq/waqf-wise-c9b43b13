@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays } from "lucide-react";
+import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
@@ -26,7 +27,7 @@ import { toast } from "sonner";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 export default function WaqfUnits() {
-  const { waqfUnits, isLoading, error, refetch } = useWaqfUnits();
+  const { waqfUnits, isLoading, error, refetch, deleteWaqfUnit } = useWaqfUnits();
   const { fiscalYears } = useFiscalYears();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -35,6 +36,9 @@ export default function WaqfUnits() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedDetailsUnit, setSelectedDetailsUnit] = useState<WaqfUnit | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<WaqfUnit | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   // فلاتر متقدمة - is_active: 'true' | 'false'
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   
@@ -86,6 +90,20 @@ export default function WaqfUnits() {
   const handleBulkExport = () => {
     const selectedUnits = waqfUnits.filter(u => selectedIds.includes(u.id));
     toast.success(`جاري تصدير ${selectedCount} قلم وقف...`);
+  };
+
+  const handleDelete = async () => {
+    if (!unitToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteWaqfUnit(unitToDelete.id);
+      setDeleteDialogOpen(false);
+      setUnitToDelete(null);
+    } catch (error) {
+      // الخطأ يُعالج في الـ Hook
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Calculate statistics
@@ -412,6 +430,17 @@ export default function WaqfUnits() {
                       >
                         تعديل
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setUnitToDelete(unit as WaqfUnit);
+                          setDeleteDialogOpen(true);
+                        }}
+                        className="text-xs sm:text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -437,6 +466,16 @@ export default function WaqfUnits() {
         onOpenChange={setDetailsDialogOpen}
         waqfUnit={selectedDetailsUnit}
         selectedFiscalYearId={selectedFiscalYear !== 'all' ? selectedFiscalYear : activeFiscalYear?.id}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="حذف قلم الوقف"
+        description={`هل أنت متأكد من حذف قلم الوقف "${unitToDelete?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
       />
 
       {/* Bulk Actions Bar */}
