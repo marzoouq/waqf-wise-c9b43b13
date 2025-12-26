@@ -27,7 +27,7 @@ export const MessagesSection = memo(function MessagesSection({
     <ScrollArea ref={scrollRef} className={cn("flex-1", compact ? "p-4 bg-muted/30" : "p-4")}>
       <div className="space-y-4 pb-4">
         {/* رسالة ترحيبية */}
-        {conversations.length === 0 && !isLoading && <WelcomeMessage />}
+        {conversations.length === 0 && !isLoading && <WelcomeMessage compact={compact} />}
 
         {/* الرسائل */}
         {conversations.map((msg) => (
