@@ -1,6 +1,6 @@
 /**
  * Contract Service - خدمة العقود
- * @version 2.9.10
+ * @version 2.9.11 - إضافة الأرشفة التلقائية
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,9 @@ import type { Database } from "@/integrations/supabase/types";
 import { CONTRACT_STATUS } from "@/lib/constants";
 import type { PaginatedResponse, PaginationParams } from "@/lib/pagination.types";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
+import { archiveDocument, pdfToBlob } from "@/lib/archiveDocument";
+import { generateContractPDF } from "@/lib/pdf/generateContractPDF";
+import { logger } from "@/lib/logger";
 
 type Contract = Database['public']['Tables']['contracts']['Row'];
 type ContractInsert = Database['public']['Tables']['contracts']['Insert'];
@@ -119,9 +122,67 @@ export class ContractService {
         p_monthly_rent: data.monthly_rent,
         p_payment_frequency: data.payment_frequency
       });
+
+      // أرشفة العقد تلقائياً
+      this.archiveContract(data).catch(err => {
+        logger.error(err, { context: 'contract_auto_archive', severity: 'medium' });
+      });
     }
 
     return data;
+  }
+
+  /**
+   * أرشفة عقد في نظام الأرشيف
+   */
+  static async archiveContract(contract: Contract): Promise<void> {
+    try {
+      // جلب بيانات العقار
+      let propertyData = null;
+      if (contract.property_id) {
+        const { data } = await supabase
+          .from('properties')
+          .select('name, type, location')
+          .eq('id', contract.property_id)
+          .maybeSingle();
+        propertyData = data;
+      }
+
+      // توليد PDF
+      const pdfDoc = await generateContractPDF({
+        id: contract.id,
+        contract_number: contract.contract_number || `CNT-${contract.id.slice(0, 8)}`,
+        tenant_name: contract.tenant_name || 'غير محدد',
+        monthly_rent: contract.monthly_rent || 0,
+        start_date: contract.start_date || '',
+        end_date: contract.end_date || '',
+        status: contract.status || 'نشط',
+        payment_frequency: contract.payment_frequency || 'شهري',
+        tenant_phone: contract.tenant_phone || undefined,
+        tenant_national_id: contract.tenant_id_number || undefined,
+        notes: contract.notes || undefined,
+        property: propertyData,
+      });
+
+      const pdfBlob = pdfToBlob(pdfDoc);
+      const fileName = `عقد_${contract.contract_number || contract.id.slice(0, 8)}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      await archiveDocument({
+        fileBlob: pdfBlob,
+        fileName,
+        fileType: 'contract',
+        referenceId: contract.id,
+        referenceType: 'contract',
+        description: `عقد إيجار - ${contract.tenant_name} - ${contract.contract_number}`,
+      });
+
+      logger.info('تم أرشفة العقد بنجاح', { 
+        context: 'contract_archived', 
+        metadata: { contractId: contract.id } 
+      });
+    } catch (error) {
+      logger.error(error, { context: 'archive_contract_error', severity: 'medium' });
+    }
   }
 
   static async update(id: string, updates: Partial<Contract>): Promise<Contract> {

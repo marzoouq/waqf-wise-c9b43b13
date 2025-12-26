@@ -1,11 +1,14 @@
 /**
  * Distribution Core Service - العمليات الأساسية للتوزيعات
- * @version 1.0.0
+ * @version 1.1.0 - إضافة الأرشفة التلقائية
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { NotificationService } from '../notification.service';
+import { archiveDocument, pdfToBlob } from '@/lib/archiveDocument';
+import { generateDistributionPDF } from '@/lib/pdf/generateDistributionPDF';
+import { logger } from '@/lib/logger';
 import type { Database } from '@/integrations/supabase/types';
 
 type DistributionRow = Database['public']['Tables']['distributions']['Row'];
@@ -144,7 +147,7 @@ export class DistributionCoreService {
       // إرسال إشعارات للمستفيدين
       const { data: vouchers } = await supabase
         .from('payment_vouchers')
-        .select('beneficiary_id')
+        .select('beneficiary_id, beneficiaries(full_name), amount, status')
         .eq('distribution_id', id);
 
       if (vouchers && vouchers.length > 0) {
@@ -152,12 +155,68 @@ export class DistributionCoreService {
         if (beneficiaryIds.length > 0) {
           await NotificationService.notifyDistributionApproved(id, beneficiaryIds);
         }
+
+        // أرشفة التوزيع بعد الموافقة
+        this.archiveDistribution(data, vouchers).catch(err => {
+          logger.error(err, { context: 'distribution_auto_archive', severity: 'medium' });
+        });
       }
 
       return data;
     } catch (error) {
       productionLogger.error('Error approving distribution', error);
       throw error;
+    }
+  }
+
+  /**
+   * أرشفة توزيع في نظام الأرشيف
+   */
+  static async archiveDistribution(
+    distribution: DistributionRow, 
+    vouchers?: { beneficiary_id: string | null; beneficiaries: { full_name: string } | null; amount: number | null; status: string | null }[]
+  ): Promise<void> {
+    try {
+      // تحضير بيانات السندات
+      const voucherData = vouchers?.map(v => ({
+        beneficiary_name: v.beneficiaries?.full_name || 'غير محدد',
+        amount: v.amount || 0,
+        status: v.status || 'pending',
+      })) || [];
+
+      // توليد PDF - استخدام month كاسم التوزيع
+      const distributionName = distribution.month || `توزيع ${distribution.id.slice(0, 8)}`;
+      const pdfDoc = await generateDistributionPDF({
+        id: distribution.id,
+        name: distributionName,
+        distribution_date: distribution.distribution_date || new Date().toISOString().split('T')[0],
+        total_amount: distribution.total_amount || 0,
+        beneficiaries_count: distribution.beneficiaries_count || 0,
+        status: distribution.status || 'draft',
+        distribution_type: distribution.distribution_type || undefined,
+        notes: distribution.notes || undefined,
+        approved_by: distribution.approved_by || undefined,
+        approved_at: distribution.approved_at || undefined,
+      }, voucherData);
+
+      const pdfBlob = pdfToBlob(pdfDoc);
+      const fileName = `توزيع_${distributionName}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      await archiveDocument({
+        fileBlob: pdfBlob,
+        fileName,
+        fileType: 'distribution',
+        referenceId: distribution.id,
+        referenceType: 'distribution',
+        description: `تقرير التوزيع - ${distributionName} - ${distribution.beneficiaries_count} مستفيد`,
+      });
+
+      logger.info('تم أرشفة التوزيع بنجاح', { 
+        context: 'distribution_archived', 
+        metadata: { distributionId: distribution.id } 
+      });
+    } catch (error) {
+      logger.error(error, { context: 'archive_distribution_error', severity: 'medium' });
     }
   }
 
