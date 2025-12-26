@@ -1,11 +1,14 @@
 /**
  * Available Users for Messaging Hook
- * @version 2.8.43
+ * @version 2.8.66
+ * 
+ * يستثني المستخدم الحالي من قائمة المتاحين للمراسلة
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { UserService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface AvailableUser {
   id: string;
@@ -16,10 +19,15 @@ export interface AvailableUser {
 }
 
 export function useAvailableUsers() {
+  const { user } = useAuth();
+  
   return useQuery({
-    queryKey: QUERY_KEYS.AVAILABLE_USERS,
+    queryKey: [...QUERY_KEYS.AVAILABLE_USERS, user?.id],
     queryFn: async (): Promise<AvailableUser[]> => {
-      return UserService.getAvailableUsers();
+      const allUsers = await UserService.getAvailableUsers();
+      // استثناء المستخدم الحالي من القائمة
+      return allUsers.filter(u => u.id !== user?.id);
     },
+    enabled: !!user,
   });
 }

@@ -82,8 +82,12 @@ export function RequestSubmissionDialog({
             const formData = new FormData(e.currentTarget);
             const amount = formData.get("amount");
 
+            if (!selectedType) {
+              return;
+            }
+
             handleSubmit({
-              request_type_id: formData.get("request_type_id") as string,
+              request_type_id: selectedType,
               description: formData.get("description") as string,
               amount: amount ? Number(amount) : undefined,
               priority: formData.get("priority") as string,
@@ -180,7 +184,7 @@ export function RequestSubmissionDialog({
             >
               إلغاء
             </Button>
-            <Button type="submit" disabled={submitRequest.isPending}>
+            <Button type="submit" disabled={submitRequest.isPending || !selectedType}>
               {submitRequest.isPending ? "جاري التقديم..." : "تقديم الطلب"}
             </Button>
           </div>
