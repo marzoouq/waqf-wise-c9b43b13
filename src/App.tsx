@@ -14,6 +14,10 @@ import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { initializeAppearanceSettings } from "@/components/settings/AppearanceSettingsDialog";
+
+// ✅ تطبيق إعدادات المظهر المحفوظة فوراً
+initializeAppearanceSettings();
 
 // ✅ استيراد خفيف للصفحة الترحيبية (بدون Radix UI)
 import LandingPageLight from "@/pages/LandingPageLight";
