@@ -31,6 +31,17 @@ export function useEmergencyAid() {
     },
   });
 
+  const deleteEmergencyAid = useMutation({
+    mutationFn: (id: string) => LoansService.deleteEmergencyAid(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
+      toast({ title: "تم حذف طلب الفزعة بنجاح" });
+    },
+    onError: () => {
+      toast({ title: "فشل حذف الطلب", variant: "destructive" });
+    },
+  });
+
   return {
     emergencyAids,
     isLoading,
@@ -38,5 +49,7 @@ export function useEmergencyAid() {
     refetch,
     addEmergencyAid: addEmergencyAid.mutate,
     updateEmergencyAid: updateEmergencyAid.mutate,
+    deleteEmergencyAid: deleteEmergencyAid.mutate,
+    isDeleting: deleteEmergencyAid.isPending,
   };
 }

@@ -4,13 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherDialog";
-import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign, Link2, Link2Off, Loader2 } from "lucide-react";
-import { formatRelative } from "@/lib/date";
+import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign, Link2, Link2Off, Loader2, Edit, Trash2 } from "lucide-react";
+import { formatRelative, format, arLocale as ar } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { usePaymentVouchersData } from "@/hooks/payments/usePaymentVouchersData";
 import { useToast } from "@/hooks/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 export default function PaymentVouchers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,11 +115,30 @@ export default function PaymentVouchers() {
           description="إدارة سندات الصرف والقبض والقيود اليومية"
           icon={<Receipt className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
           actions={
-            <Button onClick={() => setShowCreateDialog(true)} size="sm">
-              <Receipt className="ms-2 h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">إنشاء سند جديد</span>
-              <span className="sm:hidden">جديد</span>
-            </Button>
+            <div className="flex gap-2">
+              {vouchers && vouchers.length > 0 && (
+                <ExportButton
+                  data={vouchers.map(v => ({
+                    'رقم السند': v.voucher_number,
+                    'النوع': getVoucherTypeLabel(v.voucher_type),
+                    'الوصف': v.description || '-',
+                    'المبلغ': v.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 }) + ' ر.س',
+                    'الحالة': v.status,
+                    'المستفيد': v.beneficiaries?.full_name || '-',
+                    'طريقة الدفع': v.payment_method || '-',
+                    'التاريخ': format(new Date(v.created_at), 'dd/MM/yyyy', { locale: ar }),
+                  }))}
+                  filename="سندات_الدفع"
+                  title="تقرير سندات الدفع والقبض"
+                  headers={['رقم السند', 'النوع', 'الوصف', 'المبلغ', 'الحالة', 'المستفيد', 'طريقة الدفع', 'التاريخ']}
+                />
+              )}
+              <Button onClick={() => setShowCreateDialog(true)} size="sm">
+                <Receipt className="ms-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">إنشاء سند جديد</span>
+                <span className="sm:hidden">جديد</span>
+              </Button>
+            </div>
           }
         />
 
