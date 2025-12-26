@@ -1,17 +1,95 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Inbox } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Inbox, Plus } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { format, arLocale as ar } from "@/lib/date";
-import { useBeneficiaryLoans, useBeneficiaryEmergencyAid } from "@/hooks/beneficiary";
+import { useBeneficiaryLoans, useBeneficiaryEmergencyAid, useBeneficiaryId } from "@/hooks/beneficiary";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
+import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
+import { LoansService, RequestService } from "@/services";
+import { useToast } from "@/hooks/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/query-keys";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export function LoansOverviewTab() {
   const { settings } = useVisibilitySettings();
   const { loans, statistics, isLoading: loansLoading, hasLoans } = useBeneficiaryLoans();
   const { emergencyAids, totalAidAmount, isLoading: aidsLoading, hasEmergencyAid } = useBeneficiaryEmergencyAid();
+  const { beneficiaryId } = useBeneficiaryId();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
+  const [showLoanDialog, setShowLoanDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleEmergencySubmit = async (data: { amount: number; emergency_reason: string; description: string }) => {
+    if (!beneficiaryId) {
+      toast({ title: "خطأ", description: "لم يتم العثور على معرف المستفيد", variant: "destructive" });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      await LoansService.createEmergencyAid({
+        beneficiary_id: beneficiaryId,
+        amount: data.amount,
+        reason: data.emergency_reason,
+        aid_type: "فزعة طارئة",
+        urgency_level: "high",
+        notes: data.description,
+      });
+      
+      toast({ title: "تم بنجاح", description: "تم تقديم طلب الفزعة الطارئة" });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_EMERGENCY_AID(beneficiaryId) });
+      setShowEmergencyDialog(false);
+    } catch (error) {
+      toast({ title: "خطأ", description: "فشل في تقديم طلب الفزعة", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLoanSubmit = async (data: { loan_amount: number; loan_term_months: number; loan_reason: string; description: string }) => {
+    if (!beneficiaryId) {
+      toast({ title: "خطأ", description: "لم يتم العثور على معرف المستفيد", variant: "destructive" });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      // تقديم طلب القرض عبر نظام الطلبات (ليس مباشرة في جدول القروض)
+      const result = await RequestService.create({
+        beneficiary_id: beneficiaryId,
+        request_type_id: "9822dc12-eef2-4cf7-92fa-113be89b1d6d", // نوع القرض من قاعدة البيانات
+        description: `طلب قرض بقيمة ${data.loan_amount} ريال لمدة ${data.loan_term_months} شهر\nسبب القرض: ${data.loan_reason}\n${data.description}`,
+        amount: data.loan_amount,
+        priority: "متوسطة",
+      });
+      
+      if (!result.success) throw new Error(result.message);
+      
+      toast({ title: "تم بنجاح", description: "تم تقديم طلب القرض وسيتم مراجعته" });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
+      setShowLoanDialog(false);
+    } catch (error) {
+      toast({ title: "خطأ", description: "فشل في تقديم طلب القرض", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!settings?.show_own_loans) {
     return (
@@ -40,6 +118,18 @@ export function LoansOverviewTab() {
 
   return (
     <div className="space-y-6">
+      {/* أزرار تقديم الطلبات */}
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={() => setShowEmergencyDialog(true)} variant="destructive">
+          <Plus className="h-4 w-4 ms-2" />
+          طلب فزعة طارئة
+        </Button>
+        <Button onClick={() => setShowLoanDialog(true)} variant="default">
+          <Plus className="h-4 w-4 ms-2" />
+          طلب قرض
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -224,6 +314,26 @@ export function LoansOverviewTab() {
           </CardContent>
         </Card>
       )}
+
+      {/* Dialog طلب الفزعة */}
+      <Dialog open={showEmergencyDialog} onOpenChange={setShowEmergencyDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>طلب فزعة طارئة</DialogTitle>
+          </DialogHeader>
+          <EmergencyRequestForm onSubmit={handleEmergencySubmit} isLoading={isSubmitting} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog طلب القرض */}
+      <Dialog open={showLoanDialog} onOpenChange={setShowLoanDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>طلب قرض</DialogTitle>
+          </DialogHeader>
+          <LoanRequestForm onSubmit={handleLoanSubmit} isLoading={isSubmitting} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
