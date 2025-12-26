@@ -21,6 +21,8 @@ export interface Contract {
   notes?: string;
   created_at: string;
   updated_at: string;
+  ejar_document_url?: string;
+  ejar_document_name?: string;
   properties?: {
     name: string;
     type: string;
@@ -48,6 +50,8 @@ export interface ContractInsert {
   renewal_notice_days?: number;
   terms_and_conditions?: string;
   notes?: string;
+  ejar_document_url?: string;
+  ejar_document_name?: string;
 }
 
 export interface ContractWithUnitsCount extends Contract {

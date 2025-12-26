@@ -161,6 +161,8 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       tax_percentage: data.tax_percentage,
       units_count: data.unit_ids.length,
       unit_ids: data.unit_ids,
+      ejar_document_url: uploadedFileUrl || undefined,
+      ejar_document_name: contractFile?.name || undefined,
     };
 
     try {

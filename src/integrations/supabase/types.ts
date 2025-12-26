@@ -3050,6 +3050,8 @@ export type Database = {
           contract_type: string
           created_at: string
           created_by: string | null
+          ejar_document_name: string | null
+          ejar_document_url: string | null
           end_date: string
           id: string
           is_renewable: boolean | null
@@ -3077,6 +3079,8 @@ export type Database = {
           contract_type: string
           created_at?: string
           created_by?: string | null
+          ejar_document_name?: string | null
+          ejar_document_url?: string | null
           end_date: string
           id?: string
           is_renewable?: boolean | null
@@ -3104,6 +3108,8 @@ export type Database = {
           contract_type?: string
           created_at?: string
           created_by?: string | null
+          ejar_document_name?: string | null
+          ejar_document_url?: string | null
           end_date?: string
           id?: string
           is_renewable?: boolean | null
