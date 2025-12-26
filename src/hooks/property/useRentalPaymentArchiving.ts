@@ -66,20 +66,28 @@ async function archiveInvoicePDF(
   orgSettings: OrganizationSettingsRecord,
   tenantName?: string
 ): Promise<void> {
-  const jsPDF = (await import('jspdf')).default;
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  
-  await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings);
-  const invoiceBlob = doc.output('blob');
+  try {
+    // توليد الفاتورة - generateInvoicePDF يُرجع jsPDF document
+    const pdfDoc = await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings);
+    
+    if (!pdfDoc) {
+      logger.warn('فشل توليد PDF الفاتورة', { context: 'archive_invoice_pdf' });
+      return;
+    }
+    
+    const invoiceBlob = pdfDoc.output('blob');
 
-  await archiveDocument({
-    fileBlob: invoiceBlob,
-    fileName: `Invoice-${invoiceData.invoice_number}.pdf`,
-    fileType: 'invoice',
-    referenceId: invoiceData.id,
-    referenceType: 'invoice',
-    description: `فاتورة ${invoiceData.invoice_number} - ${tenantName || 'غير محدد'}`
-  });
+    await archiveDocument({
+      fileBlob: invoiceBlob,
+      fileName: `فاتورة-${invoiceData.invoice_number}.pdf`,
+      fileType: 'invoice',
+      referenceId: invoiceData.id,
+      referenceType: 'invoice',
+      description: `فاتورة ${invoiceData.invoice_number} - ${tenantName || 'غير محدد'}`
+    });
+  } catch (error) {
+    logger.error(error, { context: 'archive_invoice_pdf', severity: 'medium' });
+  }
 }
 
 /**
@@ -90,18 +98,26 @@ async function archiveReceiptPDF(
   orgSettings: OrganizationSettingsRecord,
   tenantName?: string
 ): Promise<void> {
-  const jsPDF = (await import('jspdf')).default;
-  const receiptDoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  
-  await generateReceiptPDF(receiptData, orgSettings);
-  const receiptBlob = receiptDoc.output('blob');
+  try {
+    // توليد سند القبض - generateReceiptPDF يُرجع jsPDF document
+    const pdfDoc = await generateReceiptPDF(receiptData, orgSettings);
+    
+    if (!pdfDoc) {
+      logger.warn('فشل توليد PDF سند القبض', { context: 'archive_receipt_pdf' });
+      return;
+    }
+    
+    const receiptBlob = pdfDoc.output('blob');
 
-  await archiveDocument({
-    fileBlob: receiptBlob,
-    fileName: `Receipt-${receiptData.payment_number || receiptData.id}.pdf`,
-    fileType: 'receipt',
-    referenceId: receiptData.id,
-    referenceType: 'payment',
-    description: `سند قبض ${receiptData.payment_number || receiptData.id} - ${tenantName || 'غير محدد'}`
-  });
+    await archiveDocument({
+      fileBlob: receiptBlob,
+      fileName: `سند-قبض-${receiptData.payment_number || receiptData.id}.pdf`,
+      fileType: 'receipt',
+      referenceId: receiptData.id,
+      referenceType: 'payment',
+      description: `سند قبض ${receiptData.payment_number || receiptData.id} - ${tenantName || 'غير محدد'}`
+    });
+  } catch (error) {
+    logger.error(error, { context: 'archive_receipt_pdf', severity: 'medium' });
+  }
 }
