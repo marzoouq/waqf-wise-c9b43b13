@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Printer, Edit, Trash2 } from "lucide-react";
+import { Search, Printer, Edit, Trash2, FileText, ExternalLink } from "lucide-react";
 import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
@@ -336,6 +336,17 @@ export const ContractsTab = ({ onEdit }: Props) => {
         emptyMessage="لا توجد عقود"
         actions={(contract: Contract) => (
           <div className="flex gap-1">
+            {contract.ejar_document_url && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.open(contract.ejar_document_url, '_blank')}
+                title="عرض عقد إيجار"
+                className="hover:bg-success/10 text-success"
+              >
+                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
