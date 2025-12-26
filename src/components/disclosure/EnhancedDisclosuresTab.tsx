@@ -1,10 +1,11 @@
 /**
  * EnhancedDisclosuresTab - تبويب الإفصاحات المحسّن
  * @description يعرض قائمة الإفصاحات مع إمكانية عرض التفاصيل الكاملة
- * @version 2.8.66
+ * @version 2.9.0
  */
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +18,8 @@ import {
   Users, 
   Calendar,
   FileText,
-  ChevronLeft
+  ChevronLeft,
+  Loader2
 } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useDisclosures } from "@/hooks/beneficiary/useBeneficiaryTabsData";
@@ -25,6 +27,9 @@ import { MaskedValue } from "@/components/shared/MaskedValue";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
+import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
+import { toast } from "sonner";
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ar-SA", {
@@ -35,10 +40,13 @@ const formatCurrency = (amount: number): string => {
 };
 
 export function EnhancedDisclosuresTab() {
+  const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
   const { data: disclosures, isLoading, error, refetch } = useDisclosures(settings?.show_disclosures || false);
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState<string | null>(null);
+  const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
 
   if (!settings?.show_disclosures) {
     return (
@@ -80,6 +88,23 @@ export function EnhancedDisclosuresTab() {
   const handleViewDetails = (disclosure: AnnualDisclosure) => {
     setSelectedDisclosure(disclosure);
     setDialogOpen(true);
+  };
+
+  const handleViewFullPage = (disclosure: AnnualDisclosure) => {
+    navigate(`/beneficiary-portal?tab=disclosure-details&id=${disclosure.id}`);
+  };
+
+  const handleDownloadPDF = async (disclosure: AnnualDisclosure) => {
+    setIsExporting(disclosure.id);
+    try {
+      const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
+      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      toast.success("تم تحميل ملف PDF بنجاح");
+    } catch (error) {
+      toast.error("فشل تحميل ملف PDF");
+    } finally {
+      setIsExporting(null);
+    }
   };
 
   return (
@@ -220,9 +245,18 @@ export function EnhancedDisclosuresTab() {
                   </Button>
                   
                   {settings?.allow_export_pdf && (
-                    <Button variant="outline" className="flex-1 sm:flex-initial">
-                      <Download className="h-4 w-4 ms-2" />
-                      تحميل PDF
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 sm:flex-initial"
+                      onClick={() => handleDownloadPDF(disclosure as AnnualDisclosure)}
+                      disabled={isExporting === disclosure.id}
+                    >
+                      {isExporting === disclosure.id ? (
+                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                      ) : (
+                        <Download className="h-4 w-4 ms-2" />
+                      )}
+                      {isExporting === disclosure.id ? "جاري التحميل..." : "تحميل PDF"}
                     </Button>
                   )}
                 </div>

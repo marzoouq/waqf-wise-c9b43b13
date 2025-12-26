@@ -1,13 +1,15 @@
 /**
  * ViewDisclosureDialog - حوار عرض الإفصاح السنوي
  * @description صفحة إفصاح منظمة وشفافة تعرض رحلة الأموال من الإيرادات إلى المتبقي
- * @version 2.8.67
+ * @version 2.9.0
  */
 
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -25,7 +27,10 @@ import {
   Percent,
   BarChart3,
   Lightbulb,
-  Building2
+  Building2,
+  Download,
+  Printer,
+  Loader2
 } from "lucide-react";
 import { AnnualDisclosure, useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
 import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
@@ -34,6 +39,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFoo
 import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
 import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
 import { SmartInsights } from "@/components/disclosure/SmartInsights";
+import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
+import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
+import { toast } from "sonner";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -133,8 +141,34 @@ const formatCurrency = (amount: number | null | undefined): string => {
 export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDisclosureDialogProps) {
   // جلب جميع الإفصاحات للمقارنة
   const { disclosures: allDisclosures } = useAnnualDisclosures();
+  const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
+  const [isExporting, setIsExporting] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   
   if (!disclosure) return null;
+
+  // وظيفة تصدير PDF
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
+      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      toast.success("تم تحميل ملف PDF بنجاح");
+    } catch (error) {
+      toast.error("فشل تحميل ملف PDF");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // وظيفة الطباعة
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 100);
+  };
 
   // البحث عن السنة السابقة للمقارنة
   const previousYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
@@ -189,9 +223,39 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">{disclosure.waqf_name}</p>
             </div>
-            <Badge variant="outline" className="text-sm sm:text-lg px-2 sm:px-4 py-1 sm:py-2 w-fit">
-              {disclosure.status === 'published' ? 'منشور' : 'مسودة'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                disabled={isPrinting}
+                className="gap-2"
+              >
+                {isPrinting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Printer className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">طباعة</span>
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleExportPDF}
+                disabled={isExporting}
+                className="gap-2"
+              >
+                {isExporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">تصدير PDF</span>
+              </Button>
+              <Badge variant="outline" className="text-sm sm:text-lg px-2 sm:px-4 py-1 sm:py-2 w-fit">
+                {disclosure.status === 'published' ? 'منشور' : 'مسودة'}
+              </Badge>
+            </div>
           </div>
         </DialogHeader>
 

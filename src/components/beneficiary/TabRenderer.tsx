@@ -56,6 +56,9 @@ const LazyBeneficiaryRequestsTab = lazy(() =>
 const LazyBeneficiaryDocumentsTab = lazy(() => 
   import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab").then(m => ({ default: m.BeneficiaryDocumentsTab }))
 );
+const LazyDisclosureDetailsTab = lazy(() => 
+  import("@/components/beneficiary/tabs/DisclosureDetailsTab").then(m => ({ default: m.DisclosureDetailsTab }))
+);
 
 interface TabConfig {
   key: string;
@@ -79,6 +82,7 @@ const TAB_CONFIGS: TabConfig[] = [
   { key: "reports", settingKey: "show_financial_reports", component: LazyFinancialReportsTab },
   { key: "approvals", settingKey: "show_approvals_log", component: LazyApprovalsLogTab },
   { key: "disclosures", settingKey: "show_disclosures", component: LazyDisclosuresTab },
+  { key: "disclosure-details", settingKey: "show_disclosures", component: LazyDisclosureDetailsTab },
   { key: "governance", settingKey: "show_governance", component: LazyGovernanceTab },
   { key: "budgets", settingKey: "show_budgets", component: LazyBudgetsTab },
   { key: "loans", settingKey: "show_own_loans", component: LazyLoansOverviewTab },
