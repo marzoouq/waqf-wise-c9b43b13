@@ -106,7 +106,7 @@ export function RequestSubmissionDialog({
                 <SelectContent>
                   {requestTypes.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
-                      {type.name}
+                      {type.name_ar || type.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

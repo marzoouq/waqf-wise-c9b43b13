@@ -30,7 +30,7 @@ const BENEFICIARY_QUICK_ACTIONS = [
     description: "إرسال طلب للإدارة",
     color: "text-[hsl(var(--status-warning))]",
     bgColor: "bg-[hsl(var(--status-warning)/0.1)]",
-    path: "/beneficiary/requests",
+    path: "/beneficiary-portal?tab=requests",
   },
   {
     icon: HelpCircle,
