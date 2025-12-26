@@ -69,7 +69,7 @@ import {
 import { useUserRole } from "@/hooks/auth/useUserRole";
 import { useMemo } from "react";
 
-// القائمة المنظمة الجديدة - 8 مجموعات رئيسية
+// القائمة المنظمة الجديدة - أقسام متخصصة
 const menuGroups = [
   {
     id: "dashboard",
@@ -80,8 +80,8 @@ const menuGroups = [
     subItems: []
   },
   {
-    id: "waqf",
-    label: "إدارة الوقف",
+    id: "beneficiaries",
+    label: "المستفيدين",
     icon: Users,
     roles: ["admin", "accountant", "nazer"],
     subItems: [
@@ -90,10 +90,26 @@ const menuGroups = [
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: CheckSquare, label: "إدارة الطلبات", path: "/staff/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: HeartHandshake, label: "المساعدات الطارئة", path: "/emergency-aid", roles: ["admin", "accountant", "nazer"] },
-      { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
-      { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
+    ]
+  },
+  {
+    id: "properties",
+    label: "العقارات",
+    icon: Building2,
+    roles: ["admin", "accountant", "nazer", "cashier"],
+    subItems: [
       { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
       { icon: Users, label: "المستأجرون", path: "/tenants", roles: ["admin", "accountant", "nazer", "cashier"] },
+    ]
+  },
+  {
+    id: "waqf-funds",
+    label: "الأموال والوقف",
+    icon: Wallet,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
+      { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
