@@ -1,14 +1,16 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Form } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useContracts, Contract } from "@/hooks/property/useContracts";
 import { useProperties } from "@/hooks/property/useProperties";
 import { toast } from "@/hooks/ui/use-toast";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, Upload, FileText, X, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   contractSchema, 
   ContractFormValues, 
@@ -31,6 +33,11 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { addContract, updateContract } = useContracts();
   const { properties } = useProperties();
   const isEditing = !!contract;
+  
+  // حالة رفع ملف العقد
+  const [contractFile, setContractFile] = useState<File | null>(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
 
   // إنشاء النموذج مع react-hook-form + zod
   const form = useForm<ContractFormValues>({
@@ -44,10 +51,42 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       const values = contractToFormValues(contract);
       form.reset(values);
     } else if (open) {
-      // إعادة تعيين النموذج عند فتح حوار إضافة جديد
       form.reset(getDefaultValues());
+      setContractFile(null);
+      setUploadedFileUrl(null);
     }
   }, [contract, open, form]);
+
+  // رفع ملف العقد
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "خطأ", description: "حجم الملف يجب أن يكون أقل من 10 ميجابايت", variant: "destructive" });
+      return;
+    }
+    
+    setContractFile(file);
+    setUploadingFile(true);
+    
+    try {
+      const fileName = `ejar-contracts/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage.from('archive-documents').upload(fileName, file);
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage.from('archive-documents').getPublicUrl(fileName);
+      setUploadedFileUrl(publicUrl);
+      toast({ title: "تم رفع الملف بنجاح" });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({ title: "خطأ في رفع الملف", variant: "destructive" });
+      setContractFile(null);
+    } finally {
+      setUploadingFile(false);
+    }
+  };
 
   // حسابات تلقائية للإيجار الشهري (للضريبة)
   const startDate = form.watch('start_date');
@@ -188,6 +227,37 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
           />
 
           <RenewalFields form={form} />
+
+          {/* قسم رفع عقد إيجار */}
+          <div className="border rounded-lg p-4 bg-muted/30">
+            <FormLabel className="flex items-center gap-2 mb-3">
+              <Upload className="h-4 w-4" />
+              أرشفة عقد منصة إيجار (اختياري)
+            </FormLabel>
+            <div className="flex items-center gap-3">
+              <Input
+                type="file"
+                accept=".pdf,image/*"
+                onChange={handleFileChange}
+                disabled={uploadingFile}
+                className="flex-1"
+              />
+              {uploadingFile && <Loader2 className="h-4 w-4 animate-spin" />}
+            </div>
+            {contractFile && (
+              <div className="flex items-center gap-2 mt-2 p-2 bg-background rounded border">
+                <FileText className="h-4 w-4 text-primary" />
+                <span className="text-sm flex-1">{contractFile.name}</span>
+                {uploadedFileUrl && (
+                  <a href={uploadedFileUrl} target="_blank" className="text-xs text-primary hover:underline">عرض</a>
+                )}
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setContractFile(null); setUploadedFileUrl(null); }}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            <FormDescription className="mt-2">يمكنك رفع نسخة من عقد منصة إيجار للأرشفة</FormDescription>
+          </div>
 
           <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end pt-4 border-t">
             <Button 
