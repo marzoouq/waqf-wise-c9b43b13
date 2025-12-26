@@ -18,82 +18,31 @@
  * });
  */
 
-// النطاقات المسموح بها
-const ALLOWED_ORIGINS = [
-  // Production - النطاق الرئيسي
-  'https://waqf-ba7r.store',
-  'https://www.waqf-ba7r.store',
-  // Lovable staging
-  'https://zsacuvrcohmraoldilph.lovable.app',
-  // Development
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:8080',
-  // Lovable preview domains - دعم جميع الأنماط
-  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
-  // دعم أي نمط: xxx--yyy.lovable.app (مثل id-preview--xxx, preview--xxx)
-  /^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/,
-  // دعم subdomains عادية: xxx.lovable.app
-  /^https:\/\/[a-z0-9-]+\.lovable\.app$/,
-];
+// ✅ CORS عام (لأن الاستدعاءات تعتمد على Authorization header وليست cookies)
+// هذا يحل مشكلة فشل الاستدعاء في بيئات المعاينة (CORS mismatch)
+export const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  // رؤوس أمان إضافية
+  'X-Content-Type-Options': 'nosniff',
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+};
 
 /**
- * التحقق من أن Origin مسموح به
+ * ✅ (اختياري) حافظنا على الدالة لتوافق الواجهات، لكنها الآن تُرجع نفس الرؤوس العامة
  */
-function isOriginAllowed(origin: string | null): boolean {
-  if (!origin) return false;
-  
-  return ALLOWED_ORIGINS.some(allowed => {
-    if (typeof allowed === 'string') {
-      return origin === allowed;
-    }
-    // RegExp
-    return allowed.test(origin);
-  });
+export function getCorsHeaders(_req: Request): Record<string, string> {
+  return corsHeaders;
 }
-
-/**
- * الحصول على Origin المسموح به للاستجابة
- */
-function getAllowedOrigin(req: Request): string {
-  const origin = req.headers.get('Origin');
-  
-  if (origin && isOriginAllowed(origin)) {
-    return origin;
-  }
-  
-  // في حالة عدم وجود Origin أو غير مسموح، نستخدم النطاق الرئيسي
-  return 'https://waqf-ba7r.store';
-}
-
-/**
- * إنشاء CORS Headers ديناميكية
- */
-export function getCorsHeaders(req: Request): Record<string, string> {
-  return {
-    'Access-Control-Allow-Origin': getAllowedOrigin(req),
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Credentials': 'true',
-    // رؤوس أمان إضافية
-    'X-Content-Type-Options': 'nosniff',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-  };
-}
-
-// ⚠️ DEPRECATED: استخدم getCorsHeaders(req) بدلاً من corsHeaders
-// الحفاظ على التوافق مع الكود الحالي - لكن مع تحذير
-/** @deprecated Use getCorsHeaders(req) instead for better security */
-export const corsHeaders = getCorsHeaders(new Request('https://waqf-ba7r.store'));
 
 /**
  * إنشاء Response للـ OPTIONS requests (CORS preflight)
  */
-export function createCorsResponse(req?: Request): Response {
-  const headers = req ? getCorsHeaders(req) : corsHeaders;
-  return new Response(null, { 
+export function createCorsResponse(_req?: Request): Response {
+  return new Response(null, {
     status: 204,
-    headers 
+    headers: corsHeaders,
   });
 }
 
@@ -112,16 +61,11 @@ export function handleCors(req: Request): Response | null {
 /**
  * إنشاء JSON Response مع CORS headers
  */
-export function jsonResponse<T>(
-  data: T, 
-  status: number = 200,
-  req?: Request
-): Response {
-  const headers = req ? getCorsHeaders(req) : corsHeaders;
+export function jsonResponse<T>(data: T, status: number = 200, _req?: Request): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      ...headers,
+      ...corsHeaders,
       'Content-Type': 'application/json',
     },
   });
