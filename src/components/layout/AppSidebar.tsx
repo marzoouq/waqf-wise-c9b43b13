@@ -100,6 +100,7 @@ const menuGroups = [
     subItems: [
       { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
       { icon: Users, label: "المستأجرون", path: "/tenants", roles: ["admin", "accountant", "nazer", "cashier"] },
+      { icon: Clock, label: "تقرير أعمار المستأجرين", path: "/tenants/aging-report", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
@@ -126,7 +127,6 @@ const menuGroups = [
       { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
       { icon: HandCoins, label: "القروض", path: "/loans", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "التحويلات البنكية", path: "/bank-transfers", roles: ["admin", "accountant", "nazer"] },
-      { icon: Clock, label: "تقرير أعمار المستأجرين", path: "/tenants/aging-report", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
@@ -146,8 +146,8 @@ const menuGroups = [
     icon: BarChart3,
     roles: ["admin", "accountant", "nazer"],
     subItems: [
-      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"], id: "reports-view" },
-      { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
+      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-view" },
+      { icon: FileText, label: "منشئ التقارير", path: "/reports/custom", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"], id: "ai-insights" },
       { icon: ScanSearch, label: "الفحص الذكي", path: "/ai-audit", roles: ["admin", "nazer"], id: "ai-audit" },
       { icon: Zap, label: "مراقبة Edge", path: "/edge-monitor", roles: ["admin", "nazer"], id: "edge-monitor" },
