@@ -12,7 +12,6 @@ import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab";
 import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
-import { WaqfUnitsTab } from "@/components/funds/tabs/WaqfUnitsTab";
 import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -75,7 +74,7 @@ const Funds = () => {
       <MobileOptimizedLayout>
         <MobileOptimizedHeader
           title="الأموال والتوزيعات"
-          description="إدارة أقلام الوقف وتوزيع الغلة"
+          description="إدارة التوزيعات والإفصاح السنوي"
           actions={
             <div className="flex flex-col md:flex-row gap-2">
               <Button
@@ -102,9 +101,8 @@ const Funds = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
-            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 mb-6 h-auto">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 mb-6 h-auto">
               <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">نظرة عامة</TabsTrigger>
-              <TabsTrigger value="funds" className="text-xs sm:text-sm px-3 py-2">أقلام الوقف</TabsTrigger>
               <TabsTrigger value="distributions" className="text-xs sm:text-sm px-3 py-2">التوزيعات</TabsTrigger>
               <TabsTrigger value="disclosure" className="text-xs sm:text-sm px-3 py-2">الإفصاح السنوي</TabsTrigger>
             </TabsList>
@@ -112,10 +110,6 @@ const Funds = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <OverviewTab summaryStats={summaryStats} distributions={distributions} />
-          </TabsContent>
-
-          <TabsContent value="funds" className="space-y-6">
-            <WaqfUnitsTab waqfUnits={waqfUnits} isLoading={waqfUnitsLoading} />
           </TabsContent>
 
           <TabsContent value="distributions" className="space-y-6">
