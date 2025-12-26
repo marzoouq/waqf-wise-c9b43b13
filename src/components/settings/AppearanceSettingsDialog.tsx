@@ -1,53 +1,91 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { Palette, Monitor, Sun, Moon } from "lucide-react";
+import { Monitor, Sun, Moon } from "lucide-react";
 
 interface AppearanceSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+// ألوان التمييز بـ HSL
+const accentColors: Record<string, { primary: string; primaryForeground: string }> = {
+  blue: { primary: "217 91% 60%", primaryForeground: "0 0% 100%" },
+  green: { primary: "142 76% 36%", primaryForeground: "0 0% 100%" },
+  purple: { primary: "271 91% 65%", primaryForeground: "0 0% 100%" },
+  orange: { primary: "24 95% 53%", primaryForeground: "0 0% 100%" },
+  red: { primary: "0 72% 51%", primaryForeground: "0 0% 100%" },
+  teal: { primary: "173 80% 40%", primaryForeground: "0 0% 100%" },
+};
+
+const applyAccentColor = (colorName: string) => {
+  const colors = accentColors[colorName];
+  if (colors) {
+    document.documentElement.style.setProperty("--primary", colors.primary);
+    document.documentElement.style.setProperty("--primary-foreground", colors.primaryForeground);
+  }
+};
+
+const applyTheme = (themeName: string) => {
+  if (themeName === "dark") {
+    document.documentElement.classList.add("dark");
+  } else if (themeName === "light") {
+    document.documentElement.classList.remove("dark");
+  } else {
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+};
+
+// تطبيق الإعدادات المحفوظة عند تحميل الصفحة
+export const initializeAppearanceSettings = () => {
+  const savedTheme = localStorage.getItem("app-theme") || "system";
+  const savedAccentColor = localStorage.getItem("app-accent-color") || "blue";
+  
+  applyTheme(savedTheme);
+  applyAccentColor(savedAccentColor);
+};
+
 export function AppearanceSettingsDialog({
   open,
   onOpenChange,
 }: AppearanceSettingsDialogProps) {
   const { toast } = useToast();
-  const [theme, setTheme] = useState("system");
-  const [accentColor, setAccentColor] = useState("blue");
+  const [theme, setTheme] = useState(() => localStorage.getItem("app-theme") || "system");
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("app-accent-color") || "blue");
+
+  useEffect(() => {
+    // تطبيق الإعدادات عند فتح الحوار
+    applyTheme(theme);
+    applyAccentColor(accentColor);
+  }, []);
 
   const handleThemeChange = (value: string) => {
     setTheme(value);
-    
-    // تطبيق الثيم
-    if (value === "dark") {
-      document.documentElement.classList.add("dark");
-    } else if (value === "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      // system
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (isDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
+    localStorage.setItem("app-theme", value);
+    applyTheme(value);
 
     toast({
       title: "تم تحديث المظهر",
-      description: "تم تغيير سمة التطبيق بنجاح",
+      description: "تم تغيير سمة التطبيق وحفظها بنجاح",
     });
   };
 
   const handleAccentColorChange = (color: string) => {
     setAccentColor(color);
+    localStorage.setItem("app-accent-color", color);
+    applyAccentColor(color);
+    
     toast({
       title: "تم تحديث اللون",
-      description: "تم تغيير لون التمييز بنجاح",
+      description: "تم تغيير لون التمييز وحفظه بنجاح",
     });
   };
 
