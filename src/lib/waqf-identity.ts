@@ -74,25 +74,29 @@ export const WAQF_IDENTITY = {
   version: APP_VERSION,
 } as const;
 
+// أسماء الشهور بالعربية
+const ARABIC_MONTHS = [
+  'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+  'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+];
+
 /**
- * الحصول على التاريخ الحالي بالتنسيق العربي
+ * الحصول على التاريخ الحالي بالتنسيق العربي (أرقام إنجليزية آمنة للـ PDF)
+ * يستخدم أرقام إنجليزية لتجنب مشاكل RTL في PDF
  */
 export function getCurrentDateArabic(): string {
-  return new Date().toLocaleDateString('ar-SA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const now = new Date();
+  return `${now.getDate()} ${ARABIC_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 }
 
 /**
- * الحصول على الوقت الحالي بالتنسيق العربي
+ * الحصول على الوقت الحالي (أرقام إنجليزية آمنة للـ PDF)
  */
 export function getCurrentTimeArabic(): string {
-  return new Date().toLocaleTimeString('ar-SA', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
 /**
@@ -103,8 +107,8 @@ export function getCurrentDateTimeArabic(): string {
 }
 
 /**
- * تنسيق المبلغ بالريال السعودي
+ * تنسيق المبلغ بالريال السعودي (أرقام إنجليزية)
  */
 export function formatCurrencySAR(amount: number): string {
-  return `${amount.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`;
+  return `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س`;
 }

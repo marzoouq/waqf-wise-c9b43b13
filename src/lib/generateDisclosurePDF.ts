@@ -309,8 +309,10 @@ export const generateDisclosurePDF = async (
       doc.setLineWidth(0.3);
       doc.line(20, 280, 190, 280);
       
+      // استخدام تنسيق آمن للتاريخ (أرقام إنجليزية)
+      const issueDate = new Date().toLocaleDateString('en-GB');
       doc.text(
-        processArabicText(`تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`),
+        processArabicText(`تاريخ الإصدار: ${issueDate}`),
         105,
         285,
         { align: "center" }
