@@ -12684,6 +12684,39 @@ export type Database = {
           },
         ]
       }
+      waqf_branding: {
+        Row: {
+          created_at: string | null
+          id: string
+          nazer_name: string | null
+          signature_image_url: string | null
+          stamp_image_url: string | null
+          updated_at: string | null
+          updated_by: string | null
+          waqf_logo_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nazer_name?: string | null
+          signature_image_url?: string | null
+          stamp_image_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          waqf_logo_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nazer_name?: string | null
+          signature_image_url?: string | null
+          stamp_image_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          waqf_logo_url?: string | null
+        }
+        Relationships: []
+      }
       waqf_distribution_settings: {
         Row: {
           auto_distribution: boolean | null

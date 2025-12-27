@@ -22,6 +22,7 @@ import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBenefici
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
 import { ManualTasksCard } from "@/components/nazer/ManualTasksCard";
+import { WaqfBrandingSettings } from "@/components/nazer/WaqfBrandingSettings";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
@@ -180,6 +181,9 @@ export default function NazerDashboard() {
             <div className="space-y-6">
               <Suspense fallback={<SectionSkeleton />}>
                 <ManualTasksCard />
+              </Suspense>
+              <Suspense fallback={<SectionSkeleton />}>
+                <WaqfBrandingSettings />
               </Suspense>
               <Suspense fallback={<SectionSkeleton />}>
                 <BeneficiaryControlSection />
