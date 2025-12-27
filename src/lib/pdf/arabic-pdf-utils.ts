@@ -143,9 +143,11 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
     
     doc.setFont("Amiri", "normal");
     doc.setLanguage("ar");
-    
-    // ⚠️ لا نستخدم setR2L لأن BiDi Algorithm يتولى الترتيب البصري
-    // استخدام setR2L سيسبب عكس مضاعف
+
+    // ✅ التوجيه RTL الحقيقي في jsPDF
+    // بدون هذا، jsPDF يرسم الأحرف من اليسار لليمين مما يُظهر العربية بشكل معكوس/مفكك
+    // نستخدم Arabic Shaping (reshape) لتوصيل الحروف + setR2L(true) لاتجاه الرسم
+    doc.setR2L(true);
     
     return "Amiri";
   } catch (error) {
