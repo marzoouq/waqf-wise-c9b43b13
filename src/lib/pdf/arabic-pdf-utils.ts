@@ -75,9 +75,11 @@ function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] 
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
- * يستخدم reshape فقط لتشكيل الحروف - خط Amiri يدعم presentation forms
+ * jsPDF يكتب من اليسار لليمين، لذا نحتاج:
+ * 1. تشكيل الحروف (reshape) لتصبح متصلة
+ * 2. عكس النص بصرياً للعرض RTL
  * 
- * @version 3.1.0 - إصلاح العكس المزدوج
+ * @version 3.2.0 - إصلاح العرض RTL
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
@@ -91,9 +93,11 @@ export const processArabicText = (text: string | number | null | undefined): str
       return strText; // لا يوجد عربي، إرجاع كما هو
     }
     
-    // فقط reshape لتشكيل الحروف - بدون أي عكس
-    // خط Amiri يدعم presentation forms بشكل صحيح
-    return reshape(strText);
+    // 1) تشكيل الحروف العربية لتصبح متصلة
+    const shaped = reshape(strText);
+    
+    // 2) عكس النص بصرياً حيث أن jsPDF يكتب LTR
+    return reverseString(shaped);
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
