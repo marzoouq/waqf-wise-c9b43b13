@@ -60,56 +60,59 @@ export const processArabicText = (text: string | number | null | undefined): str
  * - يعالج كل مقطع بشكل منفصل
  * - يعيد ترتيب المقاطع لمحاكاة RTL بدون قلب الأرقام
  * 
- * @version 3.0.0 - Token-based approach
+ * @version 3.1.0 - إصلاح جذري للأرقام والعملات
  */
 function processRTLMixedText(text: string): string {
   // تقسيم النص إلى مقاطع (tokens)
-  // المقاطع: عربي، أرقام مع فواصل/نقاط، لاتيني، مسافات/رموز
-  const tokenRegex = /([\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]+)|([0-9٠-٩]+(?:[,\.،٬٫][0-9٠-٩]+)*%?)|([A-Za-z]+(?:[._-][A-Za-z0-9]+)*)|(\s+)|([^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF0-9٠-٩A-Za-z\s]+)/g;
+  // الأولوية: ر.س أولاً، ثم عربي، ثم أرقام، ثم لاتيني، ثم مسافات، ثم رموز
+  const tokenRegex = /(ر\.س)|([\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]+)|([0-9٠-٩]+(?:[,،٬][0-9٠-٩]{3})*(?:[\.٫][0-9٠-٩]+)?%?)|([A-Za-z]+)|(\s+)|([^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF0-9٠-٩A-Za-z\sر\.س]+)/g;
   
-  const tokens: { type: 'arabic' | 'number' | 'latin' | 'space' | 'symbol'; value: string }[] = [];
+  const tokens: { type: 'currency' | 'arabic' | 'number' | 'latin' | 'space' | 'symbol'; value: string }[] = [];
   let match;
   
   while ((match = tokenRegex.exec(text)) !== null) {
     if (match[1]) {
-      // نص عربي - نعيد تشكيله
-      tokens.push({ type: 'arabic', value: reshape(match[1]) });
+      // ر.س - رمز العملة (كوحدة واحدة لا تُعكس)
+      tokens.push({ type: 'currency', value: 'ر.س' });
     } else if (match[2]) {
-      // أرقام - نحافظ عليها كما هي
-      tokens.push({ type: 'number', value: match[2] });
+      // نص عربي - نعيد تشكيله
+      tokens.push({ type: 'arabic', value: reshape(match[2]) });
     } else if (match[3]) {
-      // نص لاتيني - نحافظ عليه كما هو
-      tokens.push({ type: 'latin', value: match[3] });
+      // أرقام - نحافظ عليها كما هي
+      tokens.push({ type: 'number', value: match[3] });
     } else if (match[4]) {
-      // مسافات
-      tokens.push({ type: 'space', value: match[4] });
+      // نص لاتيني - نحافظ عليه كما هو
+      tokens.push({ type: 'latin', value: match[4] });
     } else if (match[5]) {
-      // رموز (ر.س، %، إلخ)
-      tokens.push({ type: 'symbol', value: match[5] });
+      // مسافات
+      tokens.push({ type: 'space', value: match[5] });
+    } else if (match[6]) {
+      // رموز أخرى (%, -, إلخ)
+      tokens.push({ type: 'symbol', value: match[6] });
     }
   }
   
-  // عكس ترتيب المقاطع لمحاكاة RTL
-  const reversedTokens = tokens.reverse();
+  // عكس ترتيب المقاطع لمحاكاة RTL (نسخة جديدة - immutable)
+  const reversedTokens = [...tokens].reverse();
   
   // بناء النص النهائي
   let result = '';
   for (const token of reversedTokens) {
-    if (token.type === 'arabic') {
-      // النص العربي المُشكَّل يُعكس حروفه
-      result += token.value.split('').reverse().join('');
-    } else if (token.type === 'number' || token.type === 'latin') {
-      // الأرقام واللاتيني تبقى كما هي (لا نعكسها)
-      result += token.value;
-    } else if (token.type === 'symbol') {
-      // معالجة الرموز الخاصة
-      let symbol = token.value;
-      // إصلاح ر.س
-      symbol = symbol.replace(/س\.ر/g, 'ر.س');
-      // عكس الرموز العربية
-      result += symbol.split('').reverse().join('');
-    } else {
-      result += token.value;
+    switch (token.type) {
+      case 'arabic':
+        // النص العربي المُشكَّل يُعكس حروفه فقط
+        result += token.value.split('').reverse().join('');
+        break;
+      case 'number':
+      case 'currency':
+      case 'latin':
+      case 'space':
+      case 'symbol':
+        // ✅ لا نعكس الأرقام أو العملة أو اللاتيني أو الرموز
+        result += token.value;
+        break;
+      default:
+        result += token.value;
     }
   }
   
