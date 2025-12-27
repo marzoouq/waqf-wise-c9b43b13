@@ -2,7 +2,13 @@
  * أدوات PDF العربية الموحدة
  * Unified Arabic PDF Utilities with Visual RTL Rendering
  * 
- * @version 3.0.0 - Visual RTL Rendering (حل جذري للعربية في jsPDF)
+ * @version 4.0.0 - BiDi Algorithm Implementation
+ * 
+ * الحل الجذري:
+ * 1. Arabic Shaping (js-arabic-reshaper) - لتوصيل الحروف العربية
+ * 2. BiDi Visual Reordering (bidi-js) - لترتيب النص بصرياً للعرض LTR
+ * 
+ * ⚠️ ممنوع منعاً باتاً استخدام أي reverse يدوي للنص ⚠️
  */
 
 import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
@@ -10,8 +16,14 @@ import { logger } from "@/lib/logger";
 import { WAQF_IDENTITY, getCurrentDateArabic, getCurrentDateTimeArabic } from "@/lib/waqf-identity";
 import type { jsPDF } from "jspdf";
 
-// Import Arabic reshaper for proper text rendering
+// Arabic reshaper for proper letter joining
 import { reshape } from "js-arabic-reshaper";
+
+// BiDi algorithm for visual reordering
+import bidiFactory from "bidi-js";
+
+// Initialize BiDi instance once
+const bidi = bidiFactory();
 
 // ============= أدوات مساعدة =============
 
@@ -21,48 +33,86 @@ import { reshape } from "js-arabic-reshaper";
 const ARABIC_CHAR_REGEX = /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/;
 
 /**
- * فحص إذا كان الحرف عربياً
+ * فحص إذا كان النص يحتوي على عربي
  */
-function isArabicChar(char: string): boolean {
-  return ARABIC_CHAR_REGEX.test(char);
-}
-
-/**
- * عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
- * هذا يحافظ على اتصال الحروف العربية
- */
-function reverseWords(str: string): string {
-  return str.split(/\s+/).reverse().join(" ");
+function containsArabic(text: string): boolean {
+  return ARABIC_CHAR_REGEX.test(text);
 }
 
 // ============= معالجة النص العربي =============
 
 /**
+ * تطبيق خوارزمية BiDi لإعادة ترتيب النص بصرياً
+ * 
+ * هذه الدالة تحول النص من الترتيب المنطقي (logical order)
+ * إلى الترتيب البصري (visual order) المناسب لـ jsPDF
+ */
+function applyBidiReordering(text: string): string {
+  try {
+    // الحصول على مستويات التضمين BiDi
+    const embeddingLevels = bidi.getEmbeddingLevels(text, 'rtl');
+    
+    // الحصول على نطاقات العكس
+    const flips = bidi.getReorderSegments(text, embeddingLevels);
+    
+    // تحويل النص إلى مصفوفة أحرف للتعديل
+    const chars = Array.from(text);
+    
+    // تطبيق جميع عمليات العكس بالترتيب
+    for (const [start, end] of flips) {
+      // عكس النطاق المحدد
+      const segment = chars.slice(start, end + 1);
+      segment.reverse();
+      for (let i = 0; i < segment.length; i++) {
+        chars[start + i] = segment[i];
+      }
+    }
+    
+    // معالجة الأحرف المنعكسة (مثل الأقواس)
+    const mirrored = bidi.getMirroredCharactersMap(text, embeddingLevels);
+    mirrored.forEach((mirroredChar, index) => {
+      chars[index] = mirroredChar;
+    });
+    
+    return chars.join('');
+  } catch (error) {
+    logger.error(error, { context: 'bidi_reordering', severity: 'low' });
+    return text;
+  }
+}
+
+/**
  * معالجة النص العربي للعرض الصحيح في PDF
  * 
- * الخوارزمية الجديدة:
- * 1. تشكيل الحروف (reshape) لتصبح متصلة
- * 2. عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
+ * Pipeline الجديد:
+ * 1. Arabic Shaping (reshape) - توصيل الحروف العربية
+ * 2. BiDi Visual Reordering - ترتيب النص بصرياً
  * 
- * @version 3.4.0 - حل جذري: عكس الكلمات وليس الحروف
+ * ⚠️ لا يوجد أي reverse يدوي - BiDi Algorithm يتولى كل شيء ⚠️
+ * 
+ * @version 4.0.0 - حل نهائي باستخدام Unicode BiDi Algorithm
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
 
   const strText = String(text);
-  if (!strText) return "";
+  if (!strText.trim()) return "";
 
   try {
-    // فحص إذا كان النص يحتوي على عربي
-    if (!ARABIC_CHAR_REGEX.test(strText)) {
-      return strText; // لا يوجد عربي، إرجاع كما هو
+    // إذا لا يوجد عربي، إرجاع كما هو
+    if (!containsArabic(strText)) {
+      return strText;
     }
     
-    // 1) تشكيل الحروف العربية لتصبح متصلة
+    // الخطوة 1: تشكيل الحروف العربية (Arabic Shaping)
+    // هذا يحول الحروف المنفصلة إلى أشكالها المتصلة
     const shaped = reshape(strText);
     
-    // 2) عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
-    return reverseWords(shaped);
+    // الخطوة 2: إعادة الترتيب البصري (BiDi Visual Reordering)
+    // هذا يعيد ترتيب النص ليظهر بشكل صحيح في jsPDF
+    const visual = applyBidiReordering(shaped);
+    
+    return visual;
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
@@ -134,7 +184,9 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
     
     doc.setFont("Amiri", "normal");
     doc.setLanguage("ar");
-    // لا نستخدم setR2L لأننا نقوم بالعكس البصري يدوياً
+    
+    // ⚠️ لا نستخدم setR2L لأن BiDi Algorithm يتولى الترتيب البصري
+    // استخدام setR2L سيسبب عكس مضاعف
     
     return "Amiri";
   } catch (error) {
