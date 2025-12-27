@@ -61,7 +61,11 @@ export const NotificationsBell = memo(function NotificationsBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0">
+      <DropdownMenuContent 
+        align="end" 
+        className="w-80 sm:w-96 max-w-[calc(100vw-1rem)] p-0"
+        sideOffset={8}
+      >
         <div className="flex items-center justify-between p-3 sm:p-4 border-b">
           <h3 className="font-semibold text-sm sm:text-base">الإشعارات</h3>
           {unreadCount > 0 && (

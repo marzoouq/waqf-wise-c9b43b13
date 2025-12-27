@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
@@ -9,6 +9,7 @@ import { Bell, Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Notifications = () => {
   const { 
@@ -92,15 +93,17 @@ const Notifications = () => {
                     description="سيتم عرض جميع الإشعارات هنا"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden divide-y">
-                    {notifications.map((notification) => (
-                      <NotificationItem
-                        key={notification.id}
-                        notification={notification}
-                        onMarkAsRead={markAsRead}
-                      />
-                    ))}
-                  </div>
+                  <ScrollArea className="h-[calc(100vh-320px)] min-h-[300px]">
+                    <div className="border rounded-lg overflow-hidden divide-y">
+                      {notifications.map((notification) => (
+                        <NotificationItem
+                          key={notification.id}
+                          notification={notification}
+                          onMarkAsRead={markAsRead}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
                 )}
               </TabsContent>
 
@@ -112,15 +115,17 @@ const Notifications = () => {
                     description="جميع الإشعارات مقروءة"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden divide-y">
-                    {unreadNotifications.map((notification) => (
-                      <NotificationItem
-                        key={notification.id}
-                        notification={notification}
-                        onMarkAsRead={markAsRead}
-                      />
-                    ))}
-                  </div>
+                  <ScrollArea className="h-[calc(100vh-320px)] min-h-[300px]">
+                    <div className="border rounded-lg overflow-hidden divide-y">
+                      {unreadNotifications.map((notification) => (
+                        <NotificationItem
+                          key={notification.id}
+                          notification={notification}
+                          onMarkAsRead={markAsRead}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
                 )}
               </TabsContent>
 
@@ -132,15 +137,17 @@ const Notifications = () => {
                     description="لم تقرأ أي إشعارات بعد"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden divide-y">
-                    {readNotifications.map((notification) => (
-                      <NotificationItem
-                        key={notification.id}
-                        notification={notification}
-                        onMarkAsRead={markAsRead}
-                      />
-                    ))}
-                  </div>
+                  <ScrollArea className="h-[calc(100vh-320px)] min-h-[300px]">
+                    <div className="border rounded-lg overflow-hidden divide-y">
+                      {readNotifications.map((notification) => (
+                        <NotificationItem
+                          key={notification.id}
+                          notification={notification}
+                          onMarkAsRead={markAsRead}
+                        />
+                      ))}
+                    </div>
+                  </ScrollArea>
                 )}
               </TabsContent>
             </Tabs>
