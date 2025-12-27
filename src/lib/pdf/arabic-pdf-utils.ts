@@ -28,47 +28,11 @@ function isArabicChar(char: string): boolean {
 }
 
 /**
- * عكس سلسلة نصية (للعرض البصري RTL)
+ * عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
+ * هذا يحافظ على اتصال الحروف العربية
  */
-function reverseString(str: string): string {
-  return str.split("").reverse().join("");
-}
-
-/**
- * تقسيم النص إلى مقاطع (عربي / غير عربي)
- */
-function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] {
-  if (!text || text.length === 0) return [];
-  
-  const segments: { text: string; isArabic: boolean }[] = [];
-  let buffer = "";
-  let currentIsArabic = isArabicChar(text[0]);
-
-  for (const char of text) {
-    const charIsArabic = isArabicChar(char);
-    
-    // المسافات والأرقام تتبع السياق السابق
-    if (char === ' ' || /[0-9.,،٬٫%٪]/.test(char)) {
-      buffer += char;
-      continue;
-    }
-    
-    if (charIsArabic === currentIsArabic) {
-      buffer += char;
-    } else {
-      if (buffer) {
-        segments.push({ text: buffer, isArabic: currentIsArabic });
-      }
-      buffer = char;
-      currentIsArabic = charIsArabic;
-    }
-  }
-  
-  if (buffer) {
-    segments.push({ text: buffer, isArabic: currentIsArabic });
-  }
-  
-  return segments;
+function reverseWords(str: string): string {
+  return str.split(/\s+/).reverse().join(" ");
 }
 
 // ============= معالجة النص العربي =============
@@ -76,13 +40,11 @@ function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
  * 
- * الخوارزمية:
- * 1. تقسيم النص إلى مقاطع (عربي / غير عربي)
- * 2. reshape للمقاطع العربية فقط
- * 3. عكس المقاطع العربية بصرياً
- * 4. عكس ترتيب المقاطع للـ RTL
+ * الخوارزمية الجديدة:
+ * 1. تشكيل الحروف (reshape) لتصبح متصلة
+ * 2. عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
  * 
- * @version 3.3.0 - حل جذري للنص المختلط (عربي + أرقام)
+ * @version 3.4.0 - حل جذري: عكس الكلمات وليس الحروف
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
@@ -96,23 +58,11 @@ export const processArabicText = (text: string | number | null | undefined): str
       return strText; // لا يوجد عربي، إرجاع كما هو
     }
     
-    // تقسيم النص إلى مقاطع
-    const segments = splitIntoSegments(strText);
+    // 1) تشكيل الحروف العربية لتصبح متصلة
+    const shaped = reshape(strText);
     
-    // معالجة كل مقطع حسب نوعه
-    const processedSegments = segments.map(seg => {
-      if (seg.isArabic) {
-        // المقاطع العربية: reshape ثم عكس بصري
-        const shaped = reshape(seg.text);
-        return reverseString(shaped);
-      } else {
-        // الأرقام والنص اللاتيني: تبقى كما هي
-        return seg.text;
-      }
-    });
-    
-    // عكس ترتيب المقاطع للـ RTL
-    return processedSegments.reverse().join("");
+    // 2) عكس ترتيب الكلمات (وليس الحروف) للعرض RTL
+    return reverseWords(shaped);
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
