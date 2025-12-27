@@ -1,12 +1,21 @@
 /**
  * مولّد تقرير الإفصاح السنوي PDF
- * @version 2.9.75
+ * @version 3.0.0 - Visual RTL + ترويسة رسمية + ختم الناظر
  */
 
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { Database } from "@/integrations/supabase/types";
 import { logger } from "@/lib/logger";
-import { loadArabicFontToPDF, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
+import { 
+  loadArabicFontToPDF, 
+  WAQF_COLORS, 
+  processArabicText, 
+  processArabicHeaders, 
+  processArabicTableData,
+  addWaqfHeader,
+  addWaqfFooter,
+  addNazerStamp
+} from "./pdf/arabic-pdf-utils";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
@@ -14,7 +23,6 @@ type JsPDF = import('jspdf').jsPDF;
 
 /**
  * تنسيق الأرقام بشكل موحد للـ PDF
- * يستخدم تنسيق عربي مع فاصلة للآلاف ونقطة للكسور
  */
 const formatNumber = (num: number): string => {
   return new Intl.NumberFormat('en-US').format(num);
@@ -49,44 +57,30 @@ export const generateDisclosurePDF = async (
     const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
-    // تحميل الخط العربي باستخدام النظام الموحد
+    // تحميل الخط العربي
     const fontName = await loadArabicFontToPDF(doc);
 
-    let yPos = 20;
-
+    // ========= الصفحة الأولى =========
+    
     // الإطار الرئيسي
-    doc.setDrawColor(66, 139, 202);
+    doc.setDrawColor(...WAQF_COLORS.primary);
     doc.setLineWidth(2);
     doc.rect(10, 10, 190, 277);
 
-    // العنوان الرئيسي
+    // ترويسة الوقف الرسمية
+    let yPos = addWaqfHeader(doc, fontName, `الإفصاح السنوي ${disclosure.year}`);
+    
+    // اسم الوقف
     doc.setFont(fontName, "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(33, 37, 41);
-    doc.text(processArabicText("الإفصاح السنوي"), 105, yPos, { align: "center" });
-    
-    yPos += 10;
-    doc.setFontSize(18);
-    doc.setTextColor(66, 139, 202);
-    doc.text(`${disclosure.year}`, 105, yPos, { align: "center" });
-    
-    yPos += 8;
     doc.setFontSize(14);
-    doc.setTextColor(108, 117, 125);
+    doc.setTextColor(...WAQF_COLORS.text);
     doc.text(processArabicText(disclosure.waqf_name), 105, yPos, { align: "center" });
-    
-    // خط فاصل
-    yPos += 8;
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.5);
-    doc.line(20, yPos, 190, yPos);
-    
-    yPos += 10;
+    yPos += 12;
 
-    // المعلومات المالية
+    // ========= الملخص المالي =========
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
-    doc.setTextColor(33, 37, 41);
+    doc.setTextColor(...WAQF_COLORS.text);
     doc.text(processArabicText("الملخص المالي السنوي"), 190, yPos, { align: "right" });
     yPos += 8;
 
@@ -108,19 +102,19 @@ export const generateDisclosurePDF = async (
         cellPadding: 4,
       },
       headStyles: {
-        fillColor: [66, 139, 202],
-        textColor: [255, 255, 255],
+        fillColor: WAQF_COLORS.primary,
+        textColor: WAQF_COLORS.white,
         fontStyle: 'bold',
       },
       alternateRowStyles: {
-        fillColor: [248, 249, 250],
+        fillColor: WAQF_COLORS.alternateRow,
       },
       margin: { left: 20, right: 20 },
     });
 
-    yPos = doc.lastAutoTable?.finalY ?? yPos + 12;
+    yPos = (doc.lastAutoTable?.finalY ?? yPos) + 10;
 
-    // نسب التوزيع
+    // ========= نسب التوزيع =========
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
     doc.text(processArabicText("نسب وحصص التوزيع"), 190, yPos, { align: "right" });
@@ -145,18 +139,18 @@ export const generateDisclosurePDF = async (
       },
       headStyles: {
         fillColor: [40, 167, 69],
-        textColor: [255, 255, 255],
+        textColor: WAQF_COLORS.white,
         fontStyle: 'bold',
       },
       alternateRowStyles: {
-        fillColor: [248, 249, 250],
+        fillColor: WAQF_COLORS.alternateRow,
       },
       margin: { left: 20, right: 20 },
     });
 
-    yPos = doc.lastAutoTable?.finalY ?? yPos + 12;
+    yPos = (doc.lastAutoTable?.finalY ?? yPos) + 10;
 
-    // إحصائيات المستفيدين
+    // ========= إحصائيات المستفيدين =========
     doc.setFont(fontName, "bold");
     doc.setFontSize(13);
     doc.text(processArabicText("إحصائيات المستفيدين"), 190, yPos, { align: "right" });
@@ -182,21 +176,21 @@ export const generateDisclosurePDF = async (
       },
       headStyles: {
         fillColor: [255, 193, 7],
-        textColor: [33, 37, 41],
+        textColor: WAQF_COLORS.text,
         fontStyle: 'bold',
       },
       alternateRowStyles: {
-        fillColor: [248, 249, 250],
+        fillColor: WAQF_COLORS.alternateRow,
       },
       margin: { left: 20, right: 20 },
     });
 
-    // صفحة جديدة للمستفيدين إذا كانوا موجودين
+    // ========= صفحة المستفيدين =========
     if (beneficiaries.length > 0) {
       doc.addPage();
       
       // الإطار
-      doc.setDrawColor(66, 139, 202);
+      doc.setDrawColor(...WAQF_COLORS.primary);
       doc.setLineWidth(2);
       doc.rect(10, 10, 190, 277);
       
@@ -204,7 +198,7 @@ export const generateDisclosurePDF = async (
       
       doc.setFont(fontName, "bold");
       doc.setFontSize(16);
-      doc.setTextColor(33, 37, 41);
+      doc.setTextColor(...WAQF_COLORS.text);
       doc.text(processArabicText("قائمة المستفيدين وحصصهم"), 105, yPos, { align: "center" });
       yPos += 12;
 
@@ -229,23 +223,23 @@ export const generateDisclosurePDF = async (
         },
         headStyles: {
           fillColor: [220, 53, 69],
-          textColor: [255, 255, 255],
+          textColor: WAQF_COLORS.white,
           fontStyle: 'bold',
         },
         alternateRowStyles: {
-          fillColor: [248, 249, 250],
+          fillColor: WAQF_COLORS.alternateRow,
         },
         margin: { left: 15, right: 15 },
       });
     }
 
-    // المصروفات التفصيلية
+    // ========= صفحة المصروفات التفصيلية =========
     if (disclosure.maintenance_expenses || disclosure.administrative_expenses || 
         disclosure.development_expenses || disclosure.other_expenses) {
       doc.addPage();
       
       // الإطار
-      doc.setDrawColor(66, 139, 202);
+      doc.setDrawColor(...WAQF_COLORS.primary);
       doc.setLineWidth(2);
       doc.rect(10, 10, 190, 277);
       
@@ -253,7 +247,7 @@ export const generateDisclosurePDF = async (
       
       doc.setFont(fontName, "bold");
       doc.setFontSize(16);
-      doc.setTextColor(33, 37, 41);
+      doc.setTextColor(...WAQF_COLORS.text);
       doc.text(processArabicText("تفصيل المصروفات"), 105, yPos, { align: "center" });
       yPos += 12;
 
@@ -286,37 +280,33 @@ export const generateDisclosurePDF = async (
         },
         headStyles: {
           fillColor: [23, 162, 184],
-          textColor: [255, 255, 255],
+          textColor: WAQF_COLORS.white,
           fontStyle: 'bold',
         },
         alternateRowStyles: {
-          fillColor: [248, 249, 250],
+          fillColor: WAQF_COLORS.alternateRow,
         },
         margin: { left: 20, right: 20 },
       });
     }
 
-    // التذييل لكل الصفحات
+    // ========= التذييل وختم الناظر لكل الصفحات =========
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
+      
+      // ختم الناظر في الصفحة الأولى فقط
+      if (i === 1) {
+        addNazerStamp(doc, fontName, "ناظر الوقف");
+      }
+      
+      // التذييل
+      addWaqfFooter(doc, fontName);
+      
+      // رقم الصفحة
       doc.setFont(fontName, "normal");
       doc.setFontSize(9);
-      doc.setTextColor(108, 117, 125);
-      
-      // خط فاصل
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.3);
-      doc.line(20, 280, 190, 280);
-      
-      // استخدام تنسيق آمن للتاريخ (أرقام إنجليزية)
-      const issueDate = new Date().toLocaleDateString('en-GB');
-      doc.text(
-        processArabicText(`تاريخ الإصدار: ${issueDate}`),
-        105,
-        285,
-        { align: "center" }
-      );
+      doc.setTextColor(...WAQF_COLORS.muted);
       doc.text(
         processArabicText(`صفحة ${i} من ${pageCount}`),
         105,

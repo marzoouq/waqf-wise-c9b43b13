@@ -1,8 +1,8 @@
 /**
  * أدوات PDF العربية الموحدة
- * Unified Arabic PDF Utilities with Waqf Identity
+ * Unified Arabic PDF Utilities with Visual RTL Rendering
  * 
- * @version 2.9.75 - إصلاح جذري لمعالجة الأرقام
+ * @version 3.0.0 - Visual RTL Rendering (حل جذري للعربية في jsPDF)
  */
 
 import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
@@ -13,9 +13,114 @@ import type { jsPDF } from "jspdf";
 // Import Arabic reshaper for proper text rendering
 import { reshape } from "js-arabic-reshaper";
 
+// ============= أدوات مساعدة =============
+
+/**
+ * نمط الأحرف العربية (يشمل جميع نطاقات Unicode العربية)
+ */
+const ARABIC_CHAR_REGEX = /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+/**
+ * فحص إذا كان الحرف عربياً
+ */
+function isArabicChar(char: string): boolean {
+  return ARABIC_CHAR_REGEX.test(char);
+}
+
+/**
+ * عكس سلسلة نصية (للعرض البصري RTL)
+ */
+function reverseString(str: string): string {
+  return str.split("").reverse().join("");
+}
+
+/**
+ * تقسيم النص إلى مقاطع (عربي / غير عربي)
+ */
+function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] {
+  if (!text || text.length === 0) return [];
+  
+  const segments: { text: string; isArabic: boolean }[] = [];
+  let buffer = "";
+  let currentIsArabic = isArabicChar(text[0]);
+
+  for (const char of text) {
+    const charIsArabic = isArabicChar(char);
+    
+    // المسافات والأرقام تتبع السياق السابق
+    if (char === ' ' || /[0-9.,،٬٫%٪]/.test(char)) {
+      buffer += char;
+      continue;
+    }
+    
+    if (charIsArabic === currentIsArabic) {
+      buffer += char;
+    } else {
+      if (buffer) {
+        segments.push({ text: buffer, isArabic: currentIsArabic });
+      }
+      buffer = char;
+      currentIsArabic = charIsArabic;
+    }
+  }
+  
+  if (buffer) {
+    segments.push({ text: buffer, isArabic: currentIsArabic });
+  }
+  
+  return segments;
+}
+
+// ============= معالجة النص العربي =============
+
+/**
+ * معالجة النص العربي للعرض الصحيح في PDF
+ * يستخدم Visual RTL Rendering:
+ * 1. تشكيل الحروف العربية (reshape)
+ * 2. عكس الحروف العربية بصرياً
+ * 3. عكس ترتيب المقاطع للـ RTL
+ * 
+ * @version 3.0.0 - Visual RTL Rendering
+ */
+export const processArabicText = (text: string | number | null | undefined): string => {
+  if (text === null || text === undefined) return "";
+
+  const strText = String(text);
+  if (!strText) return "";
+
+  try {
+    // فحص إذا كان النص يحتوي على عربي
+    if (!ARABIC_CHAR_REGEX.test(strText)) {
+      return strText; // لا يوجد عربي، إرجاع كما هو
+    }
+    
+    const segments = splitIntoSegments(strText);
+    
+    const processed = segments.map(seg => {
+      if (seg.isArabic) {
+        // 1) تشكيل الحروف العربية لتصبح متصلة
+        const shaped = reshape(seg.text);
+        // 2) عكس بصري للحروف العربية
+        return reverseString(shaped);
+      } else {
+        // الأرقام والرموز اللاتينية تبقى كما هي
+        return seg.text;
+      }
+    });
+    
+    // 3) عكس ترتيب المقاطع بالكامل (RTL)
+    return processed.reverse().join("");
+  } catch (error) {
+    logger.error(error, { context: "process_arabic_text", severity: "low" });
+    return strText;
+  }
+};
+
+// ============= تنسيق الأرقام والعملة =============
+
 /**
  * تنسيق الأرقام للـ PDF
- * يستخدم تنسيق إنجليزي (1,234,567.89) لضمان التوافق مع معالجة RTL
+ * يستخدم تنسيق إنجليزي (1,234,567.89) لضمان التوافق
  */
 export const formatNumberForPDF = (num: number): string => {
   return new Intl.NumberFormat('en-US').format(num);
@@ -23,6 +128,7 @@ export const formatNumberForPDF = (num: number): string => {
 
 /**
  * تنسيق العملة للـ PDF
+ * الترتيب: الرقم أولاً ثم "ر.س"
  */
 export const formatCurrencyForPDF = (num: number): string => {
   return `${formatNumberForPDF(num)} ر.س`;
@@ -35,79 +141,7 @@ export const formatPercentageForPDF = (num: number): string => {
   return `${num}%`;
 };
 
-/**
- * معالجة النص العربي للعرض الصحيح في PDF
- * - إعادة تشكيل الحروف (reshape) لتصبح متصلة
- * - معالجة النص المختلط (عربي + أرقام/رموز/إنجليزي) بدون قلب الأرقام
- */
-export const processArabicText = (text: string | number | null | undefined): string => {
-  if (text === null || text === undefined) return "";
-
-  const strText = String(text);
-  if (!strText) return "";
-
-  try {
-    return processRTLMixedText(strText);
-  } catch (error) {
-    logger.error(error, { context: "process_arabic_text", severity: "low" });
-    return strText;
-  }
-};
-
-// Unicode Directional Isolates لعزل الأرقام
-const LRI = "\u2066"; // Left-to-Right Isolate
-const RLI = "\u2067"; // Right-to-Left Isolate
-const PDI = "\u2069"; // Pop Directional Isolate
-
-/**
- * عزل النص LTR (للأرقام والعملة والنسب)
- */
-function isolateLTR(value: string): string {
-  return `${LRI}${value}${PDI}`;
-}
-
-/**
- * معالجة RTL للنص المختلط باستخدام Unicode Directional Isolates
- * - يعزل الأرقام والعملة والنسب المئوية في كبسولات LTR
- * - يحافظ على النص العربي ويعيد تشكيله
- * 
- * @version 4.0.0 - نهج LTR Isolation بدلاً من عكس المقاطع
- */
-function processRTLMixedText(text: string): string {
-  // أولاً: عزل الأرقام والعملة والنسب في كبسولات LTR
-  // نمط: أرقام مع فواصل ونقاط ونسب، أو رمز العملة ر.س
-  let processed = text.replace(
-    /([0-9٠-٩]+(?:[,،٬][0-9٠-٩]{3})*(?:[\.٫][0-9٠-٩]+)?(?:\s*[%٪])?)/g,
-    (match) => isolateLTR(match)
-  );
-  
-  // عزل "ر.س" كوحدة واحدة
-  processed = processed.replace(/ر\.س/g, isolateLTR('ر.س'));
-  
-  // عزل "صفحة X من Y"
-  processed = processed.replace(
-    /صفحة\s+(\d+)\s+من\s+(\d+)/g,
-    (_, page, total) => `صفحة ${isolateLTR(page)} من ${isolateLTR(total)}`
-  );
-  
-  // عزل التواريخ (XX/XX/XXXX أو XX-XX-XXXX)
-  processed = processed.replace(
-    /(\d{1,4}[\/\-]\d{1,2}[\/\-]\d{1,4})/g,
-    (match) => isolateLTR(match)
-  );
-  
-  // معالجة النص العربي فقط بـ reshape
-  const arabicPattern = /([\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]+)/g;
-  processed = processed.replace(arabicPattern, (match) => {
-    try {
-      return reshape(match);
-    } catch {
-      return match;
-    }
-  });
-  
-  return processed;
-}
+// ============= معالجة الجداول =============
 
 /**
  * معالجة مصفوفة من الرؤوس للجداول
@@ -130,6 +164,8 @@ export const processArabicTableData = (
   );
 };
 
+// ============= تحميل الخط العربي =============
+
 /**
  * تحميل وتهيئة الخط العربي في مستند PDF
  */
@@ -145,17 +181,17 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
     
     doc.setFont("Amiri", "normal");
     doc.setLanguage("ar");
-    doc.setR2L(true);
+    // لا نستخدم setR2L لأننا نقوم بالعكس البصري يدوياً
     
     return "Amiri";
   } catch (error) {
     logger.error(error, { context: 'load_arabic_font_pdf', severity: 'low' });
-    // Fallback to helvetica
     doc.setLanguage("ar");
-    doc.setR2L(true);
     return "helvetica";
   }
 };
+
+// ============= ترويسة وتذييل الوقف =============
 
 /**
  * إضافة ترويسة الوقف إلى مستند PDF
@@ -226,6 +262,54 @@ export const addWaqfFooter = (doc: jsPDF, fontName: string) => {
   doc.setFontSize(7);
   doc.text(processArabicText(`تاريخ الطباعة: ${getCurrentDateTimeArabic()} | الإصدار: ${WAQF_IDENTITY.version}`), pageWidth / 2, pageHeight - 12, { align: "center" });
 };
+
+// ============= ختم الناظر الإلكتروني =============
+
+/**
+ * إضافة ختم الناظر الإلكتروني للاعتماد
+ */
+export const addNazerStamp = (
+  doc: jsPDF, 
+  fontName: string,
+  nazerName: string = "ناظر الوقف",
+  date?: string
+): void => {
+  const pageWidth = doc.internal.pageSize.width;
+  const stampX = pageWidth - 40;
+  const stampY = 260;
+  const stampRadius = 18;
+  
+  // رسم الختم الدائري
+  doc.setDrawColor(22, 101, 52);
+  doc.setFillColor(240, 253, 244);
+  doc.setLineWidth(1.5);
+  doc.circle(stampX, stampY, stampRadius, 'FD');
+  
+  // دائرة داخلية
+  doc.setLineWidth(0.5);
+  doc.circle(stampX, stampY, stampRadius - 3, 'S');
+  
+  // نص "معتمد"
+  doc.setFont(fontName, "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(22, 101, 52);
+  doc.text(processArabicText("معتمد"), stampX, stampY - 4, { align: "center" });
+  
+  // اسم الناظر
+  doc.setFontSize(7);
+  doc.setFont(fontName, "normal");
+  doc.text(processArabicText(nazerName), stampX, stampY + 3, { align: "center" });
+  
+  // التاريخ
+  const stampDate = date || new Date().toLocaleDateString('en-GB');
+  doc.setFontSize(6);
+  doc.text(stampDate, stampX, stampY + 8, { align: "center" });
+  
+  // إعادة الألوان للوضع الطبيعي
+  doc.setTextColor(0, 0, 0);
+};
+
+// ============= الألوان الرسمية =============
 
 /**
  * الألوان الرسمية للوقف
