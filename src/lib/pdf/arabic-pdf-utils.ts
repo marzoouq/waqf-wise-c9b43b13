@@ -1,14 +1,16 @@
 /**
  * أدوات PDF العربية الموحدة
- * Unified Arabic PDF Utilities with Visual RTL Rendering
+ * Unified Arabic PDF Utilities
  * 
- * @version 4.0.0 - BiDi Algorithm Implementation
+ * @version 5.0.0 - Arabic Shaping Only
  * 
- * الحل الجذري:
- * 1. Arabic Shaping (js-arabic-reshaper) - لتوصيل الحروف العربية
- * 2. BiDi Visual Reordering (bidi-js) - لترتيب النص بصرياً للعرض LTR
+ * الحل النهائي المثبت:
+ * - استخدام Arabic Shaping فقط (js-arabic-reshaper) لتوصيل الحروف
+ * - خط Amiri OpenType + jsPDF يتولى الترتيب RTL تلقائياً
+ * - لا حاجة لـ BiDi reordering اليدوي
  * 
- * ⚠️ ممنوع منعاً باتاً استخدام أي reverse يدوي للنص ⚠️
+ * ⚠️ ملف governance-pdf.ts يعمل لأنه لا يستخدم أي معالجة - فقط الخط ⚠️
+ * ⚠️ الحل: reshape فقط لتوصيل الحروف، بدون أي عكس ⚠️
  */
 
 import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
@@ -18,12 +20,6 @@ import type { jsPDF } from "jspdf";
 
 // Arabic reshaper for proper letter joining
 import { reshape } from "js-arabic-reshaper";
-
-// BiDi algorithm for visual reordering
-import bidiFactory from "bidi-js";
-
-// Initialize BiDi instance once
-const bidi = bidiFactory();
 
 // ============= أدوات مساعدة =============
 
@@ -42,60 +38,21 @@ function containsArabic(text: string): boolean {
 // ============= معالجة النص العربي =============
 
 /**
- * تطبيق خوارزمية BiDi لإعادة ترتيب النص بصرياً
- * 
- * هذه الدالة تحول النص من الترتيب المنطقي (logical order)
- * إلى الترتيب البصري (visual order) المناسب لـ jsPDF
- */
-function applyBidiReordering(text: string): string {
-  try {
-    // ملاحظة مهمة جداً:
-    // bidi-js يستخدم فهارس UTF-16 (code units). لذلك يجب أن نستخدم split('')
-    // وليس Array.from (الذي يعتمد على code points) وإلا ستختل جميع الفهارس.
-
-    // الحصول على مستويات التضمين BiDi
-    const embeddingLevels = bidi.getEmbeddingLevels(text, 'rtl');
-
-    // تحويل النص إلى مصفوفة (UTF-16 code units) للتعديل
-    const chars = text.split('');
-
-    // 1) معالجة الأحرف المنعكسة (مثل الأقواس) على الفهارس المنطقية قبل إعادة الترتيب
-    const mirrored = bidi.getMirroredCharactersMap(text, embeddingLevels);
-    mirrored.forEach((mirroredChar, index) => {
-      chars[index] = mirroredChar;
-    });
-
-    // 2) تطبيق نطاقات العكس (reorder segments) بالترتيب
-    const flips = bidi.getReorderSegments(text, embeddingLevels);
-    for (const [start, end] of flips) {
-      let i = start;
-      let j = end;
-      while (i < j) {
-        const tmp = chars[i];
-        chars[i] = chars[j];
-        chars[j] = tmp;
-        i++;
-        j--;
-      }
-    }
-
-    return chars.join('');
-  } catch (error) {
-    logger.error(error, { context: 'bidi_reordering', severity: 'low' });
-    return text;
-  }
-}
-
-/**
  * معالجة النص العربي للعرض الصحيح في PDF
  * 
- * Pipeline الجديد:
- * 1. Arabic Shaping (reshape) - توصيل الحروف العربية
- * 2. BiDi Visual Reordering - ترتيب النص بصرياً
+ * الحل النهائي المثبت:
+ * - استخدام Arabic Shaping فقط (reshape) لتوصيل الحروف
+ * - خط Amiri + jsPDF يتولى الترتيب RTL تلقائياً
+ * - لا حاجة لـ BiDi reordering اليدوي
  * 
- * ⚠️ لا يوجد أي reverse يدوي - BiDi Algorithm يتولى كل شيء ⚠️
+ * ⚠️ ملاحظة مهمة: ملف governance-pdf.ts يعمل بشكل صحيح لأنه:
+ *    1. يستخدم خط Amiri (يدعم OpenType)
+ *    2. يمرر النص مباشرة بدون أي معالجة
+ *    3. jsPDF يتولى الترتيب RTL تلقائياً
  * 
- * @version 4.0.0 - حل نهائي باستخدام Unicode BiDi Algorithm
+ * لذا الحل هو: reshape فقط لتوصيل الحروف، بدون أي عكس أو BiDi
+ * 
+ * @version 5.0.0 - حل نهائي: Arabic Shaping فقط
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
@@ -109,15 +66,12 @@ export const processArabicText = (text: string | number | null | undefined): str
       return strText;
     }
     
-    // الخطوة 1: تشكيل الحروف العربية (Arabic Shaping)
+    // الخطوة الوحيدة: تشكيل الحروف العربية (Arabic Shaping)
     // هذا يحول الحروف المنفصلة إلى أشكالها المتصلة
+    // خط Amiri + jsPDF يتولى الترتيب RTL تلقائياً
     const shaped = reshape(strText);
     
-    // الخطوة 2: إعادة الترتيب البصري (BiDi Visual Reordering)
-    // هذا يعيد ترتيب النص ليظهر بشكل صحيح في jsPDF
-    const visual = applyBidiReordering(shaped);
-    
-    return visual;
+    return shaped;
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
