@@ -1,6 +1,6 @@
 /**
  * مولّد تقرير الإفصاح السنوي PDF
- * @version 2.9.74
+ * @version 2.9.75
  */
 
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
@@ -11,6 +11,22 @@ import { loadArabicFontToPDF, WAQF_COLORS, processArabicText, processArabicHeade
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
 type JsPDF = import('jspdf').jsPDF;
+
+/**
+ * تنسيق الأرقام بشكل موحد للـ PDF
+ * يستخدم تنسيق عربي مع فاصلة للآلاف ونقطة للكسور
+ */
+const formatNumber = (num: number): string => {
+  return new Intl.NumberFormat('en-US').format(num);
+};
+
+const formatCurrency = (num: number): string => {
+  return `${formatNumber(num)} ر.س`;
+};
+
+const formatPercentage = (num: number): string => {
+  return `${num}%`;
+};
 
 // Type Augmentation for jspdf-autotable
 declare module 'jspdf' {
@@ -75,9 +91,9 @@ export const generateDisclosurePDF = async (
     yPos += 8;
 
     const financialData = processArabicTableData([
-      ["إجمالي الإيرادات", `${disclosure.total_revenues.toLocaleString()} ر.س`],
-      ["إجمالي المصروفات", `${disclosure.total_expenses.toLocaleString()} ر.س`],
-      ["صافي الدخل", `${disclosure.net_income.toLocaleString()} ر.س`],
+      ["إجمالي الإيرادات", formatCurrency(disclosure.total_revenues)],
+      ["إجمالي المصروفات", formatCurrency(disclosure.total_expenses)],
+      ["صافي الدخل", formatCurrency(disclosure.net_income)],
     ]);
 
     autoTable(doc, {
@@ -111,9 +127,9 @@ export const generateDisclosurePDF = async (
     yPos += 8;
 
     const distributionData = processArabicTableData([
-      ["حصة الناظر", `${disclosure.nazer_share.toLocaleString()} ر.س`, `${disclosure.nazer_percentage}%`],
-      ["صدقة الواقف", `${disclosure.charity_share.toLocaleString()} ر.س`, `${disclosure.charity_percentage}%`],
-      ["رأس مال الوقف", `${disclosure.corpus_share.toLocaleString()} ر.س`, `${disclosure.corpus_percentage}%`],
+      ["حصة الناظر", formatCurrency(disclosure.nazer_share), formatPercentage(disclosure.nazer_percentage)],
+      ["صدقة الواقف", formatCurrency(disclosure.charity_share), formatPercentage(disclosure.charity_percentage)],
+      ["رأس مال الوقف", formatCurrency(disclosure.corpus_share), formatPercentage(disclosure.corpus_percentage)],
     ]);
 
     autoTable(doc, {
@@ -196,7 +212,7 @@ export const generateDisclosurePDF = async (
         b.beneficiary_name,
         b.beneficiary_type || "-",
         b.relationship || "-",
-        `${b.allocated_amount.toLocaleString()} ر.س`,
+        formatCurrency(b.allocated_amount),
         b.payments_count.toString(),
       ]));
 
@@ -243,16 +259,16 @@ export const generateDisclosurePDF = async (
 
       const expensesDataRaw: string[][] = [];
       if (disclosure.maintenance_expenses) {
-        expensesDataRaw.push(["مصروفات الصيانة", `${disclosure.maintenance_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات الصيانة", formatCurrency(disclosure.maintenance_expenses)]);
       }
       if (disclosure.administrative_expenses) {
-        expensesDataRaw.push(["مصروفات إدارية", `${disclosure.administrative_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات إدارية", formatCurrency(disclosure.administrative_expenses)]);
       }
       if (disclosure.development_expenses) {
-        expensesDataRaw.push(["مصروفات التطوير", `${disclosure.development_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات التطوير", formatCurrency(disclosure.development_expenses)]);
       }
       if (disclosure.other_expenses) {
-        expensesDataRaw.push(["مصروفات أخرى", `${disclosure.other_expenses.toLocaleString()} ر.س`]);
+        expensesDataRaw.push(["مصروفات أخرى", formatCurrency(disclosure.other_expenses)]);
       }
 
       const expensesData = processArabicTableData(expensesDataRaw);

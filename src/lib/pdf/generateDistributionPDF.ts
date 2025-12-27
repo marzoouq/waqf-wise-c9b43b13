@@ -2,12 +2,11 @@
  * توليد PDF للتوزيعات
  * Distribution PDF Generator
  * 
- * @version 1.0.0
+ * @version 1.0.1 - إصلاح تنسيق الأرقام
  */
 
 import type { jsPDF } from "jspdf";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, processArabicText, WAQF_COLORS } from "./arabic-pdf-utils";
-import { formatCurrency } from "@/lib/utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, processArabicText, WAQF_COLORS, formatCurrencyForPDF } from "./arabic-pdf-utils";
 
 interface DistributionData {
   id: string;
@@ -63,7 +62,7 @@ export async function generateDistributionPDF(
   const distributionInfo = [
     { label: "تاريخ التوزيع", value: distribution.distribution_date },
     { label: "نوع التوزيع", value: distribution.distribution_type || "عام" },
-    { label: "إجمالي المبلغ", value: formatCurrency(distribution.total_amount) },
+    { label: "إجمالي المبلغ", value: formatCurrencyForPDF(distribution.total_amount) },
     { label: "عدد المستفيدين", value: String(distribution.beneficiaries_count) },
     { label: "الحالة", value: getStatusLabel(distribution.status) },
   ];
@@ -148,7 +147,7 @@ export async function generateDistributionPDF(
       
       pdf.text(processArabicText(String(i + 1)), pageWidth - margin - 5, yPosition + 5, { align: "right" });
       pdf.text(processArabicText(voucher.beneficiary_name), pageWidth - margin - 20, yPosition + 5, { align: "right" });
-      pdf.text(processArabicText(formatCurrency(voucher.amount)), margin + 60, yPosition + 5, { align: "right" });
+      pdf.text(processArabicText(formatCurrencyForPDF(voucher.amount)), margin + 60, yPosition + 5, { align: "right" });
       pdf.text(processArabicText(getStatusLabel(voucher.status)), margin + 20, yPosition + 5, { align: "right" });
       
       yPosition += 7;

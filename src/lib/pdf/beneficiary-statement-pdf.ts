@@ -2,13 +2,12 @@
  * نظام تصدير كشف حساب المستفيد الاحترافي
  * Professional Beneficiary Statement PDF Export
  * 
- * @version 2.9.44
+ * @version 2.9.75
  * @description تم تحويل الاستيرادات إلى Dynamic Import لتحسين الأداء
  */
 
 import type jsPDF from "jspdf";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles, processArabicText } from "./arabic-pdf-utils";
-import { formatCurrency } from "@/lib/utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles, processArabicText, formatCurrencyForPDF } from "./arabic-pdf-utils";
 import { logger } from "@/lib/logger";
 
 // Type extension for jsPDF with autoTable
@@ -250,7 +249,7 @@ const addAccountSummary = (
     doc.setFont(fontName, "bold");
     doc.setFontSize(10);
     doc.setTextColor(...item.color);
-    const valueText = item.isCount ? String(item.value) : formatCurrency(item.value);
+    const valueText = item.isCount ? String(item.value) : formatCurrencyForPDF(item.value);
     doc.text(processArabicText(valueText), x + boxWidth / 2, yPosition + 14, { align: "center" });
   });
   
@@ -272,7 +271,7 @@ const addPaymentsTable = (
   // تحويل البيانات للجدول - مع معالجة النصوص العربية
   const tableData = payments.map((payment, index) => [
     processArabicText(payment.status === 'completed' || payment.status === 'مكتمل' ? '✓' : '○'),
-    processArabicText(formatCurrency(payment.amount)),
+    processArabicText(formatCurrencyForPDF(payment.amount)),
     processArabicText(payment.method || payment.type || '-'),
     processArabicText(payment.payer_name || '-'),
     processArabicText(new Date(payment.payment_date).toLocaleDateString('ar-SA')),
