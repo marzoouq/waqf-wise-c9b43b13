@@ -49,31 +49,36 @@ function containsArabic(text: string): boolean {
  */
 function applyBidiReordering(text: string): string {
   try {
+    // ملاحظة مهمة جداً:
+    // bidi-js يستخدم فهارس UTF-16 (code units). لذلك يجب أن نستخدم split('')
+    // وليس Array.from (الذي يعتمد على code points) وإلا ستختل جميع الفهارس.
+
     // الحصول على مستويات التضمين BiDi
     const embeddingLevels = bidi.getEmbeddingLevels(text, 'rtl');
-    
-    // الحصول على نطاقات العكس
-    const flips = bidi.getReorderSegments(text, embeddingLevels);
-    
-    // تحويل النص إلى مصفوفة أحرف للتعديل
-    const chars = Array.from(text);
-    
-    // تطبيق جميع عمليات العكس بالترتيب
-    for (const [start, end] of flips) {
-      // عكس النطاق المحدد
-      const segment = chars.slice(start, end + 1);
-      segment.reverse();
-      for (let i = 0; i < segment.length; i++) {
-        chars[start + i] = segment[i];
-      }
-    }
-    
-    // معالجة الأحرف المنعكسة (مثل الأقواس)
+
+    // تحويل النص إلى مصفوفة (UTF-16 code units) للتعديل
+    const chars = text.split('');
+
+    // 1) معالجة الأحرف المنعكسة (مثل الأقواس) على الفهارس المنطقية قبل إعادة الترتيب
     const mirrored = bidi.getMirroredCharactersMap(text, embeddingLevels);
     mirrored.forEach((mirroredChar, index) => {
       chars[index] = mirroredChar;
     });
-    
+
+    // 2) تطبيق نطاقات العكس (reorder segments) بالترتيب
+    const flips = bidi.getReorderSegments(text, embeddingLevels);
+    for (const [start, end] of flips) {
+      let i = start;
+      let j = end;
+      while (i < j) {
+        const tmp = chars[i];
+        chars[i] = chars[j];
+        chars[j] = tmp;
+        i++;
+        j--;
+      }
+    }
+
     return chars.join('');
   } catch (error) {
     logger.error(error, { context: 'bidi_reordering', severity: 'low' });
