@@ -168,10 +168,15 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                 min={min}
                 max={max}
                 step={step}
-                {...field}
-                onChange={(e) =>
-                  field.onChange(e.target.value ? Number(e.target.value) : undefined)
-                }
+                value={field.value === undefined || field.value === null ? "" : field.value}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // السماح بالحقل الفارغ (undefined) بدلاً من إجبار 0
+                  field.onChange(val === "" ? undefined : Number(val));
+                }}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                name={field.name}
               />
             ) : (
               <Input
