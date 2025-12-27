@@ -13,7 +13,7 @@ import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useBeneficiaryAccountStatementData } from '@/hooks/beneficiary/useBeneficiaryAccountStatementData';
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from '@/lib/pdf/arabic-pdf-utils';
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, formatCurrencyForPDF } from '@/lib/pdf/arabic-pdf-utils';
 
 export default function BeneficiaryAccountStatement() {
   const { user } = useAuth();
@@ -80,18 +80,18 @@ export default function BeneficiaryAccountStatement() {
     doc.setFont(fontName, 'normal');
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text(`إجمالي المدفوعات: ${formatCurrency(stats.totalPayments)}`, pageWidth - 20, yPos, { align: 'right' });
+    doc.text(`إجمالي المدفوعات: ${formatCurrencyForPDF(stats.totalPayments)}`, pageWidth - 20, yPos, { align: 'right' });
     yPos += 6;
     doc.text(`عدد المدفوعات: ${stats.paymentsCount}`, pageWidth - 20, yPos, { align: 'right' });
     yPos += 6;
-    doc.text(`متوسط الدفعة: ${formatCurrency(stats.avgPayment)}`, pageWidth - 20, yPos, { align: 'right' });
+    doc.text(`متوسط الدفعة: ${formatCurrencyForPDF(stats.avgPayment)}`, pageWidth - 20, yPos, { align: 'right' });
     yPos += 10;
     
     // الجدول
     const tableData = filteredPayments.map(payment => [
       format(new Date(payment.payment_date), 'dd/MM/yyyy'),
       payment.description || '-',
-      formatCurrency(payment.amount),
+      formatCurrencyForPDF(payment.amount),
       payment.payment_method || '-',
     ]);
     
