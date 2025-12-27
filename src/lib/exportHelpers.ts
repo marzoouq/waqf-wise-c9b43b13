@@ -2,11 +2,11 @@
  * Export Helpers - أدوات التصدير الموحدة مع هوية الوقف
  * تدعم الخطوط العربية (Amiri) في جميع ملفات PDF
  * 
- * @version 2.9.74
+ * @version 2.9.75 - إصلاح تنسيق الأرقام
  */
 
 import { logger } from "./logger";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData, formatCurrencyForPDF } from "./pdf/arabic-pdf-utils";
 
 export const exportToPDF = async (
   title: string,
@@ -115,7 +115,7 @@ export const exportFinancialStatementToPDF = async (
     doc.setFont(fontName, "normal");
     doc.setTextColor(...WAQF_COLORS.text);
     section.items.forEach((item) => {
-      const amountText = processArabicText(item.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 }) + ' ر.س');
+      const amountText = processArabicText(formatCurrencyForPDF(item.amount));
       doc.text(processArabicText(item.label), 30, yPosition);
       doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
         align: "right",
@@ -143,7 +143,7 @@ export const exportFinancialStatementToPDF = async (
   doc.setFont(fontName, "bold");
   doc.setTextColor(...WAQF_COLORS.primary);
   totals.forEach((total) => {
-    const amountText = processArabicText(total.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 }) + ' ر.س');
+    const amountText = processArabicText(formatCurrencyForPDF(total.amount));
     doc.text(processArabicText(total.label), 20, yPosition);
     doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
       align: "right",

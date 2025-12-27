@@ -2,7 +2,7 @@
  * أدوات PDF العربية الموحدة
  * Unified Arabic PDF Utilities with Waqf Identity
  * 
- * @version 2.9.74
+ * @version 2.9.75 - إصلاح جذري لمعالجة الأرقام
  */
 
 import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
@@ -12,6 +12,28 @@ import type { jsPDF } from "jspdf";
 
 // Import Arabic reshaper for proper text rendering
 import { reshape } from "js-arabic-reshaper";
+
+/**
+ * تنسيق الأرقام للـ PDF
+ * يستخدم تنسيق إنجليزي (1,234,567.89) لضمان التوافق مع معالجة RTL
+ */
+export const formatNumberForPDF = (num: number): string => {
+  return new Intl.NumberFormat('en-US').format(num);
+};
+
+/**
+ * تنسيق العملة للـ PDF
+ */
+export const formatCurrencyForPDF = (num: number): string => {
+  return `${formatNumberForPDF(num)} ر.س`;
+};
+
+/**
+ * تنسيق النسبة المئوية للـ PDF
+ */
+export const formatPercentageForPDF = (num: number): string => {
+  return `${num}%`;
+};
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
@@ -36,7 +58,9 @@ export const processArabicText = (text: string | number | null | undefined): str
  * معالجة RTL للنص المختلط بشكل آمن:
  * - يعيد تشكيل العربية لتصبح الحروف متصلة
  * - يعكس النص كاملاً لتجاوز غياب الـ bidi في jsPDF
- * - ثم يُصلح قلب الأرقام/اللاتيني داخل النص حتى لا تنعكس (1,083,094)
+ * - ثم يُصلح قلب الأرقام/اللاتيني داخل النص حتى لا تنعكس
+ * 
+ * @version 2.9.75 - إصلاح جذري لمعالجة الأرقام
  */
 function processRTLMixedText(text: string): string {
   const reverse = (s: string) => s.split("").reverse().join("");
@@ -50,20 +74,29 @@ function processRTLMixedText(text: string): string {
   // إصلاح "ر.س" المقلوبة أولاً
   rtl = rtl.replace(/س\.ر/g, "ر.س");
   
-  // إصلاح الأرقام مع الفواصل والنقاط بشكل شامل
-  // بعد العكس، الأرقام تظهر معكوسة مثل: 490,380,1 بدلاً من 1,083,094
-  // الـ regex يلتقط سلاسل الأرقام مع الفواصل/النقاط بينها
-  // مثال: "490,380,1" أو "23.456,789" أو "5" فقط
+  // ======= إصلاح جذري للأرقام =======
+  // بعد العكس، الأرقام تظهر معكوسة: 490,380,1 بدلاً من 1,083,094
+  // نحتاج لإعادة عكسها للحصول على الترتيب الصحيح
+  // 
+  // نمط يلتقط: أرقام مع فواصل أو نقاط (للآلاف والكسور العشرية)
+  // مثال: "490,380,1" أو "125.239,85" أو "5"
+  // 
+  // ملاحظة مهمة: الأرقام العربية قد تستخدم النقطة للآلاف والفاصلة للكسور
   rtl = rtl.replace(
-    /[0-9\u0660-\u0669](?:[0-9\u0660-\u0669,\.]*[0-9\u0660-\u0669])?/g,
-    (match) => reverse(match)
+    /([0-9\u0660-\u0669]+(?:[,\.][0-9\u0660-\u0669]+)*)/g,
+    (match) => {
+      // عكس الرقم بالكامل ليعود للترتيب الصحيح
+      return reverse(match);
+    }
   );
   
-  // إصلاح النسب المئوية (% في البداية بعد العكس)
-  // مثال: %5.84 تصبح 84.5%
+  // إصلاح النسب المئوية
+  // بعد العكس: %5 أو %5.84 -> يجب أن تصبح 5% أو 84.5%
+  // لكن بعد إصلاح الأرقام أعلاه، قد تكون % في البداية أو النهاية
+  // نتعامل مع الحالة: %[رقم] -> [رقم]%
   rtl = rtl.replace(
-    /%([0-9\u0660-\u0669](?:[0-9\u0660-\u0669\.]*[0-9\u0660-\u0669])?)/g,
-    (_, num) => reverse(num) + "%"
+    /%([0-9\u0660-\u0669]+(?:\.[0-9\u0660-\u0669]+)?)/g,
+    (_, num) => `${num}%`
   );
 
   // إصلاح الكلمات/الاختصارات اللاتينية إن وجدت
