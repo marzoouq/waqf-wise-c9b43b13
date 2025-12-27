@@ -75,12 +75,9 @@ function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] 
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
- * يستخدم Visual RTL Rendering:
- * 1. تشكيل الحروف العربية (reshape)
- * 2. عكس الحروف العربية بصرياً
- * 3. عكس ترتيب المقاطع للـ RTL
+ * يستخدم reshape فقط لتشكيل الحروف - خط Amiri يدعم presentation forms
  * 
- * @version 3.0.0 - Visual RTL Rendering
+ * @version 3.1.0 - إصلاح العكس المزدوج
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
@@ -94,22 +91,9 @@ export const processArabicText = (text: string | number | null | undefined): str
       return strText; // لا يوجد عربي، إرجاع كما هو
     }
     
-    const segments = splitIntoSegments(strText);
-    
-    const processed = segments.map(seg => {
-      if (seg.isArabic) {
-        // 1) تشكيل الحروف العربية لتصبح متصلة
-        const shaped = reshape(seg.text);
-        // 2) عكس بصري للحروف العربية
-        return reverseString(shaped);
-      } else {
-        // الأرقام والرموز اللاتينية تبقى كما هي
-        return seg.text;
-      }
-    });
-    
-    // 3) عكس ترتيب المقاطع بالكامل (RTL)
-    return processed.reverse().join("");
+    // فقط reshape لتشكيل الحروف - بدون أي عكس
+    // خط Amiri يدعم presentation forms بشكل صحيح
+    return reshape(strText);
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
@@ -265,18 +249,72 @@ export const addWaqfFooter = (doc: jsPDF, fontName: string) => {
 
 // ============= ختم الناظر الإلكتروني =============
 
+export interface NazerStampOptions {
+  nazerName?: string;
+  date?: string;
+  stampImageUrl?: string | null;
+  signatureImageUrl?: string | null;
+}
+
 /**
  * إضافة ختم الناظر الإلكتروني للاعتماد
+ * يدعم صور مخصصة للختم والتوقيع
  */
-export const addNazerStamp = (
+export const addNazerStamp = async (
   doc: jsPDF, 
   fontName: string,
-  nazerName: string = "ناظر الوقف",
-  date?: string
-): void => {
+  options: NazerStampOptions = {}
+): Promise<void> => {
+  const { 
+    nazerName = "ناظر الوقف", 
+    date, 
+    stampImageUrl, 
+    signatureImageUrl 
+  } = options;
+  
   const pageWidth = doc.internal.pageSize.width;
   const stampX = pageWidth - 40;
-  const stampY = 260;
+  const stampY = 255;
+  
+  // إذا توجد صورة ختم مخصصة
+  if (stampImageUrl) {
+    try {
+      const img = await loadImageAsBase64(stampImageUrl);
+      doc.addImage(img, 'PNG', stampX - 20, stampY - 20, 40, 40);
+    } catch {
+      // fallback للختم المرسوم
+      drawDefaultStamp(doc, fontName, stampX, stampY, nazerName, date);
+    }
+  } else {
+    // الختم المرسوم الافتراضي
+    drawDefaultStamp(doc, fontName, stampX, stampY, nazerName, date);
+  }
+  
+  // إضافة التوقيع إذا وُجد
+  if (signatureImageUrl) {
+    try {
+      const sig = await loadImageAsBase64(signatureImageUrl);
+      doc.addImage(sig, 'PNG', stampX - 55, stampY - 10, 30, 20);
+    } catch {
+      // تجاهل خطأ تحميل التوقيع
+    }
+  }
+  
+  // إعادة الألوان للوضع الطبيعي
+  doc.setTextColor(0, 0, 0);
+};
+
+/**
+ * رسم الختم الافتراضي (في حالة عدم وجود صورة)
+ */
+function drawDefaultStamp(
+  doc: jsPDF, 
+  fontName: string, 
+  stampX: number, 
+  stampY: number, 
+  nazerName: string, 
+  date?: string
+): void {
   const stampRadius = 18;
   
   // رسم الختم الدائري
@@ -304,10 +342,27 @@ export const addNazerStamp = (
   const stampDate = date || new Date().toLocaleDateString('en-GB');
   doc.setFontSize(6);
   doc.text(stampDate, stampX, stampY + 8, { align: "center" });
-  
-  // إعادة الألوان للوضع الطبيعي
-  doc.setTextColor(0, 0, 0);
-};
+}
+
+/**
+ * تحميل صورة كـ Base64 لإضافتها للـ PDF
+ */
+async function loadImageAsBase64(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
 
 // ============= الألوان الرسمية =============
 

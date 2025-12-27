@@ -297,7 +297,7 @@ export const generateDisclosurePDF = async (
       
       // ختم الناظر في الصفحة الأولى فقط
       if (i === 1) {
-        addNazerStamp(doc, fontName, "ناظر الوقف");
+        await addNazerStamp(doc, fontName, { nazerName: "ناظر الوقف" });
       }
       
       // التذييل
