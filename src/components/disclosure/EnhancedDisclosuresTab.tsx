@@ -237,11 +237,20 @@ export function EnhancedDisclosuresTab() {
                   <Button 
                     variant="default" 
                     className="flex-1"
-                    onClick={() => handleViewDetails(disclosure as AnnualDisclosure)}
+                    onClick={() => handleViewFullPage(disclosure as AnnualDisclosure)}
                   >
                     <Eye className="h-4 w-4 ms-2" />
                     عرض التفاصيل الكاملة
                     <ChevronLeft className="h-4 w-4 me-2" />
+                  </Button>
+                  
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleViewDetails(disclosure as AnnualDisclosure)}
+                  >
+                    <Eye className="h-4 w-4 ms-2" />
+                    معاينة سريعة
                   </Button>
                   
                   {settings?.allow_export_pdf && (
