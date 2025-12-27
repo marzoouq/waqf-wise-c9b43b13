@@ -55,54 +55,65 @@ export const processArabicText = (text: string | number | null | undefined): str
 };
 
 /**
- * معالجة RTL للنص المختلط بشكل آمن:
- * - يعيد تشكيل العربية لتصبح الحروف متصلة
- * - يعكس النص كاملاً لتجاوز غياب الـ bidi في jsPDF
- * - ثم يُصلح قلب الأرقام/اللاتيني داخل النص حتى لا تنعكس
+ * معالجة RTL للنص المختلط بنهج Token-based:
+ * - يقسم النص إلى مقاطع (عربي / أرقام+رموز / لاتيني)
+ * - يعالج كل مقطع بشكل منفصل
+ * - يعيد ترتيب المقاطع لمحاكاة RTL بدون قلب الأرقام
  * 
- * @version 2.9.75 - إصلاح جذري لمعالجة الأرقام
+ * @version 3.0.0 - Token-based approach
  */
 function processRTLMixedText(text: string): string {
-  const reverse = (s: string) => s.split("").reverse().join("");
-
-  // إعادة تشكيل العربية (لا تؤثر سلباً على الأرقام)
-  const reshaped = reshape(text);
-
-  // عكس كامل النص لمحاكاة RTL
-  let rtl = reverse(reshaped);
-
-  // إصلاح "ر.س" المقلوبة أولاً
-  rtl = rtl.replace(/س\.ر/g, "ر.س");
+  // تقسيم النص إلى مقاطع (tokens)
+  // المقاطع: عربي، أرقام مع فواصل/نقاط، لاتيني، مسافات/رموز
+  const tokenRegex = /([\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]+)|([0-9٠-٩]+(?:[,\.،٬٫][0-9٠-٩]+)*%?)|([A-Za-z]+(?:[._-][A-Za-z0-9]+)*)|(\s+)|([^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF0-9٠-٩A-Za-z\s]+)/g;
   
-  // ======= إصلاح جذري للأرقام =======
-  // بعد العكس، الأرقام تظهر معكوسة: 490,380,1 بدلاً من 1,083,094
-  // نحتاج لإعادة عكسها للحصول على الترتيب الصحيح
-  // 
-  // نمط يلتقط: أرقام مع فواصل أو نقاط (للآلاف والكسور العشرية)
-  // مثال: "490,380,1" أو "125.239,85" أو "5"
-  // 
-  // ملاحظة مهمة: الأرقام العربية قد تستخدم النقطة للآلاف والفاصلة للكسور
-  rtl = rtl.replace(
-    /([0-9\u0660-\u0669]+(?:[,\.][0-9\u0660-\u0669]+)*)/g,
-    (match) => {
-      // عكس الرقم بالكامل ليعود للترتيب الصحيح
-      return reverse(match);
+  const tokens: { type: 'arabic' | 'number' | 'latin' | 'space' | 'symbol'; value: string }[] = [];
+  let match;
+  
+  while ((match = tokenRegex.exec(text)) !== null) {
+    if (match[1]) {
+      // نص عربي - نعيد تشكيله
+      tokens.push({ type: 'arabic', value: reshape(match[1]) });
+    } else if (match[2]) {
+      // أرقام - نحافظ عليها كما هي
+      tokens.push({ type: 'number', value: match[2] });
+    } else if (match[3]) {
+      // نص لاتيني - نحافظ عليه كما هو
+      tokens.push({ type: 'latin', value: match[3] });
+    } else if (match[4]) {
+      // مسافات
+      tokens.push({ type: 'space', value: match[4] });
+    } else if (match[5]) {
+      // رموز (ر.س، %، إلخ)
+      tokens.push({ type: 'symbol', value: match[5] });
     }
-  );
+  }
   
-  // إصلاح النسب المئوية
-  // بعد العكس: %5 أو %5.84 -> يجب أن تصبح 5% أو 84.5%
-  // لكن بعد إصلاح الأرقام أعلاه، قد تكون % في البداية أو النهاية
-  // نتعامل مع الحالة: %[رقم] -> [رقم]%
-  rtl = rtl.replace(
-    /%([0-9\u0660-\u0669]+(?:\.[0-9\u0660-\u0669]+)?)/g,
-    (_, num) => `${num}%`
-  );
-
-  // إصلاح الكلمات/الاختصارات اللاتينية إن وجدت
-  rtl = rtl.replace(/[A-Za-z][A-Za-z0-9._-]*/g, (m) => reverse(m));
-
-  return rtl;
+  // عكس ترتيب المقاطع لمحاكاة RTL
+  const reversedTokens = tokens.reverse();
+  
+  // بناء النص النهائي
+  let result = '';
+  for (const token of reversedTokens) {
+    if (token.type === 'arabic') {
+      // النص العربي المُشكَّل يُعكس حروفه
+      result += token.value.split('').reverse().join('');
+    } else if (token.type === 'number' || token.type === 'latin') {
+      // الأرقام واللاتيني تبقى كما هي (لا نعكسها)
+      result += token.value;
+    } else if (token.type === 'symbol') {
+      // معالجة الرموز الخاصة
+      let symbol = token.value;
+      // إصلاح ر.س
+      symbol = symbol.replace(/س\.ر/g, 'ر.س');
+      // عكس الرموز العربية
+      result += symbol.split('').reverse().join('');
+    } else {
+      result += token.value;
+    }
+  }
+  
+  return result;
 }
 
 /**

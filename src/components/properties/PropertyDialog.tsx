@@ -21,8 +21,15 @@ const propertySchema = z.object({
     .min(1, { message: "عدد الوحدات يجب أن يكون 1 على الأقل" }),
   status: z.string().min(1, { message: "الحالة مطلوبة" }),
   description: z.string().optional(),
-  shop_count: z.coerce.number().min(0).default(0),
-  apartment_count: z.coerce.number().min(0).default(0),
+  // السماح بالقيم الفارغة أثناء التحرير، وتحويلها إلى 0 عند الحفظ
+  shop_count: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? 0 : Number(val)),
+    z.number().min(0)
+  ),
+  apartment_count: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? 0 : Number(val)),
+    z.number().min(0)
+  ),
 });
 
 type PropertyFormValues = z.infer<typeof propertySchema>;
