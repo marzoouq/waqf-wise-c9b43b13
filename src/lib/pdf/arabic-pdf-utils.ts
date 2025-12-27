@@ -75,11 +75,14 @@ function splitIntoSegments(text: string): { text: string; isArabic: boolean }[] 
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
- * jsPDF يكتب من اليسار لليمين، لذا نحتاج:
- * 1. تشكيل الحروف (reshape) لتصبح متصلة
- * 2. عكس النص بصرياً للعرض RTL
  * 
- * @version 3.2.0 - إصلاح العرض RTL
+ * الخوارزمية:
+ * 1. تقسيم النص إلى مقاطع (عربي / غير عربي)
+ * 2. reshape للمقاطع العربية فقط
+ * 3. عكس المقاطع العربية بصرياً
+ * 4. عكس ترتيب المقاطع للـ RTL
+ * 
+ * @version 3.3.0 - حل جذري للنص المختلط (عربي + أرقام)
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
   if (text === null || text === undefined) return "";
@@ -93,11 +96,23 @@ export const processArabicText = (text: string | number | null | undefined): str
       return strText; // لا يوجد عربي، إرجاع كما هو
     }
     
-    // 1) تشكيل الحروف العربية لتصبح متصلة
-    const shaped = reshape(strText);
+    // تقسيم النص إلى مقاطع
+    const segments = splitIntoSegments(strText);
     
-    // 2) عكس النص بصرياً حيث أن jsPDF يكتب LTR
-    return reverseString(shaped);
+    // معالجة كل مقطع حسب نوعه
+    const processedSegments = segments.map(seg => {
+      if (seg.isArabic) {
+        // المقاطع العربية: reshape ثم عكس بصري
+        const shaped = reshape(seg.text);
+        return reverseString(shaped);
+      } else {
+        // الأرقام والنص اللاتيني: تبقى كما هي
+        return seg.text;
+      }
+    });
+    
+    // عكس ترتيب المقاطع للـ RTL
+    return processedSegments.reverse().join("");
   } catch (error) {
     logger.error(error, { context: "process_arabic_text", severity: "low" });
     return strText;
