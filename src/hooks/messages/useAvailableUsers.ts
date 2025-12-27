@@ -1,12 +1,13 @@
 /**
  * Available Users for Messaging Hook
- * @version 2.8.66
+ * @version 2.8.67
  * 
- * يستثني المستخدم الحالي من قائمة المتاحين للمراسلة
+ * يستخدم MessageService.getRecipients لجلب المستلمين المتاحين
+ * حسب دور المستخدم الحالي (المستفيدين يرون الناظر/المشرف فقط)
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { UserService } from "@/services";
+import { MessageService } from "@/services/message.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -24,9 +25,15 @@ export function useAvailableUsers() {
   return useQuery({
     queryKey: [...QUERY_KEYS.AVAILABLE_USERS, user?.id],
     queryFn: async (): Promise<AvailableUser[]> => {
-      const allUsers = await UserService.getAvailableUsers();
-      // استثناء المستخدم الحالي من القائمة
-      return allUsers.filter(u => u.id !== user?.id);
+      // استخدام الدالة الصحيحة التي تصفي المستلمين حسب دور المستخدم
+      const recipients = await MessageService.getRecipients(user!.id);
+      return recipients.map(r => ({
+        id: r.id,
+        name: r.name,
+        roles: [r.roleKey],
+        displayName: `${r.name} (${r.role})`,
+        role: r.roleKey,
+      }));
     },
     enabled: !!user,
   });

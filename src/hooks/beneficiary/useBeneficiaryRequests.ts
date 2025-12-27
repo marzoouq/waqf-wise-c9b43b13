@@ -25,6 +25,7 @@ export function useBeneficiaryRequests(beneficiaryId: string) {
     mutationFn: async (formData: BeneficiaryRequestData) => {
       const priorityMap: Record<string, 'عاجلة' | 'عالية' | 'متوسطة' | 'منخفضة'> = {
         'عاجلة': 'عاجلة',
+        'مهمة': 'عالية',
         'عالية': 'عالية',
         'متوسطة': 'متوسطة',
         'منخفضة': 'منخفضة',
