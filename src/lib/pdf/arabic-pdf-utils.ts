@@ -153,16 +153,67 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
   }
 };
 
+// ============= جلب بيانات الهوية البصرية =============
+
+import { supabase } from "@/integrations/supabase/client";
+
+export interface WaqfBrandingData {
+  stamp_image_url: string | null;
+  signature_image_url: string | null;
+  waqf_logo_url: string | null;
+  nazer_name: string;
+  show_logo_in_pdf: boolean;
+  show_stamp_in_pdf: boolean;
+}
+
+/**
+ * جلب بيانات الهوية البصرية للوقف
+ */
+export const fetchWaqfBranding = async (): Promise<WaqfBrandingData | null> => {
+  try {
+    const { data, error } = await supabase
+      .from("waqf_branding")
+      .select("stamp_image_url, signature_image_url, waqf_logo_url, nazer_name, show_logo_in_pdf, show_stamp_in_pdf")
+      .limit(1)
+      .single();
+
+    if (error) throw error;
+    return data as WaqfBrandingData;
+  } catch {
+    return null;
+  }
+};
+
 // ============= ترويسة وتذييل الوقف =============
+
+export interface WaqfHeaderOptions {
+  logoUrl?: string | null;
+  showLogo?: boolean;
+}
 
 /**
  * إضافة ترويسة الوقف إلى مستند PDF
+ * يدعم الشعار المخصص من قاعدة البيانات
  */
-export const addWaqfHeader = (doc: jsPDF, fontName: string, title: string): number => {
+export const addWaqfHeader = (
+  doc: jsPDF, 
+  fontName: string, 
+  title: string,
+  options?: WaqfHeaderOptions
+): number => {
   const pageWidth = doc.internal.pageSize.width;
   let yPosition = 15;
   
-  // شعار واسم الوقف
+  const { logoUrl, showLogo = true } = options || {};
+  
+  // شعار الوقف (صورة مخصصة إذا وُجدت)
+  if (showLogo && logoUrl) {
+    // سيتم إضافة الشعار بشكل async في addWaqfHeaderWithLogo
+    // هنا نترك مكان للشعار
+    yPosition = 35; // نترك مساحة للشعار
+  }
+  
+  // شعار واسم الوقف (نص)
   doc.setFont(fontName, "bold");
   doc.setFontSize(18);
   doc.setTextColor(22, 101, 52); // أخضر غامق
@@ -197,6 +248,69 @@ export const addWaqfHeader = (doc: jsPDF, fontName: string, title: string): numb
   yPosition += 10;
   
   // إعادة الألوان للوضع الطبيعي
+  doc.setTextColor(0, 0, 0);
+  
+  return yPosition;
+};
+
+/**
+ * إضافة ترويسة الوقف مع الشعار المخصص (async)
+ */
+export const addWaqfHeaderWithLogo = async (
+  doc: jsPDF, 
+  fontName: string, 
+  title: string
+): Promise<number> => {
+  const branding = await fetchWaqfBranding();
+  const pageWidth = doc.internal.pageSize.width;
+  let yPosition = 15;
+  
+  // إضافة الشعار إذا وُجد ومفعّل
+  if (branding?.show_logo_in_pdf && branding?.waqf_logo_url) {
+    try {
+      const logoBase64 = await loadImageAsBase64(branding.waqf_logo_url);
+      // الشعار في المنتصف
+      doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 15, yPosition - 5, 30, 20);
+      yPosition += 18;
+    } catch {
+      // تجاهل خطأ تحميل الشعار
+    }
+  }
+  
+  // شعار واسم الوقف (نص)
+  doc.setFont(fontName, "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(22, 101, 52);
+  doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 8;
+  
+  // اسم المنصة
+  doc.setFont(fontName, "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+  doc.text(processArabicText(WAQF_IDENTITY.platformName), pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 5;
+  
+  // خط فاصل
+  doc.setDrawColor(22, 101, 52);
+  doc.setLineWidth(0.5);
+  doc.line(20, yPosition, pageWidth - 20, yPosition);
+  yPosition += 10;
+  
+  // عنوان التقرير
+  doc.setFont(fontName, "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(31, 41, 55);
+  doc.text(processArabicText(title), pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 8;
+  
+  // التاريخ
+  doc.setFont(fontName, "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+  doc.text(processArabicText(`التاريخ: ${getCurrentDateArabic()}`), pageWidth / 2, yPosition, { align: "center" });
+  yPosition += 10;
+  
   doc.setTextColor(0, 0, 0);
   
   return yPosition;
@@ -280,6 +394,25 @@ export const addNazerStamp = async (
   
   // إعادة الألوان للوضع الطبيعي
   doc.setTextColor(0, 0, 0);
+};
+
+/**
+ * إضافة ختم الناظر مع جلب البيانات من قاعدة البيانات تلقائياً
+ */
+export const addNazerStampFromDB = async (
+  doc: jsPDF, 
+  fontName: string
+): Promise<void> => {
+  const branding = await fetchWaqfBranding();
+  
+  // تحقق من تفعيل إظهار الختم
+  if (!branding?.show_stamp_in_pdf) return;
+  
+  await addNazerStamp(doc, fontName, {
+    nazerName: branding?.nazer_name || "ناظر الوقف",
+    stampImageUrl: branding?.stamp_image_url,
+    signatureImageUrl: branding?.signature_image_url,
+  });
 };
 
 /**

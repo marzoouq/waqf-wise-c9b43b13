@@ -1,5 +1,6 @@
 /**
- * مكون إعدادات الختم والتوقيع للوقف
+ * مكون إعدادات الختم والتوقيع والشعار للوقف
+ * @version 2.0.0 - إضافة شعار الوقف وخيارات الإظهار
  */
 
 import { useState, useRef } from "react";
@@ -7,14 +8,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Stamp, FileSignature, Upload, Loader2, Save, User } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Stamp, FileSignature, Upload, Loader2, Save, User, Image, Eye, EyeOff } from "lucide-react";
 import { useWaqfBranding } from "@/hooks/nazer/useWaqfBranding";
 
 export const WaqfBrandingSettings = () => {
-  const { branding, isLoading, uploadStamp, uploadSignature, updateNazerName, isUpdating } = useWaqfBranding();
+  const { 
+    branding, 
+    isLoading, 
+    uploadStamp, 
+    uploadSignature, 
+    uploadLogo,
+    updateNazerName, 
+    toggleShowLogo,
+    toggleShowStamp,
+    isUpdating 
+  } = useWaqfBranding();
   const [nazerName, setNazerName] = useState("");
   const stampInputRef = useRef<HTMLInputElement>(null);
   const signatureInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const handleStampUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,6 +40,13 @@ export const WaqfBrandingSettings = () => {
     const file = e.target.files?.[0];
     if (file) {
       await uploadSignature(file);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await uploadLogo(file);
     }
   };
 
@@ -51,10 +71,10 @@ export const WaqfBrandingSettings = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Stamp className="h-5 w-5 text-primary" />
-          إعدادات الختم والتوقيع
+          إعدادات الهوية البصرية
         </CardTitle>
         <CardDescription>
-          رفع الختم الرسمي والتوقيع لاستخدامها في التقارير والمستندات
+          رفع شعار الوقف والختم الرسمي والتوقيع لاستخدامها في التقارير والمستندات
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -84,14 +104,86 @@ export const WaqfBrandingSettings = () => {
           </p>
         </div>
 
-        {/* الختم الرسمي */}
-        <div className="space-y-3">
-          <Label className="flex items-center gap-2">
-            <Stamp className="h-4 w-4" />
-            الختم الرسمي
-          </Label>
+        {/* شعار الوقف */}
+        <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
+          <div className="flex items-center justify-between">
+            <Label className="flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              شعار الوقف
+            </Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="show-logo" className="text-xs text-muted-foreground">
+                إظهار في PDF
+              </Label>
+              <Switch
+                id="show-logo"
+                checked={branding?.show_logo_in_pdf ?? true}
+                onCheckedChange={toggleShowLogo}
+                disabled={isUpdating}
+              />
+            </div>
+          </div>
           <div className="flex items-center gap-4">
-            <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/30">
+            <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center bg-background">
+              {branding?.waqf_logo_url ? (
+                <img
+                  src={branding.waqf_logo_url}
+                  alt="شعار الوقف"
+                  className="w-full h-full object-contain rounded-lg"
+                />
+              ) : (
+                <Image className="h-8 w-8 text-muted-foreground" />
+              )}
+            </div>
+            <div className="flex-1 space-y-2">
+              <input
+                type="file"
+                ref={logoInputRef}
+                onChange={handleLogoUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                onClick={() => logoInputRef.current?.click()}
+                disabled={isUpdating}
+                className="gap-2"
+              >
+                {isUpdating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                رفع شعار الوقف
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                PNG بخلفية شفافة - يظهر في أعلى جميع التقارير
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* الختم الرسمي */}
+        <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
+          <div className="flex items-center justify-between">
+            <Label className="flex items-center gap-2">
+              <Stamp className="h-4 w-4" />
+              الختم الرسمي
+            </Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="show-stamp" className="text-xs text-muted-foreground">
+                إظهار في PDF
+              </Label>
+              <Switch
+                id="show-stamp"
+                checked={branding?.show_stamp_in_pdf ?? true}
+                onCheckedChange={toggleShowStamp}
+                disabled={isUpdating}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center bg-background">
               {branding?.stamp_image_url ? (
                 <img
                   src={branding.stamp_image_url}
@@ -131,13 +223,13 @@ export const WaqfBrandingSettings = () => {
         </div>
 
         {/* التوقيع */}
-        <div className="space-y-3">
+        <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
           <Label className="flex items-center gap-2">
             <FileSignature className="h-4 w-4" />
             التوقيع
           </Label>
           <div className="flex items-center gap-4">
-            <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/30">
+            <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center bg-background">
               {branding?.signature_image_url ? (
                 <img
                   src={branding.signature_image_url}
