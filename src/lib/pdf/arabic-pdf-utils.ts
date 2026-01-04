@@ -60,22 +60,14 @@ export const processArabicText = (text: string | number | null | undefined): str
   const strText = String(text);
   if (!strText.trim()) return "";
 
-  try {
-    // إذا لا يوجد عربي، إرجاع كما هو
-    if (!containsArabic(strText)) {
-      return strText;
-    }
-    
-    // الخطوة الوحيدة: تشكيل الحروف العربية (Arabic Shaping)
-    // هذا يحول الحروف المنفصلة إلى أشكالها المتصلة
-    // خط Amiri + jsPDF يتولى الترتيب RTL تلقائياً
-    const shaped = reshape(strText);
-    
-    return shaped;
-  } catch (error) {
-    logger.error(error, { context: "process_arabic_text", severity: "low" });
-    return strText;
-  }
+  // ✅ الحل النهائي المثبت من governance-pdf.ts:
+  // لا حاجة لأي معالجة! فقط إرجاع النص كما هو
+  // خط Amiri OpenType + jsPDF setR2L(true) يتولى كل شيء:
+  // - توصيل الحروف (OpenType shaping)
+  // - ترتيب RTL (setR2L)
+  // 
+  // استخدام reshape يسبب عكس مضاعف مع setR2L
+  return strText;
 };
 
 // ============= تنسيق الأرقام والعملة =============
