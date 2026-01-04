@@ -1,5 +1,6 @@
 /**
- * Hook لإدارة ختم وتوقيع الوقف
+ * Hook لإدارة ختم وتوقيع وشعار الوقف
+ * @version 2.0.0 - إضافة شعار الوقف وخيارات الإظهار
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,6 +13,8 @@ export interface WaqfBranding {
   signature_image_url: string | null;
   nazer_name: string;
   waqf_logo_url: string | null;
+  show_logo_in_pdf: boolean;
+  show_stamp_in_pdf: boolean;
   created_at: string;
   updated_at: string;
   updated_by: string | null;
@@ -88,8 +91,25 @@ export const useWaqfBranding = () => {
     }
   };
 
+  const uploadLogo = async (file: File) => {
+    try {
+      const url = await uploadImage(file, "logo");
+      await updateBrandingMutation.mutateAsync({ waqf_logo_url: url });
+    } catch {
+      toast.error("فشل في رفع الشعار");
+    }
+  };
+
   const updateNazerName = async (name: string) => {
     await updateBrandingMutation.mutateAsync({ nazer_name: name });
+  };
+
+  const toggleShowLogo = async (show: boolean) => {
+    await updateBrandingMutation.mutateAsync({ show_logo_in_pdf: show });
+  };
+
+  const toggleShowStamp = async (show: boolean) => {
+    await updateBrandingMutation.mutateAsync({ show_stamp_in_pdf: show });
   };
 
   return {
@@ -97,7 +117,10 @@ export const useWaqfBranding = () => {
     isLoading,
     uploadStamp,
     uploadSignature,
+    uploadLogo,
     updateNazerName,
+    toggleShowLogo,
+    toggleShowStamp,
     isUpdating: updateBrandingMutation.isPending,
   };
 };

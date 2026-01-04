@@ -12689,6 +12689,8 @@ export type Database = {
           created_at: string | null
           id: string
           nazer_name: string | null
+          show_logo_in_pdf: boolean | null
+          show_stamp_in_pdf: boolean | null
           signature_image_url: string | null
           stamp_image_url: string | null
           updated_at: string | null
@@ -12699,6 +12701,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           nazer_name?: string | null
+          show_logo_in_pdf?: boolean | null
+          show_stamp_in_pdf?: boolean | null
           signature_image_url?: string | null
           stamp_image_url?: string | null
           updated_at?: string | null
@@ -12709,6 +12713,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           nazer_name?: string | null
+          show_logo_in_pdf?: boolean | null
+          show_stamp_in_pdf?: boolean | null
           signature_image_url?: string | null
           stamp_image_url?: string | null
           updated_at?: string | null
