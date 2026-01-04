@@ -60,14 +60,17 @@ export const processArabicText = (text: string | number | null | undefined): str
   const strText = String(text);
   if (!strText.trim()) return "";
 
-  // ✅ الحل النهائي المثبت من governance-pdf.ts:
-  // لا حاجة لأي معالجة! فقط إرجاع النص كما هو
-  // خط Amiri OpenType + jsPDF setR2L(true) يتولى كل شيء:
-  // - توصيل الحروف (OpenType shaping)
-  // - ترتيب RTL (setR2L)
-  // 
-  // استخدام reshape يسبب عكس مضاعف مع setR2L
-  return strText;
+  try {
+    // إذا لا يوجد عربي، إرجاع كما هو (مهم للأرقام/الأكواد)
+    if (!containsArabic(strText)) return strText;
+
+    // تشكيل الحروف العربية فقط (بدون أي عكس)
+    // تجنّب doc.setR2L(true) لأنه يعكس ترتيب الأحرف/الأرقام ويؤدي لنص معكوس
+    return reshape(strText);
+  } catch (error) {
+    logger.error(error, { context: "process_arabic_text", severity: "low" });
+    return strText;
+  }
 };
 
 // ============= تنسيق الأرقام والعملة =============
@@ -126,24 +129,25 @@ export const processArabicTableData = (
 export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
-    
+
     doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
     doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-    
+
     doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
     doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-    
+
     doc.setFont("Amiri", "normal");
     doc.setLanguage("ar");
 
-    // ✅ التوجيه RTL الحقيقي في jsPDF
-    // بدون هذا، jsPDF يرسم الأحرف من اليسار لليمين مما يُظهر العربية بشكل معكوس/مفكك
-    // نستخدم Arabic Shaping (reshape) لتوصيل الحروف + setR2L(true) لاتجاه الرسم
-    doc.setR2L(true);
-    
+    // مهم: لا نفعّل setR2L(true) لأنه يعكس ترتيب الأحرف/الأرقام
+    // نعتمد على processArabicText(reshape) + محاذاة يمين/توسيط عبر align
+    if (typeof (doc as any).setR2L === "function") {
+      (doc as any).setR2L(false);
+    }
+
     return "Amiri";
   } catch (error) {
-    logger.error(error, { context: 'load_arabic_font_pdf', severity: 'low' });
+    logger.error(error, { context: "load_arabic_font_pdf", severity: "low" });
     doc.setLanguage("ar");
     return "helvetica";
   }
