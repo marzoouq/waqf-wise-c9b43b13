@@ -37,7 +37,14 @@ export class BeneficiaryDocumentsService {
     description?: string
   ): Promise<Database['public']['Tables']['beneficiary_attachments']['Row']> {
     try {
-      const filePath = `beneficiaries/${beneficiaryId}/${Date.now()}_${file.name}`;
+      // ⚠️ المسار يجب أن يبدأ بـ beneficiaryId مباشرة حتى يتطابق مع سياسة RLS
+      // لأن السياسة تتحقق من: (storage.foldername(name))[1]::uuid = beneficiary_id
+      const uniqueId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
+      const filePath = `${beneficiaryId}/${uniqueId}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('beneficiary-documents')
