@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { User } from "lucide-react";
+import { User, LogOut, Moon, Sun } from "lucide-react";
 import { sidebarItems } from "./config/sidebarConfig";
 import { APP_VERSION } from "@/lib/version";
+import { AuthService } from "@/services";
+import { useToast } from "@/hooks/ui/use-toast";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -36,7 +40,10 @@ export function BeneficiarySidebar({
   const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
   const { setOpenMobile, state } = useSidebar();
+  const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const isCollapsed = state === "collapsed";
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleItemClick = (tab: string) => {
     onTabChange(tab);
@@ -46,6 +53,30 @@ export function BeneficiarySidebar({
   const handleNavigate = (href: string) => {
     navigate(href);
     setOpenMobile(false);
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await AuthService.logout();
+      toast({
+        title: "تم تسجيل الخروج",
+        description: "نراك قريباً",
+      });
+      navigate("/login");
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل تسجيل الخروج",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   // تصفية العناصر حسب إعدادات الشفافية
@@ -124,12 +155,45 @@ export function BeneficiarySidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer */}
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      {/* Footer with Actions */}
+      <SidebarFooter className="border-t border-sidebar-border p-3 space-y-2">
+        {/* Theme Toggle & Logout Buttons */}
+        <div className={`flex ${isCollapsed ? 'flex-col items-center' : 'flex-row justify-center'} gap-2`}>
+          <Button
+            variant="ghost"
+            size={isCollapsed ? "icon" : "sm"}
+            onClick={toggleTheme}
+            className={isCollapsed ? "h-9 w-9" : "gap-2"}
+            title={theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+            {!isCollapsed && (
+              <span className="text-xs">{theme === "dark" ? "نهاري" : "ليلي"}</span>
+            )}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size={isCollapsed ? "icon" : "sm"}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className={`text-destructive hover:text-destructive hover:bg-destructive/10 ${isCollapsed ? "h-9 w-9" : "gap-2"}`}
+            title="تسجيل الخروج"
+          >
+            <LogOut className="h-4 w-4" />
+            {!isCollapsed && <span className="text-xs">خروج</span>}
+          </Button>
+        </div>
+
+        {/* Version Info */}
         {!isCollapsed && (
-          <div className="text-xs text-center text-sidebar-foreground/70">
+          <div className="text-xs text-center text-sidebar-foreground/70 pt-2 border-t border-sidebar-border/50">
             <p>منصة إدارة الوقف</p>
-            <p className="mt-1">الإصدار {APP_VERSION}</p>
+            <p className="mt-0.5">الإصدار {APP_VERSION}</p>
           </div>
         )}
       </SidebarFooter>
