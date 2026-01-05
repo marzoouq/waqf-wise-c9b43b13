@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { AdvancedFiltersDialog, FilterConfig, FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
+import { STATUS_OPTIONS, PRIORITY_OPTIONS } from '@/lib/request-constants';
 
 interface RequestsFiltersProps {
   searchQuery: string;
@@ -23,11 +24,7 @@ const filterConfigs: FilterConfig[] = [
     key: 'priority',
     label: 'الأولوية',
     type: 'select',
-    options: [
-      { value: 'عادي', label: 'عادي' },
-      { value: 'مهم', label: 'مهم' },
-      { value: 'عاجل', label: 'عاجل' },
-    ],
+    options: PRIORITY_OPTIONS,
   },
   {
     key: 'overdue',
@@ -65,11 +62,11 @@ export function RequestsFilters({
           <SelectValue placeholder="الحالة" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">جميع الحالات</SelectItem>
-          <SelectItem value="معلق">معلق</SelectItem>
-          <SelectItem value="قيد المعالجة">قيد المعالجة</SelectItem>
-          <SelectItem value="موافق">موافق</SelectItem>
-          <SelectItem value="مرفوض">مرفوض</SelectItem>
+          {STATUS_OPTIONS.map(option => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       <AdvancedFiltersDialog
