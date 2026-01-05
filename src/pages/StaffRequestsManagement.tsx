@@ -180,8 +180,11 @@ export default function StaffRequestsManagement() {
                                 </Badge>
                               </div>
 
-                              <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 <Badge>طلب رقم {request.request_number || request.id.slice(0, 8)}</Badge>
+                                {request.request_type?.name_ar && (
+                                  <Badge variant="outline">{request.request_type.name_ar}</Badge>
+                                )}
                                 {getRequestStatusBadge(request.status)}
                                 {request.amount && (
                                   <Badge variant="secondary">
@@ -248,7 +251,7 @@ export default function StaffRequestsManagement() {
                   <p className="mt-1 p-3 bg-muted rounded-lg">{selectedRequest.description}</p>
                 </div>
 
-                {selectedRequest.status === 'pending' && (
+                {['معلق', 'قيد المراجعة', 'قيد المعالجة', 'pending'].includes(selectedRequest.status) && (
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="review_notes">ملاحظات المراجعة</Label>
@@ -292,9 +295,18 @@ export default function StaffRequestsManagement() {
 }
 
 function getRequestStatusBadge(status: string) {
+  // دعم الحالات العربية والإنجليزية
+  const PENDING = ['معلق', 'قيد المراجعة', 'قيد المعالجة', 'pending'];
+  const APPROVED = ['معتمد', 'موافق', 'موافق عليه', 'approved'];
+  const REJECTED = ['مرفوض', 'rejected'];
+
+  let normalizedStatus: 'pending' | 'approved' | 'rejected' = 'pending';
+  if (APPROVED.includes(status)) normalizedStatus = 'approved';
+  else if (REJECTED.includes(status)) normalizedStatus = 'rejected';
+
   const labels: Record<string, string> = {
-    'pending': 'معلق',
-    'approved': 'موافق',
+    'pending': 'قيد المراجعة',
+    'approved': 'موافق عليه',
     'rejected': 'مرفوض',
   };
   
@@ -311,9 +323,9 @@ function getRequestStatusBadge(status: string) {
   };
 
   return (
-    <Badge variant={variants[status] || 'secondary'} className="gap-1">
-      {icons[status]}
-      {labels[status] || status}
+    <Badge variant={variants[normalizedStatus]} className="gap-1">
+      {icons[normalizedStatus]}
+      {labels[normalizedStatus]}
     </Badge>
   );
 }
