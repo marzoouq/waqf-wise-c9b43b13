@@ -116,7 +116,7 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
   const distributedAmount = distributions?.total || 0;
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', padding: '20px', maxWidth: '210mm' }}>
+    <div style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', padding: '0', width: '100%' }}>
       {/* أنماط الطباعة */}
       <style>{`
         @page { 

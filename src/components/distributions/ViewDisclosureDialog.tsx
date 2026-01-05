@@ -42,6 +42,8 @@ import { SmartInsights } from "@/components/disclosure/SmartInsights";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
 import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
 import { toast } from "sonner";
+import { usePrint } from "@/hooks/ui/usePrint";
+import { DisclosurePrintTemplate } from "@/components/beneficiary/tabs/DisclosurePrintTemplate";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -142,6 +144,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
   // جلب جميع الإفصاحات للمقارنة
   const { disclosures: allDisclosures } = useAnnualDisclosures();
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
+  const { printWithData } = usePrint();
   const [isExporting, setIsExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   
@@ -161,13 +164,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
     }
   };
 
-  // وظيفة الطباعة
+  // وظيفة الطباعة - استخدام نافذة طباعة مستقلة
   const handlePrint = () => {
+    // البحث عن السنة السابقة للمقارنة
+    const prevYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
+    
     setIsPrinting(true);
-    setTimeout(() => {
-      window.print();
-      setIsPrinting(false);
-    }, 100);
+    printWithData(
+      { disclosure, previousYear: prevYear },
+      (data) => <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
+    );
+    setIsPrinting(false);
   };
 
   // البحث عن السنة السابقة للمقارنة
