@@ -62,6 +62,7 @@ export interface VisibilitySettings {
   show_support_tickets: boolean;
   allow_export_pdf: boolean;
   allow_print: boolean;
+  allow_profile_edit: boolean;
   // إعدادات الأرشيف التفصيلية
   show_archive_contracts: boolean;
   show_archive_legal_docs: boolean;
