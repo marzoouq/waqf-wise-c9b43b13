@@ -221,12 +221,11 @@ export function RequestDetailsDialog({
             </TabsContent>
 
             <TabsContent value="attachments" className="px-1">
-              <div className="flex justify-center py-4">
-                <RequestAttachmentsUploader
-                  requestId={requestId}
-                  attachmentsCount={request.attachments_count || 0}
-                />
-              </div>
+              <RequestAttachmentsUploader
+                requestId={requestId}
+                attachmentsCount={request.attachments_count || 0}
+                inline={true}
+              />
             </TabsContent>
 
             <TabsContent value="messages" className="px-1">
