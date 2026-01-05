@@ -17,11 +17,7 @@ interface RequestApprovalDialogProps {
   requestDescription: string;
 }
 
-const APPROVAL_LEVELS = [
-  { level: 1, name: "المشرف", role: "admin" },
-  { level: 2, name: "المحاسب", role: "accountant" },
-  { level: 3, name: "الناظر", role: "nazer" },
-];
+import { APPROVAL_LEVELS } from '@/lib/request-constants';
 
 export function RequestApprovalDialog({
   open,

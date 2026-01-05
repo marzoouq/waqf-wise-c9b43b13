@@ -20,6 +20,7 @@ import { RequestsFilters } from '@/components/requests/RequestsFilters';
 import { RequestsDesktopView } from '@/components/requests/RequestsDesktopView';
 import { RequestsMobileView } from '@/components/requests/RequestsMobileView';
 import { RequestsDialogs } from '@/components/requests/RequestsDialogs';
+import { RequestDetailsDialog } from '@/components/requests/RequestDetailsDialog';
 import { useRequestsPage } from '@/hooks/requests/useRequestsPage';
 
 const Requests = memo(() => {
@@ -58,7 +59,10 @@ const Requests = memo(() => {
     requestToDelete,
     handleDeleteClick,
     handleDeleteConfirm,
+    handleViewDetails,
     deleteRequest,
+    detailsDialogOpen,
+    setDetailsDialogOpen,
   } = useRequestsPage();
 
   const {
@@ -114,7 +118,11 @@ const Requests = memo(() => {
         </div>
 
         {/* Stats Cards */}
-        <RequestsStatsCards stats={stats} />
+        <RequestsStatsCards 
+          stats={stats} 
+          onFilterClick={setStatusFilter}
+          activeFilter={statusFilter}
+        />
 
         {/* Filters */}
         <Card>
@@ -176,6 +184,7 @@ const Requests = memo(() => {
             setApprovalDialogOpen={setApprovalDialogOpen}
             setCommentsDialogOpen={setCommentsDialogOpen}
             handleDeleteClick={handleDeleteClick}
+            handleViewDetails={handleViewDetails}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalPages={totalPages}
@@ -196,6 +205,13 @@ const Requests = memo(() => {
           requestToDelete={requestToDelete}
           handleDeleteConfirm={handleDeleteConfirm}
           isDeleting={deleteRequest.isPending}
+        />
+
+        {/* Request Details Dialog */}
+        <RequestDetailsDialog
+          open={detailsDialogOpen}
+          onOpenChange={setDetailsDialogOpen}
+          request={selectedRequest}
         />
       </div>
     </PageErrorBoundary>

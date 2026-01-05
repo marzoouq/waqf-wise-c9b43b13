@@ -1,30 +1,52 @@
-import { Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { REQUEST_STATUS } from '@/lib/request-constants';
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 type IconComponent = React.ComponentType<{ className?: string }>;
 
-const variants: Record<string, { variant: BadgeVariant; icon: IconComponent }> = {
-  'معلق': { variant: 'secondary', icon: Clock },
-  'قيد المعالجة': { variant: 'default', icon: AlertCircle },
-  'قيد المراجعة': { variant: 'default', icon: AlertCircle },
-  'موافق': { variant: 'default', icon: CheckCircle },
-  'مرفوض': { variant: 'destructive', icon: XCircle },
-  'ملغي': { variant: 'secondary', icon: XCircle },
+interface StatusConfig {
+  variant: BadgeVariant;
+  icon: IconComponent;
+  className?: string;
+}
+
+const getVariant = (status: string | null | undefined): StatusConfig => {
+  switch (status) {
+    case REQUEST_STATUS.PENDING:
+    case 'قيد المراجعة':
+      return { variant: 'secondary', icon: Clock, className: 'bg-warning/10 text-warning border-warning/30' };
+    case REQUEST_STATUS.IN_PROGRESS:
+    case 'قيد المعالجة':
+      return { variant: 'default', icon: Loader2, className: 'bg-primary/10 text-primary border-primary/30' };
+    case REQUEST_STATUS.APPROVED:
+    case REQUEST_STATUS.COMPLETED:
+    case 'موافق':
+    case 'مكتمل':
+      return { variant: 'default', icon: CheckCircle, className: 'bg-success/10 text-success border-success/30' };
+    case REQUEST_STATUS.REJECTED:
+    case 'مرفوض':
+    case 'ملغي':
+      return { variant: 'destructive', icon: XCircle };
+    case 'معلق':
+      return { variant: 'secondary', icon: Clock, className: 'bg-warning/10 text-warning border-warning/30' };
+    default:
+      return { variant: 'secondary', icon: Clock };
+  }
 };
 
 interface RequestStatusBadgeProps {
-  status: string;
+  status: string | null | undefined;
 }
 
 export function RequestStatusBadge({ status }: RequestStatusBadgeProps) {
-  const config = variants[status] || variants['معلق'];
+  const config = getVariant(status);
   const Icon = config.icon;
 
   return (
-    <Badge variant={config.variant} className="gap-1">
+    <Badge variant={config.variant} className={`gap-1 ${config.className || ''}`}>
       <Icon className="h-3 w-3" />
-      {status}
+      {status || '-'}
     </Badge>
   );
 }

@@ -6,6 +6,7 @@ import { useDeleteConfirmation } from '@/hooks/shared';
 import { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
 import { toast } from 'sonner';
 import type { FullRequest } from '@/types/request.types';
+import { REQUEST_STATUS } from '@/lib/request-constants';
 
 // Re-export for backwards compatibility
 export type RequestData = FullRequest;
@@ -18,6 +19,7 @@ export function useRequestsPage() {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<FullRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
@@ -31,10 +33,10 @@ export function useRequestsPage() {
   const filteredRequests = useMemo(() => {
     return requests.filter(request => {
       const matchesSearch = 
-        request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        request.request_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.request_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (request.beneficiary && 'full_name' in request.beneficiary && 
-          request.beneficiary.full_name.toLowerCase().includes(searchQuery.toLowerCase()));
+          request.beneficiary.full_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
       const matchesPriority = !advancedFilters.priority || request.priority === advancedFilters.priority;
@@ -61,14 +63,15 @@ export function useRequestsPage() {
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
-  const stats = {
+  // إحصائيات مُصحّحة لتتوافق مع الحالات الفعلية في قاعدة البيانات
+  const stats = useMemo(() => ({
     total: requests.length,
-    pending: requests.filter(r => r.status === 'معلق').length,
-    inProgress: requests.filter(r => r.status === 'قيد المعالجة').length,
-    approved: requests.filter(r => r.status === 'موافق').length,
-    rejected: requests.filter(r => r.status === 'مرفوض').length,
+    pending: requests.filter(r => r.status === REQUEST_STATUS.PENDING).length,
+    inProgress: requests.filter(r => r.status === REQUEST_STATUS.IN_PROGRESS).length,
+    approved: requests.filter(r => r.status === REQUEST_STATUS.APPROVED || r.status === REQUEST_STATUS.COMPLETED).length,
+    rejected: requests.filter(r => r.status === REQUEST_STATUS.REJECTED).length,
     overdue: requests.filter(r => r.is_overdue).length,
-  };
+  }), [requests]);
 
   const bulkDeleteConfirmation = useDeleteConfirmation<string[]>({
     onDelete: async (ids) => {
@@ -102,6 +105,11 @@ export function useRequestsPage() {
       setRequestToDelete(null);
     }
   };
+
+  const handleViewDetails = useCallback((request: FullRequest) => {
+    setSelectedRequest(request);
+    setDetailsDialogOpen(true);
+  }, []);
 
   return {
     // Data
@@ -149,8 +157,11 @@ export function useRequestsPage() {
     setCommentsDialogOpen,
     deleteDialogOpen,
     setDeleteDialogOpen,
+    detailsDialogOpen,
+    setDetailsDialogOpen,
     requestToDelete,
     handleDeleteClick,
     handleDeleteConfirm,
+    handleViewDetails,
   };
 }

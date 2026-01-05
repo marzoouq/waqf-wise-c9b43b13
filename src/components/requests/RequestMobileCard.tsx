@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format, arLocale as ar } from "@/lib/date";
 import { getRequestTypeName, getBeneficiaryName, type FullRequest } from "@/types/request.types";
+import { REQUEST_STATUS, REQUEST_PRIORITY } from '@/lib/request-constants';
 
 interface RequestMobileCardProps {
   request: FullRequest;
@@ -20,25 +21,46 @@ interface RequestMobileCardProps {
   onDelete: (request: FullRequest) => void;
 }
 
-const getStatusConfig = (status: string) => {
-  const configs: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof Clock; className?: string }> = {
-    'معلق': { variant: 'secondary', icon: Clock },
-    'قيد المعالجة': { variant: 'default', icon: AlertCircle },
-    'قيد المراجعة': { variant: 'default', icon: AlertCircle },
-    'موافق': { variant: 'default', icon: CheckCircle, className: 'bg-success/10 text-success border-success/30' },
-    'مرفوض': { variant: 'destructive', icon: XCircle },
-    'ملغي': { variant: 'secondary', icon: XCircle },
-  };
-  return configs[status] || configs['معلق'];
+const getStatusConfig = (status: string | null | undefined) => {
+  switch (status) {
+    case REQUEST_STATUS.PENDING:
+    case 'قيد المراجعة':
+      return { variant: 'secondary' as const, icon: Clock, className: 'bg-warning/10 text-warning border-warning/30' };
+    case REQUEST_STATUS.IN_PROGRESS:
+    case 'قيد المعالجة':
+      return { variant: 'default' as const, icon: AlertCircle, className: 'bg-primary/10 text-primary border-primary/30' };
+    case REQUEST_STATUS.APPROVED:
+    case REQUEST_STATUS.COMPLETED:
+    case 'موافق':
+      return { variant: 'default' as const, icon: CheckCircle, className: 'bg-success/10 text-success border-success/30' };
+    case REQUEST_STATUS.REJECTED:
+    case 'مرفوض':
+      return { variant: 'destructive' as const, icon: XCircle, className: '' };
+    case 'ملغي':
+      return { variant: 'secondary' as const, icon: XCircle, className: '' };
+    default:
+      return { variant: 'secondary' as const, icon: Clock, className: '' };
+  }
 };
 
-const getPriorityBadge = (priority: string) => {
-  const configs: Record<string, string> = {
-    'عاجل': 'bg-destructive/10 text-destructive border-destructive/30',
-    'مهم': 'bg-warning/10 text-warning border-warning/30',
-    'عادي': 'bg-muted text-muted-foreground',
-  };
-  return configs[priority] || configs['عادي'];
+const getPriorityBadge = (priority: string | null | undefined) => {
+  switch (priority) {
+    case REQUEST_PRIORITY.URGENT:
+    case 'عاجل':
+      return 'bg-destructive/10 text-destructive border-destructive/30';
+    case REQUEST_PRIORITY.HIGH:
+    case 'عالية':
+    case 'مهم':
+      return 'bg-warning/10 text-warning border-warning/30';
+    case REQUEST_PRIORITY.MEDIUM:
+    case 'متوسطة':
+      return 'bg-primary/10 text-primary border-primary/30';
+    case REQUEST_PRIORITY.LOW:
+    case 'منخفضة':
+    case 'عادي':
+    default:
+      return 'bg-muted text-muted-foreground';
+  }
 };
 
 export const RequestMobileCard = memo(function RequestMobileCard({
@@ -106,7 +128,7 @@ export const RequestMobileCard = memo(function RequestMobileCard({
           <div className="flex items-center gap-2">
             <Badge 
               variant={statusConfig.variant} 
-              className={`gap-1 text-xs ${statusConfig.className || ''}`}
+              className={`gap-1 text-xs ${statusConfig.className}`}
             >
               <StatusIcon className="h-3 w-3" />
               {request.status}
@@ -116,7 +138,7 @@ export const RequestMobileCard = memo(function RequestMobileCard({
             </Badge>
           </div>
           
-          {request.amount > 0 && (
+          {request.amount && request.amount > 0 && (
             <span className="text-xs font-semibold text-primary">
               {request.amount.toLocaleString('ar-SA')} ر.س
             </span>
