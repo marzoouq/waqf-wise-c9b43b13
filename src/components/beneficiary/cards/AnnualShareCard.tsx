@@ -17,29 +17,50 @@ interface AnnualShareCardProps {
 }
 
 export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
-  const { data, isLoading } = useQuery({
+const { data, isLoading } = useQuery({
     queryKey: ['beneficiary-annual-share', beneficiaryId],
     queryFn: async () => {
       const currentYear = new Date().getFullYear();
       const lastYear = currentYear - 1;
 
-      // جلب توزيعات السنة الحالية
-      const { data: currentDistributions } = await supabase
+      // جلب توزيعات المستفيد مع السنوات المالية
+      const { data: distributions } = await supabase
         .from('heir_distributions')
-        .select('amount, distribution:distributions!inner(fiscal_year_id, fiscal_years:fiscal_year_id(year, is_closed))')
+        .select(`
+          share_amount,
+          fiscal_year_id,
+          fiscal_years:fiscal_year_id(name, start_date)
+        `)
         .eq('beneficiary_id', beneficiaryId);
 
-      // حساب المجاميع
+      // حساب المجاميع - استخراج السنة من start_date
       let currentYearTotal = 0;
       let lastYearTotal = 0;
 
-      if (currentDistributions) {
-        currentDistributions.forEach((d: any) => {
-          const year = d.distribution?.fiscal_years?.year;
-          if (year === currentYear) {
-            currentYearTotal += d.amount || 0;
-          } else if (year === lastYear) {
-            lastYearTotal += d.amount || 0;
+      if (distributions) {
+        distributions.forEach((d: any) => {
+          // استخراج السنة من start_date أو من اسم السنة المالية
+          const startDate = d.fiscal_years?.start_date;
+          const fiscalYearName = d.fiscal_years?.name || '';
+          
+          let year = 0;
+          if (startDate) {
+            year = new Date(startDate).getFullYear();
+          } else {
+            // محاولة استخراج السنة من الاسم مثل "السنة المالية 2024-2025"
+            const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
+            if (match) {
+              year = parseInt(match[1]);
+            }
+          }
+          
+          const amount = d.share_amount || 0;
+          
+          if (year === currentYear || year === currentYear - 1) {
+            // السنة المالية الحالية (تبدأ في السنة السابقة)
+            currentYearTotal += amount;
+          } else if (year === lastYear - 1 || year === lastYear) {
+            lastYearTotal += amount;
           }
         });
       }
