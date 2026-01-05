@@ -16,13 +16,16 @@ import {
   AlertTriangle,
   Tag,
   Phone,
-  CreditCard
+  CreditCard,
+  Printer
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { FullRequest } from '@/types/request.types';
 import { getRequestTypeName, getBeneficiaryName } from '@/types/request.types';
 import { REQUEST_STATUS, STATUS_BADGE_STYLES, PRIORITY_BADGE_STYLES } from '@/lib/request-constants';
+import { RequestAttachments } from './RequestAttachments';
 
 interface RequestDetailsDialogProps {
   open: boolean;
@@ -192,6 +195,17 @@ export const RequestDetailsDialog = memo(({
             </CardContent>
           </Card>
         )}
+
+        {/* المرفقات */}
+        <RequestAttachments requestId={request.id} />
+
+        {/* زر الطباعة */}
+        <div className="flex justify-end pt-2">
+          <Button variant="outline" size="sm" onClick={() => window.print()} className="gap-2">
+            <Printer className="h-4 w-4" />
+            طباعة
+          </Button>
+        </div>
       </div>
     </ResponsiveDialog>
   );

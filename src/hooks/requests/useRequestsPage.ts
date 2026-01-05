@@ -15,11 +15,13 @@ export function useRequestsPage() {
   const { requests, isLoading, error, refetch, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [requestTypeFilter, setRequestTypeFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<FullRequest | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<FullRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
@@ -39,13 +41,14 @@ export function useRequestsPage() {
           request.beneficiary.full_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
+      const matchesRequestType = requestTypeFilter === 'all' || request.request_type_id === requestTypeFilter;
       const matchesPriority = !advancedFilters.priority || request.priority === advancedFilters.priority;
       const matchesOverdue = advancedFilters.overdue === undefined || 
         (advancedFilters.overdue === 'true' ? request.is_overdue : !request.is_overdue);
 
-      return matchesSearch && matchesStatus && matchesPriority && matchesOverdue;
+      return matchesSearch && matchesStatus && matchesRequestType && matchesPriority && matchesOverdue;
     });
-  }, [requests, searchQuery, statusFilter, advancedFilters]);
+  }, [requests, searchQuery, statusFilter, requestTypeFilter, advancedFilters]);
 
   const { sortedData, sortConfig, handleSort } = useTableSort({
     data: filteredRequests,
@@ -111,6 +114,10 @@ export function useRequestsPage() {
     setDetailsDialogOpen(true);
   }, []);
 
+  const handleOpenCreateDialog = useCallback(() => {
+    setCreateDialogOpen(true);
+  }, []);
+
   return {
     // Data
     requests,
@@ -135,6 +142,8 @@ export function useRequestsPage() {
     setSearchQuery,
     statusFilter,
     setStatusFilter,
+    requestTypeFilter,
+    setRequestTypeFilter,
     advancedFilters,
     setAdvancedFilters,
     
@@ -159,6 +168,9 @@ export function useRequestsPage() {
     setDeleteDialogOpen,
     detailsDialogOpen,
     setDetailsDialogOpen,
+    createDialogOpen,
+    setCreateDialogOpen,
+    handleOpenCreateDialog,
     requestToDelete,
     handleDeleteClick,
     handleDeleteConfirm,
