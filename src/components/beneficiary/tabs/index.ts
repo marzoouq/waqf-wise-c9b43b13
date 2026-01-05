@@ -26,3 +26,5 @@ export { LoansOverviewTab } from './LoansOverviewTab';
 // تبويبات الموافقات والإفصاحات
 export { ApprovalsLogTab } from './ApprovalsLogTab';
 export { DisclosuresTab } from './DisclosuresTab';
+export { DisclosureDetailsTab } from './DisclosureDetailsTab';
+export { PrintableDisclosureContent } from './PrintableDisclosureContent';

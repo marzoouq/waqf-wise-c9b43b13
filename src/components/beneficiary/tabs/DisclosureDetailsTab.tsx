@@ -1,15 +1,15 @@
 /**
  * DisclosureDetailsTab - صفحة كاملة لعرض تفاصيل الإفصاح السنوي
- * @version 1.0.0
+ * @version 1.1.0
+ * - إصلاح مشكلة الطباعة: إضافة أنماط print للمكونات
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { 
   FileText, 
@@ -21,15 +21,10 @@ import {
   Download,
   Printer,
   Loader2,
-  BarChart3,
-  Lightbulb,
   Building2,
   Wallet,
   ArrowDown,
   CheckCircle2,
-  MinusCircle,
-  Coins,
-  Receipt,
   Percent
 } from "lucide-react";
 import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
@@ -42,6 +37,7 @@ import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
 import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
 import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
 import { SmartInsights } from "@/components/disclosure/SmartInsights";
+import { PrintableDisclosureContent } from "./PrintableDisclosureContent";
 
 interface ExpenseItem {
   name: string;
@@ -208,7 +204,10 @@ export function DisclosureDetailsTab() {
 
   return (
     <div className="space-y-6 print:space-y-4">
-      {/* Header */}
+      {/* محتوى الطباعة المُحسّن */}
+      <PrintableDisclosureContent disclosure={disclosure} previousYear={previousYear} />
+
+      {/* Header - مخفي عند الطباعة */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={handleBack}>
@@ -258,23 +257,19 @@ export function DisclosureDetailsTab() {
         </div>
       </div>
 
-      {/* Print Header */}
-      <div className="hidden print:block text-center mb-8">
-        <h1 className="text-2xl font-bold">الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}</h1>
-        <p className="text-muted-foreground">{disclosure.waqf_name}</p>
-      </div>
-
-      {/* الرؤى الذكية والمقارنة */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* الرؤى الذكية والمقارنة - مخفية عند الطباعة */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:hidden">
         <SmartInsights currentYear={disclosure} previousYear={previousYear} />
         <YearComparisonCard currentYear={disclosure} previousYear={previousYear} />
       </div>
 
-      {/* الرسوم البيانية */}
-      <DisclosureCharts disclosure={disclosure} />
+      {/* الرسوم البيانية - مخفية عند الطباعة لأنها لا تعمل */}
+      <div className="print:hidden">
+        <DisclosureCharts disclosure={disclosure} />
+      </div>
 
-      {/* الكشف المالي المتسلسل */}
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-background to-muted/30">
+      {/* الكشف المالي المتسلسل - مخفي عند الطباعة */}
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-background to-muted/30 print:hidden">
         <CardHeader className="pb-4">
           <CardTitle className="text-xl flex items-center gap-2">
             <Calculator className="h-5 w-5 text-primary" />
@@ -365,8 +360,8 @@ export function DisclosureDetailsTab() {
         </CardContent>
       </Card>
 
-      {/* تفصيل الإيرادات والمصروفات */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* تفصيل الإيرادات والمصروفات - مخفي عند الطباعة */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:hidden">
         {/* الإيرادات */}
         {revenueItems.length > 0 && (
           <Card>
@@ -440,8 +435,8 @@ export function DisclosureDetailsTab() {
         )}
       </div>
 
-      {/* توزيعات الورثة */}
-      <Card>
+      {/* توزيعات الورثة - مخفي عند الطباعة */}
+      <Card className="print:hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-warning" />
@@ -482,8 +477,8 @@ export function DisclosureDetailsTab() {
         </CardContent>
       </Card>
 
-      {/* نسب التوزيع */}
-      <Card>
+      {/* نسب التوزيع - مخفي عند الطباعة */}
+      <Card className="print:hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Percent className="h-5 w-5 text-primary" />
@@ -511,16 +506,20 @@ export function DisclosureDetailsTab() {
         </CardContent>
       </Card>
 
-      {/* تفاصيل العقارات */}
-      {disclosure.fiscal_year_id && (
-        <HistoricalRentalDetailsCard 
-          fiscalYearId={disclosure.fiscal_year_id} 
-          fiscalYearName={`${disclosure.year - 1}-${disclosure.year}`}
-        />
-      )}
+      {/* تفاصيل العقارات - مخفي عند الطباعة */}
+      <div className="print:hidden">
+        {disclosure.fiscal_year_id && (
+          <HistoricalRentalDetailsCard 
+            fiscalYearId={disclosure.fiscal_year_id} 
+            fiscalYearName={`${disclosure.year - 1}-${disclosure.year}`}
+          />
+        )}
+      </div>
 
-      {/* المستندات */}
-      <SmartDisclosureDocuments disclosureId={disclosure.id} />
+      {/* المستندات - مخفي عند الطباعة */}
+      <div className="print:hidden">
+        <SmartDisclosureDocuments disclosureId={disclosure.id} />
+      </div>
     </div>
   );
 }
