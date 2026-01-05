@@ -583,19 +583,51 @@ table {
   }
 
   /* تقسيم الصفحات بشكل مناسب */
+  /* ملاحظة منهجية: لا تستخدم break-inside: avoid للأقسام الكبيرة لأنها قد تتجاوز طول الصفحة فتظهر كتداخل */
   .print-section {
-    break-inside: avoid;
-    page-break-inside: avoid;
+    break-inside: auto;
+    page-break-inside: auto;
     margin-bottom: 16px;
   }
 
   .print-card {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  /* الشبكات (Grid) غالباً تتصرف بشكل سيء مع Pagination في الطباعة → نجعلها كتكديس عمودي */
+  .print-grid,
+  .print-grid-3,
+  .print-grid-4 {
+    display: block !important;
+  }
+
+  .print-grid > *,
+  .print-grid-3 > *,
+  .print-grid-4 > * {
+    margin-bottom: 12px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* عناصر صغيرة لا نريد تقسيمها */
+  .print-stat-box,
+  .print-flow-item {
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
   /* فاصل صفحات قبل الأقسام الكبيرة */
   .print-page-break {
+    break-before: page;
     page-break-before: always;
+    height: 0;
   }
+
+  /* منع تمدد وسائط/رسومات خارج حدود الصفحة */
+  img, svg, canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
 }
