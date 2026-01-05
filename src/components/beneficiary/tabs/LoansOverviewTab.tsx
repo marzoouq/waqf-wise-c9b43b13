@@ -327,9 +327,12 @@ export function LoansOverviewTab() {
 
       {/* Dialog طلب القرض */}
       <Dialog open={showLoanDialog} onOpenChange={setShowLoanDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>طلب قرض</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              طلب قرض
+            </DialogTitle>
           </DialogHeader>
           <LoanRequestForm onSubmit={handleLoanSubmit} isLoading={isSubmitting} />
         </DialogContent>
