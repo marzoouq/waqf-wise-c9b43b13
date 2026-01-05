@@ -79,11 +79,16 @@ export const usePrint = () => {
       
       const style = doc.createElement('style');
       style.textContent = `
+        * {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
         body { 
           font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
           direction: rtl; 
           padding: 20px;
           line-height: 1.6;
+          margin: 0;
         }
         table { 
           width: 100%; 
@@ -102,9 +107,13 @@ export const usePrint = () => {
         .print-template {
           display: block !important;
         }
+        @page { 
+          size: A4; 
+          margin: 15mm; 
+        }
         @media print { 
-          body { margin: 0; }
-          @page { margin: 1cm; }
+          body { margin: 0; padding: 0; }
+          * { overflow: visible !important; }
         }
       `;
       head.appendChild(style);
@@ -120,10 +129,19 @@ export const usePrint = () => {
       
       printWindow.focus();
       
+      // انتظار استقرار التخطيط ثم الطباعة
       setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 250);
+        // استخدام requestAnimationFrame لضمان رسم الصفحة
+        printWindow.requestAnimationFrame(() => {
+          printWindow.requestAnimationFrame(() => {
+            // إغلاق النافذة بعد الطباعة
+            printWindow.onafterprint = () => {
+              printWindow.close();
+            };
+            printWindow.print();
+          });
+        });
+      }, 300);
       
       toast({
         title: "جاري الطباعة",
