@@ -17,6 +17,9 @@ export interface RequestWithBeneficiary {
   status: string;
   created_at: string;
   decision_notes?: string;
+  request_type?: {
+    name_ar?: string;
+  };
   beneficiary: {
     full_name: string;
     national_id: string;
@@ -30,6 +33,11 @@ export interface RequestStats {
   approved: number;
   rejected: number;
 }
+
+// حالات الطلبات المختلفة
+const PENDING_STATUSES = ['معلق', 'قيد المراجعة', 'قيد المعالجة', 'pending'];
+const APPROVED_STATUSES = ['معتمد', 'موافق', 'موافق عليه', 'approved'];
+const REJECTED_STATUSES = ['مرفوض', 'rejected'];
 
 export function useStaffRequestsData() {
   const queryClient = useQueryClient();
@@ -45,7 +53,9 @@ export function useStaffRequestsData() {
 
   const updateRequestStatus = useMutation({
     mutationFn: async ({ requestId, status, notes }: { requestId: string; status: string; notes: string }) => {
-      return RequestService.updateRequestStatus(requestId, status, notes);
+      // تحويل الحالة للعربية
+      const arabicStatus = status === 'approved' ? 'موافق عليه' : status === 'rejected' ? 'مرفوض' : status;
+      return RequestService.updateRequestStatus(requestId, arabicStatus, notes);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ALL_BENEFICIARY_REQUESTS });
@@ -56,17 +66,18 @@ export function useStaffRequestsData() {
     },
   });
 
+  // حساب الإحصائيات بناءً على الحالات العربية والإنجليزية
   const stats: RequestStats = {
     total: requests.length,
-    pending: requests.filter(r => r.status === 'pending').length,
-    approved: requests.filter(r => r.status === 'approved').length,
-    rejected: requests.filter(r => r.status === 'rejected').length,
+    pending: requests.filter(r => PENDING_STATUSES.includes(r.status)).length,
+    approved: requests.filter(r => APPROVED_STATUSES.includes(r.status)).length,
+    rejected: requests.filter(r => REJECTED_STATUSES.includes(r.status)).length,
   };
 
   const filterRequests = (tab: string) => {
-    if (tab === 'pending') return requests.filter(r => r.status === 'pending');
-    if (tab === 'approved') return requests.filter(r => r.status === 'approved');
-    if (tab === 'rejected') return requests.filter(r => r.status === 'rejected');
+    if (tab === 'pending') return requests.filter(r => PENDING_STATUSES.includes(r.status));
+    if (tab === 'approved') return requests.filter(r => APPROVED_STATUSES.includes(r.status));
+    if (tab === 'rejected') return requests.filter(r => REJECTED_STATUSES.includes(r.status));
     return requests;
   };
 

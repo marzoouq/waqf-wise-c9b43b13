@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -13,8 +13,9 @@ import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestF
 import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
 import { LoansService, RequestService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,28 @@ export function LoansOverviewTab() {
   const [showEmergencyDialog, setShowEmergencyDialog] = useState(false);
   const [showLoanDialog, setShowLoanDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // جلب أنواع الطلبات ديناميكياً
+  const { data: requestTypes = [] } = useQuery({
+    queryKey: ['request-types-for-loans'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('request_types')
+        .select('id, name_ar')
+        .eq('is_active', true);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // إيجاد ID نوع القرض والفزعة ديناميكياً
+  const loanTypeId = useMemo(() => 
+    requestTypes.find(t => t.name_ar === 'قرض')?.id || null
+  , [requestTypes]);
+  
+  const emergencyTypeId = useMemo(() => 
+    requestTypes.find(t => t.name_ar === 'فزعة طارئة')?.id || null
+  , [requestTypes]);
 
   const handleEmergencySubmit = async (data: { amount: number; emergency_reason: string; description: string }) => {
     if (!beneficiaryId) {
@@ -74,17 +97,22 @@ export function LoansOverviewTab() {
       toast({ title: "خطأ", description: "لم يتم العثور على معرف المستفيد", variant: "destructive" });
       return;
     }
+
+    if (!loanTypeId) {
+      toast({ title: "خطأ", description: "لم يتم العثور على نوع طلب القرض", variant: "destructive" });
+      return;
+    }
     
     setIsSubmitting(true);
     try {
       const result = await RequestService.create({
         beneficiary_id: beneficiaryId,
-        request_type_id: "9822dc12-eef2-4cf7-92fa-113be89b1d6d",
+        request_type_id: loanTypeId, // استخدام ID ديناميكي
         description: `طلب قرض بقيمة ${data.loan_amount} ريال لمدة ${data.loan_term_months} شهر\nسبب القرض: ${data.loan_reason}\n${data.description}`,
         amount: data.loan_amount,
         priority: "متوسطة",
       });
-      
+
       if (!result.success) throw new Error(result.message);
       
       toast({ title: "تم بنجاح", description: "تم تقديم طلب القرض وسيتم مراجعته" });
