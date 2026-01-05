@@ -32,26 +32,41 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
   const { data: alerts, isLoading } = useQuery({
     queryKey: ['beneficiary-alerts', beneficiaryId],
     queryFn: async () => {
-      // جلب الطلبات المعلقة
+      // جلب الطلبات المعلقة للمستفيد
       const { data: pendingRequests } = await supabase
         .from('beneficiary_requests')
         .select('id, status, request_number, created_at')
         .eq('beneficiary_id', beneficiaryId)
-        .eq('status', 'قيد المراجعة')
+        .in('status', ['قيد المراجعة', 'معلق', 'pending'])
         .limit(5);
 
-      // جلب الإشعارات غير المقروءة
-      const { count: unreadNotifications } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_read', false);
+      // جلب user_id للمستفيد أولاً
+      const { data: beneficiaryData } = await supabase
+        .from('beneficiaries')
+        .select('user_id')
+        .eq('id', beneficiaryId)
+        .single();
+
+      let unreadNotifications = 0;
+
+      // جلب الإشعارات غير المقروءة للمستفيد فقط
+      if (beneficiaryData?.user_id) {
+        const { count } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', beneficiaryData.user_id)
+          .eq('is_read', false);
+        
+        unreadNotifications = count || 0;
+      }
 
       return {
         pendingRequests: pendingRequests || [],
-        unreadNotifications: unreadNotifications || 0
+        unreadNotifications
       };
     },
-    staleTime: 30000
+    staleTime: 30000,
+    enabled: !!beneficiaryId
   });
 
   const alertItems = useMemo(() => {
