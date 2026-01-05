@@ -200,7 +200,7 @@ export class NotificationService {
       priority: 'high',
       reference_type: 'request',
       reference_id: requestId,
-      action_url: '/staff/requests',
+      action_url: '/requests',
     });
   }
 
@@ -221,7 +221,7 @@ export class NotificationService {
       priority: 'medium',
       reference_type: 'request',
       reference_id: requestId,
-      action_url: '/staff/requests',
+      action_url: '/requests',
     });
   }
 

@@ -1,6 +1,6 @@
 /**
  * Requests Hooks - خطافات الطلبات والموافقات
- * @version 2.6.33
+ * @version 2.6.34
  */
 
 export { useRequests, useRequestTypes } from './useRequests';
@@ -13,4 +13,3 @@ export { useApprovalHistory } from './useApprovalHistory';
 export { useApprovalPermissions } from './useApprovalPermissions';
 export { useApprovalWorkflows } from './useApprovalWorkflows';
 export { usePendingApprovals } from './usePendingApprovals';
-export { useStaffRequestsData } from './useStaffRequestsData';

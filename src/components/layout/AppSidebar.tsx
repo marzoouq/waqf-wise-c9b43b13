@@ -88,7 +88,6 @@ const menuGroups = [
       { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ["admin", "accountant", "nazer"] },
       { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
-      { icon: CheckSquare, label: "إدارة الطلبات", path: "/staff/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: HeartHandshake, label: "المساعدات الطارئة", path: "/emergency-aid", roles: ["admin", "accountant", "nazer"] },
     ]
   },

@@ -68,7 +68,6 @@ export const CustomReportsPage = lazyWithRetry(() => import("@/pages/CustomRepor
 
 // ==================== الطلبات والدعم ====================
 export const Requests = lazyWithRetry(() => import("@/pages/Requests"));
-export const StaffRequestsManagement = lazyWithRetry(() => import("@/pages/StaffRequestsManagement"));
 export const EmergencyAidManagement = lazyWithRetry(() => import("@/pages/EmergencyAidManagement"));
 export const Support = lazyWithRetry(() => import("@/pages/Support"));
 export const SupportManagement = lazyWithRetry(() => import("@/pages/SupportManagement"));

@@ -30,7 +30,6 @@ import {
   Reports,
   CustomReportsPage,
   Requests,
-  StaffRequestsManagement,
   EmergencyAidManagement,
   Support,
   KnowledgeBase,
@@ -276,12 +275,13 @@ export const coreRoutes = [
       </ProtectedRoute>
     } 
   />,
+  // Redirect old staff/requests to new requests page
   <Route 
-    key="staff-requests"
+    key="staff-requests-redirect"
     path="/staff/requests" 
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
-        <StaffRequestsManagement />
+        <Requests />
       </ProtectedRoute>
     } 
   />,
