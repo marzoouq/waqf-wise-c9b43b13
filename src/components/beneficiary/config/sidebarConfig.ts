@@ -1,7 +1,7 @@
 /**
  * Beneficiary Sidebar Configuration
- * بيانات ثابتة للقائمة الجانبية
- * @version 2.9.25 - تحديث الأيقونات لتجنب التكرار
+ * بيانات ثابتة للقائمة الجانبية - إصدار مُحسّن بدون تكرار
+ * @version 3.0.0
  */
 
 import {
@@ -9,18 +9,13 @@ import {
   User,
   FileEdit,
   PieChart,
-  Receipt,
   Building2,
   FolderOpen,
   Users,
   Wallet,
-  Landmark,
   FileBarChart,
   Scale,
-  BarChart3,
   CreditCard,
-  ClipboardCheck,
-  BarChart2,
   HelpCircle,
 } from "lucide-react";
 
@@ -31,24 +26,110 @@ export interface SidebarItem {
   href?: string;
   tab?: string;
   visibilityKey?: string;
+  description?: string;
 }
 
+/**
+ * الأقسام المُدمجة:
+ * - "التوزيعات" + "كشف الحساب" = "التوزيعات والأرصدة" (توحيد البيانات المالية للمستفيد)
+ * - "الإفصاحات" + "التقارير" = "التقارير والإفصاحات" (توحيد التقارير المالية)
+ * - "الوقف" تم دمجها مع "نظرة عامة" (لأنها تعرض نفس الملخص)
+ * - "الميزانيات" + "سجل الموافقات" = ضمن "الحوكمة" (لأنها تخص الإدارة)
+ */
 export const sidebarItems: SidebarItem[] = [
-  { id: "overview", label: "نظرة عامة", icon: LayoutDashboard, tab: "overview", visibilityKey: "show_overview" },
-  { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile", visibilityKey: "show_profile" },
-  { id: "requests", label: "الطلبات", icon: FileEdit, tab: "requests", visibilityKey: "show_requests" },
-  { id: "distributions", label: "التوزيعات", icon: PieChart, tab: "distributions", visibilityKey: "show_distributions" },
-  { id: "statements", label: "كشف الحساب", icon: Receipt, tab: "statements", visibilityKey: "show_statements" },
-  { id: "properties", label: "العقارات", icon: Building2, tab: "properties", visibilityKey: "show_properties" },
-  { id: "documents", label: "المستندات", icon: FolderOpen, tab: "documents", visibilityKey: "show_documents" },
-  { id: "family", label: "العائلة", icon: Users, tab: "family", visibilityKey: "show_family_tree" },
-  { id: "bank", label: "الحسابات البنكية", icon: Wallet, tab: "bank", visibilityKey: "show_bank_accounts" },
-  { id: "waqf", label: "الوقف", icon: Landmark, tab: "waqf" },
-  { id: "disclosures", label: "الإفصاحات", icon: FileBarChart, tab: "disclosures", visibilityKey: "show_disclosures" },
-  { id: "governance", label: "الحوكمة", icon: Scale, tab: "governance", visibilityKey: "show_governance" },
-  { id: "budgets", label: "الميزانيات", icon: BarChart3, tab: "budgets", visibilityKey: "show_budgets" },
-  { id: "loans", label: "القروض", icon: CreditCard, tab: "loans", visibilityKey: "show_own_loans" },
-  { id: "approvals", label: "سجل الموافقات", icon: ClipboardCheck, tab: "approvals", visibilityKey: "show_approvals_log" },
-  { id: "reports", label: "التقارير", icon: BarChart2, tab: "reports", visibilityKey: "show_financial_reports" },
-  { id: "support", label: "الدعم الفني", icon: HelpCircle, href: "/beneficiary-support" },
+  { 
+    id: "overview", 
+    label: "نظرة عامة", 
+    icon: LayoutDashboard, 
+    tab: "overview", 
+    visibilityKey: "show_overview",
+    description: "ملخص الوقف والإحصائيات العامة"
+  },
+  { 
+    id: "profile", 
+    label: "الملف الشخصي", 
+    icon: User, 
+    tab: "profile", 
+    visibilityKey: "show_profile",
+    description: "بياناتك الشخصية والبنكية"
+  },
+  { 
+    id: "requests", 
+    label: "الطلبات", 
+    icon: FileEdit, 
+    tab: "requests", 
+    visibilityKey: "show_requests",
+    description: "طلباتك والمساعدات الطارئة"
+  },
+  { 
+    id: "distributions", 
+    label: "التوزيعات والأرصدة", 
+    icon: PieChart, 
+    tab: "distributions", 
+    visibilityKey: "show_distributions",
+    description: "توزيعاتك وكشف الحساب"
+  },
+  { 
+    id: "properties", 
+    label: "العقارات", 
+    icon: Building2, 
+    tab: "properties", 
+    visibilityKey: "show_properties",
+    description: "عقارات الوقف"
+  },
+  { 
+    id: "documents", 
+    label: "المستندات", 
+    icon: FolderOpen, 
+    tab: "documents", 
+    visibilityKey: "show_documents",
+    description: "مستنداتك ومرفقاتك"
+  },
+  { 
+    id: "family", 
+    label: "العائلة", 
+    icon: Users, 
+    tab: "family", 
+    visibilityKey: "show_family_tree",
+    description: "شجرة العائلة والورثة"
+  },
+  { 
+    id: "bank", 
+    label: "الحسابات البنكية", 
+    icon: Wallet, 
+    tab: "bank", 
+    visibilityKey: "show_bank_accounts",
+    description: "حساباتك البنكية"
+  },
+  { 
+    id: "reports", 
+    label: "التقارير والإفصاحات", 
+    icon: FileBarChart, 
+    tab: "reports", 
+    visibilityKey: "show_financial_reports",
+    description: "التقارير المالية والإفصاحات السنوية"
+  },
+  { 
+    id: "governance", 
+    label: "الحوكمة", 
+    icon: Scale, 
+    tab: "governance", 
+    visibilityKey: "show_governance",
+    description: "القرارات والميزانيات والموافقات"
+  },
+  { 
+    id: "loans", 
+    label: "القروض", 
+    icon: CreditCard, 
+    tab: "loans", 
+    visibilityKey: "show_own_loans",
+    description: "قروضك وأقساطك"
+  },
+  { 
+    id: "support", 
+    label: "الدعم الفني", 
+    icon: HelpCircle, 
+    href: "/beneficiary-support",
+    description: "تواصل مع الدعم"
+  },
 ];
