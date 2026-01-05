@@ -16,11 +16,8 @@ import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostRepor
 import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
 import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedger";
 import { AgingReport } from "@/components/reports/AgingReport";
-import { FinancialRatiosReport } from "@/components/reports/FinancialRatiosReport";
-import { BudgetVarianceReport } from "@/components/reports/BudgetVarianceReport";
-import { InvoiceManager } from "@/components/invoices/InvoiceManager";
-import { ZATCAInvoicePreview, ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
-import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, Wand2, ShieldCheck, Receipt } from "lucide-react";
+import { ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
+import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Reports = () => {
@@ -36,7 +33,7 @@ const Reports = () => {
       <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-3 lg:grid-cols-9 gap-1">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-3 lg:grid-cols-8 gap-1">
               <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">لوحة التحكم</span>
@@ -71,11 +68,6 @@ const Reports = () => {
                 <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">التحليلات</span>
                 <span className="sm:hidden">تحليل</span>
-              </TabsTrigger>
-              <TabsTrigger value="invoices" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">الفواتير</span>
-                <span className="sm:hidden">فاتورة</span>
               </TabsTrigger>
               <TabsTrigger value="zatca" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -172,29 +164,6 @@ const Reports = () => {
             <FundsPerformanceReport />
           </TabsContent>
 
-          <TabsContent value="invoices" className="space-y-6">
-            <Tabs defaultValue="manager" className="space-y-4">
-              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 h-auto">
-                  <TabsTrigger value="manager" className="text-xs sm:text-sm px-3 py-2">إدارة الفواتير</TabsTrigger>
-                  <TabsTrigger value="ratios" className="text-xs sm:text-sm px-3 py-2">النسب المالية</TabsTrigger>
-                  <TabsTrigger value="budget" className="text-xs sm:text-sm px-3 py-2">مقارنة الميزانية</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="manager">
-                <InvoiceManager />
-              </TabsContent>
-
-              <TabsContent value="ratios">
-                <FinancialRatiosReport />
-              </TabsContent>
-
-              <TabsContent value="budget">
-                <BudgetVarianceReport />
-              </TabsContent>
-            </Tabs>
-          </TabsContent>
 
           <TabsContent value="zatca" className="space-y-6">
             <Tabs defaultValue="compliance" className="space-y-4">
