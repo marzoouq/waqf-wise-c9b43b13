@@ -1,7 +1,7 @@
 /**
  * Beneficiary Sidebar Configuration
- * بيانات ثابتة للقائمة الجانبية - إصدار مُحسّن بدون تكرار
- * @version 3.0.0
+ * بيانات ثابتة للقائمة الجانبية - إصدار مُحسّن
+ * @version 3.0.1
  */
 
 import {
@@ -12,7 +12,6 @@ import {
   Building2,
   FolderOpen,
   Users,
-  Wallet,
   FileBarChart,
   Scale,
   CreditCard,
@@ -30,11 +29,9 @@ export interface SidebarItem {
 }
 
 /**
- * الأقسام المُدمجة:
- * - "التوزيعات" + "كشف الحساب" = "التوزيعات والأرصدة" (توحيد البيانات المالية للمستفيد)
- * - "الإفصاحات" + "التقارير" = "التقارير والإفصاحات" (توحيد التقارير المالية)
- * - "الوقف" تم دمجها مع "نظرة عامة" (لأنها تعرض نفس الملخص)
- * - "الميزانيات" + "سجل الموافقات" = ضمن "الحوكمة" (لأنها تخص الإدارة)
+ * الأقسام المتاحة للمستفيد:
+ * - تم إزالة "الحسابات البنكية" لأنها تعرض حسابات الوقف وليس المستفيد
+ * - بيانات المستفيد البنكية تظهر في "الملف الشخصي"
  */
 export const sidebarItems: SidebarItem[] = [
   { 
@@ -92,14 +89,6 @@ export const sidebarItems: SidebarItem[] = [
     tab: "family", 
     visibilityKey: "show_family_tree",
     description: "شجرة العائلة والورثة"
-  },
-  { 
-    id: "bank", 
-    label: "الحسابات البنكية", 
-    icon: Wallet, 
-    tab: "bank", 
-    visibilityKey: "show_bank_accounts",
-    description: "حساباتك البنكية"
   },
   { 
     id: "reports", 
