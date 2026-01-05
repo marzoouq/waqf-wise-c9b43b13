@@ -23,6 +23,7 @@ initializeAppearanceSettings();
 import LandingPageLight from "@/pages/LandingPageLight";
 import { LightErrorBoundary } from "./components/shared/LightErrorBoundary";
 import { UpdateNotification } from "./components/shared/UpdateNotification";
+import { Toaster } from "@/components/ui/toaster";
 
 // ✅ Lazy load لباقي المسارات
 const AppRoutes = lazy(() => import("./components/layout/AppRoutes"));
@@ -94,6 +95,9 @@ const App = () => {
               />
             </Routes>
           </BrowserRouter>
+
+          {/* ✅ Toasts (رسائل النجاح/الخطأ) */}
+          <Toaster />
           
           {/* ✅ إشعار التحديث المتاح */}
           <UpdateNotification />
