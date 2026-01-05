@@ -20,8 +20,7 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
 const { data, isLoading } = useQuery({
     queryKey: ['beneficiary-annual-share', beneficiaryId],
     queryFn: async () => {
-      const currentYear = new Date().getFullYear();
-      const lastYear = currentYear - 1;
+      const currentYear = new Date().getFullYear(); // 2026
 
       // جلب توزيعات المستفيد مع السنوات المالية
       const { data: distributions } = await supabase
@@ -33,37 +32,28 @@ const { data, isLoading } = useQuery({
         `)
         .eq('beneficiary_id', beneficiaryId);
 
-      // حساب المجاميع - استخراج السنة من start_date
-      let currentYearTotal = 0;
-      let lastYearTotal = 0;
+      // تجميع التوزيعات حسب السنة المالية
+      const yearTotals: Record<string, number> = {};
 
       if (distributions) {
         distributions.forEach((d: any) => {
-          // استخراج السنة من start_date أو من اسم السنة المالية
-          const startDate = d.fiscal_years?.start_date;
           const fiscalYearName = d.fiscal_years?.name || '';
-          
-          let year = 0;
-          if (startDate) {
-            year = new Date(startDate).getFullYear();
-          } else {
-            // محاولة استخراج السنة من الاسم مثل "السنة المالية 2024-2025"
-            const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
-            if (match) {
-              year = parseInt(match[1]);
-            }
-          }
-          
-          const amount = d.share_amount || 0;
-          
-          if (year === currentYear || year === currentYear - 1) {
-            // السنة المالية الحالية (تبدأ في السنة السابقة)
-            currentYearTotal += amount;
-          } else if (year === lastYear - 1 || year === lastYear) {
-            lastYearTotal += amount;
+          // استخراج السنة من الاسم مثل "السنة المالية 2025-2026"
+          const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
+          if (match) {
+            const fiscalYearKey = `${match[1]}-${match[2]}`;
+            yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (d.share_amount || 0);
           }
         });
       }
+
+      // السنة المالية الحالية: 2025-2026 (تنتهي في 2026)
+      // السنة المالية السابقة: 2024-2025
+      const currentFiscalYear = `${currentYear - 1}-${currentYear}`; // "2025-2026"
+      const lastFiscalYear = `${currentYear - 2}-${currentYear - 1}`; // "2024-2025"
+
+      const currentYearTotal = yearTotals[currentFiscalYear] || 0;
+      const lastYearTotal = yearTotals[lastFiscalYear] || 0;
 
       // حساب نسبة التغيير
       let changePercentage = 0;
@@ -75,8 +65,8 @@ const { data, isLoading } = useQuery({
         currentYearTotal,
         lastYearTotal,
         changePercentage,
-        currentYear,
-        lastYear
+        currentFiscalYear,
+        lastFiscalYear
       };
     },
     staleTime: 60000
@@ -119,7 +109,7 @@ const { data, isLoading } = useQuery({
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
                   <CalendarDays className="h-4 w-4" />
-                  حصتك السنوية {data?.currentYear}
+                  حصتك السنوية {data?.currentFiscalYear}
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
@@ -143,7 +133,7 @@ const { data, isLoading } = useQuery({
                 }
               </Badge>
               <p className="text-xs text-muted-foreground">
-                مقارنة بـ {data?.lastYear}: {formatCurrency(data?.lastYearTotal || 0)}
+                مقارنة بـ {data?.lastFiscalYear}: {formatCurrency(data?.lastYearTotal || 0)}
               </p>
             </div>
           </div>
