@@ -4,7 +4,11 @@
  * @version 1.0.0
  */
 
+import { useQuery } from "@tanstack/react-query";
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { useSmartDisclosureDocuments } from "@/hooks/reports/useSmartDisclosureDocuments";
+import { HistoricalRentalService } from "@/services/historical-rental.service";
+import { HISTORICAL_RENTAL_QUERY_KEY } from "@/hooks/fiscal-years/useHistoricalRentalDetails";
 import {
   TrendingUp,
   TrendingDown,
@@ -15,9 +19,8 @@ import {
   ArrowDown,
   CheckCircle2,
   Percent,
-  FileText,
   BarChart3,
-  Lightbulb
+  FileText
 } from "lucide-react";
 
 interface ExpenseItem {
@@ -129,12 +132,30 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
   // Calculate key figures
   const totalRevenues = disclosure.total_revenues || 0;
   const totalExpenses = disclosure.total_expenses || 0;
-  const vatAmount = disclosure.vat_amount || 0;
   const nazerShare = disclosure.nazer_share || 0;
   const charityShare = disclosure.charity_share || 0;
   const corpusShare = disclosure.corpus_share || 0;
   const distributedAmount = distributions?.total || 0;
   const netAfterExpenses = totalRevenues - totalExpenses;
+
+  // Supporting documents (printable)
+  const { documents, categorySummary } = useSmartDisclosureDocuments(disclosure.id);
+
+  // Historical rental summary (printable)
+  const fiscalYearId = disclosure.fiscal_year_id || undefined;
+  const { data: closingId } = useQuery({
+    queryKey: ['fiscal-year-closing-id', fiscalYearId],
+    queryFn: () => HistoricalRentalService.getClosingIdByFiscalYear(fiscalYearId!),
+    enabled: !!fiscalYearId,
+  });
+
+  const { data: monthlySummary = [] } = useQuery({
+    queryKey: [...HISTORICAL_RENTAL_QUERY_KEY, 'monthly-summary', closingId],
+    queryFn: () => HistoricalRentalService.getMonthlySummary(closingId!),
+    enabled: !!closingId,
+  });
+
+  const totalCollected = monthlySummary.reduce((sum, m) => sum + Number(m.paid_amount || 0), 0);
 
   return (
     <div className="hidden print:block print-content space-y-6 p-4">
@@ -464,6 +485,111 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             <p className="text-sm text-muted-foreground">{formatCurrency(corpusShare)}</p>
           </div>
         </div>
+      </div>
+
+      {/* تفاصيل الإيرادات السكنية التاريخية (طباعة) */}
+      <div className="print-section print-card">
+        <div className="print-card-header">
+          <Building2 className="h-5 w-5" />
+          تفاصيل الإيرادات السكنية التاريخية
+        </div>
+
+        {!fiscalYearId ? (
+          <p className="text-sm text-muted-foreground">لا توجد سنة مالية مرتبطة بهذا الإفصاح.</p>
+        ) : !closingId ? (
+          <p className="text-sm text-muted-foreground">لا توجد بيانات إقفال للسنة المالية.</p>
+        ) : monthlySummary.length === 0 ? (
+          <p className="text-sm text-muted-foreground">لا توجد تفاصيل إيجارات تاريخية لهذه السنة.</p>
+        ) : (
+          <>
+            <div className="print-grid-3 mb-4">
+              <div className="print-stat-box">
+                <p className="text-sm text-muted-foreground">إجمالي المحصّل</p>
+                <p className="text-lg font-bold text-success">{formatCurrency(totalCollected)}</p>
+              </div>
+              <div className="print-stat-box">
+                <p className="text-sm text-muted-foreground">عدد الأشهر</p>
+                <p className="text-lg font-bold">{monthlySummary.length}</p>
+              </div>
+              <div className="print-stat-box">
+                <p className="text-sm text-muted-foreground">متوسط الشهر</p>
+                <p className="text-lg font-bold text-warning">
+                  {formatCurrency(monthlySummary.length ? totalCollected / monthlySummary.length : 0)}
+                </p>
+              </div>
+            </div>
+
+            <table className="print-table">
+              <thead>
+                <tr>
+                  <th>الشهر</th>
+                  <th>المحصّل</th>
+                  <th>مدفوع</th>
+                  <th>غير مدفوع</th>
+                  <th>شاغر</th>
+                </tr>
+              </thead>
+              <tbody>
+                {monthlySummary.map((m) => (
+                  <tr key={m.month_date}>
+                    <td>{m.month_label || m.month_year}</td>
+                    <td className="text-success">{formatCurrency(m.paid_amount)}</td>
+                    <td>{m.paid_count}</td>
+                    <td>{m.unpaid_count}</td>
+                    <td>{m.vacant_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
+
+      {/* المستندات الداعمة (طباعة) */}
+      <div className="print-section print-card">
+        <div className="print-card-header">
+          <FileText className="h-5 w-5" />
+          المستندات الداعمة
+        </div>
+
+        {documents.length === 0 ? (
+          <p className="text-sm text-muted-foreground">لا توجد مستندات مرفقة.</p>
+        ) : (
+          <>
+            {categorySummary.length > 0 && (
+              <div className="print-grid-3 mb-4">
+                {categorySummary.slice(0, 6).map((cat) => (
+                  <div key={cat.type} className="print-stat-box">
+                    <p className="text-sm text-muted-foreground">{cat.label}</p>
+                    <p className="text-lg font-bold">{cat.count} مستند</p>
+                    <p className="text-sm text-muted-foreground">{formatCurrency(cat.totalAmount)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <table className="print-table">
+              <thead>
+                <tr>
+                  <th>المستند</th>
+                  <th>النوع</th>
+                  <th>الإجمالي</th>
+                  <th>تاريخ الرفع</th>
+                </tr>
+              </thead>
+              <tbody>
+                {documents.map((doc) => (
+                  <tr key={doc.id}>
+                    <td>{doc.document_name}</td>
+                    <td>{doc.document_type}</td>
+                    <td>{formatCurrency(doc.total_amount || 0)}</td>
+                    <td>{new Date(doc.created_at).toLocaleDateString('ar-SA')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
 
       {/* تذييل */}

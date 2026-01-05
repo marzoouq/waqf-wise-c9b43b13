@@ -5,23 +5,23 @@
  */
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
-import { 
-  FileText, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
+import {
+  FileText,
+  TrendingUp,
+  TrendingDown,
+  Users,
   Calculator,
   ArrowRight,
   Download,
   Printer,
   Loader2,
-  Building2,
   Wallet,
   ArrowDown,
   CheckCircle2,
@@ -38,6 +38,10 @@ import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
 import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
 import { SmartInsights } from "@/components/disclosure/SmartInsights";
 import { PrintableDisclosureContent } from "./PrintableDisclosureContent";
+import { QUERY_KEYS } from "@/lib/query-keys";
+import { DisclosureService } from "@/services/disclosure.service";
+import { HistoricalRentalService } from "@/services/historical-rental.service";
+import { HISTORICAL_RENTAL_QUERY_KEY } from "@/hooks/fiscal-years/useHistoricalRentalDetails";
 
 interface ExpenseItem {
   name: string;
@@ -143,12 +147,36 @@ export function DisclosureDetailsTab() {
     }
   };
 
-  const handlePrint = () => {
+  const queryClient = useQueryClient();
+
+  const handlePrint = async () => {
+    if (!disclosure) return;
     setIsPrinting(true);
-    setTimeout(() => {
+
+    try {
+      // 1) Prefetch supporting documents so print won't capture a "loading" state
+      await queryClient.prefetchQuery({
+        queryKey: QUERY_KEYS.SMART_DISCLOSURE_DOCUMENTS(disclosure.id),
+        queryFn: () => DisclosureService.getSmartDocuments(disclosure.id),
+      });
+
+      // 2) Prefetch historical rental summary (if linked)
+      if (disclosure.fiscal_year_id) {
+        const closingId = await HistoricalRentalService.getClosingIdByFiscalYear(disclosure.fiscal_year_id);
+        if (closingId) {
+          await queryClient.prefetchQuery({
+            queryKey: [...HISTORICAL_RENTAL_QUERY_KEY, 'monthly-summary', closingId],
+            queryFn: () => HistoricalRentalService.getMonthlySummary(closingId),
+          });
+        }
+      }
+
+      // Give the DOM one tick to render the print-only blocks
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
       window.print();
+    } finally {
       setIsPrinting(false);
-    }, 100);
+    }
   };
 
   if (isLoading) {
