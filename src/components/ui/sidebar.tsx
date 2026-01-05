@@ -49,14 +49,7 @@ const SidebarProvider = React.forwardRef<
     onOpenChange?: (open: boolean) => void;
   }
 >(({ defaultOpen = true, open: openProp, onOpenChange: setOpenProp, className, style, children, ...props }, ref) => {
-  const currentIsMobile = useIsMobile();
-  
-  // ✅ تثبيت قيمة isMobile عند أول mount لمنع التبديل بين المكونات
-  const isMobileRef = React.useRef<boolean | null>(null);
-  if (isMobileRef.current === null) {
-    isMobileRef.current = currentIsMobile;
-  }
-  const isMobile = isMobileRef.current;
+  const isMobile = useIsMobile();
   
   const [openMobile, setOpenMobile] = React.useState(false);
 
