@@ -2246,6 +2246,7 @@ export type Database = {
           allow_export_pdf: boolean | null
           allow_preview_documents: boolean | null
           allow_print: boolean | null
+          allow_profile_edit: boolean | null
           created_at: string | null
           id: string
           mask_exact_amounts: boolean | null
@@ -2316,6 +2317,7 @@ export type Database = {
           allow_export_pdf?: boolean | null
           allow_preview_documents?: boolean | null
           allow_print?: boolean | null
+          allow_profile_edit?: boolean | null
           created_at?: string | null
           id?: string
           mask_exact_amounts?: boolean | null
@@ -2386,6 +2388,7 @@ export type Database = {
           allow_export_pdf?: boolean | null
           allow_preview_documents?: boolean | null
           allow_print?: boolean | null
+          allow_profile_edit?: boolean | null
           created_at?: string | null
           id?: string
           mask_exact_amounts?: boolean | null
@@ -14332,6 +14335,7 @@ export type Database = {
           allow_export_pdf: boolean | null
           allow_preview_documents: boolean | null
           allow_print: boolean | null
+          allow_profile_edit: boolean | null
           created_at: string | null
           id: string
           mask_exact_amounts: boolean | null
