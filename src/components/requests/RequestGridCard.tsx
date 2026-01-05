@@ -2,7 +2,7 @@
  * بطاقة طلب للعرض الشبكي
  * Request Grid Card Component
  */
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { 
@@ -21,13 +22,19 @@ import {
   Calendar,
   DollarSign,
   AlertTriangle,
-  User
+  User,
+  CheckCircle,
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { RequestStatusBadge } from './RequestStatusBadge';
-import { PRIORITY_BADGE_STYLES } from '@/lib/request-constants';
+import { PRIORITY_BADGE_STYLES, REQUEST_STATUS } from '@/lib/request-constants';
 import { getRequestTypeName, type FullRequest } from '@/types/request.types';
+import { RequestService } from '@/services/request.service';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface RequestGridCardProps {
   request: FullRequest;
@@ -44,10 +51,50 @@ export const RequestGridCard = memo(({
   onComments,
   onDelete,
 }: RequestGridCardProps) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const queryClient = useQueryClient();
+  
   const priorityStyle = PRIORITY_BADGE_STYLES[request.priority || ''] || { variant: 'secondary' as const };
   const beneficiaryName = request.beneficiary && 'full_name' in request.beneficiary 
     ? request.beneficiary.full_name 
     : '-';
+
+  // التحقق من كون الطلب قيد المراجعة
+  const isPending = [
+    REQUEST_STATUS.PENDING,
+    REQUEST_STATUS.IN_PROGRESS,
+    'معلق',
+    'قيد المراجعة',
+    'قيد المعالجة'
+  ].includes(request.status || '');
+
+  const handleQuickApprove = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsProcessing(true);
+    try {
+      await RequestService.updateRequestStatus(request.id, 'موافق عليه', 'تمت الموافقة');
+      toast.success('تمت الموافقة على الطلب');
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+    } catch {
+      toast.error('فشل في الموافقة على الطلب');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleQuickReject = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsProcessing(true);
+    try {
+      await RequestService.updateRequestStatus(request.id, 'مرفوض', 'تم الرفض');
+      toast.success('تم رفض الطلب');
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+    } catch {
+      toast.error('فشل في رفض الطلب');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <Card 
@@ -91,6 +138,7 @@ export const RequestGridCard = memo(({
                 <MessageSquare className="h-4 w-4 ml-2" />
                 التعليقات
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={(e) => { e.stopPropagation(); onDelete(request); }}
                 className="text-destructive focus:text-destructive"
@@ -146,9 +194,48 @@ export const RequestGridCard = memo(({
               : '-'}
           </span>
         </div>
+
+        {/* أزرار الموافقة/الرفض السريعة للطلبات المعلقة */}
+        {isPending && (
+          <div className="flex gap-2 mt-3 pt-3 border-t" onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1 text-xs h-8 text-success border-success/30 hover:bg-success/10 hover:text-success"
+              onClick={handleQuickApprove}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <>
+                  <CheckCircle className="h-3 w-3 ml-1" />
+                  موافقة
+                </>
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1 text-xs h-8 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleQuickReject}
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <>
+                  <XCircle className="h-3 w-3 ml-1" />
+                  رفض
+                </>
+              )}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 });
 
 RequestGridCard.displayName = 'RequestGridCard';
+
