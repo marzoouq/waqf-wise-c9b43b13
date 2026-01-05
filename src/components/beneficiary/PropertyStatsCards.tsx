@@ -1,17 +1,22 @@
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff, ArrowLeft, ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { usePropertyStats } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { PropertyUnitsDisplay } from "./properties/PropertyUnitsDisplay";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { motion } from "framer-motion";
+
+const MAX_PROPERTIES_DISPLAY = 5;
 
 export function PropertyStatsCards() {
+  const navigate = useNavigate();
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   const { data, isLoading: dataLoading, error, refetch } = usePropertyStats();
 
@@ -19,19 +24,24 @@ export function PropertyStatsCards() {
   const properties = data?.properties || [];
   const payments = data?.payments || [];
 
+  // عرض أول 5 عقارات فقط مرتبة حسب الإشغال
+  const displayProperties = useMemo(() => {
+    return [...properties]
+      .sort((a, b) => (b.occupied_units || 0) - (a.occupied_units || 0))
+      .slice(0, MAX_PROPERTIES_DISPLAY);
+  }, [properties]);
+
+  const hasMoreProperties = properties.length > MAX_PROPERTIES_DISPLAY;
+
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
+        <Skeleton className="h-64" />
       </div>
     );
   }
@@ -54,8 +64,13 @@ export function PropertyStatsCards() {
   const totalTax = payments.reduce((sum, p) => sum + (p.tax_amount || 0), 0);
   const netRevenue = totalCollected - totalTax;
 
+  const handleViewAllProperties = () => {
+    navigate("/beneficiary-portal?tab=properties");
+  };
+
   return (
     <div className="space-y-6">
+      {/* إحصائيات العقارات */}
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
           <Building2 className="h-4 w-4" />
@@ -69,6 +84,7 @@ export function PropertyStatsCards() {
         </div>
       </div>
 
+      {/* الإيرادات المحصلة */}
       {isCurrentYearPublished ? (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -92,6 +108,7 @@ export function PropertyStatsCards() {
         </Alert>
       )}
 
+      {/* الاستقطاعات الحكومية */}
       {isCurrentYearPublished && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -105,50 +122,74 @@ export function PropertyStatsCards() {
         </div>
       )}
 
-      <Card className="border-primary/20">
+      {/* نظرة سريعة على العقارات - محسّنة */}
+      <Card className="border-primary/20 overflow-hidden">
         <CardHeader className="bg-gradient-to-br from-primary/5 to-background pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Package className="h-5 w-5 text-primary" />
-            نظرة سريعة على العقارات
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Package className="h-5 w-5 text-primary" />
+              نظرة سريعة على العقارات
+            </CardTitle>
+            {hasMoreProperties && (
+              <Badge variant="secondary" className="text-xs">
+                {properties.length} عقار
+              </Badge>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="pt-4">
-          {properties.length > 0 ? (
-            <Accordion type="single" collapsible className="space-y-3">
-              {properties.map((property) => (
-                <AccordionItem
-                  key={property.id}
-                  value={property.id}
-                  className="border border-border/50 rounded-lg overflow-hidden"
-                >
-                  <AccordionTrigger className="px-3 sm:px-4 hover:no-underline hover:bg-muted/50">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pe-3 sm:pe-4 gap-2 sm:gap-0">
-                      <div className="text-left flex-1 min-w-0">
-                        <h4 className="font-semibold text-xs sm:text-sm lg:text-base truncate">{property.name}</h4>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 mt-0.5 sm:mt-1 truncate">
-                          <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
+          {displayProperties.length > 0 ? (
+            <div className="space-y-3">
+              {/* قائمة العقارات المبسطة */}
+              <div className="grid gap-2">
+                {displayProperties.map((property, index) => (
+                  <motion.div
+                    key={property.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-gradient-to-l from-muted/30 to-transparent hover:border-primary/30 hover:bg-muted/50 transition-all"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                        <Building2 className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-sm truncate">{property.name}</h4>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
+                          <MapPin className="h-3 w-3 shrink-0" />
                           {property.location}
                         </p>
                       </div>
-                      <div className="flex gap-1.5 sm:gap-2 flex-wrap shrink-0">
-                        <Badge variant="outline" className="text-[10px] sm:text-xs">
-                          {property.total_units || 0} وحدة
-                        </Badge>
-                        <Badge className="bg-success-light text-success border-success text-[10px] sm:text-xs">
-                          {property.occupied_units || 0} مشغول
-                        </Badge>
-                        <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                          {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
-                        </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="text-left">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                            {property.total_units || 0} وحدة
+                          </Badge>
+                          <Badge className="bg-success/10 text-success border-success/30 text-[10px] px-1.5 py-0">
+                            {property.occupied_units || 0} مشغول
+                          </Badge>
+                        </div>
                       </div>
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-3 sm:px-4 pb-3 sm:pb-4">
-                    <PropertyUnitsDisplay propertyId={property.id} />
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* زر عرض جميع العقارات */}
+              {hasMoreProperties && (
+                <Button
+                  variant="outline"
+                  className="w-full mt-4 group hover:border-primary hover:bg-primary/5"
+                  onClick={handleViewAllProperties}
+                >
+                  <span>عرض جميع العقارات ({properties.length})</span>
+                  <ChevronLeft className="h-4 w-4 me-2 group-hover:-translate-x-1 transition-transform" />
+                </Button>
+              )}
+            </div>
           ) : (
             <div className="text-center py-8">
               <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
