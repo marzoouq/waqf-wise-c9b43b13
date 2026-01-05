@@ -204,11 +204,17 @@ export class ArchiveService {
     folder_id?: string
   ): Promise<Document> {
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
-    const storagePath = `${category}/${Date.now()}_${name.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_')}.${fileExt}`;
+
+    // ملاحظة: تجنب إدخال اسم المستند داخل مسار التخزين لتفادي أخطاء "Invalid key"
+    // (قد تنتج عن محارف خاصة/طويلة/غير مدعومة في بعض البيئات)
+    const uniquePart = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    const storagePath = `${category}/${uniquePart}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage.from('archive-documents').upload(storagePath, file);
     if (uploadError) throw new Error(`فشل في رفع الملف: ${uploadError.message}`);
-
     const { data: urlData } = supabase.storage.from('archive-documents').getPublicUrl(storagePath);
     const formatSize = (b: number) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
 
