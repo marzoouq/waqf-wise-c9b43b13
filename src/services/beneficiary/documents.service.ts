@@ -37,8 +37,8 @@ export class BeneficiaryDocumentsService {
     description?: string
   ): Promise<Database['public']['Tables']['beneficiary_attachments']['Row']> {
     try {
-      // ⚠️ المسار يجب أن يبدأ بـ beneficiaryId مباشرة حتى يتطابق مع سياسة RLS
-      // لأن السياسة تتحقق من: (storage.foldername(name))[1]::uuid = beneficiary_id
+      // ⚠️ يجب أن يتطابق اسم الـ bucket مع المستخدم فعلياً في النظام.
+      // لوحة الناظر تستخدم bucket: beneficiary-attachments
       const uniqueId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
         ? crypto.randomUUID()
         : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
@@ -47,7 +47,7 @@ export class BeneficiaryDocumentsService {
       const filePath = `${beneficiaryId}/${uniqueId}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
-        .from('beneficiary-documents')
+        .from('beneficiary-attachments')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -87,7 +87,7 @@ export class BeneficiaryDocumentsService {
 
       if (doc?.file_path) {
         await supabase.storage
-          .from('beneficiary-documents')
+          .from('beneficiary-attachments')
           .remove([doc.file_path]);
       }
 

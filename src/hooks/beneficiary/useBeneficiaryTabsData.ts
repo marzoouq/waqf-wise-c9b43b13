@@ -50,7 +50,7 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
   });
 
   const viewDocument = async (filePath: string) => {
-    const signedUrl = await StorageService.getSignedUrl('beneficiary-documents', filePath, 3600);
+    const signedUrl = await StorageService.getSignedUrl('beneficiary-attachments', filePath, 3600);
     if (signedUrl) {
       window.open(signedUrl, "_blank");
     }
