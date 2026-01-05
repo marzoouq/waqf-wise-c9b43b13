@@ -107,7 +107,7 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
         onUploadComplete={() => {
-          queryClient.invalidateQueries({ queryKey: ["beneficiary-documents", beneficiaryId] });
+          queryClient.invalidateQueries({ queryKey: ["beneficiary-documents"] });
         }}
       />
     </div>
