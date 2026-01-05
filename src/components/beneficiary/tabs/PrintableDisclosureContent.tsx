@@ -158,12 +158,15 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
   const totalCollected = monthlySummary.reduce((sum, m) => sum + Number(m.paid_amount || 0), 0);
 
   return (
-    <div className="hidden print:block print-content space-y-6 p-4">
+    <div className="hidden print:block print-content p-4" style={{ overflow: 'visible', height: 'auto' }}>
       <style>{`
         @media print {
           .print-content {
             display: block !important;
             visibility: visible !important;
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
           }
           .print-content * {
             visibility: visible !important;
@@ -171,11 +174,12 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
           .print-section {
             break-inside: avoid;
             page-break-inside: avoid;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
           }
           .print-table {
             width: 100%;
             border-collapse: collapse;
+            page-break-inside: auto;
           }
           .print-table th, .print-table td {
             border: 1px solid #ddd;
@@ -186,11 +190,16 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             background-color: #f5f5f5;
             font-weight: bold;
           }
+          .print-table tr {
+            page-break-inside: avoid;
+          }
           .print-card {
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            break-inside: avoid;
+            page-break-inside: avoid;
           }
           .print-card-header {
             font-size: 16px;
@@ -220,12 +229,19 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             border-radius: 8px;
             padding: 12px;
             text-align: center;
+            break-inside: avoid;
           }
           .print-flow-item {
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .print-page-break {
+            page-break-before: always;
           }
           .text-success { color: #16a34a; }
           .text-destructive { color: #dc2626; }
@@ -357,8 +373,11 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
         </div>
       </div>
 
+      {/* فاصل صفحة قبل التفاصيل */}
+      <div className="print-page-break"></div>
+
       {/* تفصيل الإيرادات والمصروفات */}
-      <div className="print-section print-grid">
+      <div className="print-grid" style={{ marginBottom: '20px' }}>
         {/* الإيرادات */}
         {revenueItems.length > 0 && (
           <div className="print-card">
@@ -487,8 +506,11 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
         </div>
       </div>
 
+      {/* فاصل صفحة قبل تفاصيل الإيرادات السكنية */}
+      <div className="print-page-break"></div>
+
       {/* تفاصيل الإيرادات السكنية التاريخية (طباعة) */}
-      <div className="print-section print-card">
+      <div className="print-card" style={{ marginBottom: '20px' }}>
         <div className="print-card-header">
           <Building2 className="h-5 w-5" />
           تفاصيل الإيرادات السكنية التاريخية
@@ -545,8 +567,11 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
         )}
       </div>
 
+      {/* فاصل صفحة قبل المستندات */}
+      <div className="print-page-break"></div>
+
       {/* المستندات الداعمة (طباعة) */}
-      <div className="print-section print-card">
+      <div className="print-card" style={{ marginBottom: '20px' }}>
         <div className="print-card-header">
           <FileText className="h-5 w-5" />
           المستندات الداعمة
