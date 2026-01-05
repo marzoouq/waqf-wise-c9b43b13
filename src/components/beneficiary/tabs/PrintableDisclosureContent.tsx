@@ -172,8 +172,8 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             visibility: visible !important;
           }
           .print-section {
-            break-inside: avoid;
-            page-break-inside: avoid;
+            break-inside: auto;
+            page-break-inside: auto;
             margin-bottom: 20px;
           }
           .print-table {
@@ -198,8 +198,8 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
-            break-inside: avoid;
-            page-break-inside: avoid;
+            break-inside: auto;
+            page-break-inside: auto;
           }
           .print-card-header {
             font-size: 16px;
@@ -209,20 +209,18 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             align-items: center;
             gap: 8px;
           }
-          .print-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-          }
-          .print-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-          }
+          /* Grid في الطباعة يسبب تداخل/قص في بعض المتصفحات → تكديس عمودي */
+          .print-grid,
+          .print-grid-3,
           .print-grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            display: block;
+          }
+          .print-grid > *,
+          .print-grid-3 > *,
+          .print-grid-4 > * {
+            margin-bottom: 12px;
+            break-inside: avoid;
+            page-break-inside: avoid;
           }
           .print-stat-box {
             border: 1px solid #ddd;
@@ -230,6 +228,7 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             padding: 12px;
             text-align: center;
             break-inside: avoid;
+            page-break-inside: avoid;
           }
           .print-flow-item {
             border: 1px solid #ddd;
@@ -239,9 +238,13 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             display: flex;
             justify-content: space-between;
             align-items: center;
+            break-inside: avoid;
+            page-break-inside: avoid;
           }
           .print-page-break {
+            break-before: page;
             page-break-before: always;
+            height: 0;
           }
           .text-success { color: #16a34a; }
           .text-destructive { color: #dc2626; }
