@@ -95,6 +95,8 @@ export function UploadDocumentDialog({
     }
 
     try {
+      console.log('[UploadDocument] Starting upload...', { name: data.name, category: data.category });
+      
       await uploadDocument({
         file,
         name: data.name,
@@ -103,11 +105,13 @@ export function UploadDocumentDialog({
         folder_id: data.folder_id || undefined,
       });
       
+      console.log('[UploadDocument] Upload successful!');
       form.reset();
       setSelectedFile(null);
       onOpenChange(false);
     } catch (error) {
-      // Error handled by hook
+      console.error('[UploadDocument] Upload failed:', error);
+      // Error handled by hook toast
     }
   };
 
