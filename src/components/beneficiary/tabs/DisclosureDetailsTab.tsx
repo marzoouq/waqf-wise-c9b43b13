@@ -5,7 +5,6 @@
  */
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,11 +36,8 @@ import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
 import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
 import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
 import { SmartInsights } from "@/components/disclosure/SmartInsights";
-import { PrintableDisclosureContent } from "./PrintableDisclosureContent";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { DisclosureService } from "@/services/disclosure.service";
-import { HistoricalRentalService } from "@/services/historical-rental.service";
-import { HISTORICAL_RENTAL_QUERY_KEY } from "@/hooks/fiscal-years/useHistoricalRentalDetails";
+import { DisclosurePrintTemplate } from "./DisclosurePrintTemplate";
+import { usePrint } from "@/hooks/ui/usePrint";
 
 interface ExpenseItem {
   name: string;
@@ -147,36 +143,21 @@ export function DisclosureDetailsTab() {
     }
   };
 
-  const queryClient = useQueryClient();
+  
 
-  const handlePrint = async () => {
+  const { printWithData } = usePrint();
+
+  const handlePrint = () => {
     if (!disclosure) return;
     setIsPrinting(true);
-
-    try {
-      // 1) Prefetch supporting documents so print won't capture a "loading" state
-      await queryClient.prefetchQuery({
-        queryKey: QUERY_KEYS.SMART_DISCLOSURE_DOCUMENTS(disclosure.id),
-        queryFn: () => DisclosureService.getSmartDocuments(disclosure.id),
-      });
-
-      // 2) Prefetch historical rental summary (if linked)
-      if (disclosure.fiscal_year_id) {
-        const closingId = await HistoricalRentalService.getClosingIdByFiscalYear(disclosure.fiscal_year_id);
-        if (closingId) {
-          await queryClient.prefetchQuery({
-            queryKey: [...HISTORICAL_RENTAL_QUERY_KEY, 'monthly-summary', closingId],
-            queryFn: () => HistoricalRentalService.getMonthlySummary(closingId),
-          });
-        }
-      }
-
-      // Give the DOM one tick to render the print-only blocks
-      await new Promise((r) => requestAnimationFrame(() => r(null)));
-      window.print();
-    } finally {
-      setIsPrinting(false);
-    }
+    
+    // استخدام printWithData لفتح نافذة طباعة مستقلة بدون تداخل CSS
+    printWithData(
+      { disclosure, previousYear },
+      (data) => <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
+    );
+    
+    setIsPrinting(false);
   };
 
   if (isLoading) {
@@ -233,7 +214,7 @@ export function DisclosureDetailsTab() {
   return (
     <div className="space-y-6 print:space-y-4">
       {/* محتوى الطباعة المُحسّن */}
-      <PrintableDisclosureContent disclosure={disclosure} previousYear={previousYear} />
+      
 
       {/* Header - مخفي عند الطباعة */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
