@@ -213,14 +213,17 @@ export function UploadDocumentDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>المجلد</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select 
+                    onValueChange={(val) => field.onChange(val === "__none__" ? "" : val)} 
+                    defaultValue={field.value || "__none__"}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر المجلد (اختياري)" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">بدون مجلد</SelectItem>
+                      <SelectItem value="__none__">بدون مجلد</SelectItem>
                       {folders?.map((folder) => (
                         <SelectItem key={folder.id} value={folder.id}>
                           {folder.name}
