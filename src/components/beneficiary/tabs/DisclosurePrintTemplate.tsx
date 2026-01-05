@@ -116,81 +116,69 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
   const distributedAmount = distributions?.total || 0;
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', padding: '20px', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl', padding: '0', width: '100%' }}>
       {/* أنماط الطباعة */}
       <style>{`
         @page { 
           size: A4; 
-          margin: 10mm; 
-        }
-        @media print {
-          html, body {
-            height: auto !important;
-            overflow: visible !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          * {
-            overflow: visible !important;
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
+          margin: 15mm; 
         }
         body {
-          font-size: 11px;
-          line-height: 1.4;
+          font-size: 12px;
+          line-height: 1.5;
           color: #333;
         }
         .print-header {
           text-align: center;
-          margin-bottom: 20px;
-          padding-bottom: 15px;
+          margin-bottom: 30px;
+          padding-bottom: 20px;
           border-bottom: 2px solid #333;
         }
         .print-title {
-          font-size: 20px;
+          font-size: 24px;
           font-weight: bold;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
           color: #1a365d;
         }
         .print-subtitle {
-          font-size: 14px;
+          font-size: 16px;
           color: #555;
         }
         .print-section {
-          margin-bottom: 15px;
+          margin-bottom: 25px;
           page-break-inside: auto;
         }
         .section-title {
-          font-size: 14px;
+          font-size: 16px;
           font-weight: bold;
           color: #1a365d;
-          margin-bottom: 10px;
-          padding-bottom: 5px;
+          margin-bottom: 15px;
+          padding-bottom: 8px;
           border-bottom: 1px solid #ddd;
         }
         .summary-grid {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 15px;
+          gap: 15px;
+          margin-bottom: 20px;
         }
         .summary-box {
           flex: 1;
-          min-width: 120px;
-          padding: 10px;
+          min-width: 150px;
+          padding: 15px;
           border: 1px solid #ddd;
-          border-radius: 6px;
+          border-radius: 8px;
           text-align: center;
           background: #fafafa;
+          page-break-inside: avoid;
         }
         .summary-label {
-          font-size: 10px;
+          font-size: 11px;
           color: #666;
-          margin-bottom: 3px;
+          margin-bottom: 5px;
         }
         .summary-value {
-          font-size: 13px;
+          font-size: 16px;
           font-weight: bold;
           color: #1a365d;
         }
@@ -199,13 +187,12 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
         .data-table {
           width: 100%;
           border-collapse: collapse;
-          margin-bottom: 15px;
-          font-size: 10px;
+          margin-bottom: 20px;
         }
         .data-table th,
         .data-table td {
           border: 1px solid #ddd;
-          padding: 6px 8px;
+          padding: 10px;
           text-align: right;
         }
         .data-table th {
@@ -217,18 +204,18 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
           font-weight: bold;
         }
         .flow-section {
-          margin-bottom: 15px;
+          margin-bottom: 20px;
         }
         .flow-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 8px 10px;
-          margin-bottom: 4px;
+          padding: 12px 15px;
+          margin-bottom: 8px;
           border: 1px solid #ddd;
-          border-radius: 6px;
+          border-radius: 8px;
           background: #fafafa;
-          font-size: 11px;
+          page-break-inside: avoid;
         }
         .flow-item.highlight {
           border: 2px solid #1a365d;
@@ -236,33 +223,34 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
         }
         .flow-arrow {
           text-align: center;
-          padding: 2px 0;
+          padding: 5px 0;
           color: #999;
-          font-size: 14px;
+          font-size: 18px;
         }
         .beneficiaries-section {
-          margin-top: 15px;
+          margin-top: 20px;
         }
         .heir-grid {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
         }
         .heir-box {
           flex: 1;
-          min-width: 100px;
-          padding: 10px;
+          min-width: 120px;
+          padding: 12px;
           border: 1px solid #ddd;
-          border-radius: 6px;
+          border-radius: 8px;
           text-align: center;
           background: #fafafa;
+          page-break-inside: avoid;
         }
         .footer {
-          margin-top: 20px;
-          padding-top: 10px;
+          margin-top: 30px;
+          padding-top: 15px;
           border-top: 1px solid #ddd;
           text-align: center;
-          font-size: 9px;
+          font-size: 10px;
           color: #888;
         }
       `}</style>
