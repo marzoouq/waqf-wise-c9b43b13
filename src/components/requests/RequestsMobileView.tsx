@@ -17,6 +17,7 @@ interface RequestsMobileViewProps {
   setApprovalDialogOpen: (open: boolean) => void;
   setCommentsDialogOpen: (open: boolean) => void;
   handleDeleteClick: (request: FullRequest) => void;
+  handleViewDetails: (request: FullRequest) => void;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
@@ -32,6 +33,7 @@ export const RequestsMobileView = memo(({
   setApprovalDialogOpen,
   setCommentsDialogOpen,
   handleDeleteClick,
+  handleViewDetails,
   currentPage,
   setCurrentPage,
   totalPages,
@@ -59,10 +61,7 @@ export const RequestsMobileView = memo(({
             <RequestMobileCard
               key={request.id}
               request={request}
-              onViewDetails={(r) => {
-                setSelectedRequest(r);
-                setApprovalDialogOpen(true);
-              }}
+              onViewDetails={handleViewDetails}
               onViewComments={(r) => {
                 setSelectedRequest(r);
                 setCommentsDialogOpen(true);

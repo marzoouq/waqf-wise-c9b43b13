@@ -21,6 +21,7 @@ import { RequestsDesktopView } from '@/components/requests/RequestsDesktopView';
 import { RequestsMobileView } from '@/components/requests/RequestsMobileView';
 import { RequestsDialogs } from '@/components/requests/RequestsDialogs';
 import { RequestDetailsDialog } from '@/components/requests/RequestDetailsDialog';
+import { CreateRequestDialog } from '@/components/requests/CreateRequestDialog';
 import { useRequestsPage } from '@/hooks/requests/useRequestsPage';
 
 const Requests = memo(() => {
@@ -41,6 +42,8 @@ const Requests = memo(() => {
     setSearchQuery,
     statusFilter,
     setStatusFilter,
+    requestTypeFilter,
+    setRequestTypeFilter,
     advancedFilters,
     setAdvancedFilters,
     sortConfig,
@@ -63,6 +66,9 @@ const Requests = memo(() => {
     deleteRequest,
     detailsDialogOpen,
     setDetailsDialogOpen,
+    createDialogOpen,
+    setCreateDialogOpen,
+    handleOpenCreateDialog,
   } = useRequestsPage();
 
   const {
@@ -136,6 +142,8 @@ const Requests = memo(() => {
               onSearchChange={setSearchQuery}
               statusFilter={statusFilter}
               onStatusChange={setStatusFilter}
+              requestTypeFilter={requestTypeFilter}
+              onRequestTypeChange={setRequestTypeFilter}
               advancedFilters={advancedFilters}
               onAdvancedFiltersChange={setAdvancedFilters}
             />
@@ -163,6 +171,7 @@ const Requests = memo(() => {
             setApprovalDialogOpen={setApprovalDialogOpen}
             setCommentsDialogOpen={setCommentsDialogOpen}
             handleDeleteClick={handleDeleteClick}
+            handleViewDetails={handleViewDetails}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalPages={totalPages}
@@ -185,6 +194,7 @@ const Requests = memo(() => {
             setCommentsDialogOpen={setCommentsDialogOpen}
             handleDeleteClick={handleDeleteClick}
             handleViewDetails={handleViewDetails}
+            onAddRequest={handleOpenCreateDialog}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             totalPages={totalPages}
@@ -212,6 +222,13 @@ const Requests = memo(() => {
           open={detailsDialogOpen}
           onOpenChange={setDetailsDialogOpen}
           request={selectedRequest}
+        />
+
+        {/* Create Request Dialog */}
+        <CreateRequestDialog
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          onSuccess={refetch}
         />
       </div>
     </PageErrorBoundary>
