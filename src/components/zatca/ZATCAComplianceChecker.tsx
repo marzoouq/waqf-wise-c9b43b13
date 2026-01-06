@@ -1,8 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, AlertTriangle, XCircle, ShieldCheck } from "lucide-react";
-import { useState, useEffect } from "react";
+import { CheckCircle, AlertTriangle, XCircle, ShieldCheck, Loader2, RefreshCw } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
+import { validateVATNumber } from "@/lib/zatca";
+import { Button } from "@/components/ui/button";
 
 interface ComplianceCheck {
   id: string;
@@ -10,86 +14,174 @@ interface ComplianceCheck {
   description: string;
   status: 'pass' | 'warning' | 'fail';
   category: string;
+  details?: string;
 }
 
 export function ZATCAComplianceChecker() {
   const [complianceScore, setComplianceScore] = useState(0);
   const [checks, setChecks] = useState<ComplianceCheck[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { settings: orgSettings } = useOrganizationSettings();
 
-  useEffect(() => {
-    // محاكاة فحص الامتثال
-    const performChecks = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  const performChecks = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // جلب الفواتير من قاعدة البيانات
+      const { data: invoices, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('*, invoice_lines(*)')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (invoicesError) throw invoicesError;
+
+      const checkResults: ComplianceCheck[] = [];
+
+      // 1. فحص الرقم الضريبي للمنظمة
+      const vatNumber = orgSettings?.vat_registration_number;
+      const isVatValid = vatNumber && validateVATNumber(vatNumber);
+      checkResults.push({
+        id: '1',
+        title: 'الرقم الضريبي',
+        description: 'وجود رقم تسجيل ضريبي صحيح',
+        status: isVatValid ? 'pass' : vatNumber ? 'warning' : 'fail',
+        category: 'تسجيل',
+        details: isVatValid 
+          ? `الرقم الضريبي: ${vatNumber}` 
+          : vatNumber 
+            ? 'الرقم الضريبي موجود لكن قد يكون غير صحيح'
+            : 'لم يتم تسجيل رقم ضريبي',
+      });
+
+      // 2. فحص شهادة التوقيع الرقمي (نفحص الإعدادات)
+      const { data: zatcaSettings } = await supabase
+        .from('system_settings')
+        .select('setting_key, setting_value')
+        .eq('category', 'zatca');
+
+      const hasDigitalCert = zatcaSettings?.some(s => 
+        s.setting_key === 'digital_certificate' && s.setting_value
+      );
+      checkResults.push({
+        id: '2',
+        title: 'شهادة التوقيع الرقمي',
+        description: 'شهادة توقيع إلكتروني صالحة ومفعلة',
+        status: hasDigitalCert ? 'pass' : 'warning',
+        category: 'أمان',
+        details: hasDigitalCert 
+          ? 'شهادة التوقيع الرقمي مفعّلة' 
+          : 'لم يتم تفعيل شهادة التوقيع الرقمي بعد',
+      });
+
+      // 3. فحص تنسيق الفواتير
+      const invoicesWithQR = invoices?.filter(inv => inv.qr_code_data) || [];
+      const qrRatio = invoices?.length ? (invoicesWithQR.length / invoices.length) * 100 : 0;
       
-      const checkResults: ComplianceCheck[] = [
-        {
-          id: '1',
-          title: 'الرقم الضريبي',
-          description: 'وجود رقم تسجيل ضريبي صحيح',
-          status: 'pass',
-          category: 'تسجيل',
-        },
-        {
-          id: '2',
-          title: 'شهادة التوقيع الرقمي',
-          description: 'شهادة توقيع إلكتروني صالحة ومفعلة',
-          status: 'pass',
-          category: 'أمان',
-        },
-        {
-          id: '3',
-          title: 'تنسيق الفواتير',
-          description: 'الفواتير متوافقة مع معايير الهيئة',
-          status: 'warning',
-          category: 'فواتير',
-        },
-        {
-          id: '4',
-          title: 'رمز الاستجابة السريع (QR)',
-          description: 'وجود QR Code على جميع الفواتير',
-          status: 'pass',
-          category: 'فواتير',
-        },
-        {
-          id: '5',
-          title: 'ختم التشفير',
-          description: 'ختم تشفير صحيح على الفواتير',
-          status: 'pass',
-          category: 'أمان',
-        },
-        {
-          id: '6',
-          title: 'أرشفة الفواتير',
-          description: 'حفظ الفواتير لمدة لا تقل عن 6 سنوات',
-          status: 'pass',
-          category: 'أرشفة',
-        },
-        {
-          id: '7',
-          title: 'معلومات العميل',
-          description: 'معلومات العميل كاملة ومطابقة للمعايير',
-          status: 'warning',
-          category: 'بيانات',
-        },
-        {
-          id: '8',
-          title: 'رقم تسلسلي للفواتير',
-          description: 'ترقيم تسلسلي فريد لكل فاتورة',
-          status: 'pass',
-          category: 'فواتير',
-        },
-      ];
+      checkResults.push({
+        id: '3',
+        title: 'تنسيق الفواتير',
+        description: 'الفواتير متوافقة مع معايير الهيئة',
+        status: qrRatio >= 95 ? 'pass' : qrRatio >= 70 ? 'warning' : 'fail',
+        category: 'فواتير',
+        details: `${invoicesWithQR.length} من ${invoices?.length || 0} فاتورة تحتوي على البيانات المطلوبة (${qrRatio.toFixed(0)}%)`,
+      });
+
+      // 4. فحص رمز QR
+      checkResults.push({
+        id: '4',
+        title: 'رمز الاستجابة السريع (QR)',
+        description: 'وجود QR Code على جميع الفواتير',
+        status: qrRatio >= 95 ? 'pass' : qrRatio >= 70 ? 'warning' : 'fail',
+        category: 'فواتير',
+        details: `${qrRatio.toFixed(0)}% من الفواتير تحتوي على QR Code`,
+      });
+
+      // 5. فحص ختم التشفير
+      const hasEncryption = zatcaSettings?.some(s => 
+        s.setting_key === 'encryption_enabled' && s.setting_value === 'true'
+      );
+      checkResults.push({
+        id: '5',
+        title: 'ختم التشفير',
+        description: 'ختم تشفير صحيح على الفواتير',
+        status: hasEncryption ? 'pass' : 'warning',
+        category: 'أمان',
+        details: hasEncryption ? 'التشفير مفعّل' : 'التشفير غير مفعّل',
+      });
+
+      // 6. فحص الأرشفة (نفحص أقدم فاتورة)
+      const { data: oldestInvoice } = await supabase
+        .from('invoices')
+        .select('invoice_date')
+        .order('invoice_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      const archiveYears = oldestInvoice?.invoice_date
+        ? Math.floor((Date.now() - new Date(oldestInvoice.invoice_date).getTime()) / (365 * 24 * 60 * 60 * 1000))
+        : 0;
+
+      checkResults.push({
+        id: '6',
+        title: 'أرشفة الفواتير',
+        description: 'حفظ الفواتير لمدة لا تقل عن 6 سنوات',
+        status: invoices?.length ? 'pass' : 'warning',
+        category: 'أرشفة',
+        details: oldestInvoice 
+          ? `الفواتير محفوظة منذ ${archiveYears} سنة` 
+          : 'لا توجد فواتير في النظام',
+      });
+
+      // 7. فحص معلومات العميل
+      const invoicesWithFullCustomer = invoices?.filter(inv => 
+        inv.customer_name && inv.customer_name.trim().length > 2
+      ) || [];
+      const customerRatio = invoices?.length 
+        ? (invoicesWithFullCustomer.length / invoices.length) * 100 
+        : 100;
+
+      checkResults.push({
+        id: '7',
+        title: 'معلومات العميل',
+        description: 'معلومات العميل كاملة ومطابقة للمعايير',
+        status: customerRatio >= 95 ? 'pass' : customerRatio >= 70 ? 'warning' : 'fail',
+        category: 'بيانات',
+        details: `${customerRatio.toFixed(0)}% من الفواتير تحتوي على معلومات عميل كاملة`,
+      });
+
+      // 8. فحص الترقيم التسلسلي
+      const invoiceNumbers = invoices?.map(i => i.invoice_number) || [];
+      const uniqueNumbers = new Set(invoiceNumbers);
+      const hasUniqueNumbers = invoiceNumbers.length === uniqueNumbers.size;
+
+      checkResults.push({
+        id: '8',
+        title: 'رقم تسلسلي للفواتير',
+        description: 'ترقيم تسلسلي فريد لكل فاتورة',
+        status: hasUniqueNumbers ? 'pass' : 'fail',
+        category: 'فواتير',
+        details: hasUniqueNumbers 
+          ? `${invoices?.length || 0} فاتورة بترقيم فريد` 
+          : 'يوجد تكرار في أرقام الفواتير!',
+      });
 
       setChecks(checkResults);
 
       // حساب نسبة الامتثال
       const passedChecks = checkResults.filter(c => c.status === 'pass').length;
-      const score = (passedChecks / checkResults.length) * 100;
+      const warningChecks = checkResults.filter(c => c.status === 'warning').length;
+      const score = ((passedChecks + warningChecks * 0.5) / checkResults.length) * 100;
       setComplianceScore(score);
-    };
+    } catch (error) {
+      console.error('Error performing compliance checks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [orgSettings]);
 
+  useEffect(() => {
     performChecks();
-  }, []);
+  }, [performChecks]);
 
   const getStatusIcon = (status: ComplianceCheck['status']) => {
     switch (status) {
@@ -121,6 +213,15 @@ export function ZATCAComplianceChecker() {
     return acc;
   }, {} as Record<string, ComplianceCheck[]>);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="mr-2">جارٍ فحص الامتثال...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Overall Compliance Score */}
@@ -131,16 +232,22 @@ export function ZATCAComplianceChecker() {
               <ShieldCheck className="h-6 w-6 text-primary" />
               <CardTitle>مستوى الامتثال العام</CardTitle>
             </div>
-            <Badge 
-              variant={
-                complianceScore >= 90 ? 'default' : 
-                complianceScore >= 70 ? 'secondary' : 
-                'destructive'
-              }
-              className="text-lg px-4 py-2"
-            >
-              {complianceScore.toFixed(0)}%
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={performChecks}>
+                <RefreshCw className="h-4 w-4 ml-1" />
+                تحديث
+              </Button>
+              <Badge 
+                variant={
+                  complianceScore >= 90 ? 'default' : 
+                  complianceScore >= 70 ? 'secondary' : 
+                  'destructive'
+                }
+                className="text-lg px-4 py-2"
+              >
+                {complianceScore.toFixed(0)}%
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -175,6 +282,11 @@ export function ZATCAComplianceChecker() {
                       <p className="text-sm text-muted-foreground">
                         {check.description}
                       </p>
+                      {check.details && (
+                        <p className="text-xs text-muted-foreground mt-1 bg-muted/50 px-2 py-1 rounded">
+                          {check.details}
+                        </p>
+                      )}
                     </div>
                   </div>
                   {getStatusBadge(check.status)}
