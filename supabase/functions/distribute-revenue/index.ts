@@ -55,11 +55,13 @@ Deno.serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[distribute-revenue] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[distribute-revenue] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'distribute-revenue',
+            testMode: !!parsed.testMode,
+            message: parsed.testMode ? 'اختبار ناجح - لم يتم تنفيذ توزيع فعلي' : undefined,
             timestamp: new Date().toISOString()
           });
         }

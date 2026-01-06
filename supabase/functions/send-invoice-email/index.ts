@@ -25,16 +25,19 @@ const handler = async (req: Request): Promise<Response> => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[send-invoice-email] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[send-invoice-email] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'send-invoice-email',
+            testMode: !!parsed.testMode,
+            message: parsed.testMode ? 'اختبار ناجح - لم يتم إرسال بريد فعلي' : undefined,
             timestamp: new Date().toISOString()
           });
         }
       } catch { /* not JSON, continue */ }
     }
+
     const {
       invoiceId,
       customerEmail,

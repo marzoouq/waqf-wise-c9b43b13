@@ -26,12 +26,26 @@ serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
+    const body = await req.json();
+    const { disclosure_id, testMode } = body;
+
+    // ✅ Test Mode Support
+    if (testMode) {
+      console.log('[notify-disclosure-published] Test mode - returning mock response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'اختبار ناجح - لم يتم إرسال إشعارات فعلية',
+        notificationsCount: 0,
+        emailsCount: 0
+      });
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
-
-    const { disclosure_id } = await req.json();
 
     if (!disclosure_id) {
       throw new Error('disclosure_id is required');

@@ -43,7 +43,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
       { name: 'chatbot', description: 'المساعد الذكي', defaultBody: { message: 'مرحباً، كيف يمكنني المساعدة؟' } },
       { name: 'generate-ai-insights', description: 'توليد الرؤى الذكية', defaultBody: { reportType: 'beneficiaries' } },
       { name: 'intelligent-search', description: 'البحث الذكي', defaultBody: { query: 'بحث تجريبي', type: 'beneficiaries' } },
-      { name: 'property-ai-assistant', description: 'مساعد العقارات الذكي', defaultBody: { query: 'ما هي العقارات المتاحة؟' } },
+      { name: 'property-ai-assistant', description: 'مساعد العقارات الذكي', defaultBody: { action: 'analyze_property', data: { name: 'عقار تجريبي', type: 'سكني', location: 'الرياض', monthly_rent: 5000, occupancy_rate: 90 } } },
     ]
   },
   database: {
@@ -55,7 +55,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
       { name: 'db-performance-stats', description: 'إحصائيات أداء قاعدة البيانات', defaultBody: {} },
       { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', defaultBody: {} },
       { name: 'backup-database', description: 'النسخ الاحتياطي', defaultBody: { backupType: 'full' } },
-      { name: 'restore-database', description: 'استعادة النسخة الاحتياطية', defaultBody: { backupId: 'test' } },
+      { name: 'restore-database', description: 'استعادة النسخة الاحتياطية', defaultBody: { testMode: true } },
     ]
   },
   security: {
@@ -63,11 +63,11 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     icon: Shield,
     color: 'text-red-500',
     functions: [
-      { name: 'encrypt-file', description: 'تشفير الملفات', defaultBody: { filePath: 'test.pdf' } },
-      { name: 'decrypt-file', description: 'فك تشفير الملفات', defaultBody: { filePath: 'test.pdf.enc' } },
-      { name: 'secure-delete-file', description: 'حذف آمن للملفات', defaultBody: { filePath: 'test.pdf' } },
+      { name: 'encrypt-file', description: 'تشفير الملفات', defaultBody: { ping: true } },
+      { name: 'decrypt-file', description: 'فك تشفير الملفات', defaultBody: { ping: true } },
+      { name: 'secure-delete-file', description: 'حذف آمن للملفات', defaultBody: { testMode: true, fileId: 'test-file-id' } },
       { name: 'check-leaked-password', description: 'فحص كلمات المرور المسربة', defaultBody: { password: 'test123' } },
-      { name: 'biometric-auth', description: 'المصادقة البيومترية', defaultBody: { action: 'verify' } },
+      { name: 'biometric-auth', description: 'المصادقة البيومترية', defaultBody: { action: 'check', credentialId: 'test-credential-id', userId: 'test-user-id', challenge: 'test-challenge' } },
     ]
   },
   notifications: {
@@ -76,10 +76,10 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     color: 'text-yellow-500',
     functions: [
       { name: 'send-notification', description: 'إرسال إشعار', defaultBody: { userId: 'test', title: 'اختبار', message: 'رسالة اختبار' } },
-      { name: 'send-push-notification', description: 'إشعار الدفع', defaultBody: { userId: 'test', title: 'اختبار' } },
+      { name: 'send-push-notification', description: 'إشعار الدفع', defaultBody: { userId: 'test', title: 'اختبار', body: 'رسالة اختبار للإشعارات' } },
       { name: 'daily-notifications', description: 'الإشعارات اليومية', defaultBody: {} },
-      { name: 'notify-admins', description: 'إشعار المديرين', defaultBody: { message: 'تنبيه اختباري' } },
-      { name: 'notify-disclosure-published', description: 'إشعار نشر الإفصاح', defaultBody: { disclosureId: 'test' } },
+      { name: 'notify-admins', description: 'إشعار المديرين', defaultBody: { title: 'تنبيه اختباري', message: 'رسالة اختبار للمديرين', severity: 'info' } },
+      { name: 'notify-disclosure-published', description: 'إشعار نشر الإفصاح', defaultBody: { testMode: true } },
       { name: 'send-slack-alert', description: 'تنبيه Slack', defaultBody: { message: 'اختبار', severity: 'info' } },
       { name: 'generate-smart-alerts', description: 'التنبيهات الذكية', defaultBody: {} },
       { name: 'contract-renewal-alerts', description: 'تنبيهات تجديد العقود', defaultBody: {} },
@@ -90,14 +90,14 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     icon: CreditCard,
     color: 'text-green-500',
     functions: [
-      { name: 'distribute-revenue', description: 'توزيع الإيرادات', defaultBody: { amount: 1000 } },
+      { name: 'distribute-revenue', description: 'توزيع الإيرادات', defaultBody: { testMode: true, totalAmount: 1000, fiscalYearId: 'test-fiscal-year', distributionDate: new Date().toISOString().split('T')[0] } },
       { name: 'simulate-distribution', description: 'محاكاة التوزيع', defaultBody: { amount: 1000 } },
-      { name: 'auto-create-journal', description: 'إنشاء قيد آلي', defaultBody: { type: 'payment', amount: 100 } },
+      { name: 'auto-create-journal', description: 'إنشاء قيد آلي', defaultBody: { trigger_event: 'payment', reference_id: 'test-ref', reference_type: 'payment', amount: 100 } },
       { name: 'calculate-cash-flow', description: 'حساب التدفقات النقدية', defaultBody: { period: 'monthly' } },
-      { name: 'link-voucher-journal', description: 'ربط السند بالقيد', defaultBody: { voucherId: 'test' } },
-      { name: 'publish-fiscal-year', description: 'نشر السنة المالية', defaultBody: { yearId: 'test' } },
-      { name: 'auto-close-fiscal-year', description: 'إقفال السنة المالية', defaultBody: {} },
-      { name: 'zatca-submit', description: 'إرسال لزاتكا', defaultBody: { invoiceId: 'test' } },
+      { name: 'link-voucher-journal', description: 'ربط السند بالقيد', defaultBody: { voucher_id: 'test-voucher-id', create_journal: false } },
+      { name: 'publish-fiscal-year', description: 'نشر السنة المالية', defaultBody: { fiscalYearId: 'test-fiscal-year-id', notifyHeirs: false } },
+      { name: 'auto-close-fiscal-year', description: 'إقفال السنة المالية', defaultBody: { fiscal_year_id: 'test-fiscal-year-id', preview_only: true } },
+      { name: 'zatca-submit', description: 'إرسال لزاتكا', defaultBody: { testMode: true, invoice_id: 'test-invoice-id', submission_type: 'reporting' } },
     ]
   },
   documents: {
@@ -105,11 +105,11 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     icon: FileText,
     color: 'text-orange-500',
     functions: [
-      { name: 'ocr-document', description: 'قراءة المستندات OCR', defaultBody: { filePath: 'test.pdf' } },
-      { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', defaultBody: { filePath: 'invoice.pdf' } },
-      { name: 'auto-classify-document', description: 'تصنيف المستندات', defaultBody: { filePath: 'doc.pdf' } },
+      { name: 'ocr-document', description: 'قراءة المستندات OCR', defaultBody: { ping: true } },
+      { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', defaultBody: { ping: true } },
+      { name: 'auto-classify-document', description: 'تصنيف المستندات', defaultBody: { documentId: 'test-document-id', useAI: false } },
       { name: 'backfill-rental-documents', description: 'استكمال مستندات الإيجار', defaultBody: {} },
-      { name: 'send-invoice-email', description: 'إرسال الفاتورة بالبريد', defaultBody: { invoiceId: 'test' } },
+      { name: 'send-invoice-email', description: 'إرسال الفاتورة بالبريد', defaultBody: { testMode: true, invoiceId: 'test', customerEmail: 'test@test.com', customerName: 'اختبار', invoiceNumber: 'INV-001', totalAmount: 100 } },
     ]
   },
   users: {
@@ -118,9 +118,9 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     color: 'text-indigo-500',
     functions: [
       { name: 'create-beneficiary-accounts', description: 'إنشاء حسابات المستفيدين', defaultBody: { beneficiaryIds: [] } },
-      { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمة مرور المستفيد', defaultBody: { beneficiaryId: 'test' } },
-      { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', defaultBody: { userId: 'test' } },
-      { name: 'update-user-email', description: 'تحديث البريد الإلكتروني', defaultBody: { userId: 'test', newEmail: 'test@test.com' } },
+      { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمة مرور المستفيد', defaultBody: { action: 'reset-password', beneficiaryId: 'test-beneficiary-id', newPassword: 'Test@123456' } },
+      { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', defaultBody: { user_id: 'test-user-id', new_password: 'Test@123456' } },
+      { name: 'update-user-email', description: 'تحديث البريد الإلكتروني', defaultBody: { userId: 'test-user-id', newEmail: 'test@test.com' } },
     ]
   },
   maintenance: {
@@ -129,7 +129,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     color: 'text-gray-500',
     functions: [
       { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', defaultBody: {} },
-      { name: 'cleanup-old-files', description: 'تنظيف الملفات القديمة', defaultBody: { daysOld: 30 } },
+      { name: 'cleanup-old-files', description: 'تنظيف الملفات القديمة', defaultBody: { testMode: true } },
       { name: 'cleanup-sensitive-files', description: 'تنظيف الملفات الحساسة', defaultBody: {} },
       { name: 'scheduled-cleanup', description: 'التنظيف المجدول', defaultBody: {} },
       { name: 'execute-auto-fix', description: 'تنفيذ الإصلاح التلقائي', defaultBody: { fixId: 'test' } },
@@ -142,7 +142,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     functions: [
       { name: 'generate-scheduled-report', description: 'توليد تقرير مجدول', defaultBody: { reportType: 'monthly' } },
       { name: 'weekly-report', description: 'التقرير الأسبوعي', defaultBody: {} },
-      { name: 'generate-distribution-summary', description: 'ملخص التوزيعات', defaultBody: { distributionId: 'test' } },
+      { name: 'generate-distribution-summary', description: 'ملخص التوزيعات', defaultBody: { period_start: '2024-01-01', period_end: '2024-12-31', distribution_type: 'سنوي' } },
     ]
   },
   support: {
@@ -152,7 +152,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
     functions: [
       { name: 'support-auto-escalate', description: 'التصعيد التلقائي للدعم', defaultBody: {} },
       { name: 'log-error', description: 'تسجيل الأخطاء', defaultBody: { error: 'test error', source: 'test' } },
-      { name: 'test-auth', description: 'اختبار المصادقة', defaultBody: {} },
+      { name: 'test-auth', description: 'اختبار المصادقة', defaultBody: { action: 'health-check' } },
     ]
   },
 };

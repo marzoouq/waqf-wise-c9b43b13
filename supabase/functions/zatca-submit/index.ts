@@ -37,11 +37,13 @@ serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[zatca-submit] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[zatca-submit] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'zatca-submit',
+            testMode: !!parsed.testMode,
+            message: parsed.testMode ? 'اختبار ناجح - لم يتم إرسال فعلي لزاتكا' : undefined,
             timestamp: new Date().toISOString()
           });
         }

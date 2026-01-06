@@ -46,11 +46,13 @@ serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[secure-delete-file] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[secure-delete-file] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'secure-delete-file',
+            testMode: !!parsed.testMode,
+            message: parsed.testMode ? 'اختبار ناجح - لم يتم حذف ملفات فعلية' : undefined,
             timestamp: new Date().toISOString()
           });
         }
