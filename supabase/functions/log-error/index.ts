@@ -482,8 +482,12 @@ async function handleAutoEscalation(supabase: SupabaseClient, alertId: string, e
 
 async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: ErrorReport, errorLogId: string) {
   try {
+    // ✅ لا تُنشئ تنبيهات تكرار لرسائل placeholder/فارغة
+    const msg = (errorReport.error_message || '').trim();
+    if (!msg || msg === 'No message provided') return;
+
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    
+
     const { data: similarErrors } = await supabase
       .from('system_error_logs')
       .select('id')
@@ -491,19 +495,64 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
       .eq('error_message', errorReport.error_message)
       .gte('created_at', oneHourAgo);
 
-    if (similarErrors && similarErrors.length > 10) {
-      console.warn(`🚨 ALERT: Error occurred ${similarErrors.length} times in the last hour!`);
-      
-      await supabase.from('system_alerts').insert({
-        alert_type: 'recurring_error',
-        severity: 'critical',
-        title: 'خطأ متكرر حرج',
-        description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
-        occurrence_count: similarErrors.length,
-        related_error_type: errorReport.error_type,
-        status: 'active',
-      });
+    if (!similarErrors || similarErrors.length <= 10) return;
+
+    console.warn(`🚨 ALERT: Error occurred ${similarErrors.length} times in the last hour!`);
+
+    // ✅ Dedup: حدّث تنبيه موجود بدل إنشاء تنبيهات كثيرة
+    const { data: existing } = await supabase
+      .from('system_alerts')
+      .select('id, occurrence_count')
+      .eq('status', 'active')
+      .eq('alert_type', 'recurring_error')
+      .eq('related_error_type', errorReport.error_type)
+      .eq('description', `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`)
+      .maybeSingle();
+
+    // ملاحظة: لأن الوصف يحتوي العدد، قد لا نجد مطابقاً دائماً؛ نستخدم fallback على نفس related_error_type + alert_type
+    const { data: existingByType } = existing
+      ? { data: existing }
+      : await supabase
+          .from('system_alerts')
+          .select('id, occurrence_count, metadata')
+          .eq('status', 'active')
+          .eq('alert_type', 'recurring_error')
+          .eq('related_error_type', errorReport.error_type)
+          .maybeSingle();
+
+    const target = existingByType;
+
+    if (target?.id) {
+      await supabase
+        .from('system_alerts')
+        .update({
+          occurrence_count: similarErrors.length,
+          description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
+          metadata: {
+            ...(typeof (target as any).metadata === 'object' && (target as any).metadata ? (target as any).metadata : {}),
+            error_message: errorReport.error_message,
+            last_seen_at: new Date().toISOString(),
+            sample_error_log_id: errorLogId,
+          },
+        })
+        .eq('id', target.id);
+      return;
     }
+
+    await supabase.from('system_alerts').insert({
+      alert_type: 'recurring_error',
+      severity: 'critical',
+      title: 'خطأ متكرر حرج',
+      description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
+      occurrence_count: similarErrors.length,
+      related_error_type: errorReport.error_type,
+      status: 'active',
+      metadata: {
+        error_message: errorReport.error_message,
+        first_seen_at: oneHourAgo,
+        sample_error_log_id: errorLogId,
+      },
+    });
   } catch (error) {
     console.error('Failed to analyze recurring errors:', error);
   }
