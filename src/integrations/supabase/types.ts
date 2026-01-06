@@ -6910,41 +6910,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_jel_account"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_jel_account"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts_hierarchy"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_jel_account"
-            columns: ["account_id"]
-            isOneToOne: false
-            referencedRelation: "general_ledger"
-            referencedColumns: ["account_id"]
-          },
-          {
-            foreignKeyName: "fk_jel_journal_entry"
-            columns: ["journal_entry_id"]
-            isOneToOne: false
-            referencedRelation: "journal_entries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_jel_journal_entry"
-            columns: ["journal_entry_id"]
-            isOneToOne: false
-            referencedRelation: "journal_entries_with_lines"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "journal_entry_lines_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false

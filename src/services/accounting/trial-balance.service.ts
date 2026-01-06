@@ -237,7 +237,7 @@ export class TrialBalanceService {
       .from("journal_entry_lines")
       .select(`
         *,
-        journal_entry:journal_entries!fk_jel_journal_entry(
+        journal_entry:journal_entries(
           entry_number,
           entry_date,
           description,

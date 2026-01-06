@@ -50,9 +50,9 @@ export class JournalEntryService {
         .from('journal_entries')
         .select(`
           *,
-          journal_entry_lines!fk_jel_journal_entry (
+          journal_entry_lines (
             *,
-            accounts!fk_jel_account (code, name_ar, account_type)
+            accounts (code, name_ar, account_type)
           )
         `)
         .order('entry_date', { ascending: false });
@@ -325,7 +325,7 @@ export class JournalEntryService {
       .from("journal_entry_lines")
       .select(`
         *,
-        account:accounts!fk_jel_account(code, name_ar)
+        account:accounts(code, name_ar)
       `)
       .eq("journal_entry_id", entryId)
       .order("line_number");
@@ -383,7 +383,7 @@ export class JournalEntryService {
       .from('journal_entry_lines')
       .select(`
         *,
-        journal_entries:journal_entries!fk_jel_journal_entry(
+        journal_entries(
           entry_number,
           entry_date,
           description,
