@@ -111,9 +111,9 @@ export class BankReconciliationService {
         .from('journal_entries')
         .select(`
           *, 
-          journal_entry_lines!fk_jel_journal_entry(
+          journal_entry_lines(
             *, 
-            accounts:accounts!fk_jel_account(id, code, name_ar, account_type)
+            accounts(id, code, name_ar, account_type)
           )
         `)
         .eq('status', 'posted');

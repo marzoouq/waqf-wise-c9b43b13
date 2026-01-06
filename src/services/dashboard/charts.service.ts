@@ -82,7 +82,7 @@ export const ChartsService = {
       .select(`
         credit_amount,
         debit_amount,
-        accounts:accounts!fk_jel_account(name_ar, account_type)
+        accounts(name_ar, account_type)
       `)
       .limit(50);
 
@@ -154,10 +154,10 @@ export const ChartsService = {
       .select(`
         debit_amount,
         credit_amount,
-        journal_entries:journal_entries!fk_jel_journal_entry (
+        journal_entries (
           entry_date
         ),
-        accounts:accounts!fk_jel_account (
+        accounts (
           account_type,
           account_nature
         )
