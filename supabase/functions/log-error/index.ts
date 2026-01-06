@@ -158,17 +158,45 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ✅ 4. إضافة قيم افتراضية للحقول الناقصة
+    // ✅ 4. تجاهل البيانات الفارغة أو غير المكتملة
+    // إذا كانت البيانات تحتوي على error/context فقط بدون error_type/error_message - تجاهل
+    const hasErrorContext = 'error' in rawData && 'context' in rawData;
+    const hasMissingFields = !rawData.error_type && !rawData.error_message;
+    
+    if (hasErrorContext && hasMissingFields) {
+      console.log('⚠️ Ignoring malformed error data (error/context format without proper fields)');
+      return jsonResponse({
+        success: true,
+        message: 'Malformed data ignored - missing error_type/error_message',
+        stored: false,
+      });
+    }
+    
+    // استخراج البيانات من error object إذا وجد
+    const errorObj = rawData.error as Record<string, unknown> | undefined;
+    const contextObj = rawData.context as Record<string, unknown> | undefined;
+    
+    // إضافة قيم افتراضية للحقول الناقصة
     const normalizedData = {
-      error_type: rawData.error_type || 'unknown_error',
-      error_message: rawData.error_message || rawData.message || 'No message provided',
-      error_stack: rawData.error_stack,
+      error_type: rawData.error_type || (errorObj?.name ? String(errorObj.name) : 'unknown_error'),
+      error_message: rawData.error_message || rawData.message || (errorObj?.message ? String(errorObj.message) : null),
+      error_stack: rawData.error_stack || (errorObj?.stack ? String(errorObj.stack) : undefined),
       severity: rawData.severity || 'medium',
-      url: rawData.url || 'unknown',
+      url: rawData.url || (contextObj?.url ? String(contextObj.url) : 'unknown'),
       user_agent: rawData.user_agent || 'unknown',
       user_id: rawData.user_id,
-      additional_data: rawData.additional_data || rawData.data,
+      additional_data: rawData.additional_data || rawData.data || contextObj,
     };
+    
+    // ✅ تجاهل الأخطاء بدون رسالة حقيقية
+    if (!normalizedData.error_message || normalizedData.error_message === 'No message provided') {
+      console.log('⚠️ Ignoring error without meaningful message');
+      return jsonResponse({
+        success: true,
+        message: 'Error without message ignored',
+        stored: false,
+      });
+    }
     
     // ✅ 5. محاولة تحليل كخطأ باستخدام safeParse
     const parseResult = errorReportSchema.safeParse(normalizedData);
