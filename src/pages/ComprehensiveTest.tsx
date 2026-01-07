@@ -1835,9 +1835,24 @@ export default function ComprehensiveTest() {
     return Math.round(results.reduce((acc, r) => acc + r.duration, 0) / results.length);
   };
 
+  // حساب عدد الاختبارات المختارة مع الاختبارات المدمجة
+  const EMBEDDED_TESTS_COUNT: Record<string, number> = {
+    'ui-components': 60,
+    'workflows': 15,
+    'reports-export': 40,
+    'responsive-a11y': 45,
+    'hooks-tests': 200,
+    'components-tests': 150,
+    'integration-tests': 30,
+    'advanced-workflow-tests': 50,
+    'advanced-performance-tests': 20,
+  };
+  
   const selectedTestsCount = selectedCategories.reduce((acc, catId) => {
     const cat = ALL_TESTS.find(c => c.id === catId);
-    return acc + (cat?.tests.length || 0);
+    const baseCount = cat?.tests.length || 0;
+    const embeddedCount = EMBEDDED_TESTS_COUNT[catId] || 0;
+    return acc + baseCount + embeddedCount;
   }, 0);
 
   return (
