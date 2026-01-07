@@ -1201,7 +1201,7 @@ const ALL_TESTS: TestCategory[] = [
         await supabase.from('accounts').select('*');
       }),
       createPerformanceTest('journal-entries-list', 'قائمة القيود', 2000, async () => {
-        await supabase.from('journal_entries').select('id, entry_number, total_amount').limit(50);
+        await supabase.from('journal_entries').select('id, entry_number, status').limit(50);
       }),
       createPerformanceTest('notifications-load', 'تحميل الإشعارات', 1000, async () => {
         await supabase.from('notifications').select('id, title').limit(20);
