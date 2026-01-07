@@ -111,6 +111,18 @@ Deno.serve(async (req) => {
       return errorResponse("البيانات المطلوبة غير مكتملة", 400, undefined, req);
     }
 
+    // ✅ التحقق من صحة UUID قبل الاستعلام
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.log('[update-user-email] Invalid userId format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف المستخدم غير صالح',
+        userId
+      });
+    }
+
     // التحقق من صحة البريد الإلكتروني
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {

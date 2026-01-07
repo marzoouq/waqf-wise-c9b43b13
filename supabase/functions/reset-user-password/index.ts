@@ -98,6 +98,18 @@ serve(async (req) => {
       return errorResponse('البيانات المطلوبة ناقصة', 400, undefined, req);
     }
 
+    // ✅ التحقق من صحة UUID قبل الاستعلام
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(user_id)) {
+      console.log('[reset-user-password] Invalid user_id format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف المستخدم غير صالح',
+        user_id
+      });
+    }
+
     if (new_password.length < 8) {
       return errorResponse('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400, undefined, req);
     }

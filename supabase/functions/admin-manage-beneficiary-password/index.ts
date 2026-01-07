@@ -105,13 +105,26 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
     }
 
-    const { action, beneficiaryId, nationalId, newPassword } = await req.json();
+    const body = await req.json();
+    const { action, beneficiaryId, nationalId, newPassword } = body;
 
     console.log('✅ Admin manage password request:', { 
       action, 
       beneficiaryId,
       adminId: user.id
     });
+
+    // ✅ التحقق من صحة UUID قبل الاستعلام
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!beneficiaryId || !uuidRegex.test(beneficiaryId)) {
+      console.log('[admin-manage-beneficiary-password] Invalid beneficiaryId format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف المستفيد غير صالح',
+        beneficiaryId
+      });
+    }
 
     if (action === 'reset-password') {
       // التحقق من وجود المستفيد

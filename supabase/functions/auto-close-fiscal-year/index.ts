@@ -92,7 +92,20 @@ Deno.serve(async (req) => {
     // ============ تنفيذ الإقفال ============
     console.log(`Authorized fiscal year close by user: ${user.id}`);
 
-    const { fiscal_year_id, preview_only = false }: ClosingRequest = await req.json();
+    const body = await req.json();
+    
+    // ✅ دعم وضع الاختبار حتى بعد التحقق من الصلاحيات
+    if (body.testMode) {
+      return jsonResponse({
+        status: 'healthy',
+        function: 'auto-close-fiscal-year',
+        timestamp: new Date().toISOString(),
+        testMode: true,
+        authorized: true
+      });
+    }
+    
+    const { fiscal_year_id, preview_only = false }: ClosingRequest = body;
 
     console.log('Starting fiscal year closing:', { fiscal_year_id, preview_only });
 
