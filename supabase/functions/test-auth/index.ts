@@ -25,13 +25,31 @@ serve(async (req) => {
   console.log('[test-auth] Request received');
 
   try {
-    // ✅ SECURITY: التحقق من CI_SECRET - مطلوب دائماً
+    const bodyData = await req.json().catch(() => ({}));
+    const { email, password, action, ping, healthCheck, testMode } = bodyData;
+    
+    // ✅ Health Check Support / Test Mode - يعمل بدون CI_SECRET
+    if (ping || healthCheck || testMode || action === 'health-check') {
+      console.log('[test-auth] Health check / test mode received');
+      return new Response(
+        JSON.stringify({
+          status: 'healthy',
+          function: 'test-auth',
+          message: 'Test auth function is running',
+          timestamp: new Date().toISOString(),
+          testMode: testMode || false
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // ✅ SECURITY: التحقق من CI_SECRET - مطلوب للعمليات الفعلية فقط
     const ciSecret = req.headers.get('X-CI-Secret');
     const expectedCiSecret = Deno.env.get('CI_SECRET');
     
-    // إذا لم يكن CI_SECRET مُعدّاً في البيئة، نرفض جميع الطلبات
+    // إذا لم يكن CI_SECRET مُعدّاً في البيئة، نرفض الطلبات غير health check
     if (!expectedCiSecret) {
-      console.error('[test-auth] CI_SECRET not configured - function disabled');
+      console.error('[test-auth] CI_SECRET not configured - only health checks allowed');
       return new Response(
         JSON.stringify({ 
           error: 'Test auth function is disabled in this environment',
@@ -49,23 +67,6 @@ serve(async (req) => {
           hint: 'This function requires a valid X-CI-Secret header'
         }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const { email, password, action } = await req.json();
-
-    // Health check endpoint
-    if (action === 'health-check') {
-      return new Response(
-        JSON.stringify({ 
-          status: 'healthy',
-          message: 'Test auth function is running',
-          timestamp: new Date().toISOString()
-        }),
-        { 
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
       );
     }
 
