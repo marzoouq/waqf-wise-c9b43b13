@@ -263,13 +263,28 @@ export class TrialBalanceService {
    * جلب البيانات المالية الموحدة
    */
   static async getFinancialData(): Promise<FinancialSummary> {
+    // القيم الافتراضية
+    const defaultSummary: FinancialSummary = {
+      totalAssets: 0,
+      totalLiabilities: 0,
+      totalEquity: 0,
+      totalRevenue: 0,
+      totalExpenses: 0,
+      netIncome: 0,
+    };
+
     try {
       // جلب السنة المالية النشطة
-      const { data: fiscalYear } = await supabase
+      const { data: fiscalYear, error: fiscalError } = await supabase
         .from("fiscal_years")
         .select("id")
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
+
+      // إذا لم توجد سنة مالية نشطة، ارجع القيم الافتراضية
+      if (fiscalError || !fiscalYear) {
+        return defaultSummary;
+      }
 
       // جلب القيود اليومية والأرصدة الافتتاحية بالتوازي
       const [entriesResult, openingBalancesResult] = await Promise.all([
@@ -293,10 +308,18 @@ export class TrialBalanceService {
               account_nature
             )
           `)
-          .eq("fiscal_year_id", fiscalYear?.id || '')
+          .eq("fiscal_year_id", fiscalYear.id)
       ]);
 
-      if (entriesResult.error) throw entriesResult.error;
+      // إذا فشل جلب القيود (RLS أو خطأ آخر)، ارجع القيم الافتراضية
+      if (entriesResult.error) {
+        // فقط سجل كتحذير وليس كخطأ إذا كان RLS
+        if (entriesResult.error.code === '42501' || entriesResult.error.message?.includes('permission')) {
+          return defaultSummary;
+        }
+        productionLogger.warn('Could not fetch journal entries', entriesResult.error);
+        return defaultSummary;
+      }
 
       let totalAssets = 0;
       let totalLiabilities = 0;
@@ -340,7 +363,7 @@ export class TrialBalanceService {
         }
       });
 
-      // إضافة الأرصدة الافتتاحية
+      // إضافة الأرصدة الافتتاحية (تجاهل الأخطاء)
       (openingBalancesResult.data as OpeningBalance[] | null)?.forEach((ob) => {
         const accountType = ob.accounts?.account_type;
         const balance = Number(ob.opening_balance || 0);
@@ -363,8 +386,9 @@ export class TrialBalanceService {
         netIncome,
       };
     } catch (error) {
-      productionLogger.error('Error fetching financial data', error);
-      throw error;
+      // تسجيل كتحذير فقط لأن هذا قد يكون بسبب عدم تسجيل الدخول
+      productionLogger.warn('Error fetching financial data', error);
+      return defaultSummary;
     }
   }
 }

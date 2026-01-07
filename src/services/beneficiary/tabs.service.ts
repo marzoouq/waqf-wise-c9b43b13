@@ -418,11 +418,19 @@ export class BeneficiaryTabsService {
         .order("created_at", { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
+      // إذا كان خطأ صلاحيات، أرجع قائمة فارغة
+      if (error) {
+        if (error.code === '42501' || error.message?.includes('permission')) {
+          return [];
+        }
+        productionLogger.warn('Error fetching quick beneficiaries list', error);
+        return [];
+      }
       return data || [];
     } catch (error) {
-      productionLogger.error('Error fetching quick beneficiaries list', error);
-      throw error;
+      // تجاهل الأخطاء وأرجع قائمة فارغة
+      productionLogger.warn('Error fetching quick beneficiaries list', error);
+      return [];
     }
   }
 
