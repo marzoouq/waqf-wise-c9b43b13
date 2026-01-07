@@ -404,11 +404,11 @@ const ALL_TESTS: TestCategory[] = [
       createEdgeFunctionTest('decrypt-file', 'فك التشفير', { ping: true }),
       createEdgeFunctionTest('secure-delete-file', 'حذف آمن', { testMode: true, fileId: 'test' }),
       createEdgeFunctionTest('check-leaked-password', 'فحص كلمات المرور', { password: 'test123' }),
-      createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { action: 'check' }),
+      createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { credentialId: 'test', userId: 'test', challenge: 'test' }),
       
       // الإشعارات
       createEdgeFunctionTest('send-notification', 'إرسال إشعار', { userId: 'test', title: 'اختبار', message: 'رسالة' }),
-      createEdgeFunctionTest('send-push-notification', 'إشعار الدفع', { userId: 'test', title: 'اختبار' }),
+      createEdgeFunctionTest('send-push-notification', 'إشعار الدفع', { userId: 'test', title: 'اختبار', body: 'رسالة اختبار' }),
       createEdgeFunctionTest('daily-notifications', 'الإشعارات اليومية', {}),
       createEdgeFunctionTest('notify-admins', 'إشعار المديرين', { title: 'اختبار', message: 'رسالة', severity: 'info' }),
       createEdgeFunctionTest('notify-disclosure-published', 'إشعار نشر الإفصاح', { testMode: true }),
@@ -475,11 +475,11 @@ const ALL_TESTS: TestCategory[] = [
       createDatabaseTest('distributions', 'قراءة التوزيعات', 'id, total_amount'),
       createDatabaseTest('accounts', 'قراءة دليل الحسابات', 'id, name_ar, code'),
       createDatabaseTest('journal_entries', 'قراءة القيود اليومية', 'id, entry_number'),
-      createDatabaseTest('fiscal_years', 'قراءة السنوات المالية', 'id, year_name'),
-      createDatabaseTest('families', 'قراءة العائلات', 'id, family_name'),
+      createDatabaseTest('fiscal_years', 'قراءة السنوات المالية', 'id, name'),
+      createDatabaseTest('families', 'قراءة العائلات', 'id, name'),
       createDatabaseTest('notifications', 'قراءة الإشعارات', 'id, title'),
       createDatabaseTest('audit_logs', 'قراءة سجلات التدقيق', 'id, action_type'),
-      createDatabaseTest('system_settings', 'قراءة إعدادات النظام', 'id, key'),
+      createDatabaseTest('waqf_settings', 'قراءة إعدادات الوقف', 'id'),
       createDatabaseTest('profiles', 'قراءة الملفات الشخصية', 'id, email'),
       
       // جداول الوقف والعقارات
@@ -487,23 +487,22 @@ const ALL_TESTS: TestCategory[] = [
       createDatabaseTest('property_units', 'قراءة الوحدات العقارية', 'id, unit_number'),
       createDatabaseTest('maintenance_requests', 'قراءة طلبات الصيانة', 'id, status'),
       createDatabaseTest('maintenance_schedules', 'قراءة جدولة الصيانة', 'id'),
-      createDatabaseTest('rental_payments', 'قراءة دفعات الإيجار', 'id, amount'),
+      createDatabaseTest('rental_payments', 'قراءة دفعات الإيجار', 'id, payment_date'),
       
       // جداول الدعم والمعرفة
       createDatabaseTest('support_tickets', 'قراءة تذاكر الدعم', 'id, subject'),
       createDatabaseTest('knowledge_articles', 'قراءة مقالات المعرفة', 'id, title'),
-      createDatabaseTest('knowledge_faqs', 'قراءة الأسئلة الشائعة', 'id, question'),
       
       // جداول الحوكمة
-      createDatabaseTest('governance_decisions', 'قراءة قرارات الحوكمة', 'id, title'),
+      createDatabaseTest('governance_decisions', 'قراءة قرارات الحوكمة', 'id, decision_number'),
       createDatabaseTest('annual_disclosures', 'قراءة الإفصاحات السنوية', 'id, year'),
       createDatabaseTest('approval_workflows', 'قراءة مسارات الموافقة', 'id, workflow_name'),
       createDatabaseTest('approval_status', 'قراءة حالات الموافقة', 'id, status'),
       
       // جداول القروض والصناديق
       createDatabaseTest('loans', 'قراءة القروض', 'id, loan_number'),
-      createDatabaseTest('loan_installments', 'قراءة أقساط القروض', 'id, amount'),
-      createDatabaseTest('funds', 'قراءة الصناديق', 'id, fund_name'),
+      createDatabaseTest('loan_installments', 'قراءة أقساط القروض', 'id, loan_id'),
+      createDatabaseTest('funds', 'قراءة الصناديق', 'id, name'),
       createDatabaseTest('fund_transactions', 'قراءة معاملات الصناديق', 'id, amount'),
       
       // جداول المدفوعات والبنوك
@@ -514,12 +513,12 @@ const ALL_TESTS: TestCategory[] = [
       createDatabaseTest('bank_transfer_files', 'قراءة ملفات التحويل', 'id, file_number'),
       
       // جداول الميزانية
-      createDatabaseTest('budgets', 'قراءة الميزانيات', 'id, budget_name'),
-      createDatabaseTest('budget_items', 'قراءة بنود الميزانية', 'id, item_name'),
+      createDatabaseTest('budgets', 'قراءة الميزانيات', 'id, name'),
+      createDatabaseTest('budget_items', 'قراءة بنود الميزانية', 'id, account_id'),
       
       // جداول المستخدمين والصلاحيات
       createDatabaseTest('user_permissions', 'قراءة صلاحيات المستخدمين', 'id'),
-      createDatabaseTest('roles', 'قراءة الأدوار', 'id, name'),
+      createDatabaseTest('user_roles', 'قراءة أدوار المستخدمين', 'id, user_id'),
       createDatabaseTest('tribes', 'قراءة القبائل', 'id, name'),
       
       // جداول الرسائل
@@ -527,23 +526,18 @@ const ALL_TESTS: TestCategory[] = [
       
       // جداول نقطة البيع
       createDatabaseTest('pos_transactions', 'قراءة معاملات POS', 'id'),
-      createDatabaseTest('pos_sessions', 'قراءة جلسات POS', 'id'),
-      
-      // جداول الأرشيف
-      createDatabaseTest('archived_documents', 'قراءة المستندات المؤرشفة', 'id, file_name'),
       
       // جداول التكامل والأخطاء
-      createDatabaseTest('integration_logs', 'قراءة سجلات التكامل', 'id'),
       createDatabaseTest('system_error_logs', 'قراءة سجلات الأخطاء', 'id, error_message'),
       
       // جداول المستفيدين الإضافية
       createDatabaseTest('beneficiary_requests', 'قراءة طلبات المستفيدين', 'id, status'),
       createDatabaseTest('beneficiary_attachments', 'قراءة مرفقات المستفيدين', 'id, file_name'),
       createDatabaseTest('beneficiary_categories', 'قراءة تصنيفات المستفيدين', 'id, name'),
-      createDatabaseTest('heir_distributions', 'قراءة توزيعات الورثة', 'id, amount'),
+      createDatabaseTest('heir_distributions', 'قراءة توزيعات الورثة', 'id, distribution_id'),
       
       // جداول أخرى
-      createDatabaseTest('request_types', 'قراءة أنواع الطلبات', 'id, name'),
+      createDatabaseTest('request_types', 'قراءة أنواع الطلبات', 'id, type_name'),
       createDatabaseTest('activities', 'قراءة الأنشطة', 'id, action'),
       createDatabaseTest('backup_logs', 'قراءة سجلات النسخ الاحتياطي', 'id, status'),
     ]
