@@ -1908,14 +1908,8 @@ const ALL_TESTS: TestCategory[] = [
 ];
 
 // ================== حساب الإحصائيات ==================
-// إجمالي الاختبارات = الاختبارات المباشرة + الاختبارات المدمجة
-// الاختبارات المدمجة:
-// - UI: 60 | Workflow: 15 | Reports: 40 | A11y: 45 | Hooks: 200 | Components: 150
-// - Integration: 30 | Advanced Workflow: 50 | Advanced Performance: 20
-// - Services Detailed: 300 | Edge Functions Detailed: 260 | Contexts Detailed: 100
-// - Libraries Detailed: 200 | Pages Detailed: 400 | Types: 250
-// Total Embedded: 60+15+40+45+200+150+30+50+20+300+260+100+200+400+250 = 2120
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 2120;
+// إجمالي الاختبارات = الاختبارات المباشرة فقط (المدمجة تُحسب عند التنفيذ)
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0);
 
 // ================== المكون الرئيسي ==================
 
