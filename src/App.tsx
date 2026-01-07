@@ -7,6 +7,7 @@
  * ✅ نظام إشعار التحديثات التلقائي
  * ✅ SEO مع react-helmet-async
  * ✅ مراقبة الاتصال الشاملة
+ * ✅ مراقبة قنوات Realtime
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +18,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { initializeAppearanceSettings } from "@/components/settings/AppearanceSettingsDialog";
 import { initializeSupabaseInterceptor } from "@/integrations/supabase/request-interceptor";
+import { queryInvalidationManager } from "@/lib/query-invalidation-manager";
+import { realtimeManager } from "@/services/realtime-manager";
 
 // ✅ تطبيق إعدادات المظهر المحفوظة فوراً
 initializeAppearanceSettings();
@@ -57,6 +60,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// ✅ تهيئة QueryInvalidationManager
+queryInvalidationManager.setQueryClient(queryClient);
 
 // ✅ Fallback خفيف جداً
 const LightFallback = () => (

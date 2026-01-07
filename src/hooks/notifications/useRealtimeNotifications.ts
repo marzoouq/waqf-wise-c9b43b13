@@ -1,25 +1,34 @@
-import { useEffect } from 'react';
+/**
+ * Hook للاستماع للإشعارات في الوقت الفعلي
+ * @version 2.0.0 - تم إصلاح مشكلة تراكم الاشتراكات
+ */
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/ui/use-toast';
 import type { RealtimeNotification } from '@/types/notifications';
 import type { InternalMessage } from '@/types/messages';
+import { queryInvalidationManager } from '@/lib/query-invalidation-manager';
 
-/**
- * Hook للاستماع للإشعارات في الوقت الفعلي
- */
 export function useRealtimeNotifications() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // استخدام refs لتجنب إعادة إنشاء الاشتراكات
+  const toastRef = useRef(toast);
+  useEffect(() => { toastRef.current = toast; }, [toast]);
+
   useEffect(() => {
     if (!user?.id) return;
 
-    // الاشتراك في إشعارات المستخدم
-    const notificationsChannel = supabase
-      .channel('user-notifications')
+    // اسم قناة ثابت لكل مستخدم
+    const channelName = `user-notifications-${user.id}`;
+
+    // الاشتراك الموحد في قناة واحدة
+    const channel = supabase
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -29,23 +38,16 @@ export function useRealtimeNotifications() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          // تحديث cache
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          queryInvalidationManager.invalidate(['notifications']);
           
-          // عرض toast notification
           const notification = payload.new as RealtimeNotification;
-          toast({
+          toastRef.current({
             title: notification.title,
             description: notification.message,
             variant: notification.type === 'error' ? 'destructive' : 'default',
           });
         }
       )
-      .subscribe();
-
-    // الاشتراك في الطلبات
-    const requestsChannel = supabase
-      .channel('beneficiary-requests')
       .on(
         'postgres_changes',
         {
@@ -54,14 +56,9 @@ export function useRealtimeNotifications() {
           table: 'beneficiary_requests',
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['beneficiary-requests'] });
+          queryInvalidationManager.invalidate(['beneficiary-requests']);
         }
       )
-      .subscribe();
-
-    // الاشتراك في المرفقات
-    const attachmentsChannel = supabase
-      .channel('beneficiary-attachments')
       .on(
         'postgres_changes',
         {
@@ -70,14 +67,9 @@ export function useRealtimeNotifications() {
           table: 'beneficiary_attachments',
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments'] });
+          queryInvalidationManager.invalidate(['beneficiary-attachments']);
         }
       )
-      .subscribe();
-
-    // الاشتراك في الرسائل الداخلية
-    const messagesChannel = supabase
-      .channel('internal-messages')
       .on(
         'postgres_changes',
         {
@@ -87,10 +79,10 @@ export function useRealtimeNotifications() {
           filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          queryClient.invalidateQueries({ queryKey: ['internal-messages'] });
+          queryInvalidationManager.invalidate(['internal-messages']);
           
           const message = payload.new as InternalMessage;
-          toast({
+          toastRef.current({
             title: '📨 رسالة جديدة',
             description: `من: ${message.sender_id || 'الإدارة'}`,
           });
@@ -99,10 +91,7 @@ export function useRealtimeNotifications() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(notificationsChannel);
-      supabase.removeChannel(requestsChannel);
-      supabase.removeChannel(attachmentsChannel);
-      supabase.removeChannel(messagesChannel);
+      supabase.removeChannel(channel);
     };
-  }, [user?.id, queryClient, toast]);
+  }, [user?.id]); // فقط user.id - لا queryClient أو toast
 }
