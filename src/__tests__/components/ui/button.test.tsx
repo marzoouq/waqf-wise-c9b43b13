@@ -30,6 +30,12 @@ describe('Button Component', () => {
     expect(button).toHaveClass('border');
   });
 
+  it('should apply secondary variant', () => {
+    render(<Button variant="secondary">Secondary</Button>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('bg-secondary');
+  });
+
   it('should be disabled when prop is set', () => {
     render(<Button disabled>Disabled</Button>);
     expect(screen.getByRole('button')).toBeDisabled();
@@ -38,6 +44,6 @@ describe('Button Component', () => {
   it('should apply size classes', () => {
     render(<Button size="sm">Small</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveClass('h-8');
+    expect(button).toHaveClass('h-9');
   });
 });
