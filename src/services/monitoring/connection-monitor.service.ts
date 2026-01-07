@@ -31,10 +31,34 @@ class ConnectionMonitorService {
   private lastOnlineTime: Date = new Date();
   private totalDowntime: number = 0;
   private disconnectionCount: number = 0;
+  
+  // وضع الاختبار - يُخفف المراقبة
+  private testingMode: boolean = false;
+  private performanceObserver: PerformanceObserver | null = null;
 
   constructor() {
     this.initializeNetworkListeners();
     this.initializePerformanceObserver();
+  }
+
+  /**
+   * تفعيل/تعطيل وضع الاختبار
+   */
+  setTestingMode(enabled: boolean): void {
+    this.testingMode = enabled;
+    if (enabled) {
+      // تعطيل PerformanceObserver أثناء الاختبار
+      this.performanceObserver?.disconnect();
+      console.log('[ConnectionMonitor] Testing mode enabled - reduced monitoring');
+    } else {
+      // إعادة تفعيل المراقبة
+      this.initializePerformanceObserver();
+      console.log('[ConnectionMonitor] Testing mode disabled - full monitoring');
+    }
+  }
+
+  isInTestingMode(): boolean {
+    return this.testingMode;
   }
 
   private initializeNetworkListeners(): void {
@@ -85,13 +109,16 @@ class ConnectionMonitorService {
   private initializePerformanceObserver(): void {
     if ('PerformanceObserver' in window) {
       try {
-        const observer = new PerformanceObserver((list) => {
+        this.performanceObserver = new PerformanceObserver((list) => {
+          // تجاهل المراقبة في وضع الاختبار
+          if (this.testingMode) return;
+          
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'resource') {
               const resourceEntry = entry as PerformanceResourceTiming;
               
-              // تحقق من الطلبات الفاشلة أو البطيئة
-              if (resourceEntry.duration > 10000) {
+              // تحقق من الطلبات الفاشلة أو البطيئة (رفع الحد إلى 15 ثانية)
+              if (resourceEntry.duration > 15000) {
                 this.logEvent({
                   type: 'api',
                   status: 'slow',
@@ -105,7 +132,7 @@ class ConnectionMonitorService {
           }
         });
         
-        observer.observe({ entryTypes: ['resource'] });
+        this.performanceObserver.observe({ entryTypes: ['resource'] });
       } catch {
         // PerformanceObserver غير مدعوم
       }
@@ -113,6 +140,13 @@ class ConnectionMonitorService {
   }
 
   logEvent(eventData: Omit<ConnectionEvent, 'id' | 'timestamp'>): void {
+    // في وضع الاختبار، تجاهل أحداث slow وبعض الأخطاء
+    if (this.testingMode) {
+      if (eventData.status === 'slow') return;
+      // تقليل تسجيل الأخطاء في وضع الاختبار
+      if (eventData.status === 'error' && this.events.length > 20) return;
+    }
+    
     const event: ConnectionEvent = {
       ...eventData,
       id: crypto.randomUUID(),
@@ -121,14 +155,17 @@ class ConnectionMonitorService {
 
     this.events.unshift(event);
     
-    // الاحتفاظ بآخر 100 حدث فقط
-    if (this.events.length > 100) {
-      this.events = this.events.slice(0, 100);
+    // الاحتفاظ بآخر 100 حدث فقط (50 في وضع الاختبار)
+    const maxEvents = this.testingMode ? 50 : 100;
+    if (this.events.length > maxEvents) {
+      this.events = this.events.slice(0, maxEvents);
     }
 
-    // إشعار المستمعين
-    this.listeners.forEach(listener => listener(event));
-    this.notifyStatsListeners();
+    // إشعار المستمعين (تقليل في وضع الاختبار)
+    if (!this.testingMode || this.events.length % 5 === 0) {
+      this.listeners.forEach(listener => listener(event));
+      this.notifyStatsListeners();
+    }
   }
 
   logApiError(url: string, status: number, message: string): void {

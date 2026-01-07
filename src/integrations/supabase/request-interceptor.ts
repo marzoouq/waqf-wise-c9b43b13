@@ -7,6 +7,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { connectionMonitor } from '@/services/monitoring/connection-monitor.service';
 
 let isInitialized = false;
+let testingMode = false;
+
+/**
+ * تفعيل/تعطيل وضع الاختبار
+ */
+export function setInterceptorTestingMode(enabled: boolean): void {
+  testingMode = enabled;
+  console.log(`[RequestInterceptor] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
+}
+
+export function isInterceptorInTestingMode(): boolean {
+  return testingMode;
+}
 
 export function initializeSupabaseInterceptor(): void {
   if (isInitialized) return;
@@ -44,8 +57,8 @@ export function initializeSupabaseInterceptor(): void {
       const response = await originalFetch.apply(this, args);
       const duration = Date.now() - startTime;
 
-      // تسجيل الطلبات البطيئة
-      if (duration > 5000 && url.includes('supabase')) {
+      // تسجيل الطلبات البطيئة (تعطيل في وضع الاختبار)
+      if (!testingMode && duration > 5000 && url.includes('supabase')) {
         connectionMonitor.logEvent({
           type: 'api',
           status: 'slow',
@@ -56,16 +69,20 @@ export function initializeSupabaseInterceptor(): void {
         });
       }
 
-      // تسجيل الأخطاء
+      // تسجيل الأخطاء (تقليل في وضع الاختبار)
       if (!response.ok && url.includes('supabase')) {
-        connectionMonitor.logApiError(url, response.status, response.statusText);
+        // في وضع الاختبار، تجاهل أخطاء 429 و 500+
+        if (!testingMode || (response.status !== 429 && response.status < 500)) {
+          connectionMonitor.logApiError(url, response.status, response.statusText);
+        }
       }
 
       return response;
     } catch (error) {
       const duration = Date.now() - startTime;
       
-      if (url.includes('supabase')) {
+      // في وضع الاختبار، تقليل تسجيل الأخطاء
+      if (url.includes('supabase') && !testingMode) {
         // تحديد نوع الخطأ
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
           connectionMonitor.logEvent({
