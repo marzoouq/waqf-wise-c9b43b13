@@ -15,9 +15,9 @@ describe('Monitoring Hooks', () => {
     expect(module.useDatabasePerformance).toBeDefined();
   });
 
-  it('useEdgeFunctionsHealth should be importable', async () => {
-    const module = await import('@/hooks/monitoring/useEdgeFunctionsHealth');
-    expect(module.useEdgeFunctionsHealth).toBeDefined();
+  it('useIgnoredAlerts should be importable', async () => {
+    const module = await import('@/hooks/monitoring');
+    expect(module.useIgnoredAlerts).toBeDefined();
   });
 
   it('useLivePerformance should be importable', async () => {
