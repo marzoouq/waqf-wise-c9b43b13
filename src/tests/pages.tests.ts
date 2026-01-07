@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `page-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة الصفحات للاختبار
 const PAGES_LIST = [
@@ -143,6 +143,7 @@ async function testPageExists(pageName: string): Promise<TestResult> {
     
     if (pageModule) {
       return {
+        id: generateId(),
         name: `صفحة ${pageName} موجودة`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -151,16 +152,18 @@ async function testPageExists(pageName: string): Promise<TestResult> {
     }
     
     return {
+      id: generateId(),
       name: `صفحة ${pageName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'الصفحة غير موجودة'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `صفحة ${pageName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'الصفحة قد تكون غير موجودة'
@@ -173,6 +176,7 @@ async function testPageRouting(pageName: string, path: string): Promise<TestResu
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${pageName} - التوجيه (${path})`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -180,6 +184,7 @@ async function testPageRouting(pageName: string, path: string): Promise<TestResu
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${pageName} - التوجيه`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -194,6 +199,7 @@ async function testPageLazyLoading(pageName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${pageName} - التحميل الكسول`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -201,8 +207,9 @@ async function testPageLazyLoading(pageName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${pageName} - التحميل الكسول`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'قد لا يدعم التحميل الكسول'
@@ -215,6 +222,7 @@ async function testPageSEO(pageName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${pageName} - SEO`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -222,8 +230,9 @@ async function testPageSEO(pageName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${pageName} - SEO`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'SEO غير مكتمل'
@@ -236,6 +245,7 @@ async function testPageAccessibility(pageName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${pageName} - إمكانية الوصول`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -243,8 +253,9 @@ async function testPageAccessibility(pageName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${pageName} - إمكانية الوصول`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'قد تحتاج تحسين إمكانية الوصول'
@@ -257,6 +268,7 @@ async function testPageResponsiveness(pageName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${pageName} - التجاوب`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -264,8 +276,9 @@ async function testPageResponsiveness(pageName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${pageName} - التجاوب`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'pages',
       error: 'قد تحتاج تحسين التجاوب'
@@ -307,6 +320,7 @@ export async function runPagesTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية
   results.push({
+    id: generateId(),
     name: 'التحقق من ملفات التوجيه',
     status: 'passed',
     duration: 1,
@@ -314,6 +328,7 @@ export async function runPagesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من حماية المسارات',
     status: 'passed',
     duration: 1,
@@ -321,6 +336,7 @@ export async function runPagesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من صفحات الخطأ',
     status: 'passed',
     duration: 1,

@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `svc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة الخدمات للاختبار
 const SERVICES_LIST = [
@@ -118,6 +118,7 @@ async function testServiceExists(serviceName: string, modulePath: string): Promi
     
     if (serviceModule) {
       return {
+        id: generateId(),
         name: `خدمة ${serviceName} موجودة`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -131,6 +132,7 @@ async function testServiceExists(serviceName: string, modulePath: string): Promi
     
     if (mainServices && (mainServices as Record<string, unknown>)[serviceNamePascal]) {
       return {
+        id: generateId(),
         name: `خدمة ${serviceName} موجودة في الفهرس`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -139,14 +141,16 @@ async function testServiceExists(serviceName: string, modulePath: string): Promi
     }
     
     return {
+      id: generateId(),
       name: `خدمة ${serviceName} غير موجودة`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'services',
       error: 'الخدمة غير موجودة - قد تحتاج للإنشاء'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `خدمة ${serviceName}`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -165,6 +169,7 @@ async function testServiceFunctions(serviceName: string, functions: string[]): P
     try {
       // اختبار وهمي للدالة
       results.push({
+        id: generateId(),
         name: `${serviceName}.${func}() - الدالة موجودة`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -172,8 +177,9 @@ async function testServiceFunctions(serviceName: string, functions: string[]): P
       });
     } catch (error) {
       results.push({
+        id: generateId(),
         name: `${serviceName}.${func}()`,
-        status: 'warning',
+        status: 'skipped',
         duration: performance.now() - startTime,
         category: 'services',
         error: 'الدالة غير موجودة أو غير قابلة للاختبار'
@@ -193,6 +199,7 @@ async function testServiceDatabaseIntegration(serviceName: string): Promise<Test
     
     if (supabase) {
       return {
+        id: generateId(),
         name: `${serviceName} - تكامل قاعدة البيانات`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -201,14 +208,16 @@ async function testServiceDatabaseIntegration(serviceName: string): Promise<Test
     }
     
     return {
+      id: generateId(),
       name: `${serviceName} - تكامل قاعدة البيانات`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'services',
       error: 'لم يتم التحقق من الاتصال'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${serviceName} - تكامل قاعدة البيانات`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -224,6 +233,7 @@ async function testServiceErrorHandling(serviceName: string): Promise<TestResult
   try {
     // اختبار معالجة الأخطاء
     return {
+      id: generateId(),
       name: `${serviceName} - معالجة الأخطاء`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -231,6 +241,7 @@ async function testServiceErrorHandling(serviceName: string): Promise<TestResult
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${serviceName} - معالجة الأخطاء`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -266,6 +277,7 @@ export async function runServicesTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية للخدمات المشتركة
   results.push({
+    id: generateId(),
     name: 'التحقق من تصدير الخدمات من الفهرس الرئيسي',
     status: 'passed',
     duration: 1,
@@ -273,6 +285,7 @@ export async function runServicesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من استخدام نمط Singleton للخدمات',
     status: 'passed',
     duration: 1,
@@ -280,6 +293,7 @@ export async function runServicesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من تسجيل الأخطاء في الخدمات',
     status: 'passed',
     duration: 1,
