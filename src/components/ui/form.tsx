@@ -86,15 +86,26 @@ const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.Compon
   ({ ...props }, ref) => {
     const { error, formItemId, formDescriptionId, formMessageId, name } = useFormField();
 
+    // تمرير name للعنصر الفرعي عبر cloneElement
+    const childWithName = React.Children.map(props.children, (child) => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, {
+          name: (child.props as Record<string, unknown>).name || name,
+        } as React.Attributes);
+      }
+      return child;
+    });
+
     return (
       <Slot
         ref={ref}
         id={formItemId}
         aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
         aria-invalid={!!error}
-        data-name={name}
         {...props}
-      />
+      >
+        {childWithName}
+      </Slot>
     );
   },
 );
