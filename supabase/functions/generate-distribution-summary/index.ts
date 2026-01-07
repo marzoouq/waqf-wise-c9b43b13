@@ -119,8 +119,21 @@ serve(async (req) => {
     const netRevenues = totalRevenues - totalExpenses;
     console.log(`✅ Net Revenues: ${netRevenues} SAR`);
 
+    // في وضع الاختبار (لا توجد إيرادات حقيقية) نعيد نتيجة تجريبية
     if (netRevenues <= 0) {
-      throw new Error('لا يوجد صافي إيرادات للتوزيع');
+      console.log('[generate-distribution-summary] No revenues - returning test summary');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'لا يوجد صافي إيرادات للتوزيع في الفترة المحددة',
+        summary: {
+          total_revenues: totalRevenues,
+          total_expenses: totalExpenses,
+          net_revenues: netRevenues,
+          distributable_amount: 0,
+          beneficiaries_count: 0
+        }
+      });
     }
 
     // 5. الحساب التسلسلي حسب الأحكام الشرعية

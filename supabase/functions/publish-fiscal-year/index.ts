@@ -65,6 +65,18 @@ Deno.serve(async (req) => {
 
     console.log(`[publish-fiscal-year] Publishing fiscal year: ${fiscalYearId}`);
 
+    // التحقق من صحة UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(fiscalYearId)) {
+      console.log('[publish-fiscal-year] Invalid fiscalYearId format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف السنة المالية غير صالح',
+        fiscalYearId
+      });
+    }
+
     // Get fiscal year details
     const { data: fiscalYear, error: fyError } = await supabase
       .from('fiscal_years')

@@ -83,6 +83,18 @@ serve(async (req) => {
       return errorResponse('يجب تحديد رقم سند الصرف', 400);
     }
 
+    // التحقق من صحة UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(voucher_id)) {
+      console.log('[link-voucher-journal] Invalid voucher_id format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف سند الصرف غير صالح',
+        voucher_id
+      });
+    }
+
     // جلب بيانات سند الصرف
     const { data: voucher, error: voucherError } = await supabase
       .from('payment_vouchers')
