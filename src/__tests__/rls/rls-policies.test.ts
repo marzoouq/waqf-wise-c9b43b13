@@ -51,7 +51,7 @@ describe('RLS Policies Tests - اختبارات سياسات RLS', () => {
 
   describe('User Roles Table RLS', () => {
     it('should only allow admins to modify roles', () => {
-      const userRole = 'user';
+      const userRole: string = 'user';
       const canModifyRoles = userRole === 'admin';
       expect(canModifyRoles).toBe(false);
     });
@@ -106,7 +106,7 @@ describe('RLS Policies Tests - اختبارات سياسات RLS', () => {
 
   describe('Audit Logs Table RLS', () => {
     it('should be read-only for non-system users', () => {
-      const userRole = 'user';
+      const userRole: string = 'user';
       const canInsert = userRole === 'system';
       expect(canInsert).toBe(false);
     });
