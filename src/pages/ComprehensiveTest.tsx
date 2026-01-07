@@ -418,7 +418,7 @@ const ALL_TESTS: TestCategory[] = [
       
       // المالية
       createEdgeFunctionTest('distribute-revenue', 'توزيع الإيرادات', { testMode: true, totalAmount: 1000 }),
-      createEdgeFunctionTest('simulate-distribution', 'محاكاة التوزيع', { amount: 1000 }),
+      createEdgeFunctionTest('simulate-distribution', 'محاكاة التوزيع', { total_amount: 1000 }),
       createEdgeFunctionTest('auto-create-journal', 'إنشاء قيد آلي', { trigger_event: 'payment', amount: 100 }),
       createEdgeFunctionTest('calculate-cash-flow', 'حساب التدفقات', { period: 'monthly' }),
       createEdgeFunctionTest('link-voucher-journal', 'ربط السند بالقيد', { voucher_id: 'test', create_journal: false }),
