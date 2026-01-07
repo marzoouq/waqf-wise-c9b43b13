@@ -17,29 +17,30 @@ vi.mock('@/integrations/supabase/client', () => ({
   }
 }));
 
-// قائمة جميع Edge Functions
+// قائمة جميع Edge Functions (51 وظيفة)
 const ALL_EDGE_FUNCTIONS = [
   // AI Functions (5)
+  'ai-system-audit',
   'chatbot',
   'generate-ai-insights',
-  'ai-system-audit',
   'intelligent-search',
   'property-ai-assistant',
   
-  // Database Functions (4)
+  // Database Functions (5)
   'db-health-check',
   'db-performance-stats',
+  'run-vacuum',
   'backup-database',
   'restore-database',
   
   // Security Functions (5)
   'encrypt-file',
   'decrypt-file',
-  'biometric-auth',
-  'check-leaked-password',
   'secure-delete-file',
+  'check-leaked-password',
+  'biometric-auth',
   
-  // Notification Functions (7)
+  // Notification Functions (8)
   'send-notification',
   'send-push-notification',
   'daily-notifications',
@@ -47,50 +48,47 @@ const ALL_EDGE_FUNCTIONS = [
   'notify-disclosure-published',
   'send-slack-alert',
   'generate-smart-alerts',
+  'contract-renewal-alerts',
   
   // Finance Functions (8)
   'distribute-revenue',
   'simulate-distribution',
   'auto-create-journal',
-  'zatca-submit',
-  'publish-fiscal-year',
-  'auto-close-fiscal-year',
   'calculate-cash-flow',
   'link-voucher-journal',
+  'publish-fiscal-year',
+  'auto-close-fiscal-year',
+  'zatca-submit',
   
-  // Document Functions (6)
+  // Document Functions (5)
   'ocr-document',
   'extract-invoice-data',
   'auto-classify-document',
-  'generate-distribution-summary',
-  'send-invoice-email',
   'backfill-rental-documents',
+  'send-invoice-email',
   
-  // User Management Functions (5)
+  // User Management Functions (4)
+  'create-beneficiary-accounts',
+  'admin-manage-beneficiary-password',
   'reset-user-password',
   'update-user-email',
-  'admin-manage-beneficiary-password',
-  'create-beneficiary-accounts',
-  'test-auth',
   
   // Maintenance Functions (5)
   'weekly-maintenance',
-  'run-vacuum',
   'cleanup-old-files',
-  'scheduled-cleanup',
   'cleanup-sensitive-files',
+  'scheduled-cleanup',
+  'execute-auto-fix',
   
   // Reports Functions (3)
   'generate-scheduled-report',
   'weekly-report',
-  'contract-renewal-alerts',
+  'generate-distribution-summary',
   
-  // Support Functions (2)
+  // Support & Logs Functions (3)
   'support-auto-escalate',
   'log-error',
-  
-  // Auto Fix (1)
-  'execute-auto-fix',
+  'test-auth',
 ] as const;
 
 type EdgeFunctionName = typeof ALL_EDGE_FUNCTIONS[number];
@@ -151,7 +149,7 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 30000
   },
 
-  // === Database Functions ===
+  // === Database Functions (5) ===
   {
     name: 'db-health-check',
     category: 'Database',
@@ -167,6 +165,14 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     expectedFields: ['status'],
     requiresAuth: false,
     timeout: 10000
+  },
+  {
+    name: 'run-vacuum',
+    category: 'Database',
+    testBody: { testMode: true },
+    expectedFields: ['success'],
+    requiresAuth: true,
+    timeout: 120000
   },
   {
     name: 'backup-database',
@@ -227,7 +233,7 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 30000
   },
 
-  // === Notification Functions ===
+  // === Notification Functions (8) ===
   {
     name: 'send-notification',
     category: 'Notifications',
@@ -282,6 +288,14 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     testBody: { testMode: true },
     expectedFields: ['success'],
     requiresAuth: true,
+    timeout: 30000
+  },
+  {
+    name: 'contract-renewal-alerts',
+    category: 'Notifications',
+    testBody: { testMode: true },
+    expectedFields: ['success'],
+    requiresAuth: false,
     timeout: 30000
   },
 
@@ -351,7 +365,7 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 15000
   },
 
-  // === Document Functions ===
+  // === Document Functions (5) ===
   {
     name: 'ocr-document',
     category: 'Documents',
@@ -377,12 +391,12 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 30000
   },
   {
-    name: 'generate-distribution-summary',
+    name: 'backfill-rental-documents',
     category: 'Documents',
     testBody: { testMode: true },
     expectedFields: ['success'],
     requiresAuth: true,
-    timeout: 30000
+    timeout: 60000
   },
   {
     name: 'send-invoice-email',
@@ -392,16 +406,24 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     requiresAuth: true,
     timeout: 30000
   },
+
+  // === User Management Functions (4) ===
   {
-    name: 'backfill-rental-documents',
-    category: 'Documents',
+    name: 'create-beneficiary-accounts',
+    category: 'Users',
     testBody: { testMode: true },
     expectedFields: ['success'],
     requiresAuth: true,
-    timeout: 60000
+    timeout: 30000
   },
-
-  // === User Management Functions ===
+  {
+    name: 'admin-manage-beneficiary-password',
+    category: 'Users',
+    testBody: { ping: true },
+    expectedFields: ['status'],
+    requiresAuth: false,
+    timeout: 15000
+  },
   {
     name: 'reset-user-password',
     category: 'Users',
@@ -418,32 +440,8 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     requiresAuth: false,
     timeout: 15000
   },
-  {
-    name: 'admin-manage-beneficiary-password',
-    category: 'Users',
-    testBody: { ping: true },
-    expectedFields: ['status'],
-    requiresAuth: false,
-    timeout: 15000
-  },
-  {
-    name: 'create-beneficiary-accounts',
-    category: 'Users',
-    testBody: { testMode: true },
-    expectedFields: ['success'],
-    requiresAuth: true,
-    timeout: 30000
-  },
-  {
-    name: 'test-auth',
-    category: 'Users',
-    testBody: { action: 'health-check' },
-    expectedFields: ['status'],
-    requiresAuth: false,
-    timeout: 10000
-  },
 
-  // === Maintenance Functions ===
+  // === Maintenance Functions (5) ===
   {
     name: 'weekly-maintenance',
     category: 'Maintenance',
@@ -453,19 +451,19 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 60000
   },
   {
-    name: 'run-vacuum',
-    category: 'Maintenance',
-    testBody: { testMode: true },
-    expectedFields: ['success'],
-    requiresAuth: true,
-    timeout: 120000
-  },
-  {
     name: 'cleanup-old-files',
     category: 'Maintenance',
     testBody: { testMode: true },
     expectedFields: ['success'],
     requiresAuth: false,
+    timeout: 60000
+  },
+  {
+    name: 'cleanup-sensitive-files',
+    category: 'Maintenance',
+    testBody: { testMode: true },
+    expectedFields: ['success'],
+    requiresAuth: true,
     timeout: 60000
   },
   {
@@ -477,7 +475,7 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 30000
   },
   {
-    name: 'cleanup-sensitive-files',
+    name: 'execute-auto-fix',
     category: 'Maintenance',
     testBody: { testMode: true },
     expectedFields: ['success'],
@@ -485,7 +483,7 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 60000
   },
 
-  // === Reports Functions ===
+  // === Reports Functions (3) ===
   {
     name: 'generate-scheduled-report',
     category: 'Reports',
@@ -503,15 +501,15 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     timeout: 60000
   },
   {
-    name: 'contract-renewal-alerts',
+    name: 'generate-distribution-summary',
     category: 'Reports',
     testBody: { testMode: true },
     expectedFields: ['success'],
-    requiresAuth: false,
+    requiresAuth: true,
     timeout: 30000
   },
 
-  // === Support Functions ===
+  // === Support & Logs Functions (3) ===
   {
     name: 'support-auto-escalate',
     category: 'Support',
@@ -528,15 +526,13 @@ const FUNCTION_CONFIGS: FunctionTestConfig[] = [
     requiresAuth: false,
     timeout: 10000
   },
-
-  // === Auto Fix ===
   {
-    name: 'execute-auto-fix',
-    category: 'AutoFix',
-    testBody: { testMode: true },
-    expectedFields: ['success'],
-    requiresAuth: true,
-    timeout: 60000
+    name: 'test-auth',
+    category: 'Support',
+    testBody: { action: 'health-check' },
+    expectedFields: ['status'],
+    requiresAuth: false,
+    timeout: 10000
   },
 ];
 
