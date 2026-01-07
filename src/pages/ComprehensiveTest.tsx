@@ -33,6 +33,12 @@ import { runComponentsTests } from '@/tests/components.tests';
 import { runIntegrationTests } from '@/tests/integration.tests';
 import { runAdvancedWorkflowTests } from '@/tests/advanced-workflow.tests';
 import { runAdvancedPerformanceTests } from '@/tests/performance-advanced.tests';
+import { runServicesTests } from '@/tests/services.tests';
+import { runEdgeFunctionsTests } from '@/tests/edge-functions.tests';
+import { runContextsTests } from '@/tests/contexts.tests';
+import { runLibrariesTests } from '@/tests/libraries.tests';
+import { runPagesTests } from '@/tests/pages.tests';
+import { runTypesTests } from '@/tests/types.tests';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 import { Code2, Boxes, Link2, Workflow, Gauge } from 'lucide-react';
 
@@ -1635,12 +1641,281 @@ const ALL_TESTS: TestCategory[] = [
       }
     ]
   },
+
+  // =============== 19. الخدمات المفصلة (300+ اختبار) ===============
+  {
+    id: 'services-detailed',
+    label: 'الخدمات المفصلة',
+    icon: Server,
+    color: 'text-indigo-600',
+    tests: [
+      {
+        id: 'services-detailed-all',
+        name: 'جميع اختبارات الخدمات المفصلة (300+)',
+        description: 'اختبار 40+ خدمة مع جميع الدوال والتكاملات',
+        category: 'services-detailed',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runServicesTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'services-detailed-all',
+              testName: 'جميع اختبارات الخدمات المفصلة',
+              category: 'services-detailed',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'services-detailed-all',
+              testName: 'جميع اختبارات الخدمات المفصلة',
+              category: 'services-detailed',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 20. Edge Functions المفصلة (260+ اختبار) ===============
+  {
+    id: 'edge-functions-detailed',
+    label: 'Edge Functions المفصلة',
+    icon: Zap,
+    color: 'text-purple-600',
+    tests: [
+      {
+        id: 'edge-functions-detailed-all',
+        name: 'جميع اختبارات Edge Functions المفصلة (260+)',
+        description: 'اختبار 50+ وظيفة مع CORS والمصادقة ومعالجة الأخطاء',
+        category: 'edge-functions-detailed',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runEdgeFunctionsTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'edge-functions-detailed-all',
+              testName: 'جميع اختبارات Edge Functions المفصلة',
+              category: 'edge-functions-detailed',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'edge-functions-detailed-all',
+              testName: 'جميع اختبارات Edge Functions المفصلة',
+              category: 'edge-functions-detailed',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 21. السياقات المفصلة (100+ اختبار) ===============
+  {
+    id: 'contexts-detailed',
+    label: 'السياقات المفصلة',
+    icon: Layers,
+    color: 'text-cyan-600',
+    tests: [
+      {
+        id: 'contexts-detailed-all',
+        name: 'جميع اختبارات السياقات المفصلة (100+)',
+        description: 'اختبار 7 سياقات مع الدوال والتصديرات والتفاعلية',
+        category: 'contexts-detailed',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runContextsTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'contexts-detailed-all',
+              testName: 'جميع اختبارات السياقات المفصلة',
+              category: 'contexts-detailed',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'contexts-detailed-all',
+              testName: 'جميع اختبارات السياقات المفصلة',
+              category: 'contexts-detailed',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 22. المكتبات المفصلة (200+ اختبار) ===============
+  {
+    id: 'libraries-detailed',
+    label: 'المكتبات المفصلة',
+    icon: Package,
+    color: 'text-amber-600',
+    tests: [
+      {
+        id: 'libraries-detailed-all',
+        name: 'جميع اختبارات المكتبات المفصلة (200+)',
+        description: 'اختبار 30+ مكتبة مع الدوال والتوثيق والأنواع',
+        category: 'libraries-detailed',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runLibrariesTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'libraries-detailed-all',
+              testName: 'جميع اختبارات المكتبات المفصلة',
+              category: 'libraries-detailed',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'libraries-detailed-all',
+              testName: 'جميع اختبارات المكتبات المفصلة',
+              category: 'libraries-detailed',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 23. الصفحات المفصلة (400+ اختبار) ===============
+  {
+    id: 'pages-detailed',
+    label: 'الصفحات المفصلة',
+    icon: LayoutDashboard,
+    color: 'text-teal-600',
+    tests: [
+      {
+        id: 'pages-detailed-all',
+        name: 'جميع اختبارات الصفحات المفصلة (400+)',
+        description: 'اختبار 70+ صفحة مع التوجيه والتحميل الكسول وSEO',
+        category: 'pages-detailed',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runPagesTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'pages-detailed-all',
+              testName: 'جميع اختبارات الصفحات المفصلة',
+              category: 'pages-detailed',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'pages-detailed-all',
+              testName: 'جميع اختبارات الصفحات المفصلة',
+              category: 'pages-detailed',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 24. أنواع البيانات (250+ اختبار) ===============
+  {
+    id: 'types-tests',
+    label: 'أنواع البيانات',
+    icon: FileText,
+    color: 'text-gray-600',
+    tests: [
+      {
+        id: 'types-all',
+        name: 'جميع اختبارات أنواع البيانات (250+)',
+        description: 'اختبار 30+ ملف أنواع مع التعريفات والتصدير والتوافق',
+        category: 'types-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runTypesTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'types-all',
+              testName: 'جميع اختبارات أنواع البيانات',
+              category: 'types-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'types-all',
+              testName: 'جميع اختبارات أنواع البيانات',
+              category: 'types-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
 ];
 
 // ================== حساب الإحصائيات ==================
 // إجمالي الاختبارات = الاختبارات المباشرة + الاختبارات المدمجة
-// (60 UI + 15 Workflow + 40 Reports + 45 A11y + 200 Hooks + 150 Components + 30 Integration + 50 Advanced Workflow + 20 Advanced Performance)
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 610;
+// الاختبارات المدمجة:
+// - UI: 60 | Workflow: 15 | Reports: 40 | A11y: 45 | Hooks: 200 | Components: 150
+// - Integration: 30 | Advanced Workflow: 50 | Advanced Performance: 20
+// - Services Detailed: 300 | Edge Functions Detailed: 260 | Contexts Detailed: 100
+// - Libraries Detailed: 200 | Pages Detailed: 400 | Types: 250
+// Total Embedded: 60+15+40+45+200+150+30+50+20+300+260+100+200+400+250 = 2120
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 2120;
 
 // ================== المكون الرئيسي ==================
 
