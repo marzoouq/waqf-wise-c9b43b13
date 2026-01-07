@@ -22,6 +22,7 @@ import {
   AISystemAudit,
   EdgeFunctionTest,
   EdgeFunctionsMonitor,
+  ComprehensiveTest,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -170,6 +171,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <EdgeFunctionsMonitor />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="comprehensive-test"
+    path="/comprehensive-test" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <ComprehensiveTest />
       </ProtectedRoute>
     } 
   />,

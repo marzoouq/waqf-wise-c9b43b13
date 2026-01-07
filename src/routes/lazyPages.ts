@@ -112,6 +112,7 @@ export const AIInsights = lazyWithRetry(() => import("@/pages/AIInsights"));
 export const AISystemAudit = lazyWithRetry(() => import("@/pages/AISystemAudit"));
 export const EdgeFunctionTest = lazyWithRetry(() => import("@/pages/EdgeFunctionTest"));
 export const EdgeFunctionsMonitor = lazyWithRetry(() => import("@/pages/EdgeFunctionsMonitor"));
+export const ComprehensiveTest = lazyWithRetry(() => import("@/pages/ComprehensiveTest"));
 export const Chatbot = lazyWithRetry(() => import("@/pages/Chatbot"));
 
 // ==================== نقطة البيع ====================
