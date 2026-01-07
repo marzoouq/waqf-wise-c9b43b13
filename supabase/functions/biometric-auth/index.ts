@@ -53,13 +53,14 @@ Deno.serve(async (req) => {
       try {
         bodyData = JSON.parse(bodyText);
         
-        // ✅ Health Check Support
-        if (bodyData.ping || bodyData.healthCheck) {
-          console.log('[biometric-auth] Health check received');
+        // ✅ Health Check Support / Test Mode
+        if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+          console.log('[biometric-auth] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'biometric-auth',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            testMode: bodyData.testMode || false
           });
         }
       } catch {
@@ -70,12 +71,20 @@ Deno.serve(async (req) => {
     // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
     const { credentialId, userId, challenge } = bodyData;
     
-    console.log("Biometric auth request:", { credentialId: credentialId?.substring(0, 20), userId });
-
+    // ✅ التحقق من وجود المعاملات (تجاوز في وضع الاختبار)
     if (!credentialId || !userId) {
       console.error("Missing required parameters");
       return errorResponse("Missing credentialId or userId", 400);
     }
+
+    // ✅ التحقق من صحة UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.error("Invalid userId format:", userId);
+      return errorResponse("Invalid userId format - must be a valid UUID", 400);
+    }
+    
+    console.log("Biometric auth request:", { credentialId: credentialId?.substring(0, 20), userId });
 
     // ✅ التحقق من rate limit
     const rateLimitKey = `biometric_${userId}`;

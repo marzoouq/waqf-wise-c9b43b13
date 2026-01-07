@@ -17,17 +17,18 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
+    // ✅ Health Check Support / Test Mode
     const bodyClone = await req.clone().text();
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[publish-fiscal-year] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[publish-fiscal-year] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'publish-fiscal-year',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            testMode: parsed.testMode || false
           });
         }
       } catch { /* not JSON, continue */ }

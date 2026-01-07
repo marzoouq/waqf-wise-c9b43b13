@@ -91,14 +91,14 @@ Deno.serve(async (req) => {
 
     console.log(`✅ Found ${admins?.length || 0} admins to notify`);
 
-    // إنشاء إشعار لكل مسؤول
+    // إنشاء إشعار لكل مسؤول - مع التأكد من عدم وجود قيم null
     const notifications = admins?.map((admin) => ({
       user_id: admin.user_id,
-      title: payload.title,
-      message: payload.description,
+      title: payload.title || 'تنبيه',
+      message: payload.description || payload.title || 'إشعار من النظام',
       type: 'system',
       reference_type: 'system_alert',
-      reference_id: payload.alertId,
+      reference_id: payload.alertId || null,
       action_url: '/system/monitoring',
       is_read: false,
     })) || [];
