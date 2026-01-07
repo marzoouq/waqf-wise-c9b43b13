@@ -28,7 +28,13 @@ import { runUITests } from '@/tests/ui-components.tests';
 import { runWorkflowTests } from '@/tests/workflow.tests';
 import { runReportTests } from '@/tests/reports-export.tests';
 import { runResponsiveA11yTests } from '@/tests/responsive-a11y.tests';
+import { runHooksTests } from '@/tests/hooks.tests';
+import { runComponentsTests } from '@/tests/components.tests';
+import { runIntegrationTests } from '@/tests/integration.tests';
+import { runAdvancedWorkflowTests } from '@/tests/advanced-workflow.tests';
+import { runAdvancedPerformanceTests } from '@/tests/performance-advanced.tests';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
+import { Code2, Boxes, Link2, Workflow, Gauge } from 'lucide-react';
 
 // ================== أنواع البيانات ==================
 
@@ -1409,11 +1415,232 @@ const ALL_TESTS: TestCategory[] = [
       }
     ]
   },
+  
+  // =============== 14. اختبارات الـ Hooks (200+ اختبار) ===============
+  {
+    id: 'hooks-tests',
+    label: 'اختبارات الـ Hooks',
+    icon: Code2,
+    color: 'text-violet-500',
+    tests: [
+      {
+        id: 'hooks-all',
+        name: 'جميع اختبارات الـ Hooks (200+)',
+        description: 'اختبار جميع الـ Hooks: المحاسبة، المستفيدين، العقارات، المصادقة، التوزيعات',
+        category: 'hooks-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runHooksTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'hooks-all',
+              testName: 'جميع اختبارات الـ Hooks',
+              category: 'hooks-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'hooks-all',
+              testName: 'جميع اختبارات الـ Hooks',
+              category: 'hooks-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 15. اختبارات المكونات (150+ اختبار) ===============
+  {
+    id: 'components-tests',
+    label: 'اختبارات المكونات',
+    icon: Boxes,
+    color: 'text-amber-500',
+    tests: [
+      {
+        id: 'components-all',
+        name: 'جميع اختبارات المكونات (150+)',
+        description: 'اختبار مكونات المحاسبة، المستفيدين، العقارات، الحوكمة، المشتركة',
+        category: 'components-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runComponentsTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'components-all',
+              testName: 'جميع اختبارات المكونات',
+              category: 'components-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'components-all',
+              testName: 'جميع اختبارات المكونات',
+              category: 'components-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 16. اختبارات التكامل (30+ اختبار) ===============
+  {
+    id: 'integration-tests',
+    label: 'اختبارات التكامل',
+    icon: Link2,
+    color: 'text-teal-500',
+    tests: [
+      {
+        id: 'integration-all',
+        name: 'جميع اختبارات التكامل (30+)',
+        description: 'اختبار قاعدة البيانات، Edge Functions، الواجهة مع Backend',
+        category: 'integration-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runIntegrationTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'integration-all',
+              testName: 'جميع اختبارات التكامل',
+              category: 'integration-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'integration-all',
+              testName: 'جميع اختبارات التكامل',
+              category: 'integration-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 17. سير العمل المتقدم (50+ اختبار) ===============
+  {
+    id: 'advanced-workflow-tests',
+    label: 'سير العمل المتقدم',
+    icon: Workflow,
+    color: 'text-rose-500',
+    tests: [
+      {
+        id: 'advanced-workflow-all',
+        name: 'جميع اختبارات سير العمل المتقدم (50+)',
+        description: 'اختبار تدفقات المستفيدين، العقارات، المالية، الحوكمة',
+        category: 'advanced-workflow-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runAdvancedWorkflowTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'advanced-workflow-all',
+              testName: 'جميع اختبارات سير العمل المتقدم',
+              category: 'advanced-workflow-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'advanced-workflow-all',
+              testName: 'جميع اختبارات سير العمل المتقدم',
+              category: 'advanced-workflow-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 18. الأداء المتقدم (20+ اختبار) ===============
+  {
+    id: 'advanced-performance-tests',
+    label: 'الأداء المتقدم',
+    icon: Gauge,
+    color: 'text-lime-500',
+    tests: [
+      {
+        id: 'advanced-performance-all',
+        name: 'جميع اختبارات الأداء المتقدم (20+)',
+        description: 'اختبار التحميل، الذاكرة، الاستجابة، Lazy Loading',
+        category: 'advanced-performance-tests',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runAdvancedPerformanceTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'advanced-performance-all',
+              testName: 'جميع اختبارات الأداء المتقدم',
+              category: 'advanced-performance-tests',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'advanced-performance-all',
+              testName: 'جميع اختبارات الأداء المتقدم',
+              category: 'advanced-performance-tests',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
 ];
 
 // ================== حساب الإحصائيات ==================
-// إجمالي الاختبارات = الاختبارات المباشرة + الاختبارات المدمجة (60 UI + 15 Workflow + 40 Reports + 45 A11y)
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 160;
+// إجمالي الاختبارات = الاختبارات المباشرة + الاختبارات المدمجة
+// (60 UI + 15 Workflow + 40 Reports + 45 A11y + 200 Hooks + 150 Components + 30 Integration + 50 Advanced Workflow + 20 Advanced Performance)
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 610;
 
 // ================== المكون الرئيسي ==================
 
