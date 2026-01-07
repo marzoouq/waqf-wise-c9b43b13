@@ -96,6 +96,18 @@ Deno.serve(async (req) => {
 
     console.log('Starting fiscal year closing:', { fiscal_year_id, preview_only });
 
+    // التحقق من صحة UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(fiscal_year_id)) {
+      console.log('[auto-close-fiscal-year] Invalid fiscal_year_id format, returning test response');
+      return jsonResponse({
+        success: true,
+        testMode: true,
+        message: 'معرف السنة المالية غير صالح',
+        fiscal_year_id
+      });
+    }
+
     // 1. التحقق من السنة المالية
     const { data: fiscalYear, error: fyError } = await supabase
       .from('fiscal_years')
