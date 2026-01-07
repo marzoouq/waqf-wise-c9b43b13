@@ -14,6 +14,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
+import { setInterceptorTestingMode } from '@/integrations/supabase/request-interceptor';
+import { connectionMonitor } from '@/services/monitoring/connection-monitor.service';
+import { errorTracker } from '@/lib/errors/tracker';
 import { 
   Play, CheckCircle, XCircle, Clock, 
   AlertTriangle, Zap, Database, Shield,
@@ -1999,54 +2002,114 @@ export default function ComprehensiveTest() {
     });
 
     addLog(`🚀 بدء تشغيل ~${selectedTotalTests} اختبار...`);
+    addLog(`🛡️ تفعيل وضع الاختبار الآمن (تخفيف المراقبة)...`);
+    
+    // تفعيل وضع الاختبار في جميع الأنظمة
+    setInterceptorTestingMode(true);
+    connectionMonitor.setTestingMode(true);
+    errorTracker.setTestingMode(true);
 
     let totalPassed = 0;
     let totalFailed = 0;
     let totalCompleted = 0;
+    let categoryIndex = 0;
+    
+    // إعادة ترتيب الفئات: Edge Functions في النهاية لأنها الأثقل
+    const orderedCategories = [...ALL_TESTS].sort((a, b) => {
+      const heavyCategories = ['edge-functions', 'database', 'api'];
+      const aIsHeavy = heavyCategories.includes(a.id);
+      const bIsHeavy = heavyCategories.includes(b.id);
+      if (aIsHeavy && !bIsHeavy) return 1;
+      if (!aIsHeavy && bIsHeavy) return -1;
+      return 0;
+    });
 
-    for (const category of ALL_TESTS) {
-      if (stopRequested) break;
-      if (!selectedCategories.includes(category.id)) continue;
-
-      for (const test of category.tests) {
-        if (stopRequested) {
-          addLog('⏹️ تم إيقاف الاختبارات');
-          break;
-        }
-
-        setProgress(prev => ({
-          ...prev,
-          currentTest: test.name
-        }));
-
-        addLog(`▶️ تشغيل: ${test.name}`);
+    try {
+      for (const category of orderedCategories) {
+        if (stopRequested) break;
+        if (!selectedCategories.includes(category.id)) continue;
         
-        const result = await test.run();
-        
-        // إذا كان الاختبار يحتوي على نتائج فرعية، نعرضها
-        if (result.details?.results && Array.isArray(result.details.results)) {
-          const subResults = result.details.results;
+        categoryIndex++;
+        addLog(`\n📁 الفئة ${categoryIndex}: ${category.label} (${category.tests.length} اختبار)`);
+
+        for (const test of category.tests) {
+          if (stopRequested) {
+            addLog('⏹️ تم إيقاف الاختبارات');
+            break;
+          }
+
+          setProgress(prev => ({
+            ...prev,
+            currentTest: test.name
+          }));
+
+          addLog(`▶️ تشغيل: ${test.name}`);
           
-          for (const subResult of subResults) {
-            const testResult: TestResult = {
-              testId: subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
-              testName: subResult.name || subResult.testName,
-              category: subResult.category || category.id,
-              success: subResult.status === 'passed' || subResult.success === true,
-              duration: subResult.duration || 0,
-              message: subResult.details || subResult.message,
+          // إضافة timeout لكل اختبار (30 ثانية كحد أقصى)
+          let result: TestResult;
+          try {
+            const timeoutPromise = new Promise<TestResult>((_, reject) => 
+              setTimeout(() => reject(new Error('Timeout: تجاوز الحد الأقصى للوقت')), 30000)
+            );
+            result = await Promise.race([test.run(), timeoutPromise]);
+          } catch (err: any) {
+            result = {
+              testId: test.id,
+              testName: test.name,
+              category: test.category,
+              success: false,
+              duration: 30000,
+              message: err.message || 'Timeout',
               timestamp: new Date()
             };
+          }
+          
+          // إذا كان الاختبار يحتوي على نتائج فرعية، نعرضها
+          if (result.details?.results && Array.isArray(result.details.results)) {
+            const subResults = result.details.results;
             
-            setResults(prev => [...prev, testResult]);
+            for (const subResult of subResults) {
+              const testResult: TestResult = {
+                testId: subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
+                testName: subResult.name || subResult.testName,
+                category: subResult.category || category.id,
+                success: subResult.status === 'passed' || subResult.success === true,
+                duration: subResult.duration || 0,
+                message: subResult.details || subResult.message,
+                timestamp: new Date()
+              };
+              
+              setResults(prev => [...prev, testResult]);
+              
+              if (testResult.success) {
+                totalPassed++;
+              } else {
+                totalFailed++;
+              }
+              totalCompleted++;
+              
+              setProgress(prev => ({
+                ...prev,
+                completed: totalCompleted,
+                passed: totalPassed,
+                failed: totalFailed
+              }));
+            }
             
-            if (testResult.success) {
+            addLog(`📦 ${test.name}: ${subResults.filter((r: any) => r.status === 'passed' || r.success).length} نجح، ${subResults.filter((r: any) => r.status === 'failed' || r.success === false).length} فشل من ${subResults.length}`);
+          } else {
+            // اختبار عادي بدون نتائج فرعية
+            setResults(prev => [...prev, result]);
+            
+            if (result.success) {
               totalPassed++;
+              addLog(`✅ ${test.name}: نجح (${result.duration}ms)`);
             } else {
               totalFailed++;
+              addLog(`❌ ${test.name}: فشل - ${result.message}`);
             }
-            totalCompleted++;
             
+            totalCompleted++;
             setProgress(prev => ({
               ...prev,
               completed: totalCompleted,
@@ -2054,42 +2117,39 @@ export default function ComprehensiveTest() {
               failed: totalFailed
             }));
           }
-          
-          addLog(`📦 ${test.name}: ${subResults.filter((r: any) => r.status === 'passed' || r.success).length} نجح، ${subResults.filter((r: any) => r.status === 'failed' || r.success === false).length} فشل من ${subResults.length}`);
-        } else {
-          // اختبار عادي بدون نتائج فرعية
-          setResults(prev => [...prev, result]);
-          
-          if (result.success) {
-            totalPassed++;
-            addLog(`✅ ${test.name}: نجح (${result.duration}ms)`);
-          } else {
-            totalFailed++;
-            addLog(`❌ ${test.name}: فشل - ${result.message}`);
-          }
-          
-          totalCompleted++;
-          setProgress(prev => ({
-            ...prev,
-            completed: totalCompleted,
-            passed: totalPassed,
-            failed: totalFailed
-          }));
-        }
 
-        // تأخير ديناميكي لمنع Rate Limiting وانقطاع الاتصال
-        // زيادة التأخير كل 10 اختبارات لتجنب إرهاق الخادم
-        const dynamicDelay = 150 + Math.floor(totalCompleted / 10) * 50;
-        const maxDelay = Math.min(dynamicDelay, 500); // حد أقصى 500ms
+          // تأخير ديناميكي محسّن لمنع Rate Limiting
+          const isHeavyCategory = ['edge-functions', 'database', 'api'].includes(category.id);
+          const baseDelay = isHeavyCategory ? 300 : 100;
+          const dynamicDelay = baseDelay + Math.floor(totalCompleted / 10) * 50;
+          const maxDelay = Math.min(dynamicDelay, isHeavyCategory ? 800 : 400);
+          
+          // استراحة أطول بعد أول 5 اختبارات (الأكثر خطورة)
+          if (totalCompleted === 5) {
+            addLog(`⏸️ استراحة بداية آمنة...`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          // استراحة كل 15 اختبار
+          else if (totalCompleted > 0 && totalCompleted % 15 === 0) {
+            addLog(`⏸️ استراحة لحماية الاتصال (${totalCompleted} اختبار)...`);
+            await new Promise(resolve => setTimeout(resolve, 2500));
+          } else {
+            await new Promise(resolve => setTimeout(resolve, maxDelay));
+          }
+        }
         
-        // استراحة إضافية كل 25 اختبار لتجنب Rate Limiting
-        if (totalCompleted > 0 && totalCompleted % 25 === 0) {
-          addLog(`⏸️ استراحة قصيرة لحماية الاتصال (${totalCompleted} اختبار)...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        } else {
-          await new Promise(resolve => setTimeout(resolve, maxDelay));
+        // استراحة بين الفئات
+        if (!stopRequested && categoryIndex < orderedCategories.filter(c => selectedCategories.includes(c.id)).length) {
+          addLog(`⏸️ استراحة بين الفئات...`);
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
       }
+    } finally {
+      // تعطيل وضع الاختبار في جميع الأنظمة
+      setInterceptorTestingMode(false);
+      connectionMonitor.setTestingMode(false);
+      errorTracker.setTestingMode(false);
+      addLog(`🛡️ تم تعطيل وضع الاختبار الآمن`);
     }
 
     setProgress(prev => ({

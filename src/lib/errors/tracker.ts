@@ -39,6 +39,10 @@ class ErrorTracker {
   private errorCounts = new Map<string, number>();
   private consecutiveErrors = 0;
   private errorDeduplication = new Map<string, DeduplicationEntry>();
+  
+  // وضع الاختبار - يؤجل إرسال الأخطاء
+  private testingMode = false;
+  private testingModeBuffer: ErrorReport[] = [];
 
   private constructor() {
     this.loadSettingsFromDB();
@@ -46,6 +50,28 @@ class ErrorTracker {
     this.cleanupOldAuthErrors();
     this.loadPendingErrors();
     this.setupCircuitBreakerCheck();
+  }
+
+  /**
+   * تفعيل/تعطيل وضع الاختبار
+   * في وضع الاختبار، يتم تجميع الأخطاء وإرسالها دفعة واحدة بعد انتهاء الاختبار
+   */
+  setTestingMode(enabled: boolean): void {
+    this.testingMode = enabled;
+    if (!enabled && this.testingModeBuffer.length > 0) {
+      // إرسال الأخطاء المجمعة عند إنهاء وضع الاختبار
+      console.log(`[ErrorTracker] Flushing ${this.testingModeBuffer.length} buffered errors`);
+      this.testingModeBuffer.forEach(report => {
+        this.errorQueue.push(report);
+      });
+      this.testingModeBuffer = [];
+      this.processQueue();
+    }
+    console.log(`[ErrorTracker] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  isInTestingMode(): boolean {
+    return this.testingMode;
   }
 
   private async loadSettingsFromDB(): Promise<void> {
@@ -316,6 +342,17 @@ class ErrorTracker {
     report.error_message = cleanMessage;
     
     if (shouldIgnoreError(report.error_message, report.additional_data)) return;
+
+    // في وضع الاختبار، تجميع الأخطاء بدلاً من إرسالها فوراً
+    if (this.testingMode) {
+      // تجاهل أخطاء الشبكة في وضع الاختبار
+      if (report.error_type === 'network_error') return;
+      // تخزين فقط أول 10 أخطاء في وضع الاختبار
+      if (this.testingModeBuffer.length < 10) {
+        this.testingModeBuffer.push(report);
+      }
+      return;
+    }
 
     // Deduplication
     const errorKey = createErrorKey(report.error_type, report.error_message);
@@ -600,6 +637,8 @@ export const errorTracker = {
   resetCircuitBreaker: () => getErrorTracker().resetCircuitBreaker(),
   getStats: () => getErrorTracker().getStats(),
   getDeduplicationStats: () => getErrorTracker().getDeduplicationStats(),
+  setTestingMode: (enabled: boolean) => getErrorTracker().setTestingMode(enabled),
+  isInTestingMode: () => getErrorTracker().isInTestingMode(),
 };
 
 // تصدير للاستخدام المباشر
