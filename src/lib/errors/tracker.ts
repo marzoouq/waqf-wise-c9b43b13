@@ -267,30 +267,9 @@ class ErrorTracker {
   }
 
   private setupNetworkErrorTracking(): void {
-    const originalFetch = window.fetch;
-    
-    window.fetch = async (...args: Parameters<typeof fetch>): Promise<Response> => {
-      const requestUrl = typeof args[0] === 'string' 
-        ? args[0] 
-        : (args[0] as Request)?.url || 'unknown';
-      
-      if (isAuthRelatedUrl(requestUrl)) {
-        return originalFetch(...args);
-      }
-      
-      try {
-        const response = await originalFetch(...args);
-        
-        if (!response.ok && response.status >= 500) {
-          this.handleServerError(response, requestUrl);
-        }
-        
-        return response;
-      } catch (error) {
-        this.handleFetchError(error, requestUrl);
-        throw error;
-      }
-    };
+    // ❌ تعطيل اعتراض fetch هنا لأنه يتعارض مع request-interceptor.ts
+    // connectionMonitor يتولى مراقبة الشبكة بشكل مركزي
+    // تم نقل المراقبة إلى request-interceptor.ts لتجنب التعارض
   }
 
   private handleServerError(response: Response, requestUrl: string): void {
