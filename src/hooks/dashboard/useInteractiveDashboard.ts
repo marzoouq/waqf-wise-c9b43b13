@@ -1,9 +1,10 @@
 /**
  * Hook للوحة التحكم التفاعلية
  * Interactive Dashboard Hook
+ * @version 2.0.0 - تم إصلاح مشكلة تراكم الاشتراكات
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
@@ -11,12 +12,18 @@ import { ChartDataPoint } from '@/components/unified/UnifiedChart';
 import { QUERY_CONFIG } from '@/infrastructure/react-query';
 import { BeneficiaryService, PropertyService } from '@/services';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { realtimeManager } from '@/services/realtime-manager';
+import { queryInvalidationManager } from '@/lib/query-invalidation-manager';
 
 export function useInteractiveDashboard() {
   const [timeRange, setTimeRange] = useState('month');
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
   const queryClient = useQueryClient();
   const [lastUpdated, setLastUpdated] = useState<Date>();
+
+  // استخدام ref لتجنب إعادة إنشاء الاشتراكات
+  const queryClientRef = useRef(queryClient);
+  useEffect(() => { queryClientRef.current = queryClient; }, [queryClient]);
 
   // إحصائيات المستفيدين
   const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt, error: beneficiariesError } = useQuery({
@@ -45,25 +52,26 @@ export function useInteractiveDashboard() {
     }
   }, [dataUpdatedAt]);
 
-  // Real-time subscriptions
+  // Real-time subscriptions - باستخدام RealtimeManager المركزي
   useEffect(() => {
-    const channel = supabase
-      .channel('interactive-dashboard-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES() });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS() });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES });
-      })
-      .subscribe();
+    const unsubBeneficiaries = realtimeManager.subscribe('beneficiaries', () => {
+      queryInvalidationManager.invalidate(QUERY_KEYS.DASHBOARD_BENEFICIARIES());
+    });
+
+    const unsubPayments = realtimeManager.subscribe('payments', () => {
+      queryInvalidationManager.invalidate(QUERY_KEYS.DASHBOARD_PAYMENTS());
+    });
+
+    const unsubProperties = realtimeManager.subscribe('properties', () => {
+      queryInvalidationManager.invalidate(QUERY_KEYS.DASHBOARD_PROPERTIES);
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubBeneficiaries();
+      unsubPayments();
+      unsubProperties();
     };
-  }, [queryClient]);
+  }, []); // لا تبعيات = لا إعادة اشتراك
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES() });
