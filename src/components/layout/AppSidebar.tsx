@@ -209,6 +209,7 @@ const menuGroups = [
       { icon: BarChart3, label: "أداء قاعدة البيانات", path: "/db-performance", roles: ["admin", "nazer"] },
       { icon: Plug, label: "إدارة التكاملات", path: "/integrations", roles: ["admin", "nazer"] },
       { icon: TestTube, label: "اختبار Edge", path: "/edge-test", roles: ["admin"] },
+      { icon: TestTube, label: "الاختبارات الشاملة", path: "/comprehensive-test", roles: ["admin"] },
     ]
   },
 ];
