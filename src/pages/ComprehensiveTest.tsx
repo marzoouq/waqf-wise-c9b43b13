@@ -3,7 +3,7 @@
  * تختبر جميع أجزاء التطبيق فعلياً من المتصفح (500+ اختبار)
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, ErrorInfo, Component, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -2034,9 +2034,53 @@ const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => {
   return acc + cat.tests.length;
 }, 0);
 
+// ================== Error Boundary خاص بالاختبارات ==================
+
+interface TestErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class TestErrorBoundary extends Component<{ children: ReactNode }, TestErrorBoundaryState> {
+  state: TestErrorBoundaryState = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // تسجيل الخطأ بدون إعادة تحميل الصفحة
+    console.error('[TestErrorBoundary] Caught error:', error, errorInfo);
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="container mx-auto p-6 space-y-6" dir="rtl">
+          <div className="bg-destructive/10 border border-destructive/50 rounded-lg p-6 text-center">
+            <h2 className="text-xl font-bold text-destructive mb-2">حدث خطأ في الاختبارات</h2>
+            <p className="text-muted-foreground mb-4">{this.state.error?.message || 'خطأ غير معروف'}</p>
+            <button 
+              onClick={this.handleReset}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ================== المكون الرئيسي ==================
 
-export default function ComprehensiveTest() {
+function ComprehensiveTestContent() {
   const [results, setResults] = useState<TestResult[]>([]);
   const [progress, setProgress] = useState<TestProgress>({
     total: TOTAL_TESTS,
@@ -2148,13 +2192,15 @@ export default function ComprehensiveTest() {
             );
             result = await Promise.race([test.run(), timeoutPromise]);
           } catch (err: any) {
+            // التقاط أي خطأ ومنعه من الانتشار للـ Error Boundary
+            console.warn(`[Test Error] ${test.name}:`, err?.message || err);
             result = {
               testId: test.id,
               testName: test.name,
               category: test.category,
               success: false,
               duration: 30000,
-              message: err.message || 'Timeout',
+              message: err?.message || String(err) || 'خطأ غير معروف',
               timestamp: new Date()
             };
           }
@@ -2720,5 +2766,15 @@ export default function ComprehensiveTest() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// ================== المكون المُصدَّر ==================
+
+export default function ComprehensiveTest() {
+  return (
+    <TestErrorBoundary>
+      <ComprehensiveTestContent />
+    </TestErrorBoundary>
   );
 }
