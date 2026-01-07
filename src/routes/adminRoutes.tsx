@@ -13,6 +13,7 @@ import {
   SystemMonitoring,
   SystemErrorLogs,
   DeveloperDashboard,
+  ConnectionDiagnostics,
   SecurityDashboard,
   PerformanceDashboard,
   DatabasePerformanceDashboard,
@@ -226,6 +227,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin"]}>
         <TestsDashboard />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="connection-diagnostics"
+    path="/connection-diagnostics" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+        <ConnectionDiagnostics />
       </ProtectedRoute>
     } 
   />,

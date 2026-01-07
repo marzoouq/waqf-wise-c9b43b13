@@ -19,3 +19,4 @@ export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
 export { useSelfHealingStats } from './useSelfHealingStats';
 export { useAbortableEdgeFunction } from './useAbortableEdgeFunction';
+export { useConnectionMonitor, type ConnectionEvent, type ConnectionStats } from './useConnectionMonitor';
