@@ -1,6 +1,6 @@
 /**
  * صفحة الاختبارات الشاملة المتقدمة
- * تختبر جميع أجزاء التطبيق فعلياً من المتصفح (300+ اختبار)
+ * تختبر جميع أجزاء التطبيق فعلياً من المتصفح (500+ اختبار)
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -21,8 +21,13 @@ import {
   CreditCard, Server, Activity, Loader2, 
   LucideIcon, Download, Trash2, Pause, PlayCircle,
   TestTube, Network, Layers, Package, BookOpen,
-  Search, Filter, RefreshCw, LayoutDashboard
+  Search, Filter, RefreshCw, LayoutDashboard,
+  MousePointer, Table2, FormInput, Accessibility, Monitor, Printer
 } from 'lucide-react';
+import { runUITests } from '@/tests/ui-components.tests';
+import { runWorkflowTests } from '@/tests/workflow.tests';
+import { runReportTests } from '@/tests/reports-export.tests';
+import { runResponsiveA11yTests } from '@/tests/responsive-a11y.tests';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 
 // ================== أنواع البيانات ==================
@@ -1228,11 +1233,187 @@ const ALL_TESTS: TestCategory[] = [
       }),
     ]
   },
+  
+  // =============== 10. اختبارات مكونات الواجهة (60+ اختبار) ===============
+  {
+    id: 'ui-components',
+    label: 'مكونات الواجهة',
+    icon: MousePointer,
+    color: 'text-pink-500',
+    tests: [
+      {
+        id: 'ui-all',
+        name: 'جميع اختبارات الواجهة',
+        description: 'اختبار الأزرار، النماذج، الجداول، التبويبات، الحوارات',
+        category: 'ui-components',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runUITests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'ui-all',
+              testName: 'جميع اختبارات الواجهة',
+              category: 'ui-components',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'ui-all',
+              testName: 'جميع اختبارات الواجهة',
+              category: 'ui-components',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 11. اختبارات سير العمل (15 اختبار) ===============
+  {
+    id: 'workflows',
+    label: 'سير العمل',
+    icon: RefreshCw,
+    color: 'text-indigo-500',
+    tests: [
+      {
+        id: 'wf-all',
+        name: 'جميع اختبارات سير العمل',
+        description: 'اختبار تدفق العمليات كاملة',
+        category: 'workflows',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runWorkflowTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'wf-all',
+              testName: 'جميع اختبارات سير العمل',
+              category: 'workflows',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'wf-all',
+              testName: 'جميع اختبارات سير العمل',
+              category: 'workflows',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 12. اختبارات التقارير والتصدير (40+ اختبار) ===============
+  {
+    id: 'reports-export',
+    label: 'التقارير والتصدير',
+    icon: Printer,
+    color: 'text-emerald-500',
+    tests: [
+      {
+        id: 'reports-all',
+        name: 'جميع اختبارات التقارير والتصدير',
+        description: 'اختبار PDF, Excel, طباعة',
+        category: 'reports-export',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runReportTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'reports-all',
+              testName: 'جميع اختبارات التقارير والتصدير',
+              category: 'reports-export',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'reports-all',
+              testName: 'جميع اختبارات التقارير والتصدير',
+              category: 'reports-export',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+  
+  // =============== 13. اختبارات التوافق وإمكانية الوصول (45+ اختبار) ===============
+  {
+    id: 'responsive-a11y',
+    label: 'التوافق والوصول',
+    icon: Accessibility,
+    color: 'text-sky-500',
+    tests: [
+      {
+        id: 'responsive-a11y-all',
+        name: 'جميع اختبارات التوافق والوصول',
+        description: 'اختبار RTL, الاستجابة, إمكانية الوصول',
+        category: 'responsive-a11y',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runResponsiveA11yTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'responsive-a11y-all',
+              testName: 'جميع اختبارات التوافق والوصول',
+              category: 'responsive-a11y',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'responsive-a11y-all',
+              testName: 'جميع اختبارات التوافق والوصول',
+              category: 'responsive-a11y',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
 ];
 
 // ================== حساب الإحصائيات ==================
-
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0);
+// إجمالي الاختبارات = الاختبارات المباشرة + الاختبارات المدمجة (60 UI + 15 Workflow + 40 Reports + 45 A11y)
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0) + 160;
 
 // ================== المكون الرئيسي ==================
 
