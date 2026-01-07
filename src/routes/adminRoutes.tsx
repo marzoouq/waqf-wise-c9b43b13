@@ -23,6 +23,7 @@ import {
   EdgeFunctionTest,
   EdgeFunctionsMonitor,
   ComprehensiveTest,
+  TestsDashboard,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -216,6 +217,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["nazer", "accountant", "cashier"]}>
         <PointOfSale />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="tests-dashboard"
+    path="/tests-dashboard" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <TestsDashboard />
       </ProtectedRoute>
     } 
   />,
