@@ -14,9 +14,19 @@ export interface WorkflowTestResult {
   message?: string;
 }
 
+// قائمة الجداول الصالحة للاختبار
+type ValidTable = 'beneficiaries' | 'properties' | 'property_units' | 'tenants' | 'contracts' | 
+  'payments' | 'invoices' | 'journal_entries' | 'distributions' | 'governance_decisions' | 
+  'approval_status' | 'annual_disclosures' | 'support_tickets' | 'notifications';
+
 // ============= اختبارات سير العمل البسيطة =============
 
-const workflowDefinitions = [
+const workflowDefinitions: Array<{
+  id: string;
+  name: string;
+  category: string;
+  table: ValidTable;
+}> = [
   { id: 'wf-beneficiary-list', name: 'عرض قائمة المستفيدين', category: 'المستفيدين', table: 'beneficiaries' },
   { id: 'wf-beneficiary-search', name: 'البحث في المستفيدين', category: 'المستفيدين', table: 'beneficiaries' },
   { id: 'wf-property-list', name: 'عرض العقارات', category: 'العقارات', table: 'properties' },
