@@ -2077,8 +2077,18 @@ export default function ComprehensiveTest() {
           }));
         }
 
-        // تأخير صغير بين الاختبارات
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // تأخير ديناميكي لمنع Rate Limiting وانقطاع الاتصال
+        // زيادة التأخير كل 10 اختبارات لتجنب إرهاق الخادم
+        const dynamicDelay = 150 + Math.floor(totalCompleted / 10) * 50;
+        const maxDelay = Math.min(dynamicDelay, 500); // حد أقصى 500ms
+        
+        // استراحة إضافية كل 25 اختبار لتجنب Rate Limiting
+        if (totalCompleted > 0 && totalCompleted % 25 === 0) {
+          addLog(`⏸️ استراحة قصيرة لحماية الاتصال (${totalCompleted} اختبار)...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+          await new Promise(resolve => setTimeout(resolve, maxDelay));
+        }
       }
     }
 
