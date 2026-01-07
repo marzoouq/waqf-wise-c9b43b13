@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `type-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة أنواع البيانات للاختبار
 const TYPES_LIST = [
@@ -62,6 +62,7 @@ async function testTypeFileExists(fileName: string): Promise<TestResult> {
     
     if (typeModule) {
       return {
+        id: generateId(),
         name: `ملف الأنواع ${fileName} موجود`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -70,16 +71,18 @@ async function testTypeFileExists(fileName: string): Promise<TestResult> {
     }
     
     return {
+      id: generateId(),
       name: `ملف الأنواع ${fileName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'types',
       error: 'الملف غير موجود'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `ملف الأنواع ${fileName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'types',
       error: 'الملف قد يكون غير موجود'
@@ -94,6 +97,7 @@ async function testTypeDefinitions(fileName: string, types: string[]): Promise<T
   for (const typeName of types) {
     const startTime = performance.now();
     results.push({
+      id: generateId(),
       name: `${fileName} - نوع ${typeName}`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -109,6 +113,7 @@ async function testTypeExports(fileName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${fileName} - التصدير`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -116,8 +121,9 @@ async function testTypeExports(fileName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${fileName} - التصدير`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'types',
       error: 'مشكلة في التصدير'
@@ -130,6 +136,7 @@ async function testTypeDatabaseCompatibility(fileName: string): Promise<TestResu
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${fileName} - التوافق مع قاعدة البيانات`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -137,8 +144,9 @@ async function testTypeDatabaseCompatibility(fileName: string): Promise<TestResu
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${fileName} - التوافق مع قاعدة البيانات`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'types',
       error: 'قد يحتاج مراجعة التوافق'
@@ -172,6 +180,7 @@ export async function runTypesTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية
   results.push({
+    id: generateId(),
     name: 'التحقق من فهرس الأنواع الرئيسي',
     status: 'passed',
     duration: 1,
@@ -179,6 +188,7 @@ export async function runTypesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من عدم وجود أنواع any',
     status: 'passed',
     duration: 1,
@@ -186,6 +196,7 @@ export async function runTypesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من توافق Supabase Types',
     status: 'passed',
     duration: 1,

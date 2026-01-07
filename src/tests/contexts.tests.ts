@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `ctx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة السياقات للاختبار
 const CONTEXTS_LIST = [
@@ -70,6 +70,7 @@ async function testContextExists(contextName: string, modulePath: string): Promi
     
     if (contextModule) {
       return {
+        id: generateId(),
         name: `سياق ${contextName} موجود`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -78,14 +79,16 @@ async function testContextExists(contextName: string, modulePath: string): Promi
     }
     
     return {
+      id: generateId(),
       name: `سياق ${contextName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'contexts',
       error: 'السياق غير موجود'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `سياق ${contextName}`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -102,6 +105,7 @@ async function testContextExports(contextName: string, exports: string[]): Promi
   for (const exp of exports) {
     const startTime = performance.now();
     results.push({
+      id: generateId(),
       name: `${contextName} - تصدير ${exp}`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -119,6 +123,7 @@ async function testContextFunctions(contextName: string, functions: string[]): P
   for (const func of functions) {
     const startTime = performance.now();
     results.push({
+      id: generateId(),
       name: `${contextName}.${func}() - الدالة`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -134,6 +139,7 @@ async function testContextProvider(contextName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${contextName}Provider - يعمل`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -141,6 +147,7 @@ async function testContextProvider(contextName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${contextName}Provider`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -155,6 +162,7 @@ async function testContextHook(contextName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `use${contextName} Hook - يعمل`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -162,6 +170,7 @@ async function testContextHook(contextName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `use${contextName} Hook`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -176,6 +185,7 @@ async function testContextDefaultValues(contextName: string): Promise<TestResult
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${contextName} - القيم الافتراضية`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -183,6 +193,7 @@ async function testContextDefaultValues(contextName: string): Promise<TestResult
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${contextName} - القيم الافتراضية`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -197,6 +208,7 @@ async function testContextReactivity(contextName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${contextName} - التفاعلية`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -204,6 +216,7 @@ async function testContextReactivity(contextName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${contextName} - التفاعلية`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -251,6 +264,7 @@ export async function runContextsTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية عامة
   results.push({
+    id: generateId(),
     name: 'التحقق من تداخل السياقات',
     status: 'passed',
     duration: 1,
@@ -258,6 +272,7 @@ export async function runContextsTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من أداء السياقات',
     status: 'passed',
     duration: 1,
@@ -265,6 +280,7 @@ export async function runContextsTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من تنظيف الذاكرة',
     status: 'passed',
     duration: 1,

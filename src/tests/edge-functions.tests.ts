@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `ef-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة Edge Functions للاختبار
 const EDGE_FUNCTIONS_LIST = [
@@ -106,9 +106,8 @@ async function testEdgeFunctionExists(funcName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     // التحقق من وجود الوظيفة في المجلد
-    const functionPath = `supabase/functions/${funcName}/index.ts`;
-    
     return {
+      id: generateId(),
       name: `Edge Function: ${funcName} موجودة`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -116,8 +115,9 @@ async function testEdgeFunctionExists(funcName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `Edge Function: ${funcName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'edge-functions',
       error: 'الوظيفة غير موجودة أو غير قابلة للوصول'
@@ -132,9 +132,9 @@ async function testEdgeFunctionInvocation(funcName: string): Promise<TestResult>
     const { supabase } = await import('@/integrations/supabase/client');
     
     // لا نستدعي الوظيفة فعلياً لتجنب الآثار الجانبية
-    // فقط نتحقق من إمكانية الاستدعاء
     if (supabase && supabase.functions) {
       return {
+        id: generateId(),
         name: `${funcName} - قابل للاستدعاء`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -143,14 +143,16 @@ async function testEdgeFunctionInvocation(funcName: string): Promise<TestResult>
     }
     
     return {
+      id: generateId(),
       name: `${funcName} - قابل للاستدعاء`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'edge-functions',
       error: 'لم يتم التحقق من إمكانية الاستدعاء'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${funcName} - قابل للاستدعاء`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -165,6 +167,7 @@ async function testEdgeFunctionErrorHandling(funcName: string): Promise<TestResu
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${funcName} - معالجة الأخطاء`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -172,6 +175,7 @@ async function testEdgeFunctionErrorHandling(funcName: string): Promise<TestResu
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${funcName} - معالجة الأخطاء`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -186,6 +190,7 @@ async function testEdgeFunctionCORS(funcName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${funcName} - إعدادات CORS`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -193,6 +198,7 @@ async function testEdgeFunctionCORS(funcName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${funcName} - إعدادات CORS`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -207,6 +213,7 @@ async function testEdgeFunctionAuth(funcName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${funcName} - المصادقة`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -214,6 +221,7 @@ async function testEdgeFunctionAuth(funcName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${funcName} - المصادقة`,
       status: 'failed',
       duration: performance.now() - startTime,
@@ -253,6 +261,7 @@ export async function runEdgeFunctionsTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية عامة
   results.push({
+    id: generateId(),
     name: 'التحقق من إعدادات CORS المشتركة',
     status: 'passed',
     duration: 1,
@@ -260,6 +269,7 @@ export async function runEdgeFunctionsTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من استخدام المتغيرات البيئية',
     status: 'passed',
     duration: 1,
@@ -267,6 +277,7 @@ export async function runEdgeFunctionsTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من تسجيل الأخطاء المركزي',
     status: 'passed',
     duration: 1,

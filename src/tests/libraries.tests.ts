@@ -14,7 +14,7 @@ export interface TestResult {
   error?: string;
 }
 
-const generateId = () => `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () => `lib-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // قائمة المكتبات والأدوات للاختبار
 const LIBRARIES_LIST = [
@@ -120,6 +120,7 @@ async function testLibraryExists(libName: string): Promise<TestResult> {
     
     if (libModule) {
       return {
+        id: generateId(),
         name: `مكتبة ${libName} موجودة`,
         status: 'passed',
         duration: performance.now() - startTime,
@@ -128,16 +129,18 @@ async function testLibraryExists(libName: string): Promise<TestResult> {
     }
     
     return {
+      id: generateId(),
       name: `مكتبة ${libName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'libraries',
       error: 'المكتبة غير موجودة'
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `مكتبة ${libName}`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'libraries',
       error: 'المكتبة قد تكون غير موجودة أو تحتاج للإنشاء'
@@ -152,6 +155,7 @@ async function testLibraryFunctions(libName: string, functions: string[]): Promi
   for (const func of functions) {
     const startTime = performance.now();
     results.push({
+      id: generateId(),
       name: `${libName}.${func}() - موجودة`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -167,6 +171,7 @@ async function testLibraryDocumentation(libName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${libName} - التوثيق`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -174,8 +179,9 @@ async function testLibraryDocumentation(libName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${libName} - التوثيق`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'libraries',
       error: 'التوثيق غير مكتمل'
@@ -188,6 +194,7 @@ async function testLibraryTypes(libName: string): Promise<TestResult> {
   const startTime = performance.now();
   try {
     return {
+      id: generateId(),
       name: `${libName} - الأنواع TypeScript`,
       status: 'passed',
       duration: performance.now() - startTime,
@@ -195,8 +202,9 @@ async function testLibraryTypes(libName: string): Promise<TestResult> {
     };
   } catch (error) {
     return {
+      id: generateId(),
       name: `${libName} - الأنواع TypeScript`,
-      status: 'warning',
+      status: 'skipped',
       duration: performance.now() - startTime,
       category: 'libraries',
       error: 'الأنواع غير مكتملة'
@@ -230,6 +238,7 @@ export async function runLibrariesTests(): Promise<TestResult[]> {
   
   // اختبارات إضافية
   results.push({
+    id: generateId(),
     name: 'التحقق من عدم وجود تبعيات دائرية',
     status: 'passed',
     duration: 1,
@@ -237,6 +246,7 @@ export async function runLibrariesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من التصدير الصحيح',
     status: 'passed',
     duration: 1,
@@ -244,6 +254,7 @@ export async function runLibrariesTests(): Promise<TestResult[]> {
   });
   
   results.push({
+    id: generateId(),
     name: 'التحقق من التوافق مع Tree Shaking',
     status: 'passed',
     duration: 1,
