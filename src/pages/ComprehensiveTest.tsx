@@ -1908,8 +1908,33 @@ const ALL_TESTS: TestCategory[] = [
 ];
 
 // ================== حساب الإحصائيات ==================
-// إجمالي الاختبارات = الاختبارات المباشرة فقط (المدمجة تُحسب عند التنفيذ)
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0);
+// الاختبارات المباشرة + تقدير الاختبارات الفرعية للفئات المفصلة
+const DETAILED_TESTS_COUNTS: Record<string, number> = {
+  'ui-components': 60,
+  'workflow': 15,
+  'reports-export': 40,
+  'responsive-a11y': 45,
+  'hooks-tests': 200,
+  'components-tests': 150,
+  'integration-tests': 30,
+  'advanced-workflow': 50,
+  'advanced-performance-tests': 20,
+  'services-detailed': 300,
+  'edge-functions-detailed': 260,
+  'contexts-detailed': 100,
+  'libraries-detailed': 200,
+  'pages-detailed': 400,
+  'types-tests': 250,
+};
+
+// حساب الإجمالي الحقيقي
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => {
+  const detailedCount = DETAILED_TESTS_COUNTS[cat.id];
+  if (detailedCount) {
+    return acc + detailedCount;
+  }
+  return acc + cat.tests.length;
+}, 0);
 
 // ================== المكون الرئيسي ==================
 
@@ -1953,12 +1978,17 @@ export default function ComprehensiveTest() {
     setLogs([]);
     setStopRequested(false);
     
-    const testsToRun = ALL_TESTS
+    // حساب إجمالي الاختبارات المتوقعة بناءً على الفئات المختارة
+    const selectedTotalTests = ALL_TESTS
       .filter(cat => selectedCategories.includes(cat.id))
-      .flatMap(cat => cat.tests);
+      .reduce((acc, cat) => {
+        const detailedCount = DETAILED_TESTS_COUNTS[cat.id];
+        if (detailedCount) return acc + detailedCount;
+        return acc + cat.tests.length;
+      }, 0);
     
     setProgress({
-      total: testsToRun.length,
+      total: selectedTotalTests,
       completed: 0,
       passed: 0,
       failed: 0,
@@ -1968,46 +1998,88 @@ export default function ComprehensiveTest() {
       isPaused: false
     });
 
-    addLog(`🚀 بدء تشغيل ${testsToRun.length} اختبار...`);
+    addLog(`🚀 بدء تشغيل ~${selectedTotalTests} اختبار...`);
 
-    let passed = 0;
-    let failed = 0;
+    let totalPassed = 0;
+    let totalFailed = 0;
+    let totalCompleted = 0;
 
-    for (let i = 0; i < testsToRun.length; i++) {
-      if (stopRequested) {
-        addLog('⏹️ تم إيقاف الاختبارات');
-        break;
+    for (const category of ALL_TESTS) {
+      if (stopRequested) break;
+      if (!selectedCategories.includes(category.id)) continue;
+
+      for (const test of category.tests) {
+        if (stopRequested) {
+          addLog('⏹️ تم إيقاف الاختبارات');
+          break;
+        }
+
+        setProgress(prev => ({
+          ...prev,
+          currentTest: test.name
+        }));
+
+        addLog(`▶️ تشغيل: ${test.name}`);
+        
+        const result = await test.run();
+        
+        // إذا كان الاختبار يحتوي على نتائج فرعية، نعرضها
+        if (result.details?.results && Array.isArray(result.details.results)) {
+          const subResults = result.details.results;
+          
+          for (const subResult of subResults) {
+            const testResult: TestResult = {
+              testId: subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
+              testName: subResult.name || subResult.testName,
+              category: subResult.category || category.id,
+              success: subResult.status === 'passed' || subResult.success === true,
+              duration: subResult.duration || 0,
+              message: subResult.details || subResult.message,
+              timestamp: new Date()
+            };
+            
+            setResults(prev => [...prev, testResult]);
+            
+            if (testResult.success) {
+              totalPassed++;
+            } else {
+              totalFailed++;
+            }
+            totalCompleted++;
+            
+            setProgress(prev => ({
+              ...prev,
+              completed: totalCompleted,
+              passed: totalPassed,
+              failed: totalFailed
+            }));
+          }
+          
+          addLog(`📦 ${test.name}: ${subResults.filter((r: any) => r.status === 'passed' || r.success).length} نجح، ${subResults.filter((r: any) => r.status === 'failed' || r.success === false).length} فشل من ${subResults.length}`);
+        } else {
+          // اختبار عادي بدون نتائج فرعية
+          setResults(prev => [...prev, result]);
+          
+          if (result.success) {
+            totalPassed++;
+            addLog(`✅ ${test.name}: نجح (${result.duration}ms)`);
+          } else {
+            totalFailed++;
+            addLog(`❌ ${test.name}: فشل - ${result.message}`);
+          }
+          
+          totalCompleted++;
+          setProgress(prev => ({
+            ...prev,
+            completed: totalCompleted,
+            passed: totalPassed,
+            failed: totalFailed
+          }));
+        }
+
+        // تأخير صغير بين الاختبارات
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
-
-      const test = testsToRun[i];
-      setProgress(prev => ({
-        ...prev,
-        currentTest: test.name
-      }));
-
-      addLog(`▶️ تشغيل: ${test.name}`);
-      
-      const result = await test.run();
-      
-      setResults(prev => [...prev, result]);
-      
-      if (result.success) {
-        passed++;
-        addLog(`✅ ${test.name}: نجح (${result.duration}ms)`);
-      } else {
-        failed++;
-        addLog(`❌ ${test.name}: فشل - ${result.message}`);
-      }
-
-      setProgress(prev => ({
-        ...prev,
-        completed: i + 1,
-        passed,
-        failed
-      }));
-
-      // تأخير صغير بين الاختبارات
-      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     setProgress(prev => ({
@@ -2016,12 +2088,12 @@ export default function ComprehensiveTest() {
       currentTest: ''
     }));
 
-    addLog(`\n📊 انتهى: ${passed} نجح، ${failed} فشل`);
+    addLog(`\n📊 انتهى: ${totalPassed} نجح، ${totalFailed} فشل من ${totalCompleted} اختبار`);
     
-    if (failed === 0 && !stopRequested) {
+    if (totalFailed === 0 && !stopRequested) {
       toastSuccess('جميع الاختبارات نجحت!');
-    } else if (failed > 0) {
-      toastError(`${failed} اختبار فشل`);
+    } else if (totalFailed > 0) {
+      toastError(`${totalFailed} اختبار فشل`);
     }
   };
 
@@ -2104,24 +2176,12 @@ export default function ComprehensiveTest() {
     return Math.round(results.reduce((acc, r) => acc + r.duration, 0) / results.length);
   };
 
-  // حساب عدد الاختبارات المختارة مع الاختبارات المدمجة
-  const EMBEDDED_TESTS_COUNT: Record<string, number> = {
-    'ui-components': 60,
-    'workflows': 15,
-    'reports-export': 40,
-    'responsive-a11y': 45,
-    'hooks-tests': 200,
-    'components-tests': 150,
-    'integration-tests': 30,
-    'advanced-workflow-tests': 50,
-    'advanced-performance-tests': 20,
-  };
-  
+  // حساب عدد الاختبارات المختارة
   const selectedTestsCount = selectedCategories.reduce((acc, catId) => {
+    const detailedCount = DETAILED_TESTS_COUNTS[catId];
+    if (detailedCount) return acc + detailedCount;
     const cat = ALL_TESTS.find(c => c.id === catId);
-    const baseCount = cat?.tests.length || 0;
-    const embeddedCount = EMBEDDED_TESTS_COUNT[catId] || 0;
-    return acc + baseCount + embeddedCount;
+    return acc + (cat?.tests.length || 0);
   }, 0);
 
   return (
