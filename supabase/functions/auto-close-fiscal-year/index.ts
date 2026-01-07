@@ -25,21 +25,26 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support / Test Mode
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
-      try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+    // ✅ Health Check Support / Test Mode - يجب فحصه أولاً قبل أي شيء
+    let bodyText = '';
+    let parsedBody: any = null;
+    
+    try {
+      bodyText = await req.clone().text();
+      if (bodyText) {
+        parsedBody = JSON.parse(bodyText);
+        if (parsedBody.ping || parsedBody.healthCheck || parsedBody.testMode) {
           console.log('[auto-close-fiscal-year] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'auto-close-fiscal-year',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsedBody.testMode || false
           });
         }
-      } catch { /* not JSON, continue */ }
+      }
+    } catch { 
+      // not JSON, continue 
     }
 
     // ============ التحقق من المصادقة والصلاحيات ============
