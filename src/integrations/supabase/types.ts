@@ -12217,6 +12217,54 @@ export type Database = {
         }
         Relationships: []
       }
+      test_runs: {
+        Row: {
+          avg_duration: number
+          categories_summary: Json | null
+          created_by: string | null
+          failed_tests: number
+          failed_tests_details: Json | null
+          id: string
+          notes: string | null
+          pass_rate: number
+          passed_tests: number
+          run_date: string
+          run_duration_seconds: number | null
+          total_tests: number
+          triggered_by: string | null
+        }
+        Insert: {
+          avg_duration?: number
+          categories_summary?: Json | null
+          created_by?: string | null
+          failed_tests?: number
+          failed_tests_details?: Json | null
+          id?: string
+          notes?: string | null
+          pass_rate?: number
+          passed_tests?: number
+          run_date?: string
+          run_duration_seconds?: number | null
+          total_tests?: number
+          triggered_by?: string | null
+        }
+        Update: {
+          avg_duration?: number
+          categories_summary?: Json | null
+          created_by?: string | null
+          failed_tests?: number
+          failed_tests_details?: Json | null
+          id?: string
+          notes?: string | null
+          pass_rate?: number
+          passed_tests?: number
+          run_date?: string
+          run_duration_seconds?: number | null
+          total_tests?: number
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       ticket_comments: {
         Row: {
           attachments: Json | null
