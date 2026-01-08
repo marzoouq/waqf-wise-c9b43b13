@@ -498,8 +498,7 @@ class ErrorTracker {
         const { error: updateError } = await supabase
           .from('system_alerts')
           .update({ 
-            occurrence_count: (existingAlert.occurrence_count || 1) + 1,
-            updated_at: new Date().toISOString()
+            occurrence_count: (existingAlert.occurrence_count || 1) + 1
           })
           .eq('id', existingAlert.id);
 
