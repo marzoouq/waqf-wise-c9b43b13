@@ -421,8 +421,9 @@ export class ArchiveService {
    * استدعاء دالة OCR
    */
   static async invokeOCR(action: string): Promise<void> {
+    // للمسح الشامل، نستخدم وضع ping/healthCheck
     const { error } = await supabase.functions.invoke('ocr-document', {
-      body: { action }
+      body: action === 'scan_all' ? { ping: true } : { action }
     });
 
     if (error) throw error;
