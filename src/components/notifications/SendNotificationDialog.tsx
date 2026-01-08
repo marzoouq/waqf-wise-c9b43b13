@@ -222,7 +222,7 @@ export function SendNotificationDialog({ open, onOpenChange }: SendNotificationD
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {beneficiaries?.map((b) => (
+                        {beneficiaries?.filter((b) => b.user_id).map((b) => (
                           <SelectItem key={b.id} value={b.user_id!}>
                             {b.full_name}
                           </SelectItem>
