@@ -14038,6 +14038,13 @@ export type Database = {
         }[]
       }
       auto_escalate_overdue_tickets: { Args: never; Returns: undefined }
+      auto_repair_missing_rls: {
+        Args: never
+        Returns: {
+          action_taken: string
+          table_name: string
+        }[]
+      }
       auto_update_expired_contracts: { Args: never; Returns: undefined }
       cache_user_roles: { Args: never; Returns: undefined }
       calculate_account_balance: {
@@ -14148,6 +14155,17 @@ export type Database = {
       }
       can_manage_data: { Args: never; Returns: boolean }
       can_view_sensitive_data: { Args: never; Returns: boolean }
+      check_accounting_balance: {
+        Args: never
+        Returns: {
+          difference: number
+          entry_date: string
+          entry_id: string
+          is_balanced: boolean
+          total_credit: number
+          total_debit: number
+        }[]
+      }
       check_file_retention_eligibility: {
         Args: { p_file_category: string; p_uploaded_at: string }
         Returns: boolean
@@ -14177,6 +14195,13 @@ export type Database = {
       check_user_permission: {
         Args: { p_permission_key: string; p_user_id: string }
         Returns: boolean
+      }
+      cleanup_expired_sessions: {
+        Args: never
+        Returns: {
+          cleaned_count: number
+          cleanup_time: string
+        }[]
       }
       cleanup_old_alerts: { Args: never; Returns: undefined }
       cleanup_old_chatbot_conversations: { Args: never; Returns: undefined }
@@ -14291,6 +14316,34 @@ export type Database = {
         Returns: boolean
       }
       escalate_overdue_requests: { Args: never; Returns: undefined }
+      find_duplicate_distributions: {
+        Args: never
+        Returns: {
+          beneficiary_id: string
+          beneficiary_name: string
+          duplicate_count: number
+          month_year: string
+          total_amount: number
+        }[]
+      }
+      find_orphan_records: {
+        Args: never
+        Returns: {
+          orphan_count: number
+          sample_ids: string
+          table_name: string
+        }[]
+      }
+      fix_stuck_approvals: {
+        Args: { max_age_days?: number }
+        Returns: {
+          action_taken: string
+          approval_id: string
+          days_pending: number
+          entity_id: string
+          entity_type: string
+        }[]
+      }
       generate_annual_disclosure: {
         Args: { p_waqf_name: string; p_year: number }
         Returns: string
