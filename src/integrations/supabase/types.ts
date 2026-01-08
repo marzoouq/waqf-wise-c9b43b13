@@ -14696,6 +14696,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_vacuum_status: {
+        Args: never
+        Returns: {
+          dead_pct: number
+          dead_rows: number
+          last_analyze: string
+          last_autovacuum: string
+          last_vacuum: string
+          live_rows: number
+          needs_vacuum: boolean
+          table_name: string
+        }[]
+      }
       get_waqf_public_stats: { Args: never; Returns: Json }
       get_waqf_summary: {
         Args: never
@@ -14946,6 +14959,8 @@ export type Database = {
         Returns: undefined
       }
       update_overdue_installments: { Args: never; Returns: undefined }
+      vacuum_all_tables: { Args: never; Returns: Json }
+      vacuum_table: { Args: { p_table_name: string }; Returns: Json }
       verify_2fa_code: {
         Args: { p_code: string; p_user_id: string }
         Returns: boolean

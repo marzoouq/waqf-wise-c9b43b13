@@ -147,79 +147,87 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    console.log('[run-vacuum] Starting table analysis...');
+    console.log('[run-vacuum] Starting comprehensive table analysis...');
 
-    // قائمة شاملة لجميع الجداول
-    const tables = [
-      // الجداول الأساسية
-      'accounts', 'beneficiaries', 'contracts', 'distributions',
-      'families', 'fiscal_years', 'invoices', 'journal_entries',
-      'journal_entry_lines', 'loans', 'notifications', 'payments',
-      'payment_vouchers', 'profiles', 'properties', 'rental_payments',
-      'tenants', 'user_roles',
-      // الجداول المالية
-      'bank_accounts', 'bank_statements', 'bank_transactions',
-      'bank_reconciliation_matches', 'opening_balances', 'pos_transactions',
-      'tenant_ledger',
-      // جداول المستفيدين
-      'beneficiary_attachments', 'beneficiary_requests',
-      'beneficiary_activity_log', 'beneficiary_changes_log',
-      'beneficiary_tags', 'distribution_details',
-      // جداول النظام
-      'system_alerts', 'audit_logs', 'approval_status',
-      'approval_steps', 'documents', 'maintenance_requests',
-      'support_tickets',
-      // جداول أخرى
-      'annual_disclosures', 'fiscal_year_closings',
-      'waqf_distribution_settings', 'historical_invoices',
-      'zatca_submission_log'
-    ];
+    // التحقق من نوع الطلب: جدول محدد أو جميع الجداول
+    const targetTable = bodyData.table as string | undefined;
 
-    const results: Array<{ table: string; status: string; reason?: string }> = [];
+    if (targetTable) {
+      // ✅ تحليل جدول محدد
+      console.log(`[run-vacuum] Analyzing single table: ${targetTable}`);
+      
+      const { data: result, error } = await supabase.rpc('vacuum_table', { 
+        p_table_name: targetTable 
+      });
 
-    for (const table of tables) {
-      try {
-        // تشغيل ANALYZE (VACUUM يتطلب صلاحيات خاصة)
-        const { error } = await supabase.rpc('analyze_table', { p_table_name: table });
-        
-        if (error) {
-          results.push({ table, status: 'skipped', reason: error.message });
-        } else {
-          results.push({ table, status: 'analyzed' });
-        }
-      } catch (e) {
-        results.push({ table, status: 'error', reason: String(e) });
+      if (error) {
+        console.error(`[run-vacuum] Error analyzing ${targetTable}:`, error);
+        return errorResponse(`فشل تحليل الجدول ${targetTable}: ${error.message}`, 500);
       }
+
+      // تسجيل العملية
+      await supabase.from('audit_logs').insert({
+        action_type: 'vacuum_table',
+        user_id: authorizedUserId,
+        description: `تم تحليل جدول ${targetTable}`,
+        new_values: { table: targetTable, result, auth_method: authMethod }
+      });
+
+      return jsonResponse({
+        success: true,
+        message: `تم تحليل الجدول ${targetTable} بنجاح`,
+        result,
+        authMethod,
+        timestamp: new Date().toISOString()
+      });
     }
+
+    // ✅ تحليل جميع الجداول باستخدام الدالة الجديدة
+    console.log('[run-vacuum] Analyzing ALL tables using vacuum_all_tables()...');
+    
+    const { data: vacuumResult, error: vacuumError } = await supabase.rpc('vacuum_all_tables');
+
+    if (vacuumError) {
+      console.error('[run-vacuum] Error running vacuum_all_tables:', vacuumError);
+      return errorResponse(`فشل تحليل الجداول: ${vacuumError.message}`, 500);
+    }
+
+    const result = vacuumResult as {
+      success: boolean;
+      total: number;
+      analyzed: number;
+      errors: number;
+      tables: Array<{ table: string; status: string; dead_rows?: number }>;
+      timestamp: string;
+      note: string;
+    };
 
     // تسجيل العملية
     await supabase.from('audit_logs').insert({
-      action_type: 'run_vacuum',
+      action_type: 'run_vacuum_all',
       user_id: authorizedUserId,
-      description: `تم تحليل ${results.filter(r => r.status === 'analyzed').length} جدول (${authMethod})`,
+      description: `تم تحليل ${result.analyzed} جدول من ${result.total} (${authMethod})`,
       new_values: {
-        total_tables: tables.length,
-        analyzed: results.filter(r => r.status === 'analyzed').length,
-        skipped: results.filter(r => r.status === 'skipped').length,
-        errors: results.filter(r => r.status === 'error').length,
+        total: result.total,
+        analyzed: result.analyzed,
+        errors: result.errors,
         auth_method: authMethod
       }
     });
 
-    console.log(`[run-vacuum] Completed - ${results.filter(r => r.status === 'analyzed').length}/${tables.length} tables analyzed`);
+    console.log(`[run-vacuum] Completed - ${result.analyzed}/${result.total} tables analyzed`);
 
     return jsonResponse({ 
       success: true, 
-      message: 'تم تحليل الجداول بنجاح',
-      results,
+      message: 'تم تحليل جميع الجداول بنجاح',
+      results: result.tables,
       summary: {
-        total: tables.length,
-        analyzed: results.filter(r => r.status === 'analyzed').length,
-        skipped: results.filter(r => r.status === 'skipped').length,
-        errors: results.filter(r => r.status === 'error').length,
+        total: result.total,
+        analyzed: result.analyzed,
+        errors: result.errors,
         authMethod
       },
-      note: 'VACUUM الكامل يتم تلقائياً بواسطة autovacuum',
+      note: result.note,
       timestamp: new Date().toISOString()
     });
 
