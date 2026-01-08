@@ -3,7 +3,7 @@
  * تختبر جميع أجزاء التطبيق فعلياً من المتصفح (500+ اختبار)
  */
 
-import { useState, useCallback, useMemo, ErrorInfo, Component, ReactNode } from 'react';
+import { useState, useCallback, useMemo, ErrorInfo, Component, ReactNode, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,8 +25,11 @@ import {
   LucideIcon, Download, Trash2, Pause, PlayCircle,
   TestTube, Network, Layers, Package, BookOpen,
   Search, Filter, RefreshCw, LayoutDashboard,
-  MousePointer, Table2, FormInput, Accessibility, Monitor, Printer
+  MousePointer, Table2, FormInput, Accessibility, Monitor, Printer,
+  History, TrendingUp, FileSpreadsheet
 } from 'lucide-react';
+import { TestProgressLive, TestHistoryChart, TestHistoryPanel } from '@/components/tests';
+import { useTestHistory, useTestExport } from '@/hooks/tests';
 import { runUITests } from '@/tests/ui-components.tests';
 import { runWorkflowTests } from '@/tests/workflow.tests';
 import { runReportTests } from '@/tests/reports-export.tests';
@@ -2098,6 +2101,11 @@ function ComprehensiveTestContent() {
   const [stopRequested, setStopRequested] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'passed' | 'failed'>('all');
+  const [recentResults, setRecentResults] = useState<Array<{ name: string; success: boolean }>>([]);
+
+  // Hooks للتاريخ والتصدير
+  const { history, isLoading: historyLoading, stats, saveRun, refetch: refetchHistory } = useTestHistory();
+  const { exportToPDF, exportToExcel } = useTestExport();
 
   const addLog = useCallback((message: string) => {
     const timestamp = new Date().toLocaleTimeString('ar-SA');
@@ -2248,6 +2256,12 @@ function ComprehensiveTestContent() {
             // اختبار عادي بدون نتائج فرعية
             setResults(prev => [...prev, result]);
             
+            // تحديث النتائج الأخيرة للعرض المباشر
+            setRecentResults(prev => [...prev.slice(-5), { 
+              name: test.name, 
+              success: result.success 
+            }]);
+            
             if (result.success) {
               totalPassed++;
               addLog(`✅ ${test.name}: نجح (${result.duration}ms)`);
@@ -2307,12 +2321,50 @@ function ComprehensiveTestContent() {
 
     addLog(`\n📊 انتهى: ${totalPassed} نجح، ${totalFailed} فشل من ${totalCompleted} اختبار`);
     
+    // حفظ النتائج في قاعدة البيانات
+    if (totalCompleted > 0 && !stopRequested) {
+      try {
+        const resultsToSave: Array<{
+          testId: string;
+          testName: string;
+          category: string;
+          success: boolean;
+          duration: number;
+          message?: string;
+          timestamp: Date;
+        }> = results.map(r => ({
+          testId: r.testId,
+          testName: r.testName,
+          category: r.category,
+          success: r.success,
+          duration: r.duration,
+          message: r.message || '',
+          timestamp: r.timestamp
+        }));
+        
+        await saveRun({
+          results: resultsToSave,
+          totalTests: totalCompleted,
+          runDurationSeconds: Math.round((Date.now() - testStartTime) / 1000),
+          triggeredBy: 'manual',
+          notes: `اكتمل: ${totalPassed} نجح، ${totalFailed} فشل`
+        });
+        addLog('💾 تم حفظ النتائج في السجل');
+        refetchHistory();
+      } catch (err) {
+        addLog('⚠️ فشل حفظ النتائج: ' + (err instanceof Error ? err.message : 'خطأ غير معروف'));
+      }
+    }
+    
     if (totalFailed === 0 && !stopRequested) {
       toastSuccess('جميع الاختبارات نجحت!');
     } else if (totalFailed > 0) {
       toastError(`${totalFailed} اختبار فشل`);
     }
   };
+
+  // متغير لتتبع وقت البدء
+  const [testStartTime, setTestStartTime] = useState(Date.now());
 
   const stopTests = () => {
     setStopRequested(true);
@@ -2511,12 +2563,28 @@ function ComprehensiveTestContent() {
         </Card>
       )}
 
+      {/* التقدم المباشر */}
+      {progress.isRunning && (
+        <TestProgressLive
+          currentTest={progress.currentTest}
+          completed={progress.completed}
+          total={progress.total}
+          passed={progress.passed}
+          failed={progress.failed}
+          recentResults={recentResults}
+        />
+      )}
+
       {/* التبويبات */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
           <TabsTrigger value="categories">الفئات ({ALL_TESTS.length})</TabsTrigger>
           <TabsTrigger value="results">النتائج ({results.length})</TabsTrigger>
+          <TabsTrigger value="history" className="gap-1">
+            <History className="h-4 w-4" />
+            التاريخ
+          </TabsTrigger>
           <TabsTrigger value="logs">السجلات</TabsTrigger>
         </TabsList>
 
@@ -2744,6 +2812,43 @@ function ComprehensiveTestContent() {
               </ScrollArea>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="history">
+          <div className="space-y-6">
+            {/* لوحة التاريخ (تتضمن الرسم البياني والإحصائيات) */}
+            <TestHistoryPanel />
+
+            {/* أزرار التصدير */}
+            {results.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileSpreadsheet className="h-5 w-5" />
+                    تصدير النتائج الحالية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-4">
+                  <Button 
+                    onClick={() => exportToPDF(results, ALL_TESTS)}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    تصدير PDF
+                  </Button>
+                  <Button 
+                    onClick={() => exportToExcel(results, ALL_TESTS)}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <FileSpreadsheet className="h-4 w-4" />
+                    تصدير Excel
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="logs">
