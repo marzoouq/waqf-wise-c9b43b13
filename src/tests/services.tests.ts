@@ -1,7 +1,7 @@
 /**
- * Services Tests - اختبارات الخدمات
- * @version 2.0.0
- * تغطية 60+ خدمة
+ * Services Tests - اختبارات الخدمات الحقيقية
+ * @version 3.0.0
+ * اختبارات وظيفية حقيقية تستورد الخدمات فعلياً
  */
 
 export interface TestResult {
@@ -12,279 +12,329 @@ export interface TestResult {
   duration: number;
   details?: string;
   error?: string;
+  recommendation?: string;
 }
 
 const generateId = () => `svc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// قائمة الخدمات للاختبار
-const SERVICES_LIST = [
-  // خدمات المصادقة والأمان
-  { name: 'auth.service', module: '@/services/auth.service', functions: ['login', 'logout', 'register', 'resetPassword', 'verifyEmail'] },
-  { name: 'biometric.service', module: '@/services/biometric.service', functions: ['authenticate', 'register', 'verify'] },
-  { name: 'two-factor.service', module: '@/services/two-factor.service', functions: ['enable', 'disable', 'verify', 'generateQR'] },
-  { name: 'security.service', module: '@/services/security.service', functions: ['checkPermissions', 'validateSession', 'auditLog'] },
-  
-  // خدمات المستفيدين
-  { name: 'beneficiary.service', module: '@/services/beneficiary.service', functions: ['getAll', 'getById', 'create', 'update', 'delete', 'getActivity'] },
-  { name: 'family.service', module: '@/services/family.service', functions: ['getAll', 'getById', 'create', 'update', 'getMembers'] },
-  { name: 'tribe.service', module: '@/services/tribe.service', functions: ['getAll', 'getById', 'create', 'update'] },
-  
-  // خدمات العقارات
-  { name: 'property.service', module: '@/services/property.service', functions: ['getAll', 'getById', 'create', 'update', 'delete', 'getUnits'] },
-  { name: 'tenant.service', module: '@/services/tenant.service', functions: ['getAll', 'getById', 'create', 'update', 'delete'] },
-  { name: 'contract.service', module: '@/services/contract.service', functions: ['getAll', 'getById', 'create', 'update', 'terminate', 'renew'] },
-  { name: 'maintenance.service', module: '@/services/maintenance.service', functions: ['getRequests', 'createRequest', 'updateStatus', 'assignProvider'] },
-  
-  // خدمات المحاسبة والمالية
-  { name: 'accounting.service', module: '@/services/accounting.service', functions: ['getAccounts', 'getJournalEntries', 'createEntry', 'getTrialBalance'] },
-  { name: 'invoice.service', module: '@/services/invoice.service', functions: ['getAll', 'getById', 'create', 'update', 'delete', 'generatePDF'] },
-  { name: 'payment.service', module: '@/services/payment.service', functions: ['getAll', 'process', 'refund', 'getHistory'] },
-  { name: 'voucher.service', module: '@/services/voucher.service', functions: ['getAll', 'create', 'approve', 'reject', 'print'] },
-  { name: 'fund.service', module: '@/services/fund.service', functions: ['getAll', 'getById', 'create', 'update', 'transfer'] },
-  { name: 'loans.service', module: '@/services/loans.service', functions: ['getAll', 'getById', 'create', 'approve', 'recordPayment'] },
-  { name: 'fiscal-year.service', module: '@/services/fiscal-year.service', functions: ['getAll', 'getCurrent', 'close', 'publish'] },
-  
-  // خدمات التوزيعات
-  { name: 'distribution.service', module: '@/services/distribution.service', functions: ['getAll', 'create', 'execute', 'simulate', 'getDetails'] },
-  
-  // خدمات الحوكمة
-  { name: 'governance.service', module: '@/services/governance.service', functions: ['getDecisions', 'createDecision', 'vote', 'getVotes'] },
-  { name: 'disclosure.service', module: '@/services/disclosure.service', functions: ['getAll', 'create', 'publish', 'getPublished'] },
-  
-  // خدمات الإشعارات والدعم
-  { name: 'notification.service', module: '@/services/notification.service', functions: ['getAll', 'send', 'markAsRead', 'getUnread'] },
-  { name: 'support.service', module: '@/services/support.service', functions: ['createTicket', 'getTickets', 'respond', 'close'] },
-  { name: 'message.service', module: '@/services/message.service', functions: ['getAll', 'send', 'markAsRead', 'delete'] },
-  
-  // خدمات التقارير
-  { name: 'report.service', module: '@/services/report.service', functions: ['generate', 'schedule', 'export', 'getHistory'] },
-  { name: 'scheduled-report.service', module: '@/services/scheduled-report.service', functions: ['getAll', 'create', 'update', 'delete', 'run'] },
-  
-  // خدمات البحث والأرشفة
-  { name: 'search.service', module: '@/services/search.service', functions: ['search', 'advancedSearch', 'getRecent', 'saveSearch'] },
-  
-  // خدمات التخزين
-  { name: 'storage.service', module: '@/services/storage.service', functions: ['upload', 'download', 'delete', 'getUrl', 'list'] },
-  { name: 'document.service', module: '@/services/document.service', functions: ['getAll', 'upload', 'download', 'archive', 'classify'] },
-  
-  // خدمات النظام
-  { name: 'system.service', module: '@/services/system.service', functions: ['getHealth', 'getMetrics', 'clearCache', 'restart'] },
-  { name: 'settings.service', module: '@/services/settings.service', functions: ['getAll', 'get', 'update', 'reset'] },
-  { name: 'integration.service', module: '@/services/integration.service', functions: ['getAll', 'enable', 'disable', 'configure'] },
-  
-  // خدمات الذكاء الاصطناعي
-  { name: 'chatbot.service', module: '@/services/chatbot.service', functions: ['sendMessage', 'getHistory', 'clearHistory'] },
-  { name: 'ai-system-audit.service', module: '@/services/ai-system-audit.service', functions: ['runAudit', 'getResults', 'applyFixes'] },
-  
-  // خدمات البنوك
-  { name: 'bank-reconciliation.service', module: '@/services/bank-reconciliation.service', functions: ['reconcile', 'getUnmatched', 'match', 'unmatch'] },
-  
-  // خدمات المستخدمين
-  { name: 'user.service', module: '@/services/user.service', functions: ['getAll', 'getById', 'create', 'update', 'delete', 'getRoles'] },
-  
-  // خدمات الوقف
-  { name: 'waqf.service', module: '@/services/waqf.service', functions: ['getInfo', 'update', 'getUnits', 'linkProperty'] },
-  
-  // خدمات Edge Functions
-  { name: 'edge-function.service', module: '@/services/edge-function.service', functions: ['invoke', 'getHealth', 'getLogs'] },
-  { name: 'edge-functions-health.service', module: '@/services/edge-functions-health.service', functions: ['checkAll', 'checkOne', 'getMetrics'] },
-  
-  // خدمات الإيجارات
-  { name: 'rental-payment.service', module: '@/services/rental-payment.service', functions: ['getAll', 'record', 'getOverdue', 'sendReminder'] },
-  { name: 'historical-rental.service', module: '@/services/historical-rental.service', functions: ['getHistory', 'archive', 'restore'] },
-  
-  // خدمات الطلبات
-  { name: 'request.service', module: '@/services/request.service', functions: ['getAll', 'create', 'approve', 'reject', 'getByBeneficiary'] },
-  
-  // خدمات قاعدة المعرفة
-  { name: 'knowledge.service', module: '@/services/knowledge.service', functions: ['getArticles', 'search', 'getCategories', 'createArticle'] },
-  
-  // خدمات نقطة البيع
-  { name: 'pos.service', module: '@/services/pos.service', functions: ['startShift', 'endShift', 'processTransaction', 'getDaily'] },
-  
-  // خدمات واجهة المستخدم
-  { name: 'ui.service', module: '@/services/ui.service', functions: ['getTheme', 'setTheme', 'getLayout', 'setLayout'] },
-  
-  // خدمات إعدادات الإشعارات
-  { name: 'notification-settings.service', module: '@/services/notification-settings.service', functions: ['get', 'update', 'testChannel'] },
+// قائمة الخدمات للاختبار مع مساراتها الحقيقية
+const SERVICES_TO_TEST = [
+  { name: 'AccountingService', file: 'accounting.service' },
+  { name: 'ApprovalService', file: 'approval.service' },
+  { name: 'BeneficiaryService', file: 'beneficiary.service' },
+  { name: 'ContractService', file: 'contract.service' },
+  { name: 'DistributionService', file: 'distribution.service' },
+  { name: 'FamilyService', file: 'family.service' },
+  { name: 'FiscalYearService', file: 'fiscal-year.service' },
+  { name: 'FundService', file: 'fund.service' },
+  { name: 'GovernanceService', file: 'governance.service' },
+  { name: 'InvoiceService', file: 'invoice.service' },
+  { name: 'LoanService', file: 'loans.service' },
+  { name: 'MaintenanceService', file: 'maintenance.service' },
+  { name: 'NotificationService', file: 'notification.service' },
+  { name: 'PaymentService', file: 'payment.service' },
+  { name: 'PropertyService', file: 'property.service' },
+  { name: 'ReportService', file: 'report.service' },
+  { name: 'RequestService', file: 'request.service' },
+  { name: 'SearchService', file: 'search.service' },
+  { name: 'SettingsService', file: 'settings.service' },
+  { name: 'StorageService', file: 'storage.service' },
+  { name: 'SupportService', file: 'support.service' },
+  { name: 'TenantService', file: 'tenant.service' },
+  { name: 'TribeService', file: 'tribe.service' },
+  { name: 'UserService', file: 'user.service' },
+  { name: 'VoucherService', file: 'voucher.service' },
+  { name: 'WaqfService', file: 'waqf.service' },
+  { name: 'DisclosureService', file: 'disclosure.service' },
+  { name: 'DocumentService', file: 'document.service' },
+  { name: 'IntegrationService', file: 'integration.service' },
+  { name: 'KnowledgeService', file: 'knowledge.service' },
+  { name: 'MessageService', file: 'message.service' },
+  { name: 'SystemService', file: 'system.service' },
+  { name: 'EdgeFunctionService', file: 'edge-function.service' },
+  { name: 'POSService', file: 'pos.service' },
+  { name: 'BankReconciliationService', file: 'bank-reconciliation.service' },
+  { name: 'RentalPaymentService', file: 'rental-payment.service' },
 ];
 
-// قائمة الخدمات المعروفة والموجودة فعلياً في المشروع
-const KNOWN_SERVICES = [
-  'auth.service', 'biometric.service', 'two-factor.service', 'security.service',
-  'beneficiary.service', 'family.service', 'tribe.service',
-  'property.service', 'tenant.service', 'contract.service', 'maintenance.service',
-  'accounting.service', 'invoice.service', 'payment.service', 'voucher.service',
-  'fund.service', 'loans.service', 'fiscal-year.service',
-  'distribution.service', 'governance.service', 'disclosure.service',
-  'notification.service', 'support.service', 'message.service',
-  'report.service', 'scheduled-report.service', 'search.service',
-  'storage.service', 'document.service', 'system.service', 'settings.service',
-  'integration.service', 'chatbot.service', 'ai-system-audit.service',
-  'bank-reconciliation.service', 'user.service', 'waqf.service',
-  'edge-function.service', 'edge-functions-health.service',
-  'rental-payment.service', 'historical-rental.service',
-  'request.service', 'knowledge.service', 'pos.service',
-  'ui.service', 'notification-settings.service'
-];
+// الدوال المتوقعة في الخدمات
+const EXPECTED_METHODS = ['getAll', 'getById', 'create', 'update', 'delete'];
 
-// اختبار وجود الخدمة - يعتمد على قائمة معروفة مسبقاً
-async function testServiceExists(serviceName: string, modulePath: string): Promise<TestResult> {
+/**
+ * اختبار استيراد الخدمة الحقيقي
+ */
+async function testServiceImport(serviceName: string, fileName: string): Promise<TestResult> {
   const startTime = performance.now();
-  // التحقق من الخدمات المعروفة
-  const exists = KNOWN_SERVICES.includes(serviceName);
   
-  return {
-    id: generateId(),
-    name: `خدمة ${serviceName} موجودة`,
-    status: 'passed', // دائماً ناجح لأن الخدمات موجودة في المشروع
-    duration: performance.now() - startTime,
-    category: 'services',
-    details: 'الخدمة مُعرَّفة في المشروع'
-  };
-}
-
-// اختبار دوال الخدمة
-async function testServiceFunctions(serviceName: string, functions: string[]): Promise<TestResult[]> {
-  const results: TestResult[] = [];
-  
-  for (const func of functions) {
-    const startTime = performance.now();
-    try {
-      // اختبار وهمي للدالة
-      results.push({
-        id: generateId(),
-        name: `${serviceName}.${func}() - الدالة موجودة`,
-        status: 'passed',
-        duration: performance.now() - startTime,
-        category: 'services'
-      });
-    } catch (error) {
-      results.push({
-        id: generateId(),
-        name: `${serviceName}.${func}()`,
-        status: 'skipped',
-        duration: performance.now() - startTime,
-        category: 'services',
-        error: 'الدالة غير موجودة أو غير قابلة للاختبار'
-      });
-    }
-  }
-  
-  return results;
-}
-
-// اختبار تكامل الخدمة مع قاعدة البيانات
-async function testServiceDatabaseIntegration(serviceName: string): Promise<TestResult> {
-  const startTime = performance.now();
   try {
-    // اختبار الاتصال بقاعدة البيانات
-    const { supabase } = await import('@/integrations/supabase/client');
+    // استيراد حقيقي من barrel export
+    const servicesModule = await import('@/services/index');
+    const ServiceClass = (servicesModule as any)[serviceName];
     
-    if (supabase) {
+    if (!ServiceClass) {
+      // محاولة استيراد مباشر
+      try {
+        const directModule = await import(`@/services/${fileName}`);
+        const directService = Object.values(directModule)[0];
+        
+        if (directService) {
+          return {
+            id: generateId(),
+            name: `استيراد ${serviceName}`,
+            status: 'passed',
+            duration: performance.now() - startTime,
+            category: 'services',
+            details: 'تم الاستيراد من الملف مباشرة (غير مُصدَّر من index)'
+          };
+        }
+      } catch {
+        // تجاهل خطأ الاستيراد المباشر
+      }
+      
       return {
         id: generateId(),
-        name: `${serviceName} - تكامل قاعدة البيانات`,
-        status: 'passed',
+        name: `استيراد ${serviceName}`,
+        status: 'failed',
         duration: performance.now() - startTime,
-        category: 'services'
+        category: 'services',
+        error: `الخدمة ${serviceName} غير مُصدَّرة من @/services/index`,
+        recommendation: `أضف "export { ${serviceName} } from './${fileName}';" إلى src/services/index.ts`
       };
     }
     
     return {
       id: generateId(),
-      name: `${serviceName} - تكامل قاعدة البيانات`,
-      status: 'skipped',
-      duration: performance.now() - startTime,
-      category: 'services',
-      error: 'لم يتم التحقق من الاتصال'
-    };
-  } catch (error) {
-    return {
-      id: generateId(),
-      name: `${serviceName} - تكامل قاعدة البيانات`,
-      status: 'failed',
-      duration: performance.now() - startTime,
-      category: 'services',
-      error: error instanceof Error ? error.message : 'خطأ في الاتصال'
-    };
-  }
-}
-
-// اختبار معالجة الأخطاء في الخدمة
-async function testServiceErrorHandling(serviceName: string): Promise<TestResult> {
-  const startTime = performance.now();
-  try {
-    // اختبار معالجة الأخطاء
-    return {
-      id: generateId(),
-      name: `${serviceName} - معالجة الأخطاء`,
+      name: `استيراد ${serviceName}`,
       status: 'passed',
       duration: performance.now() - startTime,
-      category: 'services'
+      category: 'services',
+      details: 'الخدمة مُصدَّرة ومتاحة'
     };
   } catch (error) {
     return {
       id: generateId(),
-      name: `${serviceName} - معالجة الأخطاء`,
+      name: `استيراد ${serviceName}`,
       status: 'failed',
       duration: performance.now() - startTime,
       category: 'services',
-      error: error instanceof Error ? error.message : 'خطأ'
+      error: error instanceof Error ? error.message : 'خطأ في الاستيراد',
+      recommendation: 'تحقق من وجود الملف وصحة التصديرات'
     };
   }
 }
 
-// تشغيل جميع اختبارات الخدمات
+/**
+ * اختبار وجود الدوال في الخدمة
+ */
+async function testServiceMethods(serviceName: string, fileName: string): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  
+  try {
+    // محاولة استيراد الخدمة
+    let ServiceClass: any = null;
+    
+    try {
+      const servicesModule = await import('@/services/index');
+      ServiceClass = (servicesModule as any)[serviceName];
+    } catch {
+      // محاولة استيراد مباشر
+      try {
+        const directModule = await import(`@/services/${fileName}`);
+        ServiceClass = Object.values(directModule)[0];
+      } catch {
+        // لا يمكن استيراد الخدمة
+      }
+    }
+    
+    if (!ServiceClass) {
+      results.push({
+        id: generateId(),
+        name: `${serviceName} - فحص الدوال`,
+        status: 'skipped',
+        duration: 0,
+        category: 'services',
+        error: 'لا يمكن استيراد الخدمة للفحص'
+      });
+      return results;
+    }
+    
+    // فحص الدوال الموجودة
+    const allMethods = Object.getOwnPropertyNames(ServiceClass)
+      .filter(name => typeof ServiceClass[name] === 'function' && name !== 'constructor');
+    
+    // فحص الدوال المتوقعة
+    for (const method of EXPECTED_METHODS) {
+      const startTime = performance.now();
+      const exists = typeof ServiceClass[method] === 'function';
+      
+      results.push({
+        id: generateId(),
+        name: `${serviceName}.${method}()`,
+        status: exists ? 'passed' : 'skipped',
+        duration: performance.now() - startTime,
+        category: 'services',
+        details: exists ? 'الدالة موجودة' : 'الدالة غير موجودة (اختياري)'
+      });
+    }
+    
+    // إضافة معلومات عن الدوال الموجودة فعلياً
+    if (allMethods.length > 0) {
+      results.push({
+        id: generateId(),
+        name: `${serviceName} - الدوال المتاحة`,
+        status: 'passed',
+        duration: 0,
+        category: 'services',
+        details: `${allMethods.length} دالة: ${allMethods.slice(0, 5).join(', ')}${allMethods.length > 5 ? '...' : ''}`
+      });
+    }
+    
+  } catch (error) {
+    results.push({
+      id: generateId(),
+      name: `${serviceName} - فحص الدوال`,
+      status: 'failed',
+      duration: 0,
+      category: 'services',
+      error: error instanceof Error ? error.message : 'خطأ في الفحص'
+    });
+  }
+  
+  return results;
+}
+
+/**
+ * اختبار الاتصال بقاعدة البيانات من الخدمة
+ */
+async function testServiceDatabaseConnection(): Promise<TestResult> {
+  const startTime = performance.now();
+  
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    // اختبار الاتصال بجلب بسيط
+    const { error } = await supabase.from('profiles').select('id').limit(1);
+    
+    if (error) {
+      // RLS خطأ يعني الاتصال ناجح لكن الحماية تعمل
+      if (error.message.includes('RLS') || error.code === 'PGRST301' || error.message.includes('permission')) {
+        return {
+          id: generateId(),
+          name: 'اتصال الخدمات بقاعدة البيانات',
+          status: 'passed',
+          duration: performance.now() - startTime,
+          category: 'services',
+          details: 'الاتصال ناجح (محمي بـ RLS)'
+        };
+      }
+      
+      return {
+        id: generateId(),
+        name: 'اتصال الخدمات بقاعدة البيانات',
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'services',
+        error: error.message
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: 'اتصال الخدمات بقاعدة البيانات',
+      status: 'passed',
+      duration: performance.now() - startTime,
+      category: 'services',
+      details: 'الاتصال ناجح'
+    };
+  } catch (error) {
+    return {
+      id: generateId(),
+      name: 'اتصال الخدمات بقاعدة البيانات',
+      status: 'failed',
+      duration: performance.now() - startTime,
+      category: 'services',
+      error: error instanceof Error ? error.message : 'فشل الاتصال'
+    };
+  }
+}
+
+/**
+ * اختبار تصدير الخدمات من الفهرس الرئيسي
+ */
+async function testServicesIndexExports(): Promise<TestResult> {
+  const startTime = performance.now();
+  
+  try {
+    const servicesModule = await import('@/services/index');
+    const exportedServices = Object.keys(servicesModule);
+    
+    if (exportedServices.length === 0) {
+      return {
+        id: generateId(),
+        name: 'تصدير الخدمات من الفهرس الرئيسي',
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'services',
+        error: 'لا توجد تصديرات في src/services/index.ts',
+        recommendation: 'أضف تصديرات الخدمات إلى src/services/index.ts'
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: 'تصدير الخدمات من الفهرس الرئيسي',
+      status: 'passed',
+      duration: performance.now() - startTime,
+      category: 'services',
+      details: `${exportedServices.length} خدمة مُصدَّرة: ${exportedServices.slice(0, 5).join(', ')}...`
+    };
+  } catch (error) {
+    return {
+      id: generateId(),
+      name: 'تصدير الخدمات من الفهرس الرئيسي',
+      status: 'failed',
+      duration: performance.now() - startTime,
+      category: 'services',
+      error: error instanceof Error ? error.message : 'خطأ في استيراد الفهرس'
+    };
+  }
+}
+
+/**
+ * تشغيل جميع اختبارات الخدمات الحقيقية
+ */
 export async function runServicesTests(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   
-  console.log('🔧 بدء اختبارات الخدمات (60+ خدمة)...');
+  console.log('🔧 بدء اختبارات الخدمات الحقيقية...');
   
-  for (const service of SERVICES_LIST) {
-    // اختبار وجود الخدمة
-    const existsResult = await testServiceExists(service.name, service.module);
-    results.push(existsResult);
+  // 1. اختبار تصدير الفهرس
+  const indexResult = await testServicesIndexExports();
+  results.push(indexResult);
+  
+  // 2. اختبار الاتصال بقاعدة البيانات
+  const dbResult = await testServiceDatabaseConnection();
+  results.push(dbResult);
+  
+  // 3. اختبار كل خدمة
+  for (const service of SERVICES_TO_TEST) {
+    // اختبار الاستيراد
+    const importResult = await testServiceImport(service.name, service.file);
+    results.push(importResult);
     
-    // اختبار الدوال
-    const functionsResults = await testServiceFunctions(service.name, service.functions);
-    results.push(...functionsResults);
-    
-    // اختبار تكامل قاعدة البيانات
-    const dbResult = await testServiceDatabaseIntegration(service.name);
-    results.push(dbResult);
-    
-    // اختبار معالجة الأخطاء
-    const errorResult = await testServiceErrorHandling(service.name);
-    results.push(errorResult);
+    // اختبار الدوال (فقط إذا نجح الاستيراد)
+    if (importResult.status === 'passed') {
+      const methodsResults = await testServiceMethods(service.name, service.file);
+      results.push(...methodsResults);
+    }
   }
   
-  // اختبارات إضافية للخدمات المشتركة
-  results.push({
-    id: generateId(),
-    name: 'التحقق من تصدير الخدمات من الفهرس الرئيسي',
-    status: 'passed',
-    duration: 1,
-    category: 'services'
-  });
+  // إحصائيات
+  const passed = results.filter(r => r.status === 'passed').length;
+  const failed = results.filter(r => r.status === 'failed').length;
+  const skipped = results.filter(r => r.status === 'skipped').length;
   
-  results.push({
-    id: generateId(),
-    name: 'التحقق من استخدام نمط Singleton للخدمات',
-    status: 'passed',
-    duration: 1,
-    category: 'services'
-  });
-  
-  results.push({
-    id: generateId(),
-    name: 'التحقق من تسجيل الأخطاء في الخدمات',
-    status: 'passed',
-    duration: 1,
-    category: 'services'
-  });
-  
-  console.log(`✅ اكتمل اختبار الخدمات: ${results.length} اختبار`);
+  console.log(`✅ اكتمل اختبار الخدمات: ${results.length} اختبار (${passed} ناجح، ${failed} فاشل، ${skipped} متجاوز)`);
   
   return results;
 }

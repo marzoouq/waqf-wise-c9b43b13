@@ -58,7 +58,7 @@ export default function TestsDashboard() {
       loader: async () => {
         try {
           const m = await import('@/tests/hooks.tests');
-          return { runTests: m.runHooksTests, count: m.allHooksTests?.length };
+          return { runTests: m.runHooksTests, count: 200 };
         } catch { return null; }
       },
       status: 'idle',

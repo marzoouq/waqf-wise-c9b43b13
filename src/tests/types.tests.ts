@@ -1,7 +1,7 @@
 /**
- * Types Tests - اختبارات أنواع البيانات
- * @version 2.0.0
- * تغطية 50+ نوع بيانات
+ * Types Tests - اختبارات أنواع البيانات الحقيقية
+ * @version 3.0.0
+ * اختبارات تستورد الأنواع فعلياً وتتحقق من التصديرات
  */
 
 export interface TestResult {
@@ -12,170 +12,280 @@ export interface TestResult {
   duration: number;
   details?: string;
   error?: string;
+  recommendation?: string;
 }
 
 const generateId = () => `type-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// قائمة أنواع البيانات للاختبار
-const TYPES_LIST = [
-  // أنواع المحاسبة
-  { name: 'accounting.ts', types: ['Account', 'JournalEntry', 'JournalLine', 'TrialBalance', 'Ledger'] },
-  { name: 'admin.ts', types: ['AdminSettings', 'SystemConfig', 'UserManagement'] },
-  { name: 'alerts.ts', types: ['Alert', 'AlertType', 'AlertSeverity', 'AlertAction'] },
-  { name: 'approvals.ts', types: ['Approval', 'ApprovalStep', 'ApprovalWorkflow', 'ApprovalStatus'] },
-  { name: 'audit.ts', types: ['AuditLog', 'AuditAction', 'AuditEntry'] },
-  { name: 'auth.ts', types: ['User', 'Session', 'Credentials', 'AuthState'] },
-  { name: 'auto-journal.ts', types: ['AutoJournalTemplate', 'AutoJournalLog', 'TriggerEvent'] },
-  { name: 'bank-transfer.ts', types: ['BankTransfer', 'TransferFile', 'TransferStatus'] },
-  { name: 'banking.ts', types: ['BankAccount', 'BankStatement', 'BankTransaction', 'Reconciliation'] },
-  { name: 'beneficiary.ts', types: ['Beneficiary', 'BeneficiaryCategory', 'BeneficiaryRequest', 'BeneficiaryActivity'] },
-  { name: 'contracts.ts', types: ['Contract', 'ContractStatus', 'ContractType', 'RenewalInfo'] },
-  { name: 'dashboard.ts', types: ['DashboardStats', 'DashboardWidget', 'DashboardConfig'] },
-  { name: 'disclosure.ts', types: ['Disclosure', 'DisclosureStatus', 'DisclosureData'] },
-  { name: 'distributions.ts', types: ['Distribution', 'DistributionItem', 'DistributionRule', 'DistributionStatus'] },
-  { name: 'documents.ts', types: ['Document', 'DocumentType', 'DocumentMetadata', 'FileUpload'] },
-  { name: 'governance.ts', types: ['Decision', 'Vote', 'Meeting', 'Policy'] },
-  { name: 'integrations.ts', types: ['Integration', 'IntegrationConfig', 'WebhookConfig'] },
-  { name: 'invoices.ts', types: ['Invoice', 'InvoiceItem', 'InvoiceStatus', 'ZATCAInvoice'] },
-  { name: 'journal.ts', types: ['JournalEntry', 'JournalLine', 'JournalStatus'] },
-  { name: 'loans.ts', types: ['Loan', 'LoanPayment', 'LoanInstallment', 'LoanStatus'] },
-  { name: 'maintenance.ts', types: ['MaintenanceRequest', 'MaintenanceProvider', 'MaintenanceSchedule'] },
-  { name: 'messages.ts', types: ['Message', 'Conversation', 'MessageAttachment'] },
-  { name: 'monitoring.ts', types: ['SystemHealth', 'PerformanceMetrics', 'ErrorLog'] },
-  { name: 'notifications.ts', types: ['Notification', 'NotificationType', 'NotificationSettings'] },
-  { name: 'payments.ts', types: ['Payment', 'PaymentMethod', 'PaymentStatus', 'PaymentVoucher'] },
-  { name: 'performance.ts', types: ['PerformanceMetric', 'PerformanceReport', 'Benchmark'] },
-  { name: 'requests.ts', types: ['Request', 'RequestType', 'RequestStatus', 'RequestPriority'] },
-  { name: 'roles.ts', types: ['Role', 'Permission', 'RoleAssignment'] },
-  { name: 'security.ts', types: ['SecurityConfig', 'RLSPolicy', 'AuditPolicy'] },
-  { name: 'support.ts', types: ['Ticket', 'TicketStatus', 'TicketPriority', 'TicketResponse'] },
-  { name: 'tenants.ts', types: ['Tenant', 'TenantContract', 'RentalPayment', 'TenantLedger'] },
-  { name: 'tribes.ts', types: ['Tribe', 'TribeMember', 'TribeHierarchy'] },
+// قائمة ملفات الأنواع للاختبار
+const TYPES_TO_TEST = [
+  { file: 'accounting', path: '@/types/accounting' },
+  { file: 'admin', path: '@/types/admin' },
+  { file: 'alerts', path: '@/types/alerts' },
+  { file: 'approvals', path: '@/types/approvals' },
+  { file: 'audit', path: '@/types/audit' },
+  { file: 'auth', path: '@/types/auth' },
+  { file: 'auto-journal', path: '@/types/auto-journal' },
+  { file: 'bank-transfer', path: '@/types/bank-transfer' },
+  { file: 'banking', path: '@/types/banking' },
+  { file: 'beneficiary', path: '@/types/beneficiary' },
+  { file: 'contracts', path: '@/types/contracts' },
+  { file: 'dashboard', path: '@/types/dashboard' },
+  { file: 'disclosure', path: '@/types/disclosure' },
+  { file: 'distributions', path: '@/types/distributions' },
+  { file: 'documents', path: '@/types/documents' },
+  { file: 'governance', path: '@/types/governance' },
+  { file: 'integrations', path: '@/types/integrations' },
+  { file: 'invoices', path: '@/types/invoices' },
+  { file: 'journal', path: '@/types/journal' },
+  { file: 'loans', path: '@/types/loans' },
+  { file: 'maintenance', path: '@/types/maintenance' },
+  { file: 'messages', path: '@/types/messages' },
+  { file: 'monitoring', path: '@/types/monitoring' },
+  { file: 'notifications', path: '@/types/notifications' },
+  { file: 'payments', path: '@/types/payments' },
+  { file: 'performance', path: '@/types/performance' },
+  { file: 'requests', path: '@/types/requests' },
+  { file: 'roles', path: '@/types/roles' },
+  { file: 'security', path: '@/types/security' },
+  { file: 'support', path: '@/types/support' },
+  { file: 'tenants', path: '@/types/tenants' },
+  { file: 'tribes', path: '@/types/tribes' },
 ];
 
-// قائمة ملفات الأنواع المعروفة والموجودة فعلياً في المشروع
-const KNOWN_TYPE_FILES = [
-  'accounting.ts', 'admin.ts', 'alerts.ts', 'approvals.ts', 'audit.ts',
-  'auth.ts', 'auto-journal.ts', 'bank-transfer.ts', 'banking.ts', 'beneficiary.ts',
-  'contracts.ts', 'dashboard.ts', 'disclosure.ts', 'distributions.ts', 'documents.ts',
-  'governance.ts', 'integrations.ts', 'invoices.ts', 'journal.ts', 'loans.ts',
-  'maintenance.ts', 'messages.ts', 'monitoring.ts', 'notifications.ts', 'payments.ts',
-  'performance.ts', 'requests.ts', 'roles.ts', 'security.ts', 'support.ts',
-  'tenants.ts', 'tribes.ts'
-];
-
-// اختبار وجود ملف الأنواع - يعتمد على قائمة معروفة مسبقاً
-async function testTypeFileExists(fileName: string): Promise<TestResult> {
+/**
+ * اختبار استيراد ملف الأنواع الحقيقي
+ */
+async function testTypeFileImport(fileName: string, filePath: string): Promise<TestResult> {
   const startTime = performance.now();
-  // التحقق من الملفات المعروفة
-  const exists = KNOWN_TYPE_FILES.includes(fileName);
   
-  return {
-    id: generateId(),
-    name: `ملف الأنواع ${fileName} موجود`,
-    status: 'passed', // دائماً ناجح لأن هذه ملفات تعريفات TypeScript
-    duration: performance.now() - startTime,
-    category: 'types',
-    details: 'ملف التعريفات مُعرَّف'
-  };
-}
-
-// اختبار تعريفات الأنواع
-async function testTypeDefinitions(fileName: string, types: string[]): Promise<TestResult[]> {
-  const results: TestResult[] = [];
-  
-  for (const typeName of types) {
-    const startTime = performance.now();
-    results.push({
+  try {
+    const module = await import(/* @vite-ignore */ filePath);
+    const exports = Object.keys(module);
+    
+    if (exports.length === 0) {
+      return {
+        id: generateId(),
+        name: `استيراد ${fileName}.ts`,
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: 'الملف لا يحتوي على تصديرات',
+        recommendation: `أضف تصديرات إلى src/types/${fileName}.ts`
+      };
+    }
+    
+    return {
       id: generateId(),
-      name: `${fileName} - نوع ${typeName}`,
+      name: `استيراد ${fileName}.ts`,
       status: 'passed',
       duration: performance.now() - startTime,
-      category: 'types'
-    });
+      category: 'types',
+      details: `${exports.length} تصدير: ${exports.slice(0, 5).join(', ')}${exports.length > 5 ? '...' : ''}`
+    };
+    
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    
+    // ملف غير موجود
+    if (errorMsg.includes('Failed to fetch') || errorMsg.includes('not found')) {
+      return {
+        id: generateId(),
+        name: `استيراد ${fileName}.ts`,
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: `الملف غير موجود: src/types/${fileName}.ts`,
+        recommendation: `أنشئ الملف src/types/${fileName}.ts`
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: `استيراد ${fileName}.ts`,
+      status: 'failed',
+      duration: performance.now() - startTime,
+      category: 'types',
+      error: errorMsg.slice(0, 100)
+    };
   }
+}
+
+/**
+ * اختبار أن التصديرات هي أنواع TypeScript صحيحة
+ */
+async function testTypeExportsValidity(fileName: string, filePath: string): Promise<TestResult> {
+  const startTime = performance.now();
   
-  return results;
+  try {
+    const module = await import(/* @vite-ignore */ filePath);
+    const exports = Object.keys(module);
+    
+    if (exports.length === 0) {
+      return {
+        id: generateId(),
+        name: `${fileName}.ts - صحة التصديرات`,
+        status: 'skipped',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: 'لا توجد تصديرات للفحص'
+      };
+    }
+    
+    // التحقق من أن التصديرات ليست undefined
+    const validExports = exports.filter(e => module[e] !== undefined);
+    
+    if (validExports.length < exports.length) {
+      const invalidExports = exports.filter(e => module[e] === undefined);
+      return {
+        id: generateId(),
+        name: `${fileName}.ts - صحة التصديرات`,
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: `تصديرات غير صالحة: ${invalidExports.join(', ')}`
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: `${fileName}.ts - صحة التصديرات`,
+      status: 'passed',
+      duration: performance.now() - startTime,
+      category: 'types',
+      details: `جميع ${exports.length} تصديرات صالحة`
+    };
+    
+  } catch {
+    return {
+      id: generateId(),
+      name: `${fileName}.ts - صحة التصديرات`,
+      status: 'skipped',
+      duration: performance.now() - startTime,
+      category: 'types',
+      error: 'لا يمكن استيراد الملف'
+    };
+  }
 }
 
-// اختبار التصدير
-async function testTypeExports(fileName: string): Promise<TestResult> {
+/**
+ * اختبار فهرس الأنواع الرئيسي
+ */
+async function testTypesIndex(): Promise<TestResult> {
   const startTime = performance.now();
-  // التصدير دائماً ناجح لأن الملفات موجودة
-  return {
-    id: generateId(),
-    name: `${fileName} - التصدير`,
-    status: 'passed',
-    duration: performance.now() - startTime,
-    category: 'types',
-    details: 'التصدير يعمل'
-  };
+  
+  try {
+    const module = await import('@/types/index');
+    const exports = Object.keys(module);
+    
+    if (exports.length === 0) {
+      return {
+        id: generateId(),
+        name: 'فهرس الأنواع',
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: 'لا توجد تصديرات في src/types/index.ts'
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: 'فهرس الأنواع',
+      status: 'passed',
+      duration: performance.now() - startTime,
+      category: 'types',
+      details: `${exports.length} تصدير: ${exports.slice(0, 5).join(', ')}...`
+    };
+    
+  } catch {
+    return {
+      id: generateId(),
+      name: 'فهرس الأنواع',
+      status: 'skipped',
+      duration: performance.now() - startTime,
+      category: 'types',
+      details: 'لا يوجد ملف src/types/index.ts'
+    };
+  }
 }
 
-// اختبار التوافق مع قاعدة البيانات
-async function testTypeDatabaseCompatibility(fileName: string): Promise<TestResult> {
+/**
+ * اختبار توافق Supabase Types
+ */
+async function testSupabaseTypesIntegration(): Promise<TestResult> {
   const startTime = performance.now();
-  // التوافق مع قاعدة البيانات دائماً ناجح لأن الأنواع مُولَّدة من Supabase
-  return {
-    id: generateId(),
-    name: `${fileName} - التوافق مع قاعدة البيانات`,
-    status: 'passed',
-    duration: performance.now() - startTime,
-    category: 'types',
-    details: 'متوافق مع Supabase Types'
-  };
+  
+  try {
+    const types = await import('@/integrations/supabase/types');
+    
+    if (!types) {
+      return {
+        id: generateId(),
+        name: 'توافق Supabase Types',
+        status: 'failed',
+        duration: performance.now() - startTime,
+        category: 'types',
+        error: 'ملف Types غير متاح'
+      };
+    }
+    
+    return {
+      id: generateId(),
+      name: 'توافق Supabase Types',
+      status: 'passed',
+      duration: performance.now() - startTime,
+      category: 'types',
+      details: 'Supabase Types متاحة ومُولَّدة'
+    };
+    
+  } catch (error) {
+    return {
+      id: generateId(),
+      name: 'توافق Supabase Types',
+      status: 'failed',
+      duration: performance.now() - startTime,
+      category: 'types',
+      error: error instanceof Error ? error.message : 'فشل استيراد Supabase Types'
+    };
+  }
 }
 
-// تشغيل جميع اختبارات الأنواع
+/**
+ * تشغيل جميع اختبارات الأنواع الحقيقية
+ */
 export async function runTypesTests(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   
-  console.log('📝 بدء اختبارات أنواع البيانات (50+ نوع)...');
+  console.log('📝 بدء اختبارات الأنواع الحقيقية...');
   
-  for (const typeFile of TYPES_LIST) {
-    // اختبار وجود الملف
-    const existsResult = await testTypeFileExists(typeFile.name);
-    results.push(existsResult);
+  // 1. اختبار فهرس الأنواع
+  const indexResult = await testTypesIndex();
+  results.push(indexResult);
+  
+  // 2. اختبار توافق Supabase
+  const supabaseResult = await testSupabaseTypesIntegration();
+  results.push(supabaseResult);
+  
+  // 3. اختبار كل ملف أنواع
+  for (const typeFile of TYPES_TO_TEST) {
+    // اختبار الاستيراد
+    const importResult = await testTypeFileImport(typeFile.file, typeFile.path);
+    results.push(importResult);
     
-    // اختبار التعريفات
-    const defsResults = await testTypeDefinitions(typeFile.name, typeFile.types);
-    results.push(...defsResults);
-    
-    // اختبار التصدير
-    const exportResult = await testTypeExports(typeFile.name);
-    results.push(exportResult);
-    
-    // اختبار التوافق
-    const compatResult = await testTypeDatabaseCompatibility(typeFile.name);
-    results.push(compatResult);
+    if (importResult.status === 'passed') {
+      // اختبار صحة التصديرات
+      const validityResult = await testTypeExportsValidity(typeFile.file, typeFile.path);
+      results.push(validityResult);
+    }
   }
   
-  // اختبارات إضافية
-  results.push({
-    id: generateId(),
-    name: 'التحقق من فهرس الأنواع الرئيسي',
-    status: 'passed',
-    duration: 1,
-    category: 'types'
-  });
+  // إحصائيات
+  const passed = results.filter(r => r.status === 'passed').length;
+  const failed = results.filter(r => r.status === 'failed').length;
+  const skipped = results.filter(r => r.status === 'skipped').length;
   
-  results.push({
-    id: generateId(),
-    name: 'التحقق من عدم وجود أنواع any',
-    status: 'passed',
-    duration: 1,
-    category: 'types'
-  });
-  
-  results.push({
-    id: generateId(),
-    name: 'التحقق من توافق Supabase Types',
-    status: 'passed',
-    duration: 1,
-    category: 'types'
-  });
-  
-  console.log(`✅ اكتمل اختبار الأنواع: ${results.length} اختبار`);
+  console.log(`✅ اكتمل اختبار الأنواع: ${results.length} اختبار (${passed} ناجح، ${failed} فاشل، ${skipped} متجاوز)`);
   
   return results;
 }
