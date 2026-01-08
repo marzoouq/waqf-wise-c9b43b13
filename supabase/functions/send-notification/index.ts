@@ -162,19 +162,17 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // قراءة الجسم مرة واحدة فقط
+    const body = await req.json();
+
     // ✅ Health Check Support
-    try {
-      const bodyClone = await req.clone().json();
-      if (bodyClone.ping || bodyClone.healthCheck) {
-        console.log('[SEND-NOTIFICATION] Health check received');
-        return jsonResponse({
-          status: 'healthy',
-          function: 'send-notification',
-          timestamp: new Date().toISOString()
-        });
-      }
-    } catch {
-      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    if (body.ping || body.healthCheck || body.testMode) {
+      console.log('[SEND-NOTIFICATION] Health check received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'send-notification',
+        timestamp: new Date().toISOString()
+      });
     }
 
     const authHeader = req.headers.get('Authorization');
@@ -220,7 +218,7 @@ serve(async (req) => {
       actionUrl,
       channel = 'app',
       priority = 'medium'
-    }: NotificationRequest = await req.json();
+    }: NotificationRequest = body;
 
     if (!userId || !title || !message) {
       return errorResponse('userId, title, and message are required');
