@@ -96,7 +96,7 @@ const EDGE_FUNCTIONS_BY_CATEGORY: Record<string, EdgeFunctionCategory> = {
       { name: 'calculate-cash-flow', description: 'حساب التدفقات النقدية', defaultBody: { period: 'monthly' } },
       { name: 'link-voucher-journal', description: 'ربط السند بالقيد', defaultBody: { voucher_id: 'test-voucher-id', create_journal: false } },
       { name: 'publish-fiscal-year', description: 'نشر السنة المالية', defaultBody: { fiscalYearId: 'test-fiscal-year-id', notifyHeirs: false } },
-      { name: 'auto-close-fiscal-year', description: 'إقفال السنة المالية', defaultBody: { fiscal_year_id: 'test-fiscal-year-id', preview_only: true } },
+      { name: 'auto-close-fiscal-year', description: 'إقفال السنة المالية', defaultBody: { testMode: true } },
       { name: 'zatca-submit', description: 'إرسال لزاتكا', defaultBody: { testMode: true, invoice_id: 'test-invoice-id', submission_type: 'reporting' } },
     ]
   },

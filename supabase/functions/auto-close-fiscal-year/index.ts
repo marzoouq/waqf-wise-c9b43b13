@@ -7,7 +7,8 @@ import {
 } from '../_shared/cors.ts';
 
 // ============ الأدوار المسموح لها بإقفال السنة المالية ============
-const ALLOWED_ROLES = ['nazer'];
+// السماح للناظر والمسؤول (admin) بإقفال السنة المالية
+const ALLOWED_ROLES = ['nazer', 'admin'];
 
 interface ClosingRequest {
   fiscal_year_id: string;
