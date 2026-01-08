@@ -17,9 +17,10 @@ serve(async (req) => {
     const contentType = req.headers.get('content-type') || '';
     if (!contentType.includes('multipart/form-data')) {
       try {
-        const body = await req.json();
-        if (body.ping || body.healthCheck) {
-          console.log('[OCR-DOCUMENT] Health check received');
+        const clonedReq = req.clone();
+        const body = await clonedReq.json();
+        if (body.ping || body.healthCheck || body.test) {
+          console.log('[ocr-document] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'ocr-document',
