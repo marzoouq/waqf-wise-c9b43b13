@@ -11856,6 +11856,7 @@ export type Database = {
           source: string | null
           status: string | null
           title: string
+          updated_at: string | null
         }
         Insert: {
           acknowledged_at?: string | null
@@ -11874,6 +11875,7 @@ export type Database = {
           source?: string | null
           status?: string | null
           title: string
+          updated_at?: string | null
         }
         Update: {
           acknowledged_at?: string | null
@@ -11892,6 +11894,7 @@ export type Database = {
           source?: string | null
           status?: string | null
           title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
