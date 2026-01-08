@@ -419,7 +419,36 @@ const createPerformanceTest = (name: string, description: string, maxDuration: n
   }
 });
 
-// اختبار السياق الحقيقي - استيراد فعلي
+// اختبار السياق الحقيقي - استيراد فعلي (متوافق مع Vite)
+const contextModules = import.meta.glob('/src/contexts/*.{ts,tsx}', { eager: true });
+
+function resolveViteModule(
+  modules: Record<string, unknown>,
+  importPath: string
+): { path: string; mod: unknown } | null {
+  // importPath عادة يكون مثل "@/contexts/AuthContext" أو "/src/contexts/AuthContext.tsx"
+  const normalized = importPath
+    .replace(/^@\//, '/src/')
+    .replace(/\.(ts|tsx)$/, '');
+
+  for (const [path, mod] of Object.entries(modules)) {
+    const cleanPath = path.replace(/\.(ts|tsx)$/, '');
+    if (cleanPath === normalized || cleanPath.endsWith(normalized)) {
+      return { path, mod };
+    }
+  }
+
+  // fallback: مطابقة بالاسم فقط
+  const fileName = normalized.split('/').pop();
+  if (fileName) {
+    for (const [path, mod] of Object.entries(modules)) {
+      if (path.includes(`/${fileName}.`)) return { path, mod };
+    }
+  }
+
+  return null;
+}
+
 const createContextTest = (name: string, description: string, importPath: string): TestCase => ({
   id: `context-${name}`,
   name: `${name}`,
@@ -428,14 +457,27 @@ const createContextTest = (name: string, description: string, importPath: string
   run: async () => {
     const start = performance.now();
     try {
-      // استيراد حقيقي للسياق
-      const module = await import(/* @vite-ignore */ importPath);
+      const resolved = resolveViteModule(contextModules, importPath);
+      if (!resolved) {
+        const duration = Math.round(performance.now() - start);
+        return {
+          testId: `context-${name}`,
+          testName: name,
+          category: 'contexts',
+          success: false,
+          duration,
+          message: `لم يتم العثور على ملف السياق (${importPath})`,
+          timestamp: new Date(),
+        };
+      }
+
+      const module = resolved.mod as Record<string, unknown>;
       const exports = Object.keys(module);
-      const hasProvider = exports.some(e => e.includes('Provider'));
-      const hasHook = exports.some(e => e.startsWith('use'));
-      
+      const hasProvider = exports.some((e) => e.includes('Provider'));
+      const hasHook = exports.some((e) => e.startsWith('use'));
+
       const duration = Math.round(performance.now() - start);
-      
+
       if (exports.length === 0) {
         return {
           testId: `context-${name}`,
@@ -444,10 +486,10 @@ const createContextTest = (name: string, description: string, importPath: string
           success: false,
           duration,
           message: 'السياق لا يحتوي على تصديرات',
-          timestamp: new Date()
+          timestamp: new Date(),
         };
       }
-      
+
       return {
         testId: `context-${name}`,
         testName: name,
@@ -455,8 +497,8 @@ const createContextTest = (name: string, description: string, importPath: string
         success: true,
         duration,
         message: `السياق يعمل (${exports.length} تصدير${hasProvider ? ' + Provider' : ''}${hasHook ? ' + Hook' : ''})`,
-        details: { exports: exports.slice(0, 5) },
-        timestamp: new Date()
+        details: { path: resolved.path, exports: exports.slice(0, 5) },
+        timestamp: new Date(),
       };
     } catch (err: any) {
       return {
@@ -465,11 +507,11 @@ const createContextTest = (name: string, description: string, importPath: string
         category: 'contexts',
         success: false,
         duration: Math.round(performance.now() - start),
-        message: err.message || 'فشل استيراد السياق',
-        timestamp: new Date()
+        message: err?.message || 'فشل استيراد السياق',
+        timestamp: new Date(),
       };
     }
-  }
+  },
 });
 
 const createLibTest = (name: string, description: string, testFn: () => Promise<boolean>): TestCase => ({
@@ -506,7 +548,9 @@ const createLibTest = (name: string, description: string, testFn: () => Promise<
   }
 });
 
-// اختبار الصفحة الحقيقي - استيراد فعلي
+// اختبار الصفحة الحقيقي - استيراد فعلي (متوافق مع Vite)
+const pageModules = import.meta.glob('/src/pages/*.tsx', { eager: true });
+
 const createPageTest = (name: string, importPath: string, description: string): TestCase => ({
   id: `page-${name}`,
   name: `${name}`,
@@ -515,11 +559,24 @@ const createPageTest = (name: string, importPath: string, description: string): 
   run: async () => {
     const start = performance.now();
     try {
-      // استيراد حقيقي للصفحة
-      const module = await import(/* @vite-ignore */ importPath);
-      const PageComponent = module.default || Object.values(module)[0];
+      const resolved = resolveViteModule(pageModules, importPath);
+      if (!resolved) {
+        const duration = Math.round(performance.now() - start);
+        return {
+          testId: `page-${name}`,
+          testName: name,
+          category: 'pages',
+          success: false,
+          duration,
+          message: `لم يتم العثور على ملف الصفحة (${importPath})`,
+          timestamp: new Date(),
+        };
+      }
+
+      const module = resolved.mod as Record<string, unknown>;
+      const PageComponent = (module as any).default ?? Object.values(module)[0];
       const duration = Math.round(performance.now() - start);
-      
+
       if (!PageComponent) {
         return {
           testId: `page-${name}`,
@@ -528,21 +585,25 @@ const createPageTest = (name: string, importPath: string, description: string): 
           success: false,
           duration,
           message: 'الصفحة لا تحتوي على مكون',
-          timestamp: new Date()
+          timestamp: new Date(),
         };
       }
-      
-      const isValidComponent = typeof PageComponent === 'function' || 
-                               (typeof PageComponent === 'object' && PageComponent !== null);
-      
+
+      const isValidComponent =
+        typeof PageComponent === 'function' ||
+        (typeof PageComponent === 'object' && PageComponent !== null);
+
       return {
         testId: `page-${name}`,
         testName: name,
         category: 'pages',
         success: isValidComponent,
         duration,
-        message: isValidComponent ? `الصفحة موجودة وقابلة للاستيراد (${duration}ms)` : 'المكون غير صالح',
-        timestamp: new Date()
+        message: isValidComponent
+          ? `الصفحة موجودة وقابلة للاستيراد (${duration}ms)`
+          : 'المكون غير صالح',
+        details: { path: resolved.path },
+        timestamp: new Date(),
       };
     } catch (err: any) {
       return {
@@ -551,11 +612,11 @@ const createPageTest = (name: string, importPath: string, description: string): 
         category: 'pages',
         success: false,
         duration: Math.round(performance.now() - start),
-        message: err.message || 'فشل استيراد الصفحة',
-        timestamp: new Date()
+        message: err?.message || 'فشل استيراد الصفحة',
+        timestamp: new Date(),
       };
     }
-  }
+  },
 });
 
 // ================== تعريف جميع الاختبارات ==================

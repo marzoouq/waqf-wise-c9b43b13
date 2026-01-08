@@ -19,12 +19,13 @@ serve(async (req) => {
       try {
         const clonedReq = req.clone();
         const body = await clonedReq.json();
-        if (body.ping || body.healthCheck || body.test) {
+        // يدعم عدة أشكال لاختبار/فحص صحة الدالة من الواجهة
+        if (body.ping || body.healthCheck || body.test || body.testMode) {
           console.log('[ocr-document] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'ocr-document',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
       } catch {
