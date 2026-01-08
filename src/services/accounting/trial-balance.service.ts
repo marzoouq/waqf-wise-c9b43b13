@@ -294,7 +294,7 @@ export class TrialBalanceService {
             debit_amount,
             credit_amount,
             account_id,
-            accounts (
+            accounts!journal_entry_lines_account_id_fkey (
               account_type,
               account_nature
             )
