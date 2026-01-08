@@ -45,6 +45,8 @@ import { runContextsTests } from '@/tests/contexts.tests';
 import { runLibrariesTests } from '@/tests/libraries.tests';
 import { runPagesTests } from '@/tests/pages.tests';
 import { runTypesTests } from '@/tests/types.tests';
+import { runSecurityAdvancedTests } from '@/tests/security-advanced.tests';
+import { runPerformanceLoadTests } from '@/tests/performance-load.tests';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 import { Code2, Boxes, Link2, Workflow, Gauge } from 'lucide-react';
 
@@ -2006,6 +2008,94 @@ const ALL_TESTS: TestCategory[] = [
       }
     ]
   },
+
+  // =============== 25. اختبارات الأمان المتقدمة (25+ اختبار) ===============
+  {
+    id: 'security-advanced',
+    label: 'الأمان المتقدم',
+    icon: Shield,
+    color: 'text-red-600',
+    tests: [
+      {
+        id: 'security-advanced-all',
+        name: 'جميع اختبارات الأمان المتقدمة (25+)',
+        description: 'اختبار RLS، SQL Injection، XSS، CSRF، تشفير الاتصال',
+        category: 'security-advanced',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runSecurityAdvancedTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'security-advanced-all',
+              testName: 'جميع اختبارات الأمان المتقدمة',
+              category: 'security-advanced',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'security-advanced-all',
+              testName: 'جميع اختبارات الأمان المتقدمة',
+              category: 'security-advanced',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 26. اختبارات الأداء والحمل (20+ اختبار) ===============
+  {
+    id: 'performance-load',
+    label: 'الأداء والحمل',
+    icon: Gauge,
+    color: 'text-orange-600',
+    tests: [
+      {
+        id: 'performance-load-all',
+        name: 'جميع اختبارات الأداء والحمل (20+)',
+        description: 'اختبار سرعة الاستعلامات، الطلبات المتوازية، الذاكرة، التحميل',
+        category: 'performance-load',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runPerformanceLoadTests();
+            const passed = results.filter(r => r.status === 'passed').length;
+            const failed = results.filter(r => r.status === 'failed').length;
+            return {
+              testId: 'performance-load-all',
+              testName: 'جميع اختبارات الأداء والحمل',
+              category: 'performance-load',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'performance-load-all',
+              testName: 'جميع اختبارات الأداء والحمل',
+              category: 'performance-load',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
 ];
 
 // ================== حساب الإحصائيات ==================
@@ -2026,6 +2116,8 @@ const DETAILED_TESTS_COUNTS: Record<string, number> = {
   'libraries-detailed': 200,
   'pages-detailed': 400,
   'types-tests': 250,
+  'security-advanced': 25,
+  'performance-load': 20,
 };
 
 // حساب الإجمالي الحقيقي
