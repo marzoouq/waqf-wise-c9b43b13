@@ -651,37 +651,37 @@ const ALL_TESTS: TestCategory[] = [
       createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { testMode: true }),
       
       // الإشعارات
-      createEdgeFunctionTest('send-notification', 'إرسال إشعار', { userId: 'test', title: 'اختبار', message: 'رسالة' }),
-      createEdgeFunctionTest('send-push-notification', 'إشعار الدفع', { userId: 'test', title: 'اختبار', body: 'رسالة اختبار' }),
-      createEdgeFunctionTest('daily-notifications', 'الإشعارات اليومية', {}),
-      createEdgeFunctionTest('notify-admins', 'إشعار المديرين', { title: 'اختبار', message: 'رسالة', severity: 'info' }),
+      createEdgeFunctionTest('send-notification', 'إرسال إشعار', { testMode: true }),
+      createEdgeFunctionTest('send-push-notification', 'إشعار الدفع', { testMode: true }),
+      createEdgeFunctionTest('daily-notifications', 'الإشعارات اليومية', { testMode: true }),
+      createEdgeFunctionTest('notify-admins', 'إشعار المديرين', { testMode: true }),
       createEdgeFunctionTest('notify-disclosure-published', 'إشعار نشر الإفصاح', { testMode: true }),
-      createEdgeFunctionTest('send-slack-alert', 'تنبيه Slack', { message: 'اختبار', severity: 'info' }),
-      createEdgeFunctionTest('generate-smart-alerts', 'التنبيهات الذكية', {}),
-      createEdgeFunctionTest('contract-renewal-alerts', 'تنبيهات تجديد العقود', {}),
+      createEdgeFunctionTest('send-slack-alert', 'تنبيه Slack', { testMode: true }),
+      createEdgeFunctionTest('generate-smart-alerts', 'التنبيهات الذكية', { testMode: true }),
+      createEdgeFunctionTest('contract-renewal-alerts', 'تنبيهات تجديد العقود', { testMode: true }),
       
       // المالية
-      createEdgeFunctionTest('distribute-revenue', 'توزيع الإيرادات', { testMode: true, totalAmount: 1000 }),
-      createEdgeFunctionTest('simulate-distribution', 'محاكاة التوزيع', { total_amount: 1000 }),
-      createEdgeFunctionTest('auto-create-journal', 'إنشاء قيد آلي', { trigger_event: 'payment', amount: 100 }),
-      createEdgeFunctionTest('calculate-cash-flow', 'حساب التدفقات', { period: 'monthly' }),
-      createEdgeFunctionTest('link-voucher-journal', 'ربط السند بالقيد', { voucher_id: 'test', create_journal: false }),
-      createEdgeFunctionTest('publish-fiscal-year', 'نشر السنة المالية', { fiscalYearId: 'test', notifyHeirs: false }),
+      createEdgeFunctionTest('distribute-revenue', 'توزيع الإيرادات', { testMode: true }),
+      createEdgeFunctionTest('simulate-distribution', 'محاكاة التوزيع', { testMode: true }),
+      createEdgeFunctionTest('auto-create-journal', 'إنشاء قيد آلي', { testMode: true }),
+      createEdgeFunctionTest('calculate-cash-flow', 'حساب التدفقات', { testMode: true }),
+      createEdgeFunctionTest('link-voucher-journal', 'ربط السند بالقيد', { testMode: true }),
+      createEdgeFunctionTest('publish-fiscal-year', 'نشر السنة المالية', { testMode: true }),
       createEdgeFunctionTest('auto-close-fiscal-year', 'إقفال السنة المالية', { testMode: true }),
       createEdgeFunctionTest('zatca-submit', 'إرسال لزاتكا', { testMode: true }),
       
       // المستندات
-      createEdgeFunctionTest('ocr-document', 'قراءة المستندات', { ping: true }),
-      createEdgeFunctionTest('extract-invoice-data', 'استخراج بيانات الفاتورة', { ping: true }),
-      createEdgeFunctionTest('auto-classify-document', 'تصنيف المستندات', { documentId: 'test', useAI: false }),
-      createEdgeFunctionTest('backfill-rental-documents', 'استكمال مستندات الإيجار', {}),
+      createEdgeFunctionTest('ocr-document', 'قراءة المستندات', { testMode: true }),
+      createEdgeFunctionTest('extract-invoice-data', 'استخراج بيانات الفاتورة', { testMode: true }),
+      createEdgeFunctionTest('auto-classify-document', 'تصنيف المستندات', { testMode: true }),
+      createEdgeFunctionTest('backfill-rental-documents', 'استكمال مستندات الإيجار', { testMode: true }),
       createEdgeFunctionTest('send-invoice-email', 'إرسال الفاتورة بالبريد', { testMode: true }),
       
       // المستخدمين
-      createEdgeFunctionTest('create-beneficiary-accounts', 'إنشاء حسابات المستفيدين', { beneficiaryIds: [] }),
-      createEdgeFunctionTest('admin-manage-beneficiary-password', 'إدارة كلمة المرور', { action: 'reset-password', beneficiaryId: 'test' }),
-      createEdgeFunctionTest('reset-user-password', 'إعادة تعيين كلمة المرور', { user_id: 'test', new_password: 'Test@123' }),
-      createEdgeFunctionTest('update-user-email', 'تحديث البريد الإلكتروني', { userId: 'test', newEmail: 'test@test.com' }),
+      createEdgeFunctionTest('create-beneficiary-accounts', 'إنشاء حسابات المستفيدين', { testMode: true }),
+      createEdgeFunctionTest('admin-manage-beneficiary-password', 'إدارة كلمة المرور', { testMode: true }),
+      createEdgeFunctionTest('reset-user-password', 'إعادة تعيين كلمة المرور', { testMode: true }),
+      createEdgeFunctionTest('update-user-email', 'تحديث البريد الإلكتروني', { testMode: true }),
       
       // الصيانة
       createEdgeFunctionTest('weekly-maintenance', 'الصيانة الأسبوعية', {}),

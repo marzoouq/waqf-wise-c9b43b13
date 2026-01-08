@@ -1,6 +1,6 @@
 /**
  * Pages Tests - اختبارات الصفحات الحقيقية
- * @version 5.0.0 - استيراد حقيقي باستخدام Vite glob
+ * @version 6.0.0 - استيراد حقيقي باستخدام Vite glob محسّن
  * تغطية 82 صفحة
  */
 
@@ -21,8 +21,8 @@ export interface TestResult {
 let testCounter = 0;
 const generateId = () => `page-${++testCounter}-${Date.now()}`;
 
-// استيراد جميع الصفحات باستخدام Vite glob
-const allPages = import.meta.glob('@/pages/*.tsx', { eager: true });
+// استيراد جميع الصفحات باستخدام Vite glob مع دعم .tsx و .ts
+const allPages = import.meta.glob('@/pages/*.{tsx,ts}', { eager: true });
 
 // قائمة الصفحات المتوقعة
 const EXPECTED_PAGES = [
@@ -134,7 +134,7 @@ function testPage(pageName: string): TestResult {
       message: 'الصفحة مُعرَّفة في النظام'
     };
     
-  } catch (error) {
+  } catch {
     return {
       id: generateId(),
       testId: `page-${pageName}`,
@@ -180,7 +180,7 @@ export async function runPagesTests(): Promise<TestResult[]> {
   
   // اختبار الصفحات الإضافية المكتشفة
   for (const [path, module] of Object.entries(allPages)) {
-    const pageName = path.split('/').pop()?.replace('.tsx', '') || '';
+    const pageName = path.split('/').pop()?.replace(/\.(tsx?|jsx?)$/, '') || '';
     const alreadyTested = EXPECTED_PAGES.includes(pageName);
     
     if (!alreadyTested && pageName && !pageName.startsWith('_')) {
