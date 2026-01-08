@@ -2623,11 +2623,14 @@ function ComprehensiveTestContent() {
                 ? JSON.stringify(messageValue) 
                 : messageValue;
               
+              // تحديد النجاح - دعم كلا التنسيقين (status و success)
+              const isSuccess = subResult.success === true || subResult.status === 'passed';
+              
               const testResult: TestResult = {
-                testId: subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
-                testName: subResult.name || subResult.testName,
+                testId: subResult.testId || subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
+                testName: subResult.testName || subResult.name,
                 category: subResult.category || category.id,
-                success: subResult.status === 'passed' || subResult.success === true,
+                success: isSuccess,
                 duration: subResult.duration || 0,
                 message: safeMessage,
                 timestamp: new Date()
@@ -2635,10 +2638,18 @@ function ComprehensiveTestContent() {
               
               setResults(prev => [...prev, testResult]);
               
+              // تحديث النتائج الأخيرة للعرض المباشر
+              setRecentResults(prev => [...prev.slice(-5), { 
+                name: testResult.testName, 
+                success: testResult.success 
+              }]);
+              
               if (testResult.success) {
                 totalPassed++;
+                addLog(`  ✅ ${testResult.testName}: نجح (${testResult.duration}ms)`);
               } else {
                 totalFailed++;
+                addLog(`  ❌ ${testResult.testName}: فشل - ${testResult.message}`);
               }
               totalCompleted++;
               
@@ -2650,7 +2661,9 @@ function ComprehensiveTestContent() {
               }));
             }
             
-            addLog(`📦 ${test.name}: ${subResults.filter((r: any) => r.status === 'passed' || r.success).length} نجح، ${subResults.filter((r: any) => r.status === 'failed' || r.success === false).length} فشل من ${subResults.length}`);
+            const passedCount = subResults.filter((r: any) => r.success === true || r.status === 'passed').length;
+            const failedCount = subResults.filter((r: any) => r.success === false || r.status === 'failed').length;
+            addLog(`📦 ${test.name}: ${passedCount} نجح، ${failedCount} فشل من ${subResults.length}`);
           } else {
             // اختبار عادي بدون نتائج فرعية
             setResults(prev => [...prev, result]);
@@ -3031,7 +3044,7 @@ function ComprehensiveTestContent() {
                           <span className="font-medium text-xs">{category.label}</span>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {category.tests.length} اختبار
+                          {DETAILED_TESTS_COUNTS[category.id] || category.tests.length} اختبار
                         </div>
                         {categoryResults.length > 0 && (
                           <div className="flex gap-2 mt-2">
