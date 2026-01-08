@@ -11,12 +11,14 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ Health Check Support - يجب أن يكون أول شيء
+    const bodyText = await req.clone().text();
+    let parsedBody: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        parsedBody = JSON.parse(bodyText);
+        if (parsedBody.ping || parsedBody.healthCheck) {
           console.log('[notify-disclosure-published] Health check received');
           return jsonResponse({
             status: 'healthy',
@@ -27,8 +29,8 @@ serve(async (req) => {
       } catch { /* not JSON, continue */ }
     }
 
-    const body = await req.json();
-    const { disclosure_id, testMode } = body;
+    const disclosure_id = parsedBody.disclosure_id as string | undefined;
+    const testMode = parsedBody.testMode as boolean | undefined;
 
     // ✅ Test Mode Support
     if (testMode) {

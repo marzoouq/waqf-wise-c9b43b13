@@ -20,27 +20,28 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support - يجب أن يكون قبل التحقق من Authorization
-    try {
-      const bodyClone = await req.clone().text();
-      if (bodyClone) {
-        const parsed = JSON.parse(bodyClone);
+    // ✅ Health Check Support - يجب أن يكون قبل أي شيء آخر
+    const bodyText = await req.clone().text();
+    if (bodyText) {
+      try {
+        const parsed = JSON.parse(bodyText);
         if (parsed.ping || parsed.healthCheck || parsed.test) {
-          console.log('[backfill-rental-documents] Health check / test mode received');
+          console.log('[backfill-rental-documents] Health check received');
           return jsonResponse({
             status: 'healthy',
             function: 'backfill-rental-documents',
             timestamp: new Date().toISOString()
           });
         }
+      } catch {
+        // ليس JSON، متابعة
       }
-    } catch {
-      // ليس JSON، متابعة
     }
 
     // 1. التحقق من المصادقة والصلاحيات
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.log('[backfill-rental-documents] Missing authorization header');
       return unauthorizedResponse('Missing authorization header');
     }
 
