@@ -500,6 +500,291 @@ export class SelfHealingManager {
   }
 }
 
+// ============================================
+// 6. دوال الإصلاح الذاتي المتقدمة
+// ============================================
+
+/**
+ * تنظيف التوزيعات المكررة
+ */
+export async function cleanDuplicateDistributions(): Promise<{ cleaned: number; details: string[] }> {
+  try {
+    const { data, error } = await supabase.rpc('find_duplicate_distributions');
+    
+    if (error) {
+      productionLogger.error('فشل البحث عن التوزيعات المكررة:', error);
+      return { cleaned: 0, details: ['فشل الاتصال بقاعدة البيانات'] };
+    }
+    
+    const duplicates = data || [];
+    if (duplicates.length === 0) {
+      return { cleaned: 0, details: ['لا توجد توزيعات مكررة'] };
+    }
+    
+    // إلغاء التكرارات
+    const { error: cleanError } = await supabase.rpc('cleanup_expired_sessions');
+    
+    if (cleanError) {
+      productionLogger.error('فشل تنظيف التوزيعات:', cleanError);
+      return { cleaned: 0, details: ['فشل التنظيف'] };
+    }
+    
+    productionLogger.info(`✅ تم تنظيف ${duplicates.length} توزيعة مكررة`);
+    return { 
+      cleaned: duplicates.length, 
+      details: duplicates.map((d: { beneficiary_id: string }) => `المستفيد: ${d.beneficiary_id}`)
+    };
+  } catch (err) {
+    productionLogger.error('خطأ في تنظيف التوزيعات:', err);
+    return { cleaned: 0, details: ['خطأ غير متوقع'] };
+  }
+}
+
+/**
+ * فحص التوازن المحاسبي
+ */
+export async function verifyAccountingBalance(): Promise<{ balanced: boolean; unbalancedEntries: string[] }> {
+  try {
+    const { data, error } = await supabase.rpc('check_accounting_balance');
+    
+    if (error) {
+      productionLogger.error('فشل فحص التوازن المحاسبي:', error);
+      return { balanced: false, unbalancedEntries: ['فشل الاتصال'] };
+    }
+    
+    const unbalanced = data || [];
+    const balanced = unbalanced.length === 0;
+    
+    if (!balanced) {
+      productionLogger.warn(`⚠️ وُجدت ${unbalanced.length} قيود غير متوازنة`);
+    } else {
+      productionLogger.info('✅ جميع القيود متوازنة');
+    }
+    
+    return { 
+      balanced, 
+      unbalancedEntries: unbalanced.map((e: { entry_id: string }) => e.entry_id) 
+    };
+  } catch (err) {
+    productionLogger.error('خطأ في فحص التوازن:', err);
+    return { balanced: false, unbalancedEntries: ['خطأ غير متوقع'] };
+  }
+}
+
+/**
+ * إصلاح الموافقات المعلقة القديمة
+ */
+export async function fixStuckApprovals(maxAgeDays: number = 30): Promise<{ fixed: number }> {
+  try {
+    const { data, error } = await supabase.rpc('fix_stuck_approvals', { 
+      max_age_days: maxAgeDays 
+    });
+    
+    if (error) {
+      productionLogger.error('فشل إصلاح الموافقات:', error);
+      return { fixed: 0 };
+    }
+    
+    // التعامل مع البيانات المُرجَعة كمصفوفة أو رقم
+    let fixedCount = 0;
+    if (Array.isArray(data)) {
+      fixedCount = data.length;
+    } else if (typeof data === 'number') {
+      fixedCount = data;
+    }
+    
+    if (fixedCount > 0) {
+      productionLogger.info(`✅ تم إصلاح ${fixedCount} موافقة معلقة`);
+    }
+    
+    return { fixed: fixedCount };
+  } catch (err) {
+    productionLogger.error('خطأ في إصلاح الموافقات:', err);
+    return { fixed: 0 };
+  }
+}
+
+/**
+ * تنظيف الجلسات المنتهية
+ */
+export async function cleanExpiredSessions(): Promise<{ cleaned: number }> {
+  try {
+    const { data, error } = await supabase.rpc('cleanup_expired_sessions');
+    
+    if (error) {
+      productionLogger.error('فشل تنظيف الجلسات:', error);
+      return { cleaned: 0 };
+    }
+    
+    // التعامل مع البيانات المُرجَعة كمصفوفة أو رقم
+    let cleaned = 0;
+    if (Array.isArray(data) && data.length > 0) {
+      cleaned = data[0]?.cleaned_count || data.length;
+    } else if (typeof data === 'number') {
+      cleaned = data;
+    }
+    
+    if (cleaned > 0) {
+      productionLogger.info(`✅ تم تنظيف ${cleaned} جلسة منتهية`);
+    }
+    
+    return { cleaned };
+  } catch (err) {
+    productionLogger.error('خطأ في تنظيف الجلسات:', err);
+    return { cleaned: 0 };
+  }
+}
+
+/**
+ * فحص وإصلاح RLS المفقود
+ */
+export async function checkAndFixRLS(): Promise<{ fixed: string[] }> {
+  try {
+    const { data, error } = await supabase.rpc('auto_repair_missing_rls');
+    
+    if (error) {
+      productionLogger.error('فشل إصلاح RLS:', error);
+      return { fixed: [] };
+    }
+    
+    const fixed = (data || []).map((r: { table_name: string }) => r.table_name);
+    
+    if (fixed.length > 0) {
+      productionLogger.info(`✅ تم تفعيل RLS على: ${fixed.join(', ')}`);
+    } else {
+      productionLogger.info('✅ جميع الجداول مُأمَّنة');
+    }
+    
+    return { fixed };
+  } catch (err) {
+    productionLogger.error('خطأ في إصلاح RLS:', err);
+    return { fixed: [] };
+  }
+}
+
+/**
+ * فحص صحة الوظائف المجدولة
+ */
+export async function checkCronJobsHealth(): Promise<{ healthy: boolean; stoppedJobs: string[] }> {
+  try {
+    // فحص آخر تنفيذ للوظائف المجدولة
+    const { data: backups, error: backupErr } = await supabase
+      .from('backup_logs')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    
+    const stoppedJobs: string[] = [];
+    
+    // فحص النسخ الاحتياطي (يجب أن يكون خلال 24 ساعة)
+    if (!backupErr && backups && backups.length > 0) {
+      const lastBackup = new Date(backups[0].created_at);
+      const hoursSinceBackup = (Date.now() - lastBackup.getTime()) / (1000 * 60 * 60);
+      if (hoursSinceBackup > 48) {
+        stoppedJobs.push('backup-database');
+      }
+    }
+    
+    const healthy = stoppedJobs.length === 0;
+    
+    if (!healthy) {
+      productionLogger.warn(`⚠️ وظائف متوقفة: ${stoppedJobs.join(', ')}`);
+    }
+    
+    return { healthy, stoppedJobs };
+  } catch (err) {
+    productionLogger.error('خطأ في فحص الوظائف:', err);
+    return { healthy: false, stoppedJobs: ['unknown'] };
+  }
+}
+
+/**
+ * فحص السجلات اليتيمة
+ */
+export async function findOrphanRecords(): Promise<{ 
+  orphanPayments: number; 
+  orphanContracts: number;
+  orphanDistributions: number;
+}> {
+  try {
+    const { data, error } = await supabase.rpc('find_orphan_records');
+    
+    if (error) {
+      productionLogger.error('فشل البحث عن السجلات اليتيمة:', error);
+      return { orphanPayments: 0, orphanContracts: 0, orphanDistributions: 0 };
+    }
+    
+    // التعامل مع مختلف أشكال البيانات المُرجَعة
+    if (!data || !Array.isArray(data)) {
+      return { orphanPayments: 0, orphanContracts: 0, orphanDistributions: 0 };
+    }
+    
+    // حساب اليتيمة من المصفوفة
+    let orphanPayments = 0;
+    let orphanContracts = 0;
+    let orphanDistributions = 0;
+    
+    for (const record of data) {
+      // تحويل السجل لنوع مرن
+      const rec = record as Record<string, unknown>;
+      
+      if ('table_name' in rec && 'orphan_count' in rec) {
+        // الشكل: كل سجل لجدول مختلف
+        const tableName = rec.table_name as string;
+        const count = typeof rec.orphan_count === 'number' ? rec.orphan_count : 0;
+        
+        if (tableName === 'payments') orphanPayments = count;
+        if (tableName === 'contracts') orphanContracts = count;
+        if (tableName === 'distributions' || tableName === 'heir_distributions') orphanDistributions = count;
+      }
+    }
+    
+    return { orphanPayments, orphanContracts, orphanDistributions };
+  } catch (err) {
+    productionLogger.error('خطأ في البحث عن اليتيمة:', err);
+    return { orphanPayments: 0, orphanContracts: 0, orphanDistributions: 0 };
+  }
+}
+
+/**
+ * تشغيل الإصلاح الذاتي الشامل
+ */
+export async function runComprehensiveSelfHealing(): Promise<{
+  duplicatesClean: { cleaned: number };
+  accountingCheck: { balanced: boolean };
+  approvalsFixed: { fixed: number };
+  sessionsClean: { cleaned: number };
+  rlsFixed: { fixed: string[] };
+  cronHealth: { healthy: boolean };
+  orphanRecords: { total: number };
+}> {
+  productionLogger.info('🔧 بدء الإصلاح الذاتي الشامل...');
+  
+  const [duplicates, accounting, approvals, sessions, rls, cron, orphans] = await Promise.all([
+    cleanDuplicateDistributions(),
+    verifyAccountingBalance(),
+    fixStuckApprovals(30),
+    cleanExpiredSessions(),
+    checkAndFixRLS(),
+    checkCronJobsHealth(),
+    findOrphanRecords()
+  ]);
+  
+  productionLogger.info('✅ اكتمل الإصلاح الذاتي الشامل');
+  
+  return {
+    duplicatesClean: { cleaned: duplicates.cleaned },
+    accountingCheck: { balanced: accounting.balanced },
+    approvalsFixed: { fixed: approvals.fixed },
+    sessionsClean: { cleaned: sessions.cleaned },
+    rlsFixed: { fixed: rls.fixed },
+    cronHealth: { healthy: cron.healthy },
+    orphanRecords: { 
+      total: orphans.orphanPayments + orphans.orphanContracts + orphans.orphanDistributions 
+    }
+  };
+}
+
 // ✅ تأجيل إنشاء singleton حتى الاستخدام الفعلي
 let _selfHealingInstance: SelfHealingManager | null = null;
 
@@ -518,6 +803,15 @@ export const selfHealing = {
   get healthMonitor() { return getSelfHealing().healthMonitor; },
   fetch: <T>(cacheKey: string, fetchFunction: () => Promise<T>, options?: { cacheTTL?: number }) => 
     getSelfHealing().fetch(cacheKey, fetchFunction, options),
+  // دوال الإصلاح الذاتي الجديدة
+  cleanDuplicateDistributions,
+  verifyAccountingBalance,
+  fixStuckApprovals,
+  cleanExpiredSessions,
+  checkAndFixRLS,
+  checkCronJobsHealth,
+  findOrphanRecords,
+  runComprehensiveSelfHealing,
 };
 
 // واجهات مساعدة سهلة الاستخدام

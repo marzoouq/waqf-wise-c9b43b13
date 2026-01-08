@@ -47,8 +47,13 @@ import { runPagesTests } from '@/tests/pages.tests';
 import { runTypesTests } from '@/tests/types.tests';
 import { runSecurityAdvancedTests } from '@/tests/security-advanced.tests';
 import { runPerformanceLoadTests } from '@/tests/performance-load.tests';
+import { runDataIntegrityTests } from '@/tests/data-integrity.tests';
+import { runRBACTests } from '@/tests/rbac-cross.tests';
+import { runRateLimitingTests } from '@/tests/rate-limiting-real.tests';
+import { runBackupRestoreTests } from '@/tests/backup-restore.tests';
+import { runComprehensiveSelfHealing } from '@/lib/selfHealing';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
-import { Code2, Boxes, Link2, Workflow, Gauge } from 'lucide-react';
+import { Code2, Boxes, Link2, Workflow, Gauge, Wrench, ShieldAlert, Timer, HardDrive } from 'lucide-react';
 
 // ================== أنواع البيانات ==================
 
@@ -2159,6 +2164,240 @@ const ALL_TESTS: TestCategory[] = [
       }
     ]
   },
+
+  // =============== 27. تكامل البيانات (15 اختبار) ===============
+  {
+    id: 'data-integrity',
+    label: 'تكامل البيانات',
+    icon: HardDrive,
+    color: 'text-emerald-600',
+    tests: [
+      {
+        id: 'data-integrity-all',
+        name: 'جميع اختبارات تكامل البيانات (15)',
+        description: 'اختبار التوازن المحاسبي، منع التكرار، القيود، السجلات اليتيمة',
+        category: 'data-integrity',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runDataIntegrityTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'data-integrity-all',
+              testName: 'جميع اختبارات تكامل البيانات',
+              category: 'data-integrity',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'data-integrity-all',
+              testName: 'جميع اختبارات تكامل البيانات',
+              category: 'data-integrity',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 28. اختبارات RBAC المتقاطعة (20 اختبار) ===============
+  {
+    id: 'rbac-cross',
+    label: 'RBAC المتقاطع',
+    icon: ShieldAlert,
+    color: 'text-red-500',
+    tests: [
+      {
+        id: 'rbac-cross-all',
+        name: 'جميع اختبارات RBAC المتقاطعة (20)',
+        description: 'اختبار تسرب الصلاحيات، تصعيد الامتيازات، الوصول غير المصرح',
+        category: 'rbac-cross',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runRBACTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'rbac-cross-all',
+              testName: 'جميع اختبارات RBAC المتقاطعة',
+              category: 'rbac-cross',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'rbac-cross-all',
+              testName: 'جميع اختبارات RBAC المتقاطعة',
+              category: 'rbac-cross',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 29. اختبارات Rate Limiting الحقيقية (10 اختبار) ===============
+  {
+    id: 'rate-limiting-real',
+    label: 'Rate Limiting',
+    icon: Timer,
+    color: 'text-yellow-600',
+    tests: [
+      {
+        id: 'rate-limiting-all',
+        name: 'جميع اختبارات Rate Limiting (10)',
+        description: 'اختبار حماية الطلبات المتكررة، Brute Force، حماية Edge Functions',
+        category: 'rate-limiting-real',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runRateLimitingTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'rate-limiting-all',
+              testName: 'جميع اختبارات Rate Limiting',
+              category: 'rate-limiting-real',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'rate-limiting-all',
+              testName: 'جميع اختبارات Rate Limiting',
+              category: 'rate-limiting-real',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 30. اختبارات النسخ والاستعادة (5 اختبار) ===============
+  {
+    id: 'backup-restore',
+    label: 'النسخ والاستعادة',
+    icon: HardDrive,
+    color: 'text-blue-600',
+    tests: [
+      {
+        id: 'backup-restore-all',
+        name: 'جميع اختبارات النسخ والاستعادة (5)',
+        description: 'اختبار إنشاء نسخة احتياطية، التحقق، الاستعادة',
+        category: 'backup-restore',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runBackupRestoreTests();
+            const passed = results.filter(r => r.success).length;
+            const failed = results.filter(r => !r.success).length;
+            return {
+              testId: 'backup-restore-all',
+              testName: 'جميع اختبارات النسخ والاستعادة',
+              category: 'backup-restore',
+              success: failed === 0,
+              duration: Math.round(performance.now() - start),
+              message: `${passed} نجح، ${failed} فشل من ${results.length} اختبار`,
+              details: { results },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'backup-restore-all',
+              testName: 'جميع اختبارات النسخ والاستعادة',
+              category: 'backup-restore',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
+
+  // =============== 31. الإصلاح الذاتي الشامل ===============
+  {
+    id: 'self-healing',
+    label: 'الإصلاح الذاتي',
+    icon: Wrench,
+    color: 'text-purple-600',
+    tests: [
+      {
+        id: 'self-healing-comprehensive',
+        name: 'الإصلاح الذاتي الشامل',
+        description: 'تنظيف التكرارات، فحص التوازن، إصلاح الموافقات، تنظيف الجلسات، فحص RLS',
+        category: 'self-healing',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const result = await runComprehensiveSelfHealing();
+            const duration = Math.round(performance.now() - start);
+            
+            const issues = [];
+            if (result.duplicatesClean.cleaned > 0) issues.push(`${result.duplicatesClean.cleaned} توزيعة مكررة`);
+            if (!result.accountingCheck.balanced) issues.push('قيود غير متوازنة');
+            if (result.approvalsFixed.fixed > 0) issues.push(`${result.approvalsFixed.fixed} موافقة`);
+            if (result.sessionsClean.cleaned > 0) issues.push(`${result.sessionsClean.cleaned} جلسة`);
+            if (result.rlsFixed.fixed.length > 0) issues.push(`${result.rlsFixed.fixed.length} جدول RLS`);
+            if (!result.cronHealth.healthy) issues.push('وظائف مجدولة');
+            if (result.orphanRecords.total > 0) issues.push(`${result.orphanRecords.total} سجل يتيم`);
+            
+            const success = issues.length === 0 || 
+              (result.duplicatesClean.cleaned === 0 && result.accountingCheck.balanced && result.cronHealth.healthy);
+            
+            return {
+              testId: 'self-healing-comprehensive',
+              testName: 'الإصلاح الذاتي الشامل',
+              category: 'self-healing',
+              success,
+              duration,
+              message: issues.length > 0 
+                ? `تم إصلاح: ${issues.join(', ')}` 
+                : 'النظام سليم - لا توجد مشاكل',
+              details: result,
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'self-healing-comprehensive',
+              testName: 'الإصلاح الذاتي الشامل',
+              category: 'self-healing',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      }
+    ]
+  },
 ];
 
 // ================== حساب الإحصائيات ==================
@@ -2181,6 +2420,11 @@ const DETAILED_TESTS_COUNTS: Record<string, number> = {
   'types-tests': 250,
   'security-advanced': 25,
   'performance-load': 20,
+  'data-integrity': 15,
+  'rbac-cross': 20,
+  'rate-limiting-real': 10,
+  'backup-restore': 5,
+  'self-healing': 7,
 };
 
 // حساب الإجمالي الحقيقي
