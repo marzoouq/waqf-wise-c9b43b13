@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle } from "lucide-react";
+import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { AuthService } from "@/services/auth.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePushNotifications } from "@/hooks/notifications/usePushNotifications";
 
 interface NotificationChannel {
   id: string;
@@ -16,12 +16,29 @@ interface NotificationChannel {
   icon: React.ReactNode;
   enabled: boolean;
   description: string;
-  status: 'active' | 'pending' | 'disabled';
+  status: 'active' | 'pending' | 'disabled' | 'denied';
 }
 
 export function MultiChannelNotifications() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { 
+    isSupported: isPushSupported, 
+    permission: pushPermission, 
+    isSubscribed: isPushSubscribed,
+    isLoading: isPushLoading,
+    requestPermission,
+    subscribe: subscribePush,
+    unsubscribe: unsubscribePush
+  } = usePushNotifications();
+
+  const getPushStatus = (): 'active' | 'pending' | 'disabled' | 'denied' => {
+    if (!isPushSupported) return 'disabled';
+    if (pushPermission === 'denied') return 'denied';
+    if (isPushSubscribed) return 'active';
+    return 'pending';
+  };
+
   const [channels, setChannels] = useState<NotificationChannel[]>([
     {
       id: 'in_app',
@@ -51,21 +68,81 @@ export function MultiChannelNotifications() {
       id: 'push',
       name: 'الإشعارات الفورية (Push)',
       icon: <Smartphone className="h-5 w-5" />,
-      enabled: false,
-      description: 'إشعارات فورية على الأجهزة المحمولة',
-      status: 'pending'
+      enabled: isPushSubscribed,
+      description: !isPushSupported 
+        ? 'المتصفح لا يدعم الإشعارات الفورية'
+        : pushPermission === 'denied'
+        ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
+        : 'إشعارات فورية على هذا الجهاز',
+      status: getPushStatus()
     }
   ]);
+
+  // تحديث حالة Push عند تغيرها
+  useEffect(() => {
+    setChannels(prev => 
+      prev.map(c => 
+        c.id === 'push' 
+          ? { 
+              ...c, 
+              enabled: isPushSubscribed,
+              status: getPushStatus(),
+              description: !isPushSupported 
+                ? 'المتصفح لا يدعم الإشعارات الفورية'
+                : pushPermission === 'denied'
+                ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
+                : 'إشعارات فورية على هذا الجهاز'
+            }
+          : c
+      )
+    );
+  }, [isPushSupported, pushPermission, isPushSubscribed]);
 
   const toggleChannel = async (channelId: string) => {
     const channel = channels.find(c => c.id === channelId);
     
     if (!channel) return;
 
+    // معالجة خاصة لـ Push Notifications
+    if (channelId === 'push') {
+      if (!isPushSupported) {
+        toast({
+          title: "غير مدعوم",
+          description: "المتصفح الحالي لا يدعم الإشعارات الفورية",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (pushPermission === 'denied') {
+        toast({
+          title: "الإذن مرفوض",
+          description: "يرجى السماح بالإشعارات من إعدادات المتصفح ثم تحديث الصفحة",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      try {
+        if (isPushSubscribed) {
+          await unsubscribePush();
+        } else {
+          if (pushPermission !== 'granted') {
+            await requestPermission();
+          }
+          await subscribePush();
+        }
+      } catch (error) {
+        productionLogger.error('Error toggling push notifications:', error);
+      }
+      return;
+    }
+
+    // القنوات الأخرى (email, sms) - قريباً
     if (!channel.enabled && channel.status === 'pending') {
       toast({
         title: "قريباً",
-        description: `قناة ${channel.name} ستكون متاحة قريباً عبر Lovable Cloud`,
+        description: `قناة ${channel.name} ستكون متاحة قريباً`,
         variant: "default"
       });
       return;
@@ -102,8 +179,17 @@ export function MultiChannelNotifications() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (channel: NotificationChannel) => {
+    // حالة خاصة لـ Push أثناء التحميل
+    if (channel.id === 'push' && isPushLoading) {
+      return (
+        <Badge variant="outline" className="text-muted-foreground">
+          جاري التحميل...
+        </Badge>
+      );
+    }
+
+    switch (channel.status) {
       case 'active':
         return (
           <Badge className="bg-success/10 text-success border-success/20">
@@ -111,7 +197,29 @@ export function MultiChannelNotifications() {
             مفعّل
           </Badge>
         );
+      case 'denied':
+        return (
+          <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
+            <XCircle className="h-3 w-3 ms-1" />
+            مرفوض
+          </Badge>
+        );
+      case 'disabled':
+        return (
+          <Badge variant="secondary">
+            غير مدعوم
+          </Badge>
+        );
       case 'pending':
+        // التفريق بين Push (جاهز للتفعيل) والقنوات الأخرى (قريباً)
+        if (channel.id === 'push') {
+          return (
+            <Badge variant="outline" className="text-primary border-primary/30">
+              <Bell className="h-3 w-3 ms-1" />
+              جاهز للتفعيل
+            </Badge>
+          );
+        }
         return (
           <Badge variant="outline" className="text-muted-foreground">
             <AlertCircle className="h-3 w-3 ms-1" />
@@ -149,7 +257,7 @@ export function MultiChannelNotifications() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium">{channel.name}</h4>
-                    {getStatusBadge(channel.status)}
+                    {getStatusBadge(channel)}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {channel.description}
@@ -160,7 +268,10 @@ export function MultiChannelNotifications() {
                 <Switch
                   checked={channel.enabled}
                   onCheckedChange={() => toggleChannel(channel.id)}
-                  disabled={channel.status === 'disabled'}
+                  disabled={
+                    channel.status === 'disabled' || 
+                    (channel.id === 'push' && (isPushLoading || pushPermission === 'denied'))
+                  }
                 />
               </div>
             </div>
@@ -180,11 +291,16 @@ export function MultiChannelNotifications() {
             • <strong>الإشعارات الداخلية</strong> مفعّلة بشكل كامل
           </p>
           <p>
-            • <strong>البريد الإلكتروني، SMS، والإشعارات الفورية</strong> ستكون متاحة قريباً عبر Lovable Cloud
+            • <strong>الإشعارات الفورية (Push)</strong> متاحة للتفعيل على هذا الجهاز
           </p>
           <p>
-            • يمكن تفعيلها بسهولة عند الحاجة دون الحاجة لتعديل الكود
+            • <strong>البريد الإلكتروني و SMS</strong> ستكون متاحة قريباً
           </p>
+          {pushPermission === 'denied' && (
+            <p className="text-destructive">
+              • <strong>تنبيه:</strong> تم رفض إذن الإشعارات. لتفعيلها، اذهب لإعدادات المتصفح → الإشعارات → السماح لهذا الموقع
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
