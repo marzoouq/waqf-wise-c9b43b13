@@ -2210,13 +2210,19 @@ function ComprehensiveTestContent() {
             const subResults = result.details.results;
             
             for (const subResult of subResults) {
+              // تحويل details لنص إذا كان كائناً
+              const messageValue = subResult.details || subResult.message;
+              const safeMessage = typeof messageValue === 'object' 
+                ? JSON.stringify(messageValue) 
+                : messageValue;
+              
               const testResult: TestResult = {
                 testId: subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
                 testName: subResult.name || subResult.testName,
                 category: subResult.category || category.id,
                 success: subResult.status === 'passed' || subResult.success === true,
                 duration: subResult.duration || 0,
-                message: subResult.details || subResult.message,
+                message: safeMessage,
                 timestamp: new Date()
               };
               
