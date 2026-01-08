@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export default function PerformanceDashboard() {
-  const { slowQueries, latestMetrics, isLoading } = usePerformanceMetrics();
+  const { slowQueries, latestMetrics, isLoading, diagnostics } = usePerformanceMetrics();
 
   const columns: Column<SlowQueryLog>[] = [
     {
@@ -80,7 +80,7 @@ export default function PerformanceDashboard() {
         </Button>
       </div>
 
-      {/* مقاييس الأداء */}
+      {/* مقاييس الأداء الرئيسية */}
       <UnifiedStatsGrid columns={4}>
         <UnifiedKPICard
           title="تحميل الصفحة"
@@ -115,6 +115,41 @@ export default function PerformanceDashboard() {
           loading={isLoading}
         />
       </UnifiedStatsGrid>
+
+      {/* مقاييس Core Web Vitals */}
+      {(diagnostics.firstContentfulPaint > 0 || diagnostics.largestContentfulPaint > 0) && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
+              Core Web Vitals
+            </CardTitle>
+            <CardDescription>مقاييس Google لتجربة المستخدم</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-muted/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {diagnostics.domContentLoaded > 0 ? `${diagnostics.domContentLoaded.toFixed(2)}s` : '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">DOM Ready</div>
+              </div>
+              <div className="text-center p-3 bg-muted/50 rounded-lg">
+                <div className={`text-2xl font-bold ${diagnostics.firstContentfulPaint < 1.8 ? 'text-green-600' : diagnostics.firstContentfulPaint < 3 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {diagnostics.firstContentfulPaint > 0 ? `${diagnostics.firstContentfulPaint.toFixed(2)}s` : '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">FCP (First Paint)</div>
+              </div>
+              <div className="text-center p-3 bg-muted/50 rounded-lg">
+                <div className={`text-2xl font-bold ${diagnostics.largestContentfulPaint < 2.5 ? 'text-green-600' : diagnostics.largestContentfulPaint < 4 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {diagnostics.largestContentfulPaint > 0 ? `${diagnostics.largestContentfulPaint.toFixed(2)}s` : '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">LCP (Largest Paint)</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* الاستعلامات البطيئة */}
       <Card>
