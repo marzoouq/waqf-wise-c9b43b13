@@ -648,7 +648,7 @@ const ALL_TESTS: TestCategory[] = [
       createEdgeFunctionTest('decrypt-file', 'فك التشفير', { ping: true }),
       createEdgeFunctionTest('secure-delete-file', 'حذف آمن', { testMode: true, fileId: 'test' }),
       createEdgeFunctionTest('check-leaked-password', 'فحص كلمات المرور', { password: 'test123' }),
-      createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { credentialId: 'test', userId: 'test', challenge: 'test' }),
+      createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { testMode: true }),
       
       // الإشعارات
       createEdgeFunctionTest('send-notification', 'إرسال إشعار', { userId: 'test', title: 'اختبار', message: 'رسالة' }),
