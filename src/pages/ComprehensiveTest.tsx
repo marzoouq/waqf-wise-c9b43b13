@@ -414,24 +414,56 @@ const createPerformanceTest = (name: string, description: string, maxDuration: n
   }
 });
 
-const createContextTest = (name: string, description: string): TestCase => ({
+// اختبار السياق الحقيقي - استيراد فعلي
+const createContextTest = (name: string, description: string, importPath: string): TestCase => ({
   id: `context-${name}`,
   name: `${name}`,
   description,
   category: 'contexts',
   run: async () => {
     const start = performance.now();
-    // اختبار السياق يعتمد على التحقق من أن السياق موجود في الذاكرة
-    const duration = Math.round(performance.now() - start);
-    return {
-      testId: `context-${name}`,
-      testName: name,
-      category: 'contexts',
-      success: true,
-      duration,
-      message: 'السياق متاح',
-      timestamp: new Date()
-    };
+    try {
+      // استيراد حقيقي للسياق
+      const module = await import(/* @vite-ignore */ importPath);
+      const exports = Object.keys(module);
+      const hasProvider = exports.some(e => e.includes('Provider'));
+      const hasHook = exports.some(e => e.startsWith('use'));
+      
+      const duration = Math.round(performance.now() - start);
+      
+      if (exports.length === 0) {
+        return {
+          testId: `context-${name}`,
+          testName: name,
+          category: 'contexts',
+          success: false,
+          duration,
+          message: 'السياق لا يحتوي على تصديرات',
+          timestamp: new Date()
+        };
+      }
+      
+      return {
+        testId: `context-${name}`,
+        testName: name,
+        category: 'contexts',
+        success: true,
+        duration,
+        message: `السياق يعمل (${exports.length} تصدير${hasProvider ? ' + Provider' : ''}${hasHook ? ' + Hook' : ''})`,
+        details: { exports: exports.slice(0, 5) },
+        timestamp: new Date()
+      };
+    } catch (err: any) {
+      return {
+        testId: `context-${name}`,
+        testName: name,
+        category: 'contexts',
+        success: false,
+        duration: Math.round(performance.now() - start),
+        message: err.message || 'فشل استيراد السياق',
+        timestamp: new Date()
+      };
+    }
   }
 });
 
@@ -469,24 +501,55 @@ const createLibTest = (name: string, description: string, testFn: () => Promise<
   }
 });
 
-const createPageTest = (name: string, path: string, description: string): TestCase => ({
+// اختبار الصفحة الحقيقي - استيراد فعلي
+const createPageTest = (name: string, importPath: string, description: string): TestCase => ({
   id: `page-${name}`,
   name: `${name}`,
   description,
   category: 'pages',
   run: async () => {
     const start = performance.now();
-    // اختبار الصفحة يعتمد على التحقق من أن المسار صحيح
-    const duration = Math.round(performance.now() - start);
-    return {
-      testId: `page-${name}`,
-      testName: name,
-      category: 'pages',
-      success: true,
-      duration,
-      message: `الصفحة ${path} مُعرَّفة`,
-      timestamp: new Date()
-    };
+    try {
+      // استيراد حقيقي للصفحة
+      const module = await import(/* @vite-ignore */ importPath);
+      const PageComponent = module.default || Object.values(module)[0];
+      const duration = Math.round(performance.now() - start);
+      
+      if (!PageComponent) {
+        return {
+          testId: `page-${name}`,
+          testName: name,
+          category: 'pages',
+          success: false,
+          duration,
+          message: 'الصفحة لا تحتوي على مكون',
+          timestamp: new Date()
+        };
+      }
+      
+      const isValidComponent = typeof PageComponent === 'function' || 
+                               (typeof PageComponent === 'object' && PageComponent !== null);
+      
+      return {
+        testId: `page-${name}`,
+        testName: name,
+        category: 'pages',
+        success: isValidComponent,
+        duration,
+        message: isValidComponent ? `الصفحة موجودة وقابلة للاستيراد (${duration}ms)` : 'المكون غير صالح',
+        timestamp: new Date()
+      };
+    } catch (err: any) {
+      return {
+        testId: `page-${name}`,
+        testName: name,
+        category: 'pages',
+        success: false,
+        duration: Math.round(performance.now() - start),
+        message: err.message || 'فشل استيراد الصفحة',
+        timestamp: new Date()
+      };
+    }
   }
 });
 
@@ -845,13 +908,13 @@ const ALL_TESTS: TestCategory[] = [
     icon: Layers,
     color: 'text-cyan-500',
     tests: [
-      createContextTest('AuthContext', 'سياق المصادقة'),
-      createContextTest('RolesContext', 'سياق الأدوار'),
-      createContextTest('SettingsContext', 'سياق الإعدادات'),
-      createContextTest('UsersContext', 'سياق المستخدمين'),
-      createContextTest('PaymentsDialogsContext', 'سياق حوارات المدفوعات'),
-      createContextTest('TenantsDialogsContext', 'سياق حوارات المستأجرين'),
-      createContextTest('UsersDialogsContext', 'سياق حوارات المستخدمين'),
+      createContextTest('AuthContext', 'سياق المصادقة', '@/contexts/AuthContext'),
+      createContextTest('RolesContext', 'سياق الأدوار', '@/contexts/RolesContext'),
+      createContextTest('SettingsContext', 'سياق الإعدادات', '@/contexts/SettingsContext'),
+      createContextTest('UsersContext', 'سياق المستخدمين', '@/contexts/UsersContext'),
+      createContextTest('PaymentsDialogsContext', 'سياق حوارات المدفوعات', '@/contexts/PaymentsDialogsContext'),
+      createContextTest('TenantsDialogsContext', 'سياق حوارات المستأجرين', '@/contexts/TenantsDialogsContext'),
+      createContextTest('UsersDialogsContext', 'سياق حوارات المستخدمين', '@/contexts/UsersDialogsContext'),
     ]
   },
   
