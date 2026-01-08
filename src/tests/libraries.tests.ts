@@ -1,6 +1,6 @@
 /**
  * Libraries & Utils Tests - اختبارات المكتبات والأدوات الحقيقية
- * @version 5.0.0 - استيراد حقيقي باستخدام Vite glob
+ * @version 6.0.0 - استيراد حقيقي باستخدام Vite glob محسّن
  * تغطية 45+ مكتبة/أداة
  */
 
@@ -21,14 +21,14 @@ export interface TestResult {
 let testCounter = 0;
 const generateId = () => `lib-${++testCounter}-${Date.now()}`;
 
-// استيراد جميع المكتبات باستخدام Vite glob
-const libFiles = import.meta.glob('@/lib/*.ts', { eager: true });
-const libFolders = import.meta.glob('@/lib/*/index.ts', { eager: true });
-const libErrorsFolder = import.meta.glob('@/lib/errors/*.ts', { eager: true });
-const libFontsFolder = import.meta.glob('@/lib/fonts/*.ts', { eager: true });
-const libLoggerFolder = import.meta.glob('@/lib/logger/*.ts', { eager: true });
-const libPdfFolder = import.meta.glob('@/lib/pdf/*.ts', { eager: true });
-const libQueryKeysFolder = import.meta.glob('@/lib/query-keys/*.ts', { eager: true });
+// استيراد جميع المكتبات باستخدام Vite glob مع دعم .ts و .tsx
+const libFiles = import.meta.glob('@/lib/*.{ts,tsx}', { eager: true });
+const libFolders = import.meta.glob('@/lib/*/index.{ts,tsx}', { eager: true });
+const libErrorsFolder = import.meta.glob('@/lib/errors/*.{ts,tsx}', { eager: true });
+const libFontsFolder = import.meta.glob('@/lib/fonts/*.{ts,tsx}', { eager: true });
+const libLoggerFolder = import.meta.glob('@/lib/logger/*.{ts,tsx}', { eager: true });
+const libPdfFolder = import.meta.glob('@/lib/pdf/*.{ts,tsx}', { eager: true });
+const libQueryKeysFolder = import.meta.glob('@/lib/query-keys/*.{ts,tsx}', { eager: true });
 
 // قائمة المكتبات المتوقعة
 const EXPECTED_LIBRARIES = [
@@ -168,7 +168,7 @@ function testLibrary(libName: string, libType: string): TestResult {
       message: 'المكتبة مُعرَّفة في النظام'
     };
     
-  } catch (error) {
+  } catch {
     return {
       id: generateId(),
       testId: `lib-${libName}`,
@@ -216,7 +216,7 @@ export async function runLibrariesTests(): Promise<TestResult[]> {
   
   // اختبار المكتبات الإضافية المكتشفة
   for (const [path, module] of Object.entries(libFiles)) {
-    const libName = path.split('/').pop()?.replace('.ts', '') || '';
+    const libName = path.split('/').pop()?.replace(/\.(ts|tsx)$/, '') || '';
     const alreadyTested = EXPECTED_LIBRARIES.some(l => l.name === libName);
     
     if (!alreadyTested && libName && !libName.startsWith('_')) {
