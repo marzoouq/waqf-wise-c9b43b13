@@ -31,11 +31,12 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
+    // ✅ Health Check Support - يجب أن يكون أولاً قبل التحقق من المصادقة
+    let body: Record<string, unknown> = {};
     try {
-      const bodyClone = await req.clone().json();
-      if (bodyClone.ping || bodyClone.healthCheck) {
-        console.log('[INTELLIGENT-SEARCH] Health check received');
+      body = await req.json();
+      if (body.ping || body.healthCheck || body.test) {
+        console.log('[intelligent-search] Health check / test mode received');
         return jsonResponse({
           status: 'healthy',
           function: 'intelligent-search',
@@ -88,7 +89,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { query, searchType = 'all', limit = 20 } = await req.json();
+    // استخدام البيانات المقروءة مسبقاً
+    const query = body.query as string;
+    const searchType = (body.searchType as string) || 'all';
+    const limit = (body.limit as number) || 20;
 
     if (!query || query.trim().length < 2) {
       return errorResponse('يجب إدخال كلمة بحث (حرفين على الأقل)', 400);
