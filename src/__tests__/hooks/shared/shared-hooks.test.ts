@@ -16,8 +16,8 @@ describe('Shared Hooks', () => {
 
   it('useDeleteConfirmation returns confirmation state', async () => {
     const { useDeleteConfirmation } = await import('@/hooks/shared');
-    const onConfirm = vi.fn();
-    const { result } = renderHook(() => useDeleteConfirmation(onConfirm), { wrapper: createWrapper() });
+    const onDelete = vi.fn();
+    const { result } = renderHook(() => useDeleteConfirmation({ onDelete }), { wrapper: createWrapper() });
     expect(result.current).toHaveProperty('isOpen');
     expect(result.current.isOpen).toBe(false);
   });
