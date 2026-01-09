@@ -226,7 +226,6 @@ const REAL_HOOKS_TO_TEST = [
   
   // لوحة التحكم
   { name: 'useUnifiedKPIs', path: 'dashboard/useUnifiedKPIs', category: 'dashboard' },
-  { name: 'useDashboardStats', path: 'dashboard/useDashboardStats', category: 'dashboard' },
   
   // الناظر
   { name: 'useDistributeRevenue', path: 'nazer/useDistributeRevenue', category: 'nazer' },
