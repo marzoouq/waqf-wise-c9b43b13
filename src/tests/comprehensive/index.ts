@@ -1,15 +1,33 @@
 /**
  * Comprehensive Tests Index - فهرس الاختبارات الشاملة 100%
- * @version 5.0.0
+ * @version 6.0.0
+ * 
+ * يتضمن جميع الاختبارات (1000+ اختبار حقيقي):
+ * - 60+ خدمة
+ * - 60+ جدول قاعدة بيانات
+ * - 53+ Edge Function
+ * - 75+ اختبار أمان
+ * - 250+ Hook
+ * - 50+ اختبار تكامل
+ * - 50+ اختبار أداء
+ * - 100+ مكون
+ * - 83+ صفحة
+ * - 21+ سياق
+ * - 45+ مكتبة
  */
 
-// تصدير جميع دوال الاختبار
+// تصدير جميع دوال الاختبار والأنواع
 export { runServicesComprehensiveTests, type ComprehensiveTestResult } from './services.comprehensive.tests';
 export { runDatabaseComprehensiveTests, type DatabaseTestResult } from './database.comprehensive.tests';
 export { runEdgeFunctionsComprehensiveTests, type EdgeFunctionTestResult } from './edge-functions.comprehensive.tests';
 export { runSecurityComprehensiveTests, type SecurityTestResult } from './security.comprehensive.tests';
 export { runHooksComprehensiveTests, type HookTestResult } from './hooks.comprehensive.tests';
 export { runIntegrationComprehensiveTests, type IntegrationTestResult } from './integration.comprehensive.tests';
+export { runPerformanceComprehensiveTests, type PerformanceTestResult } from './performance.comprehensive.tests';
+export { runComponentsComprehensiveTests, type ComponentTestResult } from './components.comprehensive.tests';
+export { runPagesComprehensiveTests, type PageTestResult } from './pages.comprehensive.tests';
+export { runContextsComprehensiveTests, type ContextTestResult } from './contexts.comprehensive.tests';
+export { runLibrariesComprehensiveTests, type LibraryTestResult } from './libraries.comprehensive.tests';
 
 // استيراد الدوال للاستخدام الداخلي
 import { runServicesComprehensiveTests } from './services.comprehensive.tests';
@@ -18,26 +36,225 @@ import { runEdgeFunctionsComprehensiveTests } from './edge-functions.comprehensi
 import { runSecurityComprehensiveTests } from './security.comprehensive.tests';
 import { runHooksComprehensiveTests } from './hooks.comprehensive.tests';
 import { runIntegrationComprehensiveTests } from './integration.comprehensive.tests';
+import { runPerformanceComprehensiveTests } from './performance.comprehensive.tests';
+import { runComponentsComprehensiveTests } from './components.comprehensive.tests';
+import { runPagesComprehensiveTests } from './pages.comprehensive.tests';
+import { runContextsComprehensiveTests } from './contexts.comprehensive.tests';
+import { runLibrariesComprehensiveTests } from './libraries.comprehensive.tests';
 
 /**
- * تشغيل جميع الاختبارات الشاملة
+ * نتيجة جميع الاختبارات الشاملة
  */
-export async function runAllComprehensiveTests() {
-  console.log('🚀 بدء جميع الاختبارات الشاملة 100%...\n');
+export interface AllComprehensiveTestsResult {
+  services: Awaited<ReturnType<typeof runServicesComprehensiveTests>>;
+  database: Awaited<ReturnType<typeof runDatabaseComprehensiveTests>>;
+  edgeFunctions: Awaited<ReturnType<typeof runEdgeFunctionsComprehensiveTests>>;
+  security: Awaited<ReturnType<typeof runSecurityComprehensiveTests>>;
+  hooks: Awaited<ReturnType<typeof runHooksComprehensiveTests>>;
+  integration: Awaited<ReturnType<typeof runIntegrationComprehensiveTests>>;
+  performance: Awaited<ReturnType<typeof runPerformanceComprehensiveTests>>;
+  components: Awaited<ReturnType<typeof runComponentsComprehensiveTests>>;
+  pages: Awaited<ReturnType<typeof runPagesComprehensiveTests>>;
+  contexts: Awaited<ReturnType<typeof runContextsComprehensiveTests>>;
+  libraries: Awaited<ReturnType<typeof runLibrariesComprehensiveTests>>;
+  summary: {
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+    successRate: number;
+    totalDuration: number;
+    byCategory: Record<string, { total: number; passed: number; failed: number }>;
+  };
+}
+
+/**
+ * تشغيل جميع الاختبارات الشاملة - 1000+ اختبار حقيقي
+ */
+export async function runAllComprehensiveTests(): Promise<AllComprehensiveTestsResult> {
+  console.log('🚀 بدء جميع الاختبارات الشاملة 100% - 11 فئة...\n');
+  const overallStart = performance.now();
   
-  const results = {
-    services: await runServicesComprehensiveTests(),
-    database: await runDatabaseComprehensiveTests(),
-    edgeFunctions: await runEdgeFunctionsComprehensiveTests(),
-    security: await runSecurityComprehensiveTests(),
-    hooks: await runHooksComprehensiveTests(),
-    integration: await runIntegrationComprehensiveTests(),
+  // تشغيل جميع الاختبارات بالتوازي للسرعة
+  const [
+    services,
+    database,
+    edgeFunctions,
+    security,
+    hooks,
+    integration,
+    performanceResults,
+    components,
+    pages,
+    contexts,
+    libraries
+  ] = await Promise.all([
+    runServicesComprehensiveTests(),
+    runDatabaseComprehensiveTests(),
+    runEdgeFunctionsComprehensiveTests(),
+    runSecurityComprehensiveTests(),
+    runHooksComprehensiveTests(),
+    runIntegrationComprehensiveTests(),
+    runPerformanceComprehensiveTests(),
+    runComponentsComprehensiveTests(),
+    runPagesComprehensiveTests(),
+    runContextsComprehensiveTests(),
+    runLibrariesComprehensiveTests(),
+  ]);
+  
+  const totalDuration = performance.now() - overallStart;
+  
+  // حساب الإحصائيات
+  const allResults = [
+    ...services,
+    ...database,
+    ...edgeFunctions,
+    ...security,
+    ...hooks,
+    ...integration,
+    ...performanceResults,
+    ...components,
+    ...pages,
+    ...contexts,
+    ...libraries
+  ];
+  
+  const totalTests = allResults.length;
+  const passedTests = allResults.filter((r: any) => r.passed || r.status === 'passed').length;
+  const failedTests = totalTests - passedTests;
+  const successRate = totalTests > 0 ? (passedTests / totalTests) * 100 : 0;
+  
+  // إحصائيات حسب الفئة
+  const byCategory: Record<string, { total: number; passed: number; failed: number }> = {
+    services: { 
+      total: services.length, 
+      passed: services.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: services.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    database: { 
+      total: database.length, 
+      passed: database.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: database.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    edgeFunctions: { 
+      total: edgeFunctions.length, 
+      passed: edgeFunctions.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: edgeFunctions.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    security: { 
+      total: security.length, 
+      passed: security.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: security.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    hooks: { 
+      total: hooks.length, 
+      passed: hooks.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: hooks.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    integration: { 
+      total: integration.length, 
+      passed: integration.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: integration.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    performance: { 
+      total: performanceResults.length, 
+      passed: performanceResults.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: performanceResults.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    components: { 
+      total: components.length, 
+      passed: components.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: components.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    pages: { 
+      total: pages.length, 
+      passed: pages.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: pages.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    contexts: { 
+      total: contexts.length, 
+      passed: contexts.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: contexts.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
+    libraries: { 
+      total: libraries.length, 
+      passed: libraries.filter((r: any) => r.passed || r.status === 'passed').length,
+      failed: libraries.filter((r: any) => !r.passed && r.status !== 'passed').length
+    },
   };
   
-  const totalTests = Object.values(results).flat().length;
-  const passedTests = Object.values(results).flat().filter((r: any) => r.status === 'passed').length;
+  // طباعة النتائج
+  console.log('\n' + '='.repeat(60));
+  console.log('📊 ملخص الاختبارات الشاملة 100%');
+  console.log('='.repeat(60));
   
-  console.log(`\n📊 النتيجة النهائية: ${passedTests}/${totalTests} اختبار ناجح (${((passedTests/totalTests)*100).toFixed(1)}%)`);
+  Object.entries(byCategory).forEach(([category, stats]) => {
+    const emoji = stats.failed === 0 ? '✅' : '⚠️';
+    console.log(`${emoji} ${category}: ${stats.passed}/${stats.total} (${((stats.passed/stats.total)*100).toFixed(1)}%)`);
+  });
   
-  return results;
+  console.log('='.repeat(60));
+  console.log(`📈 الإجمالي: ${passedTests}/${totalTests} اختبار ناجح (${successRate.toFixed(1)}%)`);
+  console.log(`⏱️ الوقت الإجمالي: ${(totalDuration/1000).toFixed(2)} ثانية`);
+  console.log('='.repeat(60));
+  
+  return {
+    services,
+    database,
+    edgeFunctions,
+    security,
+    hooks,
+    integration,
+    performance: performanceResults,
+    components,
+    pages,
+    contexts,
+    libraries,
+    summary: {
+      totalTests,
+      passedTests,
+      failedTests,
+      successRate,
+      totalDuration,
+      byCategory
+    }
+  };
+}
+
+/**
+ * تشغيل اختبارات فئة محددة
+ */
+export async function runCategoryTests(category: string) {
+  switch (category) {
+    case 'services': return runServicesComprehensiveTests();
+    case 'database': return runDatabaseComprehensiveTests();
+    case 'edgeFunctions': return runEdgeFunctionsComprehensiveTests();
+    case 'security': return runSecurityComprehensiveTests();
+    case 'hooks': return runHooksComprehensiveTests();
+    case 'integration': return runIntegrationComprehensiveTests();
+    case 'performance': return runPerformanceComprehensiveTests();
+    case 'components': return runComponentsComprehensiveTests();
+    case 'pages': return runPagesComprehensiveTests();
+    case 'contexts': return runContextsComprehensiveTests();
+    case 'libraries': return runLibrariesComprehensiveTests();
+    default: throw new Error(`Unknown category: ${category}`);
+  }
+}
+
+/**
+ * الحصول على قائمة الفئات المتاحة
+ */
+export function getAvailableCategories(): string[] {
+  return [
+    'services',
+    'database', 
+    'edgeFunctions',
+    'security',
+    'hooks',
+    'integration',
+    'performance',
+    'components',
+    'pages',
+    'contexts',
+    'libraries'
+  ];
 }
