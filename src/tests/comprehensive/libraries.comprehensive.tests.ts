@@ -353,6 +353,24 @@ async function testPdfGenerators(): Promise<LibraryTestResult[]> {
 }
 
 /**
+ * الحصول على إحصائيات المكتبات
+ */
+export function getLibrariesStats() {
+  return {
+    totalLibraries: ALL_LIBRARIES.length,
+    totalTests: ALL_LIBRARIES.length + 12, // الاختبارات المفصلة
+    categories: {
+      utils: ALL_LIBRARIES.filter(l => l.category === 'utils').length,
+      helpers: ALL_LIBRARIES.filter(l => l.category === 'helpers').length,
+      validators: ALL_LIBRARIES.filter(l => l.category === 'validators').length,
+      generators: ALL_LIBRARIES.filter(l => l.category === 'generators').length,
+      services: ALL_LIBRARIES.filter(l => l.category === 'services').length,
+      filters: ALL_LIBRARIES.filter(l => l.category === 'filters').length
+    }
+  };
+}
+
+/**
  * تشغيل جميع اختبارات المكتبات الشاملة
  */
 export async function runLibrariesComprehensiveTests(): Promise<LibraryTestResult[]> {

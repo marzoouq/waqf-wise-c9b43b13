@@ -26,10 +26,10 @@ export { runSecurityComprehensiveTests, type SecurityTestResult } from './securi
 export { runHooksComprehensiveTests, type HookTestResult, getHooksStats } from './hooks.comprehensive.tests';
 export { runIntegrationComprehensiveTests, type IntegrationTestResult } from './integration.comprehensive.tests';
 export { runPerformanceComprehensiveTests, type PerformanceTestResult } from './performance.comprehensive.tests';
-export { runComponentsComprehensiveTests, type ComponentTestResult } from './components.comprehensive.tests';
-export { runPagesComprehensiveTests, type PageTestResult } from './pages.comprehensive.tests';
-export { runContextsComprehensiveTests, type ContextTestResult } from './contexts.comprehensive.tests';
-export { runLibrariesComprehensiveTests, type LibraryTestResult } from './libraries.comprehensive.tests';
+export { runComponentsComprehensiveTests, type ComponentTestResult, getComponentsStats } from './components.comprehensive.tests';
+export { runPagesComprehensiveTests, type PageTestResult, getPagesStats } from './pages.comprehensive.tests';
+export { runContextsComprehensiveTests, type ContextTestResult, getContextsStats } from './contexts.comprehensive.tests';
+export { runLibrariesComprehensiveTests, type LibraryTestResult, getLibrariesStats } from './libraries.comprehensive.tests';
 
 // استيراد الدوال للاستخدام الداخلي
 import { runServicesComprehensiveTests } from './services.comprehensive.tests';
@@ -39,10 +39,10 @@ import { runSecurityComprehensiveTests } from './security.comprehensive.tests';
 import { runHooksComprehensiveTests, getHooksStats } from './hooks.comprehensive.tests';
 import { runIntegrationComprehensiveTests } from './integration.comprehensive.tests';
 import { runPerformanceComprehensiveTests } from './performance.comprehensive.tests';
-import { runComponentsComprehensiveTests } from './components.comprehensive.tests';
-import { runPagesComprehensiveTests } from './pages.comprehensive.tests';
-import { runContextsComprehensiveTests } from './contexts.comprehensive.tests';
-import { runLibrariesComprehensiveTests } from './libraries.comprehensive.tests';
+import { runComponentsComprehensiveTests, getComponentsStats } from './components.comprehensive.tests';
+import { runPagesComprehensiveTests, getPagesStats } from './pages.comprehensive.tests';
+import { runContextsComprehensiveTests, getContextsStats } from './contexts.comprehensive.tests';
+import { runLibrariesComprehensiveTests, getLibrariesStats } from './libraries.comprehensive.tests';
 
 /**
  * نتيجة جميع الاختبارات الشاملة

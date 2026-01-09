@@ -362,6 +362,34 @@ async function testTableComponent(): Promise<ComponentTestResult> {
 }
 
 /**
+ * الحصول على إحصائيات المكونات
+ */
+export function getComponentsStats() {
+  const totalComponents = 
+    UI_COMPONENTS.length + 
+    SHARED_COMPONENTS.length + 
+    LAYOUT_COMPONENTS.length + 
+    DASHBOARD_COMPONENTS.length + 
+    BENEFICIARY_COMPONENTS.length + 
+    PROPERTY_COMPONENTS.length + 
+    ACCOUNTING_COMPONENTS.length;
+  
+  return {
+    totalComponents,
+    totalTests: totalComponents + 4, // +4 للاختبارات المفصلة
+    categories: {
+      ui: UI_COMPONENTS.length,
+      shared: SHARED_COMPONENTS.length,
+      layout: LAYOUT_COMPONENTS.length,
+      dashboard: DASHBOARD_COMPONENTS.length,
+      beneficiary: BENEFICIARY_COMPONENTS.length,
+      property: PROPERTY_COMPONENTS.length,
+      accounting: ACCOUNTING_COMPONENTS.length
+    }
+  };
+}
+
+/**
  * تشغيل جميع اختبارات المكونات الشاملة
  */
 export async function runComponentsComprehensiveTests(): Promise<ComponentTestResult[]> {
