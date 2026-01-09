@@ -38,13 +38,17 @@ const handler = async (req: Request): Promise<Response> => {
       } catch { /* not JSON, continue */ }
     }
 
-    const {
-      invoiceId,
-      customerEmail,
-      customerName,
-      invoiceNumber,
-      totalAmount,
-    }: SendInvoiceEmailRequest = await req.json();
+    const body = await req.json();
+    const invoiceId = body.invoiceId || '';
+    const customerEmail = body.customerEmail || '';
+    const customerName = body.customerName || 'العميل الكريم';
+    const invoiceNumber = body.invoiceNumber || 'غير محدد';
+    const totalAmount = typeof body.totalAmount === 'number' ? body.totalAmount : 0;
+
+    // التحقق من البيانات المطلوبة
+    if (!invoiceId || !customerEmail) {
+      return errorResponse('معرف الفاتورة والبريد الإلكتروني مطلوبان', 400);
+    }
 
     console.log("Sending invoice email:", {
       invoiceId,
@@ -191,7 +195,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <div class="total-amount">
-                المبلغ الإجمالي: ${totalAmount.toFixed(2)} ر.س
+                المبلغ الإجمالي: ${(totalAmount || 0).toFixed(2)} ر.س
               </div>
               
               <p class="message">
