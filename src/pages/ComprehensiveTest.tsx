@@ -2878,41 +2878,9 @@ const ALL_TESTS: TestCategory[] = [
   },
 ];
 
-// ================== حساب الإحصائيات ==================
-// الاختبارات المباشرة + تقدير الاختبارات الفرعية للفئات المفصلة
-const DETAILED_TESTS_COUNTS: Record<string, number> = {
-  'ui-components': 60,
-  'workflow': 15,
-  'reports-export': 40,
-  'responsive-a11y': 45,
-  'hooks-tests': 200,
-  'components-tests': 150,
-  'integration-tests': 30,
-  'advanced-workflow': 50,
-  'advanced-performance-tests': 20,
-  'services-detailed': 300,
-  'edge-functions-detailed': 260,
-  'contexts-detailed': 100,
-  'libraries-detailed': 200,
-  'pages-detailed': 400,
-  'types-tests': 250,
-  'security-advanced': 25,
-  'performance-load': 20,
-  'data-integrity': 15,
-  'rbac-cross': 20,
-  'rate-limiting-real': 10,
-  'backup-restore': 5,
-  'self-healing': 7,
-};
-
-// حساب الإجمالي الحقيقي
-const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => {
-  const detailedCount = DETAILED_TESTS_COUNTS[cat.id];
-  if (detailedCount) {
-    return acc + detailedCount;
-  }
-  return acc + cat.tests.length;
-}, 0);
+// ================== حساب الإحصائيات الحقيقية ==================
+// يتم حساب العدد الفعلي من الاختبارات المعرفة فقط - بدون تقديرات وهمية
+const TOTAL_TESTS = ALL_TESTS.reduce((acc, cat) => acc + cat.tests.length, 0);
 
 // ================== Error Boundary خاص بالاختبارات ==================
 
@@ -3007,14 +2975,10 @@ function ComprehensiveTestContent() {
     setLogs([]);
     setStopRequested(false);
     
-    // حساب إجمالي الاختبارات المتوقعة بناءً على الفئات المختارة
+    // حساب إجمالي الاختبارات المتوقعة بناءً على الفئات المختارة - حقيقي 100%
     const selectedTotalTests = ALL_TESTS
       .filter(cat => selectedCategories.includes(cat.id))
-      .reduce((acc, cat) => {
-        const detailedCount = DETAILED_TESTS_COUNTS[cat.id];
-        if (detailedCount) return acc + detailedCount;
-        return acc + cat.tests.length;
-      }, 0);
+      .reduce((acc, cat) => acc + cat.tests.length, 0);
     
     setProgress({
       total: selectedTotalTests,
@@ -3389,10 +3353,8 @@ function ComprehensiveTestContent() {
     return Math.round(results.reduce((acc, r) => acc + r.duration, 0) / results.length);
   };
 
-  // حساب عدد الاختبارات المختارة
+  // حساب عدد الاختبارات المختارة - حقيقي 100%
   const selectedTestsCount = selectedCategories.reduce((acc, catId) => {
-    const detailedCount = DETAILED_TESTS_COUNTS[catId];
-    if (detailedCount) return acc + detailedCount;
     const cat = ALL_TESTS.find(c => c.id === catId);
     return acc + (cat?.tests.length || 0);
   }, 0);
@@ -3576,7 +3538,7 @@ function ComprehensiveTestContent() {
                           <span className="font-medium text-xs">{category.label}</span>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {DETAILED_TESTS_COUNTS[category.id] || category.tests.length} اختبار
+                          {category.tests.length} اختبار
                         </div>
                         {categoryResults.length > 0 && (
                           <div className="flex gap-2 mt-2">
