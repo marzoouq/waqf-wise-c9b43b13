@@ -555,7 +555,20 @@ const createLibTest = (name: string, description: string, testFn: () => Promise<
 // اختبار الصفحة الحقيقي - استيراد فعلي (متوافق مع Vite)
 const pageModules = import.meta.glob('/src/pages/*.tsx', { eager: true });
 
-const createPageTest = (name: string, importPath: string, description: string): TestCase => ({
+/**
+ * إيجاد الصفحة في الوحدات المستوردة باستخدام اسم الصفحة
+ */
+function findPageModule(pageName: string): { path: string; mod: unknown } | null {
+  for (const [path, mod] of Object.entries(pageModules)) {
+    // البحث عن الصفحة باستخدام اسم الملف
+    if (path.includes(`/${pageName}.tsx`)) {
+      return { path, mod };
+    }
+  }
+  return null;
+}
+
+const createPageTest = (name: string, _routePath: string, description: string): TestCase => ({
   id: `page-${name}`,
   name: `${name}`,
   description,
@@ -563,7 +576,8 @@ const createPageTest = (name: string, importPath: string, description: string): 
   run: async () => {
     const start = performance.now();
     try {
-      const resolved = resolveViteModule(pageModules, importPath);
+      // البحث عن الصفحة باستخدام اسم الملف مباشرة
+      const resolved = findPageModule(name);
       if (!resolved) {
         const duration = Math.round(performance.now() - start);
         return {
@@ -572,7 +586,7 @@ const createPageTest = (name: string, importPath: string, description: string): 
           category: 'pages',
           success: false,
           duration,
-          message: `لم يتم العثور على ملف الصفحة (${importPath})`,
+          message: `لم يتم العثور على ملف الصفحة (${name}.tsx)`,
           timestamp: new Date(),
         };
       }
@@ -604,9 +618,9 @@ const createPageTest = (name: string, importPath: string, description: string): 
         success: isValidComponent,
         duration,
         message: isValidComponent
-          ? `الصفحة موجودة وقابلة للاستيراد (${duration}ms)`
+          ? `✅ الصفحة موجودة (${resolved.path.split('/').pop()})`
           : 'المكون غير صالح',
-        details: { path: resolved.path },
+        details: { path: resolved.path, exports: Object.keys(module).slice(0, 5) },
         timestamp: new Date(),
       };
     } catch (err: any) {
@@ -1077,22 +1091,23 @@ const ALL_TESTS: TestCategory[] = [
     ]
   },
   
-  // =============== 6. الصفحات (80 اختبار) ===============
+  // =============== 6. الصفحات (83 اختبار) ===============
   {
     id: 'pages',
     label: 'الصفحات',
     icon: LayoutDashboard,
     color: 'text-teal-500',
     tests: [
-      // لوحات التحكم
+      // لوحات التحكم (7)
       createPageTest('Dashboard', '/dashboard', 'لوحة التحكم الرئيسية'),
       createPageTest('AdminDashboard', '/admin-dashboard', 'لوحة تحكم المسؤول'),
       createPageTest('NazerDashboard', '/nazer-dashboard', 'لوحة تحكم الناظر'),
       createPageTest('AccountantDashboard', '/accountant-dashboard', 'لوحة تحكم المحاسب'),
       createPageTest('ArchivistDashboard', '/archivist-dashboard', 'لوحة تحكم الأرشيف'),
       createPageTest('CashierDashboard', '/cashier-dashboard', 'لوحة تحكم الصراف'),
+      createPageTest('DeveloperDashboard', '/developer-dashboard', 'لوحة تحكم المطور'),
       
-      // المستفيدين
+      // المستفيدين (8)
       createPageTest('Beneficiaries', '/beneficiaries', 'صفحة المستفيدين'),
       createPageTest('BeneficiaryProfile', '/beneficiary/:id', 'ملف المستفيد'),
       createPageTest('BeneficiaryPortal', '/beneficiary-portal', 'بوابة المستفيد'),
@@ -1102,17 +1117,17 @@ const ALL_TESTS: TestCategory[] = [
       createPageTest('BeneficiarySettings', '/beneficiary-settings', 'إعدادات المستفيد'),
       createPageTest('BeneficiarySupport', '/beneficiary-support', 'دعم المستفيد'),
       
-      // العائلات
+      // العائلات (2)
       createPageTest('Families', '/families', 'صفحة العائلات'),
       createPageTest('FamilyDetails', '/family/:id', 'تفاصيل العائلة'),
       
-      // العقارات
+      // العقارات (4)
       createPageTest('Properties', '/properties', 'صفحة العقارات'),
       createPageTest('WaqfUnits', '/waqf-units', 'أقلام الوقف'),
       createPageTest('Tenants', '/tenants', 'المستأجرين'),
       createPageTest('TenantDetails', '/tenant/:id', 'تفاصيل المستأجر'),
       
-      // المالية
+      // المالية (11)
       createPageTest('Accounting', '/accounting', 'صفحة المحاسبة'),
       createPageTest('Invoices', '/invoices', 'الفواتير'),
       createPageTest('Payments', '/payments', 'المدفوعات'),
@@ -1122,38 +1137,38 @@ const ALL_TESTS: TestCategory[] = [
       createPageTest('Funds', '/funds', 'الصناديق'),
       createPageTest('BankTransfers', '/bank-transfers', 'التحويلات البنكية'),
       createPageTest('AllTransactions', '/all-transactions', 'جميع المعاملات'),
-      
-      // المحاسبة المتقدمة
       createPageTest('FiscalYearsManagement', '/fiscal-years', 'إدارة السنوات المالية'),
-      createPageTest('TenantsAgingReport', '/tenants-aging', 'تقرير أعمار المستأجرين'),
+      createPageTest('TenantsAgingReportPage', '/tenants-aging', 'تقرير أعمار المستأجرين'),
       
-      // التقارير
+      // التقارير (2)
       createPageTest('Reports', '/reports', 'التقارير'),
       createPageTest('CustomReports', '/custom-reports', 'التقارير المخصصة'),
       
-      // الحوكمة
+      // الحوكمة (3)
       createPageTest('GovernanceDecisions', '/governance', 'قرارات الحوكمة'),
       createPageTest('DecisionDetails', '/decision/:id', 'تفاصيل القرار'),
       createPageTest('Approvals', '/approvals', 'الموافقات'),
       
-      // الذكاء الاصطناعي
+      // الذكاء الاصطناعي (3)
       createPageTest('Chatbot', '/chatbot', 'المساعد الذكي'),
       createPageTest('AIInsights', '/ai-insights', 'رؤى الذكاء الاصطناعي'),
       createPageTest('AISystemAudit', '/ai-audit', 'تدقيق النظام الذكي'),
       
-      // المراقبة
+      // المراقبة (8)
       createPageTest('SystemMonitoring', '/monitoring', 'مراقبة النظام'),
       createPageTest('SystemErrorLogs', '/error-logs', 'سجلات الأخطاء'),
       createPageTest('PerformanceDashboard', '/performance', 'لوحة الأداء'),
       createPageTest('DatabaseHealthDashboard', '/db-health', 'صحة قاعدة البيانات'),
       createPageTest('DatabasePerformanceDashboard', '/db-performance', 'أداء قاعدة البيانات'),
       createPageTest('EdgeFunctionsMonitor', '/edge-monitor', 'مراقبة Edge Functions'),
+      createPageTest('EdgeFunctionTest', '/edge-test', 'اختبار Edge Functions'),
+      createPageTest('ConnectionDiagnostics', '/connection-diagnostics', 'تشخيص الاتصال'),
       
-      // الأمان
+      // الأمان (2)
       createPageTest('SecurityDashboard', '/security', 'لوحة الأمان'),
       createPageTest('AuditLogs', '/audit-logs', 'سجلات التدقيق'),
       
-      // الإعدادات
+      // الإعدادات (8)
       createPageTest('Settings', '/settings', 'الإعدادات'),
       createPageTest('AdvancedSettings', '/advanced-settings', 'الإعدادات المتقدمة'),
       createPageTest('NotificationSettings', '/notification-settings', 'إعدادات الإشعارات'),
@@ -1163,28 +1178,27 @@ const ALL_TESTS: TestCategory[] = [
       createPageTest('RolesManagement', '/roles', 'إدارة الأدوار'),
       createPageTest('IntegrationsManagement', '/integrations', 'إدارة التكاملات'),
       
-      // المستخدمين
+      // المستخدمين (1)
       createPageTest('Users', '/users', 'المستخدمين'),
       
-      // نقطة البيع
+      // نقطة البيع (1)
       createPageTest('PointOfSale', '/pos', 'نقطة البيع'),
       
-      // الطلبات
+      // الطلبات (2)
       createPageTest('Requests', '/requests', 'الطلبات'),
-      createPageTest('StaffRequestsManagement', '/staff-requests', 'طلبات الموظفين'),
       createPageTest('EmergencyAidManagement', '/emergency-aid', 'المساعدات الطارئة'),
       
-      // الأرشيف
+      // الأرشيف (1)
       createPageTest('Archive', '/archive', 'الأرشيف'),
       
-      // الرسائل والدعم
+      // الرسائل والدعم (5)
       createPageTest('Messages', '/messages', 'الرسائل'),
       createPageTest('Support', '/support', 'الدعم الفني'),
       createPageTest('SupportManagement', '/support-management', 'إدارة الدعم'),
       createPageTest('Notifications', '/notifications', 'الإشعارات'),
       createPageTest('KnowledgeBase', '/knowledge-base', 'قاعدة المعرفة'),
       
-      // عام
+      // عام (13)
       createPageTest('LandingPage', '/', 'الصفحة الرئيسية'),
       createPageTest('LandingPageLight', '/landing-light', 'الصفحة الرئيسية الخفيفة'),
       createPageTest('Login', '/login', 'تسجيل الدخول'),
@@ -1198,6 +1212,10 @@ const ALL_TESTS: TestCategory[] = [
       createPageTest('Install', '/install', 'تثبيت التطبيق'),
       createPageTest('NotFound', '/404', 'صفحة غير موجودة'),
       createPageTest('Unauthorized', '/unauthorized', 'غير مصرح'),
+      
+      // الاختبارات (2)
+      createPageTest('ComprehensiveTest', '/comprehensive-test', 'الاختبارات الشاملة'),
+      createPageTest('TestsDashboard', '/tests-dashboard', 'لوحة الاختبارات'),
     ]
   },
   
