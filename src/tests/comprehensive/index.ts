@@ -20,10 +20,19 @@
  */
 
 // ✅ اختبارات تغطية 100% الجديدة
-export { default as runServices100Tests } from '../services.comprehensive.100.tests';
-export { default as runHooks100Tests, getHooks100Stats } from '../hooks.comprehensive.100.tests';
-export { default as runEdgeFunctions100Tests, getEdgeFunctions100Stats } from '../edge-functions.comprehensive.100.tests';
-export { default as runSecurity100Tests } from '../security.100.tests';
+import runServicesComprehensive100Tests from '../services.comprehensive.100.tests';
+import runHooksComprehensive100Tests, { getHooks100Stats as getHooksStats100 } from '../hooks.comprehensive.100.tests';
+import runEdgeFunctionsComprehensive100Tests, { getEdgeFunctions100Stats } from '../edge-functions.comprehensive.100.tests';
+import runSecurity100TestsFn from '../security.100.tests';
+
+export {
+  runServicesComprehensive100Tests as runServices100Tests,
+  runHooksComprehensive100Tests as runHooks100Tests,
+  runEdgeFunctionsComprehensive100Tests as runEdgeFunctions100Tests,
+  runSecurity100TestsFn as runSecurity100Tests,
+  getHooksStats100 as getHooks100Stats,
+  getEdgeFunctions100Stats
+};
 
 // Seed functions
 export { TestDataSeed } from '../seed';
