@@ -2574,8 +2574,10 @@ function ComprehensiveTestContent() {
 
   const filteredResults = useMemo(() => {
     return results.filter(r => {
-      const matchesSearch = r.testName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           r.category.toLowerCase().includes(searchQuery.toLowerCase());
+      const testName = r.testName || '';
+      const category = r.category || '';
+      const matchesSearch = testName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           category.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = filterStatus === 'all' || 
                            (filterStatus === 'passed' && r.success) ||
                            (filterStatus === 'failed' && !r.success);
