@@ -14204,8 +14204,9 @@ export type Database = {
         }[]
       }
       cleanup_old_alerts: { Args: never; Returns: undefined }
-      cleanup_old_chatbot_conversations: { Args: never; Returns: undefined }
+      cleanup_old_chatbot_conversations: { Args: never; Returns: number }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
+      cleanup_old_read_notifications: { Args: never; Returns: number }
       cleanup_old_records: { Args: never; Returns: undefined }
       cleanup_test_data: {
         Args: never
