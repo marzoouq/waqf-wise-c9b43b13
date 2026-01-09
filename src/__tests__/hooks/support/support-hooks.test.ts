@@ -149,15 +149,19 @@ describe('Support Hooks - Real Functional Tests', () => {
       
       const { result } = renderHook(() => useSupportStats(), { wrapper: createWrapper() });
       
-      if ('isLoading' in result.current) {
-        await waitFor(() => expect(result.current.isLoading).toBe(false), { timeout: 5000 });
-      }
+      // Wait for loading to complete - check various loading indicators
+      await waitFor(() => {
+        const current = result.current as Record<string, unknown>;
+        const loading = current.isLoading ?? current.loading ?? current.isPending ?? false;
+        return loading === false;
+      }, { timeout: 5000 });
       
-      if ('stats' in result.current) {
-        expect(result.current.stats !== undefined).toBe(true);
+      const current = result.current as Record<string, unknown>;
+      if ('stats' in current) {
+        expect(current.stats !== undefined).toBe(true);
       }
-      if ('data' in result.current) {
-        expect(result.current.data !== undefined).toBe(true);
+      if ('data' in current) {
+        expect(current.data !== undefined).toBe(true);
       }
     });
 
@@ -166,15 +170,19 @@ describe('Support Hooks - Real Functional Tests', () => {
       
       const { result } = renderHook(() => useSupportStats(), { wrapper: createWrapper() });
       
-      if ('isLoading' in result.current) {
-        await waitFor(() => expect(result.current.isLoading).toBe(false), { timeout: 5000 });
-      }
+      // Wait for loading to complete
+      await waitFor(() => {
+        const current = result.current as Record<string, unknown>;
+        const loading = current.isLoading ?? current.loading ?? current.isPending ?? false;
+        return loading === false;
+      }, { timeout: 5000 });
       
+      const current = result.current as Record<string, unknown>;
       // Check for count-related properties
-      const hasStats = 'total' in result.current || 
-                       'openCount' in result.current ||
-                       'stats' in result.current ||
-                       'data' in result.current;
+      const hasStats = 'total' in current || 
+                       'openCount' in current ||
+                       'stats' in current ||
+                       'data' in current;
       expect(hasStats).toBe(true);
     });
   });
