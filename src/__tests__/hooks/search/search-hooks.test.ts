@@ -1,19 +1,35 @@
 /**
- * Search Hooks Tests
- * @version 1.0.0
+ * اختبارات Hooks البحث - مبسطة
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(() => ({ select: vi.fn().mockReturnValue({ ilike: vi.fn().mockReturnValue({ limit: vi.fn().mockResolvedValue({ data: [], error: null }) }) }) })),
+    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }), onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })) },
+  },
+}));
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => React.createElement(QueryClientProvider, { client: qc }, children);
+};
 
 describe('Search Hooks', () => {
-  it('should import useGlobalSearchData', async () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('useGlobalSearchData returns search functionality', async () => {
     const { useGlobalSearchData } = await import('@/hooks/search');
-    expect(useGlobalSearchData).toBeDefined();
-    expect(typeof useGlobalSearchData).toBe('function');
+    const { result } = renderHook(() => useGlobalSearchData('test'), { wrapper: createWrapper() });
+    expect(result.current).toBeDefined();
   });
 
-  it('should import useRecentSearches', async () => {
+  it('useRecentSearches returns recent searches', async () => {
     const { useRecentSearches } = await import('@/hooks/search');
-    expect(useRecentSearches).toBeDefined();
-    expect(typeof useRecentSearches).toBe('function');
+    const { result } = renderHook(() => useRecentSearches('user-1'), { wrapper: createWrapper() });
+    expect(result.current).toBeDefined();
   });
 });

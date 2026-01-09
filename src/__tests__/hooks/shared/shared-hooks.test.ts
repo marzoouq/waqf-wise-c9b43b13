@@ -1,25 +1,37 @@
 /**
- * Shared Hooks Tests
- * @version 1.0.0
+ * اختبارات Hooks المشتركة - مبسطة
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => React.createElement(QueryClientProvider, { client: qc }, children);
+};
 
 describe('Shared Hooks', () => {
-  it('should import useDeleteConfirmation', async () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('useDeleteConfirmation returns confirmation state', async () => {
     const { useDeleteConfirmation } = await import('@/hooks/shared');
-    expect(useDeleteConfirmation).toBeDefined();
-    expect(typeof useDeleteConfirmation).toBe('function');
+    const onConfirm = vi.fn();
+    const { result } = renderHook(() => useDeleteConfirmation(onConfirm), { wrapper: createWrapper() });
+    expect(result.current).toHaveProperty('isOpen');
+    expect(result.current.isOpen).toBe(false);
   });
 
-  it('should import useDialog', async () => {
+  it('useDialog returns dialog state', async () => {
     const { useDialog } = await import('@/hooks/shared');
-    expect(useDialog).toBeDefined();
-    expect(typeof useDialog).toBe('function');
+    const { result } = renderHook(() => useDialog(false), { wrapper: createWrapper() });
+    expect(result.current).toHaveProperty('isOpen');
+    expect(typeof result.current.open).toBe('function');
   });
 
-  it('should import useMultipleDialogs', async () => {
+  it('useMultipleDialogs manages multiple dialogs', async () => {
     const { useMultipleDialogs } = await import('@/hooks/shared');
-    expect(useMultipleDialogs).toBeDefined();
-    expect(typeof useMultipleDialogs).toBe('function');
+    const { result } = renderHook(() => useMultipleDialogs(['create', 'edit']), { wrapper: createWrapper() });
+    expect(result.current).toBeDefined();
   });
 });

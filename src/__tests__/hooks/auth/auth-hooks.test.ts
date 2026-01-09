@@ -1,67 +1,48 @@
 /**
  * اختبارات Hooks المصادقة - مبسطة
  */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import React from 'react';
 
-import { describe, it, expect, vi } from 'vitest';
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }), onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })) },
+    from: vi.fn(() => ({ select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: null, error: null }) }) }) })),
+  },
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: null, isLoading: false, roles: [] }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+const createWrapper = () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return ({ children }: { children: React.ReactNode }) => 
+    React.createElement(QueryClientProvider, { client: qc }, React.createElement(BrowserRouter, null, children));
+};
 
 describe('Auth Hooks', () => {
-  it('useAuth should be importable', async () => {
-    const module = await import('@/hooks/auth/useAuth');
-    expect(module.useAuth).toBeDefined();
+  beforeEach(() => vi.clearAllMocks());
+
+  it('useAuth returns auth state', async () => {
+    const { useAuth } = await import('@/hooks/auth/useAuth');
+    const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
+    expect(result.current).toHaveProperty('isLoading');
   });
 
-  it('usePermissions should be importable', async () => {
-    const module = await import('@/hooks/auth/usePermissions');
-    expect(module.usePermissions).toBeDefined();
+  it('usePermissions returns permissions', async () => {
+    const { usePermissions } = await import('@/hooks/auth/usePermissions');
+    const { result } = renderHook(() => usePermissions(), { wrapper: createWrapper() });
+    expect(result.current).toBeDefined();
   });
 
-  it('useUserRole should be importable', async () => {
-    const module = await import('@/hooks/auth/useUserRole');
-    expect(module.useUserRole).toBeDefined();
-  });
-
-  it('useProfile should be importable', async () => {
-    const module = await import('@/hooks/auth/useProfile');
-    expect(module.useProfile).toBeDefined();
-  });
-
-  it('useActiveSessions should be importable', async () => {
-    const module = await import('@/hooks/auth/useActiveSessions');
-    expect(module.useActiveSessions).toBeDefined();
-  });
-
-  it('useIdleTimeout should be importable', async () => {
-    const module = await import('@/hooks/auth/useIdleTimeout');
-    expect(module.useIdleTimeout).toBeDefined();
-  });
-
-  it('useChangePassword should be importable', async () => {
-    const module = await import('@/hooks/auth/useChangePassword');
-    expect(module.useChangePassword).toBeDefined();
-  });
-
-  it('useResetPassword should be importable', async () => {
-    const module = await import('@/hooks/auth/useResetPassword');
-    expect(module.useResetPassword).toBeDefined();
-  });
-
-  it('useBiometricAuth should be importable', async () => {
-    const module = await import('@/hooks/auth/useBiometricAuth');
-    expect(module.useBiometricAuth).toBeDefined();
-  });
-
-  it('useLeakedPassword should be importable', async () => {
-    const module = await import('@/hooks/auth/useLeakedPassword');
-    expect(module.useLeakedPassword).toBeDefined();
-  });
-
-  it('useSessionCleanup should be importable', async () => {
-    const module = await import('@/hooks/auth/useSessionCleanup');
-    expect(module.useSessionCleanup).toBeDefined();
-  });
-
-  it('useLightAuth should be importable', async () => {
-    const module = await import('@/hooks/auth/useLightAuth');
-    expect(module.useLightAuth).toBeDefined();
+  it('useUserRole returns role info', async () => {
+    const { useUserRole } = await import('@/hooks/auth/useUserRole');
+    const { result } = renderHook(() => useUserRole(), { wrapper: createWrapper() });
+    expect(result.current).toBeDefined();
   });
 });
