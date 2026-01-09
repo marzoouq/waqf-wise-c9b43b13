@@ -50,13 +50,16 @@ Deno.serve(async (req) => {
       try {
         bodyData = JSON.parse(bodyText);
         
-        // ✅ Health Check Support
-        if (bodyData.ping || bodyData.healthCheck) {
-          console.log('[run-vacuum] Health check received');
+        // ✅ Health Check Support + Test Mode (بيئة معزولة)
+        if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+          console.log('[run-vacuum] Health check / test mode received - returning healthy without actual vacuum');
           return jsonResponse({
             status: 'healthy',
             function: 'run-vacuum',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            version: '2.1.0',
+            testMode: Boolean(bodyData.testMode),
+            note: bodyData.testMode ? 'Test mode - no vacuum executed' : undefined
           });
         }
       } catch { /* not JSON, continue */ }
