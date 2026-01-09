@@ -35,7 +35,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try {
       body = await req.json();
-      if (body.ping || body.healthCheck || body.test) {
+      if (body.ping || body.healthCheck || body.test || body.testMode) {
         console.log('[intelligent-search] Health check / test mode received');
         return jsonResponse({
           status: 'healthy',

@@ -45,7 +45,7 @@ serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
           console.log('[generate-ai-insights] Health check received');
           return jsonResponse({
             status: 'healthy',
