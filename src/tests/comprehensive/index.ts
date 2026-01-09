@@ -1,6 +1,6 @@
 /**
  * Comprehensive Tests Index - فهرس الاختبارات الشاملة 100%
- * @version 7.0.0
+ * @version 8.0.0
  * 
  * تغطية شاملة 100% لجميع أجزاء التطبيق:
  * - 250+ Hook (38 مجلد)
@@ -14,9 +14,19 @@
  * - 50+ اختبار أمان
  * - 50+ اختبار أداء
  * - 50+ اختبار تكامل
+ * - اختبارات E2E Playwright (تبويبات، نماذج، أزرار، CRUD)
  * 
- * إجمالي: 800+ اختبار حقيقي
+ * إجمالي: 1000+ اختبار حقيقي
  */
+
+// ✅ اختبارات تغطية 100% الجديدة
+export { default as runServices100Tests } from '../services.comprehensive.100.tests';
+export { default as runHooks100Tests, getHooks100Stats } from '../hooks.comprehensive.100.tests';
+export { default as runEdgeFunctions100Tests, getEdgeFunctions100Stats } from '../edge-functions.comprehensive.100.tests';
+export { default as runSecurity100Tests } from '../security.100.tests';
+
+// Seed functions
+export { TestDataSeed } from '../seed';
 
 // تصدير جميع دوال الاختبار والأنواع
 export { runServicesComprehensiveTests, type ComprehensiveTestResult } from './services.comprehensive.tests';
