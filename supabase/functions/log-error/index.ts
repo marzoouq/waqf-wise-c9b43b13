@@ -74,13 +74,14 @@ Deno.serve(async (req) => {
       try {
         rawData = JSON.parse(bodyText);
         
-        // ✅ Health Check Support - قبل أي عمليات أخرى
-        if (rawData.ping || rawData.healthCheck) {
+        // ✅ Health Check Support - قبل أي عمليات أخرى (بدون تحقق من apikey)
+        if (rawData.ping || rawData.healthCheck || rawData.testMode) {
           console.log('[log-error] Health check received');
           return jsonResponse({
             status: 'healthy',
             function: 'log-error',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            version: '4.1.0'
           });
         }
       } catch (parseError) {
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 🔒 1. التحقق من API Key + Rate Limiting
+    // 🔒 1. التحقق من API Key + Rate Limiting (فقط للعمليات الفعلية)
     const apiKey = req.headers.get('apikey');
     if (!apiKey || !apiKey.startsWith('eyJ')) {
       return unauthorizedResponse('API key غير صالح');
