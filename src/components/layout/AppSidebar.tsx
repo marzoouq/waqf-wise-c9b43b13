@@ -210,6 +210,7 @@ const menuGroups = [
       { icon: Plug, label: "إدارة التكاملات", path: "/integrations", roles: ["admin", "nazer"] },
       { icon: TestTube, label: "اختبار Edge", path: "/edge-test", roles: ["admin"] },
       { icon: TestTube, label: "الاختبارات الشاملة", path: "/comprehensive-test", roles: ["admin"] },
+      { icon: TestTube, label: "الاختبارات الحقيقية", path: "/tests/real", roles: ["admin"] },
     ]
   },
 ];
