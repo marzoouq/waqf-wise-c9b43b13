@@ -288,6 +288,23 @@ async function testDialogContexts(): Promise<ContextTestResult[]> {
 }
 
 /**
+ * الحصول على إحصائيات السياقات
+ */
+export function getContextsStats() {
+  return {
+    totalContexts: ALL_CONTEXTS.length,
+    totalTests: ALL_CONTEXTS.length + 14, // الاختبارات المفصلة
+    categories: {
+      auth: 1,
+      roles: 1,
+      settings: 1,
+      users: 1,
+      dialogs: 3
+    }
+  };
+}
+
+/**
  * تشغيل جميع اختبارات السياقات الشاملة
  */
 export async function runContextsComprehensiveTests(): Promise<ContextTestResult[]> {
