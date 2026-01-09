@@ -18,7 +18,7 @@ export interface EdgeFunctionTestResult {
 }
 
 // قائمة جميع Edge Functions مقسمة حسب الفئات
-const ALL_EDGE_FUNCTIONS = {
+const ALL_EDGE_FUNCTIONS: Record<string, { name: string; description: string }[]> = {
   // الذكاء الاصطناعي
   ai: [
     { name: 'chatbot', description: 'المساعد الذكي' },
@@ -122,7 +122,7 @@ const ALL_EDGE_FUNCTIONS = {
     { name: 'test-auth', description: 'اختبار المصادقة' },
     { name: 'scheduled-tests', description: 'الاختبارات المجدولة' },
   ],
-];
+};
 
 // اختبار Edge Function واحدة
 async function testSingleEdgeFunction(
