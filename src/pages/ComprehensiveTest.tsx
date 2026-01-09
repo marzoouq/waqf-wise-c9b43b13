@@ -56,6 +56,11 @@ import { runRBACTests } from '@/tests/rbac-cross.tests';
 import { runRateLimitingTests } from '@/tests/rate-limiting-real.tests';
 import { runBackupRestoreTests } from '@/tests/backup-restore.tests';
 import { runComprehensiveSelfHealing } from '@/lib/selfHealing';
+// ✅ اختبارات حقيقية 100%
+import { runServicesRealTests } from '@/tests/services.real.tests';
+import { runContextsRealTests } from '@/tests/contexts.real.tests';
+import { runPagesRealTests } from '@/tests/pages.real.tests';
+import { runLibrariesRealTests } from '@/tests/libraries.real.tests';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 import { Code2, Boxes, Link2, Workflow, Gauge, Wrench, ShieldAlert, Timer, HardDrive } from 'lucide-react';
 
