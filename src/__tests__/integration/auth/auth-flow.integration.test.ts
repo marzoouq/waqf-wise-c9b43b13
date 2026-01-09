@@ -3,12 +3,7 @@
  * Auth Flow Integration Tests - Comprehensive
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
-import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Supabase client
 const mockSignIn = vi.fn();
@@ -19,10 +14,10 @@ const mockOnAuthStateChange = vi.fn();
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
-      signInWithPassword: (credentials: any) => mockSignIn(credentials),
+      signInWithPassword: (credentials: unknown) => mockSignIn(credentials),
       signOut: () => mockSignOut(),
       getSession: () => mockGetSession(),
-      onAuthStateChange: (callback: any) => {
+      onAuthStateChange: (callback: unknown) => {
         mockOnAuthStateChange(callback);
         return { data: { subscription: { unsubscribe: vi.fn() } } };
       },
@@ -37,17 +32,6 @@ vi.mock('@/integrations/supabase/client', () => ({
     })),
   },
 }));
-
-const createTestWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false, gcTime: 0 } },
-  });
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
-    </QueryClientProvider>
-  );
-};
 
 describe('Auth Flow Integration', () => {
   beforeEach(() => {
@@ -65,7 +49,6 @@ describe('Auth Flow Integration', () => {
         error: null,
       });
 
-      // Simulate login
       const result = await mockSignIn({
         email: 'test@waqf.sa',
         password: 'Password123!',
@@ -222,7 +205,6 @@ describe('Auth Flow Integration', () => {
       const callback = vi.fn();
       mockOnAuthStateChange(callback);
 
-      // Simulate sign out event
       callback('SIGNED_OUT', null);
 
       expect(callback).toHaveBeenCalledWith('SIGNED_OUT', null);
@@ -235,8 +217,8 @@ describe('Auth Flow Integration', () => {
 
       try {
         await mockSignIn({ email: 'test@test.com', password: 'pass' });
-      } catch (error: any) {
-        expect(error.message).toBe('Network error');
+      } catch (error) {
+        expect((error as Error).message).toBe('Network error');
       }
     });
 
@@ -250,13 +232,12 @@ describe('Auth Flow Integration', () => {
         return Promise.resolve({ data: { session: null }, error: null });
       });
 
-      // Retry logic
       let result;
       for (let i = 0; i < 3; i++) {
         try {
           result = await mockGetSession();
           break;
-        } catch (e) {
+        } catch {
           continue;
         }
       }
