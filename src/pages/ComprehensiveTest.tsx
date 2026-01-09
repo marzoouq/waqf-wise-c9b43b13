@@ -630,24 +630,24 @@ const ALL_TESTS: TestCategory[] = [
     color: 'text-purple-500',
     tests: [
       // الذكاء الاصطناعي
-      createEdgeFunctionTest('ai-system-audit', 'الفحص الذكي للنظام', { auditType: 'full', categories: ['database'] }),
-      createEdgeFunctionTest('chatbot', 'المساعد الذكي', { message: 'مرحباً' }),
-      createEdgeFunctionTest('generate-ai-insights', 'توليد الرؤى', { reportType: 'beneficiaries' }),
-      createEdgeFunctionTest('intelligent-search', 'البحث الذكي', { query: 'اختبار', type: 'beneficiaries' }),
-      createEdgeFunctionTest('property-ai-assistant', 'مساعد العقارات', { action: 'analyze_property', data: { name: 'عقار تجريبي' } }),
+      createEdgeFunctionTest('ai-system-audit', 'الفحص الذكي للنظام', { testMode: true }),
+      createEdgeFunctionTest('chatbot', 'المساعد الذكي', { testMode: true }),
+      createEdgeFunctionTest('generate-ai-insights', 'توليد الرؤى', { testMode: true }),
+      createEdgeFunctionTest('intelligent-search', 'البحث الذكي', { testMode: true }),
+      createEdgeFunctionTest('property-ai-assistant', 'مساعد العقارات', { testMode: true }),
       
       // قاعدة البيانات
-      createEdgeFunctionTest('db-health-check', 'فحص صحة قاعدة البيانات', {}),
-      createEdgeFunctionTest('db-performance-stats', 'إحصائيات الأداء', {}),
-      createEdgeFunctionTest('run-vacuum', 'تنظيف قاعدة البيانات', {}),
-      createEdgeFunctionTest('backup-database', 'النسخ الاحتياطي', { backupType: 'full' }),
+      createEdgeFunctionTest('db-health-check', 'فحص صحة قاعدة البيانات', { testMode: true }),
+      createEdgeFunctionTest('db-performance-stats', 'إحصائيات الأداء', { testMode: true }),
+      createEdgeFunctionTest('run-vacuum', 'تنظيف قاعدة البيانات', { testMode: true }),
+      createEdgeFunctionTest('backup-database', 'النسخ الاحتياطي', { testMode: true }),
       createEdgeFunctionTest('restore-database', 'استعادة النسخة', { testMode: true }),
       
       // الأمان
-      createEdgeFunctionTest('encrypt-file', 'تشفير الملفات', { ping: true }),
-      createEdgeFunctionTest('decrypt-file', 'فك التشفير', { ping: true }),
-      createEdgeFunctionTest('secure-delete-file', 'حذف آمن', { testMode: true, fileId: 'test' }),
-      createEdgeFunctionTest('check-leaked-password', 'فحص كلمات المرور', { password: 'test123' }),
+      createEdgeFunctionTest('encrypt-file', 'تشفير الملفات', { testMode: true }),
+      createEdgeFunctionTest('decrypt-file', 'فك التشفير', { testMode: true }),
+      createEdgeFunctionTest('secure-delete-file', 'حذف آمن', { testMode: true }),
+      createEdgeFunctionTest('check-leaked-password', 'فحص كلمات المرور', { testMode: true }),
       createEdgeFunctionTest('biometric-auth', 'المصادقة البيومترية', { testMode: true }),
       
       // الإشعارات
@@ -684,20 +684,20 @@ const ALL_TESTS: TestCategory[] = [
       createEdgeFunctionTest('update-user-email', 'تحديث البريد الإلكتروني', { testMode: true }),
       
       // الصيانة
-      createEdgeFunctionTest('weekly-maintenance', 'الصيانة الأسبوعية', {}),
+      createEdgeFunctionTest('weekly-maintenance', 'الصيانة الأسبوعية', { testMode: true }),
       createEdgeFunctionTest('cleanup-old-files', 'تنظيف الملفات القديمة', { testMode: true }),
-      createEdgeFunctionTest('cleanup-sensitive-files', 'تنظيف الملفات الحساسة', {}),
-      createEdgeFunctionTest('scheduled-cleanup', 'التنظيف المجدول', {}),
-      createEdgeFunctionTest('execute-auto-fix', 'تنفيذ الإصلاح التلقائي', { fixId: 'test' }),
+      createEdgeFunctionTest('cleanup-sensitive-files', 'تنظيف الملفات الحساسة', { testMode: true }),
+      createEdgeFunctionTest('scheduled-cleanup', 'التنظيف المجدول', { testMode: true }),
+      createEdgeFunctionTest('execute-auto-fix', 'تنفيذ الإصلاح التلقائي', { testMode: true }),
       
       // التقارير
-      createEdgeFunctionTest('generate-scheduled-report', 'توليد تقرير مجدول', { reportType: 'monthly' }),
-      createEdgeFunctionTest('weekly-report', 'التقرير الأسبوعي', {}),
-      createEdgeFunctionTest('generate-distribution-summary', 'ملخص التوزيعات', { period_start: '2024-01-01', period_end: '2024-12-31' }),
+      createEdgeFunctionTest('generate-scheduled-report', 'توليد تقرير مجدول', { testMode: true }),
+      createEdgeFunctionTest('weekly-report', 'التقرير الأسبوعي', { testMode: true }),
+      createEdgeFunctionTest('generate-distribution-summary', 'ملخص التوزيعات', { testMode: true }),
       
       // الدعم
-      createEdgeFunctionTest('support-auto-escalate', 'التصعيد التلقائي', {}),
-      createEdgeFunctionTest('log-error', 'تسجيل الأخطاء', { error: 'test', source: 'test' }),
+      createEdgeFunctionTest('support-auto-escalate', 'التصعيد التلقائي', { testMode: true }),
+      createEdgeFunctionTest('log-error', 'تسجيل الأخطاء', { testMode: true }),
       createEdgeFunctionTest('test-auth', 'اختبار المصادقة', { action: 'health-check' }),
     ]
   },

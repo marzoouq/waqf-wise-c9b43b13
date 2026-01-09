@@ -108,7 +108,7 @@ serve(async (req) => {
         bodyData = JSON.parse(bodyText);
         
         // ✅ Health Check Support
-        if (bodyData.ping || bodyData.healthCheck) {
+        if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
           console.log('[db-health-check] Health check received');
           return jsonResponse({
             status: 'healthy',

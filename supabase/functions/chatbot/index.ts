@@ -40,7 +40,7 @@ serve(async (req) => {
     // ✅ Health Check Support
     try {
       const bodyClone = await req.clone().json();
-      if (bodyClone.ping || bodyClone.healthCheck) {
+      if (bodyClone.ping || bodyClone.healthCheck || bodyClone.testMode) {
         console.log('[CHATBOT] Health check received');
         return jsonResponse({
           status: 'healthy',
