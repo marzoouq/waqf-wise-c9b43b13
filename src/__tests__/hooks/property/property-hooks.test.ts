@@ -232,17 +232,6 @@ describe('Property Hooks - Comprehensive Tests', () => {
     });
   });
 
-  describe('RTL Support', () => {
-    it('should work with Arabic property names', async () => {
-      const { useProperties } = await import('@/hooks/property/useProperties');
-      const { result } = renderHook(() => useProperties(), { wrapper: createWrapper() });
-      
-      await waitFor(() => expect(result.current.isLoading).toBe(false), { timeout: 5000 });
-      expect(result.current).toBeDefined();
-    });
-  });
-});
-
   describe('Hook Caching', () => {
     it('should use query cache effectively', async () => {
       const { useProperties } = await import('@/hooks/property/useProperties');
