@@ -1,7 +1,7 @@
 /**
  * Pages Tests - اختبارات الصفحات الحقيقية
- * @version 6.0.0 - استيراد حقيقي باستخدام Vite glob محسّن
- * تغطية 82 صفحة
+ * @version 7.0.0 - قائمة محدثة تطابق الصفحات الموجودة فعلياً
+ * تغطية 83 صفحة
  */
 
 export interface TestResult {
@@ -21,75 +21,75 @@ export interface TestResult {
 let testCounter = 0;
 const generateId = () => `page-${++testCounter}-${Date.now()}`;
 
-// استيراد جميع الصفحات باستخدام Vite glob مع مسارات فعلية
-const allPages = import.meta.glob('/src/pages/*.{tsx,ts}', { eager: true });
+// استيراد جميع الصفحات باستخدام Vite glob
+const allPages = import.meta.glob('/src/pages/*.tsx', { eager: true });
 
-// قائمة الصفحات المتوقعة
+// قائمة الصفحات الموجودة فعلياً (83 صفحة)
 const EXPECTED_PAGES = [
-  // لوحات التحكم
+  // لوحات التحكم (7)
   'Dashboard', 'AdminDashboard', 'NazerDashboard', 'AccountantDashboard',
   'ArchivistDashboard', 'CashierDashboard', 'DeveloperDashboard',
   
-  // المستفيدين
+  // المستفيدين (8)
   'Beneficiaries', 'BeneficiaryProfile', 'BeneficiaryPortal',
   'BeneficiaryRequests', 'BeneficiaryReports', 'BeneficiaryAccountStatement',
   'BeneficiarySettings', 'BeneficiarySupport',
   
-  // العائلات
+  // العائلات (2)
   'Families', 'FamilyDetails',
   
-  // العقارات
+  // العقارات (4)
   'Properties', 'WaqfUnits', 'Tenants', 'TenantDetails',
   
-  // المالية
+  // المالية (11)
   'Accounting', 'Invoices', 'Payments', 'PaymentVouchers', 'Budgets',
   'Loans', 'Funds', 'BankTransfers', 'AllTransactions',
   'FiscalYearsManagement', 'TenantsAgingReportPage',
   
-  // التقارير
+  // التقارير (2)
   'Reports', 'CustomReports',
   
-  // الحوكمة
+  // الحوكمة (3)
   'GovernanceDecisions', 'DecisionDetails', 'Approvals',
   
-  // الذكاء الاصطناعي
+  // الذكاء الاصطناعي (3)
   'Chatbot', 'AIInsights', 'AISystemAudit',
   
-  // المراقبة
+  // المراقبة (8)
   'SystemMonitoring', 'SystemErrorLogs', 'PerformanceDashboard',
   'DatabaseHealthDashboard', 'DatabasePerformanceDashboard',
   'EdgeFunctionsMonitor', 'EdgeFunctionTest', 'ConnectionDiagnostics',
   
-  // الأمان
+  // الأمان (2)
   'SecurityDashboard', 'AuditLogs',
   
-  // الإعدادات
+  // الإعدادات (8)
   'Settings', 'AdvancedSettings', 'NotificationSettings',
   'TransparencySettings', 'LandingPageSettings', 'PermissionsManagement',
   'RolesManagement', 'IntegrationsManagement',
   
-  // المستخدمين
+  // المستخدمين (1)
   'Users',
   
-  // نقطة البيع
+  // نقطة البيع (1)
   'PointOfSale',
   
-  // التوزيعات
-  'Distributions', 'BankTransfersPage',
+  // الطلبات (2)
+  'Requests', 'EmergencyAidManagement',
   
-  // الطلبات
-  'Requests', 'StaffRequestsManagement', 'EmergencyAidManagement',
-  
-  // الأرشيف
+  // الأرشيف (1)
   'Archive',
   
-  // الرسائل والدعم
+  // الرسائل والدعم (5)
   'Messages', 'Support', 'SupportManagement', 'Notifications', 'KnowledgeBase',
   
-  // عام
+  // عام (13)
   'LandingPage', 'LandingPageLight', 'Login', 'Signup', 'FAQ', 'Contact',
   'PrivacyPolicy', 'TermsOfUse', 'SecurityPolicy', 'WaqfGovernanceGuide',
-  'Install', 'NotFound', 'Unauthorized', 'Index', 'ComprehensiveTest'
+  'Install', 'NotFound', 'Unauthorized',
+  
+  // اختبارات (2)
+  'ComprehensiveTest', 'TestsDashboard'
 ];
 
 /**
@@ -101,7 +101,7 @@ function testPage(pageName: string): TestResult {
   try {
     // البحث عن الصفحة في الوحدات المستوردة
     for (const [path, module] of Object.entries(allPages)) {
-      if (path.includes(pageName)) {
+      if (path.includes(`/${pageName}.tsx`)) {
         const exports = Object.keys(module as object);
         const hasDefaultExport = 'default' in (module as object);
         
@@ -120,7 +120,7 @@ function testPage(pageName: string): TestResult {
       }
     }
     
-    // الصفحة مُسجَّلة ولكن غير موجودة - نعتبرها ناجحة
+    // الصفحة غير موجودة
     return {
       id: generateId(),
       testId: `page-${pageName}`,
@@ -180,7 +180,7 @@ export async function runPagesTests(): Promise<TestResult[]> {
   
   // اختبار الصفحات الإضافية المكتشفة
   for (const [path, module] of Object.entries(allPages)) {
-    const pageName = path.split('/').pop()?.replace(/\.(tsx?|jsx?)$/, '') || '';
+    const pageName = path.split('/').pop()?.replace(/\.tsx?$/, '') || '';
     const alreadyTested = EXPECTED_PAGES.includes(pageName);
     
     if (!alreadyTested && pageName && !pageName.startsWith('_')) {
@@ -213,6 +213,8 @@ export async function runPagesTests(): Promise<TestResult[]> {
     details: `${results.length} اختبار`,
     message: `تم اختبار ${EXPECTED_PAGES.length} صفحة بنجاح`
   });
+  
+  console.log(`📄 اكتمل اختبار الصفحات: ${results.length} اختبار (${results.filter(r => r.status === 'passed').length} ناجح)`);
   
   return results;
 }
