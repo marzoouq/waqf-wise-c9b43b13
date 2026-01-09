@@ -103,6 +103,17 @@ Deno.serve(async (req) => {
     const body: DistributionRequest = await req.json();
     const { totalAmount, fiscalYearId, distributionDate, notes, notifyHeirs } = body;
 
+    // التحقق من البيانات المطلوبة
+    if (!totalAmount || typeof totalAmount !== 'number' || totalAmount <= 0) {
+      return errorResponse('المبلغ الإجمالي مطلوب ويجب أن يكون رقماً موجباً', 400);
+    }
+    if (!fiscalYearId) {
+      return errorResponse('معرف السنة المالية مطلوب', 400);
+    }
+    if (!distributionDate) {
+      return errorResponse('تاريخ التوزيع مطلوب', 400);
+    }
+
     console.log(`[distribute-revenue] Starting distribution: ${totalAmount} SAR`);
 
     // Calculate shariah-based distribution
@@ -112,6 +123,11 @@ Deno.serve(async (req) => {
     if (calcError) {
       console.error('[distribute-revenue] Calculation error:', calcError);
       return errorResponse('خطأ في حساب التوزيع: ' + calcError.message, 500);
+    }
+    
+    // التحقق من وجود بيانات
+    if (!heirShares || heirShares.length === 0) {
+      return errorResponse('لا يوجد مستفيدون مؤهلون للتوزيع', 400);
     }
 
     console.log(`[distribute-revenue] Calculated shares for ${heirShares?.length} heirs`);

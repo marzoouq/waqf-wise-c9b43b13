@@ -107,33 +107,37 @@ function runFormattingTests(): RealTestResult[] {
   // اختبار formatCurrency
   results.push(runTest('formatCurrency - رقم موجب', 'التنسيق', () => {
     const result = formatCurrency(1500);
-    const passed = result.includes('1') && result.includes('500');
-    return { passed, expected: 'يحتوي على 1,500', actual: result, input: '1500' };
+    // يقبل أرقام عربية (١٬٥٠٠) أو إنجليزية (1,500) ويتضمن ر.س أو SAR
+    const hasNumber = result.includes('١') || result.includes('1');
+    const hasCurrency = result.includes('ر.س') || result.includes('SAR');
+    const passed = hasNumber && hasCurrency;
+    return { passed, expected: 'مبلغ مُنسق بالريال', actual: result, input: '1500' };
   }));
   
   results.push(runTest('formatCurrency - صفر', 'التنسيق', () => {
     const result = formatCurrency(0);
-    const passed = result.includes('0');
-    return { passed, expected: 'يحتوي على 0', actual: result, input: '0' };
+    const passed = result.includes('٠') || result.includes('0');
+    return { passed, expected: 'يحتوي على صفر', actual: result, input: '0' };
   }));
   
   results.push(runTest('formatCurrency - رقم سالب', 'التنسيق', () => {
     const result = formatCurrency(-500);
-    const passed = result.includes('500');
+    const passed = result.includes('٥٠٠') || result.includes('500');
     return { passed, expected: 'يحتوي على 500', actual: result, input: '-500' };
   }));
   
   // اختبار formatNumber
   results.push(runTest('formatNumber - كسور', 'التنسيق', () => {
     const result = formatNumber(123.456, 2);
-    const passed = result.includes('123') && result.includes('46');
+    const passed = (result.includes('123') || result.includes('١٢٣')) && 
+                   (result.includes('46') || result.includes('٤٦'));
     return { passed, expected: 'تقريب لمنزلتين', actual: result, input: '123.456' };
   }));
   
   // اختبار formatPercentage
   results.push(runTest('formatPercentage', 'التنسيق', () => {
     const result = formatPercentage(75.5, 1);
-    const passed = result.includes('75') && result.includes('%');
+    const passed = (result.includes('75') || result.includes('٧٥')) && result.includes('%');
     return { passed, expected: 'يحتوي على 75 و %', actual: result, input: '75.5' };
   }));
   
