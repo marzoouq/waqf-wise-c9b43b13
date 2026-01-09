@@ -23,7 +23,8 @@ import {
   Code,
   Layers,
   FileCode,
-  Settings
+  Settings,
+  LayoutDashboard
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -44,6 +45,7 @@ interface CategoryResults {
 
 const RealTestsDashboard = () => {
   const [categories, setCategories] = useState<CategoryResults[]>([
+    { category: 'Dashboards', icon: <LayoutDashboard className="h-4 w-4" />, results: [], isRunning: false },
     { category: 'Hooks', icon: <Code className="h-4 w-4" />, results: [], isRunning: false },
     { category: 'Components', icon: <Layers className="h-4 w-4" />, results: [], isRunning: false },
     { category: 'Services', icon: <Server className="h-4 w-4" />, results: [], isRunning: false },
@@ -72,6 +74,19 @@ const RealTestsDashboard = () => {
       let runFunction: () => Promise<TestResult[]>;
       
       switch (categoryName) {
+        case 'dashboards':
+          const { runDashboardTests } = await import('@/tests/real/dashboards.real.tests');
+          runFunction = async () => {
+            const results = await runDashboardTests();
+            return results.map(r => ({
+              name: r.testName,
+              status: r.passed ? 'passed' as const : 'failed' as const,
+              duration: Math.round(r.executionTime),
+              error: r.errors?.join(', '),
+              details: r.details
+            }));
+          };
+          break;
         case 'hooks':
           const { runRealHooksTests } = await import('@/tests/real/hooks.real.tests');
           runFunction = runRealHooksTests;
@@ -238,7 +253,7 @@ const RealTestsDashboard = () => {
 
       {/* Categories */}
       <Tabs defaultValue="hooks" className="space-y-4">
-        <TabsList className="grid grid-cols-8 w-full">
+        <TabsList className="grid grid-cols-9 w-full">
           {categories.map((cat, index) => (
             <TabsTrigger 
               key={cat.category} 
