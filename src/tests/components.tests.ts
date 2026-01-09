@@ -1,10 +1,91 @@
 /**
- * اختبارات المكونات الشاملة
- * تغطي جميع مكونات UI في التطبيق (150+ اختبار)
- * @version 1.0.0
+ * اختبارات المكونات الشاملة - حقيقية
+ * تختبر وجود المكونات وقابليتها للاستيراد
+ * @version 2.0.0 - Real Tests
  */
 
 import type { TestResult } from './hooks.tests';
+
+// ==================== دوال مساعدة للاختبارات الحقيقية ====================
+
+/**
+ * اختبار استيراد مكون حقيقي
+ */
+async function testComponentImport(
+  componentPath: string,
+  componentName: string
+): Promise<{ success: boolean; details: string }> {
+  try {
+    const module = await import(/* @vite-ignore */ componentPath);
+    
+    // فحص وجود المكون بالاسم المحدد أو كـ default export
+    const Component = module[componentName] || module.default;
+    
+    if (Component) {
+      // تحقق أنه React component (function أو class)
+      if (typeof Component === 'function') {
+        return { 
+          success: true, 
+          details: `✅ المكون ${componentName} موجود وقابل للاستيراد` 
+        };
+      } else {
+        return { 
+          success: false, 
+          details: `⚠️ ${componentName} موجود لكنه ليس React Component` 
+        };
+      }
+    } else {
+      // فحص الـ exports المتاحة
+      const availableExports = Object.keys(module).filter(k => k !== '__esModule');
+      return { 
+        success: false, 
+        details: `❌ ${componentName} غير موجود. المتاح: [${availableExports.join(', ')}]` 
+      };
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    
+    // تحليل نوع الخطأ
+    if (errorMsg.includes('Failed to fetch') || errorMsg.includes('Cannot find module')) {
+      return { 
+        success: false, 
+        details: `❌ الملف ${componentPath} غير موجود` 
+      };
+    }
+    
+    return { 
+      success: false, 
+      details: `❌ خطأ في استيراد ${componentName}: ${errorMsg}` 
+    };
+  }
+}
+
+/**
+ * اختبار مجموعة مكونات من مجلد
+ */
+async function testComponentsFromFolder(
+  folderPath: string,
+  componentNames: string[]
+): Promise<{ found: string[]; missing: string[]; errors: string[] }> {
+  const found: string[] = [];
+  const missing: string[] = [];
+  const errors: string[] = [];
+  
+  for (const name of componentNames) {
+    try {
+      const module = await import(/* @vite-ignore */ `${folderPath}/${name}`);
+      if (module[name] || module.default) {
+        found.push(name);
+      } else {
+        missing.push(name);
+      }
+    } catch {
+      errors.push(name);
+    }
+  }
+  
+  return { found, missing, errors };
+}
 
 // ==================== اختبارات مكونات المحاسبة ====================
 
@@ -13,121 +94,61 @@ const accountingComponentsTests = [
     id: 'comp-accounts-tree-render',
     name: 'AccountsTree - عرض الشجرة',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض شجرة الحسابات' })
+    test: async () => testComponentImport('@/components/accounting/AccountsTree', 'AccountsTree')
   },
   {
-    id: 'comp-accounts-tree-expand',
-    name: 'AccountsTree - توسيع/طي العقد',
+    id: 'comp-add-account-dialog',
+    name: 'AddAccountDialog - إضافة حساب',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار توسيع وطي عقد الشجرة' })
-  },
-  {
-    id: 'comp-accounts-tree-select',
-    name: 'AccountsTree - اختيار حساب',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار اختيار حساب من الشجرة' })
+    test: async () => testComponentImport('@/components/accounting/AddAccountDialog', 'AddAccountDialog')
   },
   {
     id: 'comp-journal-entry-form-render',
-    name: 'JournalEntryForm - عرض النموذج',
+    name: 'JournalEntryForm - نموذج القيد',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض نموذج القيد اليومي' })
+    test: async () => testComponentImport('@/components/accounting/journal/JournalEntryForm', 'JournalEntryForm')
   },
   {
-    id: 'comp-journal-entry-form-validation',
-    name: 'JournalEntryForm - التحقق من الصحة',
+    id: 'comp-journal-entries-list',
+    name: 'JournalEntriesList - قائمة القيود',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار التحقق من صحة بيانات القيد' })
-  },
-  {
-    id: 'comp-journal-entry-form-balance',
-    name: 'JournalEntryForm - توازن القيد',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار التحقق من توازن المدين والدائن' })
-  },
-  {
-    id: 'comp-journal-entry-form-submit',
-    name: 'JournalEntryForm - إرسال النموذج',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار إرسال نموذج القيد' })
+    test: async () => testComponentImport('@/components/accounting/journal/JournalEntriesList', 'JournalEntriesList')
   },
   {
     id: 'comp-trial-balance-render',
-    name: 'TrialBalance - عرض الميزان',
+    name: 'TrialBalance - ميزان المراجعة',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض ميزان المراجعة' })
-  },
-  {
-    id: 'comp-trial-balance-totals',
-    name: 'TrialBalance - إجماليات الميزان',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار حساب إجماليات الميزان' })
+    test: async () => testComponentImport('@/components/accounting/reports/TrialBalance', 'TrialBalance')
   },
   {
     id: 'comp-income-statement-render',
-    name: 'IncomeStatement - عرض قائمة الدخل',
+    name: 'IncomeStatement - قائمة الدخل',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض قائمة الدخل' })
-  },
-  {
-    id: 'comp-income-statement-calculations',
-    name: 'IncomeStatement - حسابات الدخل',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار حسابات قائمة الدخل' })
+    test: async () => testComponentImport('@/components/accounting/reports/IncomeStatement', 'IncomeStatement')
   },
   {
     id: 'comp-balance-sheet-render',
-    name: 'BalanceSheet - عرض الميزانية',
+    name: 'BalanceSheet - الميزانية العمومية',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض الميزانية العمومية' })
-  },
-  {
-    id: 'comp-balance-sheet-balance',
-    name: 'BalanceSheet - توازن الميزانية',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار توازن الميزانية العمومية' })
-  },
-  {
-    id: 'comp-invoice-form-render',
-    name: 'InvoiceForm - عرض نموذج الفاتورة',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض نموذج الفاتورة' })
-  },
-  {
-    id: 'comp-invoice-form-lines',
-    name: 'InvoiceForm - بنود الفاتورة',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار إضافة/حذف بنود الفاتورة' })
-  },
-  {
-    id: 'comp-invoice-form-calculations',
-    name: 'InvoiceForm - حسابات الفاتورة',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار حسابات الفاتورة (الضريبة/الإجمالي)' })
-  },
-  {
-    id: 'comp-voucher-form-render',
-    name: 'VoucherForm - عرض نموذج السند',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار عرض نموذج سند الصرف' })
-  },
-  {
-    id: 'comp-voucher-form-validation',
-    name: 'VoucherForm - التحقق من السند',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار التحقق من بيانات السند' })
-  },
-  {
-    id: 'comp-budget-dialog-render',
-    name: 'BudgetDialog - حوار الميزانية',
-    category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار حوار الميزانية' })
+    test: async () => testComponentImport('@/components/accounting/reports/BalanceSheet', 'BalanceSheet')
   },
   {
     id: 'comp-fiscal-year-selector',
     name: 'FiscalYearSelector - اختيار السنة المالية',
     category: 'components-accounting',
-    test: async () => ({ success: true, details: 'اختبار اختيار السنة المالية' })
+    test: async () => testComponentImport('@/components/accounting/FiscalYearSelector', 'FiscalYearSelector')
+  },
+  {
+    id: 'comp-budget-dialog-render',
+    name: 'BudgetDialog - حوار الميزانية',
+    category: 'components-accounting',
+    test: async () => testComponentImport('@/components/budgets/BudgetDialog', 'BudgetDialog')
+  },
+  {
+    id: 'comp-voucher-form-render',
+    name: 'PaymentVoucherForm - نموذج السند',
+    category: 'components-accounting',
+    test: async () => testComponentImport('@/components/payments/vouchers/PaymentVoucherForm', 'PaymentVoucherForm')
   },
 ];
 
@@ -136,123 +157,63 @@ const accountingComponentsTests = [
 const beneficiaryComponentsTests = [
   {
     id: 'comp-beneficiary-form-render',
-    name: 'BeneficiaryForm - عرض النموذج',
+    name: 'BeneficiaryForm - نموذج المستفيد',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض نموذج المستفيد' })
-  },
-  {
-    id: 'comp-beneficiary-form-validation',
-    name: 'BeneficiaryForm - التحقق من الصحة',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار التحقق من بيانات المستفيد' })
-  },
-  {
-    id: 'comp-beneficiary-form-national-id',
-    name: 'BeneficiaryForm - رقم الهوية',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار التحقق من رقم الهوية' })
-  },
-  {
-    id: 'comp-beneficiary-form-iban',
-    name: 'BeneficiaryForm - رقم الآيبان',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار التحقق من رقم الآيبان' })
+    test: async () => testComponentImport('@/components/beneficiaries/BeneficiaryForm', 'BeneficiaryForm')
   },
   {
     id: 'comp-beneficiary-card-render',
-    name: 'BeneficiaryCard - عرض البطاقة',
+    name: 'BeneficiaryCard - بطاقة المستفيد',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض بطاقة المستفيد' })
+    test: async () => testComponentImport('@/components/beneficiaries/BeneficiaryCard', 'BeneficiaryCard')
   },
   {
-    id: 'comp-beneficiary-card-actions',
-    name: 'BeneficiaryCard - إجراءات البطاقة',
+    id: 'comp-beneficiaries-table',
+    name: 'BeneficiariesTable - جدول المستفيدين',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار إجراءات بطاقة المستفيد' })
+    test: async () => testComponentImport('@/components/beneficiaries/BeneficiariesTable', 'BeneficiariesTable')
   },
   {
-    id: 'comp-beneficiary-card-status',
-    name: 'BeneficiaryCard - حالة المستفيد',
+    id: 'comp-beneficiary-filters',
+    name: 'BeneficiaryFilters - فلاتر المستفيدين',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض حالة المستفيد' })
+    test: async () => testComponentImport('@/components/beneficiaries/filters/BeneficiaryFilters', 'BeneficiaryFilters')
   },
   {
     id: 'comp-family-tree-render',
-    name: 'FamilyTree - عرض الشجرة',
+    name: 'FamilyTree - شجرة العائلة',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض شجرة العائلة' })
+    test: async () => testComponentImport('@/components/beneficiaries/FamilyTree', 'FamilyTree')
   },
   {
-    id: 'comp-family-tree-expand',
-    name: 'FamilyTree - توسيع الشجرة',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار توسيع شجرة العائلة' })
-  },
-  {
-    id: 'comp-family-tree-select',
-    name: 'FamilyTree - اختيار فرد',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار اختيار فرد من الشجرة' })
-  },
-  {
-    id: 'comp-distribution-summary-render',
-    name: 'DistributionSummary - ملخص التوزيع',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض ملخص التوزيع' })
-  },
-  {
-    id: 'comp-distribution-summary-chart',
-    name: 'DistributionSummary - رسم بياني',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار الرسم البياني للتوزيع' })
-  },
-  {
-    id: 'comp-beneficiary-timeline-render',
+    id: 'comp-beneficiary-timeline',
     name: 'BeneficiaryTimeline - الجدول الزمني',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار عرض الجدول الزمني' })
+    test: async () => testComponentImport('@/components/beneficiaries/BeneficiaryTimeline', 'BeneficiaryTimeline')
   },
   {
-    id: 'comp-beneficiary-stats-card',
-    name: 'BeneficiaryStatsCard - بطاقة الإحصائيات',
+    id: 'comp-beneficiary-attachments',
+    name: 'BeneficiaryAttachments - المرفقات',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار بطاقة إحصائيات المستفيد' })
-  },
-  {
-    id: 'comp-beneficiary-attachments-list',
-    name: 'BeneficiaryAttachments - قائمة المرفقات',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار قائمة مرفقات المستفيد' })
-  },
-  {
-    id: 'comp-beneficiary-attachments-upload',
-    name: 'BeneficiaryAttachments - رفع المرفقات',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار رفع مرفقات المستفيد' })
+    test: async () => testComponentImport('@/components/beneficiaries/attachments/BeneficiaryAttachments', 'BeneficiaryAttachments')
   },
   {
     id: 'comp-emergency-aid-form',
-    name: 'EmergencyAidForm - نموذج المساعدة',
+    name: 'EmergencyAidForm - المساعدة الطارئة',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار نموذج المساعدة الطارئة' })
+    test: async () => testComponentImport('@/components/beneficiaries/emergency/EmergencyAidForm', 'EmergencyAidForm')
   },
   {
     id: 'comp-eligibility-badge',
     name: 'EligibilityBadge - شارة الأهلية',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار شارة أهلية المستفيد' })
+    test: async () => testComponentImport('@/components/beneficiaries/EligibilityBadge', 'EligibilityBadge')
   },
   {
-    id: 'comp-beneficiary-category-selector',
-    name: 'CategorySelector - اختيار الفئة',
+    id: 'comp-distribution-summary',
+    name: 'DistributionSummary - ملخص التوزيع',
     category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار اختيار فئة المستفيد' })
-  },
-  {
-    id: 'comp-request-form-render',
-    name: 'RequestForm - نموذج الطلب',
-    category: 'components-beneficiary',
-    test: async () => ({ success: true, details: 'اختبار نموذج طلب المستفيد' })
+    test: async () => testComponentImport('@/components/distributions/DistributionSummary', 'DistributionSummary')
   },
 ];
 
@@ -261,111 +222,75 @@ const beneficiaryComponentsTests = [
 const propertyComponentsTests = [
   {
     id: 'comp-property-card-render',
-    name: 'PropertyCard - عرض البطاقة',
+    name: 'PropertyCard - بطاقة العقار',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار عرض بطاقة العقار' })
+    test: async () => testComponentImport('@/components/properties/PropertyCard', 'PropertyCard')
   },
   {
-    id: 'comp-property-card-image',
-    name: 'PropertyCard - صورة العقار',
+    id: 'comp-properties-table',
+    name: 'PropertiesTable - جدول العقارات',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار عرض صورة العقار' })
-  },
-  {
-    id: 'comp-property-card-stats',
-    name: 'PropertyCard - إحصائيات العقار',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار إحصائيات العقار' })
+    test: async () => testComponentImport('@/components/properties/PropertiesTable', 'PropertiesTable')
   },
   {
     id: 'comp-units-list-render',
     name: 'UnitsList - قائمة الوحدات',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار عرض قائمة الوحدات' })
+    test: async () => testComponentImport('@/components/properties/units/UnitsList', 'UnitsList')
   },
   {
-    id: 'comp-units-list-filter',
-    name: 'UnitsList - تصفية الوحدات',
+    id: 'comp-unit-form',
+    name: 'UnitForm - نموذج الوحدة',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار تصفية الوحدات' })
-  },
-  {
-    id: 'comp-units-list-status',
-    name: 'UnitsList - حالة الوحدات',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار عرض حالة الوحدات' })
+    test: async () => testComponentImport('@/components/properties/units/UnitForm', 'UnitForm')
   },
   {
     id: 'comp-contract-form-render',
     name: 'ContractForm - نموذج العقد',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار نموذج العقد' })
+    test: async () => testComponentImport('@/components/properties/contracts/ContractForm', 'ContractForm')
   },
   {
-    id: 'comp-contract-form-dates',
-    name: 'ContractForm - تواريخ العقد',
+    id: 'comp-contracts-table',
+    name: 'ContractsTable - جدول العقود',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار تواريخ العقد' })
-  },
-  {
-    id: 'comp-contract-form-calculations',
-    name: 'ContractForm - حسابات العقد',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار حسابات العقد' })
+    test: async () => testComponentImport('@/components/properties/contracts/ContractsTable', 'ContractsTable')
   },
   {
     id: 'comp-tenant-details-render',
     name: 'TenantDetails - تفاصيل المستأجر',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار تفاصيل المستأجر' })
+    test: async () => testComponentImport('@/components/tenants/TenantDetails', 'TenantDetails')
   },
   {
-    id: 'comp-tenant-details-payments',
-    name: 'TenantDetails - دفعات المستأجر',
+    id: 'comp-tenants-table',
+    name: 'TenantsTable - جدول المستأجرين',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار دفعات المستأجر' })
+    test: async () => testComponentImport('@/components/tenants/TenantsTable', 'TenantsTable')
   },
   {
     id: 'comp-maintenance-table-render',
     name: 'MaintenanceTable - جدول الصيانة',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار جدول طلبات الصيانة' })
-  },
-  {
-    id: 'comp-maintenance-table-actions',
-    name: 'MaintenanceTable - إجراءات الصيانة',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار إجراءات الصيانة' })
+    test: async () => testComponentImport('@/components/maintenance/MaintenanceTable', 'MaintenanceTable')
   },
   {
     id: 'comp-maintenance-form-render',
     name: 'MaintenanceForm - نموذج الصيانة',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار نموذج طلب الصيانة' })
+    test: async () => testComponentImport('@/components/maintenance/MaintenanceForm', 'MaintenanceForm')
   },
   {
     id: 'comp-rental-payment-form',
     name: 'RentalPaymentForm - نموذج الدفع',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار نموذج دفعة الإيجار' })
+    test: async () => testComponentImport('@/components/properties/payments/RentalPaymentForm', 'RentalPaymentForm')
   },
   {
     id: 'comp-contract-expiry-alert',
     name: 'ContractExpiryAlert - تنبيه الانتهاء',
     category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار تنبيه انتهاء العقد' })
-  },
-  {
-    id: 'comp-property-stats-card',
-    name: 'PropertyStatsCard - بطاقة الإحصائيات',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار بطاقة إحصائيات العقار' })
-  },
-  {
-    id: 'comp-occupancy-chart',
-    name: 'OccupancyChart - رسم الإشغال',
-    category: 'components-property',
-    test: async () => ({ success: true, details: 'اختبار رسم نسبة الإشغال' })
+    test: async () => testComponentImport('@/components/properties/contracts/ContractExpiryAlert', 'ContractExpiryAlert')
   },
 ];
 
@@ -376,85 +301,43 @@ const governanceComponentsTests = [
     id: 'comp-decision-card-render',
     name: 'DecisionCard - بطاقة القرار',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عرض بطاقة القرار' })
+    test: async () => testComponentImport('@/components/governance/DecisionCard', 'DecisionCard')
   },
   {
-    id: 'comp-decision-card-status',
-    name: 'DecisionCard - حالة القرار',
+    id: 'comp-decisions-table',
+    name: 'DecisionsTable - جدول القرارات',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار حالة القرار' })
-  },
-  {
-    id: 'comp-decision-card-actions',
-    name: 'DecisionCard - إجراءات القرار',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار إجراءات القرار' })
+    test: async () => testComponentImport('@/components/governance/DecisionsTable', 'DecisionsTable')
   },
   {
     id: 'comp-voting-panel-render',
     name: 'VotingPanel - لوحة التصويت',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار لوحة التصويت' })
-  },
-  {
-    id: 'comp-voting-panel-vote',
-    name: 'VotingPanel - الإدلاء بالصوت',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار الإدلاء بالصوت' })
-  },
-  {
-    id: 'comp-voting-panel-results',
-    name: 'VotingPanel - نتائج التصويت',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عرض نتائج التصويت' })
+    test: async () => testComponentImport('@/components/governance/VotingPanel', 'VotingPanel')
   },
   {
     id: 'comp-disclosure-form-render',
     name: 'DisclosureForm - نموذج الإفصاح',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار نموذج الإفصاح' })
+    test: async () => testComponentImport('@/components/disclosures/DisclosureForm', 'DisclosureForm')
   },
   {
-    id: 'comp-disclosure-form-validation',
-    name: 'DisclosureForm - التحقق من الإفصاح',
+    id: 'comp-disclosures-list',
+    name: 'DisclosuresList - قائمة الإفصاحات',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار التحقق من بيانات الإفصاح' })
+    test: async () => testComponentImport('@/components/disclosures/DisclosuresList', 'DisclosuresList')
   },
   {
     id: 'comp-approval-workflow-render',
     name: 'ApprovalWorkflow - سير الموافقات',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عرض سير الموافقات' })
+    test: async () => testComponentImport('@/components/approvals/ApprovalWorkflow', 'ApprovalWorkflow')
   },
   {
-    id: 'comp-approval-workflow-steps',
-    name: 'ApprovalWorkflow - خطوات الموافقة',
+    id: 'comp-approval-steps',
+    name: 'ApprovalSteps - خطوات الموافقة',
     category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار خطوات سير الموافقات' })
-  },
-  {
-    id: 'comp-approval-workflow-approve',
-    name: 'ApprovalWorkflow - الموافقة',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عملية الموافقة' })
-  },
-  {
-    id: 'comp-approval-workflow-reject',
-    name: 'ApprovalWorkflow - الرفض',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عملية الرفض' })
-  },
-  {
-    id: 'comp-board-meeting-form',
-    name: 'BoardMeetingForm - نموذج الاجتماع',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار نموذج اجتماع المجلس' })
-  },
-  {
-    id: 'comp-policy-document-viewer',
-    name: 'PolicyDocumentViewer - عارض السياسات',
-    category: 'components-governance',
-    test: async () => ({ success: true, details: 'اختبار عارض السياسات' })
+    test: async () => testComponentImport('@/components/approvals/ApprovalSteps', 'ApprovalSteps')
   },
 ];
 
@@ -463,213 +346,135 @@ const governanceComponentsTests = [
 const sharedComponentsTests = [
   {
     id: 'comp-data-table-render',
-    name: 'DataTable - عرض الجدول',
+    name: 'DataTable - جدول البيانات',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار عرض جدول البيانات' })
+    test: async () => testComponentImport('@/components/ui/data-table', 'DataTable')
   },
   {
-    id: 'comp-data-table-sort',
-    name: 'DataTable - ترتيب الجدول',
+    id: 'comp-button',
+    name: 'Button - الزر',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار ترتيب جدول البيانات' })
+    test: async () => testComponentImport('@/components/ui/button', 'Button')
   },
   {
-    id: 'comp-data-table-filter',
-    name: 'DataTable - تصفية الجدول',
+    id: 'comp-input',
+    name: 'Input - حقل الإدخال',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تصفية جدول البيانات' })
+    test: async () => testComponentImport('@/components/ui/input', 'Input')
   },
   {
-    id: 'comp-data-table-pagination',
-    name: 'DataTable - ترقيم الصفحات',
+    id: 'comp-card',
+    name: 'Card - البطاقة',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار ترقيم صفحات الجدول' })
+    test: async () => testComponentImport('@/components/ui/card', 'Card')
   },
   {
-    id: 'comp-data-table-select',
-    name: 'DataTable - تحديد الصفوف',
+    id: 'comp-dialog',
+    name: 'Dialog - الحوار',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تحديد صفوف الجدول' })
+    test: async () => testComponentImport('@/components/ui/dialog', 'Dialog')
   },
   {
-    id: 'comp-export-button-excel',
-    name: 'ExportButton - تصدير Excel',
+    id: 'comp-table',
+    name: 'Table - الجدول',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تصدير Excel' })
+    test: async () => testComponentImport('@/components/ui/table', 'Table')
   },
   {
-    id: 'comp-export-button-pdf',
-    name: 'ExportButton - تصدير PDF',
+    id: 'comp-tabs',
+    name: 'Tabs - التبويبات',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تصدير PDF' })
+    test: async () => testComponentImport('@/components/ui/tabs', 'Tabs')
   },
   {
-    id: 'comp-print-button-render',
+    id: 'comp-select',
+    name: 'Select - القائمة المنسدلة',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/ui/select', 'Select')
+  },
+  {
+    id: 'comp-badge',
+    name: 'Badge - الشارة',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/ui/badge', 'Badge')
+  },
+  {
+    id: 'comp-skeleton',
+    name: 'Skeleton - هيكل التحميل',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/ui/skeleton', 'Skeleton')
+  },
+  {
+    id: 'comp-alert',
+    name: 'Alert - التنبيه',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/ui/alert', 'Alert')
+  },
+  {
+    id: 'comp-avatar',
+    name: 'Avatar - الصورة الرمزية',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/ui/avatar', 'Avatar')
+  },
+  {
+    id: 'comp-export-button',
+    name: 'ExportButton - زر التصدير',
+    category: 'components-shared',
+    test: async () => testComponentImport('@/components/shared/ExportButton', 'ExportButton')
+  },
+  {
+    id: 'comp-print-button',
     name: 'PrintButton - زر الطباعة',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار زر الطباعة' })
-  },
-  {
-    id: 'comp-print-button-action',
-    name: 'PrintButton - تنفيذ الطباعة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تنفيذ الطباعة' })
-  },
-  {
-    id: 'comp-filter-panel-render',
-    name: 'FilterPanel - لوحة الفلاتر',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار لوحة الفلاتر' })
-  },
-  {
-    id: 'comp-filter-panel-apply',
-    name: 'FilterPanel - تطبيق الفلاتر',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تطبيق الفلاتر' })
-  },
-  {
-    id: 'comp-filter-panel-reset',
-    name: 'FilterPanel - إعادة تعيين الفلاتر',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار إعادة تعيين الفلاتر' })
-  },
-  {
-    id: 'comp-search-input-render',
-    name: 'SearchInput - حقل البحث',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار حقل البحث' })
-  },
-  {
-    id: 'comp-search-input-debounce',
-    name: 'SearchInput - تأخير البحث',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار تأخير البحث' })
-  },
-  {
-    id: 'comp-search-input-clear',
-    name: 'SearchInput - مسح البحث',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار مسح حقل البحث' })
-  },
-  {
-    id: 'comp-pagination-render',
-    name: 'Pagination - ترقيم الصفحات',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار ترقيم الصفحات' })
-  },
-  {
-    id: 'comp-pagination-navigate',
-    name: 'Pagination - التنقل بين الصفحات',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار التنقل بين الصفحات' })
-  },
-  {
-    id: 'comp-status-badge-render',
-    name: 'StatusBadge - شارة الحالة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار شارة الحالة' })
-  },
-  {
-    id: 'comp-status-badge-colors',
-    name: 'StatusBadge - ألوان الحالة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار ألوان شارة الحالة' })
+    test: async () => testComponentImport('@/components/shared/PrintButton', 'PrintButton')
   },
   {
     id: 'comp-empty-state-render',
     name: 'EmptyState - الحالة الفارغة',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار عرض الحالة الفارغة' })
-  },
-  {
-    id: 'comp-empty-state-action',
-    name: 'EmptyState - إجراء الحالة الفارغة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار إجراء الحالة الفارغة' })
+    test: async () => testComponentImport('@/components/shared/EmptyState', 'EmptyState')
   },
   {
     id: 'comp-error-state-render',
     name: 'ErrorState - حالة الخطأ',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار عرض حالة الخطأ' })
-  },
-  {
-    id: 'comp-error-state-retry',
-    name: 'ErrorState - إعادة المحاولة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار إعادة المحاولة' })
+    test: async () => testComponentImport('@/components/shared/ErrorState', 'ErrorState')
   },
   {
     id: 'comp-loading-skeleton-render',
     name: 'LoadingSkeleton - هيكل التحميل',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار هيكل التحميل' })
-  },
-  {
-    id: 'comp-confirmation-dialog',
-    name: 'ConfirmationDialog - حوار التأكيد',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار حوار التأكيد' })
+    test: async () => testComponentImport('@/components/shared/LoadingSkeleton', 'LoadingSkeleton')
   },
   {
     id: 'comp-delete-confirm-dialog',
     name: 'DeleteConfirmDialog - تأكيد الحذف',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار حوار تأكيد الحذف' })
+    test: async () => testComponentImport('@/components/shared/DeleteConfirmDialog', 'DeleteConfirmDialog')
   },
   {
     id: 'comp-responsive-dialog',
     name: 'ResponsiveDialog - الحوار المتجاوب',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار الحوار المتجاوب' })
-  },
-  {
-    id: 'comp-virtualized-table',
-    name: 'VirtualizedTable - الجدول الافتراضي',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار الجدول الافتراضي' })
-  },
-  {
-    id: 'comp-lazy-load-wrapper',
-    name: 'LazyLoadWrapper - غلاف التحميل الكسول',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار غلاف التحميل الكسول' })
-  },
-  {
-    id: 'comp-lazy-image',
-    name: 'LazyImage - الصورة الكسولة',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار الصورة الكسولة' })
-  },
-  {
-    id: 'comp-masked-value',
-    name: 'MaskedValue - القيمة المخفية',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار القيمة المخفية' })
+    test: async () => testComponentImport('@/components/shared/ResponsiveDialog', 'ResponsiveDialog')
   },
   {
     id: 'comp-permission-gate',
     name: 'PermissionGate - بوابة الصلاحيات',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار بوابة الصلاحيات' })
+    test: async () => testComponentImport('@/components/shared/PermissionGate', 'PermissionGate')
   },
   {
-    id: 'comp-global-error-boundary',
-    name: 'GlobalErrorBoundary - حدود الخطأ',
+    id: 'comp-global-search',
+    name: 'GlobalSearch - البحث الشامل',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار حدود الخطأ العامة' })
+    test: async () => testComponentImport('@/components/shared/GlobalSearch', 'GlobalSearch')
   },
   {
-    id: 'comp-update-notification',
-    name: 'UpdateNotification - إشعار التحديث',
+    id: 'comp-status-badge',
+    name: 'StatusBadge - شارة الحالة',
     category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار إشعار التحديث' })
-  },
-  {
-    id: 'comp-self-healing',
-    name: 'SelfHealingComponent - الشفاء الذاتي',
-    category: 'components-shared',
-    test: async () => ({ success: true, details: 'اختبار مكون الشفاء الذاتي' })
+    test: async () => testComponentImport('@/components/shared/StatusBadge', 'StatusBadge')
   },
 ];
 
@@ -680,61 +485,112 @@ const dashboardComponentsTests = [
     id: 'comp-dashboard-stats-card',
     name: 'StatsCard - بطاقة الإحصائيات',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار بطاقة الإحصائيات' })
+    test: async () => testComponentImport('@/components/dashboard/StatsCard', 'StatsCard')
   },
   {
-    id: 'comp-dashboard-chart-card',
-    name: 'ChartCard - بطاقة الرسم البياني',
+    id: 'comp-dashboard-kpi-card',
+    name: 'KPICard - بطاقة KPI',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار بطاقة الرسم البياني' })
+    test: async () => testComponentImport('@/components/dashboard/KPICard', 'KPICard')
   },
   {
     id: 'comp-dashboard-activity-feed',
     name: 'ActivityFeed - تغذية النشاط',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار تغذية النشاط' })
+    test: async () => testComponentImport('@/components/dashboard/ActivityFeed', 'ActivityFeed')
   },
   {
     id: 'comp-dashboard-quick-actions',
     name: 'QuickActions - الإجراءات السريعة',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار الإجراءات السريعة' })
+    test: async () => testComponentImport('@/components/dashboard/QuickActions', 'QuickActions')
   },
   {
     id: 'comp-dashboard-alerts-panel',
     name: 'AlertsPanel - لوحة التنبيهات',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار لوحة التنبيهات' })
+    test: async () => testComponentImport('@/components/dashboard/AlertsPanel', 'AlertsPanel')
   },
   {
-    id: 'comp-dashboard-pie-chart',
-    name: 'PieChart - الرسم الدائري',
+    id: 'comp-dashboard-chart',
+    name: 'DashboardChart - رسم بياني',
     category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار الرسم الدائري' })
+    test: async () => testComponentImport('@/components/dashboard/DashboardChart', 'DashboardChart')
+  },
+];
+
+// ==================== اختبارات مكونات الذكاء الاصطناعي ====================
+
+const aiComponentsTests = [
+  {
+    id: 'comp-chatbot-interface',
+    name: 'ChatbotInterface - واجهة الدردشة',
+    category: 'components-ai',
+    test: async () => testComponentImport('@/components/ai/ChatbotInterface', 'ChatbotInterface')
   },
   {
-    id: 'comp-dashboard-bar-chart',
-    name: 'BarChart - الرسم الشريطي',
-    category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار الرسم الشريطي' })
+    id: 'comp-ai-insights-card',
+    name: 'AIInsightsCard - بطاقة رؤى AI',
+    category: 'components-ai',
+    test: async () => testComponentImport('@/components/ai/AIInsightsCard', 'AIInsightsCard')
   },
   {
-    id: 'comp-dashboard-line-chart',
-    name: 'LineChart - الرسم الخطي',
-    category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار الرسم الخطي' })
+    id: 'comp-intelligent-search',
+    name: 'IntelligentSearch - البحث الذكي',
+    category: 'components-ai',
+    test: async () => testComponentImport('@/components/ai/IntelligentSearch', 'IntelligentSearch')
+  },
+];
+
+// ==================== اختبارات مكونات المراقبة ====================
+
+const monitoringComponentsTests = [
+  {
+    id: 'comp-system-health-indicator',
+    name: 'SystemHealthIndicator - مؤشر صحة النظام',
+    category: 'components-monitoring',
+    test: async () => testComponentImport('@/components/monitoring/SystemHealthIndicator', 'SystemHealthIndicator')
   },
   {
-    id: 'comp-dashboard-area-chart',
-    name: 'AreaChart - رسم المساحة',
-    category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار رسم المساحة' })
+    id: 'comp-performance-chart',
+    name: 'PerformanceChart - رسم الأداء',
+    category: 'components-monitoring',
+    test: async () => testComponentImport('@/components/monitoring/PerformanceChart', 'PerformanceChart')
   },
   {
-    id: 'comp-dashboard-kpi-widget',
-    name: 'KPIWidget - عنصر KPI',
-    category: 'components-dashboard',
-    test: async () => ({ success: true, details: 'اختبار عنصر مؤشر الأداء' })
+    id: 'comp-error-logs-table',
+    name: 'ErrorLogsTable - جدول الأخطاء',
+    category: 'components-monitoring',
+    test: async () => testComponentImport('@/components/monitoring/ErrorLogsTable', 'ErrorLogsTable')
+  },
+];
+
+// ==================== اختبارات مكونات Layout ====================
+
+const layoutComponentsTests = [
+  {
+    id: 'comp-sidebar',
+    name: 'Sidebar - الشريط الجانبي',
+    category: 'components-layout',
+    test: async () => testComponentImport('@/components/layout/Sidebar', 'Sidebar')
+  },
+  {
+    id: 'comp-header',
+    name: 'Header - الرأس',
+    category: 'components-layout',
+    test: async () => testComponentImport('@/components/layout/Header', 'Header')
+  },
+  {
+    id: 'comp-main-layout',
+    name: 'MainLayout - التخطيط الرئيسي',
+    category: 'components-layout',
+    test: async () => testComponentImport('@/components/layout/MainLayout', 'MainLayout')
+  },
+  {
+    id: 'comp-page-header',
+    name: 'PageHeader - رأس الصفحة',
+    category: 'components-layout',
+    test: async () => testComponentImport('@/components/layout/PageHeader', 'PageHeader')
   },
 ];
 
@@ -746,6 +602,9 @@ export const allComponentsTests = [
   ...governanceComponentsTests,
   ...sharedComponentsTests,
   ...dashboardComponentsTests,
+  ...aiComponentsTests,
+  ...monitoringComponentsTests,
+  ...layoutComponentsTests,
 ];
 
 // دالة تشغيل اختبارات المكونات
@@ -763,6 +622,8 @@ export async function runComponentsTests(): Promise<TestResult[]> {
         status: result.success ? 'passed' : 'failed',
         duration: performance.now() - startTime,
         details: result.details,
+        // إضافة معلومات نوع الاختبار
+        testType: 'real' as const,
       });
     } catch (error) {
       results.push({
@@ -772,6 +633,8 @@ export async function runComponentsTests(): Promise<TestResult[]> {
         status: 'failed',
         duration: performance.now() - startTime,
         error: error instanceof Error ? error.message : 'Unknown error',
+        details: `❌ فشل في استيراد المكون`,
+        testType: 'real' as const,
       });
     }
   }
@@ -783,6 +646,7 @@ export async function runComponentsTests(): Promise<TestResult[]> {
 export function getComponentsTestsStats() {
   return {
     total: allComponentsTests.length,
+    testType: 'real-import',
     categories: {
       accounting: accountingComponentsTests.length,
       beneficiary: beneficiaryComponentsTests.length,
@@ -790,6 +654,12 @@ export function getComponentsTestsStats() {
       governance: governanceComponentsTests.length,
       shared: sharedComponentsTests.length,
       dashboard: dashboardComponentsTests.length,
+      ai: aiComponentsTests.length,
+      monitoring: monitoringComponentsTests.length,
+      layout: layoutComponentsTests.length,
     }
   };
 }
+
+// تصدير دوال مساعدة للاستخدام الخارجي
+export { testComponentImport, testComponentsFromFolder };
