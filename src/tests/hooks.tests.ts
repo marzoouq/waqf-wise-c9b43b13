@@ -21,30 +21,30 @@ export interface TestResult {
 
 const generateId = () => `hook-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// استيراد جميع الـ Hooks باستخدام Vite glob مع دعم .ts و .tsx
-const accountingHooks = import.meta.glob('@/hooks/accounting/*.{ts,tsx}', { eager: true });
-const beneficiaryHooks = import.meta.glob('@/hooks/beneficiary/*.{ts,tsx}', { eager: true });
-const propertyHooks = import.meta.glob('@/hooks/property/*.{ts,tsx}', { eager: true });
-const authHooks = import.meta.glob('@/hooks/auth/*.{ts,tsx}', { eager: true });
-const aiHooks = import.meta.glob('@/hooks/ai/*.{ts,tsx}', { eager: true });
-const distributionsHooks = import.meta.glob('@/hooks/distributions/*.{ts,tsx}', { eager: true });
-const governanceHooks = import.meta.glob('@/hooks/governance/*.{ts,tsx}', { eager: true });
-const paymentsHooks = import.meta.glob('@/hooks/payments/*.{ts,tsx}', { eager: true });
-const monitoringHooks = import.meta.glob('@/hooks/monitoring/*.{ts,tsx}', { eager: true });
-const nazerHooks = import.meta.glob('@/hooks/nazer/*.{ts,tsx}', { eager: true });
-const searchHooks = import.meta.glob('@/hooks/search/*.{ts,tsx}', { eager: true });
-const notificationsHooks = import.meta.glob('@/hooks/notifications/*.{ts,tsx}', { eager: true });
-const dashboardHooks = import.meta.glob('@/hooks/dashboard/*.{ts,tsx}', { eager: true });
-const uiHooks = import.meta.glob('@/hooks/ui/*.{ts,tsx}', { eager: true });
-const testsHooks = import.meta.glob('@/hooks/tests/*.{ts,tsx}', { eager: true });
-const developerHooks = import.meta.glob('@/hooks/developer/*.{ts,tsx}', { eager: true });
-const waqfHooks = import.meta.glob('@/hooks/waqf/*.{ts,tsx}', { eager: true });
-const transactionsHooks = import.meta.glob('@/hooks/transactions/*.{ts,tsx}', { eager: true });
-const adminHooks = import.meta.glob('@/hooks/admin/*.{ts,tsx}', { eager: true });
-const sharedHooks = import.meta.glob('@/hooks/shared/*.{ts,tsx}', { eager: true });
+// استيراد جميع الـ Hooks باستخدام Vite glob مع مسارات فعلية
+const accountingHooks = import.meta.glob('/src/hooks/accounting/*.{ts,tsx}', { eager: true });
+const beneficiaryHooks = import.meta.glob('/src/hooks/beneficiary/*.{ts,tsx}', { eager: true });
+const propertyHooks = import.meta.glob('/src/hooks/property/*.{ts,tsx}', { eager: true });
+const authHooks = import.meta.glob('/src/hooks/auth/*.{ts,tsx}', { eager: true });
+const aiHooks = import.meta.glob('/src/hooks/ai/*.{ts,tsx}', { eager: true });
+const distributionsHooks = import.meta.glob('/src/hooks/distributions/*.{ts,tsx}', { eager: true });
+const governanceHooks = import.meta.glob('/src/hooks/governance/*.{ts,tsx}', { eager: true });
+const paymentsHooks = import.meta.glob('/src/hooks/payments/*.{ts,tsx}', { eager: true });
+const monitoringHooks = import.meta.glob('/src/hooks/monitoring/*.{ts,tsx}', { eager: true });
+const nazerHooks = import.meta.glob('/src/hooks/nazer/*.{ts,tsx}', { eager: true });
+const searchHooks = import.meta.glob('/src/hooks/search/*.{ts,tsx}', { eager: true });
+const notificationsHooks = import.meta.glob('/src/hooks/notifications/*.{ts,tsx}', { eager: true });
+const dashboardHooks = import.meta.glob('/src/hooks/dashboard/*.{ts,tsx}', { eager: true });
+const uiHooks = import.meta.glob('/src/hooks/ui/*.{ts,tsx}', { eager: true });
+const testsHooks = import.meta.glob('/src/hooks/tests/*.{ts,tsx}', { eager: true });
+const developerHooks = import.meta.glob('/src/hooks/developer/*.{ts,tsx}', { eager: true });
+const waqfHooks = import.meta.glob('/src/hooks/waqf/*.{ts,tsx}', { eager: true });
+const transactionsHooks = import.meta.glob('/src/hooks/transactions/*.{ts,tsx}', { eager: true });
+const adminHooks = import.meta.glob('/src/hooks/admin/*.{ts,tsx}', { eager: true });
+const sharedHooks = import.meta.glob('/src/hooks/shared/*.{ts,tsx}', { eager: true });
 
 // استيراد جميع الـ Hooks من المجلد الرئيسي
-const rootHooks = import.meta.glob('@/hooks/*.{ts,tsx}', { eager: true });
+const rootHooks = import.meta.glob('/src/hooks/*.{ts,tsx}', { eager: true });
 
 // قائمة الـ Hooks المتوقعة (للتحقق)
 const EXPECTED_HOOKS: Record<string, string[]> = {
