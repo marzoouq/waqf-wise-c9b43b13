@@ -72,12 +72,13 @@ serve(async (req) => {
       try {
         const clonedReq = req.clone();
         const body = await clonedReq.json();
-        if (body.ping || body.healthCheck || body.test) {
+        if (body.ping || body.healthCheck || body.test || body.testMode) {
           console.log('[encrypt-file] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'encrypt-file',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            version: '2.1.0'
           });
         }
       } catch {

@@ -40,12 +40,13 @@ serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[send-push-notification] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[send-push-notification] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'send-push-notification',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            version: '2.1.0'
           });
         }
       } catch { /* not JSON, continue */ }

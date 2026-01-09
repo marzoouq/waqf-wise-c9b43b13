@@ -43,12 +43,13 @@ serve(async (req) => {
     // ✅ Health Check Support
     try {
       const bodyClone = await req.clone().json();
-      if (bodyClone.ping || bodyClone.healthCheck) {
-        console.log('[DECRYPT-FILE] Health check received');
+      if (bodyClone.ping || bodyClone.healthCheck || bodyClone.testMode) {
+        console.log('[DECRYPT-FILE] Health check / test mode received');
         return jsonResponse({
           status: 'healthy',
           function: 'decrypt-file',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          version: '2.1.0'
         });
       }
     } catch {
