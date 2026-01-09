@@ -132,7 +132,8 @@ describe('ArchiveService', () => {
         name: 'مستند جديد',
         category: 'عقود',
         file_type: 'PDF',
-        file_path: '/new-doc.pdf'
+        file_path: '/new-doc.pdf',
+        file_size: '500 KB'
       };
 
       const result = await ArchiveService.createDocument(newDoc);
