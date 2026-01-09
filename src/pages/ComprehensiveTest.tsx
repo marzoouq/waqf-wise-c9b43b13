@@ -2676,7 +2676,28 @@ function ComprehensiveTestContent() {
           }
           
           // إذا كان الاختبار يحتوي على نتائج فرعية، نعرضها
-          if (result.details?.results && Array.isArray(result.details.results)) {
+          // ✅ Shape Guard: نتحقق أن العناصر هي "نتائج اختبار" وليست "بيانات عامة"
+          const isSubTestsArray = (arr: any[]): boolean => {
+            if (arr.length === 0) return false;
+            const sample = arr[0];
+            // نتيجة اختبار يجب أن تحتوي على أحد هذه الحقول
+            const hasTestShape = (
+              typeof sample.success === 'boolean' ||
+              sample.status === 'passed' ||
+              sample.status === 'failed' ||
+              typeof sample.testId === 'string' ||
+              typeof sample.testName === 'string'
+            );
+            // استبعاد البيانات التي تبدو كجداول أو نتائج غير اختبارية
+            const isDataShape = (
+              typeof sample.table === 'string' ||
+              typeof sample.dead_rows === 'number' ||
+              (typeof sample.status === 'string' && !['passed', 'failed'].includes(sample.status))
+            );
+            return hasTestShape && !isDataShape;
+          };
+
+          if (result.details?.results && Array.isArray(result.details.results) && isSubTestsArray(result.details.results)) {
             const subResults = result.details.results;
             
             for (const subResult of subResults) {
@@ -2691,7 +2712,7 @@ function ComprehensiveTestContent() {
               
               const testResult: TestResult = {
                 testId: subResult.testId || subResult.id || `${test.id}-${subResults.indexOf(subResult)}`,
-                testName: subResult.testName || subResult.name,
+                testName: subResult.testName || subResult.name || 'اختبار فرعي',
                 category: subResult.category || category.id,
                 success: isSuccess,
                 duration: subResult.duration || 0,
@@ -2727,6 +2748,37 @@ function ComprehensiveTestContent() {
             const passedCount = subResults.filter((r: any) => r.success === true || r.status === 'passed').length;
             const failedCount = subResults.filter((r: any) => r.success === false || r.status === 'failed').length;
             addLog(`📦 ${test.name}: ${passedCount} نجح، ${failedCount} فشل من ${subResults.length}`);
+          } else if (result.details?.results && Array.isArray(result.details.results) && result.details.results.length > 0) {
+            // ✅ حالة خاصة: النتائج هي بيانات وليست اختبارات فرعية (مثل run-vacuum)
+            // نعتبر الاختبار ناجحاً إذا أرجع بيانات
+            const dataCount = result.details.results.length;
+            const enhancedResult: TestResult = {
+              ...result,
+              success: result.success !== false, // ناجح ما لم يكن محدداً كفاشل
+              message: result.message || `تم استلام ${dataCount} عنصر بيانات`
+            };
+            
+            setResults(prev => [...prev, enhancedResult]);
+            setRecentResults(prev => [...prev.slice(-5), { 
+              name: test.name, 
+              success: enhancedResult.success 
+            }]);
+            
+            if (enhancedResult.success) {
+              totalPassed++;
+              addLog(`✅ ${test.name}: نجح (${result.duration}ms) - ${dataCount} عنصر`);
+            } else {
+              totalFailed++;
+              addLog(`❌ ${test.name}: فشل - ${result.message}`);
+            }
+            
+            totalCompleted++;
+            setProgress(prev => ({
+              ...prev,
+              completed: totalCompleted,
+              passed: totalPassed,
+              failed: totalFailed
+            }));
           } else {
             // اختبار عادي بدون نتائج فرعية
             setResults(prev => [...prev, result]);
