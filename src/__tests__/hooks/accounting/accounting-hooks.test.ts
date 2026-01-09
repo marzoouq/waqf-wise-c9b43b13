@@ -216,12 +216,29 @@ describe('Accounting Hooks - Comprehensive Tests', () => {
 
   describe('useAddJournalEntry Hook', () => {
     it('should return mutation', async () => {
-      const mockFiscalYear = { id: 'fy-1', name: '2024', status: 'open' as const, start_date: '2024-01-01', end_date: '2024-12-31', is_closed: false, created_at: '', updated_at: '' };
-      const mockAccounts = [{ id: '1', code: '1001', name_ar: 'test', account_type: 'asset' as const, account_nature: 'debit' as const, is_active: true, is_header: false, created_at: '', updated_at: '' }];
-      const { useAddJournalEntry } = await import('@/hooks/accounting/useAddJournalEntry');
-      const { result } = renderHook(() => useAddJournalEntry(mockFiscalYear, mockAccounts as any), { wrapper: createWrapper() });
+      const mockForm = {
+        getValues: vi.fn().mockReturnValue(''),
+        setValue: vi.fn(),
+        watch: vi.fn(),
+        reset: vi.fn(),
+        handleSubmit: vi.fn(),
+        formState: { errors: {} },
+        register: vi.fn(),
+        control: {},
+        getFieldState: vi.fn(),
+        setError: vi.fn(),
+        clearErrors: vi.fn(),
+        trigger: vi.fn(),
+        resetField: vi.fn(),
+        setFocus: vi.fn(),
+        unregister: vi.fn(),
+      } as any;
       
-      expect(result.current).toHaveProperty('mutate');
+      const { useAddJournalEntry } = await import('@/hooks/accounting/useAddJournalEntry');
+      const { result } = renderHook(() => useAddJournalEntry(mockForm, false), { wrapper: createWrapper() });
+      
+      expect(result.current).toHaveProperty('lines');
+      expect(result.current).toHaveProperty('setLines');
     });
   });
 
