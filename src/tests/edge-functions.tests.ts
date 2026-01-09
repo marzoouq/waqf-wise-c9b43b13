@@ -1,6 +1,6 @@
 /**
  * Edge Functions Tests - اختبارات حقيقية لوظائف الخادم
- * @version 4.0.0 - تحسين الأداء والتوازي
+ * @version 5.0.0 - اختبارات حقيقية 100%
  * اختبارات تستدعي Edge Functions فعلياً بشكل متوازي
  */
 
@@ -14,6 +14,7 @@ export interface TestResult {
   error?: string;
   recommendation?: string;
   responseTime?: number;
+  testType?: 'real' | 'fake' | 'partial';
 }
 
 const generateId = () => `ef-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -103,7 +104,7 @@ async function testEdgeFunctionInvocation(
       if (error) {
         const errorMsg = error.message || String(error);
         
-        // أخطاء المصادقة تعني الوظيفة موجودة
+        // ✅ أخطاء المصادقة تعني الوظيفة موجودة وتعمل
         if (errorMsg.includes('401') || 
             errorMsg.includes('403') || 
             errorMsg.includes('Unauthorized') ||
@@ -116,12 +117,13 @@ async function testEdgeFunctionInvocation(
             status: 'passed',
             duration: responseTime,
             category: `edge-${category}`,
-            details: `الوظيفة موجودة وتتطلب مصادقة (${Math.round(responseTime)}ms)`,
-            responseTime
+            details: `✅ الوظيفة موجودة وتتطلب مصادقة (${Math.round(responseTime)}ms)`,
+            responseTime,
+            testType: 'real'
           };
         }
         
-        // خطأ 404 = الوظيفة غير موجودة
+        // ❌ خطأ 404 = الوظيفة غير موجودة - فشل حقيقي
         if (errorMsg.includes('404') || errorMsg.includes('not found')) {
           return {
             id: generateId(),
@@ -129,73 +131,80 @@ async function testEdgeFunctionInvocation(
             status: 'failed',
             duration: responseTime,
             category: `edge-${category}`,
-            error: 'الوظيفة غير موجودة (404)',
-            recommendation: `أنشئ الوظيفة في supabase/functions/${funcName}/index.ts`
+            error: `❌ الوظيفة غير موجودة (404)`,
+            recommendation: `أنشئ الوظيفة في supabase/functions/${funcName}/index.ts`,
+            testType: 'real'
           };
         }
         
-        // خطأ 400 مع رسالة محددة = الوظيفة تعمل ولكن المعاملات خاطئة
-        if (errorMsg.includes('400') || errorMsg.includes('required')) {
+        // ✅ خطأ 400 = الوظيفة تعمل ولكن المعاملات خاطئة
+        if (errorMsg.includes('400') || errorMsg.includes('required') || errorMsg.includes('invalid')) {
           return {
             id: generateId(),
             name: `${funcName}`,
             status: 'passed',
             duration: responseTime,
             category: `edge-${category}`,
-            details: `الوظيفة موجودة ومستجيبة (${Math.round(responseTime)}ms)`,
-            responseTime
+            details: `✅ الوظيفة موجودة ومستجيبة (${Math.round(responseTime)}ms)`,
+            responseTime,
+            testType: 'real'
           };
         }
         
-        // خطأ 500 = مشكلة في الكود
+        // ❌ خطأ 500 = مشكلة في الكود - فشل حقيقي
         if (errorMsg.includes('500') || errorMsg.includes('Internal')) {
           return {
             id: generateId(),
             name: `${funcName}`,
-            status: 'passed', // نعتبرها ناجحة لأن الوظيفة موجودة
+            status: 'failed',
             duration: responseTime,
             category: `edge-${category}`,
-            details: `الوظيفة موجودة (خطأ داخلي) (${Math.round(responseTime)}ms)`,
-            responseTime
+            error: `❌ خطأ داخلي في الوظيفة (500)`,
+            recommendation: 'راجع logs الـ Edge Function وأصلح الكود',
+            testType: 'real'
           };
         }
         
-        // أي خطأ آخر = الوظيفة موجودة
+        // ⚠️ أي خطأ آخر = تحذير
         return {
           id: generateId(),
           name: `${funcName}`,
           status: 'passed',
           duration: responseTime,
           category: `edge-${category}`,
-          details: `الوظيفة مستجيبة (${Math.round(responseTime)}ms)`,
-          responseTime
+          details: `⚠️ الوظيفة مستجيبة مع خطأ: ${errorMsg.substring(0, 50)}`,
+          responseTime,
+          testType: 'partial'
         };
       }
       
-      // نجاح الاستدعاء
+      // ✅ نجاح الاستدعاء
       return {
         id: generateId(),
         name: `${funcName}`,
         status: 'passed',
         duration: responseTime,
         category: `edge-${category}`,
-        details: `الوظيفة تستجيب بنجاح (${Math.round(responseTime)}ms)`,
-        responseTime
+        details: `✅ الوظيفة تستجيب بنجاح (${Math.round(responseTime)}ms)`,
+        responseTime,
+        testType: 'real'
       };
       
     } catch (fetchError) {
       clearTimeout(timeoutId);
       const responseTime = performance.now() - startTime;
       
+      // ⚠️ Timeout
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         return {
           id: generateId(),
           name: `${funcName}`,
-          status: 'passed', // نعتبرها ناجحة مع ملاحظة
+          status: 'failed',
           duration: responseTime,
           category: `edge-${category}`,
-          details: 'الوظيفة موجودة (timeout)',
-          recommendation: 'تحقق من أداء الوظيفة'
+          error: `❌ انتهت مهلة الاستجابة (${TIMEOUT_PER_FUNCTION}ms)`,
+          recommendation: 'تحقق من أداء الوظيفة أو زد مهلة الاستجابة',
+          testType: 'real'
         };
       }
       
@@ -205,13 +214,15 @@ async function testEdgeFunctionInvocation(
   } catch (error) {
     const responseTime = performance.now() - startTime;
     
+    // ❌ فشل حقيقي
     return {
       id: generateId(),
       name: `${funcName}`,
-      status: 'passed', // نعتبرها ناجحة افتراضياً
+      status: 'failed',
       duration: responseTime,
       category: `edge-${category}`,
-      details: 'وظيفة مُسجَّلة'
+      error: `❌ خطأ: ${error instanceof Error ? error.message : 'Unknown'}`,
+      testType: 'real'
     };
   }
 }
@@ -233,7 +244,8 @@ async function testEdgeFunctionsConnection(): Promise<TestResult> {
         status: 'failed',
         duration: performance.now() - startTime,
         category: 'edge-functions',
-        error: 'عميل Edge Functions غير متاح'
+        error: '❌ عميل Edge Functions غير متاح',
+        testType: 'real'
       };
     }
     
@@ -243,7 +255,8 @@ async function testEdgeFunctionsConnection(): Promise<TestResult> {
       status: 'passed',
       duration: performance.now() - startTime,
       category: 'edge-functions',
-      details: 'عميل Edge Functions متاح'
+      details: '✅ عميل Edge Functions متاح',
+      testType: 'real'
     };
   } catch (error) {
     return {
@@ -252,7 +265,8 @@ async function testEdgeFunctionsConnection(): Promise<TestResult> {
       status: 'failed',
       duration: performance.now() - startTime,
       category: 'edge-functions',
-      error: error instanceof Error ? error.message : 'فشل الاتصال'
+      error: `❌ فشل الاتصال: ${error instanceof Error ? error.message : 'Unknown'}`,
+      testType: 'real'
     };
   }
 }

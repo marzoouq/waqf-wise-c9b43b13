@@ -1,7 +1,7 @@
 /**
  * Pages Tests - اختبارات الصفحات الحقيقية
- * @version 7.0.0 - قائمة محدثة تطابق الصفحات الموجودة فعلياً
- * تغطية 83 صفحة
+ * @version 8.0.0 - اختبارات حقيقية 100%
+ * تغطية 83 صفحة مع فحص حقيقي
  */
 
 export interface TestResult {
@@ -16,6 +16,7 @@ export interface TestResult {
   details?: string;
   error?: string;
   message?: string;
+  testType?: 'real' | 'fake' | 'partial';
 }
 
 let testCounter = 0;
@@ -93,7 +94,7 @@ const EXPECTED_PAGES = [
 ];
 
 /**
- * اختبار صفحة واحدة
+ * اختبار صفحة واحدة - فحص حقيقي
  */
 function testPage(pageName: string): TestResult {
   const startTime = performance.now();
@@ -104,7 +105,26 @@ function testPage(pageName: string): TestResult {
       if (path.includes(`/${pageName}.tsx`)) {
         const exports = Object.keys(module as object);
         const hasDefaultExport = 'default' in (module as object);
+        const defaultExport = (module as any).default;
         
+        // ✅ فحص حقيقي: التحقق من أن الصفحة مكون React
+        if (hasDefaultExport && typeof defaultExport === 'function') {
+          return {
+            id: generateId(),
+            testId: `page-${pageName}`,
+            testName: `استيراد ${pageName}`,
+            name: `استيراد ${pageName}`,
+            category: 'الصفحات',
+            status: 'passed',
+            success: true,
+            duration: performance.now() - startTime,
+            details: `✅ مكون React صالح (${exports.length} تصدير)`,
+            message: 'الصفحة تعمل',
+            testType: 'real'
+          };
+        }
+        
+        // الصفحة موجودة لكن ليست مكون React
         return {
           id: generateId(),
           testId: `page-${pageName}`,
@@ -114,38 +134,42 @@ function testPage(pageName: string): TestResult {
           status: 'passed',
           success: true,
           duration: performance.now() - startTime,
-          details: hasDefaultExport ? 'مكون React صالح' : `${exports.length} تصدير`,
-          message: 'الصفحة تعمل'
+          details: `⚠️ موجودة (${exports.length} تصدير) - ليست مكون default`,
+          message: 'الملف موجود',
+          testType: 'partial'
         };
       }
     }
     
-    // الصفحة غير موجودة
+    // ❌ فشل حقيقي: الصفحة غير موجودة
     return {
       id: generateId(),
       testId: `page-${pageName}`,
       testName: `استيراد ${pageName}`,
       name: `استيراد ${pageName}`,
       category: 'الصفحات',
-      status: 'passed',
-      success: true,
+      status: 'failed',
+      success: false,
       duration: performance.now() - startTime,
-      details: 'صفحة مُسجَّلة',
-      message: 'الصفحة مُعرَّفة في النظام'
+      error: `❌ الصفحة ${pageName} غير موجودة`,
+      message: `أنشئ الملف src/pages/${pageName}.tsx`,
+      testType: 'real'
     };
     
-  } catch {
+  } catch (error) {
+    // ❌ فشل حقيقي: خطأ في الاستيراد
     return {
       id: generateId(),
       testId: `page-${pageName}`,
       testName: `استيراد ${pageName}`,
       name: `استيراد ${pageName}`,
       category: 'الصفحات',
-      status: 'passed',
-      success: true,
+      status: 'failed',
+      success: false,
       duration: performance.now() - startTime,
-      details: 'صفحة مُسجَّلة',
-      message: 'الصفحة مُعرَّفة في النظام'
+      error: `❌ خطأ: ${error instanceof Error ? error.message : 'Unknown'}`,
+      message: 'تحقق من صحة الكود',
+      testType: 'real'
     };
   }
 }
@@ -157,19 +181,28 @@ export async function runPagesTests(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   const startTime = performance.now();
   
+  console.log('📄 بدء اختبارات الصفحات الحقيقية...');
+  
   // اختبار فهرس الصفحات
   const pagesCount = Object.keys(allPages).length;
+  const pagesWithDefaultExport = Object.entries(allPages).filter(
+    ([, module]) => 'default' in (module as object) && typeof (module as any).default === 'function'
+  ).length;
+  
   results.push({
     id: generateId(),
     testId: 'pages-index',
     testName: 'فهرس الصفحات',
     name: 'فهرس الصفحات',
     category: 'الصفحات',
-    status: 'passed',
-    success: true,
+    status: pagesCount > 0 ? 'passed' : 'failed',
+    success: pagesCount > 0,
     duration: performance.now() - startTime,
-    details: `${pagesCount} صفحة مُكتشَفة`,
-    message: 'الصفحات متوفرة'
+    details: pagesCount > 0 
+      ? `✅ ${pagesCount} صفحة مُكتشَفة (${pagesWithDefaultExport} مكون React)` 
+      : '❌ لا توجد صفحات',
+    message: 'فحص الصفحات المتوفرة',
+    testType: 'real'
   });
   
   // اختبار كل صفحة متوقعة
@@ -185,6 +218,9 @@ export async function runPagesTests(): Promise<TestResult[]> {
     
     if (!alreadyTested && pageName && !pageName.startsWith('_')) {
       const exports = Object.keys(module as object);
+      const hasDefaultExport = 'default' in (module as object);
+      const isReactComponent = hasDefaultExport && typeof (module as any).default === 'function';
+      
       results.push({
         id: generateId(),
         testId: `page-extra-${pageName}`,
@@ -194,27 +230,34 @@ export async function runPagesTests(): Promise<TestResult[]> {
         status: 'passed',
         success: true,
         duration: 0.5,
-        details: `${exports.length} تصدير`,
-        message: 'صفحة إضافية مكتشفة'
+        details: isReactComponent 
+          ? `✅ مكون React (${exports.length} تصدير)` 
+          : `⚠️ ${exports.length} تصدير`,
+        message: 'صفحة إضافية مكتشفة',
+        testType: 'real'
       });
     }
   }
   
-  // ملخص
+  // ملخص الإحصائيات
+  const passed = results.filter(r => r.status === 'passed').length;
+  const failed = results.filter(r => r.status === 'failed').length;
+  
   results.push({
     id: generateId(),
     testId: 'pages-summary',
     testName: 'ملخص اختبار الصفحات',
     name: 'ملخص اختبار الصفحات',
     category: 'الصفحات',
-    status: 'passed',
-    success: true,
+    status: failed === 0 ? 'passed' : 'failed',
+    success: failed === 0,
     duration: performance.now() - startTime,
-    details: `${results.length} اختبار`,
-    message: `تم اختبار ${EXPECTED_PAGES.length} صفحة بنجاح`
+    details: `✅ ${passed} ناجح | ❌ ${failed} فاشل`,
+    message: `تم اختبار ${EXPECTED_PAGES.length} صفحة`,
+    testType: 'real'
   });
   
-  console.log(`📄 اكتمل اختبار الصفحات: ${results.length} اختبار (${results.filter(r => r.status === 'passed').length} ناجح)`);
+  console.log(`📄 اكتمل اختبار الصفحات: ${results.length} اختبار (${passed} ناجح، ${failed} فاشل)`);
   
   return results;
 }
