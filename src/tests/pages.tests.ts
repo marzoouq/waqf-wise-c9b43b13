@@ -21,8 +21,8 @@ export interface TestResult {
 let testCounter = 0;
 const generateId = () => `page-${++testCounter}-${Date.now()}`;
 
-// استيراد جميع الصفحات باستخدام Vite glob مع دعم .tsx و .ts
-const allPages = import.meta.glob('@/pages/*.{tsx,ts}', { eager: true });
+// استيراد جميع الصفحات باستخدام Vite glob مع مسارات فعلية
+const allPages = import.meta.glob('/src/pages/*.{tsx,ts}', { eager: true });
 
 // قائمة الصفحات المتوقعة
 const EXPECTED_PAGES = [

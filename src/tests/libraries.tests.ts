@@ -21,14 +21,14 @@ export interface TestResult {
 let testCounter = 0;
 const generateId = () => `lib-${++testCounter}-${Date.now()}`;
 
-// استيراد جميع المكتبات باستخدام Vite glob مع دعم .ts و .tsx
-const libFiles = import.meta.glob('@/lib/*.{ts,tsx}', { eager: true });
-const libFolders = import.meta.glob('@/lib/*/index.{ts,tsx}', { eager: true });
-const libErrorsFolder = import.meta.glob('@/lib/errors/*.{ts,tsx}', { eager: true });
-const libFontsFolder = import.meta.glob('@/lib/fonts/*.{ts,tsx}', { eager: true });
-const libLoggerFolder = import.meta.glob('@/lib/logger/*.{ts,tsx}', { eager: true });
-const libPdfFolder = import.meta.glob('@/lib/pdf/*.{ts,tsx}', { eager: true });
-const libQueryKeysFolder = import.meta.glob('@/lib/query-keys/*.{ts,tsx}', { eager: true });
+// استيراد جميع المكتبات باستخدام Vite glob مع مسارات فعلية
+const libFiles = import.meta.glob('/src/lib/*.{ts,tsx}', { eager: true });
+const libFolders = import.meta.glob('/src/lib/*/index.{ts,tsx}', { eager: true });
+const libErrorsFolder = import.meta.glob('/src/lib/errors/*.{ts,tsx}', { eager: true });
+const libFontsFolder = import.meta.glob('/src/lib/fonts/*.{ts,tsx}', { eager: true });
+const libLoggerFolder = import.meta.glob('/src/lib/logger/*.{ts,tsx}', { eager: true });
+const libPdfFolder = import.meta.glob('/src/lib/pdf/*.{ts,tsx}', { eager: true });
+const libQueryKeysFolder = import.meta.glob('/src/lib/query-keys/*.{ts,tsx}', { eager: true });
 
 // قائمة المكتبات المتوقعة
 const EXPECTED_LIBRARIES = [

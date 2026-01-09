@@ -27,17 +27,18 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
+    // ✅ Health Check / Test Mode Support
     const bodyClone = await req.clone().text();
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[create-beneficiary-accounts] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[create-beneficiary-accounts] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'create-beneficiary-accounts',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            testMode: parsed.testMode || false
           });
         }
       } catch { /* not JSON, continue */ }

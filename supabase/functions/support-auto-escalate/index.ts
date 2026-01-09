@@ -10,6 +10,23 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ Health Check / Test Mode Support
+    const bodyText = await req.clone().text();
+    if (bodyText) {
+      try {
+        const parsed = JSON.parse(bodyText);
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[support-auto-escalate] Health check / test mode received');
+          return jsonResponse({
+            status: 'healthy',
+            function: 'support-auto-escalate',
+            timestamp: new Date().toISOString(),
+            testMode: parsed.testMode || false
+          });
+        }
+      } catch { /* not JSON, continue */ }
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

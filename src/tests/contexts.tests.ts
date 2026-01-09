@@ -21,8 +21,8 @@ export interface TestResult {
 
 const generateId = () => `ctx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// استيراد جميع السياقات باستخدام Vite glob مع دعم .ts و .tsx
-const allContexts = import.meta.glob('@/contexts/*.{ts,tsx}', { eager: true });
+// استيراد جميع السياقات باستخدام Vite glob مع مسارات فعلية
+const allContexts = import.meta.glob('/src/contexts/*.{ts,tsx}', { eager: true });
 
 // قائمة السياقات المتوقعة
 const EXPECTED_CONTEXTS = [
