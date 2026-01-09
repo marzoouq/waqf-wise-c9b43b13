@@ -25,6 +25,7 @@ import {
   EdgeFunctionsMonitor,
   ComprehensiveTest,
   TestsDashboard,
+  RealTestsDashboard,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -227,6 +228,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin"]}>
         <TestsDashboard />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="real-tests"
+    path="/tests/real" 
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <RealTestsDashboard />
       </ProtectedRoute>
     } 
   />,
