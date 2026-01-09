@@ -61,8 +61,23 @@ import { runServicesRealTests } from '@/tests/services.real.tests';
 import { runContextsRealTests } from '@/tests/contexts.real.tests';
 import { runPagesRealTests } from '@/tests/pages.real.tests';
 import { runLibrariesRealTests } from '@/tests/libraries.real.tests';
+// ✅ الاختبارات الشاملة الجديدة 1000+
+import { 
+  runAllComprehensiveTests,
+  runServicesComprehensiveTests,
+  runDatabaseComprehensiveTests,
+  runEdgeFunctionsComprehensiveTests,
+  runSecurityComprehensiveTests,
+  runHooksComprehensiveTests,
+  runIntegrationComprehensiveTests,
+  runPerformanceComprehensiveTests,
+  runComponentsComprehensiveTests,
+  runPagesComprehensiveTests,
+  runContextsComprehensiveTests,
+  runLibrariesComprehensiveTests,
+} from '@/tests/comprehensive';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
-import { Code2, Boxes, Link2, Workflow, Gauge, Wrench, ShieldAlert, Timer, HardDrive } from 'lucide-react';
+import { Code2, Boxes, Link2, Workflow, Gauge, Wrench, ShieldAlert, Timer, HardDrive, Sparkles } from 'lucide-react';
 
 // ================== أنواع البيانات ==================
 
@@ -2535,6 +2550,330 @@ const ALL_TESTS: TestCategory[] = [
           }
         }
       }
+    ]
+  },
+
+  // =============== 32. الاختبارات الشاملة 100% الجديدة ===============
+  {
+    id: 'comprehensive-100',
+    label: '🚀 شامل 100%',
+    icon: Sparkles,
+    color: 'text-emerald-600',
+    tests: [
+      {
+        id: 'comprehensive-all',
+        name: 'جميع الاختبارات الشاملة (1000+)',
+        description: 'تشغيل جميع الاختبارات الشاملة الحقيقية 100%',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const result = await runAllComprehensiveTests();
+            const duration = Math.round(performance.now() - start);
+            const msg = result.summary.passedTests + '/' + result.summary.totalTests + ' ناجح (' + result.summary.successRate.toFixed(1) + '%)';
+            
+            return {
+              testId: 'comprehensive-all',
+              testName: 'جميع الاختبارات الشاملة',
+              category: 'comprehensive-100',
+              success: result.summary.successRate >= 80,
+              duration,
+              message: msg,
+              details: { results: [
+                ...result.services.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
+                ...result.database.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
+                ...result.hooks.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
+              ]},
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return {
+              testId: 'comprehensive-all',
+              testName: 'جميع الاختبارات الشاملة',
+              category: 'comprehensive-100',
+              success: false,
+              duration: Math.round(performance.now() - start),
+              message: err.message,
+              timestamp: new Date()
+            };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-services',
+        name: 'الخدمات الشاملة (60+)',
+        description: 'اختبار جميع الخدمات',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runServicesComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-services',
+              testName: 'الخدمات الشاملة',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-services', testName: 'الخدمات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-database',
+        name: 'قاعدة البيانات الشاملة (60+)',
+        description: 'اختبار جميع الجداول',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runDatabaseComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-database',
+              testName: 'قاعدة البيانات',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-database', testName: 'قاعدة البيانات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-hooks',
+        name: 'Hooks الشاملة (250+)',
+        description: 'اختبار جميع الـ Hooks',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runHooksComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-hooks',
+              testName: 'Hooks الشاملة',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-hooks', testName: 'Hooks', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-security',
+        name: 'الأمان الشامل (75+)',
+        description: 'اختبار جميع جوانب الأمان',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runSecurityComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-security',
+              testName: 'الأمان الشامل',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-security', testName: 'الأمان', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-edge-functions',
+        name: 'Edge Functions الشاملة (53+)',
+        description: 'اختبار جميع وظائف الخادم',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runEdgeFunctionsComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-edge-functions',
+              testName: 'Edge Functions',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-edge-functions', testName: 'Edge Functions', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-performance',
+        name: 'الأداء الشامل (50+)',
+        description: 'اختبار الأداء الحقيقي',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runPerformanceComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-performance',
+              testName: 'الأداء الشامل',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-performance', testName: 'الأداء', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-components',
+        name: 'المكونات الشاملة (100+)',
+        description: 'اختبار جميع المكونات',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runComponentsComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-components',
+              testName: 'المكونات',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-components', testName: 'المكونات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-pages',
+        name: 'الصفحات الشاملة (83+)',
+        description: 'اختبار جميع الصفحات',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runPagesComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-pages',
+              testName: 'الصفحات',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-pages', testName: 'الصفحات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-contexts',
+        name: 'السياقات الشاملة (21+)',
+        description: 'اختبار جميع السياقات',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runContextsComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-contexts',
+              testName: 'السياقات',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-contexts', testName: 'السياقات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-libraries',
+        name: 'المكتبات الشاملة (45+)',
+        description: 'اختبار جميع المكتبات',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runLibrariesComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-libraries',
+              testName: 'المكتبات',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-libraries', testName: 'المكتبات', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
+      {
+        id: 'comprehensive-integration',
+        name: 'التكامل الشامل (50+)',
+        description: 'اختبار تدفقات التكامل',
+        category: 'comprehensive-100',
+        run: async () => {
+          const start = performance.now();
+          try {
+            const results = await runIntegrationComprehensiveTests();
+            const passed = results.filter((r: any) => r.passed || r.status === 'passed').length;
+            return {
+              testId: 'comprehensive-integration',
+              testName: 'التكامل',
+              category: 'comprehensive-100',
+              success: passed / results.length >= 0.8,
+              duration: Math.round(performance.now() - start),
+              message: passed + '/' + results.length + ' ناجح',
+              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              timestamp: new Date()
+            };
+          } catch (err: any) {
+            return { testId: 'comprehensive-integration', testName: 'التكامل', category: 'comprehensive-100', success: false, duration: Math.round(performance.now() - start), message: err.message, timestamp: new Date() };
+          }
+        }
+      },
     ]
   },
 ];
