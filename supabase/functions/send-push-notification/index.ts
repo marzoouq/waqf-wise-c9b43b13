@@ -87,10 +87,18 @@ serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح (100 إشعار/دقيقة). يرجى الانتظار.', 429);
     }
 
-    const { userId, title, body, icon, badge, data, actionUrl } = await req.json();
+    // Parse body - استخدام النص المحفوظ من health check
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(bodyClone);
+    } catch {
+      return errorResponse('Invalid JSON body', 400);
+    }
+    
+    const { userId, title, body: notificationBody, icon, badge, data, actionUrl } = parsedBody;
 
-    if (!userId || !title || !body) {
-      throw new Error('userId, title, and body are required');
+    if (!userId || !title || !notificationBody) {
+      return errorResponse('userId, title, and body are required', 400);
     }
 
     // الحصول على اشتراكات المستخدم
@@ -140,7 +148,7 @@ serve(async (req) => {
       .insert({
         user_id: userId,
         title,
-        message: body,
+        message: notificationBody,
         type: 'info',
         action_url: actionUrl,
         is_read: false,

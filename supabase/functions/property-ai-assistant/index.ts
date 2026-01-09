@@ -107,7 +107,21 @@ serve(async (req) => {
 
     console.log('Authenticated user for property AI:', user.id, 'Rate limit remaining:', rateCheck.remaining);
 
-    const { action, data } = await req.json();
+    // Parse body - استخدام النص المحفوظ من health check
+    let body;
+    try {
+      body = JSON.parse(bodyClone);
+    } catch {
+      return errorResponse('Invalid JSON body', 400);
+    }
+    
+    const { action, data } = body;
+    
+    // التحقق من وجود action
+    if (!action) {
+      return errorResponse('Action is required', 400);
+    }
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
