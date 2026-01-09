@@ -43,12 +43,13 @@ serve(async (req) => {
     if (bodyClone) {
       try {
         const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck) {
-          console.log('[property-ai-assistant] Health check received');
+        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
+          console.log('[property-ai-assistant] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',
             function: 'property-ai-assistant',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            version: '2.1.0'
           });
         }
       } catch { /* not JSON, continue */ }
