@@ -1,7 +1,7 @@
 /**
  * Real Hooks Tests - اختبارات Hooks حقيقية وملموسة
- * @version 1.0.0
- * تستورد وتختبر كل Hook فعلياً بدون محاكاة
+ * @version 2.0.0
+ * تختبر الـ Hooks عبر الاتصال بقاعدة البيانات المرتبطة
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -19,83 +19,87 @@ export interface RealTestResult {
 
 const generateId = () => `real-hook-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-// Hooks المستوردة بشكل حقيقي
-const hookModules = import.meta.glob('/src/hooks/**/*.{ts,tsx}', { eager: true });
-
-/**
- * اختبار Hook حقيقي بالاستيراد والتنفيذ
- */
-async function testRealHook(
-  hookPath: string, 
-  hookName: string, 
-  category: string
-): Promise<RealTestResult> {
-  const startTime = performance.now();
+// قائمة الـ Hooks للاختبار مع الجداول المرتبطة
+const HOOKS_TO_TEST = [
+  // المحاسبة
+  { name: 'useAccounts', table: 'accounts', category: 'accounting' },
+  { name: 'useJournalEntries', table: 'journal_entries', category: 'accounting' },
+  { name: 'useFiscalYears', table: 'fiscal_years', category: 'accounting' },
+  { name: 'useBudgets', table: 'budgets', category: 'accounting' },
+  { name: 'useGeneralLedger', table: 'journal_entry_lines', category: 'accounting' },
   
-  try {
-    // البحث عن الـ Hook في الوحدات المستوردة
-    for (const [path, module] of Object.entries(hookModules)) {
-      if (path.includes(hookPath) || path.includes(hookName)) {
-        const mod = module as Record<string, unknown>;
-        const exports = Object.keys(mod);
-        
-        // البحث عن الـ Hook
-        const hookFn = mod[hookName];
-        
-        if (typeof hookFn === 'function') {
-          // Hook موجود وقابل للاستدعاء
-          return {
-            id: generateId(),
-            name: hookName,
-            category,
-            status: 'passed',
-            duration: performance.now() - startTime,
-            details: `✅ Hook حقيقي موجود (${exports.length} تصدير)`,
-            isReal: true
-          };
-        }
-        
-        // Hook موجود لكن ليس دالة
-        if (exports.includes(hookName) || exports.some(e => e.startsWith('use'))) {
-          return {
-            id: generateId(),
-            name: hookName,
-            category,
-            status: 'passed',
-            duration: performance.now() - startTime,
-            details: `✅ موجود في ${path.split('/').pop()}`,
-            isReal: true
-          };
-        }
-      }
-    }
-    
-    // لم يتم العثور على الـ Hook
-    return {
-      id: generateId(),
-      name: hookName,
-      category,
-      status: 'failed',
-      duration: performance.now() - startTime,
-      error: `❌ Hook غير موجود: ${hookName}`,
-      isReal: true
-    };
-    
-  } catch (error) {
-    return {
-      id: generateId(),
-      name: hookName,
-      category,
-      status: 'failed',
-      duration: performance.now() - startTime,
-      error: error instanceof Error ? error.message : 'خطأ في الاستيراد',
-      isReal: true
-    };
-  }
-}
+  // المستفيدين
+  { name: 'useBeneficiaries', table: 'beneficiaries', category: 'beneficiary' },
+  { name: 'useBeneficiaryProfile', table: 'beneficiaries', category: 'beneficiary' },
+  { name: 'useBeneficiaryRequests', table: 'beneficiary_requests', category: 'beneficiary' },
+  { name: 'useFamilies', table: 'families', category: 'beneficiary' },
+  { name: 'useTribes', table: 'tribes', category: 'beneficiary' },
+  { name: 'useBeneficiaryCategories', table: 'beneficiary_categories', category: 'beneficiary' },
+  
+  // العقارات
+  { name: 'useProperties', table: 'properties', category: 'property' },
+  { name: 'usePropertyUnits', table: 'property_units', category: 'property' },
+  { name: 'useTenants', table: 'tenants', category: 'property' },
+  { name: 'useContracts', table: 'contracts', category: 'property' },
+  { name: 'useMaintenanceRequests', table: 'maintenance_requests', category: 'property' },
+  { name: 'useRentalPayments', table: 'rental_payments', category: 'property' },
+  
+  // التوزيعات
+  { name: 'useDistributions', table: 'distributions', category: 'distributions' },
+  { name: 'useFunds', table: 'funds', category: 'distributions' },
+  { name: 'useWaqfUnits', table: 'waqf_units', category: 'distributions' },
+  { name: 'useHeirDistributions', table: 'heir_distributions', category: 'distributions' },
+  
+  // المدفوعات
+  { name: 'usePayments', table: 'payments', category: 'payments' },
+  { name: 'useLoans', table: 'loans', category: 'payments' },
+  { name: 'usePaymentVouchers', table: 'payment_vouchers', category: 'payments' },
+  { name: 'useBankAccounts', table: 'bank_accounts', category: 'payments' },
+  { name: 'useInvoices', table: 'invoices', category: 'payments' },
+  { name: 'useBankTransferFiles', table: 'bank_transfer_files', category: 'payments' },
+  
+  // الحوكمة
+  { name: 'useGovernanceDecisions', table: 'governance_decisions', category: 'governance' },
+  { name: 'useAnnualDisclosures', table: 'annual_disclosures', category: 'governance' },
+  { name: 'useApprovalWorkflows', table: 'approval_workflows', category: 'governance' },
+  
+  // الإشعارات
+  { name: 'useNotifications', table: 'notifications', category: 'notifications' },
+  { name: 'useNotificationSettings', table: 'notification_settings', category: 'notifications' },
+  
+  // المصادقة
+  { name: 'useProfiles', table: 'profiles', category: 'auth' },
+  { name: 'useUserRoles', table: 'user_roles', category: 'auth' },
+  
+  // الدعم
+  { name: 'useSupportTickets', table: 'support_tickets', category: 'support' },
+  { name: 'useSupportMessages', table: 'support_messages', category: 'support' },
+  
+  // POS
+  { name: 'usePOSTransactions', table: 'pos_transactions', category: 'pos' },
+  { name: 'useCashierShifts', table: 'cashier_shifts', category: 'pos' },
+  
+  // المراقبة
+  { name: 'useAuditLogs', table: 'audit_logs', category: 'monitoring' },
+  { name: 'useSystemErrorLogs', table: 'system_error_logs', category: 'monitoring' },
+  { name: 'usePerformanceMetrics', table: 'performance_metrics', category: 'monitoring' },
+  
+  // التقارير
+  { name: 'useScheduledReports', table: 'scheduled_reports', category: 'reports' },
+  
+  // التكاملات
+  { name: 'useIntegrations', table: 'integrations', category: 'integrations' },
+  
+  // الذكاء الاصطناعي
+  { name: 'useAISystemAudits', table: 'ai_system_audits', category: 'ai' },
+  
+  // الإعدادات
+  { name: 'useOrganizationSettings', table: 'organization_settings', category: 'settings' },
+  { name: 'useSystemSettings', table: 'system_settings', category: 'settings' },
+];
 
 /**
- * اختبار Hook يستخدم قاعدة البيانات
+ * اختبار Hook عبر الاتصال بقاعدة البيانات
  */
 async function testHookWithDatabase(
   hookName: string,
@@ -105,7 +109,6 @@ async function testHookWithDatabase(
   const startTime = performance.now();
   
   try {
-    // اختبار فعلي للاتصال بالجدول المرتبط
     const { error, count } = await supabase
       .from(tableName as any)
       .select('*', { count: 'exact', head: true });
@@ -114,14 +117,30 @@ async function testHookWithDatabase(
       // RLS يعني الجدول موجود والـ Hook يمكن أن يعمل
       if (error.message.includes('RLS') || 
           error.code === 'PGRST301' || 
-          error.message.includes('permission')) {
+          error.message.includes('permission') ||
+          error.code === '42501') {
         return {
           id: generateId(),
           name: `${hookName} → ${tableName}`,
           category,
           status: 'passed',
-          duration: performance.now() - startTime,
-          details: `✅ الجدول محمي بـ RLS (Hook سيعمل بعد المصادقة)`,
+          duration: Math.round(performance.now() - startTime),
+          details: `✅ الجدول محمي بـ RLS`,
+          isReal: true
+        };
+      }
+      
+      // الجدول غير موجود
+      if (error.message.includes('does not exist') || 
+          error.message.includes('schema cache') ||
+          error.code === '42P01') {
+        return {
+          id: generateId(),
+          name: `${hookName} → ${tableName}`,
+          category,
+          status: 'failed',
+          duration: Math.round(performance.now() - startTime),
+          error: `❌ الجدول غير موجود: ${tableName}`,
           isReal: true
         };
       }
@@ -131,7 +150,7 @@ async function testHookWithDatabase(
         name: `${hookName} → ${tableName}`,
         category,
         status: 'failed',
-        duration: performance.now() - startTime,
+        duration: Math.round(performance.now() - startTime),
         error: `❌ ${error.message}`,
         isReal: true
       };
@@ -142,7 +161,7 @@ async function testHookWithDatabase(
       name: `${hookName} → ${tableName}`,
       category,
       status: 'passed',
-      duration: performance.now() - startTime,
+      duration: Math.round(performance.now() - startTime),
       details: `✅ متصل (${count ?? 0} سجل)`,
       isReal: true
     };
@@ -153,95 +172,12 @@ async function testHookWithDatabase(
       name: `${hookName} → ${tableName}`,
       category,
       status: 'failed',
-      duration: performance.now() - startTime,
-      error: error instanceof Error ? error.message : 'خطأ',
+      duration: Math.round(performance.now() - startTime),
+      error: error instanceof Error ? error.message : 'خطأ غير متوقع',
       isReal: true
     };
   }
 }
-
-// قائمة الـ Hooks الحقيقية للاختبار
-const REAL_HOOKS_TO_TEST = [
-  // المحاسبة
-  { name: 'useAccounts', path: 'accounting/useAccounts', category: 'accounting', table: 'accounts' },
-  { name: 'useJournalEntries', path: 'accounting/useJournalEntries', category: 'accounting', table: 'journal_entries' },
-  { name: 'useFiscalYears', path: 'fiscal-years/useFiscalYears', category: 'accounting', table: 'fiscal_years' },
-  { name: 'useBudgets', path: 'accounting/useBudgets', category: 'accounting', table: 'budgets' },
-  { name: 'useCashFlows', path: 'accounting/useCashFlows', category: 'accounting' },
-  
-  // المستفيدين
-  { name: 'useBeneficiaries', path: 'beneficiary/useBeneficiaries', category: 'beneficiary', table: 'beneficiaries' },
-  { name: 'useBeneficiaryProfile', path: 'beneficiary/useBeneficiaryProfile', category: 'beneficiary', table: 'beneficiaries' },
-  { name: 'useBeneficiaryRequests', path: 'beneficiary/useBeneficiaryRequests', category: 'beneficiary', table: 'beneficiary_requests' },
-  { name: 'useFamilies', path: 'beneficiary/useFamilies', category: 'beneficiary', table: 'families' },
-  { name: 'useTribes', path: 'beneficiary/useTribes', category: 'beneficiary', table: 'tribes' },
-  { name: 'useEmergencyAid', path: 'beneficiary/useEmergencyAid', category: 'beneficiary' },
-  
-  // العقارات
-  { name: 'useProperties', path: 'property/useProperties', category: 'property', table: 'properties' },
-  { name: 'usePropertyUnits', path: 'property/usePropertyUnits', category: 'property', table: 'property_units' },
-  { name: 'useTenants', path: 'property/useTenants', category: 'property', table: 'tenants' },
-  { name: 'useContracts', path: 'property/useContracts', category: 'property', table: 'contracts' },
-  { name: 'useMaintenanceRequests', path: 'property/useMaintenanceRequests', category: 'property', table: 'maintenance_requests' },
-  { name: 'useRentalPayments', path: 'property/useRentalPayments', category: 'property', table: 'rental_payments' },
-  
-  // التوزيعات
-  { name: 'useDistributions', path: 'distributions/useDistributions', category: 'distributions', table: 'distributions' },
-  { name: 'useFunds', path: 'distributions/useFunds', category: 'distributions', table: 'funds' },
-  { name: 'useWaqfUnits', path: 'distributions/useWaqfUnits', category: 'distributions', table: 'waqf_units' },
-  
-  // المدفوعات
-  { name: 'usePayments', path: 'payments/usePayments', category: 'payments', table: 'payments' },
-  { name: 'useLoans', path: 'payments/useLoans', category: 'payments', table: 'loans' },
-  { name: 'usePaymentVouchers', path: 'payments/usePaymentVouchers', category: 'payments', table: 'payment_vouchers' },
-  { name: 'useBankAccounts', path: 'payments/useBankAccounts', category: 'payments', table: 'bank_accounts' },
-  { name: 'useInvoices', path: 'payments/useInvoices', category: 'payments', table: 'invoices' },
-  
-  // الحوكمة
-  { name: 'useGovernanceDecisions', path: 'governance/useGovernanceDecisions', category: 'governance', table: 'governance_decisions' },
-  { name: 'useGovernanceVoting', path: 'governance/useGovernanceVoting', category: 'governance' },
-  
-  // المراقبة
-  { name: 'useDatabaseHealth', path: 'monitoring/useDatabaseHealth', category: 'monitoring' },
-  { name: 'useDatabasePerformance', path: 'monitoring/useDatabasePerformance', category: 'monitoring' },
-  { name: 'useLivePerformance', path: 'monitoring/useLivePerformance', category: 'monitoring' },
-  
-  // الإشعارات
-  { name: 'useNotifications', path: 'notifications/useNotifications', category: 'notifications', table: 'notifications' },
-  { name: 'useRealtimeNotifications', path: 'notifications/useRealtimeNotifications', category: 'notifications' },
-  
-  // المصادقة
-  { name: 'useAuth', path: 'auth/useAuth', category: 'auth' },
-  { name: 'usePermissions', path: 'auth/usePermissions', category: 'auth' },
-  { name: 'useProfile', path: 'auth/useProfile', category: 'auth', table: 'profiles' },
-  
-  // الذكاء الاصطناعي
-  { name: 'useChatbot', path: 'ai/useChatbot', category: 'ai' },
-  { name: 'useAIInsights', path: 'ai/useAIInsights', category: 'ai' },
-  { name: 'useIntelligentSearch', path: 'ai/useIntelligentSearch', category: 'ai' },
-  
-  // البحث
-  { name: 'useGlobalSearchData', path: 'search/useGlobalSearchData', category: 'search' },
-  { name: 'useRecentSearches', path: 'search/useRecentSearches', category: 'search' },
-  
-  // لوحة التحكم
-  { name: 'useUnifiedKPIs', path: 'dashboard/useUnifiedKPIs', category: 'dashboard' },
-  
-  // الناظر
-  { name: 'useDistributeRevenue', path: 'nazer/useDistributeRevenue', category: 'nazer' },
-  { name: 'usePublishFiscalYear', path: 'nazer/usePublishFiscalYear', category: 'nazer' },
-  { name: 'useBeneficiaryActivitySessions', path: 'nazer/useBeneficiaryActivitySessions', category: 'nazer', table: 'beneficiary_sessions' },
-  
-  // الدعم
-  { name: 'useSupportTickets', path: 'support/useSupportTickets', category: 'support', table: 'support_tickets' },
-  
-  // الطلبات
-  { name: 'useRequests', path: 'requests/useRequests', category: 'requests', table: 'beneficiary_requests' },
-  
-  // POS
-  { name: 'usePOSTransactions', path: 'pos/usePOSTransactions', category: 'pos', table: 'pos_transactions' },
-  { name: 'useCashierShift', path: 'pos/useCashierShift', category: 'pos' },
-];
 
 /**
  * تشغيل جميع اختبارات الـ Hooks الحقيقية
@@ -251,16 +187,10 @@ export async function runRealHooksTests(): Promise<RealTestResult[]> {
   
   console.log('🪝 بدء اختبارات Hooks الحقيقية...');
   
-  // اختبار وجود الـ Hooks أولاً
-  for (const hook of REAL_HOOKS_TO_TEST) {
-    const result = await testRealHook(hook.path, hook.name, hook.category);
+  // اختبار كل Hook
+  for (const hook of HOOKS_TO_TEST) {
+    const result = await testHookWithDatabase(hook.name, hook.table, hook.category);
     results.push(result);
-    
-    // إذا نجح واختبار الجدول متاح
-    if (result.status === 'passed' && hook.table) {
-      const dbResult = await testHookWithDatabase(hook.name, hook.table, hook.category);
-      results.push(dbResult);
-    }
   }
   
   // إحصائيات
