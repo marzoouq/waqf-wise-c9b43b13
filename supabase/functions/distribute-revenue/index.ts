@@ -50,23 +50,30 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[distribute-revenue] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'distribute-revenue',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم تنفيذ توزيع فعلي' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[distribute-revenue] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'distribute-revenue',
+        testMode: !!bodyData.testMode,
+        message: bodyData.testMode ? 'اختبار ناجح - لم يتم تنفيذ توزيع فعلي' : undefined,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -100,8 +107,12 @@ Deno.serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح. يرجى الانتظار ساعة قبل المحاولة مرة أخرى.', 429);
     }
 
-    const body: DistributionRequest = await req.json();
-    const { totalAmount, fiscalYearId, distributionDate, notes, notifyHeirs } = body;
+    // ✅ استخدام bodyData المحفوظة
+    const totalAmount = bodyData.totalAmount as number | undefined;
+    const fiscalYearId = bodyData.fiscalYearId as string | undefined;
+    const distributionDate = bodyData.distributionDate as string | undefined;
+    const notes = bodyData.notes as string | undefined;
+    const notifyHeirs = bodyData.notifyHeirs as boolean | undefined;
 
     // التحقق من البيانات المطلوبة
     if (!totalAmount || typeof totalAmount !== 'number' || totalAmount <= 0) {

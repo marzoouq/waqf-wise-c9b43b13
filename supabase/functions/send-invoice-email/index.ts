@@ -20,29 +20,35 @@ const handler = async (req: Request): Promise<Response> => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let body: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[send-invoice-email] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'send-invoice-email',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم إرسال بريد فعلي' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        body = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
 
-    const body = await req.json();
-    const invoiceId = body.invoiceId || '';
-    const customerEmail = body.customerEmail || '';
-    const customerName = body.customerName || 'العميل الكريم';
-    const invoiceNumber = body.invoiceNumber || 'غير محدد';
+    // ✅ Health Check Support
+    if (body.ping || body.healthCheck || body.testMode) {
+      console.log('[send-invoice-email] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'send-invoice-email',
+        testMode: !!body.testMode,
+        message: body.testMode ? 'اختبار ناجح - لم يتم إرسال بريد فعلي' : undefined,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ✅ استخدام body المحفوظة
+    const invoiceId = (body.invoiceId as string) || '';
+    const customerEmail = (body.customerEmail as string) || '';
+    const customerName = (body.customerName as string) || 'العميل الكريم';
+    const invoiceNumber = (body.invoiceNumber as string) || 'غير محدد';
     const totalAmount = typeof body.totalAmount === 'number' ? body.totalAmount : 0;
 
     // التحقق من البيانات المطلوبة

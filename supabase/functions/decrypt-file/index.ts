@@ -40,20 +40,27 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    try {
-      const bodyClone = await req.clone().json();
-      if (bodyClone.ping || bodyClone.healthCheck || bodyClone.testMode) {
-        console.log('[DECRYPT-FILE] Health check / test mode received');
-        return jsonResponse({
-          status: 'healthy',
-          function: 'decrypt-file',
-          timestamp: new Date().toISOString(),
-          version: '2.1.0'
-        });
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
+      try {
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
       }
-    } catch {
-      // ليس JSON أو فارغ، استمر في المعالجة العادية
+    }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[DECRYPT-FILE] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'decrypt-file',
+        timestamp: new Date().toISOString(),
+        version: '2.1.0'
+      });
     }
 
     const supabase = createClient(
@@ -79,10 +86,12 @@ serve(async (req) => {
       return rateLimitResponse('تم تجاوز حد المحاولات. انتظر دقيقة');
     }
 
-    const { fileId, accessReason } = await req.json();
+    // ✅ استخدام bodyData المحفوظة
+    const fileId = bodyData.fileId as string | undefined;
+    const accessReason = bodyData.accessReason as string | undefined;
 
     if (!fileId) {
-      throw new Error('معرف الملف مطلوب');
+      return errorResponse('معرف الملف مطلوب', 400);
     }
 
     console.log(`🔓 طلب فك تشفير ملف: ${fileId} من المستخدم: ${user.id}`);

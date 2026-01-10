@@ -32,23 +32,30 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[zatca-submit] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'zatca-submit',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم إرسال فعلي لزاتكا' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[zatca-submit] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'zatca-submit',
+        testMode: !!bodyData.testMode,
+        message: bodyData.testMode ? 'اختبار ناجح - لم يتم إرسال فعلي لزاتكا' : undefined,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // ============ التحقق من المصادقة والصلاحيات ============
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -83,9 +90,13 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية إرسال الفواتير لهيئة الزكاة والضريبة');
     }
 
-    // ============ نهاية التحقق من المصادقة ============
+    // ============ استخدام bodyData المحفوظة ============
+    const invoice_id = bodyData.invoice_id as string | undefined;
+    const submission_type = (bodyData.submission_type as 'reporting' | 'clearance') || 'reporting';
 
-    const { invoice_id, submission_type }: ZATCASubmitRequest = await req.json();
+    if (!invoice_id) {
+      return errorResponse('معرف الفاتورة مطلوب', 400);
+    }
 
     // جلب الفاتورة
     const { data: invoice, error: invoiceError } = await supabase
@@ -95,7 +106,7 @@ serve(async (req) => {
       .single();
 
     if (invoiceError || !invoice) {
-      throw new Error('لم يتم العثور على الفاتورة');
+      return errorResponse('لم يتم العثور على الفاتورة', 404);
     }
 
     // التحقق من اكتمال البيانات
