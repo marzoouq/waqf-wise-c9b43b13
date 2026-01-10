@@ -69,10 +69,12 @@ export function initializeSupabaseInterceptor(): void {
         });
       }
 
-      // تسجيل الأخطاء (تقليل في وضع الاختبار)
+      // تسجيل الأخطاء (تجاهل Edge Functions في وضع الاختبار)
       if (!response.ok && url.includes('supabase')) {
-        // في وضع الاختبار، تجاهل أخطاء 429 و 500+
-        if (!testingMode || (response.status !== 429 && response.status < 500)) {
+        // في وضع الاختبار، تجاهل جميع أخطاء Edge Functions (400/401/403)
+        const isEdgeFunction = url.includes('/functions/v1/');
+        const shouldLog = !testingMode || (!isEdgeFunction && response.status >= 500);
+        if (shouldLog) {
           connectionMonitor.logApiError(url, response.status, response.statusText);
         }
       }
