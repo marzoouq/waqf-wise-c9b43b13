@@ -31,6 +31,18 @@ export const IGNORE_ERROR_PATTERNS: RegExp[] = [
   /workbox/i,
   /Service Worker/i,
   /precache/i,
+  // ✅ تجاهل أخطاء Edge Functions المتوقعة في الاختبارات
+  /Edge function returned (400|401|403)/i,
+  /Missing credentialId/i,
+  /Admin role required/i,
+  /معرف الملف مطلوب/i,
+  /البيانات المطلوبة/i,
+  /userId.*required/i,
+  /testMode/i,
+  /healthCheck/i,
+  /يجب تقديم/i,
+  /يجب تحديد/i,
+  /Forbidden:/i,
 ];
 
 // الإعدادات الافتراضية

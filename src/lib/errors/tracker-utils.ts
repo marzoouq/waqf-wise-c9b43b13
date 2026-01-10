@@ -104,3 +104,30 @@ export function isAuthRelatedUrl(url: string): boolean {
          url.includes('auth/v1/user') ||
          url.includes('auth/v1/session');
 }
+
+/**
+ * قائمة أخطاء Edge Functions المتوقعة في الاختبارات
+ */
+const EXPECTED_EDGE_FUNCTION_ERRORS = [
+  'Missing credentialId',
+  'Admin role required',
+  'معرف الملف مطلوب',
+  'البيانات المطلوبة',
+  'required',
+  'مطلوب',
+  'testMode',
+  'healthCheck',
+  'Forbidden',
+  'يجب تقديم',
+  'يجب تحديد',
+];
+
+/**
+ * فحص إذا كان الخطأ متوقع من Edge Function
+ */
+export function isExpectedEdgeFunctionError(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return EXPECTED_EDGE_FUNCTION_ERRORS.some(err => 
+    lowerMessage.includes(err.toLowerCase())
+  );
+}
