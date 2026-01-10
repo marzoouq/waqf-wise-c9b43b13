@@ -1595,9 +1595,9 @@ const ALL_TESTS: TestCategory[] = [
         return true; // نجاح حتى لو تطلب صلاحيات
       }),
       // Edge Functions الحقيقية
-      createEdgeFunctionTest('chatbot-real', 'chatbot الحقيقي', { testMode: true, ping: true }),
-      createEdgeFunctionTest('db-health-check-real', 'db-health-check الحقيقي', { testMode: true }),
-      createEdgeFunctionTest('log-error-real', 'log-error الحقيقي', { testMode: true }),
+      createEdgeFunctionTest('chatbot', 'chatbot الحقيقي', { testMode: true, ping: true, healthCheck: true }),
+      createEdgeFunctionTest('db-health-check', 'db-health-check الحقيقي', { testMode: true, healthCheck: true }),
+      createEdgeFunctionTest('log-error', 'log-error الحقيقي', { testMode: true, healthCheck: true }),
     ]
   },
   
