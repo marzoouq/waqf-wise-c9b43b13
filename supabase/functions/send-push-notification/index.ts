@@ -35,22 +35,29 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[send-push-notification] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'send-push-notification',
-            timestamp: new Date().toISOString(),
-            version: '2.1.0'
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[send-push-notification] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'send-push-notification',
+        timestamp: new Date().toISOString(),
+        version: '2.1.0'
+      });
+    }
+
     // التحقق من JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -87,15 +94,14 @@ serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح (100 إشعار/دقيقة). يرجى الانتظار.', 429);
     }
 
-    // Parse body - استخدام النص المحفوظ من health check
-    let parsedBody;
-    try {
-      parsedBody = JSON.parse(bodyClone);
-    } catch {
-      return errorResponse('Invalid JSON body', 400);
-    }
-    
-    const { userId, title, body: notificationBody, icon, badge, data, actionUrl } = parsedBody;
+    // ✅ استخدام bodyData المحفوظة
+    const userId = bodyData.userId as string | undefined;
+    const title = bodyData.title as string | undefined;
+    const notificationBody = bodyData.body as string | undefined;
+    const icon = bodyData.icon as string | undefined;
+    const badge = bodyData.badge as string | undefined;
+    const data = bodyData.data as Record<string, unknown> | undefined;
+    const actionUrl = bodyData.actionUrl as string | undefined;
 
     if (!userId || !title || !notificationBody) {
       return errorResponse('userId, title, and body are required', 400);

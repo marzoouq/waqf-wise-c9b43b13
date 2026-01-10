@@ -37,23 +37,30 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[restore-database] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'restore-database',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم تنفيذ استعادة فعلية' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[restore-database] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'restore-database',
+        testMode: !!bodyData.testMode,
+        message: bodyData.testMode ? 'اختبار ناجح - لم يتم تنفيذ استعادة فعلية' : undefined,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // ============ التحقق من المصادقة والصلاحيات ============
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -126,10 +133,11 @@ serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح للاستعادة (3 مرات يومياً). حاول غداً.', 429);
     }
 
-    // ============ تنفيذ الاستعادة ============
+    // ============ استخدام bodyData المحفوظة ============
     console.log(`⚠️ Database restore initiated by ADMIN: ${user.id}`);
 
-    const { backupData, mode = 'replace' } = await req.json();
+    const backupData = bodyData.backupData as { data?: Record<string, unknown[]>; version?: string; created_at?: string; metadata?: { totalTables?: number } } | undefined;
+    const mode = (bodyData.mode as string) || 'replace';
     
     if (!backupData || !backupData.data) {
       return errorResponse('صيغة ملف النسخ الاحتياطي غير صالحة', 400);

@@ -38,22 +38,29 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[property-ai-assistant] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'property-ai-assistant',
-            timestamp: new Date().toISOString(),
-            version: '2.1.0'
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[property-ai-assistant] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'property-ai-assistant',
+        timestamp: new Date().toISOString(),
+        version: '2.1.0'
+      });
+    }
+
     // ✅ التحقق من المصادقة - إصلاح أمني
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -107,15 +114,9 @@ serve(async (req) => {
 
     console.log('Authenticated user for property AI:', user.id, 'Rate limit remaining:', rateCheck.remaining);
 
-    // Parse body - استخدام النص المحفوظ من health check
-    let body;
-    try {
-      body = JSON.parse(bodyClone);
-    } catch {
-      return errorResponse('Invalid JSON body', 400);
-    }
-    
-    const { action, data } = body;
+    // ✅ استخدام bodyData المحفوظة
+    const action = bodyData.action as string | undefined;
+    const data = (bodyData.data || {}) as Record<string, unknown>;
     
     // التحقق من وجود action
     if (!action) {

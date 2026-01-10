@@ -20,22 +20,28 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[cleanup-old-files] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'cleanup-old-files',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم تنظيف ملفات فعلية' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        // ليس JSON صالح - نستمر
+      }
+    }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[cleanup-old-files] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'cleanup-old-files',
+        testMode: !!bodyData.testMode,
+        message: bodyData.testMode ? 'اختبار ناجح - لم يتم تنظيف ملفات فعلية' : undefined,
+        timestamp: new Date().toISOString()
+      });
     }
     // 1. التحقق من المصادقة والصلاحيات
     const authHeader = req.headers.get('Authorization');

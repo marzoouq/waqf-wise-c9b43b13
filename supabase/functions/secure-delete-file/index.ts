@@ -41,23 +41,30 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ Health Check Support
-    const bodyClone = await req.clone().text();
-    if (bodyClone) {
+    // ✅ قراءة body مرة واحدة فقط
+    const bodyText = await req.text();
+    let bodyData: Record<string, unknown> = {};
+    
+    if (bodyText) {
       try {
-        const parsed = JSON.parse(bodyClone);
-        if (parsed.ping || parsed.healthCheck || parsed.testMode) {
-          console.log('[secure-delete-file] Health check / test mode received');
-          return jsonResponse({
-            status: 'healthy',
-            function: 'secure-delete-file',
-            testMode: !!parsed.testMode,
-            message: parsed.testMode ? 'اختبار ناجح - لم يتم حذف ملفات فعلية' : undefined,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch { /* not JSON, continue */ }
+        bodyData = JSON.parse(bodyText);
+      } catch {
+        return errorResponse('Invalid JSON body', 400);
+      }
     }
+
+    // ✅ Health Check Support
+    if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
+      console.log('[secure-delete-file] Health check / test mode received');
+      return jsonResponse({
+        status: 'healthy',
+        function: 'secure-delete-file',
+        testMode: !!bodyData.testMode,
+        message: bodyData.testMode ? 'اختبار ناجح - لم يتم حذف ملفات فعلية' : undefined,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -81,13 +88,12 @@ serve(async (req) => {
       return rateLimitResponse('تم تجاوز حد المحاولات. انتظر دقيقة');
     }
 
-    const { 
-      fileId, 
-      fileCategory = 'general',
-      deletionReason, 
-      permanentDelete = false,
-      restoreDays = 30
-    } = await req.json();
+    // ✅ استخدام bodyData المحفوظة
+    const fileId = bodyData.fileId as string | undefined;
+    const fileCategory = (bodyData.fileCategory as string) || 'general';
+    const deletionReason = bodyData.deletionReason as string | undefined;
+    const permanentDelete = (bodyData.permanentDelete as boolean) || false;
+    const restoreDays = (bodyData.restoreDays as number) || 30;
 
     if (!fileId) {
       return errorResponse('معرف الملف مطلوب', 400);
