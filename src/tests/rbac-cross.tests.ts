@@ -43,7 +43,7 @@ async function testAccountantCannotAccessSystemSettings(): Promise<RBACTestResul
   const start = performance.now();
   try {
     const { data, error } = await supabase
-      .from('system_settings')
+      .from('organization_settings')
       .select('*')
       .limit(1);
     
@@ -773,7 +773,7 @@ async function testAdditionalRBACChecks(): Promise<RBACTestResult[]> {
   const finSettingsTest = await (async () => {
     const start = performance.now();
     const { error } = await supabase
-      .from('system_settings')
+      .from('organization_settings')
       .select('id')
       .limit(1);
     

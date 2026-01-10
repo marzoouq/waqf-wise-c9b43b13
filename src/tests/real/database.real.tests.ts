@@ -84,7 +84,7 @@ const TABLES_TO_TEST = [
   // الإشعارات والدعم
   { name: 'notifications', category: 'notifications', description: 'الإشعارات' },
   { name: 'support_tickets', category: 'support', description: 'تذاكر الدعم' },
-  { name: 'messages', category: 'messages', description: 'الرسائل' },
+  { name: 'internal_messages', category: 'messages', description: 'الرسائل' },
   { name: 'knowledge_articles', category: 'knowledge', description: 'مقالات المعرفة' },
   
   // السجلات والمراقبة

@@ -296,7 +296,7 @@ const DASHBOARD_TESTS = [
     name: 'الرسائل الداخلية',
     dashboard: 'Messages',
     category: 'support',
-    tables: ['messages'],
+    tables: ['internal_messages'],
     checks: ['messages', 'threads']
   },
   {
@@ -426,7 +426,7 @@ const DASHBOARD_TESTS = [
     name: 'إدارة التكاملات',
     dashboard: 'IntegrationsManagement',
     category: 'developer',
-    tables: ['integrations'],
+    tables: ['bank_integrations'],
     checks: ['integrations', 'apis']
   },
   {

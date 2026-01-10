@@ -88,14 +88,14 @@ const HOOKS_TO_TEST = [
   { name: 'useScheduledReports', table: 'scheduled_reports', category: 'reports' },
   
   // التكاملات
-  { name: 'useIntegrations', table: 'integrations', category: 'integrations' },
+  { name: 'useIntegrations', table: 'bank_integrations', category: 'integrations' },
   
   // الذكاء الاصطناعي
   { name: 'useAISystemAudits', table: 'ai_system_audits', category: 'ai' },
   
   // الإعدادات
   { name: 'useOrganizationSettings', table: 'organization_settings', category: 'settings' },
-  { name: 'useSystemSettings', table: 'system_settings', category: 'settings' },
+  { name: 'useSystemSettings', table: 'organization_settings', category: 'settings' },
 ];
 
 /**

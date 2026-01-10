@@ -38,7 +38,7 @@ const ALL_TABLES = [
   { name: 'activities', description: 'سجل الأنشطة', category: 'core' },
   { name: 'audit_logs', description: 'سجلات التدقيق', category: 'core' },
   { name: 'notifications', description: 'الإشعارات', category: 'core' },
-  { name: 'messages', description: 'الرسائل', category: 'core' },
+  { name: 'internal_messages', description: 'الرسائل', category: 'core' },
   
   // Beneficiary Tables
   { name: 'beneficiaries', description: 'المستفيدين', category: 'beneficiary' },

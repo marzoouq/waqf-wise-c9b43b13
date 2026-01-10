@@ -196,7 +196,7 @@ const ALL_HOOKS_BY_FOLDER: Record<string, {
   // 19. الرسائل
   'messages': {
     hooks: ['useMessages', 'useInternalMessages', 'useAvailableUsers', 'useRecipients'],
-    table: 'messages',
+    table: 'internal_messages',
   },
   
   // 20. الناظر

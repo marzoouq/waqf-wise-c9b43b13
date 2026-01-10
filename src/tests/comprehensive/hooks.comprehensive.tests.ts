@@ -78,8 +78,8 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useInvoiceFormData', table: 'invoices', select: 'id', category: 'invoices', folder: 'invoices' },
 
   // ==================== messages/ (4 hooks) ====================
-  { name: 'useMessages', table: 'messages', select: 'id, subject, content, is_read', category: 'messages', folder: 'messages' },
-  { name: 'useInternalMessages', table: 'messages', select: 'id, subject', category: 'messages', folder: 'messages' },
+  { name: 'useMessages', table: 'internal_messages', select: 'id, subject, body, is_read', category: 'messages', folder: 'messages' },
+  { name: 'useInternalMessages', table: 'internal_messages', select: 'id, subject', category: 'messages', folder: 'messages' },
   { name: 'useAvailableUsers', table: 'profiles', select: 'id, full_name', category: 'messages', folder: 'messages' },
   { name: 'useRecipients', table: 'profiles', select: 'id, full_name, email', category: 'messages', folder: 'messages' },
 
@@ -119,7 +119,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useAnnualDisclosureExport', table: 'annual_disclosures', select: 'id', category: 'reports', folder: 'reports' },
   { name: 'useAnnualDisclosures', table: 'annual_disclosures', select: 'id, year, status', category: 'reports', folder: 'reports' },
   { name: 'useBeneficiaryReportsData', table: 'beneficiaries', select: 'id, status', category: 'reports', folder: 'reports' },
-  { name: 'useBudgetVarianceReport', table: 'budgets', select: 'id, total_amount', category: 'reports', folder: 'reports' },
+  { name: 'useBudgetVarianceReport', table: 'budgets', select: 'id, budgeted_amount', category: 'reports', folder: 'reports' },
   { name: 'useCashFlowReport', table: 'cash_flows', select: 'id, net_cash_flow', category: 'reports', folder: 'reports' },
   { name: 'useCustomReports', table: 'custom_reports', select: 'id, name', category: 'reports', folder: 'reports' },
   { name: 'useDetailedGeneralLedger', table: 'journal_entry_lines', select: 'id, debit_amount, credit_amount', category: 'reports', folder: 'reports' },
@@ -277,8 +277,8 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useAccounts', table: 'accounts', select: 'id, code, name_ar, account_type, account_nature, current_balance', category: 'accounting', folder: 'accounting' },
   { name: 'useJournalEntries', table: 'journal_entries', select: 'id, entry_number, entry_date, description, status, entry_type', category: 'accounting', folder: 'accounting' },
   { name: 'useFiscalYears', table: 'fiscal_years', select: 'id, name, start_date, end_date, is_active, is_closed', category: 'accounting', folder: 'accounting' },
-  { name: 'useBudgets', table: 'budgets', select: 'id, name, total_amount, fiscal_year_id, status', category: 'accounting', folder: 'accounting' },
-  { name: 'useFunds', table: 'funds', select: 'id, name, fund_type, current_balance, target_amount', category: 'accounting', folder: 'accounting' },
+  { name: 'useBudgets', table: 'budgets', select: 'id, period_type, budgeted_amount, fiscal_year_id', category: 'accounting', folder: 'accounting' },
+  { name: 'useFunds', table: 'funds', select: 'id, name, category, allocated_amount, spent_amount', category: 'accounting', folder: 'accounting' },
   { name: 'useLoans', table: 'loans', select: 'id, loan_amount, status, interest_rate, term_months', category: 'accounting', folder: 'accounting' },
 
   // ==================== distributions/ (13 hooks) ====================
@@ -312,10 +312,10 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useCashierShifts', table: 'cashier_shifts', select: 'id, cashier_id, status, opening_balance, closing_balance', category: 'pos', folder: 'pos' },
 
   // ==================== dashboard/ (10 hooks) ====================
-  { name: 'useProfiles', table: 'profiles', select: 'id, full_name, email, role, is_active', category: 'dashboard', folder: 'dashboard' },
-  { name: 'useMessagesSystem', table: 'messages', select: 'id, subject, content, is_read, created_at', category: 'dashboard', folder: 'dashboard' },
+  { name: 'useProfiles', table: 'profiles', select: 'id, full_name, email, is_active', category: 'dashboard', folder: 'dashboard' },
+  { name: 'useMessagesSystem', table: 'internal_messages', select: 'id, subject, body, is_read, created_at', category: 'dashboard', folder: 'dashboard' },
   { name: 'useActivitiesDash', table: 'activities', select: 'id, action, user_name, timestamp', category: 'dashboard', folder: 'dashboard' },
-  { name: 'useOrganizationSettings', table: 'organization_settings', select: 'id, setting_key, setting_value, is_active', category: 'dashboard', folder: 'dashboard' },
+  { name: 'useOrganizationSettings', table: 'organization_settings', select: 'id, organization_name_ar, organization_name_en', category: 'dashboard', folder: 'dashboard' },
   { name: 'useRolePermissions', table: 'role_permissions', select: 'id, role, permission_id, granted', category: 'dashboard', folder: 'dashboard' },
   { name: 'useSystemErrorLogs', table: 'system_error_logs', select: 'id, error_type, error_message, severity, created_at', category: 'dashboard', folder: 'dashboard' },
 
@@ -348,7 +348,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useDeveloperDashboardData', table: 'system_error_logs', select: 'id, severity', category: 'developer', folder: 'developer' },
 
   // ==================== admin/ (2 hooks) ====================
-  { name: 'useUserStats', table: 'profiles', select: 'id, role', category: 'admin', folder: 'admin' },
+  { name: 'useUserStats', table: 'profiles', select: 'id, is_active', category: 'admin', folder: 'admin' },
 ];
 
 /**

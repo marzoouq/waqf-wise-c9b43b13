@@ -55,7 +55,7 @@ const SERVICES_WITH_TABLES: Array<{
   { service: 'SettingsService', table: 'organization_settings', description: 'إعدادات المنظمة' },
   { service: 'SupportService', table: 'support_tickets', description: 'تذاكر الدعم' },
   { service: 'KnowledgeService', table: 'knowledge_articles', description: 'قاعدة المعرفة' },
-  { service: 'MessageService', table: 'messages', description: 'الرسائل' },
+  { service: 'MessageService', table: 'internal_messages', description: 'الرسائل' },
   { service: 'POSService', table: 'pos_transactions', description: 'معاملات نقطة البيع' },
   { service: 'RequestService', table: 'beneficiary_requests', description: 'طلبات المستفيدين' },
   { service: 'AttachmentService', table: 'beneficiary_attachments', description: 'المرفقات' },
