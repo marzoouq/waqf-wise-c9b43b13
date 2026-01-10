@@ -36,7 +36,7 @@ const ALL_CONTEXTS = [
     name: 'SettingsContext',
     description: 'سياق الإعدادات',
     file: 'src/contexts/SettingsContext.tsx',
-    dependencies: ['supabase', 'system_settings'],
+    dependencies: ['supabase', 'organization_settings'],
     provides: ['settings', 'updateSettings', 'theme', 'language']
   },
   {
@@ -105,13 +105,13 @@ async function testSingleContext(context: typeof ALL_CONTEXTS[0]): Promise<Conte
           dependenciesPassed = false;
           dependenciesError = `جدول profiles غير متاح: ${e.message}`;
         }
-      } else if (dep === 'system_settings') {
+      } else if (dep === 'organization_settings') {
         try {
-          const { error } = await supabase.from('system_settings').select('id').limit(1);
+          const { error } = await supabase.from('organization_settings').select('id').limit(1);
           if (error) throw error;
         } catch (e: any) {
           dependenciesPassed = false;
-          dependenciesError = `جدول system_settings غير متاح: ${e.message}`;
+          dependenciesError = `جدول organization_settings غير متاح: ${e.message}`;
         }
       } else if (dep === 'payments') {
         try {

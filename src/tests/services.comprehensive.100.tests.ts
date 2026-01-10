@@ -143,7 +143,7 @@ const SERVICES_METHODS_MAP: Record<string, {
     methods: ['getAll', 'getById', 'create'],
   },
   'MessageService': {
-    table: 'messages',
+    table: 'internal_messages',
     methods: ['getAll', 'getById', 'send'],
   },
   'SettingsService': {
@@ -199,7 +199,7 @@ const SERVICES_METHODS_MAP: Record<string, {
     methods: ['getAll', 'archive', 'restore'],
   },
   'HistoricalRentalService': {
-    table: 'historical_rentals',
+    table: 'historical_rental_details',
     methods: ['getAll', 'create'],
   },
   'DocumentService': {

@@ -44,11 +44,11 @@ const SERVICES_TO_TEST = [
   { name: 'POSService', table: 'pos_transactions' },
   { name: 'WaqfService', table: 'waqf_units' },
   { name: 'AuditService', table: 'audit_logs' },
-  { name: 'MessageService', table: 'messages' },
+  { name: 'MessageService', table: 'internal_messages' },
   { name: 'FiscalYearService', table: 'fiscal_years' },
   { name: 'ApprovalService', table: 'approval_workflows' },
-  { name: 'SupportMessageService', table: 'support_messages' },
-  { name: 'IntegrationService', table: 'integrations' },
+  { name: 'SupportMessageService', table: 'support_tickets' },
+  { name: 'IntegrationService', table: 'bank_integrations' },
   { name: 'ScheduledReportService', table: 'scheduled_reports' },
 ];
 
