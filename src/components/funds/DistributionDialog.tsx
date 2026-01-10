@@ -200,7 +200,7 @@ export function DistributionDialog({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>الشهر الهجري *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر الشهر" />
