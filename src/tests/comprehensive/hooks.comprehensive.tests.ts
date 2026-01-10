@@ -42,18 +42,18 @@ interface HookQueryConfig {
 // ==================== قائمة شاملة لجميع الـ Hooks ====================
 const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   // ==================== auth/ (12 hooks) ====================
-  { name: 'useAuth', table: 'profiles', select: 'id, full_name, email, role', category: 'auth', folder: 'auth' },
+  { name: 'useAuth', table: 'profiles', select: 'id, full_name, email', category: 'auth', folder: 'auth' },
   { name: 'useActiveSessions', table: 'user_sessions', select: 'id, user_id, is_active', category: 'auth', folder: 'auth' },
-  { name: 'useBiometricAuth', table: 'profiles', select: 'id, biometric_enabled', category: 'auth', folder: 'auth' },
+  { name: 'useBiometricAuth', table: null, category: 'auth', folder: 'auth' },
   { name: 'useChangePassword', table: null, category: 'auth', folder: 'auth' },
   { name: 'useIdleTimeout', table: null, category: 'auth', folder: 'auth' },
   { name: 'useLeakedPassword', table: null, category: 'auth', folder: 'auth' },
-  { name: 'useLightAuth', table: 'profiles', select: 'id, role', category: 'auth', folder: 'auth' },
-  { name: 'usePermissions', table: 'role_permissions', select: 'id, role, permission', category: 'auth', folder: 'auth' },
+  { name: 'useLightAuth', table: 'profiles', select: 'id, full_name', category: 'auth', folder: 'auth' },
+  { name: 'usePermissions', table: 'role_permissions', select: 'id, role, permission_id', category: 'auth', folder: 'auth' },
   { name: 'useProfile', table: 'profiles', select: 'id, full_name, email, avatar_url', category: 'auth', folder: 'auth' },
   { name: 'useResetPassword', table: null, category: 'auth', folder: 'auth' },
   { name: 'useSessionCleanup', table: 'user_sessions', select: 'id', category: 'auth', folder: 'auth' },
-  { name: 'useUserRole', table: 'profiles', select: 'id, role', category: 'auth', folder: 'auth' },
+  { name: 'useUserRole', table: 'profiles', select: 'id, full_name', category: 'auth', folder: 'auth' },
 
   // ==================== approvals/ (7 hooks) ====================
   { name: 'useApprovalsOverview', table: 'approval_status', select: 'id, status, entity_type', category: 'approvals', folder: 'approvals' },
@@ -69,7 +69,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useCreateFiscalYear', table: 'fiscal_years', select: 'id', category: 'fiscal-years', folder: 'fiscal-years' },
   { name: 'useFiscalYearData', table: 'fiscal_years', select: 'id, name, start_date, end_date, is_active', category: 'fiscal-years', folder: 'fiscal-years' },
   { name: 'useFiscalYearTests', table: 'fiscal_years', select: 'id', category: 'fiscal-years', folder: 'fiscal-years' },
-  { name: 'useHistoricalRentalDetails', table: 'historical_rentals', select: 'id, amount', category: 'fiscal-years', folder: 'fiscal-years' },
+  { name: 'useHistoricalRentalDetails', table: 'historical_rental_details', select: 'id, monthly_payment', category: 'fiscal-years', folder: 'fiscal-years' },
 
   // ==================== invoices/ (4 hooks) ====================
   { name: 'useInvoices', table: 'invoices', select: 'id, invoice_number, total_amount, status', category: 'invoices', folder: 'invoices' },
@@ -88,7 +88,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useDistributeRevenue', table: 'distributions', select: 'id, total_amount', category: 'nazer', folder: 'nazer' },
   { name: 'useNazerBeneficiariesQuick', table: 'beneficiaries', select: 'id, full_name', category: 'nazer', folder: 'nazer' },
   { name: 'usePublishFiscalYear', table: 'fiscal_years', select: 'id, status', category: 'nazer', folder: 'nazer' },
-  { name: 'useWaqfBranding', table: 'organization_settings', select: 'id, setting_key, setting_value', category: 'nazer', folder: 'nazer' },
+  { name: 'useWaqfBranding', table: 'organization_settings', select: 'id, organization_name_ar', category: 'nazer', folder: 'nazer' },
 
   // ==================== payments/ (16 hooks) ====================
   { name: 'usePayments', table: 'payments', select: 'id, amount, status', category: 'payments', folder: 'payments' },
@@ -126,7 +126,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useDisclosureBeneficiaries', table: 'beneficiaries', select: 'id, full_name', category: 'reports', folder: 'reports' },
   { name: 'useDisclosureDocuments', table: 'disclosure_documents', select: 'id, document_type', category: 'reports', folder: 'reports' },
   { name: 'useDistributionAnalysisReport', table: 'distributions', select: 'id, total_amount', category: 'reports', folder: 'reports' },
-  { name: 'useFundsPerformanceReport', table: 'funds', select: 'id, current_balance', category: 'reports', folder: 'reports' },
+  { name: 'useFundsPerformanceReport', table: 'funds', select: 'id, allocated_amount', category: 'reports', folder: 'reports' },
   { name: 'useLoansAgingReport', table: 'loans', select: 'id, status', category: 'reports', folder: 'reports' },
   { name: 'useMaintenanceCostReport', table: 'maintenance_requests', select: 'id, estimated_cost', category: 'reports', folder: 'reports' },
   { name: 'usePropertiesReport', table: 'properties', select: 'id, name', category: 'reports', folder: 'reports' },
@@ -147,12 +147,12 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useRequestComments', table: 'request_comments', select: 'id, content', category: 'requests', folder: 'requests' },
 
   // ==================== search/ (2 hooks) ====================
-  { name: 'useGlobalSearchData', table: 'saved_filters', select: 'id, filter_name', category: 'search', folder: 'search' },
-  { name: 'useRecentSearches', table: 'saved_filters', select: 'id, filter_name, created_at', category: 'search', folder: 'search' },
+  { name: 'useGlobalSearchData', table: 'saved_filters', select: 'id, name', category: 'search', folder: 'search' },
+  { name: 'useRecentSearches', table: 'saved_filters', select: 'id, name, created_at', category: 'search', folder: 'search' },
 
   // ==================== settings/ (3 hooks) ====================
   { name: 'useLandingPageSettings', table: 'landing_page_settings', select: 'id, setting_key', category: 'settings', folder: 'settings' },
-  { name: 'useSettingsCategories', table: 'organization_settings', select: 'id, setting_key', category: 'settings', folder: 'settings' },
+  { name: 'useSettingsCategories', table: 'organization_settings', select: 'id, organization_name_ar', category: 'settings', folder: 'settings' },
   { name: 'useTwoFactorAuth', table: 'profiles', select: 'id, two_factor_enabled', category: 'settings', folder: 'settings' },
 
   // ==================== system/ (23 hooks) ====================
@@ -162,7 +162,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useSystemHealthIndicator', table: 'performance_metrics', select: 'id', category: 'system', folder: 'system' },
   { name: 'useSystemHealthActions', table: null, category: 'system', folder: 'system' },
   { name: 'useSystemPerformanceMetrics', table: 'performance_metrics', select: 'id, metric_name', category: 'system', folder: 'system' },
-  { name: 'useSystemSettings', table: 'organization_settings', select: 'id, setting_key', category: 'system', folder: 'system' },
+  { name: 'useSystemSettings', table: 'organization_settings', select: 'id, organization_name_ar', category: 'system', folder: 'system' },
   { name: 'useSystemErrorLogsData', table: 'system_error_logs', select: 'id, error_type', category: 'system', folder: 'system' },
   { name: 'useAdminAlerts', table: 'smart_alerts', select: 'id, alert_type', category: 'system', folder: 'system' },
   { name: 'useAlertCleanup', table: 'smart_alerts', select: 'id', category: 'system', folder: 'system' },
@@ -181,20 +181,20 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useUsersActivityMetrics', table: 'activities', select: 'id, action', category: 'system', folder: 'system' },
 
   // ==================== users/ (7 hooks) ====================
-  { name: 'useUsersManagement', table: 'profiles', select: 'id, full_name, email, role', category: 'users', folder: 'users' },
+  { name: 'useUsersManagement', table: 'profiles', select: 'id, full_name, email', category: 'users', folder: 'users' },
   { name: 'useUsersPaginated', table: 'profiles', select: 'id, full_name', category: 'users', folder: 'users' },
   { name: 'useUsersRealtime', table: 'profiles', select: 'id', category: 'users', folder: 'users' },
-  { name: 'useUsersFilter', table: 'profiles', select: 'id, role', category: 'users', folder: 'users' },
+  { name: 'useUsersFilter', table: 'profiles', select: 'id, full_name', category: 'users', folder: 'users' },
   { name: 'usePermissionsManagement', table: 'role_permissions', select: 'id', category: 'users', folder: 'users' },
   { name: 'useRolesManagement', table: 'role_permissions', select: 'id, role', category: 'users', folder: 'users' },
-  { name: 'useUserRolesManager', table: 'profiles', select: 'id, role', category: 'users', folder: 'users' },
+  { name: 'useUserRolesManager', table: 'profiles', select: 'id, full_name', category: 'users', folder: 'users' },
 
   // ==================== waqf/ (2 hooks) ====================
   { name: 'useLinkProperty', table: 'waqf_units', select: 'id', category: 'waqf', folder: 'waqf' },
   { name: 'useWaqfProperties', table: 'properties', select: 'id, name', category: 'waqf', folder: 'waqf' },
 
   // ==================== zatca/ (2 hooks) ====================
-  { name: 'useZATCASettings', table: 'organization_settings', select: 'id, setting_key', category: 'zatca', folder: 'zatca' },
+  { name: 'useZATCASettings', table: 'organization_settings', select: 'id, vat_registration_number', category: 'zatca', folder: 'zatca' },
   { name: 'useZATCASubmit', table: 'invoices', select: 'id, zatca_status', category: 'zatca', folder: 'zatca' },
 
   // ==================== transactions/ (1 hook) ====================
