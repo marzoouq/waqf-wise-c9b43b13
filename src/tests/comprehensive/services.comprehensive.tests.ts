@@ -110,7 +110,7 @@ const ALL_SERVICES_CONFIG = [
   // Additional Services (4)
   { name: 'DocumentService', table: null, category: 'additional', methods: ['generatePDF', 'generateInvoice'] },
   { name: 'ArchiveService', table: 'documents', category: 'additional', methods: ['getDocuments', 'archive'] },
-  { name: 'HistoricalRentalService', table: 'historical_rentals', category: 'additional', methods: ['getHistory', 'create'] },
+  { name: 'HistoricalRentalService', table: 'historical_rental_details', category: 'additional', methods: ['getHistory', 'create'] },
 ];
 
 /**
