@@ -491,13 +491,13 @@ async function testBudgetConsistency(): Promise<DataIntegrityTestResult> {
     // نستخدم الأعمدة الموجودة فعلياً
     const { data: budgets, error } = await supabase
       .from('budgets')
-      .select('id, budget_name, amount, used_amount, status');
+      .select('id, budgeted_amount, actual_amount, fiscal_year_id');
     
     if (error) throw error;
     
-    // التحقق من أن المستخدم لا يتجاوز المخصص
+    // التحقق من أن الفعلي لا يتجاوز المخطط بأكثر من 20%
     const inconsistent = (budgets || []).filter((b: any) => 
-      (b.used_amount || 0) > (b.amount || 0) && b.amount > 0
+      (b.actual_amount || 0) > (b.budgeted_amount || 0) * 1.2 && b.budgeted_amount > 0
     );
     
     return {

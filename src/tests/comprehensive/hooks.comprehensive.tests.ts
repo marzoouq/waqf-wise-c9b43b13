@@ -105,7 +105,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useInvoicesPage', table: 'invoices', select: 'id, invoice_number', category: 'payments', folder: 'payments' },
   { name: 'useLoanInstallments', table: 'loan_schedules', select: 'id, amount', category: 'payments', folder: 'payments' },
   { name: 'useLoanPayments', table: 'loan_payments', select: 'id, amount', category: 'payments', folder: 'payments' },
-  { name: 'useLoansPayments', table: 'loans', select: 'id, amount', category: 'payments', folder: 'payments' },
+  { name: 'useLoansPayments', table: 'loans', select: 'id, loan_amount', category: 'payments', folder: 'payments' },
   { name: 'usePaymentsWithContracts', table: 'payments', select: 'id, amount', category: 'payments', folder: 'payments' },
 
   // ==================== permissions/ (2 hooks) ====================
@@ -254,8 +254,8 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useBeneficiaryAttachments', table: 'beneficiary_attachments', select: 'id, file_name, file_type, file_path, created_at', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiaryCategories', table: 'beneficiary_categories', select: 'id, name, description, color, is_active', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiaryRequests', table: 'beneficiary_requests', select: 'id, description, status, priority, created_at', category: 'beneficiary', folder: 'beneficiary' },
-  { name: 'useBeneficiaryDistributions', table: 'heir_distributions', select: 'id, amount, status, distribution_id, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
-  { name: 'useBeneficiaryLoans', table: 'loans', select: 'id, amount, status, loan_type, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
+  { name: 'useBeneficiaryDistributions', table: 'heir_distributions', select: 'id, share_amount, status, fiscal_year_id, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
+  { name: 'useBeneficiaryLoans', table: 'loans', select: 'id, loan_amount, status, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiarySessions', table: 'beneficiary_sessions', select: 'id, is_online, last_activity, current_page', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiaryTags', table: 'beneficiary_tags', select: 'id, tag_name, tag_color, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useFamilies', table: 'families', select: 'id, family_name, head_of_family_id, members_count', category: 'beneficiary', folder: 'beneficiary' },
