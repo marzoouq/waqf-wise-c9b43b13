@@ -65,9 +65,9 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useRequestApprovals', table: 'beneficiary_requests', select: 'id, status', category: 'approvals', folder: 'approvals' },
 
   // ==================== fiscal-years/ (5 hooks) ====================
-  { name: 'useActiveFiscalYear', table: 'fiscal_years', select: 'id, year, status', category: 'fiscal-years', folder: 'fiscal-years' },
+  { name: 'useActiveFiscalYear', table: 'fiscal_years', select: 'id, name, is_active', category: 'fiscal-years', folder: 'fiscal-years' },
   { name: 'useCreateFiscalYear', table: 'fiscal_years', select: 'id', category: 'fiscal-years', folder: 'fiscal-years' },
-  { name: 'useFiscalYearData', table: 'fiscal_years', select: 'id, year, name, start_date, end_date', category: 'fiscal-years', folder: 'fiscal-years' },
+  { name: 'useFiscalYearData', table: 'fiscal_years', select: 'id, name, start_date, end_date, is_active', category: 'fiscal-years', folder: 'fiscal-years' },
   { name: 'useFiscalYearTests', table: 'fiscal_years', select: 'id', category: 'fiscal-years', folder: 'fiscal-years' },
   { name: 'useHistoricalRentalDetails', table: 'historical_rentals', select: 'id, amount', category: 'fiscal-years', folder: 'fiscal-years' },
 
@@ -275,20 +275,20 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
 
   // ==================== accounting/ (15 hooks) ====================
   { name: 'useAccounts', table: 'accounts', select: 'id, code, name_ar, account_type, account_nature, current_balance', category: 'accounting', folder: 'accounting' },
-  { name: 'useJournalEntries', table: 'journal_entries', select: 'id, entry_number, entry_date, description, status, total_debit', category: 'accounting', folder: 'accounting' },
-  { name: 'useFiscalYears', table: 'fiscal_years', select: 'id, year, name, start_date, end_date, status', category: 'accounting', folder: 'accounting' },
+  { name: 'useJournalEntries', table: 'journal_entries', select: 'id, entry_number, entry_date, description, status, entry_type', category: 'accounting', folder: 'accounting' },
+  { name: 'useFiscalYears', table: 'fiscal_years', select: 'id, name, start_date, end_date, is_active, is_closed', category: 'accounting', folder: 'accounting' },
   { name: 'useBudgets', table: 'budgets', select: 'id, name, total_amount, fiscal_year_id, status', category: 'accounting', folder: 'accounting' },
   { name: 'useFunds', table: 'funds', select: 'id, name, fund_type, current_balance, target_amount', category: 'accounting', folder: 'accounting' },
-  { name: 'useLoans', table: 'loans', select: 'id, amount, loan_type, status, interest_rate', category: 'accounting', folder: 'accounting' },
+  { name: 'useLoans', table: 'loans', select: 'id, loan_amount, status, interest_rate, term_months', category: 'accounting', folder: 'accounting' },
 
   // ==================== distributions/ (13 hooks) ====================
-  { name: 'useDistributions', table: 'distributions', select: 'id, distribution_name, total_amount, status, distribution_date', category: 'distribution', folder: 'distributions' },
-  { name: 'useHeirDistributions', table: 'heir_distributions', select: 'id, amount, status, payment_method, paid_at', category: 'distribution', folder: 'distributions' },
+  { name: 'useDistributions', table: 'distributions', select: 'id, month, total_amount, status, distribution_date', category: 'distribution', folder: 'distributions' },
+  { name: 'useHeirDistributions', table: 'heir_distributions', select: 'id, share_amount, status, heir_type, distribution_date', category: 'distribution', folder: 'distributions' },
   { name: 'useBankTransferFiles', table: 'bank_transfer_files', select: 'id, file_number, total_amount, status, file_format', category: 'distribution', folder: 'distributions' },
   { name: 'useBankTransferDetails', table: 'bank_transfer_details', select: 'id, beneficiary_name, amount, iban, status', category: 'distribution', folder: 'distributions' },
 
   // ==================== governance/ (9 hooks) ====================
-  { name: 'useGovernanceDecisions', table: 'governance_decisions', select: 'id, title, decision_type, status, decision_date', category: 'governance', folder: 'governance' },
+  { name: 'useGovernanceDecisions', table: 'governance_decisions', select: 'id, decision_title, decision_type, decision_status, decision_date', category: 'governance', folder: 'governance' },
   { name: 'useAnnualDisclosuresGov', table: 'annual_disclosures', select: 'id, year, waqf_name, total_revenues, total_expenses, status', category: 'governance', folder: 'governance' },
   { name: 'useApprovalWorkflowsGov', table: 'approval_workflows', select: 'id, workflow_name, entity_type, is_active', category: 'governance', folder: 'governance' },
   { name: 'useApprovalStatusGov', table: 'approval_status', select: 'id, entity_type, status, current_level, total_levels', category: 'governance', folder: 'governance' },

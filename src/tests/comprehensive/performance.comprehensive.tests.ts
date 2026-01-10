@@ -177,7 +177,7 @@ async function testComplexQueryPerformance(): Promise<PerformanceTestResult> {
       .select(`
         id, full_name, status,
         families(id, family_name),
-        heir_distributions(id, amount, status)
+        heir_distributions(id, share_amount, status)
       `)
       .limit(20);
     
