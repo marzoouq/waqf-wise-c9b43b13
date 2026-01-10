@@ -88,6 +88,17 @@ import {
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 import { Code2, Boxes, Link2, Workflow, Gauge, Wrench, ShieldAlert, Timer, HardDrive, Sparkles } from 'lucide-react';
 
+// ================== دالة تحويل النتائج الموحدة ==================
+
+/**
+ * تحويل نتيجة الاختبار لصيغة موحدة
+ * يدعم: status, passed, success
+ */
+const normalizeTestResult = (r: any) => ({
+  ...r,
+  status: r.status || (r.passed === true ? 'passed' : r.success === true ? 'passed' : 'failed')
+});
+
 // ================== أنواع البيانات ==================
 
 interface TestCase {
@@ -2812,9 +2823,17 @@ const ALL_TESTS: TestCategory[] = [
               duration,
               message: msg,
               details: { results: [
-                ...result.services.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
-                ...result.database.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
-                ...result.hooks.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })),
+                ...result.services.map(normalizeTestResult),
+                ...result.database.map(normalizeTestResult),
+                ...result.hooks.map(normalizeTestResult),
+                ...(result.edgeFunctions || []).map(normalizeTestResult),
+                ...(result.security || []).map(normalizeTestResult),
+                ...(result.integration || []).map(normalizeTestResult),
+                ...(result.performance || []).map(normalizeTestResult),
+                ...(result.components || []).map(normalizeTestResult),
+                ...(result.pages || []).map(normalizeTestResult),
+                ...(result.contexts || []).map(normalizeTestResult),
+                ...(result.libraries || []).map(normalizeTestResult),
               ]},
               timestamp: new Date()
             };
@@ -2848,7 +2867,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2873,7 +2892,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2898,7 +2917,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2923,7 +2942,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2948,7 +2967,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2973,7 +2992,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -2998,7 +3017,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -3023,7 +3042,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -3048,7 +3067,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -3073,7 +3092,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
@@ -3098,7 +3117,7 @@ const ALL_TESTS: TestCategory[] = [
               success: passed / results.length >= 0.8,
               duration: Math.round(performance.now() - start),
               message: passed + '/' + results.length + ' ناجح',
-              details: { results: results.map((r: any) => ({ ...r, status: r.passed ? 'passed' : 'failed' })) },
+              details: { results: results.map(normalizeTestResult) },
               timestamp: new Date()
             };
           } catch (err: any) {
