@@ -6437,6 +6437,57 @@ export type Database = {
           },
         ]
       }
+      integrations: {
+        Row: {
+          configuration: Json | null
+          created_at: string
+          created_by: string | null
+          credentials: Json | null
+          error_message: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          metadata: Json | null
+          name: string
+          provider: string | null
+          sync_status: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json | null
+          created_at?: string
+          created_by?: string | null
+          credentials?: Json | null
+          error_message?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          name: string
+          provider?: string | null
+          sync_status?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json | null
+          created_at?: string
+          created_by?: string | null
+          credentials?: Json | null
+          error_message?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          metadata?: Json | null
+          name?: string
+          provider?: string | null
+          sync_status?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       internal_messages: {
         Row: {
           body: string
@@ -11005,6 +11056,63 @@ export type Database = {
           },
         ]
       }
+      scheduled_reports: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          filters: Json | null
+          format: string | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          last_run_error: string | null
+          last_run_status: string | null
+          next_run_at: string | null
+          recipients: Json | null
+          report_name: string
+          report_type: string
+          schedule_config: Json | null
+          schedule_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          filters?: Json | null
+          format?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_error?: string | null
+          last_run_status?: string | null
+          next_run_at?: string | null
+          recipients?: Json | null
+          report_name: string
+          report_type: string
+          schedule_config?: Json | null
+          schedule_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          filters?: Json | null
+          format?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_error?: string | null
+          last_run_status?: string | null
+          next_run_at?: string | null
+          recipients?: Json | null
+          report_name?: string
+          report_type?: string
+          schedule_config?: Json | null
+          schedule_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           created_at: string | null
@@ -11429,6 +11537,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "support_escalations_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_messages: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          is_internal: boolean | null
+          message: string
+          read_at: string | null
+          sender_id: string | null
+          sender_type: string | null
+          ticket_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          message: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type?: string | null
+          ticket_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          message?: string
+          read_at?: string | null
+          sender_id?: string | null
+          sender_type?: string | null
+          ticket_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
             columns: ["ticket_id"]
             isOneToOne: false
             referencedRelation: "support_tickets"
