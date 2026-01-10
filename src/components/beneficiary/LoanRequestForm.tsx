@@ -60,7 +60,7 @@ export function LoanRequestForm({ onSubmit, isLoading }: LoanRequestFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>مدة السداد *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                <Select onValueChange={field.onChange} value={field.value?.toString()}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="اختر المدة" />

@@ -159,7 +159,7 @@ export function CreateDecisionDialog({
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                         className="grid grid-cols-1 gap-4 mt-3"
                       >
                         <label

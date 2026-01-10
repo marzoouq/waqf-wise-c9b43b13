@@ -188,7 +188,7 @@ export function UploadDocumentDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>الفئة *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الفئة" />
@@ -215,7 +215,7 @@ export function UploadDocumentDialog({
                   <FormLabel>المجلد</FormLabel>
                   <Select 
                     onValueChange={(val) => field.onChange(val === "__none__" ? "" : val)} 
-                    defaultValue={field.value || "__none__"}
+                    value={field.value || "__none__"}
                   >
                     <FormControl>
                       <SelectTrigger>

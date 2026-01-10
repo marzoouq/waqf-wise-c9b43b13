@@ -76,7 +76,7 @@ export function AddFamilyMemberForm({ onSubmit, isLoading }: AddFamilyMemberForm
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>القرابة *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر القرابة" />
@@ -104,7 +104,7 @@ export function AddFamilyMemberForm({ onSubmit, isLoading }: AddFamilyMemberForm
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الجنس *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر الجنس" />
