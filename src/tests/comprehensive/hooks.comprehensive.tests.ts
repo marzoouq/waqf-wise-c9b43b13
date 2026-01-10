@@ -153,7 +153,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   // ==================== settings/ (3 hooks) ====================
   { name: 'useLandingPageSettings', table: 'landing_page_settings', select: 'id, setting_key', category: 'settings', folder: 'settings' },
   { name: 'useSettingsCategories', table: 'organization_settings', select: 'id, organization_name_ar', category: 'settings', folder: 'settings' },
-  { name: 'useTwoFactorAuth', table: 'profiles', select: 'id, two_factor_enabled', category: 'settings', folder: 'settings' },
+  { name: 'useTwoFactorAuth', table: null, category: 'settings', folder: 'settings' },
 
   // ==================== system/ (23 hooks) ====================
   { name: 'useSystemHealth', table: 'performance_metrics', select: 'id, metric_type, metric_name', category: 'system', folder: 'system' },
@@ -170,7 +170,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useAutoPerformanceMonitor', table: 'performance_metrics', select: 'id', category: 'system', folder: 'system' },
   { name: 'useBackup', table: 'backup_logs', select: 'id, status', category: 'system', folder: 'system' },
   { name: 'useConnectionMonitor', table: null, category: 'system', folder: 'system' },
-  { name: 'useEdgeFunctionsHealth', table: 'system_error_logs', select: 'id, error_type, component', category: 'system', folder: 'system' },
+  { name: 'useEdgeFunctionsHealth', table: 'system_error_logs', select: 'id, error_type, severity', category: 'system', folder: 'system' },
   { name: 'useGlobalErrorLogging', table: 'system_error_logs', select: 'id', category: 'system', folder: 'system' },
   { name: 'useIntegrationsData', table: 'bank_integrations', select: 'id, bank_name', category: 'system', folder: 'system' },
   { name: 'useSecurityAlerts', table: 'system_alerts', select: 'id, alert_type, severity, status', category: 'system', folder: 'system' },
@@ -225,7 +225,7 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'usePagination', table: null, category: 'ui', folder: 'ui' },
   { name: 'usePrint', table: null, category: 'ui', folder: 'ui' },
   { name: 'useSavedFilters', table: 'saved_filters', select: 'id', category: 'ui', folder: 'ui' },
-  { name: 'useSavedSearches', table: 'saved_filters', select: 'id, filter_name', category: 'ui', folder: 'ui' },
+  { name: 'useSavedSearches', table: 'saved_filters', select: 'id, name', category: 'ui', folder: 'ui' },
   { name: 'useTableSort', table: null, category: 'ui', folder: 'ui' },
   { name: 'useTasks', table: null, category: 'ui', folder: 'ui' },
   { name: 'useTranslation', table: null, category: 'ui', folder: 'ui' },
@@ -258,14 +258,14 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useBeneficiaryLoans', table: 'loans', select: 'id, loan_amount, status, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiarySessions', table: 'beneficiary_sessions', select: 'id, is_online, last_activity, current_page', category: 'beneficiary', folder: 'beneficiary' },
   { name: 'useBeneficiaryTags', table: 'beneficiary_tags', select: 'id, tag_name, tag_color, beneficiary_id', category: 'beneficiary', folder: 'beneficiary' },
-  { name: 'useFamilies', table: 'families', select: 'id, family_name, head_of_family_id, members_count', category: 'beneficiary', folder: 'beneficiary' },
-  { name: 'useTribes', table: 'tribes', select: 'id, name, description, members_count', category: 'beneficiary', folder: 'beneficiary' },
-  { name: 'useEmergencyAid', table: 'emergency_aid_requests', select: 'id, request_type, amount, status, urgency_level', category: 'beneficiary', folder: 'beneficiary' },
+  { name: 'useFamilies', table: 'families', select: 'id, family_name, head_of_family_id, total_members', category: 'beneficiary', folder: 'beneficiary' },
+  { name: 'useTribes', table: 'tribes', select: 'id, name, description, total_beneficiaries', category: 'beneficiary', folder: 'beneficiary' },
+  { name: 'useEmergencyAid', table: 'emergency_aid_requests', select: 'id, urgency_level, amount_requested, status', category: 'beneficiary', folder: 'beneficiary' },
 
   // ==================== property/ (18 hooks) ====================
-  { name: 'useProperties', table: 'properties', select: 'id, name, location, property_type, status', category: 'property', folder: 'property' },
+  { name: 'useProperties', table: 'properties', select: 'id, name, location, type, status', category: 'property', folder: 'property' },
   { name: 'usePropertyUnits', table: 'property_units', select: 'id, unit_number, floor_number, area, status, monthly_rent', category: 'property', folder: 'property' },
-  { name: 'useTenants', table: 'tenants', select: 'id, full_name, phone, national_id, status', category: 'property', folder: 'property' },
+  { name: 'useTenants', table: 'tenants', select: 'id, full_name, phone, id_number, status', category: 'property', folder: 'property' },
   { name: 'useContracts', table: 'contracts', select: 'id, contract_number, start_date, end_date, status, monthly_rent', category: 'property', folder: 'property' },
   { name: 'useMaintenanceRequests', table: 'maintenance_requests', select: 'id, title, description, status, priority', category: 'property', folder: 'property' },
   { name: 'useRentalPayments', table: 'rental_payments', select: 'id, amount_due, payment_date, status, payment_method', category: 'property', folder: 'property' },
