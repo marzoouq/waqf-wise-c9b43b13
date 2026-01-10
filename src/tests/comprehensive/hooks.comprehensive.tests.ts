@@ -103,14 +103,14 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useInvoiceOCR', table: null, category: 'payments', folder: 'payments' },
   { name: 'useInvoicesPayments', table: 'invoices', select: 'id, total_amount', category: 'payments', folder: 'payments' },
   { name: 'useInvoicesPage', table: 'invoices', select: 'id, invoice_number', category: 'payments', folder: 'payments' },
-  { name: 'useLoanInstallments', table: 'loan_schedules', select: 'id, amount', category: 'payments', folder: 'payments' },
-  { name: 'useLoanPayments', table: 'loan_payments', select: 'id, amount', category: 'payments', folder: 'payments' },
+  { name: 'useLoanInstallments', table: 'loan_schedules', select: 'id, total_amount', category: 'payments', folder: 'payments' },
+  { name: 'useLoanPayments', table: 'loan_payments', select: 'id, payment_amount', category: 'payments', folder: 'payments' },
   { name: 'useLoansPayments', table: 'loans', select: 'id, loan_amount', category: 'payments', folder: 'payments' },
   { name: 'usePaymentsWithContracts', table: 'payments', select: 'id, amount', category: 'payments', folder: 'payments' },
 
   // ==================== permissions/ (2 hooks) ====================
-  { name: 'useRolePermissionsData', table: 'role_permissions', select: 'id, role, permission', category: 'permissions', folder: 'permissions' },
-  { name: 'useUserPermissionsOverride', table: 'user_permissions_override', select: 'id, user_id', category: 'permissions', folder: 'permissions' },
+  { name: 'useRolePermissionsData', table: 'role_permissions', select: 'id, role, permission_id', category: 'permissions', folder: 'permissions' },
+  { name: 'useUserPermissionsOverride', table: 'user_permissions', select: 'id, user_id', category: 'permissions', folder: 'permissions' },
 
   // ==================== reports/ (20 hooks) ====================
   { name: 'useReports', table: 'scheduled_reports', select: 'id, report_name', category: 'reports', folder: 'reports' },
@@ -120,9 +120,9 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
   { name: 'useAnnualDisclosures', table: 'annual_disclosures', select: 'id, year, status', category: 'reports', folder: 'reports' },
   { name: 'useBeneficiaryReportsData', table: 'beneficiaries', select: 'id, status', category: 'reports', folder: 'reports' },
   { name: 'useBudgetVarianceReport', table: 'budgets', select: 'id, total_amount', category: 'reports', folder: 'reports' },
-  { name: 'useCashFlowReport', table: 'cash_flows', select: 'id, amount', category: 'reports', folder: 'reports' },
+  { name: 'useCashFlowReport', table: 'cash_flows', select: 'id, net_cash_flow', category: 'reports', folder: 'reports' },
   { name: 'useCustomReports', table: 'custom_reports', select: 'id, name', category: 'reports', folder: 'reports' },
-  { name: 'useDetailedGeneralLedger', table: 'journal_entry_lines', select: 'id, debit, credit', category: 'reports', folder: 'reports' },
+  { name: 'useDetailedGeneralLedger', table: 'journal_entry_lines', select: 'id, debit_amount, credit_amount', category: 'reports', folder: 'reports' },
   { name: 'useDisclosureBeneficiaries', table: 'beneficiaries', select: 'id, full_name', category: 'reports', folder: 'reports' },
   { name: 'useDisclosureDocuments', table: 'disclosure_documents', select: 'id, document_type', category: 'reports', folder: 'reports' },
   { name: 'useDistributionAnalysisReport', table: 'distributions', select: 'id, total_amount', category: 'reports', folder: 'reports' },
