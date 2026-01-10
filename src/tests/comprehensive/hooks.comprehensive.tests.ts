@@ -334,11 +334,11 @@ const ALL_HOOKS_WITH_QUERIES: HookQueryConfig[] = [
 
   // ==================== security/ (3 hooks) ====================
   { name: 'useSecurityDashboardData', table: 'audit_logs', select: 'id, action_type', category: 'security', folder: 'security' },
-  { name: 'useSecurityAlertsData', table: 'security_alerts', select: 'id, alert_type', category: 'security', folder: 'security' },
+  { name: 'useSecurityAlertsData', table: 'system_alerts', select: 'id, alert_type, severity, status', category: 'security', folder: 'security' },
 
   // ==================== ai/ (5 hooks) ====================
-  { name: 'useAIInsights', table: 'ai_insights', select: 'id, insight_type', category: 'ai', folder: 'ai' },
-  { name: 'useChatbot', table: 'chatbot_sessions', select: 'id', category: 'ai', folder: 'ai' },
+  { name: 'useAIInsights', table: 'ai_system_audits', select: 'id, audit_type', category: 'ai', folder: 'ai' },
+  { name: 'useChatbot', table: 'chatbot_conversations', select: 'id', category: 'ai', folder: 'ai' },
   { name: 'useIntelligentSearch', table: null, category: 'ai', folder: 'ai' },
   { name: 'useAISystemAudit', table: 'ai_system_audits', select: 'id', category: 'ai', folder: 'ai' },
   { name: 'usePropertyAI', table: null, category: 'ai', folder: 'ai' },
