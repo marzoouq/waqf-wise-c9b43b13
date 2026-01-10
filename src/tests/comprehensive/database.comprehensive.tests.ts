@@ -126,7 +126,7 @@ const TABLE_RELATIONS = [
   { from: 'property_units', to: 'properties', field: 'property_id' },
   { from: 'journal_entry_lines', to: 'journal_entries', field: 'journal_entry_id' },
   { from: 'journal_entry_lines', to: 'accounts', field: 'account_id' },
-  { from: 'heir_distributions', to: 'distributions', field: 'distribution_id' },
+  { from: 'heir_distributions', to: 'fiscal_years', field: 'fiscal_year_id' },
   { from: 'heir_distributions', to: 'beneficiaries', field: 'beneficiary_id' },
   { from: 'payment_vouchers', to: 'beneficiaries', field: 'beneficiary_id' },
   { from: 'rental_payments', to: 'contracts', field: 'contract_id' },

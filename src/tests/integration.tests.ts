@@ -42,7 +42,7 @@ const TABLE_RELATIONS = [
   { parent: 'properties', child: 'property_units', foreignKey: 'property_id' },
   { parent: 'property_units', child: 'contracts', foreignKey: 'unit_id' },
   { parent: 'accounts', child: 'journal_entry_lines', foreignKey: 'account_id' },
-  { parent: 'distributions', child: 'heir_distributions', foreignKey: 'distribution_id' },
+  { parent: 'fiscal_years', child: 'heir_distributions', foreignKey: 'fiscal_year_id' },
 ];
 
 // Edge Functions للفحص الحقيقي

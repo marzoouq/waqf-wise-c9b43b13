@@ -112,7 +112,7 @@ const RELATIONS_TO_TEST = [
   { parent: 'accounts', child: 'journal_entry_lines', foreignKey: 'account_id' },
   { parent: 'journal_entries', child: 'journal_entry_lines', foreignKey: 'journal_entry_id' },
   { parent: 'fiscal_years', child: 'journal_entries', foreignKey: 'fiscal_year_id' },
-  { parent: 'distributions', child: 'heir_distributions', foreignKey: 'distribution_id' },
+  { parent: 'fiscal_years', child: 'heir_distributions', foreignKey: 'fiscal_year_id' },
   { parent: 'beneficiaries', child: 'heir_distributions', foreignKey: 'beneficiary_id' },
   { parent: 'loans', child: 'loan_installments', foreignKey: 'loan_id' },
   { parent: 'funds', child: 'fund_transactions', foreignKey: 'fund_id' },
