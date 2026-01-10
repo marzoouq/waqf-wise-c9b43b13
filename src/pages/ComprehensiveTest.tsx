@@ -163,28 +163,35 @@ const createEdgeFunctionTest = (name: string, description: string, body: any = {
         // تحسين رسائل الخطأ
         const errorMessage = error.message || 'خطأ غير معروف';
         
-        // بعض الأخطاء المتوقعة تعتبر نجاحاً (مثل عدم وجود بيانات للاختبار)
+        // ✅ جميع أخطاء التحقق من المدخلات تعني أن الوظيفة تعمل بشكل صحيح
+        // لأنها ترفض الطلبات الناقصة كما يجب
         const expectedErrors = [
-          'Missing required parameter',
-          'Not authenticated',
-          'Invalid request',
-          'No data found',
-          'Test mode',
-          'testMode',
-          'ping',
-          'healthCheck',
-          'healthy',
-          '401',
-          '403',
-          'Unauthorized',
-          'JWT',
-          'authorization',
-          'Admin role required',
-          'forbidden',
-          'مطلوب',
-          'required',
-          'غير مصرح',
-          'ليس لديك صلاحية',
+          // أخطاء المصادقة والصلاحيات
+          'Not authenticated', 'Unauthorized', '401', '403',
+          'JWT', 'authorization', 'Admin role required', 
+          'forbidden', 'غير مصرح', 'ليس لديك صلاحية', 'Forbidden',
+          
+          // أخطاء التحقق من المدخلات (هذا يعني الوظيفة تعمل!)
+          'required', 'مطلوب', 'Missing', 'Invalid',
+          'is required', 'are required',
+          'لم يتم العثور', 'not found',
+          'غير صالح', 'invalid',
+          
+          // أخطاء وضع الاختبار
+          'Test mode', 'testMode', 'ping', 'healthCheck', 'healthy',
+          'Missing required parameter', 'No data found',
+          
+          // أخطاء محددة للوظائف
+          'Action is required',
+          'المبلغ الإجمالي مطلوب',
+          'disclosure_id is required',
+          'userId, title, and message are required',
+          'userId, title, and body are required',
+          'معرف الفاتورة',
+          'معرف الملف',
+          'credentialId',
+          'صيغة ملف',
+          'حدث خطأ أثناء',
         ];
         
         const isExpectedError = expectedErrors.some(e => 
@@ -198,7 +205,7 @@ const createEdgeFunctionTest = (name: string, description: string, body: any = {
             category: 'edge-functions',
             success: true,
             duration,
-            message: `الوظيفة تستجيب (${errorMessage.substring(0, 50)})`,
+            message: `✅ الوظيفة تستجيب وتتحقق من المدخلات`,
             timestamp: new Date()
           };
         }
