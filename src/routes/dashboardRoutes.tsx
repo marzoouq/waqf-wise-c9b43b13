@@ -17,7 +17,14 @@ import {
 export const dashboardRoutes = [
   <Route key="index" index element={<Navigate to="/dashboard" replace />} />,
   <Route key="dashboard" path="/dashboard" element={<Dashboard />} />,
-  <Route 
+  
+  // إعادة توجيه المسارات القديمة/الخاطئة
+  <Route key="redirect-archivist" path="/dashboard/archivist" element={<Navigate to="/archivist-dashboard" replace />} />,
+  <Route key="redirect-accountant" path="/dashboard/accountant" element={<Navigate to="/accountant-dashboard" replace />} />,
+  <Route key="redirect-cashier" path="/dashboard/cashier" element={<Navigate to="/cashier-dashboard" replace />} />,
+  <Route key="redirect-nazer" path="/dashboard/nazer" element={<Navigate to="/nazer-dashboard" replace />} />,
+  <Route key="redirect-admin" path="/dashboard/admin" element={<Navigate to="/admin-dashboard" replace />} />,
+  <Route
     key="nazer-dashboard"
     path="/nazer-dashboard" 
     element={
