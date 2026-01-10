@@ -117,7 +117,7 @@ export function CreateTicketDialog({ open, onOpenChange }: CreateTicketDialogPro
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>نوع المشكلة</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر نوع المشكلة" />
@@ -142,7 +142,7 @@ export function CreateTicketDialog({ open, onOpenChange }: CreateTicketDialogPro
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>الأولوية</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الأولوية" />

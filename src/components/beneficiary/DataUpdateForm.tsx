@@ -72,7 +72,7 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>نوع التحديث *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="اختر نوع التحديث" />
