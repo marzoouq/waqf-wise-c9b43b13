@@ -195,7 +195,7 @@ const SERVICES_METHODS_MAP: Record<string, {
     methods: ['getAll', 'getById', 'create'],
   },
   'ArchiveService': {
-    table: 'archive_documents',
+    table: 'documents',
     methods: ['getAll', 'archive', 'restore'],
   },
   'HistoricalRentalService': {

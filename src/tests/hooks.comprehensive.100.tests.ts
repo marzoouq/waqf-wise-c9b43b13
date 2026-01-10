@@ -190,7 +190,7 @@ const ALL_HOOKS_BY_FOLDER: Record<string, {
     hooks: ['useArchiveStats', 'useArchivistDashboard', 'useArchivistDashboardRealtime',
             'useDocumentPreview', 'useDocumentTags', 'useDocumentUpload',
             'useDocumentVersions', 'useDocuments', 'useFolders', 'useSmartArchive'],
-    table: 'archive_documents',
+    table: 'documents',
   },
   
   // 19. الرسائل

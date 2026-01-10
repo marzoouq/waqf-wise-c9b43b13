@@ -114,7 +114,7 @@ const ALL_TABLES = [
   { name: 'smart_alerts', description: 'التنبيهات الذكية', category: 'ai' },
   
   // Archive Tables
-  { name: 'archive_documents', description: 'مستندات الأرشيف', category: 'archive' },
+  { name: 'documents', description: 'مستندات الأرشيف', category: 'archive' },
 ];
 
 // العلاقات بين الجداول (Foreign Keys)

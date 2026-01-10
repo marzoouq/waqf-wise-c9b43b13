@@ -99,8 +99,8 @@ const ALL_SERVICES_CONFIG = [
   { name: 'TranslationService', table: null, category: 'infrastructure', methods: ['translate', 'getLanguages'] },
 
   // AI Services (3)
-  { name: 'AIService', table: 'ai_insights', category: 'ai', methods: ['getInsights', 'generate'] },
-  { name: 'ChatbotService', table: 'chatbot_sessions', category: 'ai', methods: ['sendMessage', 'getHistory'] },
+  { name: 'AIService', table: 'ai_system_audits', category: 'ai', methods: ['getInsights', 'generate'] },
+  { name: 'ChatbotService', table: 'chatbot_conversations', category: 'ai', methods: ['sendMessage', 'getHistory'] },
   { name: 'AISystemAuditService', table: 'ai_system_audits', category: 'ai', methods: ['runAudit', 'getFindings'] },
 
   // Monitoring Services (2)
@@ -109,7 +109,7 @@ const ALL_SERVICES_CONFIG = [
 
   // Additional Services (4)
   { name: 'DocumentService', table: null, category: 'additional', methods: ['generatePDF', 'generateInvoice'] },
-  { name: 'ArchiveService', table: 'archive_documents', category: 'additional', methods: ['getDocuments', 'archive'] },
+  { name: 'ArchiveService', table: 'documents', category: 'additional', methods: ['getDocuments', 'archive'] },
   { name: 'HistoricalRentalService', table: 'historical_rentals', category: 'additional', methods: ['getHistory', 'create'] },
 ];
 
