@@ -312,7 +312,7 @@ async function testEdgeFunctionsPerformance(): Promise<EdgeFunctionTestResult[]>
     
     try {
       const { data, error } = await supabase.functions.invoke(fnName, {
-        body: { test: true }
+        body: { healthCheck: true, ping: true, testMode: true }
       });
       
       const duration = performance.now() - startTime;

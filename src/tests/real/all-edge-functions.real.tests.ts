@@ -149,7 +149,7 @@ async function testSingleEdgeFunction(
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 ثواني فقط
       
       const { error } = await supabase.functions.invoke(func.name, {
-        body: { test: true, healthCheck: true }
+        body: { healthCheck: true, ping: true, testMode: true }
       });
       
       clearTimeout(timeoutId);

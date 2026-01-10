@@ -133,7 +133,7 @@ async function testEdgeFunctionPerformance(functionName: string): Promise<Perfor
     for (let i = 0; i < 3; i++) {
       const callStart = performance.now();
       await supabase.functions.invoke(functionName, {
-        body: { test: true, timestamp: Date.now() }
+        body: { healthCheck: true, ping: true, testMode: true, timestamp: Date.now() }
       });
       times.push(performance.now() - callStart);
     }
