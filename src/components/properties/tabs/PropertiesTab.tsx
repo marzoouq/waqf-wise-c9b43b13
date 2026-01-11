@@ -164,7 +164,16 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
     const occupiedUnits = properties?.reduce((sum, p) => sum + p.occupied, 0) || 0;
-    const totalRevenue = properties?.reduce((sum, p) => sum + Number(p.monthly_revenue || 0), 0) || 0;
+    
+    // حساب الإيراد الشهري الصحيح (مع مراعاة revenue_type)
+    const totalMonthlyRevenue = properties?.reduce((sum, p) => {
+      const revenue = Number(p.monthly_revenue || 0);
+      // إذا كان النوع سنوي، نقسم على 12 للحصول على الشهري
+      return sum + (p.revenue_type === 'سنوي' ? revenue / 12 : revenue);
+    }, 0) || 0;
+    
+    // الإيراد السنوي = الشهري × 12
+    const totalAnnualRevenue = totalMonthlyRevenue * 12;
 
     return [
       {
@@ -187,7 +196,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
       },
       {
         label: "الإيرادات السنوية",
-        value: `${totalRevenue.toLocaleString()} ر.س`,
+        value: `${totalAnnualRevenue.toLocaleString()} ر.س`,
         icon: DollarSign,
         color: "text-accent",
       },
