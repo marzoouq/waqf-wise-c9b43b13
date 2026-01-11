@@ -1,7 +1,8 @@
-import { memo, useMemo, lazy, Suspense } from "react";
+import { memo, useMemo, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { lazyWithRetry, lazyWithRetryNamed } from "@/lib/lazyWithRetry";
 import {
   FileText,
   TreePine,
@@ -13,15 +14,15 @@ import {
   Sparkles,
 } from "lucide-react";
 
-// Lazy load components for better performance
-const EnhancedAccountsTree = lazy(() => import("./EnhancedAccountsTree").then(m => ({ default: m.EnhancedAccountsTree })));
-const JournalEntries = lazy(() => import("./JournalEntries"));
-const BudgetsContent = lazy(() => import("./BudgetsContent").then(m => ({ default: m.BudgetsContent })));
-const TrialBalanceReport = lazy(() => import("./TrialBalanceReport").then(m => ({ default: m.TrialBalanceReport })));
-const GeneralLedgerReport = lazy(() => import("./GeneralLedgerReport"));
-const BankAccountsManagement = lazy(() => import("./BankAccountsManagement").then(m => ({ default: m.BankAccountsManagement })));
-const CashFlowStatement = lazy(() => import("./CashFlowStatement").then(m => ({ default: m.CashFlowStatement })));
-const AdvancedAccountingTab = lazy(() => import("./AdvancedAccountingTab").then(m => ({ default: m.AdvancedAccountingTab })));
+// Lazy load components with retry for better reliability
+const EnhancedAccountsTree = lazyWithRetryNamed(() => import("./EnhancedAccountsTree"), "EnhancedAccountsTree");
+const JournalEntries = lazyWithRetry(() => import("./JournalEntries"));
+const BudgetsContent = lazyWithRetryNamed(() => import("./BudgetsContent"), "BudgetsContent");
+const TrialBalanceReport = lazyWithRetryNamed(() => import("./TrialBalanceReport"), "TrialBalanceReport");
+const GeneralLedgerReport = lazyWithRetry(() => import("./GeneralLedgerReport"));
+const BankAccountsManagement = lazyWithRetryNamed(() => import("./BankAccountsManagement"), "BankAccountsManagement");
+const CashFlowStatement = lazyWithRetryNamed(() => import("./CashFlowStatement"), "CashFlowStatement");
+const AdvancedAccountingTab = lazyWithRetryNamed(() => import("./AdvancedAccountingTab"), "AdvancedAccountingTab");
 
 interface AccountingTabsProps {
   activeTab: string;
