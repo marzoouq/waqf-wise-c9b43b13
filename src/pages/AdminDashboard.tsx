@@ -21,6 +21,10 @@ import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/das
 import { LoginAttemptsSection } from "@/components/dashboard/admin/LoginAttemptsSection";
 import { PermissionsOverviewCard } from "@/components/dashboard/admin/PermissionsOverviewCard";
 import { SecuritySettingsQuickAccess } from "@/components/dashboard/admin/SecuritySettingsQuickAccess";
+import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
+import { DashboardQuickSwitch } from "@/components/dashboard/shared/DashboardQuickSwitch";
+import { AdminReportsSection } from "@/components/dashboard/admin/AdminReportsSection";
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -52,6 +56,9 @@ export default function AdminDashboard() {
       role="admin"
       actions={
         <div className="flex items-center gap-2">
+          {/* التنقل السريع بين اللوحات */}
+          <DashboardQuickSwitch />
+          
           <LastSyncIndicator 
             lastUpdated={lastUpdated} 
             onRefresh={handleRefresh} 
@@ -137,6 +144,16 @@ export default function AdminDashboard() {
             </AdminDashboardErrorBoundary>
           </div>
 
+          {/* رؤى الذكاء الاصطناعي */}
+          <Suspense fallback={<ChartSkeleton />}>
+            <AIInsightsWidget />
+          </Suspense>
+
+          {/* قسم التقارير السريعة */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <AdminReportsSection />
+          </Suspense>
+
         </TabsContent>
 
         {/* Users Tab - Lazy Load */}
@@ -209,6 +226,9 @@ export default function AdminDashboard() {
         open={messageDialogOpen}
         onOpenChange={setMessageDialogOpen}
       />
+
+      {/* زر العودة للأعلى */}
+      <ScrollToTopButton />
     </UnifiedDashboardLayout>
   );
 }

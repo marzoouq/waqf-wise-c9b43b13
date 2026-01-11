@@ -7,10 +7,11 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Clock, CheckCircle2 } from "lucide-react";
+import { RefreshCw, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LastSyncIndicatorProps {
   lastUpdated?: Date | string | null;
@@ -29,6 +30,7 @@ export function LastSyncIndicator({
 }: LastSyncIndicatorProps) {
   const [displayTime, setDisplayTime] = useState<string>("");
   const [isRecent, setIsRecent] = useState(false);
+  const [isStale, setIsStale] = useState(false);
 
   useEffect(() => {
     if (!lastUpdated) {
@@ -44,6 +46,9 @@ export function LastSyncIndicator({
 
       // إذا كان التحديث خلال الدقيقتين الأخيرتين، يعتبر حديث
       setIsRecent(diffMinutes < 2);
+      
+      // تحذير إذا كانت البيانات أقدم من 5 دقائق
+      setIsStale(diffMinutes >= 5);
 
       if (diffMinutes < 1) {
         setDisplayTime("الآن");
@@ -58,9 +63,15 @@ export function LastSyncIndicator({
     return () => clearInterval(interval);
   }, [lastUpdated]);
 
-  return (
-    <div className={cn("flex items-center gap-2 text-xs text-muted-foreground", className)}>
-      {isRecent ? (
+  const indicator = (
+    <div className={cn(
+      "flex items-center gap-2 text-xs text-muted-foreground",
+      isStale && "text-warning",
+      className
+    )}>
+      {isStale ? (
+        <AlertTriangle className="h-3 w-3 text-warning" />
+      ) : isRecent ? (
         <CheckCircle2 className="h-3 w-3 text-status-success" />
       ) : (
         <Clock className="h-3 w-3" />
@@ -68,7 +79,10 @@ export function LastSyncIndicator({
       
       {showLabel && <span>آخر تحديث:</span>}
       
-      <span className={cn(isRecent && "text-status-success font-medium")}>
+      <span className={cn(
+        isRecent && "text-status-success font-medium",
+        isStale && "text-warning font-medium"
+      )}>
         {displayTime}
       </span>
 
@@ -76,7 +90,10 @@ export function LastSyncIndicator({
         <Button
           variant="ghost"
           size="icon"
-          className="h-5 w-5 p-0 hover:bg-muted"
+          className={cn(
+            "h-5 w-5 p-0 hover:bg-muted",
+            isStale && "text-warning hover:text-warning"
+          )}
           onClick={onRefresh}
           disabled={isRefreshing}
           title="تحديث البيانات"
@@ -86,4 +103,21 @@ export function LastSyncIndicator({
       )}
     </div>
   );
+
+  if (isStale) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {indicator}
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>البيانات قديمة! انقر للتحديث</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return indicator;
 }
