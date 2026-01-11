@@ -23,9 +23,6 @@ import {
   AISystemAudit,
   EdgeFunctionTest,
   EdgeFunctionsMonitor,
-  ComprehensiveTest,
-  TestsDashboard,
-  RealTestsDashboard,
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
@@ -177,15 +174,6 @@ export const adminRoutes = [
       </ProtectedRoute>
     } 
   />,
-  <Route 
-    key="comprehensive-test"
-    path="/comprehensive-test" 
-    element={
-      <ProtectedRoute requiredRoles={["admin"]}>
-        <ComprehensiveTest />
-      </ProtectedRoute>
-    } 
-  />,
   <Route
     key="advanced-settings"
     path="/advanced-settings" 
@@ -219,24 +207,6 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["nazer", "accountant", "cashier"]}>
         <PointOfSale />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="tests-dashboard"
-    path="/tests-dashboard" 
-    element={
-      <ProtectedRoute requiredRoles={["admin"]}>
-        <TestsDashboard />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="real-tests"
-    path="/tests/real" 
-    element={
-      <ProtectedRoute requiredRoles={["admin"]}>
-        <RealTestsDashboard />
       </ProtectedRoute>
     } 
   />,
