@@ -3745,6 +3745,7 @@ export type Database = {
           updated_at: string
           waqf_corpus: number | null
           waqf_name: string | null
+          waqf_unit_id: string | null
           waqif_charity: number | null
           wives_count: number | null
         }
@@ -3785,6 +3786,7 @@ export type Database = {
           updated_at?: string
           waqf_corpus?: number | null
           waqf_name?: string | null
+          waqf_unit_id?: string | null
           waqif_charity?: number | null
           wives_count?: number | null
         }
@@ -3825,6 +3827,7 @@ export type Database = {
           updated_at?: string
           waqf_corpus?: number | null
           waqf_name?: string | null
+          waqf_unit_id?: string | null
           waqif_charity?: number | null
           wives_count?: number | null
         }
@@ -3841,6 +3844,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries_with_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distributions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
