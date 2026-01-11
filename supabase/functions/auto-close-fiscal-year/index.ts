@@ -267,6 +267,30 @@ Deno.serve(async (req) => {
     // 7. تنفيذ الإقفال الفعلي
     console.log('Executing actual closing...');
 
+    // 7.1 حفظ أرصدة الحسابات الختامية في جدول account_year_balances
+    console.log('Saving closing balances...');
+    const { data: allAccounts, error: accountsError } = await supabase
+      .from('accounts')
+      .select('id, current_balance, account_type')
+      .eq('is_active', true)
+      .eq('is_header', false);
+
+    if (!accountsError && allAccounts) {
+      for (const account of allAccounts) {
+        await supabase.from('account_year_balances').upsert({
+          account_id: account.id,
+          fiscal_year_id: fiscal_year_id,
+          closing_balance: account.current_balance || 0,
+          is_final: true,
+          closed_at: new Date().toISOString(),
+          closed_by: user.id
+        }, {
+          onConflict: 'account_id,fiscal_year_id'
+        });
+      }
+      console.log(`Saved closing balances for ${allAccounts.length} accounts`);
+    }
+
     // إنشاء قيد الإقفال
     const { data: journalEntry, error: jeError } = await supabase
       .from('journal_entries')
@@ -337,7 +361,7 @@ Deno.serve(async (req) => {
     // إغلاق السنة المالية
     const { error: updateError } = await supabase
       .from('fiscal_years')
-      .update({ is_closed: true, status: 'closed' })
+      .update({ is_closed: true })
       .eq('id', fiscal_year_id);
 
     if (updateError) {
@@ -346,6 +370,46 @@ Deno.serve(async (req) => {
     }
 
     console.log('Fiscal year closed successfully');
+
+    // 7.2 تصفير حسابات الإيرادات والمصروفات وإعداد السنة الجديدة
+    console.log('Preparing for new fiscal year...');
+    
+    // الحصول على السنة المالية النشطة الجديدة
+    const { data: newFiscalYear } = await supabase
+      .from('fiscal_years')
+      .select('id')
+      .eq('is_active', true)
+      .eq('is_closed', false)
+      .single();
+
+    if (newFiscalYear && allAccounts) {
+      console.log('Creating opening balances for new fiscal year...');
+      
+      for (const account of allAccounts) {
+        // الأصول والالتزامات وحقوق الملكية تُرحّل
+        // الإيرادات والمصروفات تبدأ من صفر
+        const shouldCarryOver = ['asset', 'liability', 'equity'].includes(account.account_type);
+        const openingBalance = shouldCarryOver ? (account.current_balance || 0) : 0;
+        
+        await supabase.from('account_year_balances').upsert({
+          account_id: account.id,
+          fiscal_year_id: newFiscalYear.id,
+          opening_balance: openingBalance,
+          closing_balance: 0,
+          is_final: false
+        }, {
+          onConflict: 'account_id,fiscal_year_id'
+        });
+      }
+      
+      // تصفير أرصدة حسابات الإيرادات والمصروفات في جدول الحسابات
+      await supabase
+        .from('accounts')
+        .update({ current_balance: 0 })
+        .in('account_type', ['revenue', 'expense']);
+      
+      console.log('Opening balances created for new fiscal year');
+    }
 
     // 8. إنشاء الإفصاح السنوي تلقائياً
     console.log('Creating annual disclosure...');
