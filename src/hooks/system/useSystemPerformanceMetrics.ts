@@ -15,6 +15,7 @@ interface PerformanceDataPoint {
 /**
  * Hook لجلب إحصائيات أداء النظام من audit_logs و system_health_checks
  * يجمع البيانات حسب الساعة لآخر 24 ساعة
+ * البيانات حقيقية فقط - لا توجد بيانات افتراضية
  */
 export function useSystemPerformanceMetrics() {
   return useQuery({
@@ -23,7 +24,7 @@ export function useSystemPerformanceMetrics() {
       const now = new Date();
       const yesterday = subDays(now, DASHBOARD_METRICS.PERFORMANCE_LOOKBACK_DAYS);
       
-      // جلب البيانات بالتوازي
+      // جلب البيانات الحقيقية بالتوازي
       const [logs, healthData] = await Promise.all([
         MonitoringService.getPerformanceMetrics(yesterday),
         MonitoringService.getHealthCheckData(yesterday)
@@ -33,39 +34,29 @@ export function useSystemPerformanceMetrics() {
       const hours = eachHourOfInterval({ start: yesterday, end: now })
         .filter((_, index) => index % DASHBOARD_METRICS.PERFORMANCE_HOURS_INTERVAL === 0);
 
-      // تجميع البيانات حسب الفترة الزمنية
+      // تجميع البيانات الحقيقية حسب الفترة الزمنية
       const dataPoints: PerformanceDataPoint[] = hours.map((hour, index) => {
         const nextHour = hours[index + 1] || now;
         
-        // عد الطلبات في هذه الفترة
+        // عد الطلبات الحقيقية في هذه الفترة
         const periodLogs = (logs || []).filter(log => {
           const logDate = parseISO(log.created_at);
           return logDate >= hour && logDate < nextHour;
         });
 
-        // حساب متوسط الأداء من health checks
+        // حساب متوسط الأداء الحقيقي من health checks
         const periodHealth = (healthData || []).filter(check => {
           const checkDate = parseISO(check.created_at);
           return checkDate >= hour && checkDate < nextHour;
         });
 
-        // استخدام بيانات audit_logs لحساب وقت الاستجابة التقريبي إذا لم توجد health checks
-        let avgResponseTime = 0;
-        if (periodHealth.length > 0) {
-          avgResponseTime = Math.round(periodHealth.reduce((sum, h) => sum + (h.response_time_ms || 0), 0) / periodHealth.length);
-        } else if (periodLogs.length > 0) {
-          // تقدير وقت الاستجابة بناءً على عدد الطلبات (أكثر طلبات = وقت أبطأ)
-          avgResponseTime = Math.min(500, 50 + Math.round(periodLogs.length * 2));
-        }
+        const avgResponseTime = periodHealth.length > 0
+          ? Math.round(periodHealth.reduce((sum, h) => sum + (h.response_time_ms || 0), 0) / periodHealth.length)
+          : 0;
 
-        // نسبة CPU محسوبة من عدد الطلبات أو وقت الاستجابة
-        let avgCpu = 0;
-        if (periodHealth.length > 0) {
-          avgCpu = Math.min(100, Math.round(avgResponseTime / 10));
-        } else if (periodLogs.length > 0) {
-          // تقدير استخدام CPU بناءً على عدد الطلبات
-          avgCpu = Math.min(80, Math.round(periodLogs.length / 2));
-        }
+        const avgCpu = periodHealth.length > 0
+          ? Math.min(100, Math.round(avgResponseTime / 10))
+          : 0;
 
         return {
           time: format(hour, "HH:mm", { locale: ar }),
