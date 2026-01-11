@@ -170,10 +170,10 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <CardTitle className="text-2xl">
                 {isDynamic ? 'جاري تحديث التطبيق...' : 'حدث خطأ غير متوقع'}
               </CardTitle>
-              <CardDescription className="space-y-2">
+              <div className="text-center text-sm text-muted-foreground space-y-2">
                 {isDynamic ? (
                   <>
-                    <p>تم اكتشاف إصدار جديد من التطبيق. جاري إعادة التحميل...</p>
+                    <span className="block">تم اكتشاف إصدار جديد من التطبيق. جاري إعادة التحميل...</span>
                     {isAutoReloading && (
                       <div className="flex items-center justify-center gap-2 mt-3">
                         <RefreshCcw className="w-4 h-4 animate-spin text-primary" />
@@ -182,9 +182,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                     )}
                   </>
                 ) : (
-                  <p>نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.</p>
+                  <span className="block">نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.</span>
                 )}
-              </CardDescription>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* رسالة خاصة بأخطاء Dynamic Import */}
