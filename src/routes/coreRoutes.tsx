@@ -13,7 +13,6 @@ import {
   Properties,
   Tenants,
   TenantDetails,
-  TenantsAgingReportPage,
   Funds,
   WaqfUnits,
   Archive,
@@ -111,15 +110,6 @@ export const coreRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
         <TenantDetails />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route
-    key="tenants-aging"
-    path="/tenants/aging-report" 
-    element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
-        <TenantsAgingReportPage />
       </ProtectedRoute>
     } 
   />,

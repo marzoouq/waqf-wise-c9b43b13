@@ -45,7 +45,7 @@ export const FamilyDetails = lazyWithRetry(() => import("@/pages/FamilyDetails")
 export const Properties = lazyWithRetry(() => import("@/pages/Properties"));
 export const Tenants = lazyWithRetry(() => import("@/pages/Tenants"));
 export const TenantDetails = lazyWithRetry(() => import("@/pages/TenantDetails"));
-export const TenantsAgingReportPage = lazyWithRetry(() => import("@/pages/TenantsAgingReportPage"));
+
 export const Funds = lazyWithRetry(() => import("@/pages/Funds"));
 export const WaqfUnits = lazyWithRetry(() => import("@/pages/WaqfUnits"));
 
