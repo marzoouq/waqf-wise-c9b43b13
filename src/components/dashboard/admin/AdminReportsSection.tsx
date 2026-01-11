@@ -1,17 +1,17 @@
 /**
- * قسم التقارير السريعة للناظر
- * وصول سريع لجميع التقارير المالية والإدارية
+ * قسم التقارير السريعة للمشرف
+ * وصول سريع لجميع التقارير الإدارية والأمنية
  * 
- * @version 2.8.91 - استخدام CSS Variables
+ * @version 1.0.0
  */
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { 
-  FileText, FileBarChart, 
-  Building2, Users, Wallet, DollarSign,
-  ChevronLeft, Download, Printer, Calendar
+  FileText, Shield, Users, Activity, 
+  ChevronLeft, Download, Printer, Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,69 +29,68 @@ interface ReportCategory {
 
 const reportCategories: ReportCategory[] = [
   {
-    title: "التقارير المالية",
-    icon: DollarSign,
-    color: "text-[hsl(var(--status-success))]",
-    bgColor: "bg-[hsl(var(--status-success)/0.1)]",
-    reports: [
-      { label: "ميزان المراجعة", path: "/accounting?tab=trial-balance" },
-      { label: "قائمة الدخل", path: "/accounting?tab=income-statement" },
-      { label: "الميزانية العمومية", path: "/accounting?tab=balance-sheet" },
-      { label: "التدفقات النقدية", path: "/accounting?tab=cash-flow" },
-      { label: "دفتر الأستاذ", path: "/accounting?tab=ledger" },
-    ],
-  },
-  {
-    title: "تقارير العقارات",
-    icon: Building2,
-    color: "text-[hsl(var(--status-warning))]",
-    bgColor: "bg-[hsl(var(--status-warning)/0.1)]",
-    reports: [
-      { label: "أداء العقارات", path: "/properties" },
-      { label: "الإيجارات والتحصيل", path: "/invoices" },
-      { label: "العقود والمستأجرين", path: "/tenants" },
-    ],
-  },
-  {
-    title: "تقارير المستفيدين",
+    title: "تقارير المستخدمين",
     icon: Users,
-    color: "text-[hsl(var(--chart-1))]",
-    bgColor: "bg-[hsl(var(--chart-1)/0.1)]",
+    color: "text-primary",
+    bgColor: "bg-primary/10",
     reports: [
-      { label: "إحصائيات المستفيدين", path: "/beneficiaries" },
-      { label: "التوزيعات السنوية", path: "/fiscal-years" },
-      { label: "العائلات والورثة", path: "/families" },
-      { label: "تاريخ المدفوعات", path: "/payments" },
+      { label: "قائمة المستخدمين", path: "/users" },
+      { label: "سجل الدخول", path: "/audit-logs?filter=login" },
+      { label: "الأدوار والصلاحيات", path: "/roles" },
+      { label: "إدارة الصلاحيات", path: "/permissions" },
     ],
   },
   {
-    title: "القروض والفزعات",
-    icon: Wallet,
+    title: "تقارير الأمان",
+    icon: Shield,
     color: "text-destructive",
     bgColor: "bg-destructive/10",
     reports: [
-      { label: "القروض النشطة", path: "/loans", badge: "مهم" },
-      { label: "الفزعات الطارئة", path: "/emergency-aid" },
-      { label: "سندات الصرف", path: "/payment-vouchers" },
-      { label: "الموافقات", path: "/approvals" },
+      { label: "التنبيهات الأمنية", path: "/security", badge: "مهم" },
+      { label: "سجلات التدقيق", path: "/audit-logs" },
+      { label: "محاولات الدخول", path: "/audit-logs?filter=auth" },
+      { label: "الجلسات النشطة", path: "/security?tab=sessions" },
     ],
   },
   {
-    title: "التقارير التنفيذية",
-    icon: FileBarChart,
+    title: "تقارير النظام",
+    icon: Activity,
+    color: "text-[hsl(var(--status-success))]",
+    bgColor: "bg-[hsl(var(--status-success)/0.1)]",
+    reports: [
+      { label: "صحة النظام", path: "/system-monitoring" },
+      { label: "أداء قاعدة البيانات", path: "/db-performance" },
+      { label: "سجلات الأخطاء", path: "/system-errors" },
+      { label: "Edge Functions", path: "/edge-functions" },
+    ],
+  },
+  {
+    title: "تقارير البيانات",
+    icon: Database,
     color: "text-[hsl(var(--chart-5))]",
     bgColor: "bg-[hsl(var(--chart-5)/0.1)]",
     reports: [
+      { label: "النسخ الاحتياطي", path: "/settings?tab=backup" },
       { label: "التقارير الشاملة", path: "/reports" },
-      { label: "تقرير الحوكمة", path: "/governance/guide" },
-      { label: "قرارات الحوكمة", path: "/governance/decisions" },
       { label: "التقارير المخصصة", path: "/reports/custom" },
     ],
   },
 ];
 
-export function NazerReportsSection() {
+export function AdminReportsSection() {
   const navigate = useNavigate();
+
+  const handleExportAll = () => {
+    navigate("/reports?action=export");
+  };
+
+  const handlePrintSummary = () => {
+    window.print();
+  };
+
+  const handleSystemReport = () => {
+    navigate("/system-monitoring");
+  };
 
   return (
     <Card>
@@ -99,17 +98,17 @@ export function NazerReportsSection() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
-            <CardTitle>التقارير والإحصائيات</CardTitle>
+            <CardTitle>التقارير الإدارية</CardTitle>
           </div>
           <Button onClick={() => navigate("/reports")} variant="ghost" size="sm" className="gap-1">
             جميع التقارير
             <ChevronLeft className="h-4 w-4" />
           </Button>
         </div>
-        <CardDescription>وصول سريع لجميع التقارير المالية والإدارية</CardDescription>
+        <CardDescription>وصول سريع لتقارير النظام والأمان والمستخدمين</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {reportCategories.map((category) => (
             <div 
               key={category.title}
@@ -148,7 +147,7 @@ export function NazerReportsSection() {
             variant="outline" 
             size="sm" 
             className="gap-2"
-            onClick={() => navigate("/reports?action=export")}
+            onClick={handleExportAll}
           >
             <Download className="h-4 w-4" />
             تصدير شامل
@@ -157,7 +156,7 @@ export function NazerReportsSection() {
             variant="outline" 
             size="sm" 
             className="gap-2"
-            onClick={() => window.print()}
+            onClick={handlePrintSummary}
           >
             <Printer className="h-4 w-4" />
             طباعة ملخص
@@ -166,10 +165,10 @@ export function NazerReportsSection() {
             variant="outline" 
             size="sm" 
             className="gap-2"
-            onClick={() => navigate("/reports?tab=builder")}
+            onClick={handleSystemReport}
           >
-            <Calendar className="h-4 w-4" />
-            تقرير الفترة
+            <Activity className="h-4 w-4" />
+            تقرير النظام
           </Button>
         </div>
       </CardContent>

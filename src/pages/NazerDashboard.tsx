@@ -1,6 +1,7 @@
 import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
@@ -28,6 +29,9 @@ import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { SendNotificationDialog } from "@/components/notifications/SendNotificationDialog";
+import { useNotifications } from "@/hooks/notifications/useNotifications";
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
+import { DashboardQuickSwitch } from "@/components/dashboard/shared/DashboardQuickSwitch";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -41,6 +45,7 @@ export default function NazerDashboard() {
   useNazerDashboardRealtime();
   const { refreshAll } = useNazerDashboardRefresh();
   const { lastUpdated } = useUnifiedKPIs();
+  const { unreadCount } = useNotifications();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -53,6 +58,9 @@ export default function NazerDashboard() {
       role="nazer"
       actions={
         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          {/* التنقل السريع بين اللوحات */}
+          <DashboardQuickSwitch />
+          
           {/* مؤشر آخر تحديث */}
           <LastSyncIndicator 
             lastUpdated={lastUpdated} 
@@ -77,9 +85,22 @@ export default function NazerDashboard() {
             <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">رسالة</span>
           </Button>
-          <Button onClick={() => setNotificationDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
+          <Button 
+            onClick={() => setNotificationDialogOpen(true)} 
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3 relative" 
+            variant="ghost" 
+            size="sm"
+          >
             <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">إشعار</span>
+            {unreadCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px]"
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Badge>
+            )}
           </Button>
         </div>
       }
@@ -212,6 +233,9 @@ export default function NazerDashboard() {
         open={notificationDialogOpen}
         onOpenChange={setNotificationDialogOpen}
       />
+
+      {/* زر العودة للأعلى */}
+      <ScrollToTopButton />
     </UnifiedDashboardLayout>
   );
 }
