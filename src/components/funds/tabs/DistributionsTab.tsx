@@ -8,6 +8,7 @@ import { DistributionSimulator } from "@/components/distributions/DistributionSi
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
 import { DistributionTimelineTab } from "@/components/distributions/DistributionTimelineTab";
 import { useDistributions, Distribution } from "@/hooks/distributions/useDistributions";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
@@ -31,6 +32,7 @@ import {
 
 export function DistributionsTab() {
   const { distributions, isLoading, deleteDistribution } = useDistributions();
+  const { isAdmin } = useUserRole();
   const [selectedDistribution, setSelectedDistribution] = useState<Distribution | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
@@ -41,9 +43,15 @@ export function DistributionsTab() {
   const [timelineOpen, setTimelineOpen] = useState(false);
   const [timelineDistribution, setTimelineDistribution] = useState<Distribution | null>(null);
 
+  // المدير يمكنه حذف أي توزيع، غيره فقط المسودات
+  const canDeleteDistribution = (distribution: Distribution) => {
+    if (isAdmin) return true;
+    return distribution.status !== "معتمد";
+  };
+
   const handleDeleteClick = (distribution: Distribution) => {
-    if (distribution.status === "معتمد") {
-      return; // لا تفتح الحوار للتوزيعات المعتمدة
+    if (!canDeleteDistribution(distribution)) {
+      return;
     }
     setDistributionToDelete(distribution);
     setDeleteDialogOpen(true);
@@ -129,7 +137,7 @@ export function DistributionsTab() {
         <History className="h-3 w-3 sm:h-4 sm:w-4" />
         <span className="hidden sm:inline">السجل</span>
       </Button>
-      {distribution.status !== "معتمد" && (
+      {canDeleteDistribution(distribution) && (
         <Button
           variant="ghost"
           size="sm"
