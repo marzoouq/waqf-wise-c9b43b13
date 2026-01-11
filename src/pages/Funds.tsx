@@ -64,7 +64,7 @@ const Funds = () => {
       totalAllocated: totalAcquisitionValue,
       totalSpent: totalCurrentValue - totalAcquisitionValue, // الفرق = الربح/الخسارة
       totalAvailable: totalCurrentValue,
-      activeBeneficiaries: activeUnits, // عدد الأقلام النشطة
+      activeWaqfUnits: activeUnits, // عدد أقلام الوقف النشطة
       totalAnnualReturn,
     };
   }, [waqfUnits]);
