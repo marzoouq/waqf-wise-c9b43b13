@@ -34,6 +34,7 @@ export function usePropertyUnits(propertyId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['property-units'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث الوحدة بنجاح",
