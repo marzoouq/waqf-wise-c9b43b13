@@ -1,10 +1,16 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCcw, Home, Trash2, Wifi, Download } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, Home, Trash2, Wifi, Download, X } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { logErrorToSupport } from '@/hooks/system/useGlobalErrorLogging';
 import { clearAllCaches } from '@/lib/clearCache';
+import { 
+  isChunkLoadError, 
+  getChunkErrorInfo, 
+  logChunkError,
+  type ChunkErrorType 
+} from '@/lib/errors/chunk-error-handler';
 
 interface Props {
   children: ReactNode;
@@ -16,30 +22,20 @@ interface State {
   errorInfo: ErrorInfo | null;
   errorCount: number;
   isClearing: boolean;
-  isDynamicImportError: boolean;
+  errorType: ChunkErrorType | null;
   isAutoReloading: boolean;
+  autoReloadCountdown: number;
 }
 
-/**
- * فحص إذا كان الخطأ هو خطأ تحميل Dynamic Import
- */
-function isDynamicImportError(error: Error | null): boolean {
-  if (!error) return false;
-  const msg = error.message.toLowerCase();
-  return (
-    msg.includes('failed to fetch dynamically imported module') ||
-    msg.includes('loading chunk') ||
-    msg.includes('loading css chunk') ||
-    msg.includes('dynamically imported module')
-  );
-}
+const AUTO_RELOAD_DELAY = 3; // seconds
 
 /**
  * Global Error Boundary لالتقاط جميع الأخطاء في التطبيق
- * مع معالجة محسنة لأخطاء Dynamic Import
+ * مع معالجة محسنة لأخطاء Dynamic Import باستخدام النظام الموحد
  */
 export class GlobalErrorBoundary extends Component<Props, State> {
   private autoReloadTimeout: ReturnType<typeof setTimeout> | null = null;
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
   
   constructor(props: Props) {
     super(props);
@@ -49,79 +45,102 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       errorInfo: null,
       errorCount: 0,
       isClearing: false,
-      isDynamicImportError: false,
+      errorType: null,
       isAutoReloading: false,
+      autoReloadCountdown: AUTO_RELOAD_DELAY,
     };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
-    const isDynamic = isDynamicImportError(error);
+    const isChunk = isChunkLoadError(error);
+    const errorInfo = isChunk ? getChunkErrorInfo(error) : null;
+    
     return {
       hasError: true,
       error,
-      isDynamicImportError: isDynamic,
+      errorType: errorInfo?.type || null,
     };
   }
 
   async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const isDynamic = isDynamicImportError(error);
+    const isChunk = isChunkLoadError(error);
+    const chunkErrorInfo = isChunk ? getChunkErrorInfo(error) : null;
     
-    // تسجيل الخطأ بشكل مختلف حسب النوع
+    // Log using unified handler
+    if (isChunk) {
+      logChunkError(error, { component: 'GlobalErrorBoundary' });
+    }
+    
+    // تسجيل الخطأ
     logger.error(error, { 
       context: 'global_error_boundary', 
-      severity: isDynamic ? 'warning' : 'critical',
+      severity: isChunk ? 'warning' : 'critical',
       metadata: { 
         errorInfo, 
         errorCount: this.state.errorCount + 1,
-        errorType: isDynamic ? 'cache_mismatch' : 'runtime_error'
+        errorType: chunkErrorInfo?.type || 'runtime_error'
       }
     });
     
     this.setState((prevState) => ({
       errorInfo,
       errorCount: prevState.errorCount + 1,
-      isDynamicImportError: isDynamic,
+      errorType: chunkErrorInfo?.type || null,
     }));
 
-    // إذا كان خطأ Dynamic Import، جرب إعادة التحميل تلقائياً
-    if (isDynamic) {
+    // إذا كان خطأ Chunk، جرب إعادة التحميل تلقائياً
+    if (isChunk && chunkErrorInfo?.shouldReload) {
       const reloadCount = parseInt(sessionStorage.getItem('dynamic_import_reload_count') || '0', 10);
       
       if (reloadCount < 2) {
         sessionStorage.setItem('dynamic_import_reload_count', String(reloadCount + 1));
-        this.setState({ isAutoReloading: true });
-        
-        // انتظر 2 ثانية ثم أعد التحميل تلقائياً
-        this.autoReloadTimeout = setTimeout(() => {
-          this.handleHardRefresh();
-        }, 2000);
+        this.startAutoReload();
       } else {
         // بعد محاولتين، أرسل للدعم الفني
         sessionStorage.removeItem('dynamic_import_reload_count');
         await logErrorToSupport(error, errorInfo, this.state.errorCount + 1);
       }
-    } else {
+    } else if (!isChunk) {
       // إرسال إشعار للدعم الفني للأخطاء العادية
       await logErrorToSupport(error, errorInfo, this.state.errorCount + 1);
     }
   }
 
+  startAutoReload = () => {
+    this.setState({ 
+      isAutoReloading: true, 
+      autoReloadCountdown: AUTO_RELOAD_DELAY 
+    });
+    
+    // Countdown
+    this.countdownInterval = setInterval(() => {
+      this.setState(prev => {
+        const newCount = prev.autoReloadCountdown - 1;
+        if (newCount <= 0) {
+          this.handleHardRefresh();
+          return { ...prev, autoReloadCountdown: 0 };
+        }
+        return { ...prev, autoReloadCountdown: newCount };
+      });
+    }, 1000);
+  };
+
   componentWillUnmount() {
-    if (this.autoReloadTimeout) {
-      clearTimeout(this.autoReloadTimeout);
-    }
+    if (this.autoReloadTimeout) clearTimeout(this.autoReloadTimeout);
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
   }
 
   handleReset = () => {
-    if (this.autoReloadTimeout) {
-      clearTimeout(this.autoReloadTimeout);
-    }
+    if (this.autoReloadTimeout) clearTimeout(this.autoReloadTimeout);
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
+    
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
-      isDynamicImportError: false,
+      errorType: null,
       isAutoReloading: false,
+      autoReloadCountdown: AUTO_RELOAD_DELAY,
     });
   };
 
@@ -144,61 +163,100 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   };
 
   handleCancelAutoReload = () => {
-    if (this.autoReloadTimeout) {
-      clearTimeout(this.autoReloadTimeout);
-    }
+    if (this.autoReloadTimeout) clearTimeout(this.autoReloadTimeout);
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
     this.setState({ isAutoReloading: false });
+  };
+
+  getErrorMessage = (): { title: string; description: string } => {
+    const { errorType, error } = this.state;
+    
+    if (errorType && error) {
+      const info = getChunkErrorInfo(error);
+      
+      switch (errorType) {
+        case 'update':
+          return {
+            title: 'جاري تحديث التطبيق...',
+            description: info.userMessage
+          };
+        case 'network':
+          return {
+            title: 'مشكلة في الاتصال',
+            description: info.userMessage
+          };
+        case 'server':
+          return {
+            title: 'خطأ في الخادم',
+            description: info.userMessage
+          };
+        case 'timeout':
+          return {
+            title: 'انتهت مهلة التحميل',
+            description: info.userMessage
+          };
+        default:
+          return {
+            title: 'فشل تحميل الصفحة',
+            description: info.userMessage
+          };
+      }
+    }
+    
+    return {
+      title: 'حدث خطأ غير متوقع',
+      description: 'نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.'
+    };
   };
 
   render() {
     if (this.state.hasError) {
-      const { isDynamicImportError: isDynamic, isAutoReloading } = this.state;
+      const { errorType, isAutoReloading, autoReloadCountdown, isClearing } = this.state;
+      const isChunk = errorType !== null;
+      const { title, description } = this.getErrorMessage();
       
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <Card className="max-w-2xl w-full">
             <CardHeader className="text-center">
               <div className={`mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
-                isDynamic ? 'bg-warning/10' : 'bg-destructive/10'
+                isChunk ? 'bg-warning/10' : 'bg-destructive/10'
               }`}>
-                {isDynamic ? (
+                {isChunk ? (
                   <Download className="w-6 h-6 text-warning" />
                 ) : (
                   <AlertTriangle className="w-6 h-6 text-destructive" />
                 )}
               </div>
-              <CardTitle className="text-2xl">
-                {isDynamic ? 'جاري تحديث التطبيق...' : 'حدث خطأ غير متوقع'}
-              </CardTitle>
-              <div className="text-center text-sm text-muted-foreground space-y-2">
-                {isDynamic ? (
-                  <>
-                    <span className="block">تم اكتشاف إصدار جديد من التطبيق. جاري إعادة التحميل...</span>
-                    {isAutoReloading && (
-                      <div className="flex items-center justify-center gap-2 mt-3">
-                        <RefreshCcw className="w-4 h-4 animate-spin text-primary" />
-                        <span className="text-primary font-medium">جاري إعادة التحميل تلقائياً...</span>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <span className="block">نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.</span>
+              <CardTitle className="text-2xl">{title}</CardTitle>
+              <CardDescription className="text-center space-y-2">
+                <span className="block">{description}</span>
+                {isAutoReloading && (
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <RefreshCcw className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-primary font-medium">
+                      إعادة التحميل خلال {autoReloadCountdown} ثوان...
+                    </span>
+                  </div>
                 )}
-              </div>
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* رسالة خاصة بأخطاء Dynamic Import */}
-              {isDynamic && (
+              {/* رسالة خاصة بأخطاء Chunk */}
+              {isChunk && !isAutoReloading && (
                 <div className="bg-warning/10 p-4 rounded-lg text-center">
                   <Wifi className="w-8 h-8 mx-auto mb-2 text-warning" />
                   <p className="text-sm text-warning-foreground">
-                    يبدو أن هناك تحديث جديد للتطبيق. سيتم إعادة تحميل الصفحة تلقائياً.
+                    {errorType === 'network' 
+                      ? 'تحقق من اتصالك بالإنترنت'
+                      : 'يبدو أن هناك تحديث جديد للتطبيق'
+                    }
                   </p>
                 </div>
               )}
 
               {/* تفاصيل الخطأ (للتطوير فقط) */}
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.DEV && this.state.error && (
                 <div className="bg-muted p-4 rounded-lg overflow-auto max-h-48">
                   <p className="text-sm font-mono text-destructive">
                     {this.state.error.toString()}
@@ -212,7 +270,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               )}
 
               {/* معلومات إضافية للأخطاء العادية */}
-              {!isDynamic && (
+              {!isChunk && (
                 <div className="bg-muted p-3 rounded-lg text-sm">
                   <p className="text-muted-foreground">
                     <strong>ماذا يمكنك فعله؟</strong>
@@ -227,7 +285,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               )}
 
               {/* إحصائيات الأخطاء */}
-              {this.state.errorCount > 1 && !isDynamic && (
+              {this.state.errorCount > 1 && !isChunk && (
                 <div className="bg-destructive/10 p-3 rounded-lg text-sm text-destructive">
                   ⚠️ تم اكتشاف {this.state.errorCount} أخطاء. يُنصح بإعادة تحميل الصفحة.
                 </div>
@@ -239,8 +297,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                   <Button 
                     onClick={this.handleCancelAutoReload} 
                     variant="outline"
-                    className="w-full"
+                    className="w-full gap-2"
                   >
+                    <X className="w-4 h-4" />
                     إلغاء إعادة التحميل التلقائي
                   </Button>
                 ) : (
@@ -248,21 +307,31 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                     <Button 
                       onClick={this.handleHardRefresh} 
                       className="w-full gap-2 bg-primary hover:bg-primary/90"
-                      disabled={this.state.isClearing}
+                      disabled={isClearing}
                     >
-                      {this.state.isClearing ? (
+                      {isClearing ? (
                         <RefreshCcw className="w-4 h-4 animate-spin" />
                       ) : (
                         <Trash2 className="w-4 h-4" />
                       )}
-                      {this.state.isClearing ? 'جاري المسح...' : 'مسح ذاكرة التخزين وإعادة التحميل'}
+                      {isClearing ? 'جاري المسح...' : 'مسح ذاكرة التخزين وإعادة التحميل'}
                     </Button>
                     <div className="flex gap-3 justify-center pt-2">
-                      <Button onClick={this.handleReset} variant="outline" size="lg" disabled={this.state.isClearing}>
+                      <Button 
+                        onClick={this.handleReset} 
+                        variant="outline" 
+                        size="lg" 
+                        disabled={isClearing}
+                      >
                         <RefreshCcw className="w-4 h-4 ms-2" />
                         إعادة المحاولة
                       </Button>
-                      <Button onClick={this.handleGoHome} variant="ghost" size="lg" disabled={this.state.isClearing}>
+                      <Button 
+                        onClick={this.handleGoHome} 
+                        variant="ghost" 
+                        size="lg" 
+                        disabled={isClearing}
+                      >
                         <Home className="w-4 h-4 ms-2" />
                         العودة للرئيسية
                       </Button>
@@ -272,7 +341,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               </div>
 
               {/* معلومات التواصل */}
-              {!isDynamic && (
+              {!isChunk && (
                 <div className="text-center text-sm text-muted-foreground pt-4 border-t">
                   إذا استمرت المشكلة، يرجى التواصل مع فريق الدعم الفني
                 </div>

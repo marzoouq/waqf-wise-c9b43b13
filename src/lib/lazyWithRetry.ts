@@ -7,6 +7,12 @@
  */
 
 import React, { lazy, ComponentType } from 'react';
+import { 
+  isChunkLoadError, 
+  getChunkErrorInfo, 
+  logChunkError 
+} from '@/lib/errors/chunk-error-handler';
+import { clearAllCaches } from '@/lib/clearCache';
 
 export interface LazyRetryOptions {
   retries?: number;
@@ -53,31 +59,9 @@ function resetFailureCount(): void {
 }
 
 /**
- * Clear all caches (Service Worker + browser cache)
- */
-async function clearAllCaches(): Promise<void> {
-  try {
-    // Clear Service Worker caches
-    if ('caches' in window) {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
-    }
-    
-    // Unregister Service Workers
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(reg => reg.unregister()));
-    }
-  } catch (error) {
-    console.warn('Failed to clear caches:', error);
-  }
-}
-
-/**
  * Force reload with cache bypass
  */
 function forceReload(): void {
-  // Use cache bypass reload
   window.location.reload();
 }
 
@@ -103,7 +87,6 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        // Add cache-busting parameter on retry attempts
         const result = await componentImport();
         
         // Success - reset failure count
@@ -113,12 +96,24 @@ export function lazyWithRetry<T extends ComponentType<any>>(
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         
-        // Log the error
-        console.warn(`[LazyRetry] Attempt ${attempt + 1}/${retries} failed:`, lastError.message);
+        // Log using unified handler
+        logChunkError(lastError, { 
+          attempt: attempt + 1, 
+          action: attempt === 0 ? 'initial' : 'retry' 
+        });
+        
+        // Get error info for smart handling
+        const errorInfo = getChunkErrorInfo(lastError);
         
         // Call custom error handler if provided
         if (onError) {
           onError(lastError, attempt + 1);
+        }
+        
+        // Don't retry if it's definitely a version update (404)
+        if (errorInfo.shouldReload && attempt === 0) {
+          // Skip retries, go straight to reload logic
+          break;
         }
         
         // Don't wait after the last attempt
@@ -156,11 +151,6 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 
 /**
  * Lazy load a named export with automatic retry mechanism
- * 
- * @param importFn - Dynamic import function
- * @param exportName - Name of the export to use
- * @param options - Retry options
- * @returns Lazy component with retry logic
  */
 export function lazyWithRetryNamed<T extends ComponentType<any>>(
   importFn: () => Promise<Record<string, T>>,
@@ -184,8 +174,8 @@ export function lazyPage<T extends ComponentType<any>>(
     retries: 3,
     interval: 1500,
     onError: (error, attempt) => {
-      // Could send to analytics/monitoring here
-      console.warn(`Page load attempt ${attempt} failed:`, error.message);
+      const errorInfo = getChunkErrorInfo(error);
+      console.warn(`Page load attempt ${attempt} failed:`, errorInfo.userMessage);
     }
   });
 }

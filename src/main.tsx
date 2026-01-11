@@ -7,7 +7,7 @@ import "@fontsource/cairo/700.css";
 
 import App from "./App.tsx";
 import "./index.css";
-import { checkAndUpdateVersion } from "./lib/versionCheck";
+import { checkAndUpdateVersion, registerChunkErrorHandlers } from "./lib/versionCheck";
 
 const rootElement = document.getElementById("root")!;
 
@@ -19,6 +19,9 @@ if (loadingElement) {
 
 // فحص الإصدار (بدون مسح الكاش - Vite يدير ذلك تلقائياً)
 checkAndUpdateVersion().catch(console.error);
+
+// تسجيل مستمعي أخطاء الـ Chunks
+registerChunkErrorHandlers();
 
 // عرض التطبيق فوراً لتحسين FCP
 rootElement.innerHTML = '';
