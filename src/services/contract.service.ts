@@ -108,9 +108,26 @@ export class ContractService {
         property_unit_id: unitId,
       }));
 
-      await supabase
+      const { error: unitsError } = await supabase
         .from('contract_units')
         .insert(contractUnits);
+
+      if (unitsError) {
+        logger.error(unitsError, { context: 'contract_units_insert', severity: 'medium' });
+      }
+
+      // تحديث حالة الوحدات إذا كان العقد نشطاً (احتياطي - الـ Trigger يفعل ذلك أيضاً)
+      if (data.status === 'نشط') {
+        await supabase
+          .from('property_units')
+          .update({
+            current_contract_id: data.id,
+            current_tenant_id: contractData.tenant_id || null,
+            occupancy_status: 'مشغول',
+            updated_at: new Date().toISOString()
+          })
+          .in('id', unit_ids);
+      }
     }
 
     // إنشاء جدول الدفعات تلقائياً
@@ -197,8 +214,26 @@ export class ContractService {
   }
 
   static async terminate(id: string): Promise<Contract> {
-    const { data, error } = await supabase.from('contracts').update({ status: 'منتهي' }).eq('id', id).select().single();
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'منتهي' })
+      .eq('id', id)
+      .select()
+      .single();
+    
     if (error) throw error;
+
+    // تحرير الوحدات المربوطة (احتياطي - الـ Trigger يفعل ذلك أيضاً)
+    await supabase
+      .from('property_units')
+      .update({
+        current_contract_id: null,
+        current_tenant_id: null,
+        occupancy_status: 'شاغر',
+        updated_at: new Date().toISOString()
+      })
+      .eq('current_contract_id', id);
+
     return data;
   }
 
