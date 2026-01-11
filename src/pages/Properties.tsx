@@ -117,7 +117,7 @@ const Properties = () => {
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-info">
-                  {stats.expectedAnnualRevenue.toLocaleString('ar-SA')} ريال
+                  {(stats.expectedAnnualRevenue || 0).toLocaleString('ar-SA')} ريال
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   من العقود النشطة
@@ -135,10 +135,10 @@ const Properties = () => {
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-success">
-                  {stats.totalCollected.toLocaleString('ar-SA')} ريال
+                  {(stats.totalCollected || 0).toLocaleString('ar-SA')} ريال
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                  <p>نسبة التحصيل: <span className={stats.collectionRate >= 80 ? 'text-success' : stats.collectionRate >= 50 ? 'text-warning' : 'text-destructive'}>{stats.collectionRate}%</span></p>
+                  <p>نسبة التحصيل: <span className={(stats.collectionRate || 0) >= 80 ? 'text-success' : (stats.collectionRate || 0) >= 50 ? 'text-warning' : 'text-destructive'}>{stats.collectionRate || 0}%</span></p>
                 </div>
               </CardContent>
             </Card>
@@ -153,10 +153,10 @@ const Properties = () => {
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-primary">
-                  {stats.carryForwardWaqfCorpus.toLocaleString('ar-SA')} ريال
+                  {(stats.carryForwardWaqfCorpus || 0).toLocaleString('ar-SA')} ريال
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  من السنة المالية {stats.carryForwardSourceYear}
+                  من السنة المالية {stats.carryForwardSourceYear || 'غير محدد'}
                 </p>
               </CardContent>
             </Card>
