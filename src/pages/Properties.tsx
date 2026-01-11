@@ -14,7 +14,7 @@ import { logger } from "@/lib/logger";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, TrendingUp, Wrench, AlertCircle, Wallet } from "lucide-react";
+import { Building2, TrendingUp, Wrench, AlertCircle, Wallet, Target } from "lucide-react";
 
 const Properties = () => {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -91,7 +91,7 @@ const Properties = () => {
 
         {/* Statistics Cards */}
         {!statsLoading && stats && (
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-6">
             <Card>
               <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
                 <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -103,6 +103,24 @@ const Properties = () => {
                 <div className="text-xl sm:text-2xl font-bold">{stats.totalProperties}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {stats.occupiedProperties} مؤجر، {stats.vacantProperties} شاغر
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* بطاقة الإيراد المتوقع من العقود */}
+            <Card className="border-info/30 bg-info/5">
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Target className="h-4 w-4 text-info" />
+                  الإيراد السنوي المتوقع
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-info">
+                  {stats.expectedAnnualRevenue.toLocaleString('ar-SA')} ريال
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  من العقود النشطة
                 </p>
               </CardContent>
             </Card>
@@ -120,12 +138,7 @@ const Properties = () => {
                   {stats.totalCollected.toLocaleString('ar-SA')} ريال
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
-                  {stats.annualCollected > 0 && (
-                    <p>سنوي: {stats.annualCollected.toLocaleString('ar-SA')} ر.س</p>
-                  )}
-                  {stats.monthlyCollected > 0 && (
-                    <p>شهري: {stats.monthlyCollected.toLocaleString('ar-SA')} ر.س</p>
-                  )}
+                  <p>نسبة التحصيل: <span className={stats.collectionRate >= 80 ? 'text-success' : stats.collectionRate >= 50 ? 'text-warning' : 'text-destructive'}>{stats.collectionRate}%</span></p>
                 </div>
               </CardContent>
             </Card>

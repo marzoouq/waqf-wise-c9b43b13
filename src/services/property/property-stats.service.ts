@@ -40,6 +40,9 @@ export interface PropertiesFullStats {
   vacantProperties: number;
   totalMonthlyRevenue: number;
   totalAnnualRevenue: number;
+  // إضافات جديدة للمقارنة
+  expectedAnnualRevenue: number;
+  collectionRate: number;
 }
 
 export class PropertyStatsService {
@@ -161,6 +164,19 @@ export class PropertyStatsService {
       const totalTax = payments?.reduce((sum, p) => sum + (Number(p.tax_amount) || 0), 0) || 0;
       const totalNetRevenue = payments?.reduce((sum, p) => sum + (Number(p.net_amount) || 0), 0) || 0;
 
+      // حساب الإيراد السنوي المتوقع من العقود النشطة (مصدر الحقيقة الموحد)
+      const expectedAnnualRevenue = contracts?.reduce((sum, c) => {
+        const monthlyRent = Number(c.monthly_rent) || 0;
+        const frequency = c.payment_frequency;
+        // إذا كان سنوي، الإيراد هو نفسه، وإلا نضرب × 12
+        return sum + (frequency === 'سنوي' ? monthlyRent : monthlyRent * 12);
+      }, 0) || 0;
+
+      // نسبة التحصيل
+      const collectionRate = expectedAnnualRevenue > 0 
+        ? Math.round((totalCollected / expectedAnnualRevenue) * 100) 
+        : 0;
+
       // جلب رقبة الوقف
       let carryForwardWaqfCorpus = 0;
       if (fiscalYear) {
@@ -193,8 +209,10 @@ export class PropertyStatsService {
         expiringContracts: expiringContracts?.length || 0,
         occupiedProperties: contracts?.length || occupiedUnits,
         vacantProperties: totalProperties - (contracts?.length || 0),
-        totalMonthlyRevenue: totalCollected,
-        totalAnnualRevenue: totalCollected,
+        totalMonthlyRevenue: expectedAnnualRevenue / 12,
+        totalAnnualRevenue: expectedAnnualRevenue,
+        expectedAnnualRevenue,
+        collectionRate,
       };
     } catch (error) {
       productionLogger.error('Error fetching properties stats', error);

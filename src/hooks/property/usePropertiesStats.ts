@@ -28,6 +28,9 @@ export interface PropertyStats {
   vacantProperties: number;
   totalMonthlyRevenue: number;
   totalAnnualRevenue: number;
+  // إضافات جديدة للمقارنة
+  expectedAnnualRevenue: number;
+  collectionRate: number;
 }
 
 export function usePropertiesStats() {
