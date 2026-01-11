@@ -1,9 +1,10 @@
 /**
  * Beneficiary Bottom Navigation Configuration
- * بيانات ثابتة لشريط التنقل السفلي
+ * بيانات ثابتة لشريط التنقل السفلي - محسّنة للمستفيد
+ * @version 2.0.0
  */
 
-import { Home, FileText, Bell, Settings } from "lucide-react";
+import { Home, Wallet, FileText, User, MoreHorizontal } from "lucide-react";
 
 export interface NavigationItem {
   id: string;
@@ -23,22 +24,31 @@ export const beneficiaryNavigationItems: NavigationItem[] = [
     matchPaths: ["/beneficiary-portal"],
   },
   {
+    id: "distributions",
+    label: "التوزيعات",
+    icon: Wallet,
+    path: "/beneficiary-portal?tab=distributions",
+    matchPaths: ["/beneficiary-portal?tab=distributions"],
+  },
+  {
     id: "requests",
-    label: "طلباتي",
+    label: "الطلبات",
     icon: FileText,
-    path: "/beneficiary/requests",
-    matchPaths: ["/beneficiary/requests"],
+    path: "/beneficiary-portal?tab=requests",
+    matchPaths: ["/beneficiary-portal?tab=requests", "/beneficiary/requests"],
   },
   {
-    id: "notifications",
-    label: "الإشعارات",
-    icon: Bell,
-    path: "/notifications",
+    id: "profile",
+    label: "ملفي",
+    icon: User,
+    path: "/beneficiary-portal?tab=profile",
+    matchPaths: ["/beneficiary-portal?tab=profile"],
   },
   {
-    id: "settings",
-    label: "الإعدادات",
-    icon: Settings,
-    path: "/beneficiary-settings",
+    id: "more",
+    label: "المزيد",
+    icon: MoreHorizontal,
+    path: "/beneficiary-portal?tab=reports",
+    matchPaths: ["/beneficiary-portal?tab=reports", "/beneficiary-settings", "/beneficiary-support"],
   },
 ];

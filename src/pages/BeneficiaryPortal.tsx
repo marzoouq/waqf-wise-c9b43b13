@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
 import { AlertCircle } from "lucide-react";
 import type { Beneficiary } from "@/types/beneficiary";
 import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
@@ -140,6 +141,9 @@ export default function BeneficiaryPortal() {
         
         {/* Mobile Bottom Navigation */}
         <BottomNavigation items={beneficiaryNavigationItems} ariaLabel="التنقل السفلي للمستفيد" />
+        
+        {/* Scroll to Top Button */}
+        <ScrollToTopButton threshold={300} />
       </SidebarProvider>
     </PageErrorBoundary>
   );

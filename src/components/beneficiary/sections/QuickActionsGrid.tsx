@@ -11,18 +11,18 @@ const BENEFICIARY_QUICK_ACTIONS = [
   {
     icon: FileText,
     label: "الإفصاح السنوي",
-    description: "عرض الإفصاح المالي للسنة الحالية",
+    description: "عرض الإفصاح المالي والتقارير",
     color: "text-[hsl(var(--chart-1))]",
     bgColor: "bg-[hsl(var(--chart-1)/0.1)]",
-    path: "/beneficiary-portal?tab=disclosures",
+    path: "/beneficiary-portal?tab=reports",
   },
   {
     icon: Receipt,
-    label: "كشف الحساب",
-    description: "عرض كشف الحساب التفصيلي",
+    label: "التوزيعات",
+    description: "عرض التوزيعات وكشف الحساب",
     color: "text-[hsl(var(--status-success))]",
     bgColor: "bg-[hsl(var(--status-success)/0.1)]",
-    path: "/beneficiary-portal?tab=statements",
+    path: "/beneficiary-portal?tab=distributions",
   },
   {
     icon: Send,

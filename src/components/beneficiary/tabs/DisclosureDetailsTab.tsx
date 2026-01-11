@@ -126,7 +126,7 @@ export function DisclosureDetailsTab() {
   const previousYear = disclosures?.find(d => d.year === (disclosure?.year || 0) - 1) || null;
 
   const handleBack = () => {
-    navigate("/beneficiary-portal?tab=disclosures");
+    navigate("/beneficiary-portal?tab=reports");
   };
 
   const handleExportPDF = async () => {
