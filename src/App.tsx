@@ -78,12 +78,7 @@ const App = () => {
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         {/* ✅ AuthProvider يغلف كل شيء - يُهيأ مرة واحدة فقط */}
         <AuthProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
+          <BrowserRouter>
             <Routes>
               {/* ✅ الصفحة الترحيبية */}
               <Route 
