@@ -49,15 +49,23 @@ export function useSystemPerformanceMetrics() {
           return checkDate >= hour && checkDate < nextHour;
         });
 
-        const avgResponseTime = periodHealth.length > 0
-          ? Math.round(periodHealth.reduce((sum, h) => sum + (h.response_time_ms || 0), 0) / periodHealth.length)
-          : 0;
+        // استخدام بيانات audit_logs لحساب وقت الاستجابة التقريبي إذا لم توجد health checks
+        let avgResponseTime = 0;
+        if (periodHealth.length > 0) {
+          avgResponseTime = Math.round(periodHealth.reduce((sum, h) => sum + (h.response_time_ms || 0), 0) / periodHealth.length);
+        } else if (periodLogs.length > 0) {
+          // تقدير وقت الاستجابة بناءً على عدد الطلبات (أكثر طلبات = وقت أبطأ)
+          avgResponseTime = Math.min(500, 50 + Math.round(periodLogs.length * 2));
+        }
 
-        // نسبة CPU محسوبة من وقت الاستجابة (تقريبي)
-        // قاعدة: وقت استجابة أعلى = حمل أكثر على CPU
-        const avgCpu = periodHealth.length > 0
-          ? Math.min(100, Math.round(avgResponseTime / 10)) // تحويل تقريبي
-          : 0;
+        // نسبة CPU محسوبة من عدد الطلبات أو وقت الاستجابة
+        let avgCpu = 0;
+        if (periodHealth.length > 0) {
+          avgCpu = Math.min(100, Math.round(avgResponseTime / 10));
+        } else if (periodLogs.length > 0) {
+          // تقدير استخدام CPU بناءً على عدد الطلبات
+          avgCpu = Math.min(80, Math.round(periodLogs.length / 2));
+        }
 
         return {
           time: format(hour, "HH:mm", { locale: ar }),
