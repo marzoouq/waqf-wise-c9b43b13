@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_year_balances: {
+        Row: {
+          account_id: string
+          closed_at: string | null
+          closed_by: string | null
+          closing_balance: number | null
+          created_at: string | null
+          fiscal_year_id: string
+          id: string
+          is_final: boolean | null
+          opening_balance: number | null
+          total_credits: number | null
+          total_debits: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_id: string
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number | null
+          created_at?: string | null
+          fiscal_year_id: string
+          id?: string
+          is_final?: boolean | null
+          opening_balance?: number | null
+          total_credits?: number | null
+          total_debits?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number | null
+          created_at?: string | null
+          fiscal_year_id?: string
+          id?: string
+          is_final?: boolean | null
+          opening_balance?: number | null
+          total_credits?: number | null
+          total_debits?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_year_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_year_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts_hierarchy"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_year_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "account_year_balances_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       accounts: {
         Row: {
           account_nature: Database["public"]["Enums"]["account_nature"]
