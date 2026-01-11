@@ -155,6 +155,25 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 }
 
 /**
+ * Lazy load a named export with automatic retry mechanism
+ * 
+ * @param importFn - Dynamic import function
+ * @param exportName - Name of the export to use
+ * @param options - Retry options
+ * @returns Lazy component with retry logic
+ */
+export function lazyWithRetryNamed<T extends ComponentType<any>>(
+  importFn: () => Promise<Record<string, T>>,
+  exportName: string,
+  options: LazyRetryOptions = {}
+): React.LazyExoticComponent<T> {
+  return lazyWithRetry(
+    () => importFn().then(module => ({ default: module[exportName] })),
+    options
+  );
+}
+
+/**
  * Create a lazy component with retry for a specific page
  * Convenience wrapper with sensible defaults
  */
