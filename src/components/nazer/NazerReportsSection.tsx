@@ -50,7 +50,6 @@ const reportCategories: ReportCategory[] = [
       { label: "أداء العقارات", path: "/properties" },
       { label: "الإيجارات والتحصيل", path: "/invoices" },
       { label: "العقود والمستأجرين", path: "/tenants" },
-      { label: "تقرير أعمار الديون", path: "/tenants/aging-report" },
     ],
   },
   {

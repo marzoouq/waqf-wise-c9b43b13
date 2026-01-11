@@ -99,7 +99,6 @@ const menuGroups = [
     subItems: [
       { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
       { icon: Users, label: "المستأجرون", path: "/tenants", roles: ["admin", "accountant", "nazer", "cashier"] },
-      { icon: Clock, label: "تقرير أعمار المستأجرين", path: "/tenants/aging-report", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
