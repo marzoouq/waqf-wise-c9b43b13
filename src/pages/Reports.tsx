@@ -18,6 +18,7 @@ import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedge
 import { AgingReport } from "@/components/reports/AgingReport";
 import { ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
 import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Reports = () => {
@@ -30,7 +31,48 @@ const Reports = () => {
         icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
       />
 
-      <div className="space-y-6">
+
+       {/* وصول سريع لتقارير النظام والأمان والمستخدمين */}
+       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
+         <Link to="/users" className="block">
+           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+             <div className="flex items-center gap-2">
+               <Users className="h-4 w-4 text-primary" />
+               <div className="font-semibold">تقارير المستخدمين</div>
+             </div>
+             <div className="mt-1 text-sm text-muted-foreground">قائمة المستخدمين، الأدوار، سجل الدخول</div>
+           </div>
+         </Link>
+         <Link to="/security" className="block">
+           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+             <div className="flex items-center gap-2">
+               <ShieldCheck className="h-4 w-4 text-primary" />
+               <div className="font-semibold">تقارير الأمان</div>
+             </div>
+             <div className="mt-1 text-sm text-muted-foreground">الأحداث الأمنية ومحاولات الدخول</div>
+           </div>
+         </Link>
+         <Link to="/system-monitoring" className="block">
+           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+             <div className="flex items-center gap-2">
+               <BarChart3 className="h-4 w-4 text-primary" />
+               <div className="font-semibold">تقارير النظام</div>
+             </div>
+             <div className="mt-1 text-sm text-muted-foreground">صحة النظام، التنبيهات، الأخطاء</div>
+           </div>
+         </Link>
+         <Link to="/db-health" className="block">
+           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+             <div className="flex items-center gap-2">
+               <Building2 className="h-4 w-4 text-primary" />
+               <div className="font-semibold">تقارير البيانات</div>
+             </div>
+             <div className="mt-1 text-sm text-muted-foreground">صحة وأداء قاعدة البيانات</div>
+           </div>
+         </Link>
+       </div>
+
+       <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-3 lg:grid-cols-8 gap-1">
