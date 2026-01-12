@@ -36,8 +36,8 @@ const reportCategories: ReportCategory[] = [
     reports: [
       { label: "قائمة المستخدمين", path: "/users" },
       { label: "سجل الدخول", path: "/audit-logs?filter=login" },
-      { label: "الأدوار والصلاحيات", path: "/roles" },
-      { label: "إدارة الصلاحيات", path: "/permissions" },
+      { label: "الأدوار والصلاحيات", path: "/settings/roles" },
+      { label: "إدارة الصلاحيات", path: "/settings/permissions" },
     ],
   },
   {
@@ -60,8 +60,8 @@ const reportCategories: ReportCategory[] = [
     reports: [
       { label: "صحة النظام", path: "/system-monitoring" },
       { label: "أداء قاعدة البيانات", path: "/db-performance" },
-      { label: "سجلات الأخطاء", path: "/system-errors" },
-      { label: "Edge Functions", path: "/edge-functions" },
+      { label: "سجلات الأخطاء", path: "/system-error-logs" },
+      { label: "Edge Functions", path: "/edge-monitor" },
     ],
   },
   {
