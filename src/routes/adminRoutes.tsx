@@ -19,6 +19,8 @@ import {
   DatabasePerformanceDashboard,
   DatabaseHealthDashboard,
   IntegrationsManagement,
+  ComprehensiveTest,
+  RealTests,
   AIInsights,
   AISystemAudit,
   EdgeFunctionTest,
@@ -175,6 +177,24 @@ export const adminRoutes = [
     } 
   />,
   <Route
+    key="comprehensive-test"
+    path="/comprehensive-test"
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <ComprehensiveTest />
+      </ProtectedRoute>
+    }
+  />,
+  <Route
+    key="real-tests"
+    path="/tests/real"
+    element={
+      <ProtectedRoute requiredRoles={["admin"]}>
+        <RealTests />
+      </ProtectedRoute>
+    }
+  />,
+  <Route
     key="advanced-settings"
     path="/advanced-settings" 
     element={
@@ -183,6 +203,7 @@ export const adminRoutes = [
       </ProtectedRoute>
     } 
   />,
+
   <Route 
     key="settings-landing-page"
     path="/settings/landing-page" 

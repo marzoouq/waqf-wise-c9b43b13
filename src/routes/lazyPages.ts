@@ -108,6 +108,10 @@ export const DatabasePerformanceDashboard = lazyWithRetry(() => import("@/pages/
 export const DatabaseHealthDashboard = lazyWithRetry(() => import("@/pages/DatabaseHealthDashboard"));
 export const IntegrationsManagement = lazyWithRetry(() => import("@/pages/IntegrationsManagement"));
 
+// ==================== أدوات الاختبار ====================
+export const ComprehensiveTest = lazyWithRetry(() => import("@/pages/ComprehensiveTest"));
+export const RealTests = lazyWithRetry(() => import("@/pages/RealTests"));
+
 // ==================== الذكاء الاصطناعي ====================
 export const AIInsights = lazyWithRetry(() => import("@/pages/AIInsights"));
 export const AISystemAudit = lazyWithRetry(() => import("@/pages/AISystemAudit"));
