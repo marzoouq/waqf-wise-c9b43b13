@@ -75,7 +75,7 @@ const menuGroups = [
     id: "dashboard",
     label: "لوحة التحكم",
     icon: LayoutDashboard,
-    path: "/redirect",
+    path: "/dashboard",
     roles: ["all"],
     subItems: []
   },
