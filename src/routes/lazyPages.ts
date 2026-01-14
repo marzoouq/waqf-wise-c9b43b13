@@ -7,6 +7,7 @@ import { lazyWithRetry } from "@/lib/lazyWithRetry";
 
 // ==================== الصفحات العامة ====================
 export const LandingPage = lazyWithRetry(() => import("@/pages/LandingPage"));
+export const LandingPageLight = lazyWithRetry(() => import("@/pages/LandingPageLight"));
 export const Login = lazyWithRetry(() => import("@/pages/Login"));
 export const Signup = lazyWithRetry(() => import("@/pages/Signup"));
 export const Install = lazyWithRetry(() => import("@/pages/Install"));
