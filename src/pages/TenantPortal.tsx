@@ -1,7 +1,7 @@
 /**
  * Tenant Portal Page
  * بوابة المستأجرين لطلبات الصيانة
- * @version 1.2.0
+ * @version 1.3.0
  */
 
 import { useState } from "react";
@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2, FileText } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2, FileText, AlertCircle } from "lucide-react";
 import { useTenantAuth, useTenantProfile, useTenantMaintenanceRequests, useTenantNotifications } from "@/hooks/tenant-portal/useTenantPortal";
 import { CreateMaintenanceRequestDialog } from "@/components/tenant-portal/CreateMaintenanceRequestDialog";
 import { format } from "date-fns";
@@ -111,23 +113,30 @@ function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAu
   const { tenant, logout } = authHook;
   const { data: profileData } = useTenantProfile();
   const { data: requestsData, isLoading: loadingRequests } = useTenantMaintenanceRequests();
-  const { unreadCount } = useTenantNotifications();
+  const { data: notificationsData, unreadCount, markAsRead } = useTenantNotifications();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const requests = requestsData?.requests || [];
+  const notifications = notificationsData?.notifications || [];
   const contracts = profileData?.contracts || [];
-  const pendingCount = requests.filter((r) => r.status === "معلق").length;
-  const inProgressCount = requests.filter((r) => r.status === "قيد التنفيذ").length;
+
+  // الحالات المعلقة: جديد، معلق، قيد المراجعة
+  const pendingCount = requests.filter((r) => ["جديد", "معلق", "قيد المراجعة"].includes(r.status)).length;
+  // الحالات قيد التنفيذ: معتمد، قيد التنفيذ
+  const inProgressCount = requests.filter((r) => ["معتمد", "قيد التنفيذ"].includes(r.status)).length;
   const completedCount = requests.filter((r) => r.status === "مكتمل").length;
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
+      "جديد": "bg-yellow-100 text-yellow-800",
       "معلق": "bg-yellow-100 text-yellow-800",
+      "قيد المراجعة": "bg-orange-100 text-orange-800",
+      "معتمد": "bg-blue-100 text-blue-800",
       "قيد التنفيذ": "bg-blue-100 text-blue-800",
       "مكتمل": "bg-green-100 text-green-800",
-      "مرفوض": "bg-red-100 text-red-800",
+      "ملغي": "bg-red-100 text-red-800",
     };
-    return <Badge className={styles[status] || ""}>{status}</Badge>;
+    return <Badge className={styles[status] || "bg-gray-100 text-gray-800"}>{status}</Badge>;
   };
 
   return (
@@ -140,14 +149,63 @@ function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAu
             <span className="font-semibold">بوابة المستأجرين</span>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </Button>
+            {/* Notifications Popover */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <div className="p-3 border-b">
+                  <h4 className="font-semibold">الإشعارات</h4>
+                </div>
+                <ScrollArea className="h-[300px]">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">
+                      لا توجد إشعارات
+                    </div>
+                  ) : (
+                    <div className="divide-y">
+                      {notifications.slice(0, 10).map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`p-3 cursor-pointer hover:bg-muted/50 transition-colors ${!notification.is_read ? "bg-primary/5" : ""}`}
+                          onClick={() => {
+                            if (!notification.is_read) {
+                              markAsRead(notification.id);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start gap-2">
+                            <AlertCircle className={`h-4 w-4 mt-0.5 ${!notification.is_read ? "text-primary" : "text-muted-foreground"}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium ${!notification.is_read ? "text-foreground" : "text-muted-foreground"}`}>
+                                {notification.title}
+                              </p>
+                              <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(new Date(notification.created_at), "dd MMM yyyy HH:mm", { locale: ar })}
+                              </p>
+                            </div>
+                            {!notification.is_read && (
+                              <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
             <Button variant="ghost" size="sm" onClick={logout}>
               <LogOut className="h-4 w-4 ms-2" />
               خروج
