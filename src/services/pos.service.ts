@@ -202,9 +202,10 @@ export class POSService {
         notes,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في بدء الوردية");
     return data as CashierShift;
   }
 
@@ -303,9 +304,10 @@ export class POSService {
         net_amount: input.amount,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء العملية");
     return data as POSTransaction;
   }
 

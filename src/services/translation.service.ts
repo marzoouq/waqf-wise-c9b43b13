@@ -33,7 +33,7 @@ export const TranslationService = {
       .from('translations')
       .select('key, ar, en, fr')
       .eq('key', key)
-      .single();
+      .maybeSingle();
 
     if (error) return null;
     return data;
@@ -47,9 +47,10 @@ export const TranslationService = {
       .from('translations')
       .insert(translation)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء الترجمة");
     return data;
   },
 
@@ -62,9 +63,10 @@ export const TranslationService = {
       .update(updates)
       .eq('key', key)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("الترجمة غير موجودة");
     return data;
   },
 

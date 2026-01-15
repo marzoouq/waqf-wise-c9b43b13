@@ -67,9 +67,10 @@ export class GovernanceSettingsService {
         .from('beneficiary_visibility_settings')
         .insert(defaultSettings)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إنشاء إعدادات الرؤية");
       return data;
     } catch (error) {
       productionLogger.error('Error creating default visibility settings', error);
@@ -87,9 +88,10 @@ export class GovernanceSettingsService {
         .update(updates as never)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("إعدادات الرؤية غير موجودة");
       return data;
     } catch (error) {
       productionLogger.error('Error updating visibility settings', error);
@@ -128,18 +130,20 @@ export class GovernanceSettingsService {
           .update(updates as never)
           .eq('id', id)
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw new Error("إعدادات المنظمة غير موجودة");
         return data;
       } else {
         const { data, error } = await supabase
           .from('organization_settings')
           .insert([updates as never])
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
+        if (!data) throw new Error("فشل في إنشاء إعدادات المنظمة");
         return data;
       }
     } catch (error) {

@@ -18,7 +18,7 @@ export class NotificationSettingsService {
       .from("notification_settings")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
     return data as NotificationSettings | null;
@@ -37,18 +37,20 @@ export class NotificationSettingsService {
         .update(updates)
         .eq("id", settingsId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("إعدادات الإشعارات غير موجودة");
       return data as NotificationSettings;
     } else {
       const { data, error } = await supabase
         .from("notification_settings")
         .insert([{ ...updates, user_id: user.id }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إنشاء إعدادات الإشعارات");
       return data as NotificationSettings;
     }
   }

@@ -139,9 +139,10 @@ export class InvoiceService {
     if (error) throw error;
   }
 
-  static async updateStatus(id: string, status: string): Promise<Invoice> {
-    const { data, error } = await supabase.from('invoices').update({ status }).eq('id', id).select().single();
+  static async updateStatus(id: string, status: string): Promise<Invoice | null> {
+    const { data, error } = await supabase.from('invoices').update({ status }).eq('id', id).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("الفاتورة غير موجودة");
     return data;
   }
 

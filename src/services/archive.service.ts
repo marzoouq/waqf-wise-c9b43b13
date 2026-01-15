@@ -47,7 +47,7 @@ export class ArchiveService {
       .from('documents')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
     return data;
@@ -61,9 +61,10 @@ export class ArchiveService {
       .from('documents')
       .insert(document)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء المستند");
     return data;
   }
 
@@ -76,9 +77,10 @@ export class ArchiveService {
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error("المستند غير موجود");
     return data;
   }
 
@@ -118,9 +120,10 @@ export class ArchiveService {
       .from('folders')
       .insert(folder)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء المجلد");
     return data;
   }
 
@@ -133,9 +136,10 @@ export class ArchiveService {
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error("المجلد غير موجود");
     return data;
   }
 
@@ -228,12 +232,13 @@ export class ArchiveService {
       folder_id, 
       storage_path: storagePath, 
       file_path: urlData.publicUrl,
-    }).select().single();
+    }).select().maybeSingle();
 
     if (error) { 
       await supabase.storage.from('archive-documents').remove([storagePath]); 
       throw error; 
     }
+    if (!data) throw new Error("فشل في رفع المستند");
     return data;
   }
 
@@ -353,9 +358,10 @@ export class ArchiveService {
         created_by: user?.id,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إضافة الوسم");
     return data;
   }
 
