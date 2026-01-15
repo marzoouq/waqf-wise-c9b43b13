@@ -64,9 +64,10 @@ export class BeneficiaryDocumentsService {
           description,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل رفع المستند');
       return data;
     } catch (error) {
       productionLogger.error('Error uploading document', error);
@@ -83,7 +84,7 @@ export class BeneficiaryDocumentsService {
         .from('beneficiary_attachments')
         .select('file_path')
         .eq('id', documentId)
-        .single();
+        .maybeSingle();
 
       if (doc?.file_path) {
         await supabase.storage
@@ -132,7 +133,7 @@ export class BeneficiaryDocumentsService {
         .from('beneficiaries')
         .select('iban, bank_name, bank_account_number')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       

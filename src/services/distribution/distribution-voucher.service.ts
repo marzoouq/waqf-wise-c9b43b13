@@ -64,9 +64,10 @@ export class DistributionVoucherService {
         .from('payment_vouchers')
         .insert([voucher])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء السند');
       return data;
     } catch (error) {
       productionLogger.error('Error creating voucher', error);

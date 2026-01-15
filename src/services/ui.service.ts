@@ -59,9 +59,10 @@ export class UIService {
       .from("activities")
       .insert([activity])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إضافة النشاط');
     return data;
   }
 
@@ -88,9 +89,10 @@ export class UIService {
       .from("tasks")
       .insert([task])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إضافة المهمة');
     return data;
   }
 
@@ -103,9 +105,10 @@ export class UIService {
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('المهمة غير موجودة');
     return data;
   }
 
@@ -136,9 +139,10 @@ export class UIService {
         user_id: userData?.user?.id,
       }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل حفظ البحث');
     return data;
   }
 
@@ -162,7 +166,7 @@ export class UIService {
       .from("saved_searches")
       .select("usage_count")
       .eq("id", id)
-      .single();
+      .maybeSingle();
     
     const { error } = await supabase
       .from("saved_searches")

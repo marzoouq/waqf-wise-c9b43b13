@@ -215,7 +215,7 @@ export class AutoJournalService {
         .select('id')
         .eq('is_active', true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       // إنشاء القيد
       const { data: journalEntry, error: entryError } = await supabase
@@ -230,9 +230,10 @@ export class AutoJournalService {
           fiscal_year_id: activeFY?.id || '',
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (entryError) throw entryError;
+      if (!journalEntry) throw new Error('فشل إنشاء القيد');
 
       // إنشاء سطور القيد
       const entryLines = lines.map((line, index) => ({

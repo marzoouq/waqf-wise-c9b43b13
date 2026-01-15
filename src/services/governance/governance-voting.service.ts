@@ -73,7 +73,7 @@ export class GovernanceVotingService {
         .select('*')
         .eq('decision_id', decisionId)
         .eq('voter_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
@@ -117,9 +117,10 @@ export class GovernanceVotingService {
           vote_reason: reason,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل تسجيل الصوت');
       return data;
     } catch (error) {
       productionLogger.error('Error casting vote', error);

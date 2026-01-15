@@ -17,9 +17,10 @@ export class ReportTemplateService {
         .from("report_templates")
         .insert([template])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء قالب التقرير');
 
       await this.logActivity(`تم إنشاء قالب تقرير: ${template.template_name}`);
 

@@ -55,9 +55,10 @@ export class PropertyMaintenanceService {
         .from('maintenance_providers')
         .insert([provider])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء مزود الصيانة');
       return data;
     } catch (error) {
       productionLogger.error('Error adding maintenance provider', error);

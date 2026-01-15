@@ -137,9 +137,10 @@ export class BeneficiaryCoreService {
         .from('beneficiaries')
         .insert([beneficiary])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء المستفيد');
       return data as Beneficiary;
     } catch (error) {
       productionLogger.error('Error creating beneficiary', error);
@@ -157,9 +158,10 @@ export class BeneficiaryCoreService {
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('المستفيد غير موجود');
       return data as Beneficiary;
     } catch (error) {
       productionLogger.error('Error updating beneficiary', error);
@@ -258,7 +260,7 @@ export class BeneficiaryCoreService {
         .from('beneficiaries')
         .select('family_id')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (!beneficiary?.family_id) return [];
 
@@ -371,9 +373,10 @@ export class BeneficiaryCoreService {
         })
         .eq('id', beneficiaryId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('المستفيد غير موجود');
       return data as Beneficiary;
     } catch (error) {
       productionLogger.error('Error updating notification preferences', error);

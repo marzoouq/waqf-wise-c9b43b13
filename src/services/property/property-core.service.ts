@@ -78,9 +78,10 @@ export class PropertyCoreService {
         .from('properties')
         .insert([property])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء العقار');
       return data;
     } catch (error) {
       productionLogger.error('Error creating property', error);
@@ -98,9 +99,10 @@ export class PropertyCoreService {
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('العقار غير موجود');
       return data;
     } catch (error) {
       productionLogger.error('Error updating property', error);

@@ -70,9 +70,10 @@ export class LoansService {
       .from('loans')
       .insert(loan)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء القرض');
     return data;
   }
 
@@ -85,9 +86,10 @@ export class LoansService {
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('القرض غير موجود');
     return data;
   }
 
@@ -152,9 +154,10 @@ export class LoansService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('القسط غير موجود');
     return data;
   }
 
@@ -176,9 +179,10 @@ export class LoansService {
       })
       .eq('id', installmentId)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('القسط غير موجود');
     return data;
   }
 
@@ -240,9 +244,10 @@ export class LoansService {
       .from('emergency_aid')
       .insert([aid])
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الفزعة');
     return data;
   }
 
@@ -262,9 +267,10 @@ export class LoansService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) throw new Error('الفزعة غير موجودة');
     return data;
   }
 
@@ -336,9 +342,10 @@ export class LoansService {
       .from('loan_payments')
       .insert([payment])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الدفعة');
     return data;
   }
 

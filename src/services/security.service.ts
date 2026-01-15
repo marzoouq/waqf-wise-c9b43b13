@@ -48,7 +48,7 @@ export class SecurityService {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (error) return null;
     return data?.role || null;

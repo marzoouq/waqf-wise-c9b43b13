@@ -156,9 +156,10 @@ export class FiscalYearService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('السنة المالية غير موجودة');
     return data;
   }
 
@@ -175,10 +176,14 @@ export class FiscalYearService {
       })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return { success: false, message: error.message };
+    }
+
+    if (!data) {
+      return { success: false, message: 'السنة المالية غير موجودة' };
     }
 
     return { success: true, data };

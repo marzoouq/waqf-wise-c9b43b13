@@ -189,9 +189,10 @@ export class DisclosureService {
       })
       .eq("id", disclosureId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('الإفصاح غير موجود');
     
     try {
       await supabase.functions.invoke('notify-disclosure-published', {
