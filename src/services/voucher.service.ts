@@ -138,7 +138,11 @@ export class VoucherService {
         .from("payment_vouchers")
         .select("id, voucher_number, journal_entry_id, voucher_type")
         .eq("id", voucherId)
-        .single();
+        .maybeSingle();
+      
+      if (!existingVoucher) {
+        throw new Error("السند غير موجود");
+      }
 
       // إنشاء قيد إذا لم يكن موجوداً
       if (existingVoucher && !existingVoucher.journal_entry_id && existingVoucher.voucher_type === 'payment') {
@@ -193,7 +197,7 @@ export class VoucherService {
         .from("payment_vouchers")
         .select("voucher_number, status")
         .eq("id", voucherId)
-        .single();
+        .maybeSingle();
 
       if (voucher?.status === "paid") {
         throw new Error("لا يمكن حذف سند مدفوع");
@@ -268,7 +272,7 @@ export class VoucherService {
       .from("distributions")
       .select("*")
       .eq("id", distributionId)
-      .single();
+      .maybeSingle();
 
     if (distError) throw distError;
     if (!distribution) throw new Error("التوزيع غير موجود");
@@ -339,7 +343,7 @@ export class VoucherService {
         .from("distributions")
         .select("*")
         .eq("id", distributionId)
-        .single();
+        .maybeSingle();
 
       if (distError) throw distError;
       if (!distribution) throw new Error("التوزيع غير موجود");

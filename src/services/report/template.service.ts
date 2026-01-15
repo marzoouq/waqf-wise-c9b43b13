@@ -64,9 +64,10 @@ export class ReportTemplateService {
         .from("report_templates")
         .select("*")
         .eq("id", templateId)
-        .single();
+        .maybeSingle();
 
       if (templateError) throw templateError;
+      if (!template) throw new Error("قالب التقرير غير موجود");
 
       let reportData: ReportData[] = [];
       

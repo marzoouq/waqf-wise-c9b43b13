@@ -81,7 +81,7 @@ export class GovernanceDecisionsService {
         .from('governance_decisions')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
