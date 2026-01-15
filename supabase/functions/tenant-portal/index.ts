@@ -49,7 +49,9 @@ serve(async (req) => {
 
   const tenant = session.tenants;
   const url = new URL(req.url);
-  const action = url.searchParams.get("action");
+  // ملاحظة: بعض العملاء قد يستدعون الوظيفة بدون action عن طريق الخطأ.
+  // لتفادي كسر الواجهة، نجعل GET الافتراضي يعيد الملف الشخصي.
+  const action = url.searchParams.get("action") ?? (req.method === "GET" ? "profile" : null);
 
   try {
     // تحديث نشاط الجلسة
