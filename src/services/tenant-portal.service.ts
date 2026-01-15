@@ -19,23 +19,17 @@ export interface TenantData {
 
 export interface TenantContract {
   id: string;
+  contract_id: string;
   contract_number: string;
   start_date: string;
   end_date: string;
   status: string;
-  property_units: {
-    id: string;
-    unit_number: string;
-    unit_type: string;
-    floor_number: number;
-    property_id: string;
-    properties: {
-      id: string;
-      name: string;
-      address: string;
-      city: string;
-    };
-  };
+  property_id: string;
+  property_name: string;
+  property_address?: string;
+  unit_id?: string;
+  unit_name?: string;
+  unit_number?: string;
 }
 
 export interface TenantMaintenanceRequest {

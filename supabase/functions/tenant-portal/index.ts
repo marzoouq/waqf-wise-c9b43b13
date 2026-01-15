@@ -62,17 +62,34 @@ serve(async (req) => {
 
     // جلب بيانات المستأجر
     if (action === "profile" && req.method === "GET") {
-      // جلب الوحدات المرتبطة بالمستأجر
-      const { data: contracts } = await supabaseAdmin
+      // جلب العقود المرتبطة بالمستأجر
+      const { data: contractsRaw } = await supabaseAdmin
         .from("contracts")
         .select(`
           id, contract_number, start_date, end_date, status,
-          property_units(id, unit_number, unit_type, floor_number, property_id,
-            properties(id, name, address, city)
-          )
+          property_id,
+          properties(id, name, address, city),
+          unit_id,
+          property_units(id, unit_number, unit_type)
         `)
         .eq("tenant_id", tenant.id)
         .eq("status", "نشط");
+
+      // تحويل البيانات للتنسيق المطلوب
+      const contracts = (contractsRaw || []).map((c: any) => ({
+        id: c.id,
+        contract_id: c.id,
+        contract_number: c.contract_number,
+        start_date: c.start_date,
+        end_date: c.end_date,
+        status: c.status,
+        property_id: c.property_id,
+        property_name: c.properties?.name || "غير محدد",
+        property_address: c.properties?.address,
+        unit_id: c.unit_id,
+        unit_name: c.property_units?.unit_number || "الوحدة الرئيسية",
+        unit_number: c.property_units?.unit_number,
+      }));
 
       return new Response(
         JSON.stringify({
@@ -83,7 +100,7 @@ serve(async (req) => {
             email: tenant.email,
             tenantNumber: tenant.tenant_number,
           },
-          contracts: contracts || [],
+          contracts,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

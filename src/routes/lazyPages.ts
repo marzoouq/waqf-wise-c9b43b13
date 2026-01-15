@@ -122,3 +122,6 @@ export const Chatbot = lazyWithRetry(() => import("@/pages/Chatbot"));
 
 // ==================== نقطة البيع ====================
 export const PointOfSale = lazyWithRetry(() => import("@/pages/PointOfSale"));
+
+// ==================== بوابة المستأجرين ====================
+export const TenantPortal = lazyWithRetry(() => import("@/pages/TenantPortal"));
