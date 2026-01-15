@@ -84,9 +84,20 @@ export class FamilyService {
    */
   static async update(id: string, updates: Partial<Family>): Promise<Family> {
     try {
+      // تنظيف البيانات - إزالة القيم الفارغة التي تسبب أخطاء UUID
+      const cleanedUpdates: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(updates)) {
+        // تحويل السلاسل الفارغة إلى null لحقول UUID
+        if (key.endsWith('_id') && value === '') {
+          cleanedUpdates[key] = null;
+        } else if (value !== undefined) {
+          cleanedUpdates[key] = value;
+        }
+      }
+
       const { data, error } = await supabase
         .from('families')
-        .update(updates)
+        .update(cleanedUpdates)
         .eq('id', id)
         .select()
         .maybeSingle();
