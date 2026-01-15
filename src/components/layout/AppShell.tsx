@@ -26,7 +26,7 @@ import {
 import { debugLog } from '@/lib/logger';
 
 export default function AppShell() {
-  debugLog('AppShell', 'تحميل الهيكل');
+  debugLog('AppShell', 'تحميل الهيكل', undefined);
   
   return (
     <SettingsProvider>
