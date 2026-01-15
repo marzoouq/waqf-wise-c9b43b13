@@ -47,8 +47,12 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
       return;
     }
 
-    // بدء المؤقت عند التحميل
-    resetTimer();
+    // ✅ إصلاح: تأخير بدء المؤقت 3 ثواني لضمان استقرار الجلسة والأدوار
+    // هذا يمنع race condition مع تحميل الأدوار
+    const startDelay = setTimeout(() => {
+      // بدء المؤقت بعد التأخير
+      resetTimer();
+    }, 3000);
 
     // الأحداث التي تدل على نشاط المستخدم
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
@@ -60,6 +64,8 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
 
     // التنظيف
     return () => {
+      clearTimeout(startDelay);
+      
       events.forEach(event => {
         window.removeEventListener(event, handleActivity);
       });

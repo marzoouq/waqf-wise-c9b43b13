@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const initRef = useRef(false);
   // ✅ استخدام useRef بدلاً من localStorage للأمان
   const rolesCache = useRef<string[]>([]);
+  // ✅ قفل لمنع تكرار طلبات تحديث الـ Token (يمنع 429 rate limit)
+  const tokenRefreshLock = useRef(false);
 
   // جلب أدوار المستخدم باستخدام AuthService
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
@@ -215,6 +217,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
         setRolesLoading(false);
         return;
+      }
+
+      // ✅ إصلاح: منع تكرار طلبات TOKEN_REFRESHED (يمنع 429 rate limit)
+      if (event === 'TOKEN_REFRESHED') {
+        if (tokenRefreshLock.current) {
+          // تجاهل الطلبات المتكررة خلال 5 ثواني
+          return;
+        }
+        tokenRefreshLock.current = true;
+        setTimeout(() => {
+          tokenRefreshLock.current = false;
+        }, 5000);
       }
 
       // ✅ SIGNED_IN أو TOKEN_REFRESHED مع جلسة صالحة
