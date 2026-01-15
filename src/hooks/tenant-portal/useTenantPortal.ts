@@ -66,11 +66,20 @@ export function useTenantAuth() {
     toast({ title: "تسجيل الخروج", description: "تم تسجيل الخروج بنجاح" });
   }, [toast]);
 
+  // إعادة تحديث حالة تسجيل الدخول عند نجاح التحقق
+  useEffect(() => {
+    if (TenantPortalService.isLoggedIn() && !isLoggedIn) {
+      setIsLoggedIn(true);
+      setTenant(TenantPortalService.getCachedTenant());
+    }
+  }, [isLoggedIn]);
+
   return {
     isLoggedIn,
     tenant,
     sendOtp: sendOtpMutation.mutate,
     isSendingOtp: sendOtpMutation.isPending,
+    sendOtpSuccess: sendOtpMutation.data?.success,
     verifyOtp: verifyOtpMutation.mutate,
     isVerifyingOtp: verifyOtpMutation.isPending,
     devOtp: sendOtpMutation.data?.devOtp,
