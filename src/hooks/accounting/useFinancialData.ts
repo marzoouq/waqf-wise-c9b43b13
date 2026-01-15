@@ -59,14 +59,14 @@ export function useFinancialData(fiscalYearId?: string) {
           .from('fiscal_years')
           .select('id, name, is_active, is_closed, start_date, end_date')
           .eq('id', fiscalYearId)
-          .single();
+          .maybeSingle();
         targetFiscalYear = data;
       } else {
         const { data } = await supabase
           .from('fiscal_years')
           .select('id, name, is_active, is_closed, start_date, end_date')
           .eq('is_active', true)
-          .single();
+          .maybeSingle();
         targetFiscalYear = data;
       }
 
