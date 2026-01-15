@@ -26,11 +26,11 @@ interface DashboardOption {
 }
 
 const dashboardOptions: DashboardOption[] = [
-  { role: "admin", path: "/admin", label: "لوحة المشرف", icon: Shield, color: "text-destructive" },
-  { role: "nazer", path: "/nazer", label: "لوحة الناظر", icon: Eye, color: "text-primary" },
-  { role: "accountant", path: "/accountant", label: "لوحة المحاسب", icon: Calculator, color: "text-status-success" },
-  { role: "archivist", path: "/archivist", label: "لوحة أمين الأرشيف", icon: Archive, color: "text-status-warning" },
-  { role: "cashier", path: "/cashier", label: "لوحة الصراف", icon: Wallet, color: "text-chart-1" },
+  { role: "admin", path: "/admin-dashboard", label: "لوحة المشرف", icon: Shield, color: "text-destructive" },
+  { role: "nazer", path: "/nazer-dashboard", label: "لوحة الناظر", icon: Eye, color: "text-primary" },
+  { role: "accountant", path: "/accountant-dashboard", label: "لوحة المحاسب", icon: Calculator, color: "text-status-success" },
+  { role: "archivist", path: "/archivist-dashboard", label: "لوحة أمين الأرشيف", icon: Archive, color: "text-status-warning" },
+  { role: "cashier", path: "/cashier-dashboard", label: "لوحة الصراف", icon: Wallet, color: "text-chart-1" },
   { role: "user", path: "/dashboard", label: "لوحة المستخدم", icon: User, color: "text-muted-foreground" },
 ];
 
