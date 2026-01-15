@@ -175,10 +175,10 @@ export const fetchWaqfBranding = async (): Promise<WaqfBrandingData | null> => {
       .from("waqf_branding")
       .select("stamp_image_url, signature_image_url, waqf_logo_url, nazer_name, show_logo_in_pdf, show_stamp_in_pdf")
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return data as WaqfBrandingData;
+    return data as WaqfBrandingData | null;
   } catch {
     return null;
   }

@@ -112,9 +112,10 @@ export function useTestHistory() {
           notes
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل حفظ نتيجة الاختبار');
       return data as TestRun;
     },
     onSuccess: () => {

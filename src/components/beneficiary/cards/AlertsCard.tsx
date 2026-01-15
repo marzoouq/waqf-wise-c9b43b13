@@ -45,7 +45,7 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
         .from('beneficiaries')
         .select('user_id')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       let unreadNotifications = 0;
 

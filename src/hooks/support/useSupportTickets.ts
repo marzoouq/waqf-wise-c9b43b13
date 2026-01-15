@@ -48,9 +48,10 @@ export function useSupportTickets(filters?: SupportFilters) {
           tags: input.tags || null,
         }])
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء التذكرة');
       return data;
     },
     onSuccess: () => {

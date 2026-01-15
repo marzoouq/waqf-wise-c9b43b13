@@ -99,7 +99,7 @@ export function FinancialReportsTab() {
         .eq('status', 'published')
         .order('year', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (error && error.code !== 'PGRST116') throw error;
       return data;
@@ -118,7 +118,7 @@ export function FinancialReportsTab() {
         .from('beneficiaries')
         .select('total_received, pending_amount')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       // جلب سجل التوزيعات
       const { data: distributions, count } = await supabase

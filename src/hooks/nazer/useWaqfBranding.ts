@@ -30,10 +30,10 @@ export const useWaqfBranding = () => {
         .from("waqf_branding")
         .select("*")
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as WaqfBranding;
+      return data as WaqfBranding | null;
     },
   });
 
