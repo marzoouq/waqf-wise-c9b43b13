@@ -225,9 +225,10 @@ export class POSService {
       })
       .eq('id', shiftId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("الوردية غير موجودة");
     return data as CashierShift;
   }
 
@@ -322,9 +323,10 @@ export class POSService {
       })
       .eq('id', transactionId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("العملية غير موجودة");
     return data as POSTransaction;
   }
 

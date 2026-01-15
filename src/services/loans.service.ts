@@ -56,10 +56,10 @@ export class LoansService {
         loan_installments(*)
       `)
       .eq('id', id)
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
-    return loan as LoanWithInstallments;
+    return loan as LoanWithInstallments | null;
   }
 
   /**

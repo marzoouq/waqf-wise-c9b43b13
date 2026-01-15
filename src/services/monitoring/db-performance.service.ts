@@ -86,8 +86,7 @@ class DBPerformanceService {
    * جلب إحصائيات Sequential Scans مباشرة
    */
   async getSequentialScansStats(): Promise<TableScanStats[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('get_table_scan_stats');
+    const { data, error } = await supabase.rpc('get_table_scan_stats' as never);
     
     if (error) {
       productionLogger.error('[DBPerformanceService] Seq scan error:', error);
@@ -101,23 +100,22 @@ class DBPerformanceService {
    * جلب نسبة Cache Hit
    */
   async getCacheHitRatio(): Promise<number> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('get_cache_hit_ratio');
+    const { data, error } = await supabase.rpc('get_cache_hit_ratio' as never);
     
     if (error) {
       productionLogger.error('[DBPerformanceService] Cache hit error:', error);
       return 0;
     }
 
-    return data?.[0]?.cache_hit_ratio || 0;
+    const result = data as unknown as Array<{ cache_hit_ratio?: number }> | null;
+    return result?.[0]?.cache_hit_ratio || 0;
   }
 
   /**
    * جلب إحصائيات الاتصالات
    */
   async getConnectionStats(): Promise<ConnectionStats[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('get_connection_stats');
+    const { data, error } = await supabase.rpc('get_connection_stats' as never);
     
     if (error) {
       productionLogger.error('[DBPerformanceService] Connection stats error:', error);

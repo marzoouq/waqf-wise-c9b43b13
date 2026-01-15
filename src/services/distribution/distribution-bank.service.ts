@@ -81,13 +81,13 @@ export class DistributionBankService {
   /**
    * تتبع حالة التحويل
    */
-  static async trackTransferStatus(transferId: string): Promise<Database['public']['Tables']['bank_transfer_files']['Row']> {
+  static async trackTransferStatus(transferId: string): Promise<Database['public']['Tables']['bank_transfer_files']['Row'] | null> {
     try {
       const { data, error } = await supabase
         .from('bank_transfer_files')
         .select('*')
         .eq('id', transferId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
