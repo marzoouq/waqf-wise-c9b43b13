@@ -194,6 +194,31 @@ serve(async (req) => {
       // توليد رقم الطلب
       const requestNumber = `MR-T-${Date.now().toString().slice(-8)}`;
 
+      // تطبيع القيم لتوافق قيود قاعدة البيانات
+      const normalizeCategory = (input: unknown): string => {
+        const v = String(input ?? "").trim();
+        if (!v) return "أخرى";
+        if (v.includes("كهرب")) return "كهرباء";
+        if (v.includes("سباك")) return "سباكة";
+        if (v.includes("تكييف")) return "تكييف";
+        if (v.includes("نظاف")) return "نظافة";
+        if (v.includes("أمن")) return "أمن";
+        return "أخرى";
+      };
+
+      const normalizePriority = (input: unknown, isUrgent: boolean): string => {
+        if (isUrgent) return "عاجلة";
+        const v = String(input ?? "").trim();
+        if (v === "عاجلة" || v === "عاجل") return "عاجلة";
+        if (v === "عالية" || v === "مرتفع" || v === "مرتفعة") return "عالية";
+        if (v === "منخفضة" || v === "منخفض") return "منخفضة";
+        return "عادية";
+      };
+
+      const category = normalizeCategory(body.category);
+      const priority = normalizePriority(body.priority, Boolean(body.isUrgent));
+      const status = "جديد";
+
       const { data: newRequest, error: createError } = await supabaseAdmin
         .from("maintenance_requests")
         .insert({
@@ -203,9 +228,9 @@ serve(async (req) => {
           unit_id: body.unitId || null,
           title: body.title.trim(),
           description: body.description?.trim() || null,
-          category: body.category,
-          priority: body.isUrgent ? "عاجل" : (body.priority || "متوسطة"),
-          status: "معلق",
+          category,
+          priority,
+          status,
           location_in_unit: body.locationInUnit?.trim() || null,
           images: body.images || [],
           preferred_date: body.preferredDate || null,
