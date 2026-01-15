@@ -110,3 +110,5 @@ export function SequentialScansChart({ data, isLoading }: SequentialScansChartPr
     </Card>
   );
 }
+
+export default SequentialScansChart;

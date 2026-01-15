@@ -127,3 +127,5 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
     </Card>
   );
 }
+
+export default TablesPerformanceTable;
