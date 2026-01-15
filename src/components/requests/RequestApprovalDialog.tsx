@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
 import { useRequestApprovals } from "@/hooks/requests/useRequestApprovals";
 import { useAuth } from "@/contexts/AuthContext";
@@ -145,8 +146,10 @@ export function RequestApprovalDialog({
           {canApprove && (
             <Card className="border-dashed">
               <CardContent className="p-4 space-y-3">
-                <h4 className="font-semibold">إجراء الموافقة</h4>
+                <Label htmlFor="approval-notes" className="font-semibold">إجراء الموافقة</Label>
                 <Textarea
+                  id="approval-notes"
+                  name="approval-notes"
                   placeholder="أضف ملاحظات (اختياري)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

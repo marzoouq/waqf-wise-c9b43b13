@@ -67,16 +67,24 @@ export function RequestsFilters({
       <div className="relative flex-1 min-w-[200px]">
         <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
+          id="requests-search"
+          name="requests-search"
           placeholder="بحث في الطلبات..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pe-10 text-sm"
+          aria-label="بحث في الطلبات"
+          autoComplete="off"
         />
       </div>
       
       {/* فلتر الحالة */}
-      <Select value={statusFilter} onValueChange={onStatusChange}>
-        <SelectTrigger className="w-full sm:w-[160px] text-sm">
+      <Select value={statusFilter} onValueChange={onStatusChange} name="status-filter">
+        <SelectTrigger 
+          id="status-filter"
+          className="w-full sm:w-[160px] text-sm"
+          aria-label="تصفية حسب الحالة"
+        >
           <Filter className="h-4 w-4 ms-2" />
           <SelectValue placeholder="الحالة" />
         </SelectTrigger>
@@ -90,8 +98,12 @@ export function RequestsFilters({
       </Select>
 
       {/* فلتر نوع الطلب */}
-      <Select value={requestTypeFilter} onValueChange={onRequestTypeChange}>
-        <SelectTrigger className="w-full sm:w-[180px] text-sm">
+      <Select value={requestTypeFilter} onValueChange={onRequestTypeChange} name="request-type-filter">
+        <SelectTrigger 
+          id="request-type-filter"
+          className="w-full sm:w-[180px] text-sm"
+          aria-label="تصفية حسب نوع الطلب"
+        >
           <SelectValue placeholder="نوع الطلب" />
         </SelectTrigger>
         <SelectContent>

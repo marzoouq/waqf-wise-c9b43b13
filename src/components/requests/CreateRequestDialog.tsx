@@ -138,18 +138,22 @@ export const CreateRequestDialog = memo(({
       <form onSubmit={handleSubmit} className="space-y-4" dir="rtl">
         {/* البحث عن المستفيد */}
         <div className="space-y-2">
-          <Label htmlFor="beneficiary">المستفيد *</Label>
+          <Label htmlFor="beneficiary-select">المستفيد *</Label>
           <div className="relative mb-2">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              id="beneficiary-search"
+              name="beneficiary-search"
               placeholder="ابحث بالاسم أو رقم الهوية..."
               value={beneficiarySearch}
               onChange={(e) => setBeneficiarySearch(e.target.value)}
               className="pe-10"
+              aria-label="البحث عن المستفيد"
+              autoComplete="off"
             />
           </div>
-          <Select value={beneficiaryId} onValueChange={setBeneficiaryId}>
-            <SelectTrigger>
+          <Select value={beneficiaryId} onValueChange={setBeneficiaryId} name="beneficiary">
+            <SelectTrigger id="beneficiary-select" aria-label="اختر المستفيد">
               <SelectValue placeholder={beneficiariesLoading ? "جاري التحميل..." : "اختر المستفيد"} />
             </SelectTrigger>
             <SelectContent>
@@ -164,9 +168,9 @@ export const CreateRequestDialog = memo(({
 
         {/* نوع الطلب */}
         <div className="space-y-2">
-          <Label htmlFor="request-type">نوع الطلب *</Label>
-          <Select value={requestTypeId} onValueChange={setRequestTypeId}>
-            <SelectTrigger>
+          <Label htmlFor="request-type-select">نوع الطلب *</Label>
+          <Select value={requestTypeId} onValueChange={setRequestTypeId} name="request-type">
+            <SelectTrigger id="request-type-select" aria-label="اختر نوع الطلب">
               <SelectValue placeholder={typesLoading ? "جاري التحميل..." : "اختر نوع الطلب"} />
             </SelectTrigger>
             <SelectContent>
@@ -181,9 +185,10 @@ export const CreateRequestDialog = memo(({
 
         {/* الوصف */}
         <div className="space-y-2">
-          <Label htmlFor="description">وصف الطلب *</Label>
+          <Label htmlFor="request-description">وصف الطلب *</Label>
           <Textarea
-            id="description"
+            id="request-description"
+            name="request-description"
             placeholder="اكتب تفاصيل الطلب..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -193,23 +198,25 @@ export const CreateRequestDialog = memo(({
 
         {/* المبلغ */}
         <div className="space-y-2">
-          <Label htmlFor="amount">المبلغ (اختياري)</Label>
+          <Label htmlFor="request-amount">المبلغ (اختياري)</Label>
           <Input
-            id="amount"
+            id="request-amount"
+            name="request-amount"
             type="number"
             placeholder="0"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             min="0"
             step="0.01"
+            autoComplete="off"
           />
         </div>
 
         {/* الأولوية */}
         <div className="space-y-2">
-          <Label htmlFor="priority">الأولوية</Label>
-          <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
-            <SelectTrigger>
+          <Label htmlFor="request-priority">الأولوية</Label>
+          <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)} name="priority">
+            <SelectTrigger id="request-priority" aria-label="اختر الأولوية">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
