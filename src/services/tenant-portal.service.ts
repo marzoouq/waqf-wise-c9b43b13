@@ -149,13 +149,7 @@ export class TenantPortalService {
       throw new Error("غير مسجل الدخول");
     }
 
-    const { data, error } = await supabase.functions.invoke("tenant-portal", {
-      body: method === "POST" ? body : undefined,
-      headers: { "x-tenant-session": sessionToken },
-      method,
-    });
-
-    // إضافة action كـ query param
+    // استخدام fetch مع query param للـ action
     const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tenant-portal`);
     url.searchParams.set("action", action);
 
