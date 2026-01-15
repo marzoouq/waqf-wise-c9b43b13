@@ -1,0 +1,121 @@
+/**
+ * Tenant Verify OTP Edge Function
+ * التحقق من رمز OTP وإنشاء جلسة للمستأجر
+ * @version 1.0.0
+ */
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// توليد توكن جلسة آمن
+function generateSessionToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { phone, otp } = await req.json();
+
+    if (!phone || !otp || otp.length !== 6) {
+      return new Response(
+        JSON.stringify({ error: "البيانات غير صالحة" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    // البحث عن رمز OTP صالح
+    const { data: otpRecord, error: otpError } = await supabaseAdmin
+      .from("tenant_otp_codes")
+      .select("*, tenants(*)")
+      .eq("phone", cleanPhone)
+      .eq("otp_code", otp)
+      .eq("is_used", false)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    if (otpError || !otpRecord) {
+      return new Response(
+        JSON.stringify({ error: "رمز التحقق غير صحيح أو منتهي الصلاحية" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // تحديث حالة OTP
+    await supabaseAdmin
+      .from("tenant_otp_codes")
+      .update({ is_used: true, verified_at: new Date().toISOString() })
+      .eq("id", otpRecord.id);
+
+    // إنشاء جلسة جديدة
+    const sessionToken = generateSessionToken();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 أيام
+
+    // حذف الجلسات القديمة
+    await supabaseAdmin
+      .from("tenant_sessions")
+      .delete()
+      .eq("tenant_id", otpRecord.tenant_id);
+
+    // إنشاء جلسة جديدة
+    const { error: sessionError } = await supabaseAdmin
+      .from("tenant_sessions")
+      .insert({
+        tenant_id: otpRecord.tenant_id,
+        session_token: sessionToken,
+        ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+        user_agent: req.headers.get("user-agent"),
+        expires_at: expiresAt.toISOString(),
+      });
+
+    if (sessionError) {
+      console.error("Error creating session:", sessionError);
+      return new Response(
+        JSON.stringify({ error: "فشل في إنشاء الجلسة" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const tenant = otpRecord.tenants;
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        sessionToken,
+        expiresAt: expiresAt.toISOString(),
+        tenant: {
+          id: tenant.id,
+          fullName: tenant.full_name,
+          phone: tenant.phone,
+          email: tenant.email,
+        },
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+
+  } catch (error) {
+    console.error("Error in tenant-verify-otp:", error);
+    return new Response(
+      JSON.stringify({ error: "حدث خطأ في الخادم" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
