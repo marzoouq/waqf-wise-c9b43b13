@@ -204,12 +204,12 @@ serve(async (req) => {
           title: body.title.trim(),
           description: body.description?.trim() || null,
           category: body.category,
-          priority: body.isUrgent ? "عاجل" : (body.priority || "متوسط"),
+          priority: body.isUrgent ? "عاجل" : (body.priority || "متوسطة"),
           status: "معلق",
           location_in_unit: body.locationInUnit?.trim() || null,
           images: body.images || [],
           preferred_date: body.preferredDate || null,
-          preferred_time_slot: body.preferredTimeSlot || null,
+          preferred_time_slot: body.preferredTimeSlot || "anytime",
           contact_preference: body.contactPreference || "phone",
           contact_phone: body.contactPhone || tenant.phone,
           contact_email: body.contactEmail || tenant.email,
@@ -217,6 +217,7 @@ serve(async (req) => {
           tenant_notes: body.tenantNotes?.trim() || null,
           submitted_via: "tenant_portal",
           requested_date: new Date().toISOString().split("T")[0],
+          requested_by: tenant.full_name || tenant.phone,
         })
         .select()
         .single();
