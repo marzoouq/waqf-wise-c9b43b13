@@ -5,10 +5,10 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { DashboardService } from "@/services";
 import type { BudgetComparison } from "@/types/dashboard";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { realtimeManager } from "@/services/realtime-manager";
 
 // ==================== Budget Comparison Hook ====================
 export function useBudgetComparison() {
@@ -19,23 +19,14 @@ export function useBudgetComparison() {
     queryFn: (): Promise<BudgetComparison[]> => DashboardService.getBudgetComparison(),
   });
 
-  // Real-time subscription
+  // ✅ Real-time subscription عبر RealtimeManager المركزي لتقليل القنوات
   useEffect(() => {
-    const channel = supabase
-      .channel('budgets-realtime-chart')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'budgets'
-      }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGET_COMPARISON_CHART });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
-      })
-      .subscribe();
+    const unsub = realtimeManager.subscribe("budgets", () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGET_COMPARISON_CHART });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => unsub();
   }, [queryClient]);
 
   return query;

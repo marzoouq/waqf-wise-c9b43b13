@@ -18,10 +18,13 @@ interface ChannelInfo {
 class RealtimeManager {
   private static instance: RealtimeManager;
   private channels: Map<string, ChannelInfo> = new Map();
-  private isReconnecting = false;
-  private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // ✅ Debounce channel removal لتقليل فتح/إغلاق اتصال Realtime بشكل متكرر
+  private removalTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+
   private readonly MAX_CHANNELS = 20;
-  private readonly RECONNECT_DELAY = 500;
+  private readonly CHANNEL_IDLE_TTL_MS = 60_000; // 60s قبل إزالة القناة بعد آخر مستمع
+
 
   private constructor() {
     // Singleton
@@ -38,17 +41,14 @@ class RealtimeManager {
    * الاشتراك في تغييرات جدول معين
    */
   subscribe(table: string, callback: ListenerCallback): () => void {
-    // Connection Throttling - منع إعادة الاتصال السريع
-    if (this.isReconnecting) {
-      if (import.meta.env.DEV) {
-        console.log(`[RealtimeManager] Throttling connection to ${table}`);
-      }
-      // إضافة للانتظار
-      setTimeout(() => this.subscribe(table, callback), this.RECONNECT_DELAY);
-      return () => {};
-    }
-
     const channelName = `unified-${table}`;
+
+    // إذا كانت هناك إزالة مجدولة للقناة، نلغيها لأن هناك مستمع جديد
+    const timer = this.removalTimers.get(channelName);
+    if (timer) {
+      clearTimeout(timer);
+      this.removalTimers.delete(channelName);
+    }
 
     // التحقق من الحد الأقصى للقنوات
     if (this.channels.size >= this.MAX_CHANNELS && !this.channels.has(channelName)) {
@@ -136,21 +136,38 @@ class RealtimeManager {
       console.log(`[RealtimeManager] Removed listener from ${table}. Remaining: ${channelInfo.listeners.size}`);
     }
 
-    // إذا لم يتبق مستمعين، إزالة القناة
+    // إذا لم يتبق مستمعين، إزالة القناة (بشكل مؤجل لتجنب thrashing)
     if (channelInfo.listeners.size === 0) {
-      this.removeChannel(channelName);
+      this.scheduleChannelRemoval(channelName);
     }
   }
 
   /**
-   * إزالة قناة
+   * جدولة إزالة قناة بعد فترة خمول (لتقليل فتح/إغلاق الاتصال)
    */
-  private removeChannel(channelName: string): void {
+  private scheduleChannelRemoval(channelName: string): void {
+    if (this.removalTimers.has(channelName)) return;
+
+    const timer = setTimeout(() => {
+      this.removalTimers.delete(channelName);
+      // تأكد أن القناة ما زالت بلا مستمعين قبل الإزالة
+      const info = this.channels.get(channelName);
+      if (!info || info.listeners.size > 0) return;
+      this.removeChannelNow(channelName);
+    }, this.CHANNEL_IDLE_TTL_MS);
+
+    this.removalTimers.set(channelName, timer);
+  }
+
+  /**
+   * إزالة قناة فوراً
+   */
+  private removeChannelNow(channelName: string): void {
     const channelInfo = this.channels.get(channelName);
     if (channelInfo) {
       supabase.removeChannel(channelInfo.channel);
       this.channels.delete(channelName);
-      
+
       if (import.meta.env.DEV) {
         console.log(`[RealtimeManager] Removed channel ${channelName}. Remaining: ${this.channels.size}`);
       }
@@ -172,7 +189,7 @@ class RealtimeManager {
     });
 
     if (oldestChannel) {
-      this.removeChannel(oldestChannel);
+      this.removeChannelNow(oldestChannel);
     }
   }
 
@@ -180,11 +197,15 @@ class RealtimeManager {
    * إزالة جميع القنوات
    */
   removeAllChannels(): void {
+    // إلغاء أي عمليات إزالة مجدولة
+    this.removalTimers.forEach((t) => clearTimeout(t));
+    this.removalTimers.clear();
+
     this.channels.forEach((info) => {
       supabase.removeChannel(info.channel);
     });
     this.channels.clear();
-    
+
     if (import.meta.env.DEV) {
       console.log('[RealtimeManager] Removed all channels');
     }

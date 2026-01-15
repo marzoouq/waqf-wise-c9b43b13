@@ -14,23 +14,36 @@ export class RealtimeService {
   private static channels: Map<string, RealtimeChannel> = new Map();
   private static channelCallbacks: Map<string, Set<RealtimeCallback>> = new Map();
 
+  // ✅ Debounce removal لتقليل فتح/إغلاق اتصال Realtime
+  private static removalTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  private static readonly CHANNEL_IDLE_TTL_MS = 60_000;
+
+
   /**
    * الاشتراك في جدول - يعيد استخدام القناة الموجودة
    */
   static subscribeToTable(table: string, callback: RealtimeCallback) {
     const channelName = `realtime-${table}`;
-    
+
+    // إذا كانت هناك إزالة مجدولة للقناة، نلغيها لأن هناك مستمع جديد
+    const timer = this.removalTimers.get(channelName);
+    if (timer) {
+      clearTimeout(timer);
+      this.removalTimers.delete(channelName);
+    }
+
     // إذا كانت القناة موجودة، نضيف الـ callback فقط
     if (this.channels.has(channelName)) {
       if (import.meta.env.DEV) {
         console.log(`[RealtimeService] Reusing channel: ${channelName}`);
       }
       this.channelCallbacks.get(channelName)?.add(callback);
-      return { 
-        channel: this.channels.get(channelName)!, 
-        unsubscribe: () => this.removeCallback(channelName, callback)
+      return {
+        channel: this.channels.get(channelName)!,
+        unsubscribe: () => this.removeCallback(channelName, callback),
       };
     }
+
 
     // التحقق من الحد الأقصى
     if (this.channels.size >= MAX_CHANNELS) {
@@ -101,14 +114,27 @@ export class RealtimeService {
    */
   private static removeCallback(channelName: string, callback: RealtimeCallback): void {
     const callbacks = this.channelCallbacks.get(channelName);
-    if (callbacks) {
-      callbacks.delete(callback);
-      
-      // إذا لم يتبق callbacks، نزيل القناة
-      if (callbacks.size === 0) {
-        this.unsubscribe(channelName);
-      }
+    if (!callbacks) return;
+
+    callbacks.delete(callback);
+
+    // إذا لم يتبق callbacks، نزيل القناة بشكل مؤجل لتقليل thrashing
+    if (callbacks.size === 0) {
+      this.scheduleChannelRemoval(channelName);
     }
+  }
+
+  private static scheduleChannelRemoval(channelName: string): void {
+    if (this.removalTimers.has(channelName)) return;
+
+    const timer = setTimeout(() => {
+      this.removalTimers.delete(channelName);
+      const callbacks = this.channelCallbacks.get(channelName);
+      if (callbacks && callbacks.size > 0) return;
+      this.unsubscribe(channelName);
+    }, this.CHANNEL_IDLE_TTL_MS);
+
+    this.removalTimers.set(channelName, timer);
   }
 
   static unsubscribe(channelName: string): void {
@@ -125,10 +151,13 @@ export class RealtimeService {
   }
 
   static unsubscribeAll(): void {
+    this.removalTimers.forEach((t) => clearTimeout(t));
+    this.removalTimers.clear();
+
     this.channels.forEach(channel => supabase.removeChannel(channel));
     this.channels.clear();
     this.channelCallbacks.clear();
-    
+
     if (import.meta.env.DEV) {
       console.log('[RealtimeService] Removed all channels');
     }
