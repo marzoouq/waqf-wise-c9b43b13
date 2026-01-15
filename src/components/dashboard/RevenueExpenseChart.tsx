@@ -44,9 +44,10 @@ const RevenueExpenseChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">الإيرادات والمصروفات الشهرية</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <AreaChart data={data || []}>
-            <defs>
+        <div style={{ width: '100%', minHeight: chartHeight }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <AreaChart data={data || []}>
+              <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
@@ -107,8 +108,9 @@ const RevenueExpenseChart = () => {
               fillOpacity={1}
               fill="url(#colorExpense)"
             />
-          </AreaChart>
-        </ResponsiveContainer>
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

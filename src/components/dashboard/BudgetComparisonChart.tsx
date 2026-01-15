@@ -63,8 +63,9 @@ const BudgetComparisonChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">مقارنة الميزانيات</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={data}>
+        <div style={{ width: '100%', minHeight: chartHeight }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="account" 
@@ -106,10 +107,11 @@ const BudgetComparisonChart = () => {
                 return labels[value] || value;
               }}
             />
-            <Bar dataKey="budgeted" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="actual" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+              <Bar dataKey="budgeted" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="actual" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

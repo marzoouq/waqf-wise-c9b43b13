@@ -43,8 +43,9 @@ export default function RevenueDistributionChart() {
         <CardTitle>توزيع الإيرادات حسب المصدر</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
-          <PieChart>
+        <div style={{ width: '100%', minHeight: 350 }}>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
             <Pie
               data={data}
               cx="50%"
@@ -63,12 +64,13 @@ export default function RevenueDistributionChart() {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip
+              <Tooltip
               formatter={(value: number) => `${value.toLocaleString('ar-SA')} ر.س`}
             />
             <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

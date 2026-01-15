@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
       .update({ 
         status: 'auto_resolved',
         resolved_at: new Date().toISOString(),
-        resolved_by: 'system_auto_cleanup'
+        resolved_by: null // UUID column - cannot use string
       })
       .eq('status', 'new')
       .lt('created_at', thresholdTime)
