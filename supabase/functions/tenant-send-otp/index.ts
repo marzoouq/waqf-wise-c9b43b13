@@ -1,7 +1,7 @@
 /**
  * Tenant Send OTP Edge Function
- * إرسال رمز OTP للمستأجر عبر رقم الهاتف
- * @version 1.0.0
+ * التحقق من المستأجر وإرجاع معلومات للتحقق برقم العقد
+ * @version 2.0.0
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -60,9 +60,31 @@ serve(async (req) => {
       );
     }
 
-    // توليد رمز OTP (6 أرقام)
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 دقائق
+    // التحقق من وجود عقد نشط للمستأجر
+    const { data: contracts, error: contractError } = await supabaseAdmin
+      .from("contracts")
+      .select("id, contract_number")
+      .eq("tenant_id", tenant.id)
+      .eq("status", "نشط")
+      .limit(1);
+
+    if (contractError) {
+      console.error("Error finding contracts:", contractError);
+      return new Response(
+        JSON.stringify({ error: "حدث خطأ أثناء البحث عن العقود" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!contracts || contracts.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "لا يوجد عقد نشط مرتبط بهذا الرقم" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // حفظ بيانات التحقق مؤقتاً
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
 
     // حذف رموز OTP القديمة لنفس المستأجر
     await supabaseAdmin
@@ -70,35 +92,30 @@ serve(async (req) => {
       .delete()
       .eq("tenant_id", tenant.id);
 
-    // إنشاء رمز OTP جديد
+    // إنشاء سجل تحقق جديد (نستخدم رقم العقد كرمز)
     const { error: otpError } = await supabaseAdmin
       .from("tenant_otp_codes")
       .insert({
         tenant_id: tenant.id,
         phone: cleanPhone,
-        otp_code: otpCode,
+        otp_code: contracts[0].contract_number, // رقم العقد كرمز تحقق
         expires_at: expiresAt.toISOString(),
       });
 
     if (otpError) {
-      console.error("Error creating OTP:", otpError);
+      console.error("Error creating verification record:", otpError);
       return new Response(
-        JSON.stringify({ error: "فشل في إنشاء رمز التحقق" }),
+        JSON.stringify({ error: "فشل في إنشاء سجل التحقق" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // في الإنتاج: إرسال SMS عبر خدمة مثل Twilio
-    // هنا نعرض الرمز للتطوير فقط
-    console.log(`OTP for ${cleanPhone}: ${otpCode}`);
-
     return new Response(
       JSON.stringify({
         success: true,
-        message: "تم إرسال رمز التحقق",
+        message: "يرجى إدخال رقم العقد للتحقق",
         tenantName: tenant.full_name,
-        // للتطوير فقط - يُزال في الإنتاج
-        devOtp: Deno.env.get("ENVIRONMENT") === "development" ? otpCode : undefined,
+        verificationMethod: "contract_number",
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
