@@ -1,7 +1,7 @@
 /**
  * Tenant Portal Page
  * بوابة المستأجرين لطلبات الصيانة
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import { useState } from "react";
@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2, AlertCircle } from "lucide-react";
-import { useTenantAuth, useTenantMaintenanceRequests, useTenantNotifications } from "@/hooks/tenant-portal/useTenantPortal";
+import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2 } from "lucide-react";
+import { useTenantAuth, useTenantProfile, useTenantMaintenanceRequests, useTenantNotifications } from "@/hooks/tenant-portal/useTenantPortal";
+import { CreateMaintenanceRequestDialog } from "@/components/tenant-portal/CreateMaintenanceRequestDialog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -102,10 +102,13 @@ function TenantLogin() {
 // مكون لوحة التحكم
 function TenantDashboard() {
   const { tenant, logout } = useTenantAuth();
+  const { data: profileData } = useTenantProfile();
   const { data: requestsData, isLoading: loadingRequests } = useTenantMaintenanceRequests();
-  const { data: notificationsData, unreadCount } = useTenantNotifications();
+  const { unreadCount } = useTenantNotifications();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const requests = requestsData?.requests || [];
+  const contracts = profileData?.contracts || [];
   const pendingCount = requests.filter((r) => r.status === "معلق").length;
   const inProgressCount = requests.filter((r) => r.status === "قيد التنفيذ").length;
   const completedCount = requests.filter((r) => r.status === "مكتمل").length;
@@ -180,10 +183,17 @@ function TenantDashboard() {
         </div>
 
         {/* New Request Button */}
-        <Button className="w-full" size="lg">
+        <Button className="w-full" size="lg" onClick={() => setShowCreateDialog(true)}>
           <Plus className="h-5 w-5 ms-2" />
           طلب صيانة جديد
         </Button>
+
+        {/* Create Request Dialog */}
+        <CreateMaintenanceRequestDialog
+          open={showCreateDialog}
+          onOpenChange={setShowCreateDialog}
+          contracts={contracts}
+        />
 
         {/* Requests List */}
         <Card>

@@ -19,6 +19,7 @@ const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
 const SecurityPolicyPage = lazy(() => import("@/pages/SecurityPolicy"));
 const FAQ = lazy(() => import("@/pages/FAQ"));
 const Contact = lazy(() => import("@/pages/Contact"));
+const TenantPortal = lazy(() => import("@/pages/TenantPortal"));
 
 // ✅ Fallback خفيف للصفحات الثانوية
 const LightFallback = () => (
@@ -41,4 +42,6 @@ export const publicRoutes = [
   <Route key="security-policy" path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />,
   <Route key="faq" path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />,
   <Route key="contact" path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />,
+  // بوابة المستأجرين - لا تتطلب مصادقة عادية (تستخدم OTP)
+  <Route key="tenant-portal" path="/tenant-portal" element={<Suspense fallback={<LightFallback />}><TenantPortal /></Suspense>} />,
 ];
