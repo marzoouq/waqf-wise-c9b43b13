@@ -64,34 +64,65 @@ serve(async (req) => {
 
     // جلب بيانات المستأجر
     if (action === "profile" && req.method === "GET") {
-      // جلب العقود المرتبطة بالمستأجر
+      // جلب العقود المرتبطة بالمستأجر (نشط أو منتهي حديثاً)
       const { data: contractsRaw } = await supabaseAdmin
         .from("contracts")
         .select(`
-          id, contract_number, start_date, end_date, status,
-          property_id,
-          properties(id, name, address, city),
-          unit_id,
-          property_units(id, unit_number, unit_type)
+          id, contract_number, start_date, end_date, status, property_id,
+          properties(id, name, address, city)
         `)
         .eq("tenant_id", tenant.id)
-        .eq("status", "نشط");
+        .in("status", ["نشط", "منتهي"]);
 
-      // تحويل البيانات للتنسيق المطلوب
-      const contracts = (contractsRaw || []).map((c: any) => ({
-        id: c.id,
-        contract_id: c.id,
-        contract_number: c.contract_number,
-        start_date: c.start_date,
-        end_date: c.end_date,
-        status: c.status,
-        property_id: c.property_id,
-        property_name: c.properties?.name || "غير محدد",
-        property_address: c.properties?.address,
-        unit_id: c.unit_id,
-        unit_name: c.property_units?.unit_number || "الوحدة الرئيسية",
-        unit_number: c.property_units?.unit_number,
-      }));
+      // جلب الوحدات المرتبطة بكل عقد
+      const contracts = [];
+      for (const contract of (contractsRaw || [])) {
+        // جلب الوحدات التي تنتمي لهذا العقد
+        const { data: units } = await supabaseAdmin
+          .from("property_units")
+          .select("id, unit_number, unit_name, unit_type")
+          .eq("current_contract_id", contract.id);
+
+        if (units && units.length > 0) {
+          // إضافة كل وحدة كعقد منفصل
+          for (const unit of units) {
+            contracts.push({
+              id: contract.id,
+              contract_id: contract.id,
+              contract_number: contract.contract_number,
+              start_date: contract.start_date,
+              end_date: contract.end_date,
+              status: contract.status,
+              property_id: contract.property_id,
+              property_name: (contract as any).properties?.name || "غير محدد",
+              property_address: (contract as any).properties?.address,
+              property_city: (contract as any).properties?.city,
+              unit_id: unit.id,
+              unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
+              unit_number: unit.unit_number,
+              unit_type: unit.unit_type,
+            });
+          }
+        } else {
+          // عقد بدون وحدات محددة
+          contracts.push({
+            id: contract.id,
+            contract_id: contract.id,
+            contract_number: contract.contract_number,
+            start_date: contract.start_date,
+            end_date: contract.end_date,
+            status: contract.status,
+            property_id: contract.property_id,
+            property_name: (contract as any).properties?.name || "غير محدد",
+            property_address: (contract as any).properties?.address,
+            property_city: (contract as any).properties?.city,
+            unit_id: null,
+            unit_name: "العقار كامل",
+            unit_number: null,
+            unit_type: null,
+          });
+        }
+      }
 
       return new Response(
         JSON.stringify({
@@ -117,13 +148,22 @@ serve(async (req) => {
           location_in_unit, images, preferred_date, preferred_time_slot,
           is_urgent, tenant_notes, admin_response, rating, rating_feedback,
           scheduled_date, completed_date, created_at, updated_at,
-          properties(id, name)
+          property_id, unit_id,
+          properties(id, name, address),
+          property_units(id, unit_number, unit_name)
         `)
         .eq("tenant_id", tenant.id)
         .order("created_at", { ascending: false });
 
+      // إضافة اسم العقار والوحدة للطلبات
+      const enrichedRequests = (requests || []).map((r: any) => ({
+        ...r,
+        property_name: r.properties?.name || "غير محدد",
+        unit_name: r.property_units?.unit_name || r.property_units?.unit_number || null,
+      }));
+
       return new Response(
-        JSON.stringify({ requests: requests || [] }),
+        JSON.stringify({ requests: enrichedRequests }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

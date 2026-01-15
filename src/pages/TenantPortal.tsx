@@ -223,6 +223,16 @@ function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAu
                     {getStatusBadge(request.status)}
                   </div>
                   <p className="text-sm text-muted-foreground">{request.request_number}</p>
+                  {/* عرض العقار والوحدة */}
+                  {(request.property_name || request.unit_name) && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Building2 className="h-3 w-3" />
+                      <span>
+                        {request.property_name}
+                        {request.unit_name && ` - ${request.unit_name}`}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{request.category}</span>
                     <span>{format(new Date(request.created_at), "dd MMM yyyy", { locale: ar })}</span>
