@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
       .select("user_id, credential_id, public_key")
       .eq("credential_id", credentialId)
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (credError || !credential) {
       console.error("Credential verification failed:", credError);

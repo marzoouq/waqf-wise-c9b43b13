@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', user.id)
       .in('role', ['nazer', 'admin'])
-      .single();
+      .maybeSingle();
 
     if (!userRole) {
       return forbiddenResponse('غير مصرح لك بنشر السنة المالية');
@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
       .from('fiscal_years')
       .select('*')
       .eq('id', fiscalYearId)
-      .single();
+      .maybeSingle();
 
     if (fyError || !fiscalYear) {
       return errorResponse('السنة المالية غير موجودة', 404);

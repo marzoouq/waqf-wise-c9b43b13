@@ -129,7 +129,7 @@ serve(async (req) => {
       .from('backup_logs')
       .insert({ backup_type: backupType, status: 'running', started_at: new Date().toISOString(), tables_included: tablesToBackup })
       .select()
-      .single();
+      .maybeSingle();
 
     const backupData: Record<string, unknown[]> = {};
     let totalRecords = 0;

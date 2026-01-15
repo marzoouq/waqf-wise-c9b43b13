@@ -103,7 +103,7 @@ serve(async (req) => {
       .from('invoices')
       .select('*, invoice_lines(*)')
       .eq('id', invoice_id)
-      .single();
+      .maybeSingle();
 
     if (invoiceError || !invoice) {
       return errorResponse('لم يتم العثور على الفاتورة', 404);

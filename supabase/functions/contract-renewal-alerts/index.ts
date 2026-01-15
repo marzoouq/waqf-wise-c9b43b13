@@ -246,7 +246,7 @@ serve(async (req) => {
         .eq('reference_type', 'contract_expiry')
         .eq('reference_id', contract.id)
         .gte('created_at', new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString())
-        .single();
+        .maybeSingle();
 
       if (!existingAlert) {
         // جلب المسؤولين (admin/nazer) لإرسال الإشعارات

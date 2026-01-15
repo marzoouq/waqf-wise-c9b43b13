@@ -103,7 +103,7 @@ serve(async (req) => {
         beneficiaries:beneficiary_id (id, full_name)
       `)
       .eq('id', voucher_id)
-      .single();
+      .maybeSingle();
 
     if (voucherError || !voucher) {
       console.error('[link-voucher-journal] ❌ Voucher not found:', voucherError);
@@ -130,7 +130,7 @@ serve(async (req) => {
         .from('fiscal_years')
         .select('id')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (!fiscalYear) {
         return errorResponse('لا توجد سنة مالية نشطة', 400);
@@ -141,13 +141,13 @@ serve(async (req) => {
         .from('accounts')
         .select('id')
         .eq('code', DEFAULT_ACCOUNTS.cash)
-        .single();
+        .maybeSingle();
 
       const { data: liabilityAccount } = await supabase
         .from('accounts')
         .select('id')
         .eq('code', DEFAULT_ACCOUNTS.beneficiary)
-        .single();
+        .maybeSingle();
 
       if (!cashAccount || !liabilityAccount) {
         return errorResponse('لم يتم العثور على الحسابات المطلوبة', 400);
@@ -159,7 +159,7 @@ serve(async (req) => {
         .select('entry_number')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const lastNumber = lastEntry?.entry_number 
         ? parseInt(lastEntry.entry_number.split('-')[1], 10) 
@@ -181,12 +181,13 @@ serve(async (req) => {
           reference_id: voucher_id,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (entryError) {
         console.error('[link-voucher-journal] ❌ Entry creation error:', entryError);
         throw entryError;
       }
+      if (!journalEntry) throw new Error('فشل إنشاء القيد');
 
       // إنشاء سطور القيد
       // مدين: الخصوم (تخفيض المستحقات)

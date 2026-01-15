@@ -97,7 +97,7 @@ serve(async (req) => {
         .from('fiscal_years')
         .select('id, start_date, end_date')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (!activeFY) {
         throw new Error('لم يتم العثور على سنة مالية نشطة');
@@ -110,7 +110,7 @@ serve(async (req) => {
       .from('fiscal_years')
       .select('*')
       .eq('id', targetFiscalYear)
-      .single();
+      .maybeSingle();
 
     if (!fiscalYear) {
       throw new Error('السنة المالية غير موجودة');
@@ -262,12 +262,13 @@ serve(async (req) => {
         .from('cash_flows')
         .insert(result)
         .select()
-        .single();
+        .maybeSingle();
 
       if (insertError) {
         console.error('[calculate-cash-flow] ❌ Insert error:', insertError);
         throw insertError;
       }
+      if (!newFlow) throw new Error('فشل إنشاء التدفق النقدي');
 
       console.log('[calculate-cash-flow] ✅ Created new cash flow:', newFlow?.id);
     }

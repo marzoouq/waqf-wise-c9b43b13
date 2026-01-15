@@ -102,7 +102,7 @@ serve(async (req) => {
       .select('*, encryption_keys(*)')
       .eq('id', fileId)
       .eq('is_deleted', false)
-      .single();
+      .maybeSingle();
 
     if (fileError || !fileRecord) {
       throw new Error('الملف غير موجود أو تم حذفه');

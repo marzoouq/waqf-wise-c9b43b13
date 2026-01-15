@@ -229,11 +229,12 @@ serve(async (req) => {
         metadata: { key_base64: keyBase64 }
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (keyError) {
       throw new Error(`فشل حفظ مفتاح التشفير: ${keyError.message}`);
     }
+    if (!keyData) throw new Error('فشل إنشاء مفتاح التشفير');
 
     // ثانياً: تسجيل الملف المشفر
     const { data: fileRecord, error: fileError } = await supabase
@@ -255,13 +256,14 @@ serve(async (req) => {
         }
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (fileError) {
       // حذف الملف المشفر إذا فشل حفظ السجل
       await supabase.storage.from('encrypted-files').remove([uploadData.path]);
       throw new Error(`فشل حفظ سجل الملف: ${fileError.message}`);
     }
+    if (!fileRecord) throw new Error('فشل تسجيل الملف المشفر');
 
     // تسجيل الوصول
     await supabase.from('sensitive_data_access_log').insert({

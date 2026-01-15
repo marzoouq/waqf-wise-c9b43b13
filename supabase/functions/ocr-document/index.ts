@@ -71,7 +71,7 @@ serve(async (req) => {
 
     // تحديث حالة المعالجة
     const processingStart = Date.now();
-    const { data: logData } = await supabase
+    const { data: logData, error: logError } = await supabase
       .from('ocr_processing_log')
       .insert({
         document_id: documentId,
@@ -80,7 +80,11 @@ serve(async (req) => {
         processed_by: req.headers.get('user-id'),
       })
       .select()
-      .single();
+      .maybeSingle();
+
+    if (logError || !logData) {
+      throw new Error('فشل تسجيل عملية OCR');
+    }
 
     // تحميل الملف
     const fileResponse = await fetch(fileUrl);
@@ -139,9 +143,10 @@ serve(async (req) => {
 
     // حفظ النص في المستند أو المرفق
     if (documentId) {
+      const { data: docData } = await supabase.from('documents').select('description').eq('id', documentId).maybeSingle();
       await supabase
         .from('documents')
-        .update({ description: (await supabase.from('documents').select('description').eq('id', documentId).single()).data?.description + '\n\n[نص مستخرج]: ' + extractedText })
+        .update({ description: (docData?.description || '') + '\n\n[نص مستخرج]: ' + extractedText })
         .eq('id', documentId);
     }
 
