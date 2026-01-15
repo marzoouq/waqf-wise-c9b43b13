@@ -51,6 +51,10 @@ const UsersContent = () => {
     setSearchTerm,
     roleFilter,
     setRoleFilter,
+    userTypeFilter,
+    setUserTypeFilter,
+    staffCount,
+    beneficiariesCount,
     deleteUser,
     updateRoles,
     resetPassword,
@@ -142,6 +146,10 @@ const UsersContent = () => {
         onSearchChange={setSearchTerm}
         roleFilter={roleFilter}
         onRoleFilterChange={setRoleFilter}
+        userTypeFilter={userTypeFilter}
+        onUserTypeFilterChange={setUserTypeFilter}
+        staffCount={staffCount}
+        beneficiariesCount={beneficiariesCount}
       />
 
       {/* ✅ استخدام UsersTableWithContext - بدون Props Drilling */}

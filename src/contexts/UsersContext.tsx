@@ -1,12 +1,15 @@
 /**
  * Users Context - سياق المستخدمين
  * لتقليل Props Drilling في مكونات المستخدمين
- * @version 2.9.12
+ * @version 2.9.13
+ * 
+ * التحسينات:
+ * - إضافة فلتر نوع المستخدم (staff/beneficiaries)
  */
 
 import React, { createContext, useContext, ReactNode, useCallback } from "react";
 import { useUsersManagement, type UserProfile } from "@/hooks/users/useUsersManagement";
-import { useUsersFilter } from "@/hooks/users/useUsersFilter";
+import { useUsersFilter, type UserTypeFilter } from "@/hooks/users/useUsersFilter";
 import type { AppRole } from "@/types/roles";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/ui/use-toast";
@@ -24,6 +27,10 @@ interface UsersContextValue {
   setSearchTerm: (term: string) => void;
   roleFilter: string;
   setRoleFilter: (role: string) => void;
+  userTypeFilter: UserTypeFilter;
+  setUserTypeFilter: (type: UserTypeFilter) => void;
+  staffCount: number;
+  beneficiariesCount: number;
   
   // العمليات
   deleteUser: (user: UserProfile) => void;
@@ -71,6 +78,10 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     setSearchTerm,
     roleFilter,
     setRoleFilter,
+    userTypeFilter,
+    setUserTypeFilter,
+    staffCount,
+    beneficiariesCount,
   } = useUsersFilter({ users });
 
   // حذف المستخدم - موحد (بدون تكرار التحقق من الصلاحيات)
@@ -97,6 +108,10 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     setSearchTerm,
     roleFilter,
     setRoleFilter,
+    userTypeFilter,
+    setUserTypeFilter,
+    staffCount,
+    beneficiariesCount,
     
     deleteUser: handleDeleteUser,
     updateRoles: (userId: string, roles: AppRole[]) => 
