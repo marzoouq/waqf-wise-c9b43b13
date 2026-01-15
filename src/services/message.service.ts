@@ -112,9 +112,10 @@ export class MessageService {
         .from('internal_messages')
         .insert([message])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إرسال الرسالة');
       return data;
     } catch (error) {
       productionLogger.error('Error sending message', error);

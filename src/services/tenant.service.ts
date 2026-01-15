@@ -27,13 +27,14 @@ export class TenantService {
   }
 
   static async create(tenant: TenantInsert): Promise<Tenant> {
-    const { data, error } = await supabase.from('tenants').insert(tenant).select().single();
+    const { data, error } = await supabase.from('tenants').insert(tenant).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء المستأجر');
     return data;
   }
 
-  static async update(id: string, updates: Partial<Tenant>): Promise<Tenant> {
-    const { data, error } = await supabase.from('tenants').update(updates).eq('id', id).select().single();
+  static async update(id: string, updates: Partial<Tenant>): Promise<Tenant | null> {
+    const { data, error } = await supabase.from('tenants').update(updates).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -100,8 +101,9 @@ export class TenantService {
   }
 
   static async addLedgerEntry(entry: Database['public']['Tables']['tenant_ledger']['Insert']) {
-    const { data, error } = await supabase.from('tenant_ledger').insert(entry).select().single();
+    const { data, error } = await supabase.from('tenant_ledger').insert(entry).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إضافة القيد');
     return data;
   }
 

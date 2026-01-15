@@ -62,25 +62,26 @@ export class ScheduledReportService {
         next_run_at: nextRun,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء التقرير المجدول');
     return data as ScheduledReport;
   }
 
   /**
    * تحديث تقرير مجدول
    */
-  static async update(id: string, updates: Partial<ScheduledReport>): Promise<ScheduledReport> {
+  static async update(id: string, updates: Partial<ScheduledReport>): Promise<ScheduledReport | null> {
     const { data, error } = await supabase
       .from('scheduled_report_jobs')
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return data as ScheduledReport;
+    return data as ScheduledReport | null;
   }
 
   /**

@@ -93,22 +93,23 @@ export class SupportService {
       .from('support_tickets')
       .insert([input])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء التذكرة');
     return data;
   }
 
   /**
    * تحديث تذكرة
    */
-  static async update(id: string, updates: Partial<SupportTicketInsert>): Promise<SupportTicket> {
+  static async update(id: string, updates: Partial<SupportTicketInsert>): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -117,7 +118,7 @@ export class SupportService {
   /**
    * إغلاق تذكرة
    */
-  static async close(id: string): Promise<SupportTicket> {
+  static async close(id: string): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update({
@@ -126,7 +127,7 @@ export class SupportService {
       })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -135,7 +136,7 @@ export class SupportService {
   /**
    * إعادة فتح تذكرة
    */
-  static async reopen(id: string): Promise<SupportTicket> {
+  static async reopen(id: string): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update({
@@ -144,9 +145,10 @@ export class SupportService {
       })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) return null;
 
     // تحديث عداد إعادة الفتح
     await supabase
@@ -160,7 +162,7 @@ export class SupportService {
   /**
    * تعيين تذكرة لموظف
    */
-  static async assign(ticketId: string, userId: string, assignedBy: string): Promise<SupportTicket> {
+  static async assign(ticketId: string, userId: string, assignedBy: string): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update({
@@ -171,7 +173,7 @@ export class SupportService {
       })
       .eq('id', ticketId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;

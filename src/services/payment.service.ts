@@ -110,22 +110,23 @@ export class PaymentService {
       .from("payments")
       .insert(payment)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء المدفوعة');
     return data;
   }
 
   /**
    * تحديث مدفوعة
    */
-  static async update(id: string, updates: PaymentUpdate): Promise<Payment> {
+  static async update(id: string, updates: PaymentUpdate): Promise<Payment | null> {
     const { data, error } = await supabase
       .from("payments")
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -236,9 +237,10 @@ export class PaymentService {
       .from("bank_accounts")
       .insert([bankAccount])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الحساب البنكي');
     return data;
   }
 
@@ -251,7 +253,7 @@ export class PaymentService {
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;

@@ -141,9 +141,10 @@ export class BankReconciliationService {
         .from('bank_reconciliation_matches')
         .insert(match)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء المطابقة');
 
       // تحديث حالة العملية البنكية
       await supabase
@@ -168,9 +169,10 @@ export class BankReconciliationService {
         .from('bank_reconciliation_matches')
         .select('id, bank_transaction_id, journal_entry_id')
         .eq('id', matchId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
+      if (!match) throw new Error('المطابقة غير موجودة');
 
       // حذف المطابقة
       const { error } = await supabase
@@ -214,9 +216,10 @@ export class BankReconciliationService {
       .from('bank_transactions')
       .insert(transaction)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء العملية البنكية');
     return data;
   }
 

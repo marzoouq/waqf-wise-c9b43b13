@@ -66,9 +66,10 @@ export class AccountService {
         .from('accounts')
         .insert([{ ...account, is_active: account.is_active ?? true }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء الحساب');
       return data;
     } catch (error) {
       productionLogger.error('Error creating account', error);
@@ -96,7 +97,7 @@ export class AccountService {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
