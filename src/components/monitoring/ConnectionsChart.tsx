@@ -124,3 +124,5 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
     </Card>
   );
 }
+
+export default ConnectionsChart;

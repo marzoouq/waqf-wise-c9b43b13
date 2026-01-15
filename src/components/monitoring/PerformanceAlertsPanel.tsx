@@ -204,3 +204,5 @@ function AlertItem({ alert, type, isIgnored, onIgnore, onUnignore }: AlertItemPr
     </div>
   );
 }
+
+export default PerformanceAlertsPanel;

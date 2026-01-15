@@ -111,3 +111,5 @@ export function CacheHitChart({ ratio, isLoading }: CacheHitChartProps) {
     </Card>
   );
 }
+
+export default CacheHitChart;

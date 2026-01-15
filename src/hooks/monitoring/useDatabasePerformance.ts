@@ -7,8 +7,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { dbPerformanceService, type DBPerformanceStats, type PerformanceAlert } from "@/services/monitoring/db-performance.service";
 
-const REFRESH_INTERVAL = 30000; // 30 ثانية
+const REFRESH_INTERVAL = 60000; // 60 ثانية (كان 30)
 const QUERY_KEY = 'db-performance-monitoring';
+const STALE_TIME = 30000; // 30 ثانية
+const GC_TIME = 120000; // دقيقتين
 
 export function useDatabasePerformance() {
   const { 
@@ -16,13 +18,16 @@ export function useDatabasePerformance() {
     isLoading, 
     error, 
     refetch,
-    dataUpdatedAt 
+    dataUpdatedAt,
+    isFetching,
   } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => dbPerformanceService.getPerformanceStats(),
     refetchInterval: REFRESH_INTERVAL,
-    staleTime: 15000,
-    gcTime: 60000,
+    staleTime: STALE_TIME, // البيانات صالحة لـ 30 ثانية
+    gcTime: GC_TIME, // حفظ في الذاكرة لدقيقتين
+    refetchOnWindowFocus: false, // ✅ تقليل الطلبات الزائدة
+    refetchOnMount: 'always', // ✅ جلب عند التحميل الأول فقط
   });
 
   const alerts = useMemo<PerformanceAlert[]>(() => {
@@ -51,6 +56,7 @@ export function useDatabasePerformance() {
   return {
     stats,
     isLoading,
+    isFetching, // ✅ مفيد للـ UI
     error,
     refetch,
     lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : null,
