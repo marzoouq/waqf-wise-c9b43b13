@@ -17,11 +17,11 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 // مكون تسجيل الدخول
-function TenantLogin() {
+function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> }) {
   const [phone, setPhone] = useState("");
   const [contractNumber, setContractNumber] = useState("");
   const [step, setStep] = useState<"phone" | "contract">("phone");
-  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName, sendOtpSuccess } = useTenantAuth();
+  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName } = authHook;
 
   const handleSendOtp = () => {
     sendOtp(phone, {
@@ -107,8 +107,8 @@ function TenantLogin() {
 }
 
 // مكون لوحة التحكم
-function TenantDashboard() {
-  const { tenant, logout } = useTenantAuth();
+function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAuth> }) {
+  const { tenant, logout } = authHook;
   const { data: profileData } = useTenantProfile();
   const { data: requestsData, isLoading: loadingRequests } = useTenantMaintenanceRequests();
   const { unreadCount } = useTenantNotifications();
@@ -245,11 +245,11 @@ function TenantDashboard() {
 
 // الصفحة الرئيسية
 export default function TenantPortal() {
-  const { isLoggedIn } = useTenantAuth();
+  const authHook = useTenantAuth();
 
-  if (!isLoggedIn) {
-    return <TenantLogin />;
+  if (!authHook.isLoggedIn) {
+    return <TenantLogin authHook={authHook} />;
   }
 
-  return <TenantDashboard />;
+  return <TenantDashboard authHook={authHook} />;
 }
