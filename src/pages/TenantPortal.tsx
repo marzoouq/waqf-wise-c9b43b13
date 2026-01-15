@@ -21,11 +21,16 @@ function TenantLogin() {
   const [phone, setPhone] = useState("");
   const [contractNumber, setContractNumber] = useState("");
   const [step, setStep] = useState<"phone" | "contract">("phone");
-  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName } = useTenantAuth();
+  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName, sendOtpSuccess } = useTenantAuth();
 
   const handleSendOtp = () => {
-    sendOtp(phone);
-    setStep("contract");
+    sendOtp(phone, {
+      onSuccess: (data) => {
+        if (data?.success) {
+          setStep("contract");
+        }
+      }
+    });
   };
 
   const handleVerifyContract = () => {
