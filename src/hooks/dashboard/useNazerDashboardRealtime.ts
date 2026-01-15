@@ -26,6 +26,7 @@ const NAZER_WATCHED_TABLES = [
   "distributions",
   "heir_distributions",
   "approvals",
+  "maintenance_requests", // طلبات صيانة المستأجرين
 ] as const;
 
 // مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
@@ -43,6 +44,7 @@ const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
   distributions: [QUERY_KEYS.DISTRIBUTIONS, QUERY_KEYS.PENDING_APPROVALS],
   heir_distributions: [QUERY_KEYS.HEIR_DISTRIBUTIONS],
   approvals: [QUERY_KEYS.PENDING_APPROVALS, QUERY_KEYS.SMART_ALERTS],
+  maintenance_requests: [['tenant-maintenance-requests'] as const, QUERY_KEYS.SMART_ALERTS], // تحديث طلبات الصيانة
 };
 
 interface UseNazerDashboardRealtimeOptions {
