@@ -157,7 +157,7 @@ export class ApprovalService {
       .select(`
         *,
         beneficiaries(full_name, national_id),
-        request_types(name_ar, name)
+        request_types(name_ar, name_en)
       `)
       .in("status", ["قيد المراجعة", "معلق"])
       .order("created_at", { ascending: false });
