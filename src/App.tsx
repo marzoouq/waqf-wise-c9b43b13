@@ -1,25 +1,21 @@
 /**
- * المكون الرئيسي للتطبيق - محسّن للأداء
+ * المكون الرئيسي للتطبيق - محسّن للأداء (v3.0)
  * Main Application Component - Performance Optimized
  * 
- * ✅ AuthProvider يغلف كل شيء - متاح دائماً
- * ✅ لا إعادة تهيئة عند التنقل بين الصفحات
+ * ✅ صفحات الدخول خفيفة ومستقلة عن AuthProvider
+ * ✅ AuthProvider يُحمّل فقط للمسارات المحمية
+ * ✅ LCP محسّن بشكل جذري
  * ✅ نظام إشعار التحديثات التلقائي
- * ✅ SEO مع react-helmet-async
- * ✅ مراقبة الاتصال الشاملة
- * ✅ مراقبة قنوات Realtime
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import { HelmetProvider } from "react-helmet-async";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { initializeAppearanceSettings } from "@/components/settings/AppearanceSettingsDialog";
 import { initializeSupabaseInterceptor } from "@/integrations/supabase/request-interceptor";
 import { queryInvalidationManager } from "@/lib/query-invalidation-manager";
-import { realtimeManager } from "@/services/realtime-manager";
 
 // ✅ تطبيق إعدادات المظهر المحفوظة فوراً
 initializeAppearanceSettings();
@@ -27,14 +23,14 @@ initializeAppearanceSettings();
 // ✅ تهيئة مراقب الاتصال
 initializeSupabaseInterceptor();
 
-// ✅ استيراد خفيف للصفحة الترحيبية (بدون Radix UI)
+// ✅ استيراد خفيف للصفحات الأولية (بدون AuthContext)
 import LandingPageLight from "@/pages/LandingPageLight";
+import LoginLight from "@/pages/LoginLight";
 import { LightErrorBoundary } from "./components/shared/LightErrorBoundary";
 import { UpdateNotification } from "./components/shared/UpdateNotification";
-import { Toaster } from "@/components/ui/toaster";
 
-// ✅ Lazy load لباقي المسارات
-const AppRoutes = lazy(() => import("./components/layout/AppRoutes"));
+// ✅ Lazy load للمسارات المحمية (تحتاج AuthProvider)
+const ProtectedApp = lazy(() => import("./components/layout/ProtectedApp"));
 
 // Configure QueryClient
 const queryClient = new QueryClient({
@@ -76,11 +72,9 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        {/* ✅ AuthProvider يغلف كل شيء - يُهيأ مرة واحدة فقط */}
-        <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* ✅ الصفحة الترحيبية */}
+              {/* ✅ الصفحة الترحيبية - خفيفة */}
               <Route 
                 path="/" 
                 element={
@@ -90,26 +84,32 @@ const App = () => {
                 } 
               />
               
-              {/* ✅ باقي المسارات */}
+              {/* ✅ صفحة تسجيل الدخول - خفيفة ومستقلة */}
+              <Route 
+                path="/login" 
+                element={
+                  <LightErrorBoundary>
+                    <LoginLight />
+                  </LightErrorBoundary>
+                } 
+              />
+              
+              {/* ✅ باقي المسارات (تحتاج AuthProvider) */}
               <Route
                 path="/*"
                 element={
                   <Suspense fallback={<LightFallback />}>
-                    <AppRoutes />
+                    <ProtectedApp />
                   </Suspense>
                 }
               />
             </Routes>
           </BrowserRouter>
 
-          {/* ✅ Toasts (رسائل النجاح/الخطأ) */}
-          <Toaster />
-          
           {/* ✅ إشعار التحديث المتاح */}
           <UpdateNotification />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </HelmetProvider>
   );
 };

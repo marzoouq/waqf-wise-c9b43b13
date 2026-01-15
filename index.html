@@ -48,39 +48,70 @@
     <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
     
+    <!-- ✅ Preload critical resources for LCP -->
+    <link rel="modulepreload" href="/src/main.tsx">
     
-    <!-- Critical CSS inline for faster FCP -->
+    <!-- Critical CSS inline for faster FCP/LCP -->
     <style>
       /* Reset and base styles */
-      *, *::before, *::after { box-sizing: border-box; }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       
       /* Font-display: swap to prevent FOIT */
       @font-face {
         font-family: 'Cairo';
         font-style: normal;
+        font-weight: 400 700;
         font-display: swap;
         src: local('Cairo');
       }
       
+      :root {
+        --background: 48 20% 97%;
+        --foreground: 150 25% 15%;
+        --card: 0 0% 100%;
+        --primary: 150 45% 35%;
+        --primary-foreground: 0 0% 100%;
+        --muted: 48 15% 94%;
+        --muted-foreground: 215 20% 30%;
+        --border: 150 15% 88%;
+        --input: 150 15% 90%;
+        --ring: 150 45% 35%;
+        --radius: 0.75rem;
+      }
+      
       body { 
-        margin: 0; 
         font-family: Cairo, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        background: hsl(48 20% 97%);
-        color: hsl(150 25% 15%);
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        line-height: 1.5;
       }
       
-      /* Critical Tailwind classes for landing page */
-      .text-primary { color: hsl(142.1 76.2% 36.3%); }
-      .bg-primary { background-color: hsl(142.1 76.2% 36.3%); }
-      .text-foreground { color: hsl(150 25% 15%); }
-      .text-muted-foreground { color: hsl(240 3.8% 46.1%); }
-      .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+      #root { min-height: 100vh; }
       
-      #root {
-        min-height: 100vh;
-      }
+      /* ✅ Critical Login Page Styles (LCP) */
+      .min-h-screen { min-height: 100vh; }
+      .flex { display: flex; }
+      .items-center { align-items: center; }
+      .justify-center { justify-content: center; }
+      .p-4 { padding: 1rem; }
+      .bg-background { background: hsl(var(--background)); }
+      .bg-card { background: hsl(var(--card)); }
+      .text-foreground { color: hsl(var(--foreground)); }
+      .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+      .rounded-xl { border-radius: 0.75rem; }
+      .shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+      .border { border: 1px solid hsl(var(--border)); }
+      .w-full { width: 100%; }
+      .max-w-md { max-width: 28rem; }
+      .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+      .font-bold { font-weight: 700; }
+      .text-center { text-align: center; }
+      .mb-2 { margin-bottom: 0.5rem; }
+      .mb-6 { margin-bottom: 1.5rem; }
+      .space-y-4 > * + * { margin-top: 1rem; }
+      
       /* Loading spinner */
       .loading-container {
         position: fixed;
@@ -88,25 +119,30 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: hsl(48 20% 97%);
+        background: hsl(var(--background));
         z-index: 9999;
       }
       .loading-spinner {
         width: 48px;
         height: 48px;
-        border: 3px solid hsl(142.1 76.2% 36.3% / 0.2);
-        border-top-color: hsl(142.1 76.2% 36.3%);
+        border: 3px solid hsl(var(--primary) / 0.2);
+        border-top-color: hsl(var(--primary));
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
       }
       .loading-text {
-        color: hsl(240 3.8% 46.1%);
+        color: hsl(var(--muted-foreground));
         font-size: 14px;
         margin-top: 16px;
         font-family: Cairo, sans-serif;
       }
       @keyframes spin {
         to { transform: rotate(360deg); }
+      }
+      
+      /* ✅ Gradient background for login */
+      .bg-gradient-to-br {
+        background: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--background)), hsl(var(--muted)));
       }
     </style>
   </head>
