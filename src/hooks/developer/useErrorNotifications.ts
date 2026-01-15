@@ -2,7 +2,7 @@
  * useErrorNotifications Hook - إشعارات الأخطاء
  * يستخدم RealtimeService و MonitoringService
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { SystemErrorLog } from "@/types/system-error";
@@ -12,6 +12,7 @@ import { QUERY_KEYS } from "@/lib/query-keys";
 export function useErrorNotifications(enabled: boolean = true) {
   const shownErrorsRef = useRef<Set<string>>(new Set());
   
+  // Always call useQuery - use enabled to control execution
   const { data: errors } = useQuery({
     queryKey: QUERY_KEYS.SYSTEM_ERRORS(),
     queryFn: () => MonitoringService.getRecentErrors(20),
@@ -22,10 +23,13 @@ export function useErrorNotifications(enabled: boolean = true) {
     enabled,
   });
 
+  // Toast notification effect
   useEffect(() => {
     if (!enabled || !errors || errors.length === 0) return;
 
     const latestError = errors[0];
+    if (!latestError) return;
+    
     const errorAge = Date.now() - new Date(latestError.created_at).getTime();
     
     if (shownErrorsRef.current.has(latestError.id)) return;
@@ -49,7 +53,10 @@ export function useErrorNotifications(enabled: boolean = true) {
     }
   }, [errors, enabled]);
 
+  // Realtime subscription - always set up but only active when enabled
   useEffect(() => {
+    if (!enabled) return;
+    
     const subscription = RealtimeService.subscribeToTable(
       'system_error_logs',
       () => {
@@ -58,7 +65,7 @@ export function useErrorNotifications(enabled: boolean = true) {
     );
 
     return () => { subscription.unsubscribe(); };
-  }, []);
+  }, [enabled]);
 
-  return { errors };
+  return { errors: errors || [] };
 }
