@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/ui/use-toast';
-import { Loader2, LogIn, Smartphone, Fingerprint, Chrome } from 'lucide-react';
+import { Loader2, LogIn, Smartphone, Fingerprint, Chrome, Building2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthService } from '@/services/auth.service';
 import { useBiometricAuth } from '@/hooks/auth/useBiometricAuth';
@@ -349,8 +349,12 @@ export default function Login() {
             </form>
           </TabsContent>
         </Tabs>
-        <div className="text-center text-sm text-muted-foreground px-6 pb-4">
-          <Link to="/install" className="text-primary hover:underline inline-flex items-center justify-center gap-1">
+        <div className="text-center text-sm text-muted-foreground px-6 pb-4 space-y-2">
+          <Link to="/tenant-portal" className="text-primary hover:underline inline-flex items-center justify-center gap-1 w-full">
+            <Building2 className="h-4 w-4" />
+            بوابة المستأجرين
+          </Link>
+          <Link to="/install" className="text-muted-foreground hover:text-primary hover:underline inline-flex items-center justify-center gap-1 w-full">
             <Smartphone className="h-4 w-4" />
             تثبيت التطبيق على جهازك
           </Link>
