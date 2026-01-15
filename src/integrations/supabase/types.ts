@@ -7911,76 +7911,121 @@ export type Database = {
       maintenance_requests: {
         Row: {
           actual_cost: number | null
+          admin_response: string | null
           assigned_to: string | null
           category: string
           completed_at: string | null
           completed_date: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_preference: string | null
           contract_id: string | null
           created_at: string
           description: string
           estimated_cost: number | null
           id: string
+          images: string[] | null
+          is_urgent: boolean | null
           journal_entry_id: string | null
+          location_in_unit: string | null
           notes: string | null
+          preferred_date: string | null
+          preferred_time_slot: string | null
           priority: string
           property_id: string
           provider_id: string | null
+          rating: number | null
+          rating_feedback: string | null
           request_number: string
           requested_by: string
           requested_date: string
           scheduled_date: string | null
           status: string
+          submitted_via: string | null
+          tenant_id: string | null
+          tenant_notes: string | null
           title: string
+          unit_id: string | null
           updated_at: string
           vendor_name: string | null
         }
         Insert: {
           actual_cost?: number | null
+          admin_response?: string | null
           assigned_to?: string | null
           category: string
           completed_at?: string | null
           completed_date?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_preference?: string | null
           contract_id?: string | null
           created_at?: string
           description: string
           estimated_cost?: number | null
           id?: string
+          images?: string[] | null
+          is_urgent?: boolean | null
           journal_entry_id?: string | null
+          location_in_unit?: string | null
           notes?: string | null
+          preferred_date?: string | null
+          preferred_time_slot?: string | null
           priority?: string
           property_id: string
           provider_id?: string | null
+          rating?: number | null
+          rating_feedback?: string | null
           request_number: string
           requested_by: string
           requested_date?: string
           scheduled_date?: string | null
           status?: string
+          submitted_via?: string | null
+          tenant_id?: string | null
+          tenant_notes?: string | null
           title: string
+          unit_id?: string | null
           updated_at?: string
           vendor_name?: string | null
         }
         Update: {
           actual_cost?: number | null
+          admin_response?: string | null
           assigned_to?: string | null
           category?: string
           completed_at?: string | null
           completed_date?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_preference?: string | null
           contract_id?: string | null
           created_at?: string
           description?: string
           estimated_cost?: number | null
           id?: string
+          images?: string[] | null
+          is_urgent?: boolean | null
           journal_entry_id?: string | null
+          location_in_unit?: string | null
           notes?: string | null
+          preferred_date?: string | null
+          preferred_time_slot?: string | null
           priority?: string
           property_id?: string
           provider_id?: string | null
+          rating?: number | null
+          rating_feedback?: string | null
           request_number?: string
           requested_by?: string
           requested_date?: string
           scheduled_date?: string | null
           status?: string
+          submitted_via?: string | null
+          tenant_id?: string | null
+          tenant_notes?: string | null
           title?: string
+          unit_id?: string | null
           updated_at?: string
           vendor_name?: string | null
         }
@@ -8032,6 +8077,13 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "maintenance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -12396,6 +12448,139 @@ export type Database = {
           },
         ]
       }
+      tenant_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          read_at: string | null
+          related_request_id: string | null
+          tenant_id: string
+          title: string
+          type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          read_at?: string | null
+          related_request_id?: string | null
+          tenant_id: string
+          title: string
+          type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          read_at?: string | null
+          related_request_id?: string | null
+          tenant_id?: string
+          title?: string
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_notifications_related_request_id_fkey"
+            columns: ["related_request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_notifications_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_otp_codes: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          is_used: boolean | null
+          otp_code: string
+          phone: string
+          tenant_id: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          is_used?: boolean | null
+          otp_code: string
+          phone: string
+          tenant_id?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          is_used?: boolean | null
+          otp_code?: string
+          phone?: string
+          tenant_id?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_otp_codes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          ip_address: string | null
+          last_activity_at: string | null
+          session_token: string
+          tenant_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          ip_address?: string | null
+          last_activity_at?: string | null
+          session_token: string
+          tenant_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          last_activity_at?: string | null
+          session_token?: string
+          tenant_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           address: string | null
@@ -14442,6 +14627,7 @@ export type Database = {
           cleanup_time: string
         }[]
       }
+      cleanup_expired_tenant_otps: { Args: never; Returns: undefined }
       cleanup_old_alerts: { Args: never; Returns: undefined }
       cleanup_old_chatbot_conversations: { Args: never; Returns: number }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
