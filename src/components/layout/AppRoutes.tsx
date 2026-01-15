@@ -19,6 +19,7 @@ const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
 const SecurityPolicyPage = lazy(() => import("@/pages/SecurityPolicy"));
 const FAQ = lazy(() => import("@/pages/FAQ"));
 const Contact = lazy(() => import("@/pages/Contact"));
+const TenantPortal = lazy(() => import("@/pages/TenantPortal"));
 
 // ✅ Fallback خفيف
 const LightFallback = () => (
@@ -46,6 +47,9 @@ const AppRoutes = () => {
           <Route path="/security-policy" element={<SecurityPolicyPage />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* بوابة المستأجرين - OTP */}
+          <Route path="/tenant-portal" element={<TenantPortal />} />
           
           {/* المسارات المحمية */}
           <Route path="/*" element={<AppShell />} />
