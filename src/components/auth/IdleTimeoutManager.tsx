@@ -18,8 +18,11 @@ export function IdleTimeoutManager() {
   const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
-  // حساب حالة التفعيل
+  // حساب حالة التفعيل - انتظار اكتمال تحميل الأدوار بالكامل
   const isReady = !authLoading && !roleLoading;
+  
+  // ✅ إصلاح: تفعيل المؤقت فقط بعد التأكد من تحميل الأدوار بالكامل
+  // وعدم كون المستخدم مشرف أو مدير نظام
   const shouldEnable = isReady && !!user && !isNazer && !isAdmin;
 
   // الخروج التلقائي وتنظيف الحالة
