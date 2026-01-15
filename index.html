@@ -9,12 +9,9 @@
     <meta http-equiv="Expires" content="0">
     
     <!-- CSP Meta Tag Fallback (frame-ancestors لا تعمل هنا، تعتمد على HTTP header) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://lovable.dev https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://*.lovableproject.com; manifest-src 'self' https://*.lovableproject.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lovable.dev https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://*.lovableproject.com; manifest-src 'self' https://*.lovableproject.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
     
-    <!-- Google Fonts: Cairo -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts: Using @fontsource/cairo (self-hosted, no external requests) -->
     
     <!-- PWA Meta Tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
