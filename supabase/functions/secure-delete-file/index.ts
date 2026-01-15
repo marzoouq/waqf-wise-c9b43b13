@@ -178,12 +178,12 @@ serve(async (req) => {
           status: 'pending'
         })
         .select()
-        .single();
+        .maybeSingle();
 
       return jsonResponse({
         success: true,
         message: 'تم إنشاء طلب الحذف - في انتظار الموافقة',
-        requestId: deletionRequest.id,
+        requestId: deletionRequest?.id,
         requiresApproval: true
       });
     }

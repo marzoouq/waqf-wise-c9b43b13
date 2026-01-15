@@ -146,7 +146,7 @@ serve(async (req) => {
         notes: `Scheduled test run: ${edgeFunctions.length} edge functions, ${criticalTables.length} tables`
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (saveError) {
       console.error('Error saving test run:', saveError);

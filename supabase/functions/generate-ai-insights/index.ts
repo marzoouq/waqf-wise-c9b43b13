@@ -229,7 +229,7 @@ serve(async (req) => {
         created_by: user.id,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     // تسجيل العملية
     await supabase.from('audit_logs').insert({

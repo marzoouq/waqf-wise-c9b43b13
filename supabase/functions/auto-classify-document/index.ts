@@ -123,7 +123,7 @@ serve(async (req) => {
       .from('documents')
       .select('id, name, description, file_type, category')
       .eq('id', documentId)
-      .single();
+      .maybeSingle();
 
     if (docError || !document) {
       return errorResponse('المستند غير موجود', 404);
@@ -134,7 +134,7 @@ serve(async (req) => {
       .from('document_ocr_content')
       .select('extracted_text')
       .eq('document_id', documentId)
-      .single();
+      .maybeSingle();
 
     const textToAnalyze = [
       document.name || '',
