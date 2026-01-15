@@ -127,10 +127,10 @@ export class AISystemAuditService {
       .from('ai_system_audits')
       .select('*')
       .eq('id', auditId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return data as unknown as SystemAudit;
+    return data as unknown as SystemAudit | null;
   }
 
   /**
@@ -164,9 +164,10 @@ export class AISystemAuditService {
         .from('pending_system_fixes')
         .select('*')
         .eq('id', fixId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
+      if (!fix) throw new Error('الإصلاح غير موجود');
 
       // تنفيذ الإصلاح (ملاحظة: هذا يحتاج RPC function في الـ database)
       // في الوقت الحالي نحدث الحالة فقط
@@ -222,7 +223,7 @@ export class AISystemAuditService {
         .from('pending_system_fixes')
         .select('*')
         .eq('id', fixId)
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 

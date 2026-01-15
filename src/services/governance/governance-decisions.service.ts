@@ -100,9 +100,10 @@ export class GovernanceDecisionsService {
         .from('governance_decisions')
         .insert([decision])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء القرار');
       return data;
     } catch (error) {
       productionLogger.error('Error creating governance decision', error);
@@ -120,9 +121,10 @@ export class GovernanceDecisionsService {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('القرار غير موجود');
       return data;
     } catch (error) {
       productionLogger.error('Error updating governance decision', error);

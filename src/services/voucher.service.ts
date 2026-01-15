@@ -78,9 +78,10 @@ export class VoucherService {
         .from("payment_vouchers")
         .insert([insertData])
         .select()
-        .single();
+        .maybeSingle();
 
       if (insertError) throw insertError;
+      if (!voucher) throw new Error('فشل إنشاء السند');
 
       // 3. ربط السند بقيد محاسبي تلقائياً
       if (data.voucher_type === 'payment') {
@@ -167,9 +168,10 @@ export class VoucherService {
         })
         .eq("id", voucherId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) throw updateError;
+      if (!voucher) throw new Error('السند غير موجود');
 
       await this.logActivity(
         `تم تحديث حالة السند ${voucher.voucher_number} إلى مدفوع`

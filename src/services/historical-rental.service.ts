@@ -108,9 +108,10 @@ export const HistoricalRentalService = {
       .from('historical_rental_details')
       .insert(input)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء السجل');
     return data as HistoricalRentalDetail;
   },
 
@@ -136,9 +137,10 @@ export const HistoricalRentalService = {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('السجل غير موجود');
     return data as HistoricalRentalDetail;
   },
 
