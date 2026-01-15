@@ -108,12 +108,19 @@ function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> 
   );
 }
 
-// مكون لوحة التحكم
-function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAuth> }) {
+// مكون لوحة التحكم - يستقبل جميع البيانات كـ Props لتجنب تغيير عدد الـ Hooks
+interface TenantDashboardProps {
+  authHook: ReturnType<typeof useTenantAuth>;
+  profileQuery: ReturnType<typeof useTenantProfile>;
+  requestsQuery: ReturnType<typeof useTenantMaintenanceRequests>;
+  notificationsHook: ReturnType<typeof useTenantNotifications>;
+}
+
+function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsHook }: TenantDashboardProps) {
   const { tenant, logout } = authHook;
-  const { data: profileData } = useTenantProfile();
-  const { data: requestsData, isLoading: loadingRequests } = useTenantMaintenanceRequests();
-  const { data: notificationsData, unreadCount, markAsRead } = useTenantNotifications();
+  const { data: profileData } = profileQuery;
+  const { data: requestsData, isLoading: loadingRequests } = requestsQuery;
+  const { data: notificationsData, unreadCount, markAsRead } = notificationsHook;
   const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const requests = requestsData?.requests || [];
@@ -311,13 +318,25 @@ function TenantDashboard({ authHook }: { authHook: ReturnType<typeof useTenantAu
   );
 }
 
-// الصفحة الرئيسية
+// الصفحة الرئيسية - استدعاء جميع الـ Hooks في المستوى الأعلى (غير مشروط)
 export default function TenantPortal() {
+  // استدعاء جميع الـ Hooks دائماً لضمان ثبات عددها في كل render
   const authHook = useTenantAuth();
+  const profileQuery = useTenantProfile();
+  const requestsQuery = useTenantMaintenanceRequests();
+  const notificationsHook = useTenantNotifications();
 
+  // الآن نقرر أي مكون نعرض (بدون تغيير عدد الـ Hooks)
   if (!authHook.isLoggedIn) {
     return <TenantLogin authHook={authHook} />;
   }
 
-  return <TenantDashboard authHook={authHook} />;
+  return (
+    <TenantDashboard 
+      authHook={authHook}
+      profileQuery={profileQuery}
+      requestsQuery={requestsQuery}
+      notificationsHook={notificationsHook}
+    />
+  );
 }
