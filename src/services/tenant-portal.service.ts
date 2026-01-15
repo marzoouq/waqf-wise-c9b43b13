@@ -53,7 +53,12 @@ export interface TenantMaintenanceRequest {
   completed_date: string | null;
   created_at: string;
   updated_at: string;
-  properties: { id: string; name: string } | null;
+  property_id?: string;
+  unit_id?: string | null;
+  property_name?: string;
+  unit_name?: string | null;
+  properties: { id: string; name: string; address?: string } | null;
+  property_units?: { id: string; unit_number: string; unit_name?: string } | null;
 }
 
 export interface TenantNotification {
