@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
       .from('fiscal_years')
       .select('*')
       .eq('id', fiscal_year_id)
-      .single();
+      .maybeSingle();
 
     if (fyError || !fiscalYear) {
       throw new Error('السنة المالية غير موجودة');
@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
       .select('*')
       .order('updated_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const nazerPercentage = settings?.nazer_percentage || 10;
     const waqifPercentage = settings?.waqif_charity_percentage || 5;
@@ -304,9 +304,9 @@ Deno.serve(async (req) => {
         status: 'posted'
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (jeError) {
+    if (jeError || !journalEntry) {
       console.error('Error creating journal entry:', jeError);
       throw new Error('فشل إنشاء قيد الإقفال');
     }
@@ -318,7 +318,7 @@ Deno.serve(async (req) => {
         .from('accounts')
         .select('id')
         .eq('code', line.account_code)
-        .single();
+        .maybeSingle();
 
       if (account) {
         await supabase.from('journal_entry_lines').insert({
@@ -380,7 +380,7 @@ Deno.serve(async (req) => {
       .select('id')
       .eq('is_active', true)
       .eq('is_closed', false)
-      .single();
+      .maybeSingle();
 
     if (newFiscalYear && allAccounts) {
       console.log('Creating opening balances for new fiscal year...');
@@ -428,7 +428,7 @@ Deno.serve(async (req) => {
       .from('waqf_settings')
       .select('waqf_name')
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const waqfName = waqfSettings?.waqf_name || 'وقف آل مرزوق';
 

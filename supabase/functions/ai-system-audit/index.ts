@@ -168,9 +168,9 @@ serve(async (req) => {
         severity_summary: { critical: 0, warning: 0, info: 0, success: 0 }
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (insertError) {
+    if (insertError || !auditRecord) {
       console.error('[AI-SYSTEM-AUDIT] Error creating audit record:', insertError);
       throw new Error('Failed to create audit record');
     }

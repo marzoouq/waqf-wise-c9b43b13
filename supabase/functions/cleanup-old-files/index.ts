@@ -67,7 +67,7 @@ serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!roleData || roleData.role !== 'admin') {
       console.warn('Unauthorized cleanup attempt by:', user.id);
