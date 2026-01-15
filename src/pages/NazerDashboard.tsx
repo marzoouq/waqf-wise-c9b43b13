@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from "lucide-react";
+import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell, Wrench } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
 import { ManualTasksCard } from "@/components/nazer/ManualTasksCard";
 import { WaqfBrandingSettings } from "@/components/nazer/WaqfBrandingSettings";
+import { TenantMaintenanceRequestsSection } from "@/components/nazer/TenantMaintenanceRequestsSection";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
@@ -155,6 +156,11 @@ export default function NazerDashboard() {
                 <SmartAlertsSection />
               </Suspense>
             </div>
+
+            {/* قسم طلبات صيانة المستأجرين */}
+            <Suspense fallback={<ChartSkeleton />}>
+              <TenantMaintenanceRequestsSection />
+            </Suspense>
 
             {/* قسم الرسوم البيانية التحليلية */}
             <Suspense fallback={<ChartSkeleton />}>
