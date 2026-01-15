@@ -23,7 +23,7 @@ export const QuickActions = ({
       description: "تسجيل مستفيد جديد",
       color: "text-primary",
       bgColor: "bg-primary/10",
-      onClick: onOpenBeneficiaryDialog,
+      onClick: onOpenBeneficiaryDialog || (() => navigate("/beneficiaries")),
     },
     {
       icon: UsersRound,
@@ -47,7 +47,7 @@ export const QuickActions = ({
       description: "تسجيل عقار جديد",
       color: "text-success",
       bgColor: "bg-success/10",
-      onClick: onOpenPropertyDialog,
+      onClick: onOpenPropertyDialog || (() => navigate("/properties")),
     },
     {
       icon: Wallet,
@@ -55,7 +55,7 @@ export const QuickActions = ({
       description: "إنشاء توزيع جديد",
       color: "text-accent",
       bgColor: "bg-accent/10",
-      onClick: onOpenDistributionDialog,
+      onClick: onOpenDistributionDialog || (() => navigate("/funds")),
     },
     {
       icon: BarChart3,
