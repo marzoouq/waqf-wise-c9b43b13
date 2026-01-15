@@ -53,8 +53,12 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
     }
   };
 
+  // ✅ إصلاح: إذا الصفحة تتطلب دور معين، ننتظر حتى تنتهي rolesLoading
+  const requiresRoleCheck = requiredRole || (requiredRoles && requiredRoles.length > 0);
+  const isStillLoadingRoles = requiresRoleCheck && rolesLoading && !loadingTooLong;
+  
   // ✅ إذا استمر التحميل لأكثر من المدة المحددة، تجاوز التحميل
-  if (isLoading && !loadingTooLong) {
+  if ((isLoading || isStillLoadingRoles) && !loadingTooLong) {
     logDecision('عرض Loader');
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -63,8 +67,15 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
     );
   }
 
-  if (!user) {
-    logDecision('توجيه للدخول');
+  // ✅ إصلاح: فقط نوجه لـ /login إذا انتهى التحميل ولا يوجد مستخدم
+  if (!authLoading && !user) {
+    logDecision('توجيه للدخول - لا يوجد مستخدم');
+    return <Navigate to="/login" replace />;
+  }
+  
+  // ✅ إذا لا يزال التحميل جاري ولكن تجاوزنا الـ timeout
+  if (!user && authLoading && loadingTooLong) {
+    logDecision('توجيه للدخول - timeout');
     return <Navigate to="/login" replace />;
   }
   
