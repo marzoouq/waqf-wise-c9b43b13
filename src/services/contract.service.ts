@@ -97,9 +97,10 @@ export class ContractService {
       .from('contracts')
       .insert([contractData])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء العقد');
 
     // ربط الوحدات بالعقد
     if (data && unit_ids && unit_ids.length > 0) {
@@ -202,8 +203,8 @@ export class ContractService {
     }
   }
 
-  static async update(id: string, updates: Partial<Contract>): Promise<Contract> {
-    const { data, error } = await supabase.from('contracts').update(updates).eq('id', id).select().single();
+  static async update(id: string, updates: Partial<Contract>): Promise<Contract | null> {
+    const { data, error } = await supabase.from('contracts').update(updates).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -213,15 +214,16 @@ export class ContractService {
     if (error) throw error;
   }
 
-  static async terminate(id: string): Promise<Contract> {
+  static async terminate(id: string): Promise<Contract | null> {
     const { data, error } = await supabase
       .from('contracts')
       .update({ status: 'منتهي' })
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     
     if (error) throw error;
+    if (!data) return null;
 
     // تحرير الوحدات المربوطة (احتياطي - الـ Trigger يفعل ذلك أيضاً)
     await supabase

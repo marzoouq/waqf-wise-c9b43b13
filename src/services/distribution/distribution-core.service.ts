@@ -73,9 +73,10 @@ export class DistributionCoreService {
         .from('distributions')
         .insert([distribution])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء التوزيع');
       return data;
     } catch (error) {
       productionLogger.error('Error creating distribution', error);
@@ -86,14 +87,14 @@ export class DistributionCoreService {
   /**
    * تحديث توزيع
    */
-  static async update(id: string, updates: Partial<DistributionInsert>): Promise<DistributionRow> {
+  static async update(id: string, updates: Partial<DistributionInsert>): Promise<DistributionRow | null> {
     try {
       const { data, error } = await supabase
         .from('distributions')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -140,9 +141,10 @@ export class DistributionCoreService {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('التوزيع غير موجود');
 
       // إرسال إشعارات للمستفيدين
       const { data: vouchers } = await supabase

@@ -91,9 +91,10 @@ export class RequestService {
           submitted_at: new Date().toISOString(),
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!request) throw new Error('فشل إنشاء الطلب');
 
       productionLogger.info(`تم إنشاء طلب جديد ${request.request_number}`);
 
@@ -113,7 +114,7 @@ export class RequestService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -156,7 +157,7 @@ export class RequestService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -330,9 +331,10 @@ export class RequestService {
         description,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل رفع المرفق');
 
     // Update attachments_count
     const { data: currentRequest } = await supabase
@@ -429,9 +431,10 @@ export class RequestService {
       .from("request_comments")
       .insert([{ request_id: requestId, comment, is_internal: isInternal, user_id: user.id }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إضافة التعليق');
     return data;
   }
 
@@ -441,7 +444,7 @@ export class RequestService {
       .update({ comment })
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;

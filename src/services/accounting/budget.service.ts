@@ -90,9 +90,10 @@ export class BudgetService {
         .from('budgets')
         .insert([budget])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء الميزانية');
       return data;
     } catch (error) {
       productionLogger.error('Error creating budget', error);
@@ -103,14 +104,14 @@ export class BudgetService {
   /**
    * تحديث ميزانية
    */
-  static async updateBudget(id: string, updates: Partial<Database['public']['Tables']['budgets']['Row']>): Promise<Database['public']['Tables']['budgets']['Row']> {
+  static async updateBudget(id: string, updates: Partial<Database['public']['Tables']['budgets']['Row']>): Promise<Database['public']['Tables']['budgets']['Row'] | null> {
     try {
       const { data, error } = await supabase
         .from('budgets')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

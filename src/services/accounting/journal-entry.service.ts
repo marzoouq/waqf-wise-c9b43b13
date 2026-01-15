@@ -138,9 +138,10 @@ export class JournalEntryService {
         .from('journal_entries')
         .insert([entry])
         .select()
-        .single();
+        .maybeSingle();
 
       if (entryError) throw entryError;
+      if (!journalEntry) throw new Error('فشل إنشاء القيد');
 
       // إنشاء سطور القيد
       const entryLines = lines.map((line, index) => ({
@@ -165,7 +166,7 @@ export class JournalEntryService {
   /**
    * ترحيل قيد محاسبي
    */
-  static async postJournalEntry(id: string, postedBy: string): Promise<JournalEntryRow> {
+  static async postJournalEntry(id: string, postedBy: string): Promise<JournalEntryRow | null> {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
@@ -176,9 +177,10 @@ export class JournalEntryService {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) return null;
 
       // تحديث أرصدة الحسابات
       await this.updateAccountBalances(id);
@@ -193,14 +195,14 @@ export class JournalEntryService {
   /**
    * إلغاء قيد محاسبي
    */
-  static async cancelJournalEntry(id: string): Promise<JournalEntryRow> {
+  static async cancelJournalEntry(id: string): Promise<JournalEntryRow | null> {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
         .update({ status: 'cancelled' })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -227,7 +229,7 @@ export class JournalEntryService {
           .from('accounts')
           .select('current_balance, account_nature')
           .eq('id', line.account_id)
-          .single();
+          .maybeSingle();
 
         if (account) {
           let newBalance = account.current_balance || 0;
@@ -252,7 +254,7 @@ export class JournalEntryService {
   /**
    * الموافقة على قيد محاسبي
    */
-  static async approveJournalEntry(id: string, action: 'approve' | 'reject', notes?: string): Promise<JournalEntryRow> {
+  static async approveJournalEntry(id: string, action: 'approve' | 'reject', notes?: string): Promise<JournalEntryRow | null> {
     try {
       const status = action === 'approve' ? 'posted' : 'cancelled';
       const { data, error } = await supabase
@@ -264,9 +266,10 @@ export class JournalEntryService {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) return null;
 
       if (action === 'approve') {
         await this.updateAccountBalances(id);

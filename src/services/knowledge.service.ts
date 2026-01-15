@@ -302,7 +302,7 @@ export class KnowledgeService {
       .update(updateData)
       .eq("id", phaseId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -322,7 +322,7 @@ export class KnowledgeService {
       })
       .eq("id", phaseId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;

@@ -110,25 +110,26 @@ export class RentalPaymentService {
       .from("rental_payments")
       .insert([{ ...payment, payment_number: paymentNumber }])
       .select(RENTAL_PAYMENT_SELECT)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الدفعة');
     return data as RentalPayment;
   }
 
   /**
    * تحديث دفعة
    */
-  static async update(id: string, updates: Partial<RentalPayment>): Promise<RentalPayment> {
+  static async update(id: string, updates: Partial<RentalPayment>): Promise<RentalPayment | null> {
     const { data, error } = await supabase
       .from("rental_payments")
       .update(updates)
       .eq("id", id)
       .select(RENTAL_PAYMENT_SELECT)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return data as RentalPayment;
+    return data as RentalPayment | null;
   }
 
   /**
@@ -157,7 +158,7 @@ export class RentalPaymentService {
       .from("rental_payments")
       .select("amount_paid, payment_date, invoice_id, receipt_id, contract_id")
       .eq("id", id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -215,7 +216,7 @@ export class RentalPaymentService {
       .from('invoices')
       .select('*, invoice_lines(*)')
       .eq('id', invoiceId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as InvoiceWithLines | null;
@@ -229,7 +230,7 @@ export class RentalPaymentService {
       .from('payments')
       .select('*')
       .eq('id', receiptId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as PaymentRecord | null;
@@ -242,7 +243,7 @@ export class RentalPaymentService {
     const { data, error } = await supabase
       .from('organization_settings')
       .select('*')
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;

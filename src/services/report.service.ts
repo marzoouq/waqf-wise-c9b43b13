@@ -140,8 +140,9 @@ export const CustomReportsService = {
       .from('report_templates')
       .insert([{ template_name: template.name, report_type: template.report_type, columns: template.fields }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء قالب التقرير');
     return { 
       id: data.id, 
       name: data.template_name, 

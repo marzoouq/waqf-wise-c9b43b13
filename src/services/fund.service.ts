@@ -32,13 +32,14 @@ export class FundService {
   }
 
   static async create(fund: Omit<FundInsert, 'id' | 'created_at' | 'updated_at'>): Promise<Fund> {
-    const { data, error } = await supabase.from('funds').insert([fund]).select().single();
+    const { data, error } = await supabase.from('funds').insert([fund]).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الصندوق');
     return data;
   }
 
-  static async update(id: string, updates: Partial<FundInsert>): Promise<Fund> {
-    const { data, error } = await supabase.from('funds').update(updates).eq('id', id).select().single();
+  static async update(id: string, updates: Partial<FundInsert>): Promise<Fund | null> {
+    const { data, error } = await supabase.from('funds').update(updates).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -57,13 +58,14 @@ export class FundService {
   }
 
   static async createDisclosure(disclosure: Partial<AnnualDisclosure>): Promise<AnnualDisclosure> {
-    const { data, error } = await supabase.from('annual_disclosures').insert(disclosure as never).select().single();
+    const { data, error } = await supabase.from('annual_disclosures').insert(disclosure as never).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الإفصاح');
     return data;
   }
 
-  static async publishDisclosure(id: string): Promise<AnnualDisclosure> {
-    const { data, error } = await supabase.from('annual_disclosures').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', id).select().single();
+  static async publishDisclosure(id: string): Promise<AnnualDisclosure | null> {
+    const { data, error } = await supabase.from('annual_disclosures').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -76,11 +78,11 @@ export class FundService {
 
   static async updateDistributionSettings(id: string | undefined, updates: Record<string, unknown>) {
     if (id) {
-      const { data, error } = await supabase.from('waqf_distribution_settings').update(updates as never).eq('id', id).select().single();
+      const { data, error } = await supabase.from('waqf_distribution_settings').update(updates as never).eq('id', id).select().maybeSingle();
       if (error) throw error;
       return data;
     } else {
-      const { data, error } = await supabase.from('waqf_distribution_settings').insert([updates as never]).select().single();
+      const { data, error } = await supabase.from('waqf_distribution_settings').insert([updates as never]).select().maybeSingle();
       if (error) throw error;
       return data;
     }
@@ -104,13 +106,14 @@ export class FundService {
   }
 
   static async createWaqfUnit(unit: Record<string, unknown>) {
-    const { data, error } = await supabase.from('waqf_units').insert([unit as never]).select().single();
+    const { data, error } = await supabase.from('waqf_units').insert([unit as never]).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء قلم الوقف');
     return data;
   }
 
   static async updateWaqfUnit(id: string, updates: Record<string, unknown>) {
-    const { data, error } = await supabase.from('waqf_units').update(updates as never).eq('id', id).select().single();
+    const { data, error } = await supabase.from('waqf_units').update(updates as never).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -203,18 +206,18 @@ export class FundService {
       .maybeSingle();
 
     if (existing) {
-      const { data, error } = await supabase.from('distribution_approvals').update(approval as never).eq('id', existing.id).select().single();
+      const { data, error } = await supabase.from('distribution_approvals').update(approval as never).eq('id', existing.id).select().maybeSingle();
       if (error) throw error;
       return data;
     }
 
-    const { data, error } = await supabase.from('distribution_approvals').insert([approval as never]).select().single();
+    const { data, error } = await supabase.from('distribution_approvals').insert([approval as never]).select().maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async updateDistributionApproval(id: string, updates: Record<string, unknown>) {
-    const { data, error } = await supabase.from('distribution_approvals').update(updates as never).eq('id', id).select().single();
+    const { data, error } = await supabase.from('distribution_approvals').update(updates as never).eq('id', id).select().maybeSingle();
     if (error) throw error;
     return data;
   }

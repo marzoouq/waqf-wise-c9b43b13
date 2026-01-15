@@ -162,7 +162,7 @@ export class AccountingService {
       .from("fiscal_year_closings")
       .select("*")
       .eq("fiscal_year_id", fiscalYearId)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
     return data;
@@ -176,9 +176,10 @@ export class AccountingService {
       .from("fiscal_year_closings")
       .insert(closing)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء إقفال السنة المالية');
     return data;
   }
 
@@ -191,7 +192,7 @@ export class AccountingService {
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -263,7 +264,7 @@ export class AccountingService {
         .from('accounts')
         .select('current_balance')
         .eq('code', '1.1.1')
-        .single();
+        .maybeSingle();
 
       const openingCash = bankAccount?.current_balance || 0;
 
@@ -281,7 +282,7 @@ export class AccountingService {
           closing_cash: openingCash,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
