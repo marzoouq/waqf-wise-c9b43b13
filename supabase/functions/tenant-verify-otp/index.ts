@@ -59,7 +59,7 @@ serve(async (req) => {
         .from("contracts")
         .select("id, tenant_id, tenants(*)")
         .eq("contract_number", cleanOtp)
-        .eq("status", "نشط")
+        .in("status", ["نشط", "منتهي", "مسودة"]) // قبول جميع الحالات للتجربة
         .maybeSingle();
 
       if (directError || !directContract) {

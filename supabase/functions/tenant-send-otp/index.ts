@@ -60,12 +60,12 @@ serve(async (req) => {
       );
     }
 
-    // التحقق من وجود عقد نشط للمستأجر
+    // التحقق من وجود عقد للمستأجر
     const { data: contracts, error: contractError } = await supabaseAdmin
       .from("contracts")
-      .select("id, contract_number")
+      .select("id, contract_number, status")
       .eq("tenant_id", tenant.id)
-      .eq("status", "نشط")
+      .in("status", ["نشط", "منتهي", "مسودة"]) // قبول جميع الحالات للتجربة
       .limit(1);
 
     if (contractError) {
