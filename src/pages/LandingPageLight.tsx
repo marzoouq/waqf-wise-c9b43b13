@@ -1,13 +1,14 @@
 /**
- * صفحة ترحيبية خفيفة
- * ✅ تستخدم useAuth مباشرة لأن AuthProvider متاح في App.tsx
- * ✅ تم تقسيمها إلى مكونات صغيرة في src/components/landing-light
+ * صفحة ترحيبية خفيفة - محسّنة للأداء
+ * ✅ لا تعتمد على AuthContext عند التحميل الأولي
+ * ✅ تفحص الجلسة مباشرة من Supabase
+ * ✅ LCP محسّن بشكل جذري
  */
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEOHead } from "@/components/shared/SEOHead";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LightHeader,
   LightHeroSection,
@@ -19,37 +20,38 @@ import {
 } from "@/components/landing-light";
 
 export default function LandingPageLight() {
-  const { user, isLoading, roles } = useAuth();
   const navigate = useNavigate();
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  // تحديد المسار بناءً على الأدوار
-  const getRedirectPath = () => {
-    if (roles.includes('admin')) return '/admin';
-    if (roles.includes('nazer')) return '/nazer';
-    if (roles.includes('accountant')) return '/accountant';
-    if (roles.includes('cashier')) return '/cashier';
-    if (roles.includes('archivist')) return '/archive';
-    if (roles.includes('waqf_heir') || roles.includes('beneficiary')) return '/beneficiary';
-    return '/dashboard';
-  };
-
-  // ✅ توجيه تلقائي للمستخدمين المسجلين
+  // ✅ فحص سريع للجلسة - بدون AuthContext
   useEffect(() => {
-    if (isLoading) return;
+    let mounted = true;
     
-    if (user) {
-      setIsRedirecting(true);
-      const timer = setTimeout(() => {
-        navigate(getRedirectPath(), { replace: true });
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [user, isLoading, roles, navigate]);
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          if (session) {
+            // مستخدم مسجل - توجيه للتطبيق
+            navigate('/redirect', { replace: true });
+          } else {
+            setIsAuthenticated(false);
+          }
+        }
+      } catch {
+        if (mounted) {
+          setIsAuthenticated(false);
+        }
+      }
+    };
+    
+    checkSession();
+    
+    return () => { mounted = false; };
+  }, [navigate]);
 
-  // ✅ عرض spinner أثناء التوجيه
-  if (isRedirecting) {
+  // ✅ عرض spinner أثناء التحقق
+  if (isAuthenticated === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
