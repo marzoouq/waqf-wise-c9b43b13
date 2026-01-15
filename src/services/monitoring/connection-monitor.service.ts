@@ -23,6 +23,16 @@ export interface ConnectionStats {
   eventsByType: Record<string, number>;
 }
 
+interface NetworkInformation {
+  effectiveType: string;
+  downlink: number;
+  addEventListener(type: string, listener: () => void): void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+}
+
 class ConnectionMonitorService {
   private events: ConnectionEvent[] = [];
   private listeners: Set<(event: ConnectionEvent) => void> = new Set();
@@ -91,7 +101,8 @@ class ConnectionMonitorService {
 
     // مراقبة جودة الاتصال
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const nav = navigator as NavigatorWithConnection;
+      const connection = nav.connection;
       connection?.addEventListener('change', () => {
         const effectiveType = connection.effectiveType;
         if (effectiveType === '2g' || effectiveType === 'slow-2g') {

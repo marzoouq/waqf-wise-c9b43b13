@@ -35,11 +35,12 @@ interface MutationResult<T> {
 /**
  * Type assertion helper للتعامل مع dynamic table names
  * @note Required for dynamic table queries - Supabase types don't support string table names
+ * @see https://supabase.com/docs/reference/javascript/typescript-support
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getTableQuery = (tableName: string): any => {
+const getTableQuery = (tableName: string) => {
+  // Type assertion ضروري هنا لأن Supabase لا يدعم أسماء الجداول الديناميكية
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (supabase as any).from(tableName);
+  return supabase.from(tableName as any);
 };
 
 /**
