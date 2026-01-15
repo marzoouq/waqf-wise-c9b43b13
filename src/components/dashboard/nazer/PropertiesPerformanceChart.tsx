@@ -34,8 +34,9 @@ export default function PropertiesPerformanceChart() {
         <CardTitle>أداء العقارات (أعلى 6 عقارات)</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={data}>
+        <div style={{ width: '100%', minHeight: 350 }}>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="name" 
@@ -48,11 +49,12 @@ export default function PropertiesPerformanceChart() {
               formatter={(value: number) => `${value.toLocaleString('ar-SA')} ر.س`}
             />
             <Legend />
-            <Bar dataKey="الإيرادات الكلية" fill="hsl(var(--primary))" />
-            <Bar dataKey="المدفوع" fill="hsl(var(--status-success))" />
-            <Bar dataKey="المعلق" fill="hsl(var(--status-warning))" />
-          </BarChart>
-        </ResponsiveContainer>
+              <Bar dataKey="الإيرادات الكلية" fill="hsl(var(--primary))" />
+              <Bar dataKey="المدفوع" fill="hsl(var(--status-success))" />
+              <Bar dataKey="المعلق" fill="hsl(var(--status-warning))" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

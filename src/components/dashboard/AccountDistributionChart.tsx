@@ -47,8 +47,9 @@ const AccountDistributionChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">توزيع الحسابات حسب النوع</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={chartHeight}>
-          <PieChart>
+        <div style={{ width: '100%', minHeight: chartHeight }}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <PieChart>
             <Pie
               data={data as { name: string; value: number; count: number; [key: string]: string | number }[] || []}
               cx="50%"
@@ -76,12 +77,13 @@ const AccountDistributionChart = () => {
               }}
               formatter={(value: number, name: string) => [`${value} حساب`, name]}
             />
-            <Legend 
+              <Legend 
               wrapperStyle={{ direction: 'rtl', paddingTop: '10px' }}
               formatter={(value) => value}
             />
-          </PieChart>
-        </ResponsiveContainer>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
