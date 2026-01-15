@@ -139,7 +139,8 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
 
     const calculatedMonthlyRent = data.total_amount / durationInMonths;
 
-    const contractData = {
+    // بناء بيانات العقد الأساسية
+    const baseContractData = {
       contract_number: data.contract_number,
       property_id: data.property_id,
       tenant_id: data.tenant_id || undefined,
@@ -159,11 +160,18 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       terms_and_conditions: data.terms_and_conditions || undefined,
       notes: data.notes || undefined,
       tax_percentage: data.tax_percentage,
-      units_count: data.unit_ids.length,
-      unit_ids: data.unit_ids,
       ejar_document_url: uploadedFileUrl || undefined,
       ejar_document_name: contractFile?.name || undefined,
     };
+
+    // إضافة unit_ids فقط عند الإنشاء (وليس التعديل)
+    const contractData = isEditing 
+      ? baseContractData 
+      : { 
+          ...baseContractData, 
+          units_count: data.unit_ids.length,
+          unit_ids: data.unit_ids,
+        };
 
     try {
       if (contract) {
