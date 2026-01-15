@@ -26,10 +26,12 @@ export interface TenantContract {
   status: string;
   property_id: string;
   property_name: string;
-  property_address?: string;
+  property_location?: string;
+  property_type?: string;
   unit_id?: string;
   unit_name?: string;
   unit_number?: string;
+  unit_type?: string;
 }
 
 export interface TenantMaintenanceRequest {
