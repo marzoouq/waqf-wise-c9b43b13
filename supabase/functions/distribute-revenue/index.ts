@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', user.id)
       .in('role', ['nazer', 'admin'])
-      .single();
+      .maybeSingle();
 
     if (!userRole) {
       return forbiddenResponse('غير مصرح لك بتنفيذ التوزيع');

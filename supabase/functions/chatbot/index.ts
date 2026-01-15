@@ -169,7 +169,7 @@ ${articles?.map(art => `📖 ${art.title}:\n${art.content}`).join('\n\n') || ''}
         .from('beneficiaries')
         .select('id, full_name, total_received, pending_amount, account_balance')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (beneficiary) {
         // جلب توزيعات الوريث

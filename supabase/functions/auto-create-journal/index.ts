@@ -109,7 +109,7 @@ serve(async (req) => {
       .select('*')
       .eq('trigger_event', trigger_event)
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     if (templateError || !template) {
       // في وضع الاختبار نعيد نتيجة تجريبية
@@ -127,7 +127,7 @@ serve(async (req) => {
       .from('fiscal_years')
       .select('id')
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     if (fyError || !fiscalYear) {
       throw new Error('لم يتم العثور على سنة مالية نشطة');
@@ -139,7 +139,7 @@ serve(async (req) => {
       .select('entry_number')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const lastNumber = lastEntry?.entry_number ? parseInt(lastEntry.entry_number.split('-')[1], 10) : 0;
     const newEntryNumber = `JE-${(lastNumber + 1).toString().padStart(6, '0')}`;
@@ -157,9 +157,10 @@ serve(async (req) => {
         reference_id: reference_id,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (entryError) throw entryError;
+    if (!journalEntry) throw new Error('فشل إنشاء القيد');
 
     // إنشاء سطور القيد - المدين
     const debitLines = template.debit_accounts.map((acc: AccountTemplate, idx: number) => {

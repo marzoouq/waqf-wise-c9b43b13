@@ -132,7 +132,7 @@ serve(async (req) => {
         .from('beneficiaries')
         .select('id, national_id, user_id, full_name')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (beneficiaryError || !beneficiary) {
         console.error('Beneficiary not found:', beneficiaryError);

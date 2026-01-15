@@ -86,12 +86,13 @@ serve(async (req) => {
       .from('waqf_distribution_settings')
       .select('*')
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     if (settingsError) {
       console.error('❌ Error fetching settings:', settingsError);
       throw settingsError;
     }
+    if (!settings) throw new Error('لا توجد إعدادات توزيع نشطة');
 
     // 2. حساب الإيرادات (من الإيجارات)
     const { data: rentalPayments } = await supabase
@@ -293,9 +294,10 @@ serve(async (req) => {
         calculation_notes: 'حساب تسلسلي شرعي: صيانة ← ناظر ← صدقة ← احتياطي ← مستفيدين',
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (distError) throw distError;
+    if (!distribution) throw new Error('فشل إنشاء سجل التوزيع');
 
     console.log(`✅ Distribution created with ID: ${distribution.id}`);
 

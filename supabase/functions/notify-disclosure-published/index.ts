@@ -58,9 +58,10 @@ serve(async (req) => {
       .from('annual_disclosures')
       .select('*')
       .eq('id', disclosure_id)
-      .single();
+      .maybeSingle();
 
     if (disclosureError) throw disclosureError;
+    if (!disclosure) throw new Error('الإفصاح غير موجود');
 
     // جلب جميع المستفيدين النشطين
     const { data: beneficiaries, error: beneficiariesError } = await supabaseClient

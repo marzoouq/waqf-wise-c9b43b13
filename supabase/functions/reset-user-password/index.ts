@@ -127,7 +127,7 @@ serve(async (req) => {
       .from('profiles')
       .select('full_name, email')
       .eq('user_id', user_id)
-      .single();
+      .maybeSingle();
 
     await supabaseAdmin.from('audit_logs').insert({
       user_id: user.id,

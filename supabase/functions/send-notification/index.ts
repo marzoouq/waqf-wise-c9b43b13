@@ -256,7 +256,7 @@ serve(async (req) => {
         .from('profiles')
         .select('email, notification_preferences')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       const preferences = profile?.notification_preferences as NotificationPreferences | null;
       const emailEnabled = preferences?.email !== false;
@@ -328,7 +328,7 @@ serve(async (req) => {
         .from('profiles')
         .select('phone, notification_preferences')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       const preferences = profile?.notification_preferences as NotificationPreferences | null;
       const smsEnabled = preferences?.sms !== false;

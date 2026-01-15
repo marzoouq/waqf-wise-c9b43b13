@@ -271,12 +271,13 @@ Deno.serve(async (req) => {
         status: 'new',
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (insertError) {
       console.error('Failed to insert error log:', insertError);
       throw insertError;
     }
+    if (!errorLog) throw new Error('فشل تسجيل الخطأ');
 
     console.log('✅ Error logged:', errorLog.id);
 
@@ -335,7 +336,7 @@ async function applyAlertRules(supabase: SupabaseClient, errorLog: ErrorLog, err
             status: 'active',
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (!alert) continue;
 
@@ -439,7 +440,7 @@ async function handleAutoEscalation(supabase: SupabaseClient, alertId: string, e
       .from('system_alerts')
       .select('status')
       .eq('id', alertId)
-      .single();
+      .maybeSingle();
 
     if (!alert || alert.status === 'resolved') {
       console.log('Alert already resolved, skipping escalation');
