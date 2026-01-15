@@ -56,11 +56,29 @@ export const cleanupSession = async (options?: { keepTheme?: boolean }) => {
 
 /**
  * التحقق من وجود تنظيف معلق من جلسة سابقة
+ * ✅ إصلاح: لا ننظف إذا كانت هناك جلسة نشطة فعلاً
  */
 export const checkPendingCleanup = async () => {
   const pendingCleanup = localStorage.getItem(SESSION_CLEANUP_KEY);
   if (pendingCleanup === 'true') {
     localStorage.removeItem(SESSION_CLEANUP_KEY);
+    
+    // ✅ التحقق من وجود جلسة نشطة قبل التنظيف
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // لا ننظف إذا كانت هناك جلسة صالحة - فقط نزيل العلامة
+        if (import.meta.env.DEV) {
+          console.log('⚠️ [checkPendingCleanup] تجاهل التنظيف - يوجد جلسة نشطة');
+        }
+        return false;
+      }
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.warn('خطأ في التحقق من الجلسة', err);
+      }
+    }
+    
     await cleanupSession({ keepTheme: true });
     return true;
   }

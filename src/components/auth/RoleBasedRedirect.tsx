@@ -36,7 +36,8 @@ export function RoleBasedRedirect() {
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ إذا استمر التحميل لأكثر من 5 ثواني مع وجود مستخدم ولم تُجلب الأدوار
+  // ✅ إصلاح: إذا استمر التحميل لأكثر من 5 ثواني مع وجود مستخدم ولم تُجلب الأدوار
+  // لا نوجه لـ /login لأن المستخدم مسجل دخول فعلاً!
   if (loadingTooLong && user && !rolesReady) {
     // محاولة استخدام الأدوار المخزنة مؤقتاً مع التحقق من userId
     try {
@@ -52,8 +53,13 @@ export function RoleBasedRedirect() {
     } catch {
       // تجاهل أخطاء localStorage
     }
-    // ✅ لا نوجه لـ /dashboard! نعيد لصفحة الدخول
-    return <Navigate to="/login" replace />;
+    
+    // ✅ إصلاح: بدلاً من التوجيه لـ /login، نوجه للوحة الافتراضية
+    // المستخدم مسجل دخول لكن الأدوار لم تُحمَّل - نتركه يدخل ونترك ProtectedRoute يتعامل
+    if (import.meta.env.DEV) {
+      console.warn('⚠️ [RoleBasedRedirect] Timeout - توجيه للوحة الافتراضية بدلاً من /login');
+    }
+    return <Navigate to="/dashboard" replace />;
   }
 
   // ✅ انتظار حقيقي: لا نوجه حتى تُجلب الأدوار فعلياً
