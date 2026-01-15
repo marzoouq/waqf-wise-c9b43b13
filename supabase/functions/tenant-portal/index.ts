@@ -17,11 +17,16 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseAdmin = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  
+  console.log("Creating supabase client with URL:", supabaseUrl ? "SET" : "MISSING");
+  console.log("Service role key:", serviceRoleKey ? "SET" : "MISSING");
+
+  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    db: { schema: 'public' }
+  });
 
   // التحقق من الجلسة
   const sessionToken = req.headers.get("x-tenant-session");
@@ -64,15 +69,21 @@ serve(async (req) => {
 
     // جلب بيانات المستأجر
     if (action === "profile" && req.method === "GET") {
-      // جلب العقود المرتبطة بالمستأجر (نشط أو منتهي حديثاً)
-      const { data: contractsRaw } = await supabaseAdmin
+      console.log("Fetching contracts for tenant:", tenant.id);
+      
+      // جلب العقود المرتبطة بالمستأجر
+      const { data: contractsRaw, error: contractsError } = await supabaseAdmin
         .from("contracts")
         .select(`
           id, contract_number, start_date, end_date, status, property_id,
-          properties(id, name, address, city)
+          properties(id, name, location, type)
         `)
-        .eq("tenant_id", tenant.id)
-        .in("status", ["نشط", "منتهي"]);
+        .eq("tenant_id", tenant.id);
+      
+      if (contractsError) {
+        console.error("Contracts query error:", contractsError);
+      }
+      console.log("Contracts found:", contractsRaw?.length || 0);
 
       // جلب الوحدات المرتبطة بكل عقد
       const contracts = [];
@@ -95,8 +106,8 @@ serve(async (req) => {
               status: contract.status,
               property_id: contract.property_id,
               property_name: (contract as any).properties?.name || "غير محدد",
-              property_address: (contract as any).properties?.address,
-              property_city: (contract as any).properties?.city,
+              property_location: (contract as any).properties?.location,
+              property_type: (contract as any).properties?.type,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -114,8 +125,8 @@ serve(async (req) => {
             status: contract.status,
             property_id: contract.property_id,
             property_name: (contract as any).properties?.name || "غير محدد",
-            property_address: (contract as any).properties?.address,
-            property_city: (contract as any).properties?.city,
+            property_location: (contract as any).properties?.location,
+            property_type: (contract as any).properties?.type,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,

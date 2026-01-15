@@ -40,7 +40,8 @@ import {
   Phone, 
   Mail, 
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Building2
 } from "lucide-react";
 import { useCreateTenantRequest } from "@/hooks/tenant-portal/useTenantPortal";
 import { TenantContract } from "@/services/tenant-portal.service";
@@ -267,18 +268,56 @@ export function CreateMaintenanceRequestDialog({
               {/* Contract Selection */}
               <div className="space-y-2">
                 <Label>الوحدة السكنية *</Label>
-                <Select value={selectedContract} onValueChange={setSelectedContract}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر الوحدة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {contracts.map((contract) => (
-                      <SelectItem key={contract.contract_id} value={contract.contract_id}>
-                        {contract.property_name} - {contract.unit_name || "الوحدة الرئيسية"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {contracts.length === 0 ? (
+                  <Card className="border-destructive/50 bg-destructive/5">
+                    <CardContent className="py-4">
+                      <p className="text-sm text-destructive text-center">
+                        لا توجد عقود مرتبطة بحسابك. يرجى التواصل مع الإدارة.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <>
+                    <Select value={selectedContract} onValueChange={setSelectedContract}>
+                      <SelectTrigger className={!selectedContract && form.formState.isSubmitted ? "border-destructive" : ""}>
+                        <SelectValue placeholder="اختر الوحدة السكنية" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {contracts.map((contract) => (
+                          <SelectItem key={contract.contract_id} value={contract.contract_id}>
+                            <div className="flex flex-col items-start">
+                              <span className="font-medium">{contract.property_name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {contract.unit_name || "الوحدة الرئيسية"} 
+                                {contract.unit_number && ` (${contract.unit_number})`}
+                                {contract.property_location && ` - ${contract.property_location}`}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedContractData && (
+                      <Card className="bg-muted/50">
+                        <CardContent className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-5 w-5 text-primary" />
+                            <div className="flex-1">
+                              <p className="font-medium">{selectedContractData.property_name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {selectedContractData.unit_name}
+                                {selectedContractData.property_location && ` • ${selectedContractData.property_location}`}
+                              </p>
+                            </div>
+                            <Badge variant={selectedContractData.status === "نشط" ? "default" : "secondary"}>
+                              {selectedContractData.status}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                )}
               </div>
 
               {/* Category */}
