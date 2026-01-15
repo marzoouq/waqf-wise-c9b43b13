@@ -1,7 +1,7 @@
 /**
  * Tenant Portal Page
  * بوابة المستأجرين لطلبات الصيانة
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 import { useState } from "react";
@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2 } from "lucide-react";
+import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2, FileText } from "lucide-react";
 import { useTenantAuth, useTenantProfile, useTenantMaintenanceRequests, useTenantNotifications } from "@/hooks/tenant-portal/useTenantPortal";
 import { CreateMaintenanceRequestDialog } from "@/components/tenant-portal/CreateMaintenanceRequestDialog";
 import { format } from "date-fns";
@@ -20,17 +19,17 @@ import { ar } from "date-fns/locale";
 // مكون تسجيل الدخول
 function TenantLogin() {
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, devOtp, tenantName } = useTenantAuth();
+  const [contractNumber, setContractNumber] = useState("");
+  const [step, setStep] = useState<"phone" | "contract">("phone");
+  const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName } = useTenantAuth();
 
   const handleSendOtp = () => {
     sendOtp(phone);
-    setStep("otp");
+    setStep("contract");
   };
 
-  const handleVerifyOtp = () => {
-    verifyOtp({ phone, otp });
+  const handleVerifyContract = () => {
+    verifyOtp({ phone, otp: contractNumber });
   };
 
   return (
@@ -62,7 +61,7 @@ function TenantLogin() {
                 </div>
               </div>
               <Button onClick={handleSendOtp} disabled={!phone || phone.length < 9 || isSendingOtp} className="w-full">
-                {isSendingOtp ? "جاري الإرسال..." : "إرسال رمز التحقق"}
+                {isSendingOtp ? "جاري التحقق..." : "متابعة"}
               </Button>
             </>
           ) : (
@@ -71,21 +70,24 @@ function TenantLogin() {
                 <p className="text-center text-muted-foreground">مرحباً {tenantName}</p>
               )}
               <div className="space-y-2">
-                <Label>رمز التحقق</Label>
-                <div className="flex justify-center" dir="ltr">
-                  <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                    <InputOTPGroup>
-                      {[0, 1, 2, 3, 4, 5].map((i) => (
-                        <InputOTPSlot key={i} index={i} />
-                      ))}
-                    </InputOTPGroup>
-                  </InputOTP>
+                <Label htmlFor="contractNumber">رقم العقد</Label>
+                <div className="relative">
+                  <FileText className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="contractNumber"
+                    type="text"
+                    placeholder="أدخل رقم العقد"
+                    value={contractNumber}
+                    onChange={(e) => setContractNumber(e.target.value)}
+                    className="pe-10"
+                    dir="ltr"
+                  />
                 </div>
-                {devOtp && (
-                  <p className="text-xs text-center text-muted-foreground">للتطوير: {devOtp}</p>
-                )}
+                <p className="text-xs text-muted-foreground">
+                  رقم العقد موجود في عقد الإيجار الخاص بك
+                </p>
               </div>
-              <Button onClick={handleVerifyOtp} disabled={otp.length !== 6 || isVerifyingOtp} className="w-full">
+              <Button onClick={handleVerifyContract} disabled={!contractNumber || isVerifyingOtp} className="w-full">
                 {isVerifyingOtp ? "جاري التحقق..." : "تسجيل الدخول"}
               </Button>
               <Button variant="ghost" onClick={() => setStep("phone")} className="w-full">
