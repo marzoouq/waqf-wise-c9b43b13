@@ -194,7 +194,7 @@ export class BeneficiaryTabsService {
             is_online: true,
           })
           .select('id')
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         return data?.id || null;
@@ -260,9 +260,10 @@ export class BeneficiaryTabsService {
           submitted_at: new Date().toISOString(),
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!request) throw new Error("فشل في إنشاء الطلب");
       return request;
     } catch (error) {
       productionLogger.error('Error creating request', error);

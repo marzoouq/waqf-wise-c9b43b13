@@ -34,14 +34,16 @@ export class MaintenanceService {
   }
 
   static async createRequest(request: MaintenanceRequestInsert): Promise<MaintenanceRequest> {
-    const { data, error } = await supabase.from('maintenance_requests').insert(request).select().single();
+    const { data, error } = await supabase.from('maintenance_requests').insert(request).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء طلب الصيانة");
     return data;
   }
 
   static async updateRequest(id: string, updates: Partial<MaintenanceRequest>): Promise<MaintenanceRequest> {
-    const { data, error } = await supabase.from('maintenance_requests').update(updates).eq('id', id).select().single();
+    const { data, error } = await supabase.from('maintenance_requests').update(updates).eq('id', id).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("طلب الصيانة غير موجود");
     return data;
   }
 
@@ -55,8 +57,9 @@ export class MaintenanceService {
   }
 
   static async addProvider(provider: MaintenanceProviderInsert): Promise<MaintenanceProvider> {
-    const { data, error } = await supabase.from('maintenance_providers').insert(provider).select().single();
+    const { data, error } = await supabase.from('maintenance_providers').insert(provider).select().maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("فشل في إضافة مقدم الخدمة");
     return data;
   }
 
@@ -101,9 +104,10 @@ export class MaintenanceService {
       .from('maintenance_requests')
       .insert([{ ...request, request_number: requestNumber }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء طلب الصيانة");
     return data;
   }
 
@@ -119,9 +123,10 @@ export class MaintenanceService {
         *,
         properties(name, location)
       `)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("طلب الصيانة غير موجود");
     return data;
   }
 
@@ -146,9 +151,10 @@ export class MaintenanceService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("مقدم الخدمة غير موجود");
     return data;
   }
 
@@ -174,9 +180,10 @@ export class MaintenanceService {
       .from("provider_ratings")
       .insert([{ ...rating, rated_by: user?.id }])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إضافة التقييم");
     return data as { id: string; rating: number; provider_id: string; rated_by?: string };
   }
 
@@ -213,9 +220,10 @@ export class MaintenanceService {
       .from('maintenance_schedules')
       .insert(schedule)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إضافة جدول الصيانة");
     return data;
   }
 
@@ -228,9 +236,10 @@ export class MaintenanceService {
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("جدول الصيانة غير موجود");
     return data;
   }
 

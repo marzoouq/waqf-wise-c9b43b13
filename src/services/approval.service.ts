@@ -408,8 +408,9 @@ export class ApprovalService {
         })
         .eq("id", existing.id)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("الموافقة غير موجودة");
       return data as RequestApproval;
     }
 
@@ -417,8 +418,9 @@ export class ApprovalService {
       .from("request_approvals")
       .insert([approval])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء الموافقة");
     return data as RequestApproval;
   }
 
@@ -428,8 +430,9 @@ export class ApprovalService {
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("الموافقة غير موجودة");
     return data as RequestApproval;
   }
 

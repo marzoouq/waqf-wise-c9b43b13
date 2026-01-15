@@ -68,9 +68,10 @@ export class DistributionBankService {
           status: 'pending',
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إنشاء ملف التحويل البنكي");
       return data;
     } catch (error) {
       productionLogger.error('Error generating bank transfer', error);

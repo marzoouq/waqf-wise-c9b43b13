@@ -31,12 +31,13 @@ export class TribeService {
       .from("tribes")
       .insert([tribe])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       productionLogger.error("Error creating tribe", error);
       throw error;
     }
+    if (!data) throw new Error("فشل في إنشاء القبيلة");
     return data;
   }
 
@@ -49,12 +50,13 @@ export class TribeService {
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       productionLogger.error("Error updating tribe", error);
       throw error;
     }
+    if (!data) throw new Error("القبيلة غير موجودة");
     return data;
   }
 

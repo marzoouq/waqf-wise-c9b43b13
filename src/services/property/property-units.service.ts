@@ -84,9 +84,10 @@ export class PropertyUnitsService {
         .from('property_units')
         .insert([unit])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إنشاء الوحدة");
 
       // تحديث عدد الوحدات في العقار
       if (unit.property_id) {
@@ -118,9 +119,10 @@ export class PropertyUnitsService {
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', unitId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("الوحدة غير موجودة");
       return data;
     } catch (error) {
       productionLogger.error('Error updating property unit', error);

@@ -93,9 +93,10 @@ export class BankReconciliationService {
       .from("bank_statements")
       .insert([statement])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إنشاء كشف الحساب");
     return data as BankStatement;
   }
 
@@ -107,9 +108,10 @@ export class BankReconciliationService {
       .from("bank_transactions")
       .insert([transaction])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("فشل في إضافة الحركة البنكية");
     return data as BankTransaction;
   }
 
@@ -125,9 +127,10 @@ export class BankReconciliationService {
       })
       .eq("id", transaction_id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("الحركة البنكية غير موجودة");
     return data as BankTransaction;
   }
 
@@ -143,9 +146,10 @@ export class BankReconciliationService {
       })
       .eq("id", statementId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error("كشف الحساب غير موجود");
     return data as BankStatement;
   }
 }
