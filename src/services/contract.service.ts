@@ -99,10 +99,23 @@ export class ContractService {
       .select()
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      // تحسين رسائل الخطأ للمستخدم
+      if (error.code === '23503') {
+        const customError = new Error('بيانات المستأجر أو العقار غير صالحة. يرجى التحقق من البيانات.');
+        (customError as any).code = '23503';
+        throw customError;
+      }
+      if (error.message?.includes('occupied_units_check')) {
+        const customError = new Error('يوجد تعارض في عدد الوحدات المشغولة');
+        (customError as any).code = 'occupied_units_check';
+        throw customError;
+      }
+      throw error;
+    }
     if (!data) throw new Error('فشل إنشاء العقد');
 
-    // ربط الوحدات بالعقد
+    // ربط الوحدات بالعقد - الـ Trigger يحدث حالة الوحدات تلقائياً
     if (data && unit_ids && unit_ids.length > 0) {
       const contractUnits = unit_ids.map(unitId => ({
         contract_id: data.id,
@@ -117,18 +130,7 @@ export class ContractService {
         logger.error(unitsError, { context: 'contract_units_insert', severity: 'medium' });
       }
 
-      // تحديث حالة الوحدات إذا كان العقد نشطاً (احتياطي - الـ Trigger يفعل ذلك أيضاً)
-      if (data.status === 'نشط') {
-        await supabase
-          .from('property_units')
-          .update({
-            current_contract_id: data.id,
-            current_tenant_id: contractData.tenant_id || null,
-            occupancy_status: 'مشغول',
-            updated_at: new Date().toISOString()
-          })
-          .in('id', unit_ids);
-      }
+      // ملاحظة: تم إزالة التحديث اليدوي للوحدات - الـ Trigger يفعل ذلك تلقائياً
     }
 
     // إنشاء جدول الدفعات تلقائياً
