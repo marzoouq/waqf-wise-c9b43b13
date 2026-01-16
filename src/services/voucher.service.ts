@@ -42,14 +42,8 @@ export interface VoucherWithDetails extends PaymentVoucher {
  * التوليد التلقائي للأرقام والقيود المحاسبية
  */
 export class VoucherService {
-  /**
-   * توليد رقم سند تلقائي
-   */
-  private static generateVoucherNumber(): string {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `V-${timestamp}-${random}`;
-  }
+  // الترقيم التلقائي يتم عبر Trigger في قاعدة البيانات
+  // voucher_number يُنشأ تلقائياً بصيغة V-000001, V-000002, ...
 
   /**
    * إنشاء سند جديد
@@ -59,9 +53,9 @@ export class VoucherService {
       // 1. التحقق من البيانات
       this.validateVoucherData(data);
 
-      // 2. إنشاء السند مع رقم تلقائي
+      // 2. إنشاء السند - الترقيم التلقائي يتم عبر Trigger في قاعدة البيانات
       const insertData: PaymentVoucherInsert = {
-        voucher_number: this.generateVoucherNumber(),
+        voucher_number: '', // سيتم ملؤه تلقائياً بواسطة الـ Trigger
         voucher_type: data.voucher_type,
         amount: data.amount,
         description: data.description,
