@@ -27,6 +27,11 @@ export interface Property {
   waqf_unit_id?: string;
   monthly_rent?: number;
   floors_count?: number;
+  // الحقول الجديدة للربط
+  total_units?: number;
+  occupied_units?: number;
+  available_units?: number;
+  occupancy_percentage?: number;
 }
 
 export function useProperties() {

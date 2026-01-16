@@ -3164,6 +3164,7 @@ export type Database = {
           tenant_name: string
           tenant_phone: string
           terms_and_conditions: string | null
+          unit_id: string | null
           units_count: number | null
           updated_at: string
         }
@@ -3193,6 +3194,7 @@ export type Database = {
           tenant_name: string
           tenant_phone: string
           terms_and_conditions?: string | null
+          unit_id?: string | null
           units_count?: number | null
           updated_at?: string
         }
@@ -3222,6 +3224,7 @@ export type Database = {
           tenant_name?: string
           tenant_phone?: string
           terms_and_conditions?: string | null
+          unit_id?: string | null
           units_count?: number | null
           updated_at?: string
         }
@@ -3252,6 +3255,13 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "property_units"
             referencedColumns: ["id"]
           },
         ]
@@ -3992,6 +4002,13 @@ export type Database = {
             referencedRelation: "documents"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "document_ocr_content_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents_with_links"
+            referencedColumns: ["id"]
+          },
         ]
       }
       document_tags: {
@@ -4028,6 +4045,13 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_tags_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents_with_links"
             referencedColumns: ["id"]
           },
         ]
@@ -4075,6 +4099,13 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents_with_links"
             referencedColumns: ["id"]
           },
         ]
@@ -4139,7 +4170,9 @@ export type Database = {
       }
       documents: {
         Row: {
+          beneficiary_id: string | null
           category: string
+          contract_id: string | null
           created_at: string
           description: string | null
           file_path: string | null
@@ -4148,12 +4181,20 @@ export type Database = {
           file_type: string
           folder_id: string | null
           id: string
+          maintenance_request_id: string | null
           name: string
+          payment_voucher_id: string | null
+          property_id: string | null
+          reference_id: string | null
+          reference_type: string | null
           storage_path: string | null
+          tenant_id: string | null
           uploaded_at: string
         }
         Insert: {
+          beneficiary_id?: string | null
           category: string
+          contract_id?: string | null
           created_at?: string
           description?: string | null
           file_path?: string | null
@@ -4162,12 +4203,20 @@ export type Database = {
           file_type: string
           folder_id?: string | null
           id?: string
+          maintenance_request_id?: string | null
           name: string
+          payment_voucher_id?: string | null
+          property_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
           storage_path?: string | null
+          tenant_id?: string | null
           uploaded_at?: string
         }
         Update: {
+          beneficiary_id?: string | null
           category?: string
+          contract_id?: string | null
           created_at?: string
           description?: string | null
           file_path?: string | null
@@ -4176,16 +4225,120 @@ export type Database = {
           file_type?: string
           folder_id?: string | null
           id?: string
+          maintenance_request_id?: string | null
           name?: string
+          payment_voucher_id?: string | null
+          property_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
           storage_path?: string | null
+          tenant_id?: string | null
           uploaded_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "documents_folder_id_fkey"
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_maintenance_request_id_fkey"
+            columns: ["maintenance_request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -8895,6 +9048,13 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_processing_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents_with_links"
             referencedColumns: ["id"]
           },
         ]
@@ -14008,6 +14168,144 @@ export type Database = {
           waqif_charity?: number | null
         }
         Relationships: []
+      }
+      documents_with_links: {
+        Row: {
+          beneficiary_id: string | null
+          beneficiary_name: string | null
+          category: string | null
+          contract_id: string | null
+          contract_number: string | null
+          contract_tenant_name: string | null
+          created_at: string | null
+          description: string | null
+          file_path: string | null
+          file_size: string | null
+          file_size_bytes: number | null
+          file_type: string | null
+          folder_id: string | null
+          id: string | null
+          maintenance_request_id: string | null
+          maintenance_request_number: string | null
+          name: string | null
+          payment_voucher_id: string | null
+          property_id: string | null
+          property_name: string | null
+          reference_id: string | null
+          reference_type: string | null
+          storage_path: string | null
+          tenant_id: string | null
+          tenant_name: string | null
+          uploaded_at: string | null
+          voucher_number: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_maintenance_request_id_fkey"
+            columns: ["maintenance_request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "property_performance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_alerts: {
         Row: {
