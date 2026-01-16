@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // جلب الملف الشخصي باستخدام AuthService
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     try {
       const data = await AuthService.getProfile(userId);
       
@@ -104,12 +104,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const retryData = await AuthService.getProfile(userId);
         if (retryData) {
           setProfile(retryData as Profile);
+          return retryData as Profile;
         }
+        return null;
       } else {
         setProfile(data as Profile);
+        return data as Profile;
       }
     } catch (error) {
       productionLogger.error('Exception fetching profile', error);
+      return null;
     }
   }, []);
 
