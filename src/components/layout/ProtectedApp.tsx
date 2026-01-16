@@ -10,6 +10,8 @@ import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
+import { lazyPage } from "@/lib/lazyWithRetry";
+import { LazyErrorBoundary } from "@/components/shared/LazyErrorBoundary";
 
 // ✅ Lazy load للصفحات العامة
 const Signup = lazy(() => import("@/pages/Signup"));
@@ -22,8 +24,8 @@ const FAQ = lazy(() => import("@/pages/FAQ"));
 const Contact = lazy(() => import("@/pages/Contact"));
 const TenantPortal = lazy(() => import("@/pages/TenantPortal"));
 
-// ✅ Lazy load للتطبيق الرئيسي المحمي
-const AppShell = lazy(() => import("./AppShell"));
+// ✅ Lazy load للتطبيق الرئيسي المحمي (مع Retry)
+const AppShell = lazyPage(() => import("./AppShell"));
 
 // ✅ Fallback خفيف
 const LightFallback = () => (
@@ -49,7 +51,14 @@ export default function ProtectedApp() {
           <Route path="/tenant-portal" element={<TenantPortal />} />
           
           {/* المسارات المحمية */}
-          <Route path="/*" element={<AppShell />} />
+          <Route
+            path="/*"
+            element={
+              <LazyErrorBoundary>
+                <AppShell />
+              </LazyErrorBoundary>
+            }
+          />
         </Routes>
       </Suspense>
       
