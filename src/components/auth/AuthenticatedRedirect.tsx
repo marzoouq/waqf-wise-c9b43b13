@@ -1,29 +1,56 @@
 /**
  * مكون التوجيه للمستخدمين المسجلين
  * Redirect component for authenticated users
+ * 
+ * ✅ مستقل عن AuthContext - يستخدم Supabase مباشرة
+ * ✅ آمن للاستخدام في الصفحات الخفيفة
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function AuthenticatedRedirect() {
-  const { user, roles, isLoading, rolesLoading } = useAuth();
   const navigate = useNavigate();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // انتظار انتهاء التحميل
-    if (isLoading || rolesLoading) return;
+    let mounted = true;
 
-    // إذا لا يوجد مستخدم، رجوع للـ login
-    if (!user) {
-      navigate('/login', { replace: true });
-      return;
-    }
+    const checkAndRedirect = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
 
-    // توجيه بناءً على الأدوار
-    navigate('/redirect', { replace: true });
-  }, [user, roles, isLoading, rolesLoading, navigate]);
+        if (!session) {
+          // لا يوجد جلسة، رجوع للـ login
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        // توجيه للمسار الرئيسي الذي سيتولى التوجيه الصحيح
+        navigate('/redirect', { replace: true });
+      } catch (error) {
+        if (mounted) {
+          console.error('Error checking session:', error);
+          navigate('/login', { replace: true });
+        }
+      } finally {
+        if (mounted) {
+          setIsChecking(false);
+        }
+      }
+    };
+
+    checkAndRedirect();
+
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
+
+  if (!isChecking) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
