@@ -181,8 +181,29 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       }
       onOpenChange(false);
       form.reset(getDefaultValues());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving contract:', error);
+      
+      // رسائل خطأ واضحة للمستخدم
+      if (error?.code === '23503' || error?.message?.includes('23503')) {
+        toast({
+          title: "خطأ في البيانات",
+          description: "يرجى التأكد من صحة بيانات المستأجر والوحدات المختارة",
+          variant: "destructive",
+        });
+      } else if (error?.code === 'occupied_units_check' || error?.message?.includes('occupied_units_check')) {
+        toast({
+          title: "خطأ في العقار",
+          description: "يوجد تعارض في عدد الوحدات المشغولة",
+          variant: "destructive",
+        });
+      } else if (error?.message) {
+        toast({
+          title: "خطأ",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 

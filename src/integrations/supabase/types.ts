@@ -10142,35 +10142,7 @@ export type Database = {
             foreignKeyName: "property_units_current_tenant_id_fkey"
             columns: ["current_tenant_id"]
             isOneToOne: false
-            referencedRelation: "beneficiaries"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "property_units_current_tenant_id_fkey"
-            columns: ["current_tenant_id"]
-            isOneToOne: false
-            referencedRelation: "beneficiaries_masked"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "property_units_current_tenant_id_fkey"
-            columns: ["current_tenant_id"]
-            isOneToOne: false
-            referencedRelation: "beneficiaries_overview"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "property_units_current_tenant_id_fkey"
-            columns: ["current_tenant_id"]
-            isOneToOne: false
-            referencedRelation: "beneficiary_account_statement"
-            referencedColumns: ["beneficiary_id"]
-          },
-          {
-            foreignKeyName: "property_units_current_tenant_id_fkey"
-            columns: ["current_tenant_id"]
-            isOneToOne: false
-            referencedRelation: "beneficiary_statistics"
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
