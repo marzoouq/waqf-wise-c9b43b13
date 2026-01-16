@@ -27,6 +27,10 @@ export interface WaqfUnit {
   notes?: string;
   created_at: string;
   updated_at: string;
+  // حقول الرصيد الجديدة - مرتبطة بالسندات والقيود
+  current_balance?: number;
+  total_income?: number;
+  total_expenses?: number;
 }
 
 export function useWaqfUnits() {
