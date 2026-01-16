@@ -9320,7 +9320,7 @@ export type Database = {
           payer_name: string
           payment_date: string
           payment_method: string
-          payment_number: string
+          payment_number: string | null
           payment_type: string
           reference_id: string | null
           reference_number: string | null
@@ -9341,7 +9341,7 @@ export type Database = {
           payer_name: string
           payment_date: string
           payment_method: string
-          payment_number: string
+          payment_number?: string | null
           payment_type: string
           reference_id?: string | null
           reference_number?: string | null
@@ -9362,7 +9362,7 @@ export type Database = {
           payer_name?: string
           payment_date?: string
           payment_method?: string
-          payment_number?: string
+          payment_number?: string | null
           payment_type?: string
           reference_id?: string | null
           reference_number?: string | null
