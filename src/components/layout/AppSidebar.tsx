@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -29,22 +30,11 @@ import {
   Headphones,
   BookOpen,
   Activity,
-  AlertTriangle,
-  TrendingUp,
   Calendar,
   Store,
-  Code,
-  ShieldCheck,
-  Gauge,
-  Database,
-  TestTube,
-  Plug,
   HeartHandshake,
-  Clock,
-  Palette,
-  Eye,
-  BellRing,
-  Zap,
+  MoreHorizontal,
+  TrendingUp,
 } from "lucide-react";
 import {
   Sidebar,
@@ -67,101 +57,120 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useUserRole } from "@/hooks/auth/useUserRole";
-import { useMemo } from "react";
 
-// القائمة المنظمة الجديدة - أقسام متخصصة
-const menuGroups = [
+// القائمة المبسطة - الأقسام الأكثر استخداماً (تظهر دائماً)
+const primaryMenuItems = [
   {
     id: "dashboard",
     label: "لوحة التحكم",
     icon: LayoutDashboard,
     path: "/dashboard",
     roles: ["all"],
-    subItems: []
   },
   {
-    id: "beneficiaries",
-    label: "المستفيدين",
-    icon: Users,
-    roles: ["admin", "accountant", "nazer"],
-    subItems: [
-      { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ["admin", "accountant", "nazer"] },
-      { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
-      { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
-      { icon: HeartHandshake, label: "المساعدات الطارئة", path: "/emergency-aid", roles: ["admin", "accountant", "nazer"] },
-    ]
+    id: "pos",
+    label: "نقطة البيع",
+    icon: Store,
+    path: "/pos",
+    roles: ["nazer", "accountant", "cashier"],
   },
   {
     id: "properties",
     label: "العقارات",
     icon: Building2,
-    roles: ["admin", "accountant", "nazer", "cashier"],
-    subItems: [
-      { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
-      { icon: Users, label: "المستأجرون", path: "/tenants", roles: ["admin", "accountant", "nazer", "cashier"] },
-    ]
-  },
-  {
-    id: "waqf-funds",
-    label: "الأموال والوقف",
-    icon: Wallet,
+    path: "/properties",
     roles: ["admin", "accountant", "nazer"],
-    subItems: [
-      { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
-      { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
-    ]
   },
   {
-    id: "finance",
-    label: "المالية",
-    icon: Calculator,
+    id: "tenants",
+    label: "المستأجرون",
+    icon: Users,
+    path: "/tenants",
     roles: ["admin", "accountant", "nazer", "cashier"],
-    subItems: [
-      { icon: Store, label: "نقطة البيع", path: "/pos", roles: ["nazer", "accountant", "cashier"] },
-      { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
-      { icon: Calendar, label: "السنوات المالية", path: "/fiscal-years", roles: ["admin", "accountant", "nazer"] },
-      { icon: TrendingUp, label: "الميزانيات", path: "/budgets", roles: ["admin", "accountant", "nazer"] },
-      { icon: FileText, label: "سندات الدفع", path: "/payment-vouchers", roles: ["admin", "accountant", "cashier", "nazer"] },
-      { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
-      { icon: HandCoins, label: "القروض", path: "/loans", roles: ["admin", "accountant", "nazer"] },
-      { icon: Building2, label: "التحويلات البنكية", path: "/bank-transfers", roles: ["admin", "accountant", "nazer"] },
-    ]
   },
   {
-    id: "operations",
-    label: "العمليات المحاسبية",
-    icon: DollarSign,
+    id: "beneficiaries",
+    label: "المستفيدون",
+    icon: UsersRound,
+    path: "/beneficiaries",
     roles: ["admin", "accountant", "nazer"],
-    subItems: [
-      { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ["admin", "accountant", "nazer"] },
-      { icon: DollarSign, label: "جميع المعاملات", path: "/all-transactions", roles: ["admin", "accountant", "nazer"] },
-      { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ["admin", "accountant", "nazer"] },
-    ]
+  },
+  {
+    id: "payments",
+    label: "المدفوعات",
+    icon: CreditCard,
+    path: "/payments",
+    roles: ["admin", "accountant", "cashier", "nazer"],
   },
   {
     id: "reports",
-    label: "التقارير والرؤى",
+    label: "التقارير",
     icon: BarChart3,
+    path: "/reports",
+    roles: ["admin", "accountant", "nazer"],
+  },
+];
+
+// القائمة الموسعة - تظهر عند الضغط على "المزيد"
+const moreMenuGroups = [
+  {
+    id: "waqf",
+    label: "الوقف والأموال",
+    icon: Wallet,
     roles: ["admin", "accountant", "nazer"],
     subItems: [
-      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-view" },
-      { icon: FileText, label: "منشئ التقارير", path: "/reports/custom", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
-      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"], id: "ai-insights" },
-      { icon: ScanSearch, label: "الفحص الذكي", path: "/ai-audit", roles: ["admin", "nazer"], id: "ai-audit" },
-      { icon: Zap, label: "مراقبة Edge", path: "/edge-monitor", roles: ["admin", "nazer"], id: "edge-monitor" },
-      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], id: "chatbot" },
-      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"], id: "audit-logs" },
+      { icon: Building2, label: "أقلام الوقف", path: "/waqf-units" },
+      { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds" },
+      { icon: HandCoins, label: "القروض", path: "/loans" },
+    ]
+  },
+  {
+    id: "accounting",
+    label: "المحاسبة",
+    icon: Calculator,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: Calculator, label: "المحاسبة", path: "/accounting" },
+      { icon: Calendar, label: "السنوات المالية", path: "/fiscal-years" },
+      { icon: TrendingUp, label: "الميزانيات", path: "/budgets" },
+      { icon: FileText, label: "سندات الدفع", path: "/payment-vouchers" },
+      { icon: Receipt, label: "الفواتير", path: "/invoices" },
+      { icon: Building2, label: "التحويلات البنكية", path: "/bank-transfers" },
+      { icon: DollarSign, label: "جميع المعاملات", path: "/all-transactions" },
+      { icon: CheckSquare, label: "الموافقات", path: "/approvals" },
+    ]
+  },
+  {
+    id: "beneficiaries-more",
+    label: "المستفيدين",
+    icon: Users,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: UsersRound, label: "العائلات", path: "/families" },
+      { icon: ClipboardList, label: "الطلبات", path: "/requests" },
+      { icon: HeartHandshake, label: "المساعدات الطارئة", path: "/emergency-aid" },
     ]
   },
   {
     id: "archive",
-    label: "الأرشيف والوثائق",
+    label: "الأرشيف والحوكمة",
     icon: Archive,
-    roles: ["admin", "accountant", "nazer", "archivist", "beneficiary", "waqf_heir"],
+    roles: ["admin", "nazer", "archivist", "waqf_heir"],
     subItems: [
-      { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer", "waqf_heir"] },
-      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer", "waqf_heir"] },
-      { icon: ScrollText, label: "الدليل الإرشادي", path: "/governance/guide", roles: ["all"] },
+      { icon: Archive, label: "الأرشيف", path: "/archive" },
+      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions" },
+      { icon: ScrollText, label: "الدليل الإرشادي", path: "/governance/guide" },
+    ]
+  },
+  {
+    id: "ai",
+    label: "الذكاء الاصطناعي",
+    icon: Sparkles,
+    roles: ["admin", "nazer"],
+    subItems: [
+      { icon: Bot, label: "المساعد الذكي", path: "/chatbot" },
+      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights" },
+      { icon: ScanSearch, label: "الفحص الذكي", path: "/ai-audit" },
     ]
   },
   {
@@ -170,10 +179,9 @@ const menuGroups = [
     icon: Headphones,
     roles: ["all"],
     subItems: [
-      { icon: Mail, label: "الرسائل الداخلية", path: "/messages", roles: ["all"] },
-      { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
-      { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
-      { icon: BookOpen, label: "قاعدة المعرفة", path: "/knowledge-base", roles: ["all"] },
+      { icon: Mail, label: "الرسائل", path: "/messages" },
+      { icon: MessageSquare, label: "تذاكر الدعم", path: "/support" },
+      { icon: BookOpen, label: "قاعدة المعرفة", path: "/knowledge-base" },
     ]
   },
   {
@@ -182,34 +190,10 @@ const menuGroups = [
     icon: Settings,
     roles: ["admin", "nazer"],
     subItems: [
-      { icon: Shield, label: "المستخدمون", path: "/users", roles: ["admin", "nazer"] },
-      { icon: Shield, label: "الأدوار", path: "/settings/roles", roles: ["admin", "nazer"] },
-      { icon: Shield, label: "الصلاحيات", path: "/settings/permissions", roles: ["admin", "nazer"] },
-      { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
-      { icon: BellRing, label: "إعدادات الإشعارات", path: "/notifications/settings", roles: ["all"] },
-      { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
-      { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
-      { icon: Palette, label: "إعدادات الصفحة الرئيسية", path: "/settings/landing-page", roles: ["admin", "nazer"] },
-      { icon: Eye, label: "إعدادات الشفافية", path: "/transparency-settings", roles: ["nazer"] },
-      { icon: Settings, label: "الإعدادات المتقدمة", path: "/advanced-settings", roles: ["admin"] },
-      { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
-    ]
-  },
-  {
-    id: "developer-tools",
-    label: "أدوات المطور",
-    icon: Code,
-    roles: ["admin", "nazer"],
-    subItems: [
-      { icon: LayoutDashboard, label: "لوحة المطور", path: "/developer", roles: ["admin", "nazer"] },
-      { icon: ShieldCheck, label: "لوحة الأمان", path: "/security", roles: ["admin", "nazer"] },
-      { icon: Gauge, label: "لوحة الأداء", path: "/performance", roles: ["admin", "nazer"] },
-      { icon: Database, label: "صحة قاعدة البيانات", path: "/db-health", roles: ["admin", "nazer"] },
-      { icon: BarChart3, label: "أداء قاعدة البيانات", path: "/db-performance", roles: ["admin", "nazer"] },
-      { icon: Plug, label: "إدارة التكاملات", path: "/integrations", roles: ["admin", "nazer"] },
-      { icon: TestTube, label: "اختبار Edge", path: "/edge-test", roles: ["admin"] },
-      { icon: TestTube, label: "الاختبارات الشاملة", path: "/comprehensive-test", roles: ["admin"] },
-      { icon: TestTube, label: "الاختبارات الحقيقية", path: "/tests/real", roles: ["admin"] },
+      { icon: Shield, label: "المستخدمون", path: "/users" },
+      { icon: Bell, label: "الإشعارات", path: "/notifications" },
+      { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring" },
+      { icon: Settings, label: "الإعدادات", path: "/settings" },
     ]
   },
 ];
@@ -218,37 +202,33 @@ const AppSidebar = () => {
   const location = useLocation();
   const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [showMore, setShowMore] = useState(false);
   const { 
     hasRole,
     roles,
     isLoading: roleLoading 
   } = useUserRole();
 
-  // تصفية القوائم حسب صلاحيات المستخدم
-  const filteredMenuGroups = useMemo(() => {
+  // تصفية القوائم الأساسية حسب صلاحيات المستخدم
+  const filteredPrimaryItems = useMemo(() => {
     if (roleLoading) {
-      // عرض العناصر الأساسية فقط أثناء التحميل
-      return menuGroups.filter(group => group.roles.includes('all'));
+      return primaryMenuItems.filter(item => item.roles.includes('all'));
     }
 
-    return menuGroups.filter(group => {
-      // التحقق من صلاحية الوصول للمجموعة الرئيسية
-      const hasGroupAccess = group.roles.includes('all') || 
-        group.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'));
+    return primaryMenuItems.filter(item => 
+      item.roles.includes('all') || 
+      item.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
+    );
+  }, [roles, roleLoading, hasRole]);
 
-      if (!hasGroupAccess) return false;
+  // تصفية القوائم الموسعة حسب صلاحيات المستخدم
+  const filteredMoreGroups = useMemo(() => {
+    if (roleLoading) return [];
 
-      // تصفية العناصر الفرعية
-      if (group.subItems && group.subItems.length > 0) {
-        const filteredSubItems = group.subItems.filter(subItem => 
-          subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
-        );
-        // إظهار المجموعة فقط إذا كان هناك عناصر فرعية متاحة
-        return filteredSubItems.length > 0;
-      }
-
-      return true;
-    });
+    return moreMenuGroups.filter(group => 
+      group.roles.includes('all') || 
+      group.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
+    );
   }, [roles, roleLoading, hasRole]);
 
   return (
@@ -276,83 +256,107 @@ const AppSidebar = () => {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* القائمة الأساسية - الأكثر استخداماً */}
         <SidebarGroup>
-          <SidebarGroupLabel>القائمة الرئيسية</SidebarGroupLabel>
+          <SidebarGroupLabel>الأقسام الرئيسية</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {filteredMenuGroups.map((group) => {
-                const Icon = group.icon;
-                const isActive = group.path && location.pathname === group.path;
-
-                // إذا كانت المجموعة لا تحتوي على عناصر فرعية
-                if (!group.subItems || group.subItems.length === 0) {
-                  return (
-                    <SidebarMenuItem key={group.id}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        tooltip={group.label}
-                      >
-                        <NavLink 
-                          to={group.path || "#"}
-                          onClick={() => setOpenMobile(false)}
-                        >
-                          <Icon className="h-5 w-5" />
-                          <span>{group.label}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                }
-
-                // إذا كانت المجموعة تحتوي على عناصر فرعية - استخدام Collapsible
-                const filteredSubItems = group.subItems.filter(subItem => 
-                  subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
-                );
+              {filteredPrimaryItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
 
                 return (
-                  <Collapsible key={group.id} className="group/collapsible">
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={group.label}>
-                          <Icon className="h-5 w-5" />
-                          <span>{group.label}</span>
-                          <ChevronDown className="me-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {filteredSubItems.map((subItem, index) => {
-                            const SubIcon = subItem.icon;
-                            const isSubActive = location.pathname === subItem.path;
-                            const uniqueKey = ('id' in subItem && subItem.id) ? subItem.id : `${subItem.path}-${index}`;
-                            
-                            return (
-                              <SidebarMenuSubItem key={uniqueKey}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={isSubActive}
-                                >
-                                  <NavLink 
-                                    to={subItem.path}
-                                    onClick={() => setOpenMobile(false)}
-                                  >
-                                    <SubIcon className="h-4 w-4" />
-                                    <span>{subItem.label}</span>
-                                  </NavLink>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            );
-                          })}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.label}
+                    >
+                      <NavLink 
+                        to={item.path}
+                        onClick={() => setOpenMobile(false)}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* زر المزيد */}
+        {filteredMoreGroups.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <Collapsible 
+                  open={showMore} 
+                  onOpenChange={setShowMore}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip="المزيد من الأقسام">
+                        <MoreHorizontal className="h-5 w-5" />
+                        <span>المزيد</span>
+                        <ChevronDown className="me-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub className="mt-2 space-y-2">
+                        {filteredMoreGroups.map((group) => {
+                          const GroupIcon = group.icon;
+                          
+                          return (
+                            <Collapsible key={group.id} className="group/sub-collapsible">
+                              <CollapsibleTrigger asChild>
+                                <SidebarMenuSubButton className="w-full justify-between cursor-pointer hover:bg-sidebar-accent">
+                                  <div className="flex items-center gap-2">
+                                    <GroupIcon className="h-4 w-4" />
+                                    <span>{group.label}</span>
+                                  </div>
+                                  <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]/sub-collapsible:rotate-180" />
+                                </SidebarMenuSubButton>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <div className="ms-4 mt-1 space-y-1 border-r border-sidebar-border pr-2">
+                                  {group.subItems.map((subItem, index) => {
+                                    const SubIcon = subItem.icon;
+                                    const isSubActive = location.pathname === subItem.path;
+                                    
+                                    return (
+                                      <SidebarMenuSubItem key={`${subItem.path}-${index}`}>
+                                        <SidebarMenuSubButton
+                                          asChild
+                                          isActive={isSubActive}
+                                        >
+                                          <NavLink 
+                                            to={subItem.path}
+                                            onClick={() => setOpenMobile(false)}
+                                          >
+                                            <SubIcon className="h-3 w-3" />
+                                            <span className="text-xs">{subItem.label}</span>
+                                          </NavLink>
+                                        </SidebarMenuSubButton>
+                                      </SidebarMenuSubItem>
+                                    );
+                                  })}
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );

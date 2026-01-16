@@ -19,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
@@ -30,7 +31,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { TenantDialog } from '@/components/tenants/TenantDialog';
+import { QuickPaymentDialog } from '@/components/tenants/QuickPaymentDialog';
 import { useTenants } from '@/hooks/property/useTenants';
 import { formatCurrency } from '@/lib/utils';
 import { ExportButton } from '@/components/shared/ExportButton';
@@ -45,8 +53,9 @@ import {
   Building,
   Phone,
   Mail,
+  Banknote,
 } from 'lucide-react';
-import type { Tenant, TenantInsert } from '@/types/tenants';
+import type { Tenant, TenantInsert, TenantWithBalance } from '@/types/tenants';
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
   active: { label: 'نشط', variant: 'default' },
@@ -61,9 +70,24 @@ export default function Tenants() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [selectedTenant, setSelectedTenant] = useState<TenantWithBalance | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
+  const [tenantToDelete, setTenantToDelete] = useState<TenantWithBalance | null>(null);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [tenantForPayment, setTenantForPayment] = useState<{
+    id: string;
+    full_name: string;
+    current_balance: number;
+  } | null>(null);
+
+  const openPaymentDialog = (tenant: TenantWithBalance) => {
+    setTenantForPayment({
+      id: tenant.id,
+      full_name: tenant.full_name,
+      current_balance: tenant.current_balance,
+    });
+    setPaymentDialogOpen(true);
+  };
 
   const filteredTenants = tenants.filter(
     (tenant) =>
@@ -81,7 +105,7 @@ export default function Tenants() {
     }
   };
 
-  const handleEdit = (tenant: Tenant) => {
+  const handleEdit = (tenant: TenantWithBalance) => {
     setSelectedTenant(tenant);
     setDialogOpen(true);
   };
@@ -94,7 +118,7 @@ export default function Tenants() {
     }
   };
 
-  const openDeleteDialog = (tenant: Tenant) => {
+  const openDeleteDialog = (tenant: TenantWithBalance) => {
     setTenantToDelete(tenant);
     setDeleteDialogOpen(true);
   };
@@ -247,17 +271,29 @@ export default function Tenants() {
                       </span>
                     </div>
                     <div className="flex gap-2 mt-2 pt-2 border-t">
+                      {/* زر الدفع السريع */}
+                      <Button
+                        size="sm"
+                        variant="default"
+                        className="flex-1 text-xs bg-green-600 hover:bg-green-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openPaymentDialog(tenant);
+                        }}
+                      >
+                        <Banknote className="h-3 w-3 ms-1" />
+                        دفع
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="flex-1 text-xs"
+                        className="text-xs"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEdit(tenant);
                         }}
                       >
-                        <Edit className="h-3 w-3 ms-1" />
-                        تعديل
+                        <Edit className="h-3 w-3" />
                       </Button>
                       <Button
                         size="sm"
@@ -337,7 +373,29 @@ export default function Tenants() {
                             {formatCurrency(tenant.current_balance)}
                           </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="flex items-center gap-1">
+                          {/* زر الدفع السريع */}
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-100"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openPaymentDialog(tenant);
+                                  }}
+                                >
+                                  <Banknote className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>تسجيل دفعة</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                               <Button variant="ghost" size="icon">
@@ -345,6 +403,17 @@ export default function Tenants() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                className="text-green-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openPaymentDialog(tenant);
+                                }}
+                              >
+                                <Banknote className="ms-2 h-4 w-4" />
+                                تسجيل دفعة
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -363,6 +432,7 @@ export default function Tenants() {
                                 <FileText className="ms-2 h-4 w-4" />
                                 كشف الحساب
                               </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="text-destructive"
                                 onClick={(e) => {
@@ -417,6 +487,13 @@ export default function Tenants() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick Payment Dialog */}
+      <QuickPaymentDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        tenant={tenantForPayment}
+      />
     </div>
   );
 }
