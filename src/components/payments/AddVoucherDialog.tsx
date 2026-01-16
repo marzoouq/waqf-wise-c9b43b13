@@ -15,7 +15,6 @@ import { commonValidation } from "@/lib/validationSchemas";
 import { useAutoJournalEntry } from "@/hooks/payments/useAutoJournalEntry";
 
 const voucherSchema = z.object({
-  payment_number: z.string().min(1, { message: "رقم السند مطلوب" }),
   payment_date: commonValidation.dateString("التاريخ غير صحيح"),
   amount: z.coerce.number().min(0.01, { message: "المبلغ يجب أن يكون أكبر من صفر" }),
   payment_method: z.enum(["cash", "bank_transfer", "cheque", "card"], {
@@ -45,7 +44,6 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
   const form = useForm<VoucherFormValues>({
     resolver: zodResolver(voucherSchema),
     defaultValues: {
-      payment_number: `VCH-${format(new Date(), "yyMMdd")}-001`,
       payment_date: format(new Date(), "yyyy-MM-dd"),
       amount: 0,
       payment_method: "cash",
@@ -101,20 +99,6 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="payment_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>رقم السند *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="VCH-250115-001" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="payment_date"
