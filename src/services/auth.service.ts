@@ -71,10 +71,63 @@ export class AuthService {
   }
 
   /**
-   * تسجيل الخروج
+   * تسجيل الخروج الشامل مع تنظيف كامل للجلسة
+   * ✅ ينظف: localStorage, sessionStorage, caches, service workers, supabase session
    */
-  static async logout(): Promise<void> {
-    await supabase.auth.signOut();
+  static async logout(options?: { keepTheme?: boolean; scope?: 'local' | 'global' }): Promise<void> {
+    const keysToKeep = options?.keepTheme !== false ? [
+      'theme',
+      'vite-ui-theme',
+      'language',
+      'i18nextLng',
+    ] : [];
+
+    // 1. حفظ القيم المهمة
+    const savedValues: Record<string, string> = {};
+    keysToKeep.forEach(key => {
+      const value = localStorage.getItem(key);
+      if (value) savedValues[key] = value;
+    });
+
+    // 2. تنظيف localStorage (ما عدا المحفوظ)
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && !keysToKeep.includes(key)) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+
+    // 3. تنظيف sessionStorage بالكامل
+    sessionStorage.clear();
+
+    // 4. استعادة القيم المحفوظة
+    Object.entries(savedValues).forEach(([key, value]) => {
+      localStorage.setItem(key, value);
+    });
+
+    // 5. تنظيف caches و service workers
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(reg => reg.unregister()));
+      }
+    } catch (e) {
+      console.warn('Cache cleanup warning:', e);
+    }
+
+    // 6. تسجيل الخروج من Supabase (global = جميع الأجهزة)
+    try {
+      await supabase.auth.signOut({ scope: options?.scope || 'global' });
+    } catch (e) {
+      // تجاهل أخطاء الخروج - قد تكون الجلسة منتهية أصلاً
+      console.warn('SignOut warning:', e);
+    }
   }
 
   /**

@@ -11,12 +11,14 @@ const LAST_ACTIVE_KEY = 'waqf_last_active_timestamp';
 
 /**
  * تنظيف كامل للجلسة والبيانات المؤقتة
+ * ✅ محسّن: تنظيف شامل يشمل caches و service workers
  */
-export const cleanupSession = async (options?: { keepTheme?: boolean }) => {
+export const cleanupSession = async (options?: { keepTheme?: boolean; scope?: 'local' | 'global' }) => {
   const keysToKeep = options?.keepTheme ? [
     'theme',
     'vite-ui-theme',
     'language',
+    'i18nextLng',
   ] : [];
 
   // حفظ القيم التي نريد الاحتفاظ بها
@@ -44,9 +46,25 @@ export const cleanupSession = async (options?: { keepTheme?: boolean }) => {
     localStorage.setItem(key, value);
   });
 
+  // ✅ تنظيف caches و service workers
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+    }
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(reg => reg.unregister()));
+    }
+  } catch (e) {
+    if (import.meta.env.DEV) {
+      console.warn('Cache cleanup warning:', e);
+    }
+  }
+
   // تسجيل الخروج من Supabase
   try {
-    await supabase.auth.signOut({ scope: 'local' });
+    await supabase.auth.signOut({ scope: options?.scope || 'global' });
   } catch (err) {
     if (import.meta.env.DEV) {
       console.warn('Session cleanup signOut error', { error: err });

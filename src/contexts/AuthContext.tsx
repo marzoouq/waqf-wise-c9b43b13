@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
 import { AuthService } from '@/services/auth.service';
+import { queryInvalidationManager } from '@/lib/query-invalidation-manager';
 
 interface AuthContextType {
   user: User | null;
@@ -317,57 +318,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const keysToKeep = [
-        'theme',
-        'vite-ui-theme',
-        'paymentDaysThreshold',
-        'itemsPerPage',
-        'language',
-        'notificationsEnabled',
-      ];
-      const keysToRemove: string[] = [];
-      
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && !keysToKeep.includes(key)) {
-          keysToRemove.push(key);
-        }
-      }
-      
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      sessionStorage.clear();
-
-      // ✅ استخدام scope: 'global' لمسح الجلسة من جميع الأجهزة (أمان كامل)
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      
-      if (error) throw error;
-
+      // ✅ 1. تنظيف حالة React أولاً (قبل أي async)
       setUser(null);
       setSession(null);
       setProfile(null);
       setRoles([]);
       rolesCache.current = [];
       setRolesLoading(false);
+      
+      // ✅ 2. تنظيف React Query cache بالكامل
+      queryInvalidationManager.resetForNewUser();
+      
+      // ✅ 3. استخدام AuthService للتنظيف الشامل
+      await AuthService.logout({ keepTheme: true, scope: 'global' });
       
       toast({
         title: "تم تسجيل الخروج",
         description: "تم تسجيل خروجك بنجاح",
       });
     } catch (error: unknown) {
+      // ✅ التنظيف مضمون حتى لو حدث خطأ (تم أعلاه)
       const err = error as { message?: string };
-      toast({
-        title: "خطأ",
-        description: err?.message || "حدث خطأ أثناء تسجيل الخروج",
-        variant: "destructive",
-      });
       
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setRoles([]);
-      rolesCache.current = [];
-      setRolesLoading(false);
-      throw error;
+      // لا نعرض خطأ إذا كان بسبب انتهاء الجلسة
+      if (!err?.message?.includes('session') && !err?.message?.includes('JWT')) {
+        toast({
+          title: "تحذير",
+          description: "تم تسجيل الخروج مع بعض التحذيرات",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "تم تسجيل الخروج",
+          description: "تم تسجيل خروجك بنجاح",
+        });
+      }
     }
   };
 

@@ -119,6 +119,37 @@ class QueryInvalidationManager {
     }
     this.pendingInvalidations.clear();
   }
+
+  /**
+   * ✅ تنظيف كامل لجميع الـ cache عند تسجيل الخروج
+   * يمسح جميع البيانات المخزنة في React Query
+   */
+  clearAllCache(): void {
+    if (!this.queryClient) return;
+    
+    // إلغاء جميع الإبطالات المعلقة
+    this.clearPending();
+    
+    // مسح جميع الـ cache
+    this.queryClient.clear();
+    
+    if (import.meta.env.DEV) {
+      console.log('[QueryInvalidationManager] ✅ All cache cleared');
+    }
+  }
+
+  /**
+   * ✅ إعادة تعيين الحالة لمستخدم جديد
+   */
+  resetForNewUser(): void {
+    this.clearPending();
+    if (this.queryClient) {
+      // إزالة جميع الاستعلامات
+      this.queryClient.removeQueries();
+      // مسح الـ cache
+      this.queryClient.clear();
+    }
+  }
 }
 
 export const queryInvalidationManager = QueryInvalidationManager.getInstance();
