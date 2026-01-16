@@ -61,7 +61,8 @@ export const KPIService = {
       propertiesRes,
       contractsRes,
       loansRes,
-      paymentsRes,
+      rentalPaymentsRes,
+      vouchersRes,
       requestsRes,
       documentsRes,
     ] = await Promise.all([
@@ -70,6 +71,8 @@ export const KPIService = {
       supabase.from("contracts").select("id, status", { count: "exact" }),
       supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }),
       supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع"),
+      // إضافة: سندات القبض المدفوعة
+      supabase.from("payment_vouchers").select("id, amount, voucher_type, status").eq("status", "paid").eq("voucher_type", "receipt"),
       supabase.from("beneficiary_requests").select("id, status", { count: "exact" }),
       supabase.from("documents").select("id", { count: "exact" }),
     ]);
@@ -78,7 +81,8 @@ export const KPIService = {
     const properties = propertiesRes.data || [];
     const contracts = contractsRes.data || [];
     const loans = loansRes.data || [];
-    const payments = paymentsRes.data || [];
+    const rentalPayments = rentalPaymentsRes.data || [];
+    const vouchers = vouchersRes.data || [];
     const requests = requestsRes.data || [];
 
     const activeBeneficiaries = beneficiaries.filter(b => b.status === BENEFICIARY_STATUS.ACTIVE).length;
@@ -90,7 +94,12 @@ export const KPIService = {
       l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
     ).length;
     const totalLoansAmount = loans.reduce((sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)), 0);
-    const totalPayments = payments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+    
+    // حساب إجمالي التحصيل من دفعات الإيجار + سندات القبض
+    const rentalPaymentsTotal = rentalPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+    const vouchersTotal = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+    const totalPayments = rentalPaymentsTotal + vouchersTotal;
+    
     const pendingRequests = requests.filter(r => 
       r.status === REQUEST_STATUS.PENDING || r.status === 'pending'
     ).length;
@@ -108,7 +117,7 @@ export const KPIService = {
       },
       contracts: { total: contracts.length, active: activeContracts },
       loans: { total: loans.length, active: activeLoans, amount: totalLoansAmount },
-      payments: { total: payments.length, amount: totalPayments },
+      payments: { total: rentalPayments.length + vouchers.length, amount: totalPayments },
       requests: { total: requests.length, pending: pendingRequests },
       documents: documentsRes.count || 0,
     };
