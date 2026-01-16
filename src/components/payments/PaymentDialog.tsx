@@ -33,7 +33,6 @@ const paymentSchema = z.object({
   payment_type: z.enum(["receipt", "payment"], {
     required_error: "نوع السند مطلوب",
   }),
-  payment_number: z.string().min(1, { message: "رقم السند مطلوب" }),
   payment_date: commonValidation.dateString("التاريخ غير صحيح"),
   amount: z.coerce.number().min(0.01, { message: "المبلغ يجب أن يكون أكبر من صفر" }),
   payment_method: z.enum(["cash", "bank_transfer", "cheque", "card"], {
@@ -70,7 +69,6 @@ export function PaymentDialog({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
       payment_type: (payment?.payment_type as "receipt" | "payment") || "receipt",
-      payment_number: payment?.payment_number || "",
       payment_date: payment?.payment_date || format(new Date(), "yyyy-MM-dd"),
       amount: payment?.amount || 0,
       payment_method: (payment?.payment_method as "cash" | "bank_transfer" | "cheque" | "card") || "cash",
@@ -132,20 +130,6 @@ export function PaymentDialog({
                         <SelectItem value="payment">سند صرف</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="payment_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رقم السند *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="مثال: REC-2025-001" {...field} />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
