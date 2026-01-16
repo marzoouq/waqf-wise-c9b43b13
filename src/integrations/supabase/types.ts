@@ -2651,6 +2651,13 @@ export type Database = {
             foreignKeyName: "budget_items_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_items_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -3928,6 +3935,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries_with_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distributions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -5342,6 +5356,13 @@ export type Database = {
             foreignKeyName: "fund_transactions_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fund_transactions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -5391,6 +5412,13 @@ export type Database = {
           waqf_unit_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "funds_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "funds_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
@@ -6318,6 +6346,13 @@ export type Database = {
             foreignKeyName: "heir_distributions_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -6951,6 +6986,13 @@ export type Database = {
             foreignKeyName: "invoices_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -7051,6 +7093,13 @@ export type Database = {
             columns: ["fiscal_year_id"]
             isOneToOne: false
             referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -7639,6 +7688,13 @@ export type Database = {
             foreignKeyName: "loan_payments_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -7877,6 +7933,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -8157,6 +8220,13 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -9392,6 +9462,13 @@ export type Database = {
             foreignKeyName: "payment_vouchers_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -9526,6 +9603,13 @@ export type Database = {
             columns: ["rental_payment_id"]
             isOneToOne: false
             referencedRelation: "rental_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -9847,6 +9931,13 @@ export type Database = {
             foreignKeyName: "pos_transactions_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -10051,6 +10142,13 @@ export type Database = {
           waqf_unit_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "properties_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "properties_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
@@ -10528,6 +10626,13 @@ export type Database = {
             columns: ["receipt_id"]
             isOneToOne: false
             referencedRelation: "payments_with_contract_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_payments_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -13327,6 +13432,13 @@ export type Database = {
             foreignKeyName: "waqf_distribution_settings_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waqf_distribution_settings_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -13459,6 +13571,7 @@ export type Database = {
           annual_return: number | null
           code: string
           created_at: string
+          current_balance: number | null
           current_value: number | null
           description: string | null
           documents: Json | null
@@ -13467,6 +13580,8 @@ export type Database = {
           location: string | null
           name: string
           notes: string | null
+          total_expenses: number | null
+          total_income: number | null
           updated_at: string
           waqf_type: string | null
         }
@@ -13476,6 +13591,7 @@ export type Database = {
           annual_return?: number | null
           code: string
           created_at?: string
+          current_balance?: number | null
           current_value?: number | null
           description?: string | null
           documents?: Json | null
@@ -13484,6 +13600,8 @@ export type Database = {
           location?: string | null
           name: string
           notes?: string | null
+          total_expenses?: number | null
+          total_income?: number | null
           updated_at?: string
           waqf_type?: string | null
         }
@@ -13493,6 +13611,7 @@ export type Database = {
           annual_return?: number | null
           code?: string
           created_at?: string
+          current_balance?: number | null
           current_value?: number | null
           description?: string | null
           documents?: Json | null
@@ -13501,6 +13620,8 @@ export type Database = {
           location?: string | null
           name?: string
           notes?: string | null
+          total_expenses?: number | null
+          total_income?: number | null
           updated_at?: string
           waqf_type?: string | null
         }
@@ -14521,6 +14642,42 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           user_roles?: never
+        }
+        Relationships: []
+      }
+      waqf_balance_summary: {
+        Row: {
+          code: string | null
+          completed_distributions: number | null
+          current_balance: number | null
+          id: string | null
+          name: string | null
+          total_expenses: number | null
+          total_income: number | null
+          total_rentals_received: number | null
+          total_vouchers_paid: number | null
+        }
+        Insert: {
+          code?: string | null
+          completed_distributions?: never
+          current_balance?: never
+          id?: string | null
+          name?: string | null
+          total_expenses?: never
+          total_income?: never
+          total_rentals_received?: never
+          total_vouchers_paid?: never
+        }
+        Update: {
+          code?: string | null
+          completed_distributions?: never
+          current_balance?: never
+          id?: string | null
+          name?: string | null
+          total_expenses?: never
+          total_income?: never
+          total_rentals_received?: never
+          total_vouchers_paid?: never
         }
         Relationships: []
       }
