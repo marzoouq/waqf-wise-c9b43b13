@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/auth/useUserRole";
 import { useIdleTimeout } from "@/hooks/auth/useIdleTimeout";
@@ -12,14 +12,24 @@ import { productionLogger } from "@/lib/logger/production-logger";
  * - يعمل فقط للمستفيدين
  * - مهلة: 5 دقائق
  * - ينظف الحالة تلقائياً عند الخروج
+ * 
+ * ✅ آمن: يتحقق من وجود المستخدم قبل أي عملية
  */
 export function IdleTimeoutManager() {
   const { user, signOut, isLoading: authLoading } = useAuth();
   const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // ✅ التهيئة بعد اكتمال التحميل
+  useEffect(() => {
+    if (!authLoading && !roleLoading) {
+      setIsInitialized(true);
+    }
+  }, [authLoading, roleLoading]);
 
   // حساب حالة التفعيل - انتظار اكتمال تحميل الأدوار بالكامل
-  const isReady = !authLoading && !roleLoading;
+  const isReady = isInitialized && !authLoading && !roleLoading;
   
   // ✅ إصلاح: تفعيل المؤقت فقط بعد التأكد من تحميل الأدوار بالكامل
   // وعدم كون المستخدم مشرف أو مدير نظام
@@ -27,6 +37,9 @@ export function IdleTimeoutManager() {
 
   // الخروج التلقائي وتنظيف الحالة
   const handleIdleLogout = useCallback(async () => {
+    // ✅ تحقق إضافي قبل الخروج
+    if (!user) return;
+
     productionLogger.info('خروج تلقائي بسبب عدم النشاط');
 
     toast.warning("تم تسجيل خروجك تلقائياً", {
@@ -51,7 +64,7 @@ export function IdleTimeoutManager() {
       await AuthService.logout();
       navigate('/login', { replace: true });
     }
-  }, [signOut, navigate]);
+  }, [signOut, navigate, user]);
 
   // تفعيل نظام الخروج التلقائي - يجب استدعاؤه دائماً (قبل أي return)
   useIdleTimeout({
