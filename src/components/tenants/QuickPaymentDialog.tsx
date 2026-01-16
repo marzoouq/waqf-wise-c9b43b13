@@ -18,10 +18,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
-import { Banknote, Loader2 } from 'lucide-react';
+import { Banknote, Loader2, Receipt, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
+import { RentalPaymentService } from '@/services/rental-payment.service';
 
 interface QuickPaymentDialogProps {
   open: boolean;
@@ -50,6 +52,8 @@ export function QuickPaymentDialog({
   const [paymentMethod, setPaymentMethod] = useState('نقدي');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [receiptGenerated, setReceiptGenerated] = useState(false);
+  const [lastReceiptNumber, setLastReceiptNumber] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!tenant || !amount || parseFloat(amount) <= 0) {
@@ -59,23 +63,77 @@ export function QuickPaymentDialog({
 
     setIsSubmitting(true);
     try {
-      // إنشاء سجل دفعة في tenant_ledger
-      const { error } = await supabase.from('tenant_ledger').insert({
-        tenant_id: tenant.id,
-        transaction_type: 'payment',
-        transaction_date: new Date().toISOString().split('T')[0],
-        credit_amount: parseFloat(amount),
-        debit_amount: 0,
-        description: `دفعة إيجار - ${paymentMethod}${notes ? ` - ${notes}` : ''}`,
-        reference_type: 'quick_payment',
-      });
+      // 1. توليد رقم سند فريد
+      const receiptNumber = `RCP-${Date.now().toString(36).toUpperCase()}`;
+      const paymentDate = new Date().toISOString().split('T')[0];
+      
+      // 2. إنشاء سجل دفعة في tenant_ledger
+      const { data: ledgerEntry, error: ledgerError } = await supabase
+        .from('tenant_ledger')
+        .insert({
+          tenant_id: tenant.id,
+          transaction_type: 'payment',
+          transaction_date: paymentDate,
+          credit_amount: parseFloat(amount),
+          debit_amount: 0,
+          description: `دفعة إيجار - ${paymentMethod}${notes ? ` - ${notes}` : ''}`,
+          reference_type: 'quick_payment',
+          reference_number: receiptNumber,
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (ledgerError) throw ledgerError;
 
-      toast.success('تم تسجيل الدفعة بنجاح');
+      // 3. توليد سند القبض PDF
+      try {
+        const orgSettings = await RentalPaymentService.getOrganizationSettings();
+        
+        const receiptData = {
+          id: ledgerEntry.id,
+          payment_number: receiptNumber,
+          payment_date: paymentDate,
+          amount: parseFloat(amount),
+          payer_name: tenant.full_name,
+          payment_method: paymentMethod,
+          description: `دفعة إيجار سريعة${notes ? ` - ${notes}` : ''}`,
+          notes: notes || undefined,
+        };
+
+        const doc = await generateReceiptPDF(receiptData, orgSettings);
+        
+        // فتح السند في نافذة جديدة
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        
+        setReceiptGenerated(true);
+        setLastReceiptNumber(receiptNumber);
+      } catch (pdfError) {
+        console.error('Error generating receipt PDF:', pdfError);
+        // لا نوقف العملية إذا فشل توليد PDF
+      }
+
+      toast.success(
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4 text-success" />
+          <div>
+            <p className="font-medium">تم تسجيل الدفعة بنجاح</p>
+            <p className="text-xs text-muted-foreground">رقم السند: {receiptNumber}</p>
+          </div>
+        </div>
+      );
+      
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      onOpenChange(false);
-      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant-receipts'] });
+      
+      // إغلاق بعد ثانيتين لإظهار رسالة النجاح
+      setTimeout(() => {
+        onOpenChange(false);
+        resetForm();
+      }, 1500);
+      
     } catch (error) {
       console.error('Error recording payment:', error);
       toast.error('حدث خطأ أثناء تسجيل الدفعة');
@@ -88,6 +146,8 @@ export function QuickPaymentDialog({
     setAmount('');
     setPaymentMethod('نقدي');
     setNotes('');
+    setReceiptGenerated(false);
+    setLastReceiptNumber(null);
   };
 
   const handlePayFullBalance = () => {
@@ -97,7 +157,10 @@ export function QuickPaymentDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(open) => {
+      if (!open) resetForm();
+      onOpenChange(open);
+    }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -117,6 +180,12 @@ export function QuickPaymentDialog({
                   {formatCurrency(tenant.current_balance)}
                 </span>
               </div>
+            </div>
+
+            {/* إشعار السند التلقائي */}
+            <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg text-sm">
+              <Receipt className="h-4 w-4 text-primary" />
+              <span>سيتم إصدار سند قبض تلقائياً عند تسجيل الدفعة</span>
             </div>
 
             {/* المبلغ */}
@@ -187,8 +256,8 @@ export function QuickPaymentDialog({
               </>
             ) : (
               <>
-                <Banknote className="h-4 w-4 ms-2" />
-                تسجيل الدفعة
+                <Receipt className="h-4 w-4 ms-2" />
+                تسجيل وإصدار سند
               </>
             )}
           </Button>

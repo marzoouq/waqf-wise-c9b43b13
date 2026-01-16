@@ -16,9 +16,14 @@ export interface TenantContract {
   monthly_rent: number;
   status: string;
   payment_frequency: string;
+  security_deposit?: number;
+  tenant_name?: string;
+  notes?: string;
   properties: {
     name: string;
-  };
+    type?: string;
+    location?: string;
+  } | null;
 }
 
 export function useTenantContracts(tenantId: string) {
