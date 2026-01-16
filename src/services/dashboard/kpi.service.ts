@@ -86,7 +86,13 @@ export const KPIService = {
     const requests = requestsRes.data || [];
 
     const activeBeneficiaries = beneficiaries.filter(b => b.status === BENEFICIARY_STATUS.ACTIVE).length;
-    const occupiedProperties = properties.filter(p => p.status === PROPERTY_STATUS.ACTIVE).length;
+    // العقارات النشطة = المؤجرة بالكامل + الجزئية (بها وحدات مؤجرة)
+    const occupiedProperties = properties.filter(p => 
+      p.status === PROPERTY_STATUS.RENTED || 
+      p.status === PROPERTY_STATUS.PARTIAL ||
+      p.status === 'مؤجر' || 
+      p.status === 'جزئي'
+    ).length;
     const activeContracts = contracts.filter(c => 
       c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
     ).length;
