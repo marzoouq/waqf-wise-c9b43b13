@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TenantLedger } from '@/components/tenants/TenantLedger';
 import { TenantContracts } from '@/components/tenants/TenantContracts';
+import { TenantReceipts } from '@/components/tenants/TenantReceipts';
 import { useTenant } from '@/hooks/property/useTenants';
 import { useTenantLedger } from '@/hooks/property/useTenantLedger';
 import { formatCurrency } from '@/lib/utils';
@@ -18,6 +19,7 @@ import {
   Building,
   FileText,
   Hash,
+  Receipt,
 } from 'lucide-react';
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
@@ -98,7 +100,7 @@ export default function TenantDetails() {
       </div>
 
       <Tabs defaultValue="info" className="space-y-4">
-        <TabsList className="w-full grid grid-cols-3 h-auto">
+        <TabsList className="w-full grid grid-cols-4 h-auto">
           <TabsTrigger value="info" className="text-xs sm:text-sm py-2">
             <User className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">البيانات</span>
@@ -108,6 +110,11 @@ export default function TenantDetails() {
             <FileText className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">كشف الحساب</span>
             <span className="sm:hidden">حساب</span>
+          </TabsTrigger>
+          <TabsTrigger value="receipts" className="text-xs sm:text-sm py-2">
+            <Receipt className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">السندات</span>
+            <span className="sm:hidden">سندات</span>
           </TabsTrigger>
           <TabsTrigger value="contracts" className="text-xs sm:text-sm py-2">
             <Building className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
@@ -244,6 +251,10 @@ export default function TenantDetails() {
 
         <TabsContent value="ledger">
           <TenantLedger tenantId={tenant.id} tenantName={tenant.full_name} />
+        </TabsContent>
+
+        <TabsContent value="receipts">
+          <TenantReceipts tenantId={tenant.id} tenantName={tenant.full_name} />
         </TabsContent>
 
         <TabsContent value="contracts">
