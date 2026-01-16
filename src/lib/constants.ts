@@ -31,6 +31,8 @@ export const PROPERTY_STATUS = {
   INACTIVE: "غير نشط",
   VACANT: "شاغر",
   RENTED: "مؤجر",
+  PARTIAL: "جزئي",
+  MAINTENANCE: "صيانة",
 } as const;
 
 export const CONTRACT_STATUS = {
