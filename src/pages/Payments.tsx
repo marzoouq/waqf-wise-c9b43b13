@@ -9,11 +9,11 @@ import { PaymentsHeader } from "@/components/payments/PaymentsHeader";
 import { PaymentsStats } from "@/components/payments/PaymentsStats";
 import { PaymentsFilters } from "@/components/payments/PaymentsFilters";
 import { PaymentsTable } from "@/components/payments/PaymentsTable";
-import { PaymentReceiptTemplate } from "@/components/payments/PaymentReceiptTemplate";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { logger } from "@/lib/logger";
 import { Database } from '@/integrations/supabase/types';
-import { toPaymentReceipt } from '@/types/payment-receipt.types';
+import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
+import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -27,7 +27,8 @@ const Payments = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
-  const [printPayment, setPrintPayment] = useState<Payment | null>(null);
+  
+  const { settings: orgSettings } = useOrganizationSettings();
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
   const { paymentsWithContracts } = usePaymentsWithContracts(payments);
@@ -105,13 +106,27 @@ const Payments = () => {
     }
   };
 
-  const handlePrintReceipt = (payment: Payment) => {
-    setPrintPayment(payment);
-    setTimeout(() => window.print(), 100);
-  };
-
-  const handlePrint = (payment: Partial<Payment>) => {
-    handlePrintReceipt(payment as Payment);
+  const handlePrint = async (payment: Partial<Payment>) => {
+    try {
+      const receiptData = {
+        id: payment.id || '',
+        payment_number: payment.payment_number || '',
+        payment_date: payment.payment_date || new Date().toISOString(),
+        amount: payment.amount || 0,
+        payer_name: payment.payer_name || '',
+        payment_method: (payment as PaymentWithContract).payment_method || 'نقدي',
+        description: payment.description || '',
+        reference_number: payment.reference_number || undefined,
+      };
+      
+      const doc = await generateReceiptPDF(receiptData, orgSettings || null);
+      doc.save(`سند_قبض_${receiptData.payment_number}.pdf`);
+      
+      toast({ title: "تم تحميل السند بنجاح", variant: "default" });
+    } catch (error) {
+      logger.error(error, { context: 'print_payment_receipt', severity: 'medium' });
+      toast({ title: "حدث خطأ", description: "فشل في إنشاء ملف PDF", variant: "destructive" });
+    }
   };
 
   return (
@@ -159,16 +174,6 @@ const Payments = () => {
           isLoading={false}
         />
 
-        {printPayment && (
-          <PaymentReceiptTemplate
-            payment={toPaymentReceipt({
-              ...printPayment,
-              contract_number: (printPayment as PaymentWithContract).contract_number,
-              tenant_name: (printPayment as PaymentWithContract).tenant_name,
-              property_name: (printPayment as PaymentWithContract).property_name,
-            })}
-          />
-        )}
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
