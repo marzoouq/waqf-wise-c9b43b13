@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays, Trash2 } from "lucide-react";
+import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays, Trash2, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Input } from "@/components/ui/input";
@@ -106,12 +106,16 @@ export default function WaqfUnits() {
     }
   };
 
-  // Calculate statistics
+  // Calculate statistics - تشمل الأرصدة المالية الفعلية
   const stats = {
     total: waqfUnits.length,
     active: waqfUnits.filter((u) => u.is_active).length,
     totalValue: waqfUnits.reduce((sum, u) => sum + (u.current_value || 0), 0),
     totalReturn: waqfUnits.reduce((sum, u) => sum + (u.annual_return || 0), 0),
+    // أرصدة مالية فعلية من السندات والقيود
+    totalBalance: waqfUnits.reduce((sum, u) => sum + (u.current_balance || 0), 0),
+    totalIncome: waqfUnits.reduce((sum, u) => sum + (u.total_income || 0), 0),
+    totalExpenses: waqfUnits.reduce((sum, u) => sum + (u.total_expenses || 0), 0),
   };
 
   const getTypeBadge = (type: string) => {
@@ -184,8 +188,8 @@ export default function WaqfUnits() {
         }
       />
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Statistics Cards - تشمل الأرصدة المالية الفعلية */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -210,15 +214,44 @@ export default function WaqfUnits() {
           </div>
         </Card>
 
-        <Card className="p-4">
+        {/* الرصيد المالي الفعلي - من السندات والقيود */}
+        <Card className="p-4 border-2 border-primary/30 bg-primary/5">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <DollarSign className="h-5 w-5 text-primary" />
+            <div className="p-2 bg-primary/20 rounded-lg">
+              <Wallet className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">القيمة الإجمالية</p>
-              <p className="text-xl font-bold">
-                {stats.totalValue.toLocaleString('ar-SA')} ريال
+              <p className="text-sm text-muted-foreground font-medium">الرصيد الحالي</p>
+              <p className="text-xl font-bold text-primary">
+                {stats.totalBalance.toLocaleString('ar-SA')} ريال
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-success/10 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-success" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">إجمالي الإيرادات</p>
+              <p className="text-xl font-bold text-success">
+                {stats.totalIncome.toLocaleString('ar-SA')} ريال
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-destructive/10 rounded-lg">
+              <DollarSign className="h-5 w-5 text-destructive" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">إجمالي المصروفات</p>
+              <p className="text-xl font-bold text-destructive">
+                {stats.totalExpenses.toLocaleString('ar-SA')} ريال
               </p>
             </div>
           </div>
@@ -227,12 +260,12 @@ export default function WaqfUnits() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-accent/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-accent" />
+              <DollarSign className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">العائد السنوي</p>
+              <p className="text-sm text-muted-foreground">قيمة الأصول</p>
               <p className="text-xl font-bold">
-                {stats.totalReturn.toLocaleString('ar-SA')} ريال
+                {stats.totalValue.toLocaleString('ar-SA')} ريال
               </p>
             </div>
           </div>
@@ -330,30 +363,31 @@ export default function WaqfUnits() {
                   />
                   <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
                   <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الموقع</TableHead>
+                  {/* عمود الرصيد المالي الفعلي */}
                   <SortableTableHeader
-                    label="قيمة الاستحواذ"
-                    sortKey="acquisition_value"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="hidden lg:table-cell whitespace-nowrap"
-                  />
-                  <SortableTableHeader
-                    label="القيمة الحالية"
-                    sortKey="current_value"
+                    label="الرصيد"
+                    sortKey="current_balance"
                     currentSort={sortConfig}
                     onSort={handleSort}
                     className="whitespace-nowrap"
                   />
                   <SortableTableHeader
-                    label="العائد السنوي"
-                    sortKey="annual_return"
+                    label="الإيرادات"
+                    sortKey="total_income"
                     currentSort={sortConfig}
                     onSort={handleSort}
                     className="hidden md:table-cell whitespace-nowrap"
                   />
                   <SortableTableHeader
-                    label="تاريخ الاستحواذ"
-                    sortKey="acquisition_date"
+                    label="المصروفات"
+                    sortKey="total_expenses"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="hidden lg:table-cell whitespace-nowrap"
+                  />
+                  <SortableTableHeader
+                    label="قيمة الأصل"
+                    sortKey="current_value"
                     currentSort={sortConfig}
                     onSort={handleSort}
                     className="hidden lg:table-cell whitespace-nowrap"
@@ -385,21 +419,18 @@ export default function WaqfUnits() {
                     </TableCell>
                     <TableCell>{getTypeBadge(unit.waqf_type)}</TableCell>
                     <TableCell className="hidden md:table-cell text-xs sm:text-sm">{unit.location || "-"}</TableCell>
-                    <TableCell className="hidden lg:table-cell font-semibold text-xs sm:text-sm whitespace-nowrap">
-                      {unit.acquisition_value?.toLocaleString('ar-SA') || 0} ريال
-                    </TableCell>
-                    <TableCell className="font-semibold text-primary text-xs sm:text-sm whitespace-nowrap">
-                      {unit.current_value?.toLocaleString('ar-SA') || 0} ريال
+                    {/* الرصيد المالي الفعلي */}
+                    <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap">
+                      {(unit.current_balance || 0).toLocaleString('ar-SA')} ريال
                     </TableCell>
                     <TableCell className="hidden md:table-cell font-semibold text-success text-xs sm:text-sm whitespace-nowrap">
-                      {unit.annual_return?.toLocaleString('ar-SA') || 0} ريال
+                      {(unit.total_income || 0).toLocaleString('ar-SA')} ريال
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell font-semibold text-destructive text-xs sm:text-sm whitespace-nowrap">
+                      {(unit.total_expenses || 0).toLocaleString('ar-SA')} ريال
                     </TableCell>
                     <TableCell className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap">
-                      {unit.acquisition_date
-                        ? format(new Date(unit.acquisition_date), "dd/MM/yyyy", {
-                            locale: ar,
-                          })
-                        : "-"}
+                      {(unit.current_value || 0).toLocaleString('ar-SA')} ريال
                     </TableCell>
                     <TableCell>
                       <Badge variant={unit.is_active ? "outline" : "secondary"} className="text-xs whitespace-nowrap">

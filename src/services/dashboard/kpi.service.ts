@@ -130,7 +130,10 @@ export const KPIService = {
       loansResult,
       paymentsResult,
       journalEntriesResult,
-      journalEntriesStatusResult
+      journalEntriesStatusResult,
+      // إضافة: سندات الصرف والقبض + أقلام الوقف
+      vouchersResult,
+      waqfUnitsResult
     ] = await Promise.all([
       supabase.from('beneficiaries').select('id, status'),
       supabase.from('families').select('id'),
@@ -141,7 +144,11 @@ export const KPIService = {
       supabase.from('loans').select('id, status'),
       supabase.from('rental_payments').select('id, amount_paid, status'),
       supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount'),
-      supabase.from('journal_entries').select('id, status, entry_date')
+      supabase.from('journal_entries').select('id, status, entry_date'),
+      // سندات الصرف والقبض المدفوعة
+      supabase.from('payment_vouchers').select('id, amount, voucher_type, status').eq('status', 'paid'),
+      // أرصدة أقلام الوقف
+      supabase.from('waqf_units').select('id, current_balance, total_income, total_expenses')
     ]);
 
     const beneficiaries = beneficiariesResult.data || [];
@@ -195,11 +202,29 @@ export const KPIService = {
 
     const rentalPayments = paymentsResult.data || [];
     const completedPayments = rentalPayments.filter(p => p.status === 'مدفوع');
-    const totalRevenue = completedPayments
+    const rentalRevenue = completedPayments
       .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
 
-    // حساب المصروفات الفعلية من حسابات المصروفات
-    let totalExpenses = 0;
+    // حساب الإيرادات من سندات القبض المدفوعة
+    const vouchers = vouchersResult.data || [];
+    const receiptVouchers = vouchers.filter(v => v.voucher_type === 'receipt');
+    const vouchersRevenue = receiptVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+
+    // إجمالي الإيرادات = إيجارات + سندات قبض
+    const totalRevenue = rentalRevenue + vouchersRevenue;
+
+    // حساب المصروفات من سندات الصرف المدفوعة
+    const paymentVouchers = vouchers.filter(v => v.voucher_type === 'payment');
+    const vouchersExpenses = paymentVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+
+    // أرصدة أقلام الوقف الفعلية
+    const waqfUnits = waqfUnitsResult.data || [];
+    const totalWaqfBalance = waqfUnits.reduce((sum, w) => sum + (w.current_balance || 0), 0);
+    const totalWaqfIncome = waqfUnits.reduce((sum, w) => sum + (w.total_income || 0), 0);
+    const totalWaqfExpenses = waqfUnits.reduce((sum, w) => sum + (w.total_expenses || 0), 0);
+
+    // حساب المصروفات الفعلية من حسابات المصروفات + سندات الصرف
+    let accountingExpenses = 0;
     try {
       const { data: expenseAccounts } = await supabase
         .from("accounts")
@@ -213,14 +238,17 @@ export const KPIService = {
           .select("debit_amount")
           .in("account_id", accountIds);
         
-        totalExpenses = expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
+        accountingExpenses = expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
     } catch (error) {
       productionLogger.error("Error calculating expenses:", error);
     }
 
+    // إجمالي المصروفات = مصروفات محاسبية + سندات صرف + مصروفات أقلام الوقف
+    const totalExpenses = Math.max(accountingExpenses, vouchersExpenses, totalWaqfExpenses);
+
     const netIncome = totalRevenue - totalExpenses;
-    const availableBudget = netIncome > 0 ? netIncome : 0;
+    const availableBudget = totalWaqfBalance > 0 ? totalWaqfBalance : (netIncome > 0 ? netIncome : 0);
     const totalAssets = totalRevenue;
 
     // حساب إحصائيات القيود المحاسبية

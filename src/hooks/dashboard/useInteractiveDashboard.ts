@@ -80,7 +80,7 @@ export function useInteractiveDashboard() {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
   };
 
-  // إحصائيات المدفوعات
+  // إحصائيات المدفوعات - تشمل جدول payments وسندات الصرف والقبض
   const { data: paymentsStats, isLoading: loadingPayments, isRefetching: isRefetchingPayments, error: paymentsError } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS(timeRange),
     ...QUERY_CONFIG.REPORTS,
@@ -90,19 +90,48 @@ export function useInteractiveDashboard() {
       else if (timeRange === 'quarter') startDate.setMonth(startDate.getMonth() - 3);
       else startDate.setFullYear(startDate.getFullYear() - 1);
 
-      const { data, error } = await supabase
+      // جلب المدفوعات العادية
+      const { data: paymentsData, error: paymentsErr } = await supabase
         .from('payments')
         .select('amount, payment_date, payment_type')
         .gte('payment_date', startDate.toISOString());
       
-      if (error) throw error;
+      // جلب سندات الصرف والقبض المدفوعة
+      const { data: vouchersData, error: vouchersErr } = await supabase
+        .from('payment_vouchers')
+        .select('amount, created_at, voucher_type, status')
+        .eq('status', 'paid')
+        .gte('created_at', startDate.toISOString());
 
-      const monthlyData = (data || []).reduce((acc, curr) => {
-        const month = new Date(curr.payment_date).toLocaleDateString('ar-SA', { month: 'short' });
+      if (paymentsErr && vouchersErr) throw paymentsErr || vouchersErr;
+
+      // دمج البيانات من المصدرين
+      const combinedData: Array<{ amount: number; date: string; type: string }> = [];
+      
+      // إضافة المدفوعات
+      (paymentsData || []).forEach(p => {
+        combinedData.push({
+          amount: Number(p.amount),
+          date: p.payment_date,
+          type: p.payment_type
+        });
+      });
+
+      // إضافة السندات
+      (vouchersData || []).forEach(v => {
+        combinedData.push({
+          amount: Number(v.amount),
+          date: v.created_at,
+          type: v.voucher_type
+        });
+      });
+
+      const monthlyData = combinedData.reduce((acc, curr) => {
+        const month = new Date(curr.date).toLocaleDateString('ar-SA', { month: 'short' });
         if (!acc[month]) {
           acc[month] = { month, total: 0, count: 0 };
         }
-        acc[month].total += Number(curr.amount);
+        acc[month].total += curr.amount;
         acc[month].count += 1;
         return acc;
       }, {} as Record<string, { month: string; total: number; count: number }>);
