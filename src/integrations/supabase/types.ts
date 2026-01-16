@@ -2588,6 +2588,7 @@ export type Database = {
           planned_amount: number
           updated_at: string | null
           variance: number | null
+          waqf_unit_id: string | null
         }
         Insert: {
           account_id?: string | null
@@ -2601,6 +2602,7 @@ export type Database = {
           planned_amount?: number
           updated_at?: string | null
           variance?: number | null
+          waqf_unit_id?: string | null
         }
         Update: {
           account_id?: string | null
@@ -2614,6 +2616,7 @@ export type Database = {
           planned_amount?: number
           updated_at?: string | null
           variance?: number | null
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -2642,6 +2645,13 @@ export type Database = {
             columns: ["budget_id"]
             isOneToOne: false
             referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_items_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -5292,6 +5302,7 @@ export type Database = {
           reference_id: string | null
           reference_type: string | null
           transaction_type: string
+          waqf_unit_id: string | null
         }
         Insert: {
           amount: number
@@ -5304,6 +5315,7 @@ export type Database = {
           reference_id?: string | null
           reference_type?: string | null
           transaction_type: string
+          waqf_unit_id?: string | null
         }
         Update: {
           amount?: number
@@ -5316,6 +5328,7 @@ export type Database = {
           reference_id?: string | null
           reference_type?: string | null
           transaction_type?: string
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -5323,6 +5336,13 @@ export type Database = {
             columns: ["fund_id"]
             isOneToOne: false
             referencedRelation: "funds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fund_transactions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -6205,6 +6225,7 @@ export type Database = {
           share_amount: number
           status: string | null
           updated_at: string | null
+          waqf_unit_id: string | null
         }
         Insert: {
           beneficiary_id?: string | null
@@ -6219,6 +6240,7 @@ export type Database = {
           share_amount?: number
           status?: string | null
           updated_at?: string | null
+          waqf_unit_id?: string | null
         }
         Update: {
           beneficiary_id?: string | null
@@ -6233,6 +6255,7 @@ export type Database = {
           share_amount?: number
           status?: string | null
           updated_at?: string | null
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -6289,6 +6312,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries_with_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -6786,6 +6816,7 @@ export type Database = {
           total_amount: number
           updated_at: string
           vat_number: string | null
+          waqf_unit_id: string | null
           zatca_hash: string | null
           zatca_qr_data: string | null
           zatca_status: string | null
@@ -6829,6 +6860,7 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           vat_number?: string | null
+          waqf_unit_id?: string | null
           zatca_hash?: string | null
           zatca_qr_data?: string | null
           zatca_status?: string | null
@@ -6872,6 +6904,7 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           vat_number?: string | null
+          waqf_unit_id?: string | null
           zatca_hash?: string | null
           zatca_qr_data?: string | null
           zatca_status?: string | null
@@ -6912,6 +6945,13 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -7524,6 +7564,7 @@ export type Database = {
           payment_date: string
           payment_method: string | null
           payment_number: string | null
+          waqf_unit_id: string | null
         }
         Insert: {
           created_at?: string
@@ -7536,6 +7577,7 @@ export type Database = {
           payment_date: string
           payment_method?: string | null
           payment_number?: string | null
+          waqf_unit_id?: string | null
         }
         Update: {
           created_at?: string
@@ -7548,6 +7590,7 @@ export type Database = {
           payment_date?: string
           payment_method?: string | null
           payment_number?: string | null
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -7590,6 +7633,13 @@ export type Database = {
             columns: ["loan_id"]
             isOneToOne: false
             referencedRelation: "loans_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -7733,6 +7783,7 @@ export type Database = {
           status: string | null
           term_months: number
           updated_at: string
+          waqf_unit_id: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -7754,6 +7805,7 @@ export type Database = {
           status?: string | null
           term_months: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -7775,6 +7827,7 @@ export type Database = {
           status?: string | null
           term_months?: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -7824,6 +7877,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
@@ -9630,6 +9690,7 @@ export type Database = {
           voided: boolean | null
           voided_at: string | null
           voided_by: string | null
+          waqf_unit_id: string | null
         }
         Insert: {
           amount: number
@@ -9655,6 +9716,7 @@ export type Database = {
           voided?: boolean | null
           voided_at?: string | null
           voided_by?: string | null
+          waqf_unit_id?: string | null
         }
         Update: {
           amount?: number
@@ -9680,6 +9742,7 @@ export type Database = {
           voided?: boolean | null
           voided_at?: string | null
           voided_by?: string | null
+          waqf_unit_id?: string | null
         }
         Relationships: [
           {
@@ -9778,6 +9841,13 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
