@@ -134,7 +134,7 @@ export default function LoginLight() {
         email = data.email;
       }
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -146,7 +146,24 @@ export default function LoginLight() {
             ? 'رقم الهوية أو كلمة المرور غير صحيحة'
             : 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
         }
+        if (msg.includes('email not confirmed')) {
+          throw new Error('البريد الإلكتروني غير مؤكد. يرجى تأكيد بريدك الإلكتروني أولاً');
+        }
         throw signInError;
+      }
+
+      // ✅ التحقق من أن المستخدم نشط
+      if (authData?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('is_active')
+          .eq('user_id', authData.user.id)
+          .maybeSingle();
+        
+        if (profileData && profileData.is_active === false) {
+          await supabase.auth.signOut();
+          throw new Error('حسابك غير نشط. يرجى التواصل مع الإدارة');
+        }
       }
 
       // نجاح - توجيه للتطبيق
