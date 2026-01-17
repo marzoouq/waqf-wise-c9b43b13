@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { type AppRole, getDashboardForRoles } from '@/types/roles';
+import { supabase } from '@/integrations/supabase/client';
 
 // Re-export for backward compatibility
 export type { AppRole } from '@/types/roles';
@@ -12,20 +13,43 @@ export { getDashboardForRoles } from '@/types/roles';
  * مكون التوجيه التلقائي حسب الدور
  * يستخدم بعد تسجيل الدخول للتوجيه المباشر إلى لوحة التحكم المناسبة
  * 
- * ✅ محسّن: يتعامل مع حالات الأدوار الفارغة والمستخدمين غير النشطين
+ * ✅ محسّن: timeout مخفض + جلب الأدوار مباشرة كـ fallback
  */
 export function RoleBasedRedirect() {
   const { user, profile, isLoading: authLoading, roles, rolesLoading } = useAuth();
   const [loadingTooLong, setLoadingTooLong] = useState(false);
+  const [directRoles, setDirectRoles] = useState<AppRole[] | null>(null);
 
-  // ✅ Timeout احتياطي لمنع التعليق (تقليل لـ 3 ثواني)
+  // ✅ Timeout مخفض لـ 1 ثانية بدلاً من 3
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoadingTooLong(true);
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  // ✅ جلب الأدوار مباشرة كـ fallback إذا لم تتوفر من Context
+  useEffect(() => {
+    const fetchDirectRoles = async () => {
+      if (user && roles.length === 0 && !rolesLoading && loadingTooLong) {
+        try {
+          const { data } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+          
+          if (data && data.length > 0) {
+            setDirectRoles(data.map(r => r.role as AppRole));
+          }
+        } catch (error) {
+          console.error('Error fetching roles directly:', error);
+        }
+      }
+    };
+
+    fetchDirectRoles();
+  }, [user, roles.length, rolesLoading, loadingTooLong]);
 
   // ✅ حالة التحميل الفعلية
   const isLoading = authLoading || (!!user && rolesLoading);
@@ -40,14 +64,17 @@ export function RoleBasedRedirect() {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // ✅ إذا استمر التحميل لأكثر من 3 ثواني مع وجود مستخدم
+  // ✅ استخدام الأدوار المجلوبة مباشرة إذا توفرت
+  const effectiveRoles = roles.length > 0 ? roles : (directRoles || []);
+
+  // ✅ إذا توفرت أدوار (من أي مصدر)، توجيه فوري
+  if (user && effectiveRoles.length > 0) {
+    const target = getDashboardForRoles(effectiveRoles as AppRole[]);
+    return <Navigate to={target} replace />;
+  }
+
+  // ✅ إذا استمر التحميل لأكثر من 1 ثانية مع وجود مستخدم
   if (loadingTooLong && user) {
-    // ✅ توجيه مباشر بناءً على الأدوار المتاحة
-    if (roles.length > 0) {
-      const target = getDashboardForRoles(roles as AppRole[]);
-      return <Navigate to={target} replace />;
-    }
-    
     // محاولة استخدام الأدوار المخزنة مؤقتاً
     try {
       const cached = localStorage.getItem('waqf_user_roles');
@@ -62,8 +89,7 @@ export function RoleBasedRedirect() {
       // تجاهل أخطاء localStorage
     }
     
-    // ✅ إذا لم تُجلب الأدوار، نوجه للوحة الافتراضية
-    // بدلاً من التوجيه لـ /login (المستخدم مسجل دخول فعلاً)
+    // ✅ توجيه للوحة الافتراضية
     if (import.meta.env.DEV) {
       console.warn('⚠️ [RoleBasedRedirect] Timeout - توجيه للوحة الافتراضية');
     }
@@ -82,14 +108,8 @@ export function RoleBasedRedirect() {
     );
   }
 
-  // ✅ الأدوار جاهزة - توجيه صحيح
-  if (user && roles.length > 0) {
-    const targetDashboard = getDashboardForRoles(roles as AppRole[]);
-    return <Navigate to={targetDashboard} replace />;
-  }
-
   // ✅ مستخدم مسجل لكن بدون أدوار - توجيه للوحة الافتراضية
-  if (user && roles.length === 0 && !rolesLoading) {
+  if (user && effectiveRoles.length === 0 && !rolesLoading) {
     if (import.meta.env.DEV) {
       console.warn('⚠️ [RoleBasedRedirect] مستخدم بدون أدوار - توجيه للوحة الافتراضية');
     }

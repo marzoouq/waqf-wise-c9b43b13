@@ -3,16 +3,14 @@
  * Light Login Page - Performance Optimized
  * 
  * ✅ لا تعتمد على AuthContext عند التحميل الأولي
- * ✅ تحميل lazy للمكونات الثقيلة
+ * ✅ توجيه مباشر للوحة التحكم المناسبة حسب الدور
  * ✅ Critical CSS inline
  */
 
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-
-// ✅ Lazy load للمكونات الثقيلة
-const AuthenticatedRedirect = lazy(() => import('@/components/auth/AuthenticatedRedirect'));
+import { type AppRole, getDashboardForRoles } from '@/types/roles';
 
 // ✅ CSS Critical inline - لا يحتاج استيراد خارجي
 const criticalStyles = {
@@ -96,16 +94,37 @@ export default function LoginLight() {
     return () => { mounted = false; };
   }, []);
 
-  // ✅ إذا مسجل دخول، توجيه للـ redirect
+  // ✅ إذا مسجل دخول، جلب الأدوار والتوجيه مباشرة
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      const redirectToDashboard = async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            const { data: rolesData } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id);
+            
+            const roles = rolesData?.map(r => r.role as AppRole) || [];
+            const targetDashboard = getDashboardForRoles(roles);
+            navigate(targetDashboard, { replace: true });
+          }
+        } catch (error) {
+          console.error('Error fetching roles:', error);
+          navigate('/dashboard', { replace: true });
+        }
+      };
+      redirectToDashboard();
+    }
+  }, [isAuthenticated, navigate]);
+
+  // شاشة تحميل أثناء التوجيه
   if (isAuthenticated === true) {
     return (
-      <Suspense fallback={
-        <div className={criticalStyles.container}>
-          <div className={criticalStyles.spinner} />
-        </div>
-      }>
-        <AuthenticatedRedirect />
-      </Suspense>
+      <div className={criticalStyles.container}>
+        <div className={criticalStyles.spinner} style={{ width: 32, height: 32, borderWidth: 3 }} />
+      </div>
     );
   }
 
@@ -164,10 +183,31 @@ export default function LoginLight() {
           await supabase.auth.signOut();
           throw new Error('حسابك غير نشط. يرجى التواصل مع الإدارة');
         }
+
+        // ✅ جلب الأدوار والتوجيه مباشرة للوحة التحكم المناسبة
+        const { data: rolesData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authData.user.id);
+        
+        const roles = rolesData?.map(r => r.role as AppRole) || [];
+        const targetDashboard = getDashboardForRoles(roles);
+        
+        // تخزين الأدوار مؤقتاً للاستخدام السريع
+        try {
+          localStorage.setItem('waqf_user_roles', JSON.stringify({
+            roles,
+            userId: authData.user.id,
+            timestamp: Date.now()
+          }));
+        } catch { /* تجاهل أخطاء localStorage */ }
+        
+        navigate(targetDashboard, { replace: true });
+        return;
       }
 
-      // نجاح - توجيه للتطبيق
-      navigate('/redirect', { replace: true });
+      // نجاح - توجيه للتطبيق (fallback)
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ أثناء تسجيل الدخول');
     } finally {

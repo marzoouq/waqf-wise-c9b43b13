@@ -9897,6 +9897,7 @@ export type Database = {
           attachments: Json | null
           bank_account_id: string | null
           beneficiary_id: string | null
+          contract_id: string | null
           created_at: string | null
           created_by: string | null
           description: string
@@ -9911,6 +9912,7 @@ export type Database = {
           payment_method: string | null
           reference_number: string | null
           status: string
+          tenant_id: string | null
           updated_at: string | null
           voucher_number: string
           voucher_type: string
@@ -9923,6 +9925,7 @@ export type Database = {
           attachments?: Json | null
           bank_account_id?: string | null
           beneficiary_id?: string | null
+          contract_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description: string
@@ -9937,6 +9940,7 @@ export type Database = {
           payment_method?: string | null
           reference_number?: string | null
           status?: string
+          tenant_id?: string | null
           updated_at?: string | null
           voucher_number: string
           voucher_type: string
@@ -9949,6 +9953,7 @@ export type Database = {
           attachments?: Json | null
           bank_account_id?: string | null
           beneficiary_id?: string | null
+          contract_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string
@@ -9963,6 +9968,7 @@ export type Database = {
           payment_method?: string | null
           reference_number?: string | null
           status?: string
+          tenant_id?: string | null
           updated_at?: string | null
           voucher_number?: string
           voucher_type?: string
@@ -10009,6 +10015,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
             referencedColumns: ["id"]
           },
           {
@@ -10072,6 +10085,13 @@ export type Database = {
             columns: ["payment_id"]
             isOneToOne: false
             referencedRelation: "payments_with_contract_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
@@ -16622,6 +16642,10 @@ export type Database = {
       refresh_user_profile_cache: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      regenerate_payment_schedule: {
+        Args: { p_contract_id: string }
+        Returns: number
       }
       reset_performance_stats: { Args: never; Returns: Json }
       run_full_cleanup: { Args: never; Returns: Json }

@@ -176,12 +176,16 @@ export const KPIService = {
 
     const properties = propertiesResult.data || [];
     const totalProperties = properties.length;
+    // ✅ تصحيح: العقارات النشطة تشمل "نشط" و "مؤجر"
     const activeProperties = properties.filter(p => 
-      p.status === PROPERTY_STATUS.ACTIVE || p.status === 'active'
+      p.status === PROPERTY_STATUS.ACTIVE || 
+      p.status === 'active' ||
+      p.status === 'مؤجر' ||
+      p.status === PROPERTY_STATUS.RENTED
     ).length;
 
     const contracts = contractsResult.data || [];
-    // تصحيح: حساب العقارات المشغولة بعدد العقارات الفريدة ذات العقود النشطة
+    // ✅ تصحيح: حساب العقارات المشغولة = عدد العقود النشطة
     const activeContracts = contracts.filter(c => 
       c.status === CONTRACT_STATUS.ACTIVE || c.status === 'نشط'
     );
