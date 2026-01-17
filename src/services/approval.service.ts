@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { JournalApproval, PaymentForApproval } from "@/types";
 import { DistributionForApproval, RequestWithBeneficiary } from "@/types/approvals";
 import type { Json } from "@/integrations/supabase/types";
+import { matchesStatus } from '@/lib/constants';
 
 export interface ApprovalItem {
   id: string;
@@ -51,9 +52,9 @@ export class ApprovalService {
 
     return {
       total: allApprovals.length,
-      pending: allApprovals.filter((a) => a.status === "pending" || a.status === "معلق").length,
-      approved: allApprovals.filter((a) => a.status === "approved" || a.status === "موافق").length,
-      rejected: allApprovals.filter((a) => a.status === "rejected" || a.status === "مرفوض").length,
+      pending: allApprovals.filter((a) => matchesStatus(a.status, 'pending')).length,
+      approved: allApprovals.filter((a) => matchesStatus(a.status, 'approved')).length,
+      rejected: allApprovals.filter((a) => matchesStatus(a.status, 'rejected')).length,
     };
   }
 

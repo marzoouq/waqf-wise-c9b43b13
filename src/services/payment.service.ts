@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from '@/lib/constants';
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
@@ -208,11 +209,11 @@ export class PaymentService {
 
     return {
       total: vouchers.length,
-      draft: vouchers.filter(v => v.status === 'draft').length,
-      paid: vouchers.filter(v => v.status === 'paid').length,
+      draft: vouchers.filter(v => matchesStatus(v.status, 'draft')).length,
+      paid: vouchers.filter(v => matchesStatus(v.status, 'paid')).length,
       thisMonth: vouchers.filter(v => new Date(v.created_at) >= thisMonth).length,
       totalAmount: vouchers.reduce((sum, v) => sum + (v.amount || 0), 0),
-      paidAmount: vouchers.filter(v => v.status === 'paid').reduce((sum, v) => sum + (v.amount || 0), 0),
+      paidAmount: vouchers.filter(v => matchesStatus(v.status, 'paid')).reduce((sum, v) => sum + (v.amount || 0), 0),
     };
   }
 

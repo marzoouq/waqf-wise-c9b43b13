@@ -4,6 +4,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { matchesStatus } from '@/lib/constants';
 
 export class AnalysisService {
   /**
@@ -91,7 +92,7 @@ export class AnalysisService {
       const totalBeneficiaries = beneficiaries.data?.length || 0;
       const totalProperties = properties.data?.length || 0;
       const totalDistributed = (distributions.data || [])
-        .filter(d => d.status === 'paid' || d.status === 'مدفوع' || d.status === 'مكتمل' || d.status === 'completed')
+        .filter(d => matchesStatus(d.status, 'paid', 'completed'))
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
       const totalCollected = (payments.data || [])
         .filter(p => p.payment_type === 'receipt')
