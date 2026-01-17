@@ -69,7 +69,9 @@ export function AnnualDisclosureTab() {
   const handleExportPDF = async (disclosure: AnnualDisclosure) => {
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
-      await generateDisclosurePDF(disclosure, beneficiaries);
+      // البحث عن السنة السابقة
+      const previousYear = disclosures?.find(d => d.year === disclosure.year - 1) || null;
+      await generateDisclosurePDF(disclosure, beneficiaries, previousYear);
     } catch (error) {
       // Error already handled in generateDisclosurePDF
     }
