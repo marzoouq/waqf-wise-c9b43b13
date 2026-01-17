@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Eye, Lock } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 import { format, arLocale as ar } from "@/lib/date";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, StatusConfigMap } from "@/types/approvals";
@@ -34,7 +35,7 @@ export function DistributionApprovalsTab() {
 
   const getApprovalProgress = (approvals: Array<{ status: string }> | undefined) => {
     const total = 3;
-    const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
+    const approved = approvals?.filter((a) => matchesStatus(a.status, 'approved')).length || 0;
     return `${approved}/${total}`;
   };
 

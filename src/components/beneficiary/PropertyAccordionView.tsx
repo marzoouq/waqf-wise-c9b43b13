@@ -13,7 +13,7 @@ import { Building2, Home, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { getUnitTypeLabel } from "@/lib/constants";
+import { getUnitTypeLabel, matchesStatus } from "@/lib/constants";
 
 export function PropertyAccordionView() {
   const { properties, isLoading, error, refetch } = useProperties();
@@ -125,8 +125,8 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
     );
   }
 
-  const availableUnits = units.filter(u => u.occupancy_status === 'شاغر').length;
-  const occupiedCount = units.filter(u => u.occupancy_status === 'مشغول').length;
+  const availableUnits = units.filter(u => matchesStatus(u.occupancy_status, 'vacant')).length;
+  const occupiedCount = units.filter(u => matchesStatus(u.occupancy_status, 'occupied')).length;
 
   return (
     <div className="space-y-4 pt-4 border-t">
@@ -160,7 +160,7 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {units.map((unit) => (
           <Card key={unit.id} className="hover:shadow-md transition-all duration-200 border-s-4" 
-                style={{ borderInlineStartColor: unit.occupancy_status === 'مشغول' ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}>
+                style={{ borderInlineStartColor: matchesStatus(unit.occupancy_status, 'occupied') ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
                   </span>
                 </div>
                 <Badge 
-                  variant={unit.occupancy_status === 'مشغول' ? 'default' : 'secondary'}
+                  variant={matchesStatus(unit.occupancy_status, 'occupied') ? 'default' : 'secondary'}
                   className="text-xs"
                 >
                   {unit.occupancy_status}

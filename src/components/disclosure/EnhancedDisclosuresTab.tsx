@@ -6,6 +6,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { matchesStatus } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -154,8 +155,8 @@ export function EnhancedDisclosuresTab() {
                         {Math.abs(revenueChange).toFixed(0)}%
                       </Badge>
                     )}
-                    <Badge variant={disclosure.status === "published" ? "default" : "secondary"}>
-                      {disclosure.status === "published" ? "منشور" : "مسودة"}
+                    <Badge variant={matchesStatus(disclosure.status, 'published') ? "default" : "secondary"}>
+                      {matchesStatus(disclosure.status, 'published') ? "منشور" : "مسودة"}
                     </Badge>
                   </div>
                 </div>
