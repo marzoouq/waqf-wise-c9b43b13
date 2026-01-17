@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
 import { MonitoringService, type SystemStats } from "@/services";
 import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 export type { SystemStats };
 
@@ -55,10 +56,10 @@ export function useSystemMonitoring() {
     queryKey: QUERY_KEYS.FIX_ATTEMPTS,
     queryFn: async (): Promise<FixAttempt[]> => {
       const errors = await MonitoringService.getRecentErrors(20);
-      const resolved = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved");
+      const resolved = errors.filter(e => matchesStatus(e.status, 'resolved', 'auto_resolved'));
       return resolved.map((e) => ({
         id: e.id,
-        fix_strategy: e.status === "auto_resolved" ? "auto" : "manual",
+        fix_strategy: matchesStatus(e.status, 'auto_resolved') ? "auto" : "manual",
         attempt_number: 1,
         max_attempts: 1,
         status: "success",

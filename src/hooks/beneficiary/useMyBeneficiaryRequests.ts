@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RequestService, BeneficiaryService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 export interface BeneficiaryRequest {
   id: string;
@@ -91,9 +92,9 @@ export function useMyBeneficiaryRequests(userId?: string) {
   // حساب الإحصائيات
   const stats = {
     total: requests.length,
-    pending: requests.filter((r: BeneficiaryRequest) => r.status === "pending" || r.status === "قيد المراجعة").length,
-    approved: requests.filter((r: BeneficiaryRequest) => r.status === "approved" || r.status === "موافق عليه").length,
-    rejected: requests.filter((r: BeneficiaryRequest) => r.status === "rejected" || r.status === "مرفوض").length,
+    pending: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'pending', 'قيد المراجعة')).length,
+    approved: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'approved', 'موافق عليه')).length,
+    rejected: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'rejected', 'مرفوض')).length,
   };
 
   // دوال مساعدة

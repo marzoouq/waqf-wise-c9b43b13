@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PaymentService, PaymentScheduleResult } from '@/services';
 import { useToast } from '@/hooks/ui/use-toast';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface PaymentSchedule {
   id: string;
@@ -172,7 +173,7 @@ export function useBatchPayments(distributionId?: string) {
   const processAllPending = useCallback(
     async (distId: string) => {
       const pendingSchedules = schedules.filter(
-        (s: PaymentSchedule) => s.distribution_id === distId && s.status === 'scheduled'
+        (s: PaymentSchedule) => s.distribution_id === distId && matchesStatus(s.status, 'scheduled')
       );
 
       if (pendingSchedules.length === 0) {
@@ -202,13 +203,13 @@ export function useBatchPayments(distributionId?: string) {
   const typedSchedules = schedules as PaymentSchedule[];
   const stats = {
     total: typedSchedules.length,
-    scheduled: typedSchedules.filter((s) => s.status === 'scheduled').length,
-    processing: typedSchedules.filter((s) => s.status === 'processing').length,
-    completed: typedSchedules.filter((s) => s.status === 'completed').length,
-    failed: typedSchedules.filter((s) => s.status === 'failed').length,
+    scheduled: typedSchedules.filter((s) => matchesStatus(s.status, 'scheduled')).length,
+    processing: typedSchedules.filter((s) => matchesStatus(s.status, 'processing')).length,
+    completed: typedSchedules.filter((s) => matchesStatus(s.status, 'completed')).length,
+    failed: typedSchedules.filter((s) => matchesStatus(s.status, 'failed')).length,
     totalAmount: typedSchedules.reduce((sum, s) => sum + s.scheduled_amount, 0),
     completedAmount: typedSchedules
-      .filter((s) => s.status === 'completed')
+      .filter((s) => matchesStatus(s.status, 'completed'))
       .reduce((sum, s) => sum + s.scheduled_amount, 0),
   };
 

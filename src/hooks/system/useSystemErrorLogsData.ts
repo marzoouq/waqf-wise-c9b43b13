@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 import { MonitoringService } from "@/services";
 import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from "@/lib/constants";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 
@@ -80,9 +81,9 @@ export function useSystemErrorLogsData() {
   // إحصائيات
   const stats: ErrorStats = {
     total: errorLogs?.length || 0,
-    new: errorLogs?.filter((e) => e.status === "new").length || 0,
-    investigating: errorLogs?.filter((e) => e.status === "investigating").length || 0,
-    resolved: errorLogs?.filter((e) => e.status === "resolved").length || 0,
+    new: errorLogs?.filter((e) => matchesStatus(e.status, 'new')).length || 0,
+    investigating: errorLogs?.filter((e) => matchesStatus(e.status, 'investigating')).length || 0,
+    resolved: errorLogs?.filter((e) => matchesStatus(e.status, 'resolved')).length || 0,
     critical: errorLogs?.filter((e) => e.severity === "critical").length || 0,
   };
 

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DistributionService } from '@/services';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface TransferStatus {
   id: string;
@@ -32,12 +33,12 @@ export function useTransferStatusTracker(transferFileId: string) {
   const typedTransfers = transfers as TransferStatus[];
   const stats = {
     total: typedTransfers.length,
-    completed: typedTransfers.filter(t => t.status === 'completed').length,
-    processing: typedTransfers.filter(t => t.status === 'processing').length,
-    failed: typedTransfers.filter(t => t.status === 'failed').length,
-    pending: typedTransfers.filter(t => t.status === 'pending').length,
+    completed: typedTransfers.filter(t => matchesStatus(t.status, 'completed')).length,
+    processing: typedTransfers.filter(t => matchesStatus(t.status, 'processing')).length,
+    failed: typedTransfers.filter(t => matchesStatus(t.status, 'failed')).length,
+    pending: typedTransfers.filter(t => matchesStatus(t.status, 'pending')).length,
     totalAmount: typedTransfers.reduce((sum, t) => sum + t.amount, 0),
-    completedAmount: typedTransfers.filter(t => t.status === 'completed').reduce((sum, t) => sum + t.amount, 0),
+    completedAmount: typedTransfers.filter(t => matchesStatus(t.status, 'completed')).reduce((sum, t) => sum + t.amount, 0),
   };
 
   const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;

@@ -11,6 +11,7 @@ import { ar } from "date-fns/locale";
 import { BeneficiaryService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import type { HeirDistribution } from "@/types/distributions";
+import { matchesStatus } from "@/lib/constants";
 
 interface Request {
   status: string | null;
@@ -81,7 +82,7 @@ export function useBeneficiaryPersonalReportsData() {
       ? distributions.reduce((sum, d) => sum + Number(d.share_amount), 0) / distributions.length 
       : 0,
     requestsCount: requests.length,
-    approvedRequests: requests.filter(r => r.status === 'approved').length,
+    approvedRequests: requests.filter(r => matchesStatus(r.status, 'approved')).length,
   };
 
   // بيانات المخطط الشهري
@@ -101,9 +102,9 @@ export function useBeneficiaryPersonalReportsData() {
 
   // بيانات حالة الطلبات
   const requestsStatusData: RequestStatusData[] = [
-    { name: 'معتمد', value: requests.filter(r => r.status === 'approved').length },
-    { name: 'قيد المراجعة', value: requests.filter(r => r.status === 'pending').length },
-    { name: 'مرفوض', value: requests.filter(r => r.status === 'rejected').length },
+    { name: 'معتمد', value: requests.filter(r => matchesStatus(r.status, 'approved')).length },
+    { name: 'قيد المراجعة', value: requests.filter(r => matchesStatus(r.status, 'pending')).length },
+    { name: 'مرفوض', value: requests.filter(r => matchesStatus(r.status, 'rejected')).length },
   ].filter(item => item.value > 0);
 
   const refetch = () => {

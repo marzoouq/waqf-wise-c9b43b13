@@ -11,6 +11,7 @@ import { createMutationErrorHandler } from "@/lib/errors";
 import { ApprovalService } from "@/services";
 import { RealtimeService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 export interface RequestApproval {
   id: string;
@@ -86,15 +87,15 @@ export function useRequestApprovals(requestId?: string) {
   });
 
   const checkAllApproved = () => {
-    return approvals.length === 3 && approvals.every((a) => a.status === "موافق");
+    return approvals.length === 3 && approvals.every((a) => matchesStatus(a.status, 'موافق'));
   };
 
   const hasRejection = () => {
-    return approvals.some((a) => a.status === "مرفوض");
+    return approvals.some((a) => matchesStatus(a.status, 'مرفوض'));
   };
 
   const getCurrentLevel = () => {
-    const approvedCount = approvals.filter((a) => a.status === "موافق").length;
+    const approvedCount = approvals.filter((a) => matchesStatus(a.status, 'موافق')).length;
     return approvedCount + 1;
   };
 
