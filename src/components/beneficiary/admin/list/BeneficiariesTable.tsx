@@ -3,6 +3,7 @@ import { MoreVertical, Eye, Edit, FileText, Activity, Key, Trash2 } from "lucide
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { matchesStatus } from "@/lib/constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,7 +108,7 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
         <div className="flex items-center gap-1">
           <Badge
             className={
-              row.status === "نشط"
+              matchesStatus(row.status, 'active')
                 ? "bg-success/10 text-success hover:bg-success/20 border border-success/30 text-xs"
                 : "bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 text-xs"
             }

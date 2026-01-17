@@ -502,6 +502,17 @@ const STATUS_MAPPINGS: Record<string, string[]> = {
   'موافق عليه': ['موافق عليه', 'approved', 'معتمد'],
   'new': ['جديد', 'new'],
   'جديد': ['جديد', 'new'],
+  // System statuses
+  'healthy': ['سليم', 'healthy'],
+  'سليم': ['سليم', 'healthy'],
+  'acknowledged': ['تم الإقرار', 'acknowledged'],
+  'تم الإقرار': ['تم الإقرار', 'acknowledged'],
+  'stopped': ['متوقف', 'stopped'],
+  'متوقف': ['متوقف', 'stopped'],
+  'standby': ['استعداد', 'standby'],
+  'استعداد': ['استعداد', 'standby'],
+  'resolved': ['محلول', 'resolved'],
+  'محلول': ['محلول', 'resolved'],
 };
 
 /**

@@ -9,6 +9,7 @@ import { useTenantContracts } from '@/hooks/tenants/useTenantContracts';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EarlyTerminationDialog } from '@/components/contracts/EarlyTerminationDialog';
 import { ContractReceipts } from '@/components/contracts/ContractReceipts';
+import { matchesStatus } from '@/lib/constants';
 import {
   Collapsible,
   CollapsibleContent,
@@ -94,7 +95,7 @@ export function TenantContracts({ tenantId }: TenantContractsProps) {
             properties: contract.properties || undefined,
           };
 
-          const isActive = contract.status === 'نشط' || contract.status === 'active';
+          const isActive = matchesStatus(contract.status, 'active');
           const isExpanded = expandedContract === contract.id;
 
           return (

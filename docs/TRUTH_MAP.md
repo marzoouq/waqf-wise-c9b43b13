@@ -212,6 +212,11 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | تطبيق `matchesStatus` على 20+ ملف |
 | 2026-01-17 | تحديث ContractService و TrialBalanceService بـ withRetry |
 | 2026-01-17 | تحديث FamiliesStats, RentalPaymentDialog, CreateDistributionDialog, ReportsMenu |
+| 2026-01-17 | **إكمال المرحلة 1**: تحديث 12 ملف إضافي لاستخدام `matchesStatus()` |
+| 2026-01-17 | إضافة حالات النظام إلى STATUS_MAPPINGS: healthy, acknowledged, stopped, standby, resolved |
+| 2026-01-17 | الملفات المحدثة: PropertiesListView, BeneficiariesTable, FamilyMembersDialog, TenantContracts |
+| 2026-01-17 | الملفات المحدثة: CreateMaintenanceRequestDialog, AdminAlertsPanel, SelfHealingToolsPanel |
+| 2026-01-17 | الملفات المحدثة: useAdminAlerts, useBeneficiariesFilters |
 
 ---
 

@@ -5,6 +5,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Building2 } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 
 export function PropertiesListView() {
   const { properties, isLoading, error, refetch } = useProperties();
@@ -37,7 +38,7 @@ export function PropertiesListView() {
               <TableCell>{property.type}</TableCell>
               <TableCell>{property.location}</TableCell>
               <TableCell>
-                <Badge variant={property.status === 'نشط' ? 'default' : 'secondary'}>
+                <Badge variant={matchesStatus(property.status, 'active') ? 'default' : 'secondary'}>
                   {property.status}
                 </Badge>
               </TableCell>

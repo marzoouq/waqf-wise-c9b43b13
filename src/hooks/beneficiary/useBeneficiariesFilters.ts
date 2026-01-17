@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Beneficiary } from "@/types/beneficiary";
 import { SearchCriteria } from "@/components/beneficiary/admin/AdvancedSearchDialog";
 import { safeFilter } from "@/lib/utils/array-safe";
+import { matchesStatus } from "@/lib/constants";
 
 export function useBeneficiariesFilters(
   beneficiaries: Beneficiary[],
@@ -58,8 +59,8 @@ export function useBeneficiariesFilters(
   }, [beneficiaries, searchQuery, advancedCriteria]);
 
   const stats = useMemo(() => {
-    const activeBeneficiaries = safeFilter(beneficiaries, b => b.status === "نشط");
-    const suspendedBeneficiaries = safeFilter(beneficiaries, b => b.status === "معلق");
+    const activeBeneficiaries = safeFilter(beneficiaries, b => matchesStatus(b.status, 'active'));
+    const suspendedBeneficiaries = safeFilter(beneficiaries, b => matchesStatus(b.status, 'suspended'));
     const beneficiariesWithFamily = beneficiaries?.filter(b => b.family_name) || [];
     
     return {
