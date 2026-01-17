@@ -346,7 +346,7 @@ export function formatDisclosureForExport(disclosure: {
   return {
     'السنة المالية': disclosure.year,
     'اسم الوقف': disclosure.waqf_name,
-    'إجمالي الإيرادات': disclosure.total_revenues?.toLocaleString() || '0',
+    'إيرادات السنة المالية': disclosure.total_revenues?.toLocaleString() || '0',
     'إجمالي المصروفات': disclosure.total_expenses?.toLocaleString() || '0',
     'صافي الدخل': disclosure.net_income?.toLocaleString() || '0',
     'حصة الناظر': disclosure.nazer_share?.toLocaleString() || '0',
@@ -383,7 +383,7 @@ export function formatPropertiesForExport(properties: {
     "الحالة": p.status,
     "عدد الوحدات": p.total_units || 0,
     "الوحدات المؤجرة": p.occupied_units || 0,
-    "الإيراد الشهري": p.monthly_revenue || 0,
+    "الإيراد الشهري من العقد": p.monthly_revenue || 0,
   }));
 }
 

@@ -108,7 +108,7 @@ export const PropertyStatsCard = () => {
 
   const revenueStats = [
     {
-      title: "المبلغ المحصل",
+      title: "المحصّل فعلياً",
       value: formatCurrency(totalCollected),
       icon: Wallet,
       variant: "success" as const,
@@ -128,7 +128,7 @@ export const PropertyStatsCard = () => {
       variant: "default" as const,
     },
     {
-      title: "صافي الإيرادات",
+      title: "صافي المحصّل",
       value: formatCurrency(netRevenue),
       subtitle: "بعد الضريبة",
       icon: TrendingUp,

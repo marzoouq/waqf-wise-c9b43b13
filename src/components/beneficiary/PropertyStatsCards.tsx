@@ -92,10 +92,10 @@ export function PropertyStatsCards() {
             الإيرادات المحصلة
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <StatsCard title="المبلغ المحصل" value={formatCurrency(totalCollected)} icon={DollarSign} colorClass="text-success" />
+            <StatsCard title="المحصّل فعلياً" value={formatCurrency(totalCollected)} icon={DollarSign} colorClass="text-success" />
             <StatsCard title="الإيجارات السنوية" value={formatCurrency(totalAnnualCollected)} icon={Receipt} colorClass="text-primary" trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined} />
             <StatsCard title="الإيجارات الشهرية" value={formatCurrency(totalMonthlyCollected)} icon={Receipt} colorClass="text-accent" trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined} />
-            <StatsCard title="صافي الإيرادات" value={formatCurrency(netRevenue)} icon={TrendingUp} colorClass="text-success" trend="بعد الضريبة" />
+            <StatsCard title="صافي المحصّل" value={formatCurrency(netRevenue)} icon={TrendingUp} colorClass="text-success" trend="بعد الضريبة" />
           </div>
         </div>
       ) : (

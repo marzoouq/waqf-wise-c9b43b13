@@ -80,7 +80,7 @@ export function CollectionOverviewCard() {
           <div className="p-3 bg-success/10 rounded-lg border border-success/20">
             <div className="flex items-center gap-2 text-success mb-1">
               <TrendingUp className="h-4 w-4" />
-              <span className="text-xs font-medium">المحصّل</span>
+              <span className="text-xs font-medium">المحصّل فعلياً</span>
             </div>
             <span className="text-lg font-bold text-success">
               {formatCurrency(stats.totalCollected)}
@@ -90,7 +90,7 @@ export function CollectionOverviewCard() {
           <div className="p-3 bg-muted/50 rounded-lg border">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Clock className="h-4 w-4" />
-              <span className="text-xs font-medium">المتوقع</span>
+              <span className="text-xs font-medium">المستحق للفترة</span>
             </div>
             <span className="text-lg font-bold">
               {formatCurrency(stats.totalExpected)}
