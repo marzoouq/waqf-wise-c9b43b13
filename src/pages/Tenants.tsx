@@ -54,7 +54,9 @@ import {
   Phone,
   Mail,
   Banknote,
+  MessageCircle,
 } from 'lucide-react';
+import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import type { Tenant, TenantInsert, TenantWithBalance } from '@/types/tenants';
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
@@ -284,6 +286,18 @@ export default function Tenants() {
                         <Banknote className="h-3 w-3 ms-1" />
                         دفع
                       </Button>
+                      {/* زر واتساب */}
+                      {tenant.phone && (
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <WhatsAppButton
+                            phone={tenant.phone}
+                            tenantName={tenant.full_name}
+                            amount={tenant.current_balance}
+                            variant="icon"
+                            size="sm"
+                          />
+                        </div>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"
@@ -395,6 +409,27 @@ export default function Tenants() {
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
+
+                          {/* زر واتساب */}
+                          {tenant.phone && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div onClick={(e) => e.stopPropagation()}>
+                                    <WhatsAppButton
+                                      phone={tenant.phone}
+                                      tenantName={tenant.full_name}
+                                      amount={tenant.current_balance}
+                                      variant="icon"
+                                    />
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>إرسال واتساب</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                           
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
