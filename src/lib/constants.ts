@@ -264,6 +264,44 @@ export const APPROVAL_STATUS = {
   REJECTED: "rejected",
 } as const;
 
+// Voucher Status - حالات السندات المالية
+export const VOUCHER_STATUS = {
+  DRAFT: "draft",
+  PENDING: "pending",
+  PAID: "paid",
+  CANCELLED: "cancelled",
+  CONFIRMED: "confirmed",
+} as const;
+
+// Voucher Status Labels
+export const VOUCHER_STATUS_LABELS: Record<string, string> = {
+  "draft": "مسودة",
+  "pending": "معلق",
+  "paid": "مدفوع",
+  "cancelled": "ملغي",
+  "confirmed": "مؤكد",
+};
+
+// Approval Workflow Status - حالات سير عمل الموافقات
+export const APPROVAL_WORKFLOW_STATUS = {
+  PENDING: "pending",
+  IN_PROGRESS: "in_progress",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  COMPLETED: "completed",
+  ESCALATED: "escalated",
+} as const;
+
+// Approval Workflow Status Labels
+export const APPROVAL_WORKFLOW_STATUS_LABELS: Record<string, string> = {
+  "pending": "في الانتظار",
+  "in_progress": "قيد المعالجة",
+  "approved": "معتمد",
+  "rejected": "مرفوض",
+  "completed": "مكتمل",
+  "escalated": "مصعّد",
+};
+
 // Fiscal Year Status
 export const FISCAL_YEAR_STATUS = {
   ACTIVE: "نشط",
@@ -431,6 +469,16 @@ export function getJournalEntryStatusLabel(status: string | null | undefined): s
 export function getApprovalStatusLabel(status: string | null | undefined): string {
   if (!status) return "غير محدد";
   return APPROVAL_STATUS_LABELS[status.toLowerCase()] || APPROVAL_STATUS_LABELS[status] || status;
+}
+
+export function getVoucherStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return VOUCHER_STATUS_LABELS[status.toLowerCase()] || VOUCHER_STATUS_LABELS[status] || status;
+}
+
+export function getApprovalWorkflowStatusLabel(status: string | null | undefined): string {
+  if (!status) return "غير محدد";
+  return APPROVAL_WORKFLOW_STATUS_LABELS[status.toLowerCase()] || APPROVAL_WORKFLOW_STATUS_LABELS[status] || status;
 }
 
 // === Status Matching Mappings ===
