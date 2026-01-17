@@ -648,14 +648,18 @@ export type Database = {
           description: string | null
           id: string
           ip_address: string | null
+          metadata: Json | null
           new_values: Json | null
           old_values: Json | null
           record_id: string | null
+          request_id: string | null
+          session_id: string | null
           severity: string | null
           table_name: string | null
           user_agent: string | null
           user_email: string | null
           user_id: string | null
+          user_role: string | null
         }
         Insert: {
           action_type: string
@@ -663,14 +667,18 @@ export type Database = {
           description?: string | null
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           new_values?: Json | null
           old_values?: Json | null
           record_id?: string | null
+          request_id?: string | null
+          session_id?: string | null
           severity?: string | null
           table_name?: string | null
           user_agent?: string | null
           user_email?: string | null
           user_id?: string | null
+          user_role?: string | null
         }
         Update: {
           action_type?: string
@@ -678,14 +686,18 @@ export type Database = {
           description?: string | null
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           new_values?: Json | null
           old_values?: Json | null
           record_id?: string | null
+          request_id?: string | null
+          session_id?: string | null
           severity?: string | null
           table_name?: string | null
           user_agent?: string | null
           user_email?: string | null
           user_id?: string | null
+          user_role?: string | null
         }
         Relationships: []
       }
@@ -14073,6 +14085,48 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs_summary: {
+        Row: {
+          action_type: string | null
+          action_type_ar: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          record_id: string | null
+          severity: string | null
+          severity_ar: string | null
+          table_name: string | null
+          user_email: string | null
+          user_role: string | null
+        }
+        Insert: {
+          action_type?: string | null
+          action_type_ar?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          record_id?: string | null
+          severity?: string | null
+          severity_ar?: never
+          table_name?: string | null
+          user_email?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          action_type?: string | null
+          action_type_ar?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          record_id?: string | null
+          severity?: string | null
+          severity_ar?: never
+          table_name?: string | null
+          user_email?: string | null
+          user_role?: string | null
+        }
+        Relationships: []
+      }
       beneficiaries_by_category: {
         Row: {
           active_count: number | null
@@ -15619,6 +15673,7 @@ export type Database = {
           state: string
         }[]
       }
+      get_current_user_role: { Args: never; Returns: string }
       get_dashboard_stats: {
         Args: never
         Returns: {
@@ -16052,6 +16107,10 @@ export type Database = {
           p_record_id: string
           p_table_name: string
         }
+        Returns: undefined
+      }
+      log_view_access: {
+        Args: { _filters?: Json; _view_name: string }
         Returns: undefined
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
