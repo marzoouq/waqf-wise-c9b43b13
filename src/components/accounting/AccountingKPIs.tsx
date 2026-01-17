@@ -4,6 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useMemo } from "react";
 import type { JournalEntryLine } from "@/types/financial";
+import { matchesStatus } from "@/lib/constants";
 
 interface KPICardProps {
   title: string;
@@ -61,7 +62,7 @@ export function AccountingKPIs() {
     const todayEntries = entries.filter(e => e.entry_date === today);
     
     // إجمالي المدين والدائن من جميع القيود المرحلة
-    const postedEntries = entries.filter(e => e.status === 'posted');
+    const postedEntries = entries.filter(e => matchesStatus(e.status, 'posted'));
     let totalDebit = 0;
     let totalCredit = 0;
     
@@ -75,7 +76,7 @@ export function AccountingKPIs() {
     });
     
     // القيود المعلقة (مسودات)
-    const pendingCount = entries.filter(e => e.status === 'draft').length;
+    const pendingCount = entries.filter(e => matchesStatus(e.status, 'draft')).length;
     
     // حساب الاتجاه (مقارنة بالشهر الماضي)
     const lastMonth = new Date();

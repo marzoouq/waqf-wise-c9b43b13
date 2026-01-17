@@ -481,9 +481,59 @@ export function getApprovalWorkflowStatusLabel(status: string | null | undefined
   return APPROVAL_WORKFLOW_STATUS_LABELS[status.toLowerCase()] || APPROVAL_WORKFLOW_STATUS_LABELS[status] || status;
 }
 
+// Occupancy Status - حالة الإشغال
+export const OCCUPANCY_STATUS = {
+  VACANT: "شاغر",
+  OCCUPIED: "مشغول",
+  MAINTENANCE: "صيانة",
+} as const;
+
+// Ticket Status - حالات التذاكر
+export const TICKET_STATUS = {
+  OPEN: "open",
+  IN_PROGRESS: "in_progress",
+  RESOLVED: "resolved",
+  CLOSED: "closed",
+} as const;
+
+// Transfer Status - حالات التحويلات
+export const TRANSFER_STATUS = {
+  PENDING: "pending",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  FAILED: "failed",
+} as const;
+
+// Distribution Status - حالات التوزيعات
+export const DISTRIBUTION_STATUS = {
+  DRAFT: "draft",
+  PENDING_APPROVAL: "pending_approval",
+  APPROVED: "approved",
+  DISTRIBUTED: "distributed",
+  CANCELLED: "cancelled",
+} as const;
+
+// Disclosure Status - حالات الإفصاحات
+export const DISCLOSURE_STATUS = {
+  DRAFT: "draft",
+  PUBLISHED: "published",
+} as const;
+
+// ZATCA Check Status - حالات فحص ZATCA
+export const ZATCA_CHECK_STATUS = {
+  PASS: "pass",
+  WARNING: "warning",
+  FAIL: "fail",
+} as const;
+
 // === Status Matching Mappings ===
 const STATUS_MAPPINGS: Record<string, string[]> = {
   'active': ['نشط', 'active'],
+  // Occupancy
+  'vacant': ['شاغر', 'vacant', 'available'],
+  'شاغر': ['شاغر', 'vacant', 'available'],
+  'occupied': ['مشغول', 'occupied'],
+  'مشغول': ['مشغول', 'occupied'],
   'نشط': ['نشط', 'active'],
   'inactive': ['غير نشط', 'inactive'],
   'غير نشط': ['غير نشط', 'inactive'],
@@ -498,8 +548,9 @@ const STATUS_MAPPINGS: Record<string, string[]> = {
   'مسودة': ['مسودة', 'draft'],
   'cancelled': ['ملغي', 'cancelled'],
   'ملغي': ['ملغي', 'cancelled'],
-  'approved': ['موافق عليه', 'approved', 'معتمد'],
-  'موافق عليه': ['موافق عليه', 'approved', 'معتمد'],
+  'approved': ['موافق عليه', 'approved', 'معتمد', 'موافق'],
+  'موافق عليه': ['موافق عليه', 'approved', 'معتمد', 'موافق'],
+  'موافق': ['موافق', 'approved', 'معتمد', 'موافق عليه'],
   'new': ['جديد', 'new'],
   'جديد': ['جديد', 'new'],
   // System statuses
@@ -522,10 +573,16 @@ const STATUS_MAPPINGS: Record<string, string[]> = {
   'منفذ': ['منفذ', 'executed'],
   'rejected': ['مرفوض', 'rejected'],
   'مرفوض': ['مرفوض', 'rejected'],
-  'معتمد': ['معتمد', 'approved', 'موافق عليه'],
+  'معتمد': ['معتمد', 'approved', 'موافق عليه', 'موافق'],
+  // Disclosure statuses
+  'published': ['منشور', 'published'],
+  'منشور': ['منشور', 'published'],
   // Emergency aid statuses
   'disbursed': ['صُرف', 'disbursed', 'مصروف'],
   'صُرف': ['صُرف', 'disbursed', 'مصروف'],
+  // Posted statuses
+  'posted': ['مرحّل', 'posted', 'مُرحّل'],
+  'مرحّل': ['مرحّل', 'posted', 'مُرحّل'],
 };
 
 /**

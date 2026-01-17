@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Receipt, CreditCard } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 import type { LucideIcon } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
@@ -30,7 +31,7 @@ export function PaymentApprovalsTab() {
     if (!selectedPayment) return;
 
     const pendingApproval = selectedPayment.payment_approvals?.find(
-      (a) => a.status === "معلق"
+      (a) => matchesStatus(a.status, 'pending')
     );
 
     if (!pendingApproval) return;
@@ -80,7 +81,7 @@ export function PaymentApprovalsTab() {
 
   const getApprovalProgress = (approvals: PaymentApprovalRow[]) => {
     const total = 2;
-    const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
+    const approved = approvals?.filter((a) => matchesStatus(a.status, 'approved')).length || 0;
     return `${approved}/${total}`;
   };
 

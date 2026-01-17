@@ -228,6 +228,12 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | → useSystemMonitoring, useDistributionApprovals, useContractRequests, useContractNotifications |
 | 2026-01-17 | → useRequestApprovals, useBeneficiaryPersonalReportsData, useSystemErrorLogsData, useLoanApprovals |
 | 2026-01-17 | → useMyBeneficiaryRequests, useCollectionStats, useTransferStatusTracker, usePaymentVouchersData, useBatchPayments |
+| 2026-01-17 | **المرحلة 6 مكتملة**: فحص الثوابت - تم إضافة وتحديث: |
+| 2026-01-17 | → ثوابت جديدة: OCCUPANCY_STATUS, TICKET_STATUS, TRANSFER_STATUS, DISTRIBUTION_STATUS |
+| 2026-01-17 | → ثوابت جديدة: DISCLOSURE_STATUS, ZATCA_CHECK_STATUS |
+| 2026-01-17 | → تحديث STATUS_MAPPINGS: إضافة occupied/vacant/published/posted/موافق |
+| 2026-01-17 | → المكونات المحدثة: PropertyAccordionView, ViewJournalEntryDialog, AccountingKPIs |
+| 2026-01-17 | → المكونات المحدثة: PaymentApprovalsTab, DistributionApprovalsTab, EnhancedDisclosuresTab |
 ---
 
 ## 9. إحصائيات النظام الحالية

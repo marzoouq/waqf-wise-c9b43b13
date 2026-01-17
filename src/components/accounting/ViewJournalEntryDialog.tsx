@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Printer, CheckCircle, UserCheck } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import ApprovalDialog from "./ApprovalDialog";
 import {
@@ -48,7 +49,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
   };
 
   const handlePost = () => {
-    if (entry.status === "draft") {
+    if (matchesStatus(entry.status, 'draft')) {
       postEntry();
       onOpenChange(false);
     }
@@ -149,13 +150,13 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
             <Printer className="h-4 w-4 ms-2" />
             طباعة
           </Button>
-          {entry.status === "posted" && (
+          {matchesStatus(entry.status, 'posted') && (
             <Button variant="secondary" onClick={() => setIsApprovalDialogOpen(true)}>
               <UserCheck className="h-4 w-4 ms-2" />
               طلب موافقة
             </Button>
           )}
-          {entry.status === "draft" && (
+          {matchesStatus(entry.status, 'draft') && (
             <Button onClick={handlePost} disabled={isPosting}>
               <CheckCircle className="h-4 w-4 ms-2" />
               ترحيل القيد
