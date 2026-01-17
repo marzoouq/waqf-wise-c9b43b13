@@ -1,0 +1,46 @@
+{
+  "budgets": {
+    "javascript": {
+      "initial": "250KB",
+      "total": "500KB",
+      "vendor": "200KB",
+      "perChunk": "100KB"
+    },
+    "css": {
+      "total": "100KB",
+      "critical": "14KB"
+    },
+    "images": {
+      "maxSize": "200KB",
+      "totalPage": "1MB",
+      "formats": ["avif", "webp", "jpg", "png"]
+    },
+    "fonts": {
+      "total": "100KB",
+      "perFont": "50KB"
+    },
+    "metrics": {
+      "firstContentfulPaint": "1.5s",
+      "largestContentfulPaint": "2.5s",
+      "timeToInteractive": "3s",
+      "cumulativeLayoutShift": 0.1,
+      "firstInputDelay": "100ms",
+      "totalBlockingTime": "200ms"
+    },
+    "limits": {
+      "maxApiCalls": 10,
+      "maxRerenders": 3,
+      "maxDOMNodes": 1500,
+      "maxJSHeapSize": "50MB"
+    }
+  },
+  "thresholds": {
+    "warning": 0.8,
+    "error": 1.0
+  },
+  "monitoring": {
+    "enabled": true,
+    "sampleRate": 0.1,
+    "reportEndpoint": "/api/performance"
+  }
+}
