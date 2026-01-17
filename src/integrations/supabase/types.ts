@@ -14979,6 +14979,30 @@ export type Database = {
         }
         Relationships: []
       }
+      waqf_branding_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          show_logo_in_pdf: boolean | null
+          updated_at: string | null
+          waqf_logo_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          show_logo_in_pdf?: boolean | null
+          updated_at?: string | null
+          waqf_logo_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          show_logo_in_pdf?: boolean | null
+          updated_at?: string | null
+          waqf_logo_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       analyze_table: { Args: { p_table_name: string }; Returns: undefined }

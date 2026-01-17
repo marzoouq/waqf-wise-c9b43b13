@@ -26,14 +26,26 @@ export const useWaqfBranding = () => {
   const { data: branding, isLoading } = useQuery({
     queryKey: ["waqf-branding"],
     queryFn: async () => {
+      // محاولة الوصول للجدول الكامل (للموظفين المصرح لهم فقط)
       const { data, error } = await supabase
         .from("waqf_branding")
         .select("*")
         .limit(1)
         .maybeSingle();
 
-      if (error) throw error;
-      return data as WaqfBranding | null;
+      // إذا نجح الوصول، أرجع البيانات الكاملة
+      if (!error && data) {
+        return data as WaqfBranding;
+      }
+
+      // للمستخدمين غير المصرح لهم، استخدم الـ View العامة (بدون التوقيع/الختم)
+      const { data: publicData } = await supabase
+        .from("waqf_branding_public")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+      return publicData as Partial<WaqfBranding> | null;
     },
   });
 
