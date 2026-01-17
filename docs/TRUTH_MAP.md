@@ -219,6 +219,9 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | الملفات المحدثة: useAdminAlerts, useBeneficiariesFilters |
 | 2026-01-17 | **إكمال الفحص النهائي للمرحلة 1**: WaqfUnitDetailsDialog, system.service, monitoring.service |
 | 2026-01-17 | **المرحلة 2 مكتملة**: فحص 8 لوحات تحكم - جميعها تستخدم useUnifiedKPIs و Realtime hooks |
+| 2026-01-17 | **المرحلة 3 مكتملة**: فحص الصفحات الداخلية - تم تحديث 8 صفحات: |
+| 2026-01-17 | → EmergencyAidManagement, AllTransactions, Loans, Support |
+| 2026-01-17 | → GovernanceDecisions, Invoices + إضافة حالات الحوكمة للثوابت |
 
 ---
 

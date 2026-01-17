@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { matchesStatus } from "@/lib/constants";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { AlertCircle, Clock, CheckCircle, XCircle, Edit, Trash2, MoreVertical, Eye } from "lucide-react";
 import { useEmergencyAid } from "@/hooks/beneficiary/useEmergencyAid";
@@ -28,9 +29,9 @@ export default function EmergencyAidManagement() {
 
   const stats = {
     total: emergencyAids.length,
-    pending: emergencyAids.filter(a => a.status === 'pending').length,
-    approved: emergencyAids.filter(a => a.status === 'approved').length,
-    disbursed: emergencyAids.filter(a => a.status === 'disbursed').length,
+    pending: emergencyAids.filter(a => matchesStatus(a.status, 'pending')).length,
+    approved: emergencyAids.filter(a => matchesStatus(a.status, 'approved')).length,
+    disbursed: emergencyAids.filter(a => matchesStatus(a.status, 'disbursed')).length,
     totalAmount: emergencyAids.reduce((sum, a) => sum + a.amount, 0),
   };
 
