@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { type AppRole, getDashboardForRoles } from '@/types/roles';
+import { nationalIdToEmail, validateNationalId } from '@/lib/beneficiaryAuth';
 
 // ✅ CSS Critical inline - لا يحتاج استيراد خارجي
 const criticalStyles = {
@@ -137,20 +138,16 @@ export default function LoginLight() {
     try {
       let email = identifier;
       
-      // إذا كان مستفيد، نحتاج جلب البريد الإلكتروني من رقم الهوية
+      // ✅ تحويل رقم الهوية مباشرة للبريد بدون استعلام قاعدة البيانات
+      // هذا يتجنب مشكلة RLS التي تمنع القراءة قبل المصادقة
       if (loginType === 'beneficiary') {
-        const { data, error: lookupError } = await supabase
-          .from('beneficiaries')
-          .select('email')
-          .eq('national_id', identifier)
-          .eq('can_login', true)
-          .single();
+        const cleanedNationalId = identifier.trim().replace(/[^0-9]/g, '');
         
-        if (lookupError || !data?.email) {
-          throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول');
+        if (!validateNationalId(cleanedNationalId)) {
+          throw new Error('رقم الهوية يجب أن يكون 10 أرقام بالضبط');
         }
         
-        email = data.email;
+        email = nationalIdToEmail(cleanedNationalId);
       }
 
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -162,7 +159,7 @@ export default function LoginLight() {
         const msg = signInError.message.toLowerCase();
         if (msg.includes('invalid_credentials') || msg.includes('invalid login credentials')) {
           throw new Error(loginType === 'beneficiary' 
-            ? 'رقم الهوية أو كلمة المرور غير صحيحة'
+            ? 'رقم الهوية أو كلمة المرور غير صحيحة. إذا استمرت المشكلة بعد تغيير كلمة المرور، تواصل مع الإدارة'
             : 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
         }
         if (msg.includes('email not confirmed')) {
