@@ -15809,6 +15809,7 @@ export type Database = {
     }
     Functions: {
       analyze_table: { Args: { p_table_name: string }; Returns: undefined }
+      archive_old_audit_logs: { Args: { months_old?: number }; Returns: number }
       archive_old_notifications: { Args: never; Returns: number }
       assign_user_role: {
         Args: {

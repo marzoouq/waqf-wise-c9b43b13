@@ -42,18 +42,25 @@ export const QUERY_CONFIG = {
   // ==================== الإعدادات الأساسية ====================
   DEFAULT: {
     staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
+    gcTime: 5 * 60 * 1000, // ✅ إضافة gcTime لمنع تراكم الذاكرة
+    refetchOnWindowFocus: false, // ✅ تغيير لتقليل الطلبات الزائدة
     refetchOnMount: true,
+    retry: 2,
   },
   
   REALTIME: {
     staleTime: 30 * 1000, // 30 seconds
-    refetchOnWindowFocus: true,
+    gcTime: 2 * 60 * 1000, // ✅ إضافة gcTime
+    refetchOnWindowFocus: true, // البيانات الحية تحتاج تحديث
+    retry: 1,
   },
   
   STATIC: {
     staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // ✅ إضافة gcTime
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // ✅ البيانات الثابتة لا تحتاج تحديث عند التحميل
+    retry: 2,
   },
 
   // ==================== لوحات التحكم ====================
@@ -61,7 +68,7 @@ export const QUERY_CONFIG = {
     staleTime: 2 * 60 * 1000, // 2 minutes - للتحديث السريع
     gcTime: 5 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000, // تحديث كل 5 دقائق
-    refetchOnWindowFocus: true, // تحديث عند العودة للنافذة
+    refetchOnWindowFocus: true, // تحديث عند العودة للنافذة - مهم للوحات التحكم
     retry: 2,
   },
   
@@ -78,7 +85,7 @@ export const QUERY_CONFIG = {
     staleTime: 2 * 60 * 1000, // 2 minutes - للتقارير
     gcTime: 10 * 60 * 1000,
     refetchInterval: false as const, // يدوي فقط
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false, // ✅ التقارير لا تحتاج تحديث تلقائي
     retry: 2,
   },
 
@@ -87,7 +94,7 @@ export const QUERY_CONFIG = {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
     refetchInterval: false as const, // Disabled - manual refetch on user action
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true, // الموافقات مهمة - تحتاج تحديث
     retry: 2,
   },
   
@@ -95,7 +102,7 @@ export const QUERY_CONFIG = {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
     refetchInterval: false as const, // Disabled
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true, // التنبيهات مهمة - تحتاج تحديث
     retry: 2,
   },
 
@@ -104,7 +111,7 @@ export const QUERY_CONFIG = {
     staleTime: CACHE_TIMES.STATIC, // 1 hour
     gcTime: CACHE_TIMES.STATIC * 2,
     refetchInterval: false as const, // Disabled
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false, // ✅ الرسوم لا تتغير كثيراً
     retry: 1,
   },
   
@@ -112,7 +119,7 @@ export const QUERY_CONFIG = {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
     refetchInterval: false as const, // Disabled
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false, // ✅ الأنشطة لا تحتاج تحديث فوري
     retry: 2,
   },
 
@@ -121,7 +128,7 @@ export const QUERY_CONFIG = {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
     refetchInterval: false as const, // Disabled
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false, // ✅ تقليل الطلبات
     retry: 2,
   },
   
@@ -130,6 +137,34 @@ export const QUERY_CONFIG = {
     gcTime: CACHE_TIMES.STATIC * 2,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    retry: 2,
+  },
+
+  // ==================== إعدادات جديدة ====================
+  /** للبيانات المرجعية (المدن، الفئات، إلخ) */
+  REFERENCE_DATA: {
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 3,
+  },
+
+  /** للقوائم الكبيرة مع pagination */
+  PAGINATED_LIST: {
+    staleTime: CACHE_TIMES.STANDARD, // 5 minutes
+    gcTime: CACHE_TIMES.STANDARD * 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    retry: 2,
+  },
+
+  /** للبيانات الحساسة (موافقات، صلاحيات) */
+  SENSITIVE: {
+    staleTime: 1 * 60 * 1000, // 1 minute
+    gcTime: 3 * 60 * 1000,
+    refetchOnWindowFocus: true, // مهم للبيانات الحساسة
+    refetchOnMount: true,
     retry: 2,
   },
 } as const;

@@ -33,23 +33,26 @@ import { UpdateNotification } from "./components/shared/UpdateNotification";
 const ProtectedApp = lazy(() => import("./components/layout/ProtectedApp"));
 
 // Configure QueryClient
+// ✅ تحسين إعدادات QueryClient - المرحلة 10
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: true,
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      gcTime: 5 * 60 * 1000, // ✅ تقليل لتحسين الذاكرة
+      refetchOnWindowFocus: false, // ✅ تعطيل لتقليل الطلبات الزائدة
       refetchOnReconnect: true,
       refetchOnMount: true,
       structuralSharing: true,
       networkMode: 'online',
       retry: (failureCount, error: unknown) => {
         const errorObj = error && typeof error === 'object' ? error as { status?: number; message?: string } : {};
-        if (errorObj.status === 404 || errorObj.status === 403) return false;
+        // لا تعيد المحاولة لأخطاء المصادقة والصلاحيات
+        if (errorObj.status === 401 || errorObj.status === 403 || errorObj.status === 404) return false;
         if (errorObj.message?.includes('auth') || errorObj.message?.includes('credentials')) return false;
-        return failureCount < 3;
+        if (errorObj.message?.includes('RLS') || errorObj.message?.includes('policy')) return false;
+        return failureCount < 2; // ✅ تقليل عدد المحاولات من 3 إلى 2
       },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 4000),
+      retryDelay: (attemptIndex) => Math.min(500 * 2 ** attemptIndex, 3000), // ✅ تسريع التأخير
     },
     mutations: {
       retry: false,
