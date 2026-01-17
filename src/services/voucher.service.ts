@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from '@/lib/constants';
 
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
 type PaymentVoucher = Database['public']['Tables']['payment_vouchers']['Row'];
@@ -195,7 +196,7 @@ export class VoucherService {
         .eq("id", voucherId)
         .maybeSingle();
 
-      if (voucher?.status === "paid") {
+      if (matchesStatus(voucher?.status, 'paid')) {
         throw new Error("لا يمكن حذف سند مدفوع");
       }
 

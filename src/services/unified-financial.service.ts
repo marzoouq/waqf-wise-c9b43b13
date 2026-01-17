@@ -9,6 +9,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from '@/lib/logger/production-logger';
+import { matchesStatus } from '@/lib/constants';
 
 // ==================== Types ====================
 
@@ -260,7 +261,7 @@ export class UnifiedFinancialService {
       );
 
       const approvedDistributions = allDistributions
-        .filter(d => d.status === 'approved' || d.status === 'completed')
+        .filter(d => matchesStatus(d.status, 'approved', 'completed'))
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
 
       const beneficiaryDistributions = heirDistributionsRes.data?.reduce(

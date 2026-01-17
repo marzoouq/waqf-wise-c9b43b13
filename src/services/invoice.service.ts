@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from '@/lib/constants';
 
 type Invoice = Database['public']['Tables']['invoices']['Row'];
 type InvoiceInsert = Database['public']['Tables']['invoices']['Insert'];
@@ -125,7 +126,7 @@ export class InvoiceService {
     
     if (!invoice) throw new Error('الفاتورة غير موجودة');
     
-    if (invoice.status === 'paid') {
+    if (matchesStatus(invoice.status, 'paid')) {
       throw new Error('لا يمكن حذف فاتورة مدفوعة');
     }
     
@@ -157,7 +158,7 @@ export class InvoiceService {
     const invoices = data || [];
     return {
       total: invoices.length,
-      paid: invoices.filter(i => i.status === 'paid').length,
+      paid: invoices.filter(i => matchesStatus(i.status, 'paid')).length,
       totalAmount: invoices.reduce((s, i) => s + (i.total_amount || 0), 0),
     };
   }

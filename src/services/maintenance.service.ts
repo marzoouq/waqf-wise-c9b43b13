@@ -5,7 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { MAINTENANCE_OPEN_STATUSES } from "@/lib/constants";
+import { MAINTENANCE_OPEN_STATUSES, matchesStatus } from "@/lib/constants";
 import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['Row'];
@@ -77,7 +77,7 @@ export class MaintenanceService {
     return {
       total: requests.length,
       pending: requests.filter(r => openStatuses.includes(r.status as typeof MAINTENANCE_OPEN_STATUSES[number])).length,
-      completed: requests.filter(r => r.status === 'مكتمل').length,
+      completed: requests.filter(r => matchesStatus(r.status, 'completed')).length,
       totalCost: requests.reduce((s, r) => s + (r.actual_cost || 0), 0),
     };
   }
@@ -295,7 +295,7 @@ export class MaintenanceService {
       const cost = Number(req.actual_cost || req.estimated_cost || 0);
       propertyData[propertyId].total_cost += cost;
       const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
-      if (req.status === 'مكتمل') {
+      if (matchesStatus(req.status, 'completed')) {
         propertyData[propertyId].completed_count += 1;
       } else if (openStatuses.includes(req.status as typeof MAINTENANCE_OPEN_STATUSES[number])) {
         propertyData[propertyId].pending_count += 1;
