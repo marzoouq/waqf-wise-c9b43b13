@@ -66,12 +66,16 @@ interface FinancialSummary {
   distributionsCount: number;
 }
 
+// أنواع التقارير السريعة
+type QuickReportType = 'monthly' | 'annual' | 'pending' | null;
+
 export function FinancialReportsTab() {
   const { settings, isLoading: settingsLoading } = useVisibilitySettings();
   const { beneficiaryId, isLoading: beneficiaryLoading } = useBeneficiaryId();
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
   const [selectedReport, setSelectedReport] = useState<ReportTemplate | null>(null);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [quickReportType, setQuickReportType] = useState<QuickReportType>(null);
 
   // جلب قوالب التقارير من قاعدة البيانات
   const { data: templates = [], isLoading: templatesLoading } = useQuery({
@@ -107,7 +111,7 @@ export function FinancialReportsTab() {
     enabled: !!settings?.show_financial_reports
   });
 
-  // جلب ملخص مالي للمستفيد
+  // جلب ملخص مالي للمستفيد مع تفاصيل التوزيعات الشهرية
   const { data: financialSummary, isLoading: summaryLoading } = useQuery({
     queryKey: ['beneficiary-financial-summary', beneficiaryId],
     queryFn: async () => {
@@ -136,6 +140,64 @@ export function FinancialReportsTab() {
       } as FinancialSummary;
     },
     enabled: !!beneficiaryId && !!settings?.show_financial_reports
+  });
+
+  // جلب تفاصيل التوزيعات الشهرية (آخر 12 شهر)
+  const { data: monthlyDistributions = [] } = useQuery({
+    queryKey: ['beneficiary-monthly-distributions', beneficiaryId],
+    queryFn: async () => {
+      if (!beneficiaryId) return [];
+
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+      const { data, error } = await supabase
+        .from('heir_distributions')
+        .select('id, share_amount, distribution_date, heir_type, notes')
+        .eq('beneficiary_id', beneficiaryId)
+        .gte('distribution_date', oneYearAgo.toISOString())
+        .order('distribution_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!beneficiaryId && quickReportType === 'monthly'
+  });
+
+  // جلب ملخص السنة الحالية
+  const { data: annualSummary } = useQuery({
+    queryKey: ['beneficiary-annual-summary', beneficiaryId],
+    queryFn: async () => {
+      if (!beneficiaryId) return null;
+
+      const currentYear = new Date().getFullYear();
+      const startOfYear = `${currentYear}-01-01`;
+      const endOfYear = `${currentYear}-12-31`;
+
+      const { data, error } = await supabase
+        .from('heir_distributions')
+        .select('share_amount, distribution_date, heir_type')
+        .eq('beneficiary_id', beneficiaryId)
+        .gte('distribution_date', startOfYear)
+        .lte('distribution_date', endOfYear);
+
+      if (error) throw error;
+
+      const total = data?.reduce((sum, d) => sum + (d.share_amount || 0), 0) || 0;
+      const byType: Record<string, number> = {};
+      data?.forEach(d => {
+        const type = d.heir_type || 'أخرى';
+        byType[type] = (byType[type] || 0) + (d.share_amount || 0);
+      });
+
+      return {
+        year: currentYear,
+        totalAmount: total,
+        distributionsCount: data?.length || 0,
+        byType
+      };
+    },
+    enabled: !!beneficiaryId && quickReportType === 'annual'
   });
 
   // توليد PDF للإفصاح السنوي
@@ -438,7 +500,7 @@ export function FinancialReportsTab() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => toast.info(`جاري فتح ${report.name}...`)}
+                  onClick={() => setQuickReportType(report.id as QuickReportType)}
                 >
                   <Eye className="h-4 w-4 ms-2" />
                   عرض
@@ -480,6 +542,114 @@ export function FinancialReportsTab() {
                   </Badge>
                 </div>
               </div>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog للتقارير السريعة */}
+      <Dialog open={!!quickReportType} onOpenChange={() => setQuickReportType(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {quickReportType === 'monthly' && <TrendingUp className="h-5 w-5" />}
+              {quickReportType === 'annual' && <Calendar className="h-5 w-5" />}
+              {quickReportType === 'pending' && <DollarSign className="h-5 w-5" />}
+              {quickReportType === 'monthly' && 'ملخص التوزيعات الشهرية'}
+              {quickReportType === 'annual' && 'الملخص السنوي'}
+              {quickReportType === 'pending' && 'المبالغ المعلقة'}
+            </DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 p-4">
+              {/* محتوى التوزيعات الشهرية */}
+              {quickReportType === 'monthly' && (
+                <div className="space-y-4">
+                  <div className="text-center py-4 border-b">
+                    <p className="text-lg font-bold text-primary">
+                      آخر 12 شهر
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      عدد التوزيعات: {monthlyDistributions.length}
+                    </p>
+                  </div>
+                  {monthlyDistributions.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <TrendingDown className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>لا توجد توزيعات خلال الفترة الماضية</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {monthlyDistributions.map((dist) => (
+                        <div key={dist.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div>
+                            <p className="font-medium">{dist.heir_type}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(dist.distribution_date), 'dd MMMM yyyy', { locale: ar })}
+                            </p>
+                          </div>
+                          <span className="font-bold text-primary">
+                            {dist.share_amount?.toLocaleString('ar-SA')} ر.س
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* محتوى الملخص السنوي */}
+              {quickReportType === 'annual' && (
+                <div className="space-y-4">
+                  <div className="text-center py-4 border-b">
+                    <p className="text-lg font-bold text-primary">
+                      سنة {annualSummary?.year || new Date().getFullYear()}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-primary/10 rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground">إجمالي المستلم</p>
+                      <p className="text-2xl font-bold text-primary">
+                        {(annualSummary?.totalAmount || 0).toLocaleString('ar-SA')} ر.س
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground">عدد التوزيعات</p>
+                      <p className="text-2xl font-bold">
+                        {annualSummary?.distributionsCount || 0}
+                      </p>
+                    </div>
+                  </div>
+                  {annualSummary?.byType && Object.keys(annualSummary.byType).length > 0 && (
+                    <div className="space-y-2">
+                      <p className="font-medium">توزيع حسب النوع:</p>
+                      {Object.entries(annualSummary.byType).map(([type, amount]) => (
+                        <div key={type} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                          <span>{type}</span>
+                          <span className="font-bold">{amount.toLocaleString('ar-SA')} ر.س</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* محتوى المبالغ المعلقة */}
+              {quickReportType === 'pending' && (
+                <div className="space-y-4">
+                  <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-lg text-center">
+                    <DollarSign className="h-12 w-12 mx-auto mb-4 text-amber-600" />
+                    <p className="text-sm text-muted-foreground mb-2">المبالغ في انتظار الصرف</p>
+                    <p className="text-3xl font-bold text-amber-600">
+                      {(financialSummary?.pendingAmount || 0).toLocaleString('ar-SA')} ر.س
+                    </p>
+                  </div>
+                  <div className="text-sm text-muted-foreground text-center">
+                    <p>هذه المبالغ قيد المعالجة وسيتم صرفها قريباً</p>
+                    <p>في حال وجود استفسار، يرجى التواصل مع الإدارة</p>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
         </DialogContent>
