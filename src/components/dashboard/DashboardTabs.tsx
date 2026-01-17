@@ -24,6 +24,7 @@ const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJou
 const VouchersStatsCard = lazy(() => import("@/components/dashboard/VouchersStatsCard").then(m => ({ default: m.VouchersStatsCard })));
 const PropertyStatsCard = lazy(() => import("@/components/dashboard/PropertyStatsCard").then(m => ({ default: m.PropertyStatsCard })));
 const ExpiringContractsCard = lazy(() => import("@/components/dashboard/ExpiringContractsCard").then(m => ({ default: m.ExpiringContractsCard })));
+const UpcomingPaymentsCard = lazy(() => import("@/components/dashboard/UpcomingPaymentsCard").then(m => ({ default: m.UpcomingPaymentsCard })));
 
 interface DashboardTabsProps {
   onOpenBeneficiaryDialog: () => void;
@@ -95,9 +96,13 @@ export function DashboardTabs({
               <ExpiringContractsCard />
             </Suspense>
             <Suspense fallback={<ChartSkeleton />}>
-              <IntegratedReportsWidget />
+              <UpcomingPaymentsCard />
             </Suspense>
           </div>
+
+          <Suspense fallback={<ChartSkeleton />}>
+            <IntegratedReportsWidget />
+          </Suspense>
 
           <Suspense fallback={<ChartSkeleton />}>
             <QuickActions

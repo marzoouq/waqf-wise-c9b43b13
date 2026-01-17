@@ -12,8 +12,9 @@ interface WhatsAppButtonProps {
   tenantName: string;
   amount?: number;
   daysRemaining?: number;
-  variant?: "icon" | "button";
+  variant?: "icon" | "button" | "ghost";
   size?: "sm" | "default";
+  showLabel?: boolean;
 }
 
 const formatPhoneNumber = (phone: string): string => {
@@ -91,6 +92,7 @@ export function WhatsAppButton({
   daysRemaining = 0,
   variant = "icon",
   size = "default",
+  showLabel = true,
 }: WhatsAppButtonProps) {
   if (!phone) return null;
 
@@ -138,7 +140,41 @@ export function WhatsAppButton({
             className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
           >
             <MessageCircle className="h-4 w-4 ms-2" />
-            واتساب
+            {showLabel && "واتساب"}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem onClick={handleReminderMessage}>
+            <Clock className="h-4 w-4 ms-2 text-blue-500" />
+            تذكير بالدفعة
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOverdueMessage}>
+            <AlertTriangle className="h-4 w-4 ms-2 text-destructive" />
+            تنبيه تأخير
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleThankYouMessage}>
+            <Heart className="h-4 w-4 ms-2 text-green-500" />
+            شكر على الدفع
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCustomMessage}>
+            <Send className="h-4 w-4 ms-2 text-muted-foreground" />
+            رسالة مخصصة
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  if (variant === "ghost") {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size={size}
+            className="text-green-600 hover:text-green-700 hover:bg-green-100"
+          >
+            <MessageCircle className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
