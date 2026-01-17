@@ -210,10 +210,29 @@ export const DISTRIBUTION_CONFIG = {
 
 // Maintenance Status
 export const MAINTENANCE_STATUS = {
+  NEW: "جديد",
   PENDING: "معلق",
+  IN_REVIEW: "قيد المراجعة",
   IN_PROGRESS: "قيد التنفيذ",
   COMPLETED: "مكتمل",
   CANCELLED: "ملغي",
+} as const;
+
+// Maintenance Open Statuses - الحالات المفتوحة للصيانة (مصدر حقيقة موحد)
+export const MAINTENANCE_OPEN_STATUSES = [
+  "جديد", "معلق", "قيد المراجعة", "قيد التنفيذ"
+] as const;
+
+// Maintenance Closed Statuses - الحالات المغلقة للصيانة
+export const MAINTENANCE_CLOSED_STATUSES = [
+  "مكتمل", "ملغي"
+] as const;
+
+// Collection Source - مصدر التحصيل الرسمي
+export const COLLECTION_SOURCE = {
+  TABLE: 'payment_vouchers',
+  TYPE: 'receipt',
+  STATUS: 'paid'
 } as const;
 
 // Unit Status

@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database } from '@/integrations/supabase/types';
+import { MAINTENANCE_OPEN_STATUSES, COLLECTION_SOURCE } from '@/lib/constants';
 
 type PropertyRow = Database['public']['Tables']['properties']['Row'];
 
@@ -110,7 +111,7 @@ export class PropertyStatsService {
         supabase.from("properties").select("*"),
         supabase.from("property_units").select("*"),
         supabase.from("contracts").select("*").eq("status", "نشط"),
-        supabase.from("maintenance_requests").select("*").in("status", ["معلق", "قيد التنفيذ"]),
+        supabase.from("maintenance_requests").select("*").in("status", [...MAINTENANCE_OPEN_STATUSES]),
         supabase.from("fiscal_years").select("*").eq("is_active", true).maybeSingle(),
       ]);
 
@@ -125,16 +126,17 @@ export class PropertyStatsService {
       const maintenance = maintenanceResult.data;
       const fiscalYear = fiscalYearResult.data;
 
-      // جلب المدفوعات الفعلية
+      // جلب المدفوعات الفعلية من سندات القبض (مصدر الحقيقة الموحد)
       let paymentsQuery = supabase
-        .from("rental_payments")
-        .select("amount_paid, tax_amount, net_amount")
-        .eq("status", "مدفوع");
+        .from(COLLECTION_SOURCE.TABLE)
+        .select("amount")
+        .eq("voucher_type", COLLECTION_SOURCE.TYPE)
+        .eq("status", COLLECTION_SOURCE.STATUS);
 
       if (fiscalYear) {
         paymentsQuery = paymentsQuery
-          .gte("payment_date", fiscalYear.start_date)
-          .lte("payment_date", fiscalYear.end_date);
+          .gte("created_at", fiscalYear.start_date)
+          .lte("created_at", fiscalYear.end_date);
       }
 
       const { data: payments, error: paymentsError } = await paymentsQuery;
@@ -173,9 +175,10 @@ export class PropertyStatsService {
       const vacantUnits = Math.max(0, totalUnits - occupiedUnits);
       const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
-      const totalCollected = payments?.reduce((sum, p) => sum + (Number(p.amount_paid) || 0), 0) || 0;
-      const totalTax = payments?.reduce((sum, p) => sum + (Number(p.tax_amount) || 0), 0) || 0;
-      const totalNetRevenue = payments?.reduce((sum, p) => sum + (Number(p.net_amount) || 0), 0) || 0;
+      // حساب إجمالي المحصّل من سندات القبض
+      const totalCollected = payments?.reduce((sum, p) => sum + (Number((p as { amount: number }).amount) || 0), 0) || 0;
+      const totalTax = 0; // يمكن حسابها لاحقاً من بيانات الضريبة
+      const totalNetRevenue = totalCollected; // الصافي = المحصل (بدون ضريبة حالياً)
 
       // حساب الإيراد السنوي المتوقع من العقود النشطة (مصدر الحقيقة الموحد)
       const expectedAnnualRevenue = contracts?.reduce((sum, c) => {

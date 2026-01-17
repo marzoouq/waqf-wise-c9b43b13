@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { MAINTENANCE_OPEN_STATUSES } from "@/lib/constants";
 
 type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['Row'];
 type MaintenanceRequestInsert = Database['public']['Tables']['maintenance_requests']['Insert'];
@@ -71,9 +72,10 @@ export class MaintenanceService {
 
   static async getStats() {
     const requests = await this.getRequests();
+    const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
     return {
       total: requests.length,
-      pending: requests.filter(r => r.status === 'معلق').length,
+      pending: requests.filter(r => openStatuses.includes(r.status as typeof MAINTENANCE_OPEN_STATUSES[number])).length,
       completed: requests.filter(r => r.status === 'مكتمل').length,
       totalCost: requests.reduce((s, r) => s + (r.actual_cost || 0), 0),
     };
@@ -291,9 +293,10 @@ export class MaintenanceService {
 
       const cost = Number(req.actual_cost || req.estimated_cost || 0);
       propertyData[propertyId].total_cost += cost;
+      const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
       if (req.status === 'مكتمل') {
         propertyData[propertyId].completed_count += 1;
-      } else if (req.status === 'معلق') {
+      } else if (openStatuses.includes(req.status as typeof MAINTENANCE_OPEN_STATUSES[number])) {
         propertyData[propertyId].pending_count += 1;
       }
     });

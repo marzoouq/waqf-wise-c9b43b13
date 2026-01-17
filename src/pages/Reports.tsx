@@ -18,7 +18,7 @@ import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceRep
 import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedger";
 import { AgingReport } from "@/components/reports/AgingReport";
 import { ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
-import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck } from "lucide-react";
+import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck, FileStack, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
@@ -76,7 +76,7 @@ const Reports = () => {
        <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-3 lg:grid-cols-8 gap-1">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-5 lg:grid-cols-10 gap-1">
               <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">لوحة التحكم</span>
@@ -101,6 +101,16 @@ const Reports = () => {
                 <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">العقارات</span>
                 <span className="sm:hidden">عقار</span>
+              </TabsTrigger>
+              <TabsTrigger value="contracts" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <FileStack className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">العقود</span>
+                <span className="sm:hidden">عقد</span>
+              </TabsTrigger>
+              <TabsTrigger value="maintenance" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">الصيانة</span>
+                <span className="sm:hidden">صيانة</span>
               </TabsTrigger>
               <TabsTrigger value="financial" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -137,7 +147,14 @@ const Reports = () => {
 
           <TabsContent value="properties" className="space-y-6">
             <PropertiesReports />
+          </TabsContent>
+
+          <TabsContent value="contracts" className="space-y-6">
             <ContractsReport />
+          </TabsContent>
+
+          <TabsContent value="maintenance" className="space-y-6">
+            <MaintenanceCostReport />
           </TabsContent>
 
           <TabsContent value="financial" className="space-y-6">
@@ -172,11 +189,10 @@ const Reports = () => {
           <TabsContent value="analysis" className="space-y-6">
             <Tabs defaultValue="accounting" className="space-y-4">
               <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 h-auto">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
                   <TabsTrigger value="accounting" className="text-xs sm:text-sm px-2 sm:px-3 py-2">الربط المحاسبي</TabsTrigger>
                   <TabsTrigger value="distributions" className="text-xs sm:text-sm px-2 sm:px-3 py-2">تحليل التوزيعات</TabsTrigger>
                   <TabsTrigger value="loans" className="text-xs sm:text-sm px-2 sm:px-3 py-2">أعمار الديون</TabsTrigger>
-                  <TabsTrigger value="maintenance" className="text-xs sm:text-sm px-2 sm:px-3 py-2">تكاليف الصيانة</TabsTrigger>
                   <TabsTrigger value="ledger" className="text-xs sm:text-sm px-2 sm:px-3 py-2">دفتر الأستاذ</TabsTrigger>
                 </TabsList>
               </div>
@@ -194,10 +210,6 @@ const Reports = () => {
                   <LoansAgingReport />
                   <AgingReport />
                 </div>
-              </TabsContent>
-
-              <TabsContent value="maintenance">
-                <MaintenanceCostReport />
               </TabsContent>
 
               <TabsContent value="ledger">
