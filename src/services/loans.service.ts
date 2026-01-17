@@ -2,10 +2,12 @@
  * Loans Service - خدمة القروض
  * 
  * إدارة القروض والأقساط والسداد
+ * @version 1.1.0 - مع دعم matchesStatus
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from "@/lib/constants";
 
 type Loan = Database['public']['Tables']['loans']['Row'];
 type LoanInsert = Database['public']['Tables']['loans']['Insert'];
@@ -203,7 +205,7 @@ export class LoansService {
       i.status === 'معلق' && i.due_date < today
     ).length;
 
-    const activeLoans = loans.filter(l => l.status === 'نشط').length;
+    const activeLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
     const totalAmount = loans.reduce((sum, l) => sum + (l.loan_amount || 0), 0);
 
     return {

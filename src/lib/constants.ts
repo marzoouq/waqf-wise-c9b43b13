@@ -49,12 +49,18 @@ export const LOAN_STATUS = {
   DEFAULTED: "متعثر",
 } as const;
 
-// Tenant Status
+// Tenant Status - مع دعم ثنائي اللغة
 export const TENANT_STATUS = {
   ACTIVE: "نشط",
+  ACTIVE_EN: "active",
   INACTIVE: "غير نشط",
+  INACTIVE_EN: "inactive",
   SUSPENDED: "معلق",
+  SUSPENDED_EN: "suspended",
 } as const;
+
+// قائمة الحالات النشطة للمستأجرين (للفلاتر)
+export const TENANT_ACTIVE_STATUSES = ["نشط", "active"] as const;
 
 // Family Status
 export const FAMILY_STATUS = {
@@ -431,8 +437,11 @@ export function getApprovalStatusLabel(status: string | null | undefined): strin
 const STATUS_MAPPINGS: Record<string, string[]> = {
   'active': ['نشط', 'active'],
   'نشط': ['نشط', 'active'],
+  'inactive': ['غير نشط', 'inactive'],
+  'غير نشط': ['غير نشط', 'inactive'],
+  'suspended': ['معلق', 'suspended'],
   'pending': ['معلق', 'pending', 'قيد المراجعة'],
-  'معلق': ['معلق', 'pending', 'قيد المراجعة'],
+  'معلق': ['معلق', 'pending', 'قيد المراجعة', 'suspended'],
   'completed': ['مكتمل', 'completed', 'paid', 'مدفوع'],
   'مكتمل': ['مكتمل', 'completed', 'paid', 'مدفوع'],
   'paid': ['مدفوع', 'paid', 'مكتمل', 'completed'],
@@ -443,6 +452,8 @@ const STATUS_MAPPINGS: Record<string, string[]> = {
   'ملغي': ['ملغي', 'cancelled'],
   'approved': ['موافق عليه', 'approved', 'معتمد'],
   'موافق عليه': ['موافق عليه', 'approved', 'معتمد'],
+  'new': ['جديد', 'new'],
+  'جديد': ['جديد', 'new'],
 };
 
 /**

@@ -1,10 +1,12 @@
 /**
  * KPI Service - خدمة مؤشرات الأداء
+ * @version 2.1.0 - مع دعم matchesStatus و withRetry
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS } from "@/lib/constants";
+import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS, matchesStatus, TENANT_ACTIVE_STATUSES } from "@/lib/constants";
 import { productionLogger } from '@/lib/logger/production-logger';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -96,20 +98,15 @@ export const KPIService = {
     const vouchers = vouchersRes.data || [];
     const requests = requestsRes.data || [];
 
-    const activeBeneficiaries = beneficiaries.filter(b => b.status === BENEFICIARY_STATUS.ACTIVE).length;
+    // استخدام matchesStatus للمقارنة الآمنة
+    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
     // العقارات النشطة = المؤجرة بالكامل + الجزئية (بها وحدات مؤجرة)
     const occupiedProperties = properties.filter(p => 
-      p.status === PROPERTY_STATUS.RENTED || 
-      p.status === PROPERTY_STATUS.PARTIAL ||
-      p.status === 'مؤجر' || 
-      p.status === 'جزئي'
+      matchesStatus(p.status, PROPERTY_STATUS.RENTED) ||
+      matchesStatus(p.status, PROPERTY_STATUS.PARTIAL)
     ).length;
-    const activeContracts = contracts.filter(c => 
-      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
-    ).length;
-    const activeLoans = loans.filter(l => 
-      l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
-    ).length;
+    const activeContracts = contracts.filter(c => matchesStatus(c.status, 'active')).length;
+    const activeLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
     const totalLoansAmount = loans.reduce((sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)), 0);
     
     // حساب إجمالي التحصيل من دفعات الإيجار + سندات القبض
@@ -117,9 +114,7 @@ export const KPIService = {
     const vouchersTotal = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
     const totalPayments = rentalPaymentsTotal + vouchersTotal;
     
-    const pendingRequests = requests.filter(r => 
-      r.status === REQUEST_STATUS.PENDING || r.status === 'pending'
-    ).length;
+    const pendingRequests = requests.filter(r => matchesStatus(r.status, 'pending')).length;
 
     return {
       beneficiaries: {
@@ -179,9 +174,8 @@ export const KPIService = {
 
     const beneficiaries = beneficiariesResult.data || [];
     const totalBeneficiaries = beneficiaries.length;
-    const activeBeneficiaries = beneficiaries.filter(b => 
-      b.status === BENEFICIARY_STATUS.ACTIVE || b.status === 'active'
-    ).length;
+    // استخدام matchesStatus للمقارنة الآمنة بين العربي والإنجليزي
+    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
 
     const totalFamilies = familiesResult.data?.length || 0;
 
@@ -189,17 +183,12 @@ export const KPIService = {
     const totalProperties = properties.length;
     // ✅ تصحيح: العقارات النشطة تشمل "نشط" و "مؤجر"
     const activeProperties = properties.filter(p => 
-      p.status === PROPERTY_STATUS.ACTIVE || 
-      p.status === 'active' ||
-      p.status === 'مؤجر' ||
-      p.status === PROPERTY_STATUS.RENTED
+      matchesStatus(p.status, 'active') || matchesStatus(p.status, 'مؤجر')
     ).length;
 
     const contracts = contractsResult.data || [];
     // ✅ تصحيح: حساب العقارات المشغولة = عدد العقود النشطة
-    const activeContracts = contracts.filter(c => 
-      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'نشط'
-    );
+    const activeContracts = contracts.filter(c => matchesStatus(c.status, 'active'));
     const occupiedProperties = activeContracts.length;
     
     const monthlyReturn = activeContracts
@@ -220,15 +209,11 @@ export const KPIService = {
     const activeFunds = funds.filter(f => f.is_active).length;
 
     const requests = requestsResult.data || [];
-    const pendingRequests = requests.filter(r => 
-      r.status === REQUEST_STATUS.PENDING || r.status === 'pending'
-    ).length;
+    const pendingRequests = requests.filter(r => matchesStatus(r.status, 'pending')).length;
     const overdueRequests = requests.filter(r => r.is_overdue).length;
 
     const loans = loansResult.data || [];
-    const pendingLoans = loans.filter(l => 
-      l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
-    ).length;
+    const pendingLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
 
     const rentalPayments = paymentsResult.data || [];
     const completedPayments = rentalPayments.filter(p => p.status === 'مدفوع');

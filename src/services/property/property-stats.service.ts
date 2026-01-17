@@ -1,12 +1,14 @@
 /**
  * Property Stats Service - خدمة إحصائيات العقارات
  * @description حسابات وإحصائيات العقارات
+ * @version 2.1.0 - مع دعم matchesStatus و withRetry
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database } from '@/integrations/supabase/types';
-import { MAINTENANCE_OPEN_STATUSES, COLLECTION_SOURCE } from '@/lib/constants';
+import { MAINTENANCE_OPEN_STATUSES, COLLECTION_SOURCE, matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 
 type PropertyRow = Database['public']['Tables']['properties']['Row'];
 
@@ -155,7 +157,7 @@ export class PropertyStatsService {
       if (expiringError) throw expiringError;
 
       const totalProperties = properties?.length || 0;
-      const activeProperties = properties?.filter(p => p.status === "نشط" || p.status === "active").length || 0;
+      const activeProperties = properties?.filter(p => matchesStatus(p.status, 'نشط', 'active')).length || 0;
       
       const totalUnits = units?.length || 0;
       

@@ -1,10 +1,12 @@
 /**
  * Tenant Service - خدمة المستأجرين
- * @version 2.7.0
+ * @version 2.8.0 - مع دعم Retry و matchesStatus
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus, TENANT_ACTIVE_STATUSES } from "@/lib/constants";
+import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 type Tenant = Database['public']['Tables']['tenants']['Row'];
 type TenantInsert = Database['public']['Tables']['tenants']['Insert'];
@@ -91,8 +93,11 @@ export class TenantService {
   }
 
   static async getStats() {
-    const tenants = await this.getAll();
-    return { total: tenants.length, active: tenants.filter(t => t.status === 'نشط' || t.status === 'active').length };
+    const tenants = await withRetry(() => this.getAll(), SUPABASE_RETRY_OPTIONS);
+    return { 
+      total: tenants.length, 
+      active: tenants.filter(t => matchesStatus(t.status, 'active')).length 
+    };
   }
 
   static async delete(id: string): Promise<void> {
