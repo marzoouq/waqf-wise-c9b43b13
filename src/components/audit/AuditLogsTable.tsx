@@ -47,6 +47,8 @@ import { usePagination } from "@/hooks/ui/usePagination";
 import { AuditLogDetailsDialog } from "./AuditLogDetailsDialog";
 import { AuditStatsCards } from "./AuditStatsCards";
 import { AuditAlertsCard } from "./AuditAlertsCard";
+import { AuditDashboardCharts } from "./AuditDashboardCharts";
+import { AuditCategoryFilter, CATEGORY_TABLES } from "./AuditCategoryFilter";
 import { cn } from "@/lib/utils";
 
 const severityConfig: Record<string, { label: string; icon: typeof Info; color: string }> = {
@@ -88,10 +90,18 @@ export function AuditLogsTable() {
   const [filters, setFilters] = useState<EnhancedAuditFilters>({});
   const [selectedLog, setSelectedLog] = useState<EnhancedAuditLog | null>(null);
   const [showFilters, setShowFilters] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: logs = [], isLoading, error, refetch, isFetching } = useAuditLogsEnhanced(filters);
   const { data: availableTables = [] } = useAuditLogTables();
   const { data: availableUsers = [] } = useAuditLogUsers();
+
+  // فلترة السجلات حسب الفئة - يجب أن تكون قبل usePagination
+  const filteredLogs = useMemo(() => {
+    if (!selectedCategory) return logs;
+    const categoryTables = CATEGORY_TABLES[selectedCategory] || [];
+    return logs.filter(log => categoryTables.includes(log.table_name || ""));
+  }, [logs, selectedCategory]);
 
   const {
     paginatedData,
@@ -107,7 +117,7 @@ export function AuditLogsTable() {
     canGoPrev,
     startIndex,
     endIndex,
-  } = usePagination(logs, {
+  } = usePagination(filteredLogs, {
     initialPageSize: 20,
     pageSizeOptions: [10, 20, 50, 100],
   });
@@ -120,10 +130,10 @@ export function AuditLogsTable() {
   }, [filters.startDate, filters.endDate]);
 
   const exportLogs = () => {
-    if (!logs || logs.length === 0) return;
+    if (!filteredLogs || filteredLogs.length === 0) return;
 
     const csvHeaders = ["التاريخ", "المستخدم", "الدور", "نوع العملية", "الجدول", "الوصف", "الخطورة"];
-    const csvData = logs.map(log => [
+    const csvData = filteredLogs.map(log => [
       format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss"),
       log.user_email || "-",
       log.user_role || "-",
@@ -143,9 +153,10 @@ export function AuditLogsTable() {
 
   const clearFilters = () => {
     setFilters({});
+    setSelectedCategory(null);
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v);
+  const hasActiveFilters = Object.values(filters).some(v => v) || selectedCategory;
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجلات التدقيق..." />;
@@ -163,8 +174,17 @@ export function AuditLogsTable() {
 
   return (
     <div className="space-y-6">
+      {/* الرسوم البيانية */}
+      <AuditDashboardCharts />
+
       {/* الإحصائيات */}
       <AuditStatsCards dateRange={dateRange} />
+
+      {/* فلاتر الفئات */}
+      <AuditCategoryFilter 
+        selectedCategory={selectedCategory} 
+        onCategoryChange={setSelectedCategory} 
+      />
 
       {/* التنبيهات + الفلاتر */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
