@@ -210,6 +210,8 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | فحص شامل لـ 56 Edge Function - سليمة |
 | 2026-01-17 | فحص RLS - 10 سياسات مفتوحة (مقبولة) |
 | 2026-01-17 | تطبيق `matchesStatus` على 20+ ملف |
+| 2026-01-17 | تحديث ContractService و TrialBalanceService بـ withRetry |
+| 2026-01-17 | تحديث FamiliesStats, RentalPaymentDialog, CreateDistributionDialog, ReportsMenu |
 
 ---
 

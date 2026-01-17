@@ -1,10 +1,12 @@
 /**
  * Trial Balance Service - خدمة ميزان المراجعة
  * ميزان المراجعة ودفتر الأستاذ والقوائم المالية
+ * @version 2.0.1 - إضافة withRetry للاستعلامات الحرجة
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 import type { Database } from '@/integrations/supabase/types';
 
 type AccountRow = Database['public']['Tables']['accounts']['Row'];
@@ -59,13 +61,15 @@ export class TrialBalanceService {
    */
   static async getFinancialSummary(): Promise<FinancialSummary> {
     try {
-      const { data: accounts, error } = await supabase
-        .from('accounts')
-        .select('account_type, current_balance')
-        .eq('is_active', true)
-        .eq('is_header', false);
-
-      if (error) throw error;
+      const { data: accounts, error } = await withRetry(async () => {
+        const result = await supabase
+          .from('accounts')
+          .select('account_type, current_balance')
+          .eq('is_active', true)
+          .eq('is_header', false);
+        if (result.error) throw result.error;
+        return result;
+      }, SUPABASE_RETRY_OPTIONS);
 
       const summary: FinancialSummary = {
         totalAssets: 0,

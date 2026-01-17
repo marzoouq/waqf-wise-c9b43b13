@@ -1,11 +1,12 @@
 /**
  * Contract Service - خدمة العقود
- * @version 2.9.11 - إضافة الأرشفة التلقائية
+ * @version 2.9.12 - إضافة matchesStatus و withRetry
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { CONTRACT_STATUS } from "@/lib/constants";
+import { CONTRACT_STATUS, matchesStatus } from "@/lib/constants";
+import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 import type { PaginatedResponse, PaginationParams } from "@/lib/pagination.types";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
 import { archiveDocument, pdfToBlob } from "@/lib/archiveDocument";
@@ -252,12 +253,12 @@ export class ContractService {
   }
 
   static async getStats() {
-    const contracts = await this.getAll();
+    const contracts = await withRetry(() => this.getAll(), SUPABASE_RETRY_OPTIONS);
     return {
       total: contracts.length,
-      active: contracts.filter(c => c.status === CONTRACT_STATUS.ACTIVE).length,
-      expired: contracts.filter(c => c.status === 'منتهي').length,
-      totalRent: contracts.filter(c => c.status === CONTRACT_STATUS.ACTIVE).reduce((s, c) => s + (c.monthly_rent || 0), 0),
+      active: contracts.filter(c => matchesStatus(c.status, 'active')).length,
+      expired: contracts.filter(c => matchesStatus(c.status, 'expired')).length,
+      totalRent: contracts.filter(c => matchesStatus(c.status, 'active')).reduce((s, c) => s + (c.monthly_rent || 0), 0),
     };
   }
 
