@@ -1,9 +1,8 @@
 import { useState, useMemo } from "react";
-import { Search, Printer, Edit, Trash2, FileText, ExternalLink } from "lucide-react";
+import { Search } from "lucide-react";
 import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
@@ -14,6 +13,13 @@ import { usePrint } from "@/hooks/ui/usePrint";
 import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
 import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
 import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert";
+import { ContractActionsMenu } from "@/components/contracts/ContractActionsMenu";
+import { UnitHandoverDialog } from "@/components/contracts/UnitHandoverDialog";
+import { ContractNotificationDialog } from "@/components/contracts/ContractNotificationDialog";
+import { CancelAutoRenewDialog } from "@/components/contracts/CancelAutoRenewDialog";
+import { RentAdjustmentDialog } from "@/components/contracts/RentAdjustmentDialog";
+import { UnilateralTerminationDialog } from "@/components/contracts/UnilateralTerminationDialog";
+import { EarlyTerminationDialog } from "@/components/contracts/EarlyTerminationDialog";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
@@ -55,6 +61,15 @@ export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [printContract, setPrintContract] = useState<Contract | null>(null);
+  
+  // حالات الحوارات الجديدة
+  const [handoverContract, setHandoverContract] = useState<Contract | null>(null);
+  const [notificationContract, setNotificationContract] = useState<Contract | null>(null);
+  const [cancelAutoRenewContract, setCancelAutoRenewContract] = useState<Contract | null>(null);
+  const [rentAdjustmentContract, setRentAdjustmentContract] = useState<Contract | null>(null);
+  const [rentAdjustmentType, setRentAdjustmentType] = useState<'increase' | 'decrease'>('increase');
+  const [terminationRequestContract, setTerminationRequestContract] = useState<Contract | null>(null);
+  const [earlyTerminationContract, setEarlyTerminationContract] = useState<Contract | null>(null);
   
   const { 
     contracts, 
@@ -335,46 +350,21 @@ export const ContractsTab = ({ onEdit }: Props) => {
         loading={isLoading}
         emptyMessage="لا توجد عقود"
         actions={(contract: Contract) => (
-          <div className="flex gap-1">
-            {contract.ejar_document_url && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.open(contract.ejar_document_url, '_blank')}
-                title="عرض عقد إيجار"
-                className="hover:bg-success/10 text-success"
-              >
-                <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handlePrintContract(contract)}
-              title="طباعة"
-              className="hover:bg-primary/10"
-            >
-              <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit(contract)}
-              title="تعديل"
-              className="hover:bg-primary/10"
-            >
-              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => handleDelete(contract.id, contract.contract_number)}
-              title="حذف"
-            >
-              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-          </div>
+          <ContractActionsMenu
+            contract={contract}
+            onPrint={handlePrintContract}
+            onEdit={onEdit}
+            onDelete={(c) => handleDelete(c.id, c.contract_number)}
+            onHandover={setHandoverContract}
+            onSendNotification={setNotificationContract}
+            onCancelAutoRenew={setCancelAutoRenewContract}
+            onUnilateralTermination={setTerminationRequestContract}
+            onRentAdjustment={(c, type) => {
+              setRentAdjustmentContract(c);
+              setRentAdjustmentType(type);
+            }}
+            onEarlyTermination={setEarlyTerminationContract}
+          />
         )}
         showMobileScrollHint={true}
       />
@@ -432,6 +422,39 @@ export const ContractsTab = ({ onEdit }: Props) => {
           const data = handleBulkExport();
           toast.success(`تم تجهيز ${data.length} عقد للتصدير`);
         }}
+      />
+
+      {/* الحوارات الجديدة */}
+      <UnitHandoverDialog
+        open={!!handoverContract}
+        onOpenChange={(open) => !open && setHandoverContract(null)}
+        contract={handoverContract}
+      />
+      <ContractNotificationDialog
+        open={!!notificationContract}
+        onOpenChange={(open) => !open && setNotificationContract(null)}
+        contract={notificationContract}
+      />
+      <CancelAutoRenewDialog
+        open={!!cancelAutoRenewContract}
+        onOpenChange={(open) => !open && setCancelAutoRenewContract(null)}
+        contract={cancelAutoRenewContract}
+      />
+      <RentAdjustmentDialog
+        open={!!rentAdjustmentContract}
+        onOpenChange={(open) => !open && setRentAdjustmentContract(null)}
+        contract={rentAdjustmentContract}
+        adjustmentType={rentAdjustmentType}
+      />
+      <UnilateralTerminationDialog
+        open={!!terminationRequestContract}
+        onOpenChange={(open) => !open && setTerminationRequestContract(null)}
+        contract={terminationRequestContract}
+      />
+      <EarlyTerminationDialog
+        open={!!earlyTerminationContract}
+        onOpenChange={(open) => !open && setEarlyTerminationContract(null)}
+        contract={earlyTerminationContract}
       />
     </div>
   );
