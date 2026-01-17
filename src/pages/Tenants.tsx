@@ -41,6 +41,7 @@ import { TenantDialog } from '@/components/tenants/TenantDialog';
 import { QuickPaymentDialog } from '@/components/tenants/QuickPaymentDialog';
 import { useTenants } from '@/hooks/property/useTenants';
 import { formatCurrency } from '@/lib/utils';
+import { matchesStatus } from '@/lib/constants';
 import { ExportButton } from '@/components/shared/ExportButton';
 import {
   Users,
@@ -186,7 +187,7 @@ export default function Tenants() {
               <div>
                 <p className="text-sm text-muted-foreground">المستأجرين النشطين</p>
                 <p className="text-2xl font-bold">
-                  {tenants.filter((t) => t.status === 'نشط' || t.status === 'active').length}
+                  {tenants.filter((t) => matchesStatus(t.status, 'active')).length}
                 </p>
               </div>
               <Building className="h-8 w-8 text-status-success" />

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
+import { matchesStatus } from "@/lib/constants";
 
 interface SimulationResult {
   beneficiary_id: string;
@@ -58,7 +59,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
   const [results, setResults] = useState<SimulationResult[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  const activeBeneficiaries = beneficiaries.filter(b => b.status === 'نشط');
+  const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
 
   const runSimulation = () => {
     if (totalAmount <= 0) {

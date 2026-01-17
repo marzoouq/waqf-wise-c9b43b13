@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Edit, Trash2, Eye, Users } from 'lucide-react';
 import { Family } from '@/types';
+import { matchesStatus } from '@/lib/constants';
 
 type FamilyWithHead = Family & {
   head_of_family?: {
@@ -52,7 +53,7 @@ export const FamilyMobileCard = memo(({
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-sm truncate">{family.family_name}</h3>
                 <Badge
-                  variant={family.status === 'نشط' ? 'default' : 'secondary'}
+                  variant={matchesStatus(family.status, 'active') ? 'default' : 'secondary'}
                   className="text-xs shrink-0"
                 >
                   {family.status}

@@ -5,6 +5,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Users, User, Crown } from 'lucide-react';
 import { useFamilyTree } from '@/hooks/beneficiary/useBeneficiaryProfileData';
+import { matchesStatus } from '@/lib/constants';
 
 interface ProfileFamilyTreeProps {
   beneficiaryId: string;
@@ -108,7 +109,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                     </div>
                   </div>
 
-                  <Badge variant={member.status === 'نشط' ? 'default' : 'secondary'}>
+                  <Badge variant={matchesStatus(member.status, 'active') ? 'default' : 'secondary'}>
                     {member.status}
                   </Badge>
                 </div>

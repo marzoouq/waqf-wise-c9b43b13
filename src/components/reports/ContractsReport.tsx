@@ -3,6 +3,7 @@
  * يعرض تقرير شامل لجميع العقود مع إحصائيات
  */
 import { memo } from "react";
+import { matchesStatus } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, AlertTriangle } from "lucide-react";
@@ -156,8 +157,8 @@ export const ContractsReport = memo(function ContractsReport() {
                     <TableCell>
                       <Badge
                         variant={
-                          contract.status === "نشط" ? "default" :
-                          contract.status === "منتهي" ? "secondary" : "outline"
+                          matchesStatus(contract.status, 'active') ? "default" :
+                          matchesStatus(contract.status, 'expired') ? "secondary" : "outline"
                         }
                       >
                         {contract.status}
