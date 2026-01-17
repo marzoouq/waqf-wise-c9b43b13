@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { matchesStatus } from "@/lib/constants";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 
@@ -70,13 +71,13 @@ export class MonitoringService {
     return {
       totalErrors: errorsResult.count || 0,
       unresolvedErrors:
-        errorsResult.data?.filter((e) => e.status === "new").length || 0,
+        errorsResult.data?.filter((e) => matchesStatus(e.status, 'new')).length || 0,
       criticalErrors:
         errorsResult.data?.filter((e) => e.severity === "critical").length || 0,
       activeAlerts:
-        alertsResult.data?.filter((a) => a.status === "active").length || 0,
+        alertsResult.data?.filter((a) => matchesStatus(a.status, 'active')).length || 0,
       healthyChecks:
-        healthResult.data?.filter((h) => h.status === "healthy").length || 0,
+        healthResult.data?.filter((h) => matchesStatus(h.status, 'healthy')).length || 0,
       totalHealthChecks: healthResult.count || 0,
       successfulFixes: resolvedErrors,
       totalFixAttempts: resolvedErrors > 0 ? resolvedErrors : 1,

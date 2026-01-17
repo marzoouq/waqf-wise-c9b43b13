@@ -217,6 +217,8 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | الملفات المحدثة: PropertiesListView, BeneficiariesTable, FamilyMembersDialog, TenantContracts |
 | 2026-01-17 | الملفات المحدثة: CreateMaintenanceRequestDialog, AdminAlertsPanel, SelfHealingToolsPanel |
 | 2026-01-17 | الملفات المحدثة: useAdminAlerts, useBeneficiariesFilters |
+| 2026-01-17 | **إكمال الفحص النهائي للمرحلة 1**: WaqfUnitDetailsDialog, system.service, monitoring.service |
+| 2026-01-17 | **المرحلة 2 مكتملة**: فحص 8 لوحات تحكم - جميعها تستخدم useUnifiedKPIs و Realtime hooks |
 
 ---
 

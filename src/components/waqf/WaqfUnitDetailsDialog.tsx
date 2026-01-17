@@ -404,7 +404,7 @@ export function WaqfUnitDetailsDialog({
                           <TableCell>
                             <Badge
                               variant={
-                                property.status === "نشط"
+                                matchesStatus(property.status, 'active')
                                   ? "default"
                                   : "secondary"
                               }
