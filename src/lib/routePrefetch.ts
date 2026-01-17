@@ -1,78 +1,114 @@
 /**
  * Route Prefetching Utilities
  * تحميل مسبق للمسارات لتحسين الأداء
- * v2.9.33 - محسّن مع Network Information API
+ * 
+ * @version 2.0.0 - تحسينات المرحلة الثالثة
+ * - Smart Prefetching based on user behavior
+ * - Network-aware prefetching
+ * - Priority-based loading
+ * - Cache management with TTL
  */
 
 import { useEffect, useCallback } from 'react';
+import { shouldDeferHeavyOperations, getNetworkInfo } from '@/lib/network-utils';
+import { productionLogger } from '@/lib/logger/production-logger';
 
-// قائمة المسارات المهمة للتحميل المسبق
+// قائمة المسارات المهمة للتحميل المسبق مع الأولويات
 const PREFETCH_ROUTES = {
-  dashboard: () => import('@/pages/Dashboard'),
-  nazer: () => import('@/pages/NazerDashboard'),
-  beneficiary: () => import('@/pages/BeneficiaryPortal'),
-  properties: () => import('@/pages/Properties'),
-  beneficiaries: () => import('@/pages/Beneficiaries'),
-  accounting: () => import('@/pages/Accounting'),
-  payments: () => import('@/pages/Payments'),
-  reports: () => import('@/pages/Reports'),
+  // أولوية عالية - يُحمّل فوراً
+  dashboard: { loader: () => import('@/pages/Dashboard'), priority: 'high' as const },
+  nazer: { loader: () => import('@/pages/NazerDashboard'), priority: 'high' as const },
+  beneficiary: { loader: () => import('@/pages/BeneficiaryPortal'), priority: 'high' as const },
+  
+  // أولوية متوسطة - يُحمّل عند الخمول
+  properties: { loader: () => import('@/pages/Properties'), priority: 'medium' as const },
+  beneficiaries: { loader: () => import('@/pages/Beneficiaries'), priority: 'medium' as const },
+  accounting: { loader: () => import('@/pages/Accounting'), priority: 'medium' as const },
+  
+  // أولوية منخفضة - يُحمّل فقط على اتصالات سريعة
+  payments: { loader: () => import('@/pages/Payments'), priority: 'low' as const },
+  reports: { loader: () => import('@/pages/Reports'), priority: 'low' as const },
 } as const;
 
 type RouteKey = keyof typeof PREFETCH_ROUTES;
+type Priority = 'high' | 'medium' | 'low';
 
-// تخزين المسارات المحملة
-const loadedRoutes = new Set<RouteKey>();
+// تخزين المسارات المحملة مع TTL
+interface CachedRoute {
+  loadedAt: number;
+  priority: Priority;
+}
 
-// التحقق من سرعة الاتصال
-function shouldPrefetch(): boolean {
-  // لا تحمّل مسبقاً على الاتصالات البطيئة
-  if ('connection' in navigator) {
-    const connection = (navigator as Navigator & { 
-      connection?: { 
-        effectiveType?: string; 
-        saveData?: boolean 
-      } 
-    }).connection;
-    
-    if (connection?.saveData) return false;
-    if (connection?.effectiveType === '2g' || connection?.effectiveType === 'slow-2g') {
-      return false;
-    }
+const loadedRoutes = new Map<RouteKey, CachedRoute>();
+const CACHE_TTL = 10 * 60 * 1000; // 10 دقائق
+
+/**
+ * التحقق مما إذا كان يجب تحميل المسار مسبقاً
+ */
+function shouldPrefetch(priority: Priority): boolean {
+  const { isOnline, isSlowConnection, saveData, downlink } = getNetworkInfo();
+  
+  // لا تحمّل إذا كنا offline أو في وضع توفير البيانات
+  if (!isOnline || saveData) return false;
+  
+  // على الاتصالات البطيئة، حمّل فقط الأولوية العالية
+  if (isSlowConnection) {
+    return priority === 'high';
   }
+  
+  // على الاتصالات المتوسطة (أقل من 1.5 Mbps)
+  if (downlink < 1.5) {
+    return priority !== 'low';
+  }
+  
   return true;
+}
+
+/**
+ * التحقق مما إذا كان المسار مُحمّل ولم تنته صلاحيته
+ */
+function isCached(route: RouteKey): boolean {
+  const cached = loadedRoutes.get(route);
+  if (!cached) return false;
+  
+  return Date.now() - cached.loadedAt < CACHE_TTL;
 }
 
 /**
  * تحميل مسبق لمسار معين
  */
 export function prefetchRoute(route: RouteKey): void {
-  if (loadedRoutes.has(route)) return;
-  if (!shouldPrefetch()) return;
+  // التحقق من الـ cache
+  if (isCached(route)) return;
   
-  const loader = PREFETCH_ROUTES[route];
-  if (loader) {
-    // تحميل في الخلفية عند الخمول
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(
-        () => {
-          loader().then(() => {
-            loadedRoutes.add(route);
-          }).catch(() => {
-            // تجاهل أخطاء التحميل المسبق
-          });
-        },
-        { timeout: 2000 }
-      );
-    } else {
-      // fallback للمتصفحات القديمة
-      setTimeout(() => {
-        loader().then(() => {
-          loadedRoutes.add(route);
-        }).catch(() => {
-          // تجاهل أخطاء التحميل المسبق
+  const routeConfig = PREFETCH_ROUTES[route];
+  if (!routeConfig) return;
+  
+  // التحقق من إمكانية التحميل
+  if (!shouldPrefetch(routeConfig.priority)) return;
+  
+  const executePrefetch = () => {
+    routeConfig.loader()
+      .then(() => {
+        loadedRoutes.set(route, {
+          loadedAt: Date.now(),
+          priority: routeConfig.priority,
         });
-      }, 100);
-    }
+        productionLogger.debug(`Prefetched route: ${route}`);
+      })
+      .catch(() => {
+        // تجاهل أخطاء التحميل المسبق
+      });
+  };
+
+  // تحميل في الخلفية عند الخمول
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(executePrefetch, { 
+      timeout: routeConfig.priority === 'high' ? 1000 : 3000 
+    });
+  } else {
+    // fallback للمتصفحات القديمة
+    setTimeout(executePrefetch, routeConfig.priority === 'high' ? 50 : 200);
   }
 }
 
@@ -80,9 +116,16 @@ export function prefetchRoute(route: RouteKey): void {
  * تحميل مسبق لعدة مسارات
  */
 export function prefetchRoutes(routes: RouteKey[]): void {
-  routes.forEach((route, index) => {
+  // ترتيب حسب الأولوية
+  const sortedRoutes = [...routes].sort((a, b) => {
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[PREFETCH_ROUTES[a].priority] - priorityOrder[PREFETCH_ROUTES[b].priority];
+  });
+
+  sortedRoutes.forEach((route, index) => {
     // تأخير تدريجي لتجنب إغراق الشبكة
-    setTimeout(() => prefetchRoute(route), index * 200);
+    const delay = index * (shouldDeferHeavyOperations() ? 500 : 150);
+    setTimeout(() => prefetchRoute(route), delay);
   });
 }
 
@@ -103,7 +146,7 @@ export function usePrefetchOnHover(route: RouteKey) {
 export function useRolePrefetch(role?: string) {
   useEffect(() => {
     if (!role) return;
-    if (!shouldPrefetch()) return;
+    if (!shouldPrefetch('medium')) return;
 
     // تأخير لضمان تحميل الصفحة الحالية أولاً
     const timer = setTimeout(() => {
@@ -124,7 +167,7 @@ export function useRolePrefetch(role?: string) {
         default:
           prefetchRoutes(['dashboard']);
       }
-    }, 3000); // زيادة التأخير لتحسين الأداء الأولي
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [role]);
@@ -134,7 +177,7 @@ export function useRolePrefetch(role?: string) {
  * تحميل مسبق للمسارات الشائعة
  */
 export function prefetchCommonRoutes(): void {
-  if (!shouldPrefetch()) return;
+  if (!shouldPrefetch('low')) return;
   
   if ('requestIdleCallback' in window) {
     window.requestIdleCallback(

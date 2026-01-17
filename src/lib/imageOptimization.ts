@@ -6,9 +6,14 @@
  * - دعم WebP و AVIF
  * - Responsive images
  * - تحسين LCP
+ * - Priority Hints للصور المهمة
+ * - Blur Placeholder للتحميل التدريجي
+ * 
+ * @version 2.0.0 - تحسينات المرحلة الثالثة
  */
 
 import { productionLogger } from '@/lib/logger/production-logger';
+import { shouldDeferHeavyOperations } from '@/lib/network-utils';
 
 export interface ImageOptimizationOptions {
   width?: number;
@@ -17,32 +22,56 @@ export interface ImageOptimizationOptions {
   format?: 'webp' | 'avif' | 'jpeg' | 'png';
   fit?: 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
   priority?: boolean; // للصور المهمة (above the fold)
+  blur?: boolean; // إضافة blur placeholder
+  fetchPriority?: 'high' | 'low' | 'auto';
 }
 
+// Cache لنتائج التحقق من دعم الصيغ
+const formatSupportCache: Record<string, boolean> = {};
+
 /**
- * تحقق من دعم المتصفح لـ WebP
+ * تحقق من دعم المتصفح لـ WebP (مع cache)
  */
 export function supportsWebP(): boolean {
   if (typeof window === 'undefined') return false;
   
+  if ('webp' in formatSupportCache) return formatSupportCache.webp;
+  
   const canvas = document.createElement('canvas');
   if (canvas.getContext && canvas.getContext('2d')) {
-    return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    const result = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    formatSupportCache.webp = result;
+    return result;
   }
+  formatSupportCache.webp = false;
   return false;
 }
 
 /**
- * تحقق من دعم المتصفح لـ AVIF
+ * تحقق من دعم المتصفح لـ AVIF (مع cache)
  */
 export function supportsAVIF(): boolean {
   if (typeof window === 'undefined') return false;
   
+  if ('avif' in formatSupportCache) return formatSupportCache.avif;
+  
   const canvas = document.createElement('canvas');
   if (canvas.getContext && canvas.getContext('2d')) {
-    return canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0;
+    const result = canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0;
+    formatSupportCache.avif = result;
+    return result;
   }
+  formatSupportCache.avif = false;
   return false;
+}
+
+/**
+ * الحصول على أفضل صيغة مدعومة
+ */
+export function getBestSupportedFormat(): 'avif' | 'webp' | 'jpeg' {
+  if (supportsAVIF()) return 'avif';
+  if (supportsWebP()) return 'webp';
+  return 'jpeg';
 }
 
 /**
