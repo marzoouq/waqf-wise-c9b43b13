@@ -15,6 +15,8 @@ import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { FinancialCardsRow } from "@/components/dashboard/shared";
+import { TodayDuePaymentsCard } from "@/components/dashboard/shared/TodayDuePaymentsCard";
+import { OverduePaymentsCard } from "@/components/dashboard/shared/OverduePaymentsCard";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -87,6 +89,12 @@ export default function CashierDashboard() {
 
       {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
       <FinancialCardsRow className="mt-6 mb-4" />
+
+      {/* قسم الإيجارات المستحقة والمتأخرة - جديد */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mb-4">
+        <TodayDuePaymentsCard />
+        <OverduePaymentsCard />
+      </div>
 
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="space-y-4">

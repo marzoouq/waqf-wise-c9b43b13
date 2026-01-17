@@ -221,10 +221,11 @@ export default function LoginLight() {
     setError(null);
     
     try {
+      // توجيه OAuth إلى صفحة authenticated-redirect للتعامل مع جلب الأدوار
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/redirect`,
+          redirectTo: `${window.location.origin}/authenticated-redirect`,
         },
       });
       

@@ -144,28 +144,66 @@ export function useCollectionStats() {
         )
         .reduce((sum, p) => sum + (p.amount_due || 0), 0);
 
-      // تحويل البيانات المتأخرة
-      const overduePaymentsList: OverduePayment[] = overdueData.map(p => {
-        const dueDate = new Date(p.due_date);
-        const daysOverdue = Math.floor((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        return {
-          id: p.id,
-          tenantName: 'مستأجر',
-          amount: p.amount_due || 0,
-          dueDate: p.due_date,
-          daysOverdue,
-          propertyName: 'عقار',
-        };
-      });
+      // تحويل البيانات المتأخرة مع جلب أسماء المستأجرين
+      const overduePaymentsList: OverduePayment[] = await Promise.all(
+        overdueData.slice(0, 5).map(async (p) => {
+          const dueDate = new Date(p.due_date);
+          const daysOverdue = Math.floor((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+          
+          // جلب اسم المستأجر من العقد
+          let tenantName = 'مستأجر';
+          let propertyName = 'عقار';
+          if (p.contract_id) {
+            const { data: contract } = await supabase
+              .from('contracts')
+              .select('tenant_name, properties:property_id(name)')
+              .eq('id', p.contract_id)
+              .single();
+            if (contract) {
+              tenantName = contract.tenant_name || 'مستأجر';
+              const prop = contract.properties as unknown as { name: string } | null;
+              propertyName = prop?.name || 'عقار';
+            }
+          }
+          
+          return {
+            id: p.id,
+            tenantName,
+            amount: p.amount_due || 0,
+            dueDate: p.due_date,
+            daysOverdue: Math.max(0, daysOverdue),
+            propertyName,
+          };
+        })
+      );
 
-      // دفعات اليوم
-      const todayDuePayments: TodayDuePayment[] = todayDueData.map(p => ({
-        id: p.id,
-        tenantName: 'مستأجر',
-        amount: p.amount_due || 0,
-        unitName: undefined,
-      }));
+      // دفعات اليوم مع أسماء المستأجرين
+      const todayDuePayments: TodayDuePayment[] = await Promise.all(
+        todayDueData.slice(0, 5).map(async (p) => {
+          let tenantName = 'مستأجر';
+          let unitName = 'وحدة';
+          
+          if (p.contract_id) {
+            const { data: contract } = await supabase
+              .from('contracts')
+              .select('tenant_name, property_units:unit_id(unit_number)')
+              .eq('id', p.contract_id)
+              .single();
+            if (contract) {
+              tenantName = contract.tenant_name || 'مستأجر';
+              const unit = contract.property_units as unknown as { unit_number: string } | null;
+              unitName = unit?.unit_number || 'وحدة';
+            }
+          }
+          
+          return {
+            id: p.id,
+            tenantName,
+            amount: p.amount_due || 0,
+            unitName,
+          };
+        })
+      );
 
       const todayDueAmount = todayDuePayments.reduce((sum, p) => sum + p.amount, 0);
 
