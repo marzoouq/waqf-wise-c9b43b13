@@ -10,6 +10,7 @@ export interface BankBalanceData {
   name_ar: string;
   code: string;
   current_balance: number;
+  account_count?: number;
 }
 
 export interface FiscalYearCorpus {
@@ -32,6 +33,7 @@ export const FinancialCardsService = {
    * جلب رصيد البنك
    */
   async getBankBalance(): Promise<BankBalanceData | null> {
+    // جلب الحساب البنكي الرئيسي
     const { data, error } = await supabase
       .from("accounts")
       .select("id, name_ar, code, current_balance")
@@ -40,7 +42,19 @@ export const FinancialCardsService = {
       .maybeSingle();
 
     if (error && error.code !== "PGRST116") throw error;
-    return data;
+    
+    // جلب عدد الحسابات البنكية النشطة
+    const { count } = await supabase
+      .from("bank_accounts")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true);
+    
+    if (!data) return null;
+    
+    return {
+      ...data,
+      account_count: count || 0
+    };
   },
 
   /**
