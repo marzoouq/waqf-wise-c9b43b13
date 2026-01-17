@@ -22,6 +22,7 @@ import { DistributionPatternSelector } from "./DistributionPatternSelector";
 import { ScenarioComparison } from "../distributions/ScenarioComparison";
 import { SmartRecommendations } from "../distributions/SmartRecommendations";
 import { Loader2, TrendingUp } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 
 const simulationSchema = z.object({
   availableAmount: z.coerce
@@ -62,7 +63,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
   });
 
   const handleSimulate = async (data: SimulationFormValues) => {
-    const activeBeneficiaries = beneficiaries.filter(b => b.status === 'نشط');
+    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
     
     if (activeBeneficiaries.length === 0) {
       return;
@@ -87,7 +88,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
   };
 
   const handleCompareScenarios = async () => {
-    const activeBeneficiaries = beneficiaries.filter(b => b.status === 'نشط');
+    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
     
     if (activeBeneficiaries.length === 0) {
       return;
@@ -109,7 +110,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
     setActiveTab('comparison');
   };
 
-  const activeBeneficiariesCount = beneficiaries.filter(b => b.status === 'نشط').length;
+  const activeBeneficiariesCount = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
 
   return (
     <ResponsiveDialog 

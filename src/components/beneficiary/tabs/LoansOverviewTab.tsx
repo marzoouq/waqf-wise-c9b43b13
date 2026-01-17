@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
 import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
 import { LoansService, RequestService } from "@/services";
+import { matchesStatus } from "@/lib/constants";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/query-keys";
@@ -198,7 +199,9 @@ export function LoansOverviewTab() {
                 ? Math.round((loan.paid_amount / loan.principal_amount) * 100)
                 : 0;
               const remaining = (loan.principal_amount || 0) - (loan.paid_amount || 0);
-              const statusLabel = (loan.status === "نشط" || loan.status === "active") ? "نشط" : (loan.status === "مسدد" || loan.status === "paid") ? "مسدد" : "غير محدد";
+              const isActive = matchesStatus(loan.status, 'active');
+              const isPaid = matchesStatus(loan.status, 'paid');
+              const statusLabel = isActive ? "نشط" : isPaid ? "مسدد" : "غير محدد";
               
               return (
               <div key={loan.id} className="space-y-3 p-3 sm:p-4 border rounded-lg">
@@ -213,8 +216,8 @@ export function LoansOverviewTab() {
                       /> <span className="text-sm">ريال</span>
                     </p>
                   </div>
-                  <Badge variant={(loan.status === "نشط" || loan.status === "active") ? "default" : "secondary"} className="gap-1">
-                    {(loan.status === "نشط" || loan.status === "active") ? (
+                  <Badge variant={isActive ? "default" : "secondary"} className="gap-1">
+                    {isActive ? (
                       <AlertCircle className="h-3 w-3" />
                     ) : (
                       <CheckCircle className="h-3 w-3" />

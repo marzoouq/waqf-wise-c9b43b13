@@ -26,6 +26,7 @@ import { commonValidation } from "@/lib/validationSchemas";
 import { Database } from "@/integrations/supabase/types";
 import { useContracts } from "@/hooks/property/useContracts";
 import { Info } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -63,7 +64,7 @@ export function PaymentDialog({
   const { contracts, isLoading: contractsLoading } = useContracts();
   
   // تصفية العقود النشطة فقط
-  const activeContracts = contracts?.filter(c => c.status === "نشط") || [];
+  const activeContracts = contracts?.filter(c => matchesStatus(c.status, 'active')) || [];
 
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),

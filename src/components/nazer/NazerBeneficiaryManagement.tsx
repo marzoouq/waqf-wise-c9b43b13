@@ -18,6 +18,7 @@ import {
   UserCheck, UserX
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { matchesStatus } from "@/lib/constants";
 
 export function NazerBeneficiaryManagement() {
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ export function NazerBeneficiaryManagement() {
 
   const stats = {
     total: beneficiaries.length,
-    active: beneficiaries.filter(b => b.status === "نشط").length,
-    inactive: beneficiaries.filter(b => b.status !== "نشط").length,
+    active: beneficiaries.filter(b => matchesStatus(b.status, 'active')).length,
+    inactive: beneficiaries.filter(b => !matchesStatus(b.status, 'active')).length,
   };
 
   const getStatusBadge = (status: string) => {

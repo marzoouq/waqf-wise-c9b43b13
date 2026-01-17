@@ -28,6 +28,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { type Contract } from '@/hooks/property/useContracts';
+import { matchesStatus } from '@/lib/constants';
 
 export interface ContractActionsMenuProps {
   contract: Contract;
@@ -58,7 +59,7 @@ export function ContractActionsMenu({
 }: ContractActionsMenuProps) {
   const [open, setOpen] = useState(false);
 
-  const isActive = contract.status === 'نشط' || contract.status === 'active';
+  const isActive = matchesStatus(contract.status, 'active');
   const hasAutoRenew = contract.auto_renew;
   const hasEjarDocument = !!contract.ejar_document_url;
 

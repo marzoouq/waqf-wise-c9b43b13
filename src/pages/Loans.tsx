@@ -30,6 +30,7 @@ import {
   Download,
 } from "lucide-react";
 import { format } from "@/lib/date";
+import { matchesStatus } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import {
@@ -95,9 +96,9 @@ export default function Loans() {
   // Calculate statistics
   const stats = {
     total: loans.length,
-    active: loans.filter((l: Loan) => l.status === "نشط" || l.status === "active").length,
-    paid: loans.filter((l: Loan) => l.status === "مسدد" || l.status === "paid").length,
-    defaulted: loans.filter((l: Loan) => l.status === "متعثر" || l.status === "defaulted").length,
+    active: loans.filter((l: Loan) => matchesStatus(l.status, 'active')).length,
+    paid: loans.filter((l: Loan) => matchesStatus(l.status, 'paid')).length,
+    defaulted: loans.filter((l: Loan) => matchesStatus(l.status, 'defaulted')).length,
     totalAmount: loans.reduce((sum: number, l: Loan) => sum + l.loan_amount, 0),
   };
 
@@ -379,7 +380,7 @@ export default function Loans() {
                           >
                             الأقساط
                           </Button>
-                          {(loan.status === "نشط" || loan.status === "active") && (
+                          {matchesStatus(loan.status, 'active') && (
                             <Button
                               variant="default"
                               size="sm"
