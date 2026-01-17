@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Contract } from "@/hooks/property/useContracts";
 import { useAnnualDisclosureExport } from "@/hooks/reports/useAnnualDisclosureExport";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import { matchesStatus } from "@/lib/constants";
 
 interface ReportsMenuProps {
   type?: "beneficiary" | "waqf";
@@ -221,7 +222,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
       const data = properties.map((prop) => {
         const contracts = prop.contracts as unknown as Contract[];
-        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
+        const activeContracts = contracts?.filter((c) => matchesStatus(c.status, 'active')) || [];
         const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
         
         return {
@@ -569,7 +570,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       // حساب الإجماليات
       const totalMonthlyRent = properties.reduce((sum, prop) => {
         const contracts = prop.contracts as unknown as Contract[];
-        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
+        const activeContracts = contracts?.filter((c) => matchesStatus(c.status, 'active')) || [];
         return sum + activeContracts.reduce((cSum, c) => cSum + (c.monthly_rent || 0), 0);
       }, 0);
       const totalAnnualRent = totalMonthlyRent * 12;
@@ -588,7 +589,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       // جدول العقارات
       const tableData = properties.map((prop) => {
         const contracts = prop.contracts as unknown as Contract[];
-        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
+        const activeContracts = contracts?.filter((c) => matchesStatus(c.status, 'active')) || [];
         const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
         
         return [

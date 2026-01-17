@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { UnifiedSectionHeader } from '@/components/unified/UnifiedSectionHeader';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { matchesStatus } from '@/lib/constants';
 
 const FamiliesStats = () => {
   const { families, isLoading } = useFamilies();
   const navigate = useNavigate();
 
-  const activeFamilies = families.filter(f => f.status === 'نشط');
+  const activeFamilies = families.filter(f => matchesStatus(f.status, 'active'));
   const totalMembers = families.reduce((sum, f) => sum + f.total_members, 0);
   
   const thirtyDaysAgo = new Date();

@@ -19,6 +19,7 @@ import { useDistributions } from "@/hooks/distributions/useDistributions";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
 import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
+import { matchesStatus } from "@/lib/constants";
 
 const distributionSchema = z.object({
   period_start: z.string().min(1, "تاريخ البداية مطلوب"),
@@ -135,7 +136,7 @@ export const CreateDistributionDialog = ({
     }
   };
 
-  const activeBeneficiaries = beneficiaries.filter(b => b.status === 'نشط');
+  const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
 
   // حساب إحصائيات المستفيدين المحددين
   const selectedStats = useMemo(() => {

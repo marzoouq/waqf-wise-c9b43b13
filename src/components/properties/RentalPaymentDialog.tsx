@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRentalPayments, RentalPayment } from "@/hooks/property/useRentalPayments";
 import { useContracts } from "@/hooks/property/useContracts";
+import { matchesStatus } from "@/lib/constants";
 
 interface Props {
   open: boolean;
@@ -119,7 +120,7 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
                   <SelectValue placeholder="اختر العقد" />
                 </SelectTrigger>
                 <SelectContent>
-                  {contracts?.filter(c => c.status === 'نشط').map((contract) => (
+                  {contracts?.filter(c => matchesStatus(c.status, 'active')).map((contract) => (
                     <SelectItem key={contract.id} value={contract.id}>
                       {contract.contract_number} - {contract.tenant_name}
                     </SelectItem>
