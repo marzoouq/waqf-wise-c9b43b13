@@ -158,3 +158,18 @@ verify_jwt = true
 
 [functions.link-voucher-journal]
 verify_jwt = true
+
+[functions.tenant-portal]
+verify_jwt = false
+
+[functions.tenant-send-otp]
+verify_jwt = false
+
+[functions.tenant-verify-otp]
+verify_jwt = false
+
+[functions.auto-close-fiscal-year]
+verify_jwt = true
+
+[functions.scheduled-tests]
+verify_jwt = false
