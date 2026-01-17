@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/ui/use-toast';
-import { Loader2, LogIn, Smartphone, Fingerprint, Chrome, Building2 } from 'lucide-react';
+import { Loader2, LogIn, Smartphone, Fingerprint, Building2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AuthService } from '@/services/auth.service';
+import { nationalIdToEmail } from '@/lib/beneficiaryAuth';
 import { useBiometricAuth } from '@/hooks/auth/useBiometricAuth';
 
 export default function Login() {
@@ -73,20 +73,14 @@ export default function Login() {
           throw new Error('رقم الهوية يجب أن يكون 10 أرقام بالضبط');
         }
         
-        // تسجيل دخول المستفيد برقم الهوية عبر AuthService
+        // تسجيل دخول المستفيد برقم الهوية
         productionLogger.debug('Attempting beneficiary login with national ID:', cleanedNationalId);
-        
-        const beneficiaryData = await AuthService.getBeneficiaryEmailByNationalId(cleanedNationalId);
 
-        if (!beneficiaryData) {
-          productionLogger.warn('No beneficiary found for national ID:', cleanedNationalId);
-          throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول مفعّل. يرجى التواصل مع الإدارة لتفعيل الحساب');
-        }
-        
-        productionLogger.debug('Beneficiary found, attempting sign in with email:', beneficiaryData.email);
-        
-        // تسجيل الدخول بالبريد الإلكتروني المرتبط
-        await signIn(beneficiaryData.email, password);
+        // ✅ لا نعتمد على RPC قبل تسجيل الدخول (قد تفشل بسبب صلاحيات القراءة قبل المصادقة)
+        const beneficiaryEmail = nationalIdToEmail(cleanedNationalId);
+        productionLogger.debug('Derived beneficiary email from national ID, attempting sign in');
+
+        await signIn(beneficiaryEmail, password);
       } else {
         // تسجيل دخول الموظفين بالبريد الإلكتروني
         await signIn(identifier.trim(), password);
@@ -109,9 +103,9 @@ export default function Login() {
         const msg = error.message.toLowerCase();
         
         if (msg.includes('invalid_credentials') || msg.includes('invalid login credentials')) {
-          errorTitle = 'كلمة المرور غير صحيحة';
-          errorMessage = loginType === 'beneficiary' 
-            ? 'كلمة المرور غير صحيحة. إذا نسيت كلمة المرور، يرجى التواصل مع الإدارة'
+          errorTitle = loginType === 'beneficiary' ? 'بيانات الدخول غير صحيحة' : 'كلمة المرور غير صحيحة';
+          errorMessage = loginType === 'beneficiary'
+            ? 'رقم الهوية أو كلمة المرور غير صحيحة. إذا استمرت المشكلة، تواصل مع الإدارة'
             : 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
         } else if (msg.includes('10 أرقام')) {
           errorTitle = 'رقم الهوية غير صحيح';
