@@ -173,12 +173,12 @@ export const ContractsReport = memo(function ContractsReport() {
               إجمالي العقود: {stats.total} | نشطة: {stats.active} | منتهية: {stats.expired}
             </span>
             <div className="space-x-4 rtl:space-x-reverse">
-              <span className="font-semibold">
-                الإيراد الشهري: {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
-              </span>
-              <span className="font-semibold text-success">
-                الإيراد السنوي: {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال
-              </span>
+            <span className="font-semibold">
+              الإيراد الشهري من العقود: {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
+            </span>
+            <span className="font-semibold text-success">
+              الإيراد السنوي المتوقع: {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال
+            </span>
             </div>
           </div>
         </CardContent>

@@ -317,12 +317,12 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </CardContent>
                 </Card>
 
-                {/* توزيعات الورثة مختصرة */}
+                {/* توزيعات المستفيدين مختصرة */}
                 <Card>
                   <CardHeader className="p-3 pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Users className="h-4 w-4 text-warning" />
-                      توزيعات الورثة
+                      توزيعات المستفيدين
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 pt-0">
@@ -441,7 +441,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm sm:text-lg">إجمالي الإيرادات</p>
+                      <p className="font-semibold text-sm sm:text-lg">إيرادات السنة المالية</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">جميع مصادر الدخل للسنة المالية</p>
                     </div>
                   </div>
@@ -553,16 +553,16 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <ArrowDown className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                 </div>
 
-                {/* 6. توزيعات الورثة */}
+                {/* 6. توزيعات المستفيدين */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-warning/10 rounded-lg border border-warning/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="p-1.5 sm:p-2 bg-warning/20 rounded-full">
                       <Users className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm sm:text-lg">(-) توزيعات الورثة</p>
+                      <p className="font-semibold text-sm sm:text-lg">(-) توزيعات المستفيدين</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        {distributions?.heirs_count || disclosure.total_beneficiaries} وريث (وفق الشريعة الإسلامية)
+                        {distributions?.heirs_count || disclosure.total_beneficiaries} مستفيد
                       </p>
                     </div>
                   </div>
@@ -708,16 +708,16 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             </Card>
 
             {/* ============================================ */}
-            {/* القسم 4: توزيعات الورثة */}
+            {/* القسم 4: توزيعات المستفيدين */}
             {/* ============================================ */}
             <Card>
               <CardHeader className="p-3 sm:p-4">
                 <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                   <Users className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
-                  توزيعات الورثة (وفق الشريعة الإسلامية)
+                  توزيعات المستفيدين
                 </CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
-                  للذكر مثل حظ الأنثيين - الزوجات لهن الثمن
+                  توزيع الأرباح على المستفيدين
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">

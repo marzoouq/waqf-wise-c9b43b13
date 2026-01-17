@@ -296,7 +296,7 @@ export function DisclosureDetailsTab() {
                 <TrendingUp className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="font-semibold text-lg">إجمالي الإيرادات</p>
+                <p className="font-semibold text-lg">إيرادات السنة المالية</p>
                 <p className="text-sm text-muted-foreground">جميع مصادر الدخل للسنة المالية</p>
               </div>
             </div>
@@ -344,7 +344,7 @@ export function DisclosureDetailsTab() {
                 <Users className="h-5 w-5 text-warning" />
               </div>
               <div>
-                <p className="font-semibold text-lg">توزيعات الورثة</p>
+                <p className="font-semibold text-lg">توزيعات المستفيدين</p>
                 <p className="text-sm text-muted-foreground">المبالغ الموزعة على المستفيدين</p>
               </div>
             </div>
@@ -444,12 +444,12 @@ export function DisclosureDetailsTab() {
         )}
       </div>
 
-      {/* توزيعات الورثة - مخفي عند الطباعة */}
+      {/* توزيعات المستفيدين - مخفي عند الطباعة */}
       <Card className="print:hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-warning" />
-            توزيعات الورثة
+            توزيعات المستفيدين
           </CardTitle>
         </CardHeader>
         <CardContent>

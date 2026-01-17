@@ -148,7 +148,7 @@ export function FinancialReports() {
                       </div>
                     ))}
                   <div className="flex items-center justify-between p-3 bg-success/10 rounded font-semibold">
-                    <span>إجمالي الإيرادات</span>
+                    <span>إيرادات الفترة</span>
                     <span className="font-mono">
                       {totalRevenue.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
                     </span>

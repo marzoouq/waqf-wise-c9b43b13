@@ -68,13 +68,13 @@ export default function NazerKPIs() {
       subtitle: data.totalAssets === 0 ? "غير متاح" : undefined
     },
     {
-      title: "إجمالي الإيرادات",
+      title: "إجمالي المحصّل",
       value: (typeof data.totalRevenue === 'number' && data.totalRevenue > 0)
         ? data.totalRevenue.toLocaleString('ar-SA')
         : '—',
       icon: TrendingUp,
       variant: "success" as const,
-      subtitle: data.totalRevenue === 0 ? "غير متاح" : undefined
+      subtitle: data.totalRevenue === 0 ? "غير متاح" : "من التحصيل الفعلي"
     },
     {
       title: "المستفيدون النشطون",
@@ -113,7 +113,7 @@ export default function NazerKPIs() {
       subtitle: "القروض النشطة"
     },
     {
-      title: "العائد الشهري",
+      title: "الإيراد الشهري من العقود",
       value: (typeof data.monthlyReturn === 'number' && data.monthlyReturn > 0)
         ? data.monthlyReturn.toLocaleString('ar-SA')
         : '—',
@@ -122,7 +122,7 @@ export default function NazerKPIs() {
       subtitle: data.monthlyReturn === 0 ? "غير متاح" : "من العقود النشطة"
     },
     {
-      title: "العائد السنوي المتوقع",
+      title: "الإيراد السنوي المتوقع",
       value: (typeof data.monthlyReturn === 'number' && data.monthlyReturn > 0)
         ? (data.monthlyReturn * 12).toLocaleString('ar-SA')
         : '—',

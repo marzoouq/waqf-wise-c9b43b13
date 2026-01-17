@@ -99,7 +99,7 @@ export function AnnualDisclosureTab() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="space-y-1 p-3 bg-success-light dark:bg-success/10 rounded-lg border border-success/30">
-                    <p className="text-sm text-success">إجمالي الإيرادات</p>
+                    <p className="text-sm text-success">إيرادات السنة المالية</p>
                     <p className="text-2xl font-bold text-success">
                       {currentYearDisclosure.total_revenues.toLocaleString()}
                     </p>

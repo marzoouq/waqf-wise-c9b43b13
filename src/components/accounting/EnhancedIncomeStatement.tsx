@@ -50,8 +50,8 @@ export function EnhancedIncomeStatement() {
     ];
 
     const totals = [
-      { label: 'إجمالي الإيرادات', amount: incomeStatement.revenue.total },
-      { label: 'إجمالي المصروفات', amount: incomeStatement.expenses.total },
+      { label: 'إيرادات الفترة', amount: incomeStatement.revenue.total },
+      { label: 'مصروفات الفترة', amount: incomeStatement.expenses.total },
       { label: 'صافي الدخل', amount: incomeStatement.netIncome },
     ];
 
@@ -110,7 +110,7 @@ export function EnhancedIncomeStatement() {
             </div>
             
             <div className="flex justify-between items-center pt-2 border-t-2 font-semibold">
-              <span>إجمالي الإيرادات</span>
+              <span>إيرادات الفترة</span>
               <span className="font-mono text-success text-lg">
                 {formatNumber(incomeStatement.revenue.total)}
               </span>

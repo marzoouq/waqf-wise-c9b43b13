@@ -77,7 +77,7 @@ export const AdminKPIs = memo(() => {
         trend: "يحتاج معالجة عاجلة",
       },
       {
-        title: "إجمالي الإيرادات",
+        title: "إجمالي المحصّل",
         value: formatCurrency(kpis.totalRevenue),
         icon: TrendingUp,
         variant: "success" as const,

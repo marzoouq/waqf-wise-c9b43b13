@@ -58,7 +58,7 @@ const FinancialStats = () => {
       variant: "default" as const,
     },
     {
-      title: "إجمالي الإيرادات",
+      title: "إيرادات الفترة",
       value: formatCurrency(data.totalRevenue),
       icon: TrendingUp,
       variant: "success" as const,

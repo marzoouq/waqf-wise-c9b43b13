@@ -82,7 +82,7 @@ export function InteractiveDashboard() {
           variant="success"
         />
         <UnifiedKPICard
-          title="إجمالي الإيرادات"
+          title="إجمالي المحصّل"
           value={`${kpis?.totalRevenue?.toLocaleString('ar-SA') || '0'} ريال`}
           icon={DollarSign}
           variant="warning"
