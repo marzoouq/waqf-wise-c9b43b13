@@ -80,6 +80,20 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "account_year_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "account_year_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "account_year_balances_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
             isOneToOne: false
@@ -154,6 +168,20 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["account_id"]
           },
         ]
@@ -594,6 +622,13 @@ export type Database = {
             foreignKeyName: "approvals_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "approvals_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -787,6 +822,13 @@ export type Database = {
           trigger_event?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "auto_journal_log_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
           {
             foreignKeyName: "auto_journal_log_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
@@ -998,6 +1040,20 @@ export type Database = {
             referencedRelation: "general_ledger"
             referencedColumns: ["account_id"]
           },
+          {
+            foreignKeyName: "bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
         ]
       }
       bank_integrations: {
@@ -1146,6 +1202,13 @@ export type Database = {
             foreignKeyName: "bank_reconciliation_matches_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "bank_reconciliation_matches_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -1247,6 +1310,13 @@ export type Database = {
           transaction_type?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bank_transactions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
           {
             foreignKeyName: "bank_transactions_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
@@ -2641,17 +2711,24 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "budget_items_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "budget_items_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "budget_items_budget_id_fkey"
             columns: ["budget_id"]
             isOneToOne: false
             referencedRelation: "budgets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "budget_items_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -2729,6 +2806,20 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "budgets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "budgets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["account_id"]
           },
           {
@@ -3937,6 +4028,13 @@ export type Database = {
             foreignKeyName: "distributions_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "distributions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -3945,13 +4043,6 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries_with_lines"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "distributions_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -5203,6 +5294,20 @@ export type Database = {
             referencedRelation: "general_ledger"
             referencedColumns: ["account_id"]
           },
+          {
+            foreignKeyName: "financial_forecasts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "financial_forecasts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
         ]
       }
       financial_kpis: {
@@ -5369,6 +5474,13 @@ export type Database = {
             foreignKeyName: "fiscal_year_closings_closing_journal_entry_id_fkey"
             columns: ["closing_journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "fiscal_year_closings_closing_journal_entry_id_fkey"
+            columns: ["closing_journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -5509,13 +5621,6 @@ export type Database = {
             foreignKeyName: "fund_transactions_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fund_transactions_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -5565,13 +5670,6 @@ export type Database = {
           waqf_unit_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "funds_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "funds_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
@@ -6485,6 +6583,13 @@ export type Database = {
             foreignKeyName: "heir_distributions_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -6493,13 +6598,6 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries_with_lines"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "heir_distributions_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -6573,6 +6671,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "fiscal_years"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historical_invoices_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
           },
           {
             foreignKeyName: "historical_invoices_journal_entry_id_fkey"
@@ -6951,6 +7056,20 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "invoice_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "invoice_lines_invoice_id_fkey"
             columns: ["invoice_id"]
             isOneToOne: false
@@ -7111,6 +7230,13 @@ export type Database = {
             foreignKeyName: "invoices_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "invoices_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -7133,13 +7259,6 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -7252,13 +7371,6 @@ export type Database = {
             foreignKeyName: "journal_entries_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "journal_entries_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -7316,6 +7428,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "general_ledger"
             referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
           },
           {
             foreignKeyName: "journal_entry_lines_journal_entry_id_fkey"
@@ -7806,6 +7939,13 @@ export type Database = {
             foreignKeyName: "loan_payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "loan_payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -7835,13 +7975,6 @@ export type Database = {
             columns: ["loan_id"]
             isOneToOne: false
             referencedRelation: "loans_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loan_payments_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -8092,13 +8225,6 @@ export type Database = {
             foreignKeyName: "loans_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "loans_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -8330,6 +8456,13 @@ export type Database = {
             foreignKeyName: "maintenance_requests_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -8373,13 +8506,6 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "maintenance_requests_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -9113,6 +9239,20 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "opening_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "opening_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
+            referencedColumns: ["account_id"]
+          },
+          {
             foreignKeyName: "opening_balances_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
             isOneToOne: false
@@ -9594,6 +9734,13 @@ export type Database = {
             foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -9616,13 +9763,6 @@ export type Database = {
             columns: ["payment_id"]
             isOneToOne: false
             referencedRelation: "payments_with_contract_details"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payment_vouchers_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -9748,6 +9888,13 @@ export type Database = {
             foreignKeyName: "payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -9763,13 +9910,6 @@ export type Database = {
             columns: ["rental_payment_id"]
             isOneToOne: false
             referencedRelation: "rental_payments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -10049,6 +10189,13 @@ export type Database = {
             foreignKeyName: "pos_transactions_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -10085,13 +10232,6 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pos_transactions_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -10302,13 +10442,6 @@ export type Database = {
           waqf_unit_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "properties_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "properties_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
@@ -10764,6 +10897,13 @@ export type Database = {
             foreignKeyName: "rental_payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "rental_payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -10786,13 +10926,6 @@ export type Database = {
             columns: ["receipt_id"]
             isOneToOne: false
             referencedRelation: "payments_with_contract_details"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rental_payments_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["id"]
           },
           {
@@ -13592,13 +13725,6 @@ export type Database = {
             foreignKeyName: "waqf_distribution_settings_waqf_unit_id_fkey"
             columns: ["waqf_unit_id"]
             isOneToOne: false
-            referencedRelation: "waqf_balance_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "waqf_distribution_settings_waqf_unit_id_fkey"
-            columns: ["waqf_unit_id"]
-            isOneToOne: false
             referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
@@ -13880,9 +14006,10 @@ export type Database = {
         Row: {
           account_nature: Database["public"]["Enums"]["account_nature"] | null
           account_type: Database["public"]["Enums"]["account_type"] | null
-          children_count: number | null
           code: string | null
+          created_at: string | null
           current_balance: number | null
+          description: string | null
           id: string | null
           is_active: boolean | null
           is_header: boolean | null
@@ -13891,6 +14018,7 @@ export type Database = {
           parent_code: string | null
           parent_id: string | null
           parent_name: string | null
+          updated_at: string | null
         }
         Relationships: [
           {
@@ -13912,6 +14040,20 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "general_ledger"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "trial_balance"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_balance_summary"
             referencedColumns: ["account_id"]
           },
         ]
@@ -13943,102 +14085,64 @@ export type Database = {
       }
       beneficiaries_masked: {
         Row: {
-          beneficiary_type: string | null
+          beneficiary_number: string | null
           category: string | null
-          city: string | null
-          created_at: string | null
-          full_name: string | null
-          gender: string | null
-          iban_masked: string | null
+          family_id: string | null
+          full_name_masked: string | null
           id: string | null
           national_id_masked: string | null
-          phone_masked: string | null
           status: string | null
-          total_payments: number | null
-          total_received: number | null
         }
         Insert: {
-          beneficiary_type?: string | null
+          beneficiary_number?: string | null
           category?: string | null
-          city?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          gender?: string | null
-          iban_masked?: never
+          family_id?: string | null
+          full_name_masked?: never
           id?: string | null
           national_id_masked?: never
-          phone_masked?: never
           status?: string | null
-          total_payments?: number | null
-          total_received?: number | null
         }
         Update: {
-          beneficiary_type?: string | null
+          beneficiary_number?: string | null
           category?: string | null
-          city?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          gender?: string | null
-          iban_masked?: never
+          family_id?: string | null
+          full_name_masked?: never
           id?: string | null
           national_id_masked?: never
-          phone_masked?: never
           status?: string | null
-          total_payments?: number | null
-          total_received?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "beneficiaries_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beneficiaries_overview: {
         Row: {
           account_balance: number | null
-          active_loans: number | null
+          beneficiary_number: string | null
           category: string | null
-          distributions_count: number | null
+          created_at: string | null
+          family_id: string | null
+          family_name: string | null
           full_name: string | null
-          gender: string | null
           id: string | null
-          national_id: string | null
-          phone: string | null
-          relationship: string | null
           status: string | null
-          total_distributions: number | null
-          total_payments: number | null
           total_received: number | null
         }
-        Insert: {
-          account_balance?: number | null
-          active_loans?: never
-          category?: string | null
-          distributions_count?: never
-          full_name?: string | null
-          gender?: string | null
-          id?: string | null
-          national_id?: string | null
-          phone?: string | null
-          relationship?: string | null
-          status?: string | null
-          total_distributions?: never
-          total_payments?: number | null
-          total_received?: number | null
-        }
-        Update: {
-          account_balance?: number | null
-          active_loans?: never
-          category?: string | null
-          distributions_count?: never
-          full_name?: string | null
-          gender?: string | null
-          id?: string | null
-          national_id?: string | null
-          phone?: string | null
-          relationship?: string | null
-          status?: string | null
-          total_distributions?: never
-          total_payments?: number | null
-          total_received?: number | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "beneficiaries_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beneficiary_account_statement: {
         Row: {
@@ -14121,51 +14225,36 @@ export type Database = {
       distributions_summary: {
         Row: {
           beneficiaries_count: number | null
-          details_count: number | null
-          distributable_amount: number | null
+          created_at: string | null
           distribution_date: string | null
           distribution_type: string | null
           id: string | null
-          nazer_share: number | null
-          paid_count: number | null
+          month: string | null
           status: string | null
-          total_allocated: number | null
           total_amount: number | null
-          waqf_corpus: number | null
           waqf_name: string | null
-          waqif_charity: number | null
         }
         Insert: {
           beneficiaries_count?: number | null
-          details_count?: never
-          distributable_amount?: number | null
+          created_at?: string | null
           distribution_date?: string | null
           distribution_type?: string | null
           id?: string | null
-          nazer_share?: number | null
-          paid_count?: never
+          month?: string | null
           status?: string | null
-          total_allocated?: never
           total_amount?: number | null
-          waqf_corpus?: number | null
           waqf_name?: string | null
-          waqif_charity?: number | null
         }
         Update: {
           beneficiaries_count?: number | null
-          details_count?: never
-          distributable_amount?: number | null
+          created_at?: string | null
           distribution_date?: string | null
           distribution_type?: string | null
           id?: string | null
-          nazer_share?: number | null
-          paid_count?: never
+          month?: string | null
           status?: string | null
-          total_allocated?: never
           total_amount?: number | null
-          waqf_corpus?: number | null
           waqf_name?: string | null
-          waqif_charity?: number | null
         }
         Relationships: []
       }
@@ -14319,14 +14408,18 @@ export type Database = {
       }
       general_ledger: {
         Row: {
+          account_code: string | null
           account_id: string | null
-          account_nature: Database["public"]["Enums"]["account_nature"] | null
+          account_name: string | null
           account_type: Database["public"]["Enums"]["account_type"] | null
-          code: string | null
-          current_balance: number | null
-          name_ar: string | null
-          total_credit: number | null
-          total_debit: number | null
+          credit_amount: number | null
+          debit_amount: number | null
+          entry_date: string | null
+          entry_description: string | null
+          entry_id: string | null
+          entry_number: string | null
+          line_description: string | null
+          status: Database["public"]["Enums"]["entry_status"] | null
         }
         Relationships: []
       }
@@ -14410,19 +14503,55 @@ export type Database = {
       }
       loans_summary: {
         Row: {
+          beneficiary_id: string | null
           beneficiary_name: string | null
-          beneficiary_national_id: string | null
+          created_at: string | null
+          end_date: string | null
           id: string | null
-          loan_amount: number | null
-          loan_date: string | null
           loan_number: string | null
-          paid_amount: number | null
-          paid_installments: number | null
+          monthly_installment: number | null
+          principal_amount: number | null
           remaining_balance: number | null
+          start_date: string | null
           status: string | null
-          total_installments: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages_with_users: {
         Row: {
@@ -14499,23 +14628,20 @@ export type Database = {
         Row: {
           entries_count: number | null
           month: string | null
-          net_income: number | null
-          total_expenses: number | null
-          total_revenues: number | null
+          total_credits: number | null
+          total_debits: number | null
         }
         Relationships: []
       }
       payment_vouchers_masked: {
         Row: {
           amount: number | null
-          beneficiary_name: string | null
           created_at: string | null
-          description: string | null
-          iban_masked: string | null
           id: string | null
-          paid_at: string | null
+          payee_name_masked: string | null
           payment_method: string | null
           status: string | null
+          voucher_date: string | null
           voucher_number: string | null
         }
         Relationships: []
@@ -14625,6 +14751,13 @@ export type Database = {
             foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -14725,6 +14858,13 @@ export type Database = {
             foreignKeyName: "payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
             referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
@@ -14759,46 +14899,37 @@ export type Database = {
       }
       properties_overview: {
         Row: {
-          active_contracts: number | null
-          available_units: number | null
+          created_at: string | null
           id: string | null
           location: string | null
           monthly_revenue: number | null
-          name: string | null
-          occupancy_percentage: number | null
           occupied_units: number | null
+          property_name: string | null
+          property_type: string | null
           status: string | null
-          total_monthly_rent: number | null
           total_units: number | null
-          type: string | null
         }
         Insert: {
-          active_contracts?: never
-          available_units?: number | null
+          created_at?: string | null
           id?: string | null
           location?: string | null
           monthly_revenue?: number | null
-          name?: string | null
-          occupancy_percentage?: number | null
           occupied_units?: number | null
+          property_name?: string | null
+          property_type?: string | null
           status?: string | null
-          total_monthly_rent?: never
           total_units?: number | null
-          type?: string | null
         }
         Update: {
-          active_contracts?: never
-          available_units?: number | null
+          created_at?: string | null
           id?: string | null
           location?: string | null
           monthly_revenue?: number | null
-          name?: string | null
-          occupancy_percentage?: number | null
           occupied_units?: number | null
+          property_name?: string | null
+          property_type?: string | null
           status?: string | null
-          total_monthly_rent?: never
           total_units?: number | null
-          type?: string | null
         }
         Relationships: []
       }
@@ -14853,6 +14984,7 @@ export type Database = {
       }
       trial_balance: {
         Row: {
+          account_id: string | null
           account_nature: Database["public"]["Enums"]["account_nature"] | null
           account_type: Database["public"]["Enums"]["account_type"] | null
           balance: number | null
@@ -14866,18 +14998,10 @@ export type Database = {
       unified_transactions_view: {
         Row: {
           amount: number | null
-          beneficiary_id: string | null
-          contract_number: string | null
           created_at: string | null
           description: string | null
           id: string | null
-          journal_entry_id: string | null
-          party_name: string | null
-          payment_method: string | null
           reference_number: string | null
-          source: string | null
-          source_name_ar: string | null
-          source_name_en: string | null
           status: string | null
           transaction_date: string | null
           transaction_type: string | null
@@ -14886,17 +15010,24 @@ export type Database = {
       }
       unmatched_bank_transactions: {
         Row: {
-          account_number: string | null
           amount: number | null
+          bank_account_id: string | null
           bank_name: string | null
           description: string | null
           id: string | null
           reference_number: string | null
-          statement_date: string | null
           transaction_date: string | null
           transaction_type: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bank_statements_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profile_with_roles: {
         Row: {
@@ -14945,37 +15076,28 @@ export type Database = {
       }
       waqf_balance_summary: {
         Row: {
+          account_id: string | null
+          account_nature: Database["public"]["Enums"]["account_nature"] | null
+          account_type: Database["public"]["Enums"]["account_type"] | null
           code: string | null
-          completed_distributions: number | null
           current_balance: number | null
-          id: string | null
-          name: string | null
-          total_expenses: number | null
-          total_income: number | null
-          total_rentals_received: number | null
-          total_vouchers_paid: number | null
+          name_ar: string | null
         }
         Insert: {
+          account_id?: string | null
+          account_nature?: Database["public"]["Enums"]["account_nature"] | null
+          account_type?: Database["public"]["Enums"]["account_type"] | null
           code?: string | null
-          completed_distributions?: never
-          current_balance?: never
-          id?: string | null
-          name?: string | null
-          total_expenses?: never
-          total_income?: never
-          total_rentals_received?: never
-          total_vouchers_paid?: never
+          current_balance?: number | null
+          name_ar?: string | null
         }
         Update: {
+          account_id?: string | null
+          account_nature?: Database["public"]["Enums"]["account_nature"] | null
+          account_type?: Database["public"]["Enums"]["account_type"] | null
           code?: string | null
-          completed_distributions?: never
-          current_balance?: never
-          id?: string | null
-          name?: string | null
-          total_expenses?: never
-          total_income?: never
-          total_rentals_received?: never
-          total_vouchers_paid?: never
+          current_balance?: number | null
+          name_ar?: string | null
         }
         Relationships: []
       }
