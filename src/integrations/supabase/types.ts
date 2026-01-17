@@ -3138,6 +3138,77 @@ export type Database = {
           },
         ]
       }
+      contract_notifications: {
+        Row: {
+          content: string
+          contract_id: string
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          delivered_at: string | null
+          delivery_method: string[] | null
+          failure_reason: string | null
+          id: string
+          notification_type: string
+          read_at: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          recipient_phone: string | null
+          sent_at: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          contract_id: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          delivered_at?: string | null
+          delivery_method?: string[] | null
+          failure_reason?: string | null
+          id?: string
+          notification_type: string
+          read_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          contract_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          delivered_at?: string | null
+          delivery_method?: string[] | null
+          failure_reason?: string | null
+          id?: string
+          notification_type?: string
+          read_at?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          sent_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_notifications_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contract_renewals: {
         Row: {
           created_at: string
@@ -3201,6 +3272,217 @@ export type Database = {
           },
         ]
       }
+      contract_settlements: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          approved_by_name: string | null
+          contract_id: string
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          damages_deduction: number | null
+          early_termination_penalty: number | null
+          id: string
+          journal_entry_id: string | null
+          net_settlement: number
+          notes: string | null
+          paid_rent: number | null
+          security_deposit: number | null
+          settlement_date: string
+          settlement_number: string
+          settlement_type: string
+          status: string
+          termination_reason: string | null
+          total_contract_days: number | null
+          updated_at: string | null
+          used_days: number | null
+          used_rent: number | null
+          voucher_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_by_name?: string | null
+          contract_id: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          damages_deduction?: number | null
+          early_termination_penalty?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          net_settlement: number
+          notes?: string | null
+          paid_rent?: number | null
+          security_deposit?: number | null
+          settlement_date?: string
+          settlement_number?: string
+          settlement_type: string
+          status?: string
+          termination_reason?: string | null
+          total_contract_days?: number | null
+          updated_at?: string | null
+          used_days?: number | null
+          used_rent?: number | null
+          voucher_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_by_name?: string | null
+          contract_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          damages_deduction?: number | null
+          early_termination_penalty?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          net_settlement?: number
+          notes?: string | null
+          paid_rent?: number | null
+          security_deposit?: number | null
+          settlement_date?: string
+          settlement_number?: string
+          settlement_type?: string
+          status?: string
+          termination_reason?: string | null
+          total_contract_days?: number | null
+          updated_at?: string | null
+          used_days?: number | null
+          used_rent?: number | null
+          voucher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_settlements_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "general_ledger"
+            referencedColumns: ["entry_id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries_with_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_masked"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_settlements_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_termination_requests: {
+        Row: {
+          contract_id: string
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          deposit_refund: number | null
+          id: string
+          legal_basis: string | null
+          penalty_amount: number | null
+          reason: string
+          request_number: string
+          requested_by: string
+          requested_date: string
+          responded_at: string | null
+          responded_by: string | null
+          responded_by_name: string | null
+          response_notes: string | null
+          settlement_amount: number | null
+          status: string
+          termination_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          deposit_refund?: number | null
+          id?: string
+          legal_basis?: string | null
+          penalty_amount?: number | null
+          reason: string
+          request_number?: string
+          requested_by: string
+          requested_date?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          responded_by_name?: string | null
+          response_notes?: string | null
+          settlement_amount?: number | null
+          status?: string
+          termination_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          deposit_refund?: number | null
+          id?: string
+          legal_basis?: string | null
+          penalty_amount?: number | null
+          reason?: string
+          request_number?: string
+          requested_by?: string
+          requested_date?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          responded_by_name?: string | null
+          response_notes?: string | null
+          settlement_amount?: number | null
+          status?: string
+          termination_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_termination_requests_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contract_units: {
         Row: {
           contract_id: string
@@ -3243,6 +3525,10 @@ export type Database = {
       contracts: {
         Row: {
           auto_renew: boolean | null
+          auto_renew_cancel_reason: string | null
+          auto_renew_cancelled_at: string | null
+          auto_renew_cancelled_by: string | null
+          auto_renew_enabled: boolean | null
           contract_number: string
           contract_type: string
           created_at: string
@@ -3257,6 +3543,7 @@ export type Database = {
           payment_frequency: string
           property_id: string
           renewal_notice_days: number | null
+          renewal_period_months: number | null
           security_deposit: number | null
           start_date: string
           status: string
@@ -3273,6 +3560,10 @@ export type Database = {
         }
         Insert: {
           auto_renew?: boolean | null
+          auto_renew_cancel_reason?: string | null
+          auto_renew_cancelled_at?: string | null
+          auto_renew_cancelled_by?: string | null
+          auto_renew_enabled?: boolean | null
           contract_number: string
           contract_type: string
           created_at?: string
@@ -3287,6 +3578,7 @@ export type Database = {
           payment_frequency?: string
           property_id: string
           renewal_notice_days?: number | null
+          renewal_period_months?: number | null
           security_deposit?: number | null
           start_date: string
           status?: string
@@ -3303,6 +3595,10 @@ export type Database = {
         }
         Update: {
           auto_renew?: boolean | null
+          auto_renew_cancel_reason?: string | null
+          auto_renew_cancelled_at?: string | null
+          auto_renew_cancelled_by?: string | null
+          auto_renew_enabled?: boolean | null
           contract_number?: string
           contract_type?: string
           created_at?: string
@@ -3317,6 +3613,7 @@ export type Database = {
           payment_frequency?: string
           property_id?: string
           renewal_notice_days?: number | null
+          renewal_period_months?: number | null
           security_deposit?: number | null
           start_date?: string
           status?: string
@@ -10810,6 +11107,86 @@ export type Database = {
         }
         Relationships: []
       }
+      rent_adjustment_requests: {
+        Row: {
+          adjustment_percentage: number | null
+          adjustment_type: string
+          contract_id: string
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          current_rent: number
+          effective_date: string
+          final_rent: number | null
+          id: string
+          reason: string
+          request_number: string
+          requested_by: string
+          requested_rent: number
+          responded_at: string | null
+          responded_by: string | null
+          responded_by_name: string | null
+          response_notes: string | null
+          status: string
+          supporting_documents: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          adjustment_percentage?: number | null
+          adjustment_type: string
+          contract_id: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          current_rent: number
+          effective_date: string
+          final_rent?: number | null
+          id?: string
+          reason: string
+          request_number?: string
+          requested_by: string
+          requested_rent: number
+          responded_at?: string | null
+          responded_by?: string | null
+          responded_by_name?: string | null
+          response_notes?: string | null
+          status?: string
+          supporting_documents?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          adjustment_percentage?: number | null
+          adjustment_type?: string
+          contract_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          current_rent?: number
+          effective_date?: string
+          final_rent?: number | null
+          id?: string
+          reason?: string
+          request_number?: string
+          requested_by?: string
+          requested_rent?: number
+          responded_at?: string | null
+          responded_by?: string | null
+          responded_by_name?: string | null
+          response_notes?: string | null
+          status?: string
+          supporting_documents?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_adjustment_requests_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rental_payments: {
         Row: {
           amount_due: number
@@ -13366,6 +13743,114 @@ export type Database = {
           verified_at?: string | null
         }
         Relationships: []
+      }
+      unit_handovers: {
+        Row: {
+          access_cards_count: number | null
+          cleanliness: string | null
+          condition_notes: string | null
+          contract_id: string
+          created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
+          damages: Json | null
+          electricity_meter_reading: number | null
+          gas_meter_reading: number | null
+          general_condition: string | null
+          handover_date: string
+          handover_type: string
+          id: string
+          keys_count: number | null
+          landlord_signature: string | null
+          landlord_signed_at: string | null
+          notes: string | null
+          parking_cards_count: number | null
+          photos: string[] | null
+          remote_controls_count: number | null
+          tenant_signature: string | null
+          tenant_signed_at: string | null
+          unit_id: string | null
+          updated_at: string | null
+          water_meter_reading: number | null
+          witness_name: string | null
+          witness_signature: string | null
+        }
+        Insert: {
+          access_cards_count?: number | null
+          cleanliness?: string | null
+          condition_notes?: string | null
+          contract_id: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          damages?: Json | null
+          electricity_meter_reading?: number | null
+          gas_meter_reading?: number | null
+          general_condition?: string | null
+          handover_date?: string
+          handover_type: string
+          id?: string
+          keys_count?: number | null
+          landlord_signature?: string | null
+          landlord_signed_at?: string | null
+          notes?: string | null
+          parking_cards_count?: number | null
+          photos?: string[] | null
+          remote_controls_count?: number | null
+          tenant_signature?: string | null
+          tenant_signed_at?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+          water_meter_reading?: number | null
+          witness_name?: string | null
+          witness_signature?: string | null
+        }
+        Update: {
+          access_cards_count?: number | null
+          cleanliness?: string | null
+          condition_notes?: string | null
+          contract_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
+          damages?: Json | null
+          electricity_meter_reading?: number | null
+          gas_meter_reading?: number | null
+          general_condition?: string | null
+          handover_date?: string
+          handover_type?: string
+          id?: string
+          keys_count?: number | null
+          landlord_signature?: string | null
+          landlord_signed_at?: string | null
+          notes?: string | null
+          parking_cards_count?: number | null
+          photos?: string[] | null
+          remote_controls_count?: number | null
+          tenant_signature?: string | null
+          tenant_signed_at?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+          water_meter_reading?: number | null
+          witness_name?: string | null
+          witness_signature?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_handovers_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_handovers_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "property_units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_permissions: {
         Row: {
