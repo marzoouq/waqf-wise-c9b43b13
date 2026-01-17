@@ -5,6 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { matchesStatus } from '@/lib/constants';
 
 export interface CollectionStats {
   // إحصائيات التحصيل
@@ -157,7 +158,7 @@ export function useCollectionStats() {
       // ========== حساب المحصّل من مصادر متعددة ==========
       // 1. من دفعات الإيجار المدفوعة
       const rentalCollected = rentalPayments
-        .filter(p => p.status === 'مدفوع' || p.status === 'paid')
+        .filter(p => matchesStatus(p.status, 'مدفوع', 'paid'))
         .reduce((sum, p) => sum + (p.amount_paid || p.amount_due || 0), 0);
       
       // 2. من سندات القبض المدفوعة
@@ -173,24 +174,24 @@ export function useCollectionStats() {
 
       // ========== إحصائيات الدفعات ==========
       const pendingPayments = rentalPayments.filter(p => 
-        p.status === 'معلقة' || p.status === 'pending'
+        matchesStatus(p.status, 'معلقة', 'pending')
       ).length;
       
       const overduePayments = rentalPayments.filter(p => 
-        (p.status === 'معلقة' || p.status === 'pending' || p.status === 'متأخرة' || p.status === 'overdue') &&
+        matchesStatus(p.status, 'معلقة', 'pending', 'متأخرة', 'overdue') &&
         new Date(p.due_date) < new Date(today)
       ).length;
       
       // الدفعات المدفوعة = من rental_payments + عدد سندات القبض
       const paidFromRentals = rentalPayments.filter(p => 
-        p.status === 'مدفوع' || p.status === 'paid'
+        matchesStatus(p.status, 'مدفوع', 'paid')
       ).length;
       const paidPayments = paidFromRentals + paymentVouchers.length;
 
       // المتأخرات
       const totalOverdueAmount = rentalPayments
         .filter(p => 
-          (p.status === 'معلقة' || p.status === 'pending' || p.status === 'متأخرة') &&
+          matchesStatus(p.status, 'معلقة', 'pending', 'متأخرة') &&
           new Date(p.due_date) < new Date(today)
         )
         .reduce((sum, p) => sum + (p.amount_due || 0), 0);

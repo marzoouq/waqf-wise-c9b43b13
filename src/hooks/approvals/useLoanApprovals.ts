@@ -12,6 +12,7 @@ import { useApprovalHistory } from '@/hooks/requests/useApprovalHistory';
 import { invalidateAccountingQueries } from '@/lib/query-invalidation';
 import type { LoanForApproval } from '@/types';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export function useLoanApprovals() {
   const { toast } = useToast();
@@ -65,7 +66,7 @@ export function useLoanApprovals() {
       if (action === 'approve') {
         const loan = await LoansService.getLoanForJournalEntry(loanId);
         const allApprovals = await LoansService.getLoanApprovalsByLoanId(loanId);
-        const allApproved = allApprovals?.every((a) => a.status === 'موافق');
+        const allApproved = allApprovals?.every((a) => matchesStatus(a.status, 'موافق'));
 
         if (allApproved && loan) {
           await AccountingService.createAutoJournalEntry({

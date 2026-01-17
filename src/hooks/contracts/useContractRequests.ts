@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { matchesStatus } from '@/lib/constants';
 
 export interface TerminationRequest {
   id: string;
@@ -241,16 +242,16 @@ export function useContractRequests(contractId?: string) {
   const stats = {
     terminationRequests: {
       total: terminationRequests?.length || 0,
-      pending: terminationRequests?.filter((r) => r.status === 'pending').length || 0,
-      approved: terminationRequests?.filter((r) => r.status === 'approved').length || 0,
-      rejected: terminationRequests?.filter((r) => r.status === 'rejected').length || 0,
+      pending: terminationRequests?.filter((r) => matchesStatus(r.status, 'pending')).length || 0,
+      approved: terminationRequests?.filter((r) => matchesStatus(r.status, 'approved')).length || 0,
+      rejected: terminationRequests?.filter((r) => matchesStatus(r.status, 'rejected')).length || 0,
     },
     rentAdjustmentRequests: {
       total: rentAdjustmentRequests?.length || 0,
-      pending: rentAdjustmentRequests?.filter((r) => r.status === 'pending').length || 0,
-      approved: rentAdjustmentRequests?.filter((r) => r.status === 'approved').length || 0,
-      rejected: rentAdjustmentRequests?.filter((r) => r.status === 'rejected').length || 0,
-      negotiating: rentAdjustmentRequests?.filter((r) => r.status === 'negotiating').length || 0,
+      pending: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'pending')).length || 0,
+      approved: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'approved')).length || 0,
+      rejected: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'rejected')).length || 0,
+      negotiating: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'negotiating')).length || 0,
     },
   };
 

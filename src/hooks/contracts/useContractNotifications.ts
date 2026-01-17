@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { matchesStatus } from '@/lib/constants';
 
 export interface ContractNotification {
   id: string;
@@ -175,11 +176,11 @@ export function useContractNotifications(contractId?: string) {
   // إحصائيات الإشعارات
   const stats = {
     total: notifications?.length || 0,
-    pending: notifications?.filter((n) => n.status === 'pending').length || 0,
-    sent: notifications?.filter((n) => n.status === 'sent').length || 0,
-    delivered: notifications?.filter((n) => n.status === 'delivered').length || 0,
-    read: notifications?.filter((n) => n.status === 'read').length || 0,
-    failed: notifications?.filter((n) => n.status === 'failed').length || 0,
+    pending: notifications?.filter((n) => matchesStatus(n.status, 'pending')).length || 0,
+    sent: notifications?.filter((n) => matchesStatus(n.status, 'sent')).length || 0,
+    delivered: notifications?.filter((n) => matchesStatus(n.status, 'delivered')).length || 0,
+    read: notifications?.filter((n) => matchesStatus(n.status, 'read')).length || 0,
+    failed: notifications?.filter((n) => matchesStatus(n.status, 'failed')).length || 0,
   };
 
   return {

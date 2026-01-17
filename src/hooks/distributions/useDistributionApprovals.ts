@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { FundService, RealtimeService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 export interface DistributionApproval {
   id: string;
@@ -65,9 +66,9 @@ export function useDistributionApprovals(distributionId?: string) {
     onError: createMutationErrorHandler({ context: 'update_distribution_approval', toastTitle: 'خطأ في التحديث' }),
   });
 
-  const checkAllApproved = () => approvals.length === 3 && approvals.every(a => a.status === "موافق");
-  const hasRejection = () => approvals.some(a => a.status === "مرفوض");
-  const getCurrentLevel = () => approvals.filter(a => a.status === "موافق").length + 1;
+  const checkAllApproved = () => approvals.length === 3 && approvals.every(a => matchesStatus(a.status, 'موافق'));
+  const hasRejection = () => approvals.some(a => matchesStatus(a.status, 'مرفوض'));
+  const getCurrentLevel = () => approvals.filter(a => matchesStatus(a.status, 'موافق')).length + 1;
 
   return {
     approvals,

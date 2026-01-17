@@ -222,7 +222,12 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | **المرحلة 3 مكتملة**: فحص الصفحات الداخلية - تم تحديث 8 صفحات: |
 | 2026-01-17 | → EmergencyAidManagement, AllTransactions, Loans, Support |
 | 2026-01-17 | → GovernanceDecisions, Invoices + إضافة حالات الحوكمة للثوابت |
-
+| 2026-01-17 | **المرحلة 4 مكتملة**: فحص الخدمات - تم تحديث 7 خدمات: |
+| 2026-01-17 | → unified-financial, invoice, maintenance, voucher, payment, approval, analysis |
+| 2026-01-17 | **المرحلة 5 مكتملة**: فحص الـ Hooks - تم تحديث 14 Hook: |
+| 2026-01-17 | → useSystemMonitoring, useDistributionApprovals, useContractRequests, useContractNotifications |
+| 2026-01-17 | → useRequestApprovals, useBeneficiaryPersonalReportsData, useSystemErrorLogsData, useLoanApprovals |
+| 2026-01-17 | → useMyBeneficiaryRequests, useCollectionStats, useTransferStatusTracker, usePaymentVouchersData, useBatchPayments |
 ---
 
 ## 9. إحصائيات النظام الحالية
