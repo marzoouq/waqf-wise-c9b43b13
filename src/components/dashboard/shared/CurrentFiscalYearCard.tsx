@@ -1,13 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Globe, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar, Clock, Globe, AlertCircle, ExternalLink } from "lucide-react";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function CurrentFiscalYearCard() {
   const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading, error, refetch } = useFiscalYearsList();
+  const { roles } = useAuth();
+  
+  // التحقق من صلاحية المستخدم لنشر السنة المالية
+  const canPublish = roles.some(r => ['admin', 'nazer'].includes(r));
 
   if (isLoading) {
     return (
@@ -90,6 +97,23 @@ export function CurrentFiscalYearCard() {
             {format(new Date(activeFiscalYear.end_date), 'dd MMMM yyyy', { locale: ar })}
           </p>
         </div>
+        
+        {/* تنبيه السنة غير المنشورة */}
+        {!activeFiscalYear.is_published && canPublish && (
+          <Alert className="border-warning/30 bg-warning/10 py-2">
+            <AlertCircle className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-xs text-warning flex items-center justify-between">
+              <span>السنة المالية غير منشورة للمستفيدين</span>
+              <Link 
+                to="/fiscal-years-management" 
+                className="inline-flex items-center gap-1 text-warning hover:underline font-medium"
+              >
+                نشر الآن
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </AlertDescription>
+          </Alert>
+        )}
         
         <div className="grid grid-cols-2 gap-3 pt-2 border-t">
           <div className="text-center p-2 bg-muted/50 rounded-lg">
