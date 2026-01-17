@@ -94,9 +94,44 @@ export interface UnifiedIncomeData {
 
 export class UnifiedFinancialService {
   /**
-   * جلب بيانات الإيرادات الموحدة
+   * جلب بيانات الإيرادات الموحدة من View قاعدة البيانات
    */
   static async getRevenueData(): Promise<UnifiedRevenueData> {
+    try {
+      // استخدام View الموحد من قاعدة البيانات
+      const { data: summaryData, error: summaryError } = await supabase
+        .from('financial_summary')
+        .select('*')
+        .eq('is_active', true)
+        .single();
+
+      if (summaryError) {
+        // fallback إلى الطريقة التقليدية
+        return this.getRevenueDataFallback();
+      }
+
+      if (summaryData) {
+        return {
+          totalCollected: Number(summaryData.total_collected) || 0,
+          expectedAnnualRevenue: Number(summaryData.total_expected_revenue) || 0,
+          monthlyContractRevenue: Number(summaryData.total_expected_revenue) / 12 || 0,
+          accountingPeriodRevenue: Number(summaryData.total_rental_collected) || 0,
+          pendingAmount: Number(summaryData.pending_amount) || 0,
+          collectionRate: Number(summaryData.collection_percentage) || 0
+        };
+      }
+
+      return this.getRevenueDataFallback();
+    } catch (error) {
+      productionLogger.error('Error fetching unified revenue data from view', error);
+      return this.getRevenueDataFallback();
+    }
+  }
+
+  /**
+   * طريقة احتياطية لجلب البيانات
+   */
+  private static async getRevenueDataFallback(): Promise<UnifiedRevenueData> {
     try {
       const [
         rentalPaymentsRes,
@@ -105,40 +140,34 @@ export class UnifiedFinancialService {
         revenueAccountsRes,
         pendingPaymentsRes
       ] = await Promise.all([
-        // دفعات الإيجار المدفوعة
         supabase
           .from('rental_payments')
           .select('amount_paid')
-          .eq('status', 'مدفوع'),
+          .eq('status', 'paid'),
         
-        // سندات القبض المدفوعة
         supabase
           .from('payment_vouchers')
           .select('amount')
           .eq('voucher_type', 'receipt')
           .eq('status', 'paid'),
         
-        // العقود النشطة
         supabase
           .from('contracts')
           .select('monthly_rent')
-          .eq('status', 'نشط'),
+          .eq('status', 'active'),
         
-        // حسابات الإيرادات
         supabase
           .from('accounts')
           .select('current_balance')
           .eq('account_type', 'revenue')
           .eq('is_active', true),
         
-        // الدفعات المعلقة والمتأخرة
         supabase
           .from('rental_payments')
           .select('amount_due')
-          .in('status', ['معلق', 'متأخر'])
+          .in('status', ['pending', 'overdue'])
       ]);
 
-      // حساب إجمالي المحصّل
       const rentalCollected = rentalPaymentsRes.data?.reduce(
         (sum, p) => sum + (p.amount_paid || 0), 0
       ) || 0;
@@ -149,24 +178,20 @@ export class UnifiedFinancialService {
       
       const totalCollected = rentalCollected + vouchersCollected;
 
-      // حساب الإيراد المتوقع من العقود
       const monthlyContractRevenue = activeContractsRes.data?.reduce(
         (sum, c) => sum + (c.monthly_rent || 0), 0
       ) || 0;
       
       const expectedAnnualRevenue = monthlyContractRevenue * 12;
 
-      // إيرادات الفترة المحاسبية
       const accountingPeriodRevenue = revenueAccountsRes.data?.reduce(
         (sum, a) => sum + (a.current_balance || 0), 0
       ) || 0;
 
-      // المستحق غير المحصّل
       const pendingAmount = pendingPaymentsRes.data?.reduce(
         (sum, p) => sum + (p.amount_due || 0), 0
       ) || 0;
 
-      // نسبة التحصيل
       const totalExpected = totalCollected + pendingAmount;
       const collectionRate = totalExpected > 0 
         ? Math.round((totalCollected / totalExpected) * 100) 
@@ -181,7 +206,7 @@ export class UnifiedFinancialService {
         collectionRate
       };
     } catch (error) {
-      productionLogger.error('Error fetching unified revenue data', error);
+      productionLogger.error('Error in revenue fallback', error);
       return {
         totalCollected: 0,
         expectedAnnualRevenue: 0,
@@ -190,6 +215,27 @@ export class UnifiedFinancialService {
         pendingAmount: 0,
         collectionRate: 0
       };
+    }
+  }
+
+  /**
+   * جلب بيانات الإيرادات الموحدة من View
+   */
+  static async getUnifiedRevenueBreakdown() {
+    try {
+      const { data, error } = await supabase
+        .from('unified_revenue')
+        .select('*')
+        .eq('revenue_type', 'collected')
+        .order('transaction_date', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching unified revenue breakdown', error);
+      return [];
     }
   }
 
@@ -214,7 +260,7 @@ export class UnifiedFinancialService {
       );
 
       const approvedDistributions = allDistributions
-        .filter(d => d.status === 'معتمد' || d.status === 'completed')
+        .filter(d => d.status === 'approved' || d.status === 'completed')
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
 
       const beneficiaryDistributions = heirDistributionsRes.data?.reduce(
@@ -247,28 +293,24 @@ export class UnifiedFinancialService {
         paymentVouchersRes,
         disclosuresRes
       ] = await Promise.all([
-        // حسابات الإيرادات
         supabase
           .from('accounts')
           .select('current_balance')
           .eq('account_type', 'revenue')
           .eq('is_active', true),
         
-        // حسابات المصروفات
         supabase
           .from('accounts')
           .select('current_balance')
           .eq('account_type', 'expense')
           .eq('is_active', true),
         
-        // سندات الصرف
         supabase
           .from('payment_vouchers')
           .select('amount')
           .eq('voucher_type', 'payment')
           .eq('status', 'paid'),
         
-        // آخر إفصاح سنوي
         supabase
           .from('annual_disclosures')
           .select('total_revenues')
@@ -305,6 +347,72 @@ export class UnifiedFinancialService {
         totalExpenses: 0,
         fiscalYearRevenue: 0
       };
+    }
+  }
+
+  /**
+   * جلب ملخص التحصيل حسب العقار
+   */
+  static async getPropertyCollectionSummary(propertyId?: string) {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_property_collection_summary', { 
+          p_property_id: propertyId || null 
+        });
+
+      if (error) throw error;
+
+      return data?.[0] || {
+        total_collected: 0,
+        total_expected: 0,
+        collection_percentage: 0,
+        transaction_count: 0
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching property collection summary', error);
+      return {
+        total_collected: 0,
+        total_expected: 0,
+        collection_percentage: 0,
+        transaction_count: 0
+      };
+    }
+  }
+
+  /**
+   * جلب إجمالي المحصّل لفترة معينة
+   */
+  static async getTotalCollected(startDate?: string, endDate?: string): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_total_collected', {
+          p_start_date: startDate || null,
+          p_end_date: endDate || null
+        });
+
+      if (error) throw error;
+
+      return Number(data) || 0;
+    } catch (error) {
+      productionLogger.error('Error fetching total collected', error);
+      return 0;
+    }
+  }
+
+  /**
+   * جلب نسبة التحصيل الإجمالية
+   */
+  static async getCollectionPercentage(): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_collection_percentage');
+
+      if (error) throw error;
+
+      return Number(data) || 0;
+    } catch (error) {
+      productionLogger.error('Error fetching collection percentage', error);
+      return 0;
     }
   }
 }
