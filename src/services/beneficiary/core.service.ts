@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { matchesStatus } from '@/lib/constants';
 import type { Beneficiary } from '@/types/beneficiary';
 
 export interface BeneficiaryFilters {
@@ -218,9 +219,9 @@ export class BeneficiaryCoreService {
 
       const stats: BeneficiaryStats = {
         total: data?.length || 0,
-        active: data?.filter(b => b.status === 'نشط' || b.status === 'active').length || 0,
-        inactive: data?.filter(b => b.status === 'غير نشط' || b.status === 'inactive').length || 0,
-        pending: data?.filter(b => b.status === 'معلق' || b.status === 'pending').length || 0,
+        active: data?.filter(b => matchesStatus(b.status, 'active')).length || 0,
+        inactive: data?.filter(b => matchesStatus(b.status, 'inactive')).length || 0,
+        pending: data?.filter(b => matchesStatus(b.status, 'pending')).length || 0,
         totalPaid: data?.reduce((sum, b) => sum + (b.total_received || 0), 0) || 0,
         totalPending: data?.reduce((sum, b) => sum + (b.pending_amount || 0), 0) || 0,
       };

@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, ExternalLink, User, AlertCircle } from "lucide-react";
 import { useNazerBeneficiariesQuick } from "@/hooks/nazer/useNazerBeneficiariesQuick";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { matchesStatus } from "@/lib/constants";
 
 export function PreviewAsBeneficiaryButton() {
   const [open, setOpen] = useState(false);
@@ -112,7 +113,7 @@ export function PreviewAsBeneficiaryButton() {
                 <span className="text-sm text-muted-foreground">الحالة:</span>
                 <Badge 
                   className={
-                    selectedBeneficiary.status === "نشط" 
+                    matchesStatus(selectedBeneficiary.status, 'active')
                       ? "bg-status-success/10 text-status-success" 
                       : "bg-status-warning/10 text-status-warning"
                   }

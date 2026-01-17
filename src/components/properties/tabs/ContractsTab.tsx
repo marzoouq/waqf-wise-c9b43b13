@@ -30,6 +30,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
+import { matchesStatus } from "@/lib/constants";
 
 // تعريف الفلاتر
 const contractsFilterConfigs: FilterConfig[] = [
@@ -132,21 +133,21 @@ export const ContractsTab = ({ onEdit }: Props) => {
     const now = new Date();
     switch (activeTabFilter) {
       case "active":
-        result = result.filter(c => c.status === "نشط");
+        result = result.filter(c => matchesStatus(c.status, 'active'));
         break;
       case "draft":
-        result = result.filter(c => c.status === "مسودة" || c.status === "draft");
+        result = result.filter(c => matchesStatus(c.status, 'draft'));
         break;
       case "renewal":
         result = result.filter(c => {
-          if (c.status !== "نشط") return false;
+          if (!matchesStatus(c.status, 'active')) return false;
           const endDate = new Date(c.end_date);
           const daysUntilExpiry = differenceInDays(endDate, now);
           return daysUntilExpiry <= 60 && daysUntilExpiry > 0;
         });
         break;
       case "autoRenew":
-        result = result.filter(c => (c as any).auto_renew_enabled && c.status === "نشط");
+        result = result.filter(c => (c as any).auto_renew_enabled && matchesStatus(c.status, 'active'));
         break;
       case "expired":
         result = result.filter(c => c.status === "منتهي" || c.status === "expired");

@@ -32,6 +32,7 @@ import { MaskedValue } from "@/components/shared/MaskedValue";
 import { EditProfileDialog } from "../dialogs/EditProfileDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
 
@@ -370,10 +371,10 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-sm text-muted-foreground">حالة الحساب</p>
                 <Badge 
-                  variant={beneficiary.status === 'active' ? 'default' : 'secondary'}
+                  variant={matchesStatus(beneficiary.status, 'active') ? 'default' : 'secondary'}
                   className="mt-1"
                 >
-                  {beneficiary.status === 'active' ? 'نشط' : beneficiary.status}
+                  {matchesStatus(beneficiary.status, 'active') ? 'نشط' : beneficiary.status}
                 </Badge>
               </div>
               <div className="p-3 rounded-lg bg-muted/50">

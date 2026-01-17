@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Beneficiary } from "@/types/beneficiary";
+import { matchesStatus } from "@/lib/constants";
 
 interface BeneficiaryMobileCardProps {
   beneficiary: Beneficiary;
@@ -60,7 +61,7 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
                 </Badge>
                 <Badge
                   className={
-                    beneficiary.status === "نشط"
+                    matchesStatus(beneficiary.status, 'active')
                       ? "bg-success/10 text-success border border-success/30 text-[10px] px-1.5 py-0"
                       : "bg-warning/10 text-warning border border-warning/30 text-[10px] px-1.5 py-0"
                   }
