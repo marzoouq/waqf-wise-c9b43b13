@@ -1,6 +1,6 @@
 /**
  * System Health Live Stats Hook
- * @version 2.8.44
+ * @version 2.8.45 - مع تصدير في index.ts
  */
 
 import { useQuery } from "@tanstack/react-query";
@@ -31,5 +31,7 @@ export function useSystemHealthLive() {
     queryFn: async (): Promise<SystemHealthStats> => {
       return SystemService.getHealthStats();
     },
+    staleTime: 30 * 1000, // 30 ثانية
+    refetchInterval: 60 * 1000, // كل دقيقة
   });
 }

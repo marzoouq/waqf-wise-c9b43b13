@@ -6,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { MAINTENANCE_OPEN_STATUSES } from "@/lib/constants";
+import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['Row'];
 type MaintenanceRequestInsert = Database['public']['Tables']['maintenance_requests']['Insert'];
@@ -71,7 +72,7 @@ export class MaintenanceService {
   }
 
   static async getStats() {
-    const requests = await this.getRequests();
+    const requests = await withRetry(() => this.getRequests(), SUPABASE_RETRY_OPTIONS);
     const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
     return {
       total: requests.length,
