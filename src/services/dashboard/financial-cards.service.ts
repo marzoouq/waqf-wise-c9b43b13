@@ -71,6 +71,10 @@ export const FinancialCardsService = {
 
   /**
    * جلب تقدم الإيرادات للسنة المالية
+   * المصادر الموحدة:
+   * 1. rental_payments (دفعات الإيجار المدفوعة)
+   * 2. payment_vouchers (سندات القبض المدفوعة)
+   * 3. journal_entry_lines (القيود المحاسبية على حسابات الإيرادات)
    */
   async getRevenueProgress(fiscalYear: { id: string; start_date: string; end_date: string }): Promise<{
     totalCollected: number;
@@ -79,26 +83,63 @@ export const FinancialCardsService = {
     expectedRevenue: number;
     progress: number;
   }> {
-    const [paymentsResult, contractsResult] = await Promise.all([
+    const [paymentsResult, vouchersResult, contractsResult, revenueEntriesResult] = await Promise.all([
+      // دفعات الإيجار المدفوعة
       supabase
         .from("rental_payments")
-        .select("amount_due, tax_amount")
+        .select("amount_due, amount_paid, tax_amount")
         .eq("status", "مدفوع")
         .gte("payment_date", fiscalYear.start_date)
         .lte("payment_date", fiscalYear.end_date),
+      // سندات القبض المدفوعة
+      supabase
+        .from("payment_vouchers")
+        .select("amount")
+        .eq("voucher_type", "receipt")
+        .eq("status", "paid")
+        .gte("voucher_date", fiscalYear.start_date)
+        .lte("voucher_date", fiscalYear.end_date),
+      // العقود النشطة
       supabase
         .from("contracts")
         .select("monthly_rent, payment_frequency")
-        .eq("status", "نشط"), // تصحيح: استخدام الحالة العربية
+        .eq("status", "نشط"),
+      // القيود المحاسبية على حسابات الإيرادات
+      supabase
+        .from("journal_entry_lines")
+        .select(`
+          credit_amount,
+          journal_entries!inner(entry_date),
+          accounts!inner(account_type)
+        `)
+        .eq("accounts.account_type", "revenue")
+        .gte("journal_entries.entry_date", fiscalYear.start_date)
+        .lte("journal_entries.entry_date", fiscalYear.end_date),
     ]);
 
     const payments = paymentsResult.data || [];
+    const vouchers = vouchersResult.data || [];
     const contracts = contractsResult.data || [];
+    const revenueEntries = revenueEntriesResult.data || [];
 
-    const totalCollected = payments.reduce((sum, p) => sum + (p.amount_due || 0), 0);
+    // حساب المحصّل من دفعات الإيجار
+    const rentalCollected = payments.reduce((sum, p) => sum + (p.amount_paid || p.amount_due || 0), 0);
     const totalTax = payments.reduce((sum, p) => sum + (p.tax_amount || 0), 0);
+    
+    // حساب المحصّل من سندات القبض
+    const vouchersCollected = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+    
+    // حساب المحصّل من القيود المحاسبية (الدائن على حسابات الإيرادات)
+    const accountingRevenue = revenueEntries.reduce((sum, e) => sum + (e.credit_amount || 0), 0);
+    
+    // إجمالي المحصّل = أعلى قيمة من المصادر الثلاثة (لتجنب التكرار)
+    // أو مجموع دفعات الإيجار + سندات القبض إذا كانت أكبر
+    const directCollected = rentalCollected + vouchersCollected;
+    const totalCollected = Math.max(directCollected, accountingRevenue);
+    
     const netRevenue = totalCollected - totalTax;
 
+    // حساب الإيراد المتوقع من العقود النشطة
     const expectedRevenue = contracts.reduce((sum, c) => {
       const rent = c.monthly_rent || 0;
       const frequency = c.payment_frequency || 'شهري';
