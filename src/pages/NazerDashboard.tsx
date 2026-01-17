@@ -27,6 +27,8 @@ import { WaqfBrandingSettings } from "@/components/nazer/WaqfBrandingSettings";
 import { TenantMaintenanceRequestsSection } from "@/components/nazer/TenantMaintenanceRequestsSection";
 import { ContractsOverviewSection } from "@/components/nazer/ContractsOverviewSection";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
+import { CollectionOverviewCard } from "@/components/dashboard/shared/CollectionOverviewCard";
+import { ExpiringContractsCard } from "@/components/dashboard/shared/ExpiringContractsCard";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
@@ -148,6 +150,12 @@ export default function NazerDashboard() {
 
             {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
             <FinancialCardsRow />
+
+            {/* قسم التحصيل والعقود المنتهية - جديد */}
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+              <CollectionOverviewCard />
+              <ExpiringContractsCard />
+            </div>
 
             {/* قسم ملخص العقود */}
             <Suspense fallback={<ChartSkeleton />}>

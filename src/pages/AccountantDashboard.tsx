@@ -14,6 +14,8 @@ import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { JournalApproval } from "@/types/approvals";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
+import { CollectionOverviewCard } from "@/components/dashboard/shared/CollectionOverviewCard";
+import { OverduePaymentsCard } from "@/components/dashboard/shared/OverduePaymentsCard";
 import { PendingApprovalsList, QuickActionsGrid } from "@/components/dashboard/accountant";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from "@/hooks/dashboard/useAccountantDashboardRealtime";
@@ -105,6 +107,12 @@ const AccountantDashboard = () => {
       <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
         <CurrentFiscalYearCard />
         <RevenueProgressCard />
+      </div>
+
+      {/* قسم التحصيل - جديد */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
+        <CollectionOverviewCard />
+        <OverduePaymentsCard />
       </div>
 
       {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
