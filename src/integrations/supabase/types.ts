@@ -15786,6 +15786,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string | null
+          nazer_name: string | null
           show_logo_in_pdf: boolean | null
           updated_at: string | null
           waqf_logo_url: string | null
@@ -15793,6 +15794,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string | null
+          nazer_name?: string | null
           show_logo_in_pdf?: boolean | null
           updated_at?: string | null
           waqf_logo_url?: string | null
@@ -15800,6 +15802,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string | null
+          nazer_name?: string | null
           show_logo_in_pdf?: boolean | null
           updated_at?: string | null
           waqf_logo_url?: string | null
