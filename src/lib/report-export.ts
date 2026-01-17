@@ -3,7 +3,7 @@
  */
 
 import type { ReportResult, CustomReportTemplate } from "@/services/report.service";
-import ExcelJS from "exceljs";
+import * as ExcelJS from "exceljs";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
