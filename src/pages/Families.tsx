@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Plus, Users, MoreVertical, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { matchesStatus } from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -230,7 +231,7 @@ const Families = memo(() => {
                           <TableCell className="hidden md:table-cell text-xs sm:text-sm">{family.tribe || '-'}</TableCell>
                           <TableCell><Badge variant="secondary" className="text-xs">{family.total_members} أفراد</Badge></TableCell>
                           <TableCell className="hidden lg:table-cell">
-                            <Badge variant={family.status === 'نشط' ? 'default' : 'secondary'} className="text-xs">{family.status}</Badge>
+                            <Badge variant={matchesStatus(family.status, 'active') ? 'default' : 'secondary'} className="text-xs">{family.status}</Badge>
                           </TableCell>
                           <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">
                             {new Date(family.created_at).toLocaleDateString('ar-SA')}

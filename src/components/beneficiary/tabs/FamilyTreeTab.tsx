@@ -5,6 +5,7 @@ import { Users, User } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
+import { matchesStatus } from "@/lib/constants";
 
 interface FamilyTreeTabProps {
   beneficiaryId: string;
@@ -116,7 +117,7 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
                     </div>
 
                     <Badge 
-                      variant={member.status === "نشط" ? "default" : "secondary"}
+                      variant={matchesStatus(member.status, 'active') ? "default" : "secondary"}
                       className="text-[10px] sm:text-xs shrink-0"
                     >
                       {member.status}

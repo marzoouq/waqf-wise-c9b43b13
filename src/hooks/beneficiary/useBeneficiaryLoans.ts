@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { LoansService } from "@/services/loans.service";
 import { useBeneficiaryId } from "./useBeneficiaryId";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { matchesStatus } from "@/lib/constants";
 
 export function useBeneficiaryLoans() {
   const { beneficiaryId, isLoading: idLoading } = useBeneficiaryId();
@@ -32,7 +33,7 @@ export function useBeneficiaryLoans() {
   // Calculate statistics
   const statistics = {
     totalLoans: loans.length,
-    activeLoans: loans.filter(l => l.status === "active" || l.status === "نشط").length,
+    activeLoans: loans.filter(l => matchesStatus(l.status, 'active')).length,
     totalAmount: loans.reduce((sum, l) => sum + (l.principal_amount || 0), 0),
     totalPaid: loans.reduce((sum, l) => sum + (l.paid_amount || 0), 0),
   };

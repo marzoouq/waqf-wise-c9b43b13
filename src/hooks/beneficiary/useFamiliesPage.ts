@@ -6,6 +6,7 @@ import { useDeleteConfirmation } from '@/hooks/shared';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import type { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
+import { matchesStatus } from '@/lib/constants';
 
 export type FamilyWithHead = Family & {
   head_of_family?: {
@@ -62,7 +63,7 @@ export function useFamiliesPage() {
 
   const stats = {
     total: families.length,
-    active: families.filter(f => f.status === 'نشط' || f.status === 'active').length,
+    active: families.filter(f => matchesStatus(f.status, 'active')).length,
     totalMembers: families.reduce((sum, f) => sum + f.total_members, 0),
   };
 

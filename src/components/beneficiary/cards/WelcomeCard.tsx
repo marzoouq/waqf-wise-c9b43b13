@@ -10,6 +10,7 @@ import { Sun, Moon, Sunset, Sparkles, TrendingUp, Clock } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { format, arLocale as ar } from "@/lib/date";
 import { motion } from "framer-motion";
+import { matchesStatus } from "@/lib/constants";
 
 interface WelcomeCardProps {
   beneficiary: Beneficiary;
@@ -72,7 +73,7 @@ export function WelcomeCard({ beneficiary }: WelcomeCardProps) {
               <Badge 
                 variant="secondary" 
                 className={`border-0 backdrop-blur-sm text-xs sm:text-sm ${
-                  beneficiary.status === 'نشط' || beneficiary.status === 'active'
+                  matchesStatus(beneficiary.status, 'active')
                     ? 'bg-emerald-500/30 text-white'
                     : 'bg-amber-500/30 text-white'
                 }`}

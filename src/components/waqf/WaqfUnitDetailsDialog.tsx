@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "@/lib/date";
+import { matchesStatus } from "@/lib/constants";
 import type { WaqfUnit } from "@/hooks/distributions/useWaqfUnits";
 import { useWaqfRevenueByFiscalYear } from "@/hooks/reports/useWaqfRevenueByFiscalYear";
 import { useWaqfUnitProperties } from "@/hooks/waqf/useWaqfProperties";
@@ -65,7 +66,7 @@ export function WaqfUnitDetailsDialog({
     let annualFromContracts = 0;
 
     properties.forEach((property) => {
-      const activeContracts = property.contracts?.filter(c => c.status === 'نشط') || [];
+      const activeContracts = property.contracts?.filter(c => matchesStatus(c.status, 'active')) || [];
       activeContracts.forEach((contract) => {
         if (contract.payment_frequency === 'شهري') {
           monthlyFromContracts += contract.monthly_rent || 0;

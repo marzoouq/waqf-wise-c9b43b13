@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Users, TrendingUp, DollarSign, Download, Award } from 'lucide-react';
+import { matchesStatus } from '@/lib/constants';
 import type { 
   BeneficiaryReportData, 
   DistributionReportData, 
@@ -32,7 +33,7 @@ export function BeneficiaryDistributionReport({
   // حساب الإحصائيات
   const stats = {
     totalBeneficiaries: beneficiaries.length,
-    activeBeneficiaries: beneficiaries.filter(b => b.status === 'نشط' || b.status === 'active').length,
+    activeBeneficiaries: beneficiaries.filter(b => matchesStatus(b.status, 'active')).length,
     totalDistributed: distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0),
     avgPerBeneficiary: 0,
   };
@@ -271,8 +272,8 @@ export function BeneficiaryDistributionReport({
                     {(b.total_received || 0).toLocaleString('ar-SA')} ريال
                   </td>
                   <td className="p-2">
-                    <Badge variant={b.status === 'نشط' || b.status === 'active' ? 'default' : 'secondary'}>
-                      {b.status === 'نشط' || b.status === 'active' ? 'نشط' : 'غير نشط'}
+                    <Badge variant={matchesStatus(b.status, 'active') ? 'default' : 'secondary'}>
+                      {matchesStatus(b.status, 'active') ? 'نشط' : 'غير نشط'}
                     </Badge>
                   </td>
                 </tr>

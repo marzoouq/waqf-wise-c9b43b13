@@ -6,6 +6,7 @@ import { useContracts } from "@/hooks/property/useContracts";
 import { differenceInDays, formatDate } from "@/lib/date";
 import { useNavigate } from "react-router-dom";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { matchesStatus } from "@/lib/constants";
 
 export const ExpiringContractsCard = () => {
   const { contracts, isLoading, error, refetch } = useContracts();
@@ -63,7 +64,7 @@ export const ExpiringContractsCard = () => {
       try {
         const endDate = new Date(contract.end_date);
         const daysRemaining = differenceInDays(endDate, today);
-        return contract.status === 'نشط' && daysRemaining > 0 && daysRemaining <= 90;
+        return matchesStatus(contract.status, 'active') && daysRemaining > 0 && daysRemaining <= 90;
       } catch {
         return false;
       }

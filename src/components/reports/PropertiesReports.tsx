@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
 import { usePropertiesReport } from "@/hooks/reports/usePropertiesReport";
+import { matchesStatus } from "@/lib/constants";
 
 export function PropertiesReports() {
   const { toast } = useToast();
@@ -26,7 +27,7 @@ export function PropertiesReports() {
     const { exportToPDF } = await import("@/lib/exportHelpers");
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
     const data = properties.map((p) => {
-      const activeContract = p.contracts?.find((c) => c.status === "نشط");
+      const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
       return [
         p.name,
         p.location,
@@ -50,7 +51,7 @@ export function PropertiesReports() {
   const handleExportExcel = async () => {
     const { exportToExcel } = await import("@/lib/exportHelpers");
     const data = properties.map((p) => {
-      const activeContract = p.contracts?.find((c) => c.status === "نشط");
+      const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
       return {
         "اسم العقار": p.name,
         الموقع: p.location,
@@ -92,7 +93,7 @@ export function PropertiesReports() {
 
   // حساب الإيجار الشهري الموحد (تحويل السنوي والربع سنوي إلى شهري)
   const totalMonthlyRent = properties.reduce((sum, p) => {
-    const activeContract = p.contracts?.find((c) => c.status === "نشط");
+    const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
     if (!activeContract) return sum;
     
     const rent = Number(activeContract.monthly_rent) || 0;
@@ -146,7 +147,7 @@ export function PropertiesReports() {
             <TableBody>
               {properties.map((property) => {
                 const activeContract = property.contracts?.find(
-                  (c: { status: string }) => c.status === "نشط"
+                  (c: { status: string }) => matchesStatus(c.status, 'active')
                 );
                 return (
                   <TableRow key={property.id}>

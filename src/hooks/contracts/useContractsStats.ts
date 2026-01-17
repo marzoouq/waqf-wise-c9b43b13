@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { type Contract } from "@/hooks/property/useContracts";
 import { differenceInDays } from "date-fns";
+import { matchesStatus } from "@/lib/constants";
 
 interface ContractsStats {
   total: number;
@@ -36,7 +37,7 @@ export function useContractsStats(contracts: Contract[] | undefined): ContractsS
         acc.total++;
 
         // العقود النشطة
-        if (contract.status === "نشط") {
+        if (matchesStatus(contract.status, 'active')) {
           acc.active++;
           
           // جاهز للتجديد (ينتهي خلال 60 يوم)
@@ -53,17 +54,17 @@ export function useContractsStats(contracts: Contract[] | undefined): ContractsS
         }
 
         // العقود المسودة
-        if (contract.status === "مسودة" || contract.status === "draft") {
+        if (matchesStatus(contract.status, 'draft')) {
           acc.draft++;
         }
 
         // العقود المنتهية
-        if (contract.status === "منتهي" || contract.status === "expired") {
+        if (matchesStatus(contract.status, 'expired')) {
           acc.expired++;
         }
 
         // حساب الإيرادات
-        if (contract.status === "نشط") {
+        if (matchesStatus(contract.status, 'active')) {
           const rent = Number(contract.monthly_rent) || 0;
           const frequency = contract.payment_frequency;
 
