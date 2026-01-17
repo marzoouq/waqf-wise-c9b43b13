@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { Monitor, Sun, Moon } from "lucide-react";
+import { Monitor, Sun, Moon, Type } from "lucide-react";
 
 interface AppearanceSettingsDialogProps {
   open: boolean;
@@ -20,6 +20,14 @@ const accentColors: Record<string, { primary: string; primaryForeground: string 
   red: { primary: "0 72% 51%", primaryForeground: "0 0% 100%" },
   teal: { primary: "173 80% 40%", primaryForeground: "0 0% 100%" },
 };
+
+// خيارات الخطوط
+const fontOptions = [
+  { value: "cairo", label: "Cairo", family: "'Cairo', sans-serif" },
+  { value: "tajawal", label: "Tajawal", family: "'Tajawal', sans-serif" },
+  { value: "noto-kufi", label: "Noto Kufi Arabic", family: "'Noto Kufi Arabic', sans-serif" },
+  { value: "ibm-plex", label: "IBM Plex Sans Arabic", family: "'IBM Plex Sans Arabic', sans-serif" },
+];
 
 const applyAccentColor = (colorName: string) => {
   const colors = accentColors[colorName];
@@ -44,13 +52,23 @@ const applyTheme = (themeName: string) => {
   }
 };
 
+const applyFont = (fontValue: string) => {
+  const font = fontOptions.find(f => f.value === fontValue);
+  if (font) {
+    document.documentElement.style.setProperty("--app-font", font.family);
+    document.body.style.fontFamily = font.family;
+  }
+};
+
 // تطبيق الإعدادات المحفوظة عند تحميل الصفحة
 export const initializeAppearanceSettings = () => {
   const savedTheme = localStorage.getItem("app-theme") || "system";
   const savedAccentColor = localStorage.getItem("app-accent-color") || "blue";
+  const savedFont = localStorage.getItem("app-font") || "cairo";
   
   applyTheme(savedTheme);
   applyAccentColor(savedAccentColor);
+  applyFont(savedFont);
 };
 
 export function AppearanceSettingsDialog({
@@ -60,11 +78,13 @@ export function AppearanceSettingsDialog({
   const { toast } = useToast();
   const [theme, setTheme] = useState(() => localStorage.getItem("app-theme") || "system");
   const [accentColor, setAccentColor] = useState(() => localStorage.getItem("app-accent-color") || "blue");
+  const [font, setFont] = useState(() => localStorage.getItem("app-font") || "cairo");
 
   useEffect(() => {
     // تطبيق الإعدادات عند فتح الحوار
     applyTheme(theme);
     applyAccentColor(accentColor);
+    applyFont(font);
   }, []);
 
   const handleThemeChange = (value: string) => {
@@ -86,6 +106,17 @@ export function AppearanceSettingsDialog({
     toast({
       title: "تم تحديث اللون",
       description: "تم تغيير لون التمييز وحفظه بنجاح",
+    });
+  };
+
+  const handleFontChange = (fontValue: string) => {
+    setFont(fontValue);
+    localStorage.setItem("app-font", fontValue);
+    applyFont(fontValue);
+    
+    toast({
+      title: "تم تحديث الخط",
+      description: "تم تغيير نوع الخط وحفظه بنجاح",
     });
   };
 
@@ -170,6 +201,39 @@ export function AppearanceSettingsDialog({
                         id={`color-${option.value}`}
                       />
                       <div className={`w-6 h-6 rounded-full ${option.color}`} />
+                      <span className="font-medium">{option.label}</span>
+                    </Label>
+                  ))}
+                </div>
+              </RadioGroup>
+            </CardContent>
+          </Card>
+
+          {/* اختيار الخط */}
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Type className="h-4 w-4" />
+                نوع الخط
+              </h3>
+              
+              <RadioGroup value={font} onValueChange={handleFontChange}>
+                <div className="grid grid-cols-2 gap-3">
+                  {fontOptions.map((option) => (
+                    <Label
+                      key={option.value}
+                      htmlFor={`font-${option.value}`}
+                      className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                        font === option.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                      style={{ fontFamily: option.family }}
+                    >
+                      <RadioGroupItem
+                        value={option.value}
+                        id={`font-${option.value}`}
+                      />
                       <span className="font-medium">{option.label}</span>
                     </Label>
                   ))}
