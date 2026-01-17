@@ -7,6 +7,7 @@ import {
   DollarSign,
   PieChart,
   Settings,
+  Shield,
   LucideIcon,
 } from "lucide-react";
 
@@ -75,6 +76,14 @@ export const NAZER_QUICK_ACTIONS: QuickAction[] = [
     color: "text-primary",
     bgColor: "bg-primary/10",
     path: "/accounting",
+  },
+  {
+    icon: Shield,
+    label: "سجلات التدقيق",
+    description: "مراقبة جميع العمليات والتغييرات",
+    color: "text-amber-600",
+    bgColor: "bg-amber-500/10",
+    path: "/audit-logs",
   },
   {
     icon: Settings,
