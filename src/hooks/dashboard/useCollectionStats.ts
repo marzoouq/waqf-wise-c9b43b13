@@ -163,8 +163,9 @@ export function useCollectionStats() {
       // 2. من سندات القبض المدفوعة
       const vouchersCollected = paymentVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
       
-      // إجمالي المحصّل = أعلى قيمة لتجنب التكرار أو المجموع حسب الحالة
-      const totalCollected = Math.max(rentalCollected, vouchersCollected) || rentalCollected + vouchersCollected;
+      // إجمالي المحصّل = من سندات القبض فقط (مصدر الحقيقة الموحد)
+      // rental_payments فارغ حالياً، لذا نعتمد على payment_vouchers
+      const totalCollected = vouchersCollected || rentalCollected;
       
       const collectionRate = totalExpected > 0 
         ? Math.round((totalCollected / totalExpected) * 100) 

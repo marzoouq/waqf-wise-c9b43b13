@@ -173,7 +173,7 @@ const Properties = () => {
                   {stats.maintenanceRequests}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  قيد التنفيذ أو المعلقة
+                  طلبات مفتوحة (جديد/معلق/قيد التنفيذ)
                 </p>
               </CardContent>
             </Card>
