@@ -88,9 +88,9 @@ export default function Loans() {
       loan.beneficiary?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       loan.beneficiary?.national_id?.includes(searchQuery);
 
-    const matchesStatus = statusFilter === "all" || loan.status === statusFilter;
+    const statusMatches = statusFilter === "all" || matchesStatus(loan.status, statusFilter);
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && statusMatches;
   });
 
   // Calculate statistics

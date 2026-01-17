@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { matchesStatus } from "@/lib/constants";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,9 +35,9 @@ export default function AllTransactions() {
 
     const matchSource = filterSource === "all" || transaction.source === filterSource;
     const matchType = filterType === "all" || transaction.transaction_type === filterType;
-    const matchStatus = filterStatus === "all" || transaction.status === filterStatus;
+    const matchStatusFilter = filterStatus === "all" || matchesStatus(transaction.status, filterStatus);
 
-    return matchSearch && matchSource && matchType && matchStatus;
+    return matchSearch && matchSource && matchType && matchStatusFilter;
   });
 
   // حساب الإحصائيات

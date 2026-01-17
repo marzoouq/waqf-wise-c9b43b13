@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { matchesStatus } from "@/lib/constants";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,13 +43,13 @@ export default function GovernanceDecisions() {
   
   // فلترة القرارات حسب الحالة بعد جلبها
   const activeDecisions = typedDecisions.filter(d => 
-    d.decision_status === 'قيد التصويت' || d.decision_status === 'قيد التنفيذ'
+    matchesStatus(d.decision_status, 'voting', 'executing')
   );
   const completedDecisions = typedDecisions.filter(d => 
-    d.decision_status === 'معتمد' || d.decision_status === 'منفذ'
+    matchesStatus(d.decision_status, 'approved', 'executed')
   );
   const rejectedDecisions = typedDecisions.filter(d => 
-    d.decision_status === 'مرفوض' || d.decision_status === 'ملغي'
+    matchesStatus(d.decision_status, 'rejected', 'cancelled')
   );
 
   // تحديد القرارات المعروضة حسب التبويب النشط

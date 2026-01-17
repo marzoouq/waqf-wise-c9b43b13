@@ -513,6 +513,19 @@ const STATUS_MAPPINGS: Record<string, string[]> = {
   'استعداد': ['استعداد', 'standby'],
   'resolved': ['محلول', 'resolved'],
   'محلول': ['محلول', 'resolved'],
+  // Governance decision statuses
+  'voting': ['قيد التصويت', 'voting'],
+  'قيد التصويت': ['قيد التصويت', 'voting'],
+  'executing': ['قيد التنفيذ', 'executing'],
+  'قيد التنفيذ': ['قيد التنفيذ', 'executing'],
+  'executed': ['منفذ', 'executed'],
+  'منفذ': ['منفذ', 'executed'],
+  'rejected': ['مرفوض', 'rejected'],
+  'مرفوض': ['مرفوض', 'rejected'],
+  'معتمد': ['معتمد', 'approved', 'موافق عليه'],
+  // Emergency aid statuses
+  'disbursed': ['صُرف', 'disbursed', 'مصروف'],
+  'صُرف': ['صُرف', 'disbursed', 'مصروف'],
 };
 
 /**

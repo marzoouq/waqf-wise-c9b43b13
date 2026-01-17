@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { matchesStatus } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
@@ -117,7 +118,7 @@ export default function Support() {
                         <Badge variant={statusColors[ticket.status as keyof typeof statusColors]}>
                           {statusLabels[ticket.status as keyof typeof statusLabels]}
                         </Badge>
-                        {ticket.status === 'resolved' && (
+                        {matchesStatus(ticket.status, 'resolved') && (
                           <Button
                             size="sm"
                             variant="outline"

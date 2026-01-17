@@ -1,4 +1,5 @@
 import { Plus, Eye, Edit, Trash2, MoreVertical, FileText } from "lucide-react";
+import { matchesStatus } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
 import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
@@ -180,7 +181,7 @@ const Invoices = () => {
                           <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
                             <Eye className="ms-2 h-4 w-4" /> معاينة
                           </DropdownMenuItem>
-                          {invoice.status === "draft" && (
+                          {matchesStatus(invoice.status, 'draft') && (
                             <DropdownMenuItem onClick={() => handleEditClick(invoice)}>
                               <Edit className="ms-2 h-4 w-4" /> تعديل
                             </DropdownMenuItem>
@@ -188,7 +189,7 @@ const Invoices = () => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-destructive"
-                            disabled={invoice.status === "paid"}
+                            disabled={matchesStatus(invoice.status, 'paid')}
                             onClick={() => handleDeleteClick(invoice.id, invoice.status)}
                           >
                             <Trash2 className="ms-2 h-4 w-4" /> حذف
