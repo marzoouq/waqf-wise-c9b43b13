@@ -5,6 +5,7 @@ import { CustomReportBuilder } from '@/components/reports/CustomReportBuilder';
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { BeneficiaryReports } from '@/components/reports/BeneficiaryReports';
 import { PropertiesReports } from '@/components/reports/PropertiesReports';
+import { ContractsReport } from '@/components/reports/ContractsReport';
 import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeStatement";
 import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceSheet";
 import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
@@ -134,8 +135,9 @@ const Reports = () => {
             <BeneficiaryReports />
           </TabsContent>
 
-          <TabsContent value="properties">
+          <TabsContent value="properties" className="space-y-6">
             <PropertiesReports />
+            <ContractsReport />
           </TabsContent>
 
           <TabsContent value="financial" className="space-y-6">

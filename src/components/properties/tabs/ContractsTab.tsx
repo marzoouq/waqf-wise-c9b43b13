@@ -3,7 +3,6 @@ import { Search } from "lucide-react";
 import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
 import { type Contract } from "@/hooks/property/useContracts";
@@ -20,6 +19,9 @@ import { CancelAutoRenewDialog } from "@/components/contracts/CancelAutoRenewDia
 import { RentAdjustmentDialog } from "@/components/contracts/RentAdjustmentDialog";
 import { UnilateralTerminationDialog } from "@/components/contracts/UnilateralTerminationDialog";
 import { EarlyTerminationDialog } from "@/components/contracts/EarlyTerminationDialog";
+import { ContractsStatsCards } from "@/components/contracts/ContractsStatsCards";
+import { ContractsFilterTabs } from "@/components/contracts/ContractsFilterTabs";
+import { useContractsStats } from "@/hooks/contracts/useContractsStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
@@ -27,6 +29,7 @@ import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { toast } from "sonner";
+import { differenceInDays } from "date-fns";
 
 // تعريف الفلاتر
 const contractsFilterConfigs: FilterConfig[] = [
@@ -61,6 +64,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [printContract, setPrintContract] = useState<Contract | null>(null);
+  const [activeTabFilter, setActiveTabFilter] = useState("all");
   
   // حالات الحوارات الجديدة
   const [handoverContract, setHandoverContract] = useState<Contract | null>(null);
@@ -85,6 +89,9 @@ export const ContractsTab = ({ onEdit }: Props) => {
   } = useContractsPaginated();
   
   const { printWithData } = usePrint();
+  
+  // إحصائيات العقود
+  const stats = useContractsStats(contracts as Contract[]);
 
   const {
     confirmDelete,
@@ -121,6 +128,31 @@ export const ContractsTab = ({ onEdit }: Props) => {
   const filteredContracts = useMemo(() => {
     let result = contracts || [];
     
+    // فلترة بالتبويب
+    const now = new Date();
+    switch (activeTabFilter) {
+      case "active":
+        result = result.filter(c => c.status === "نشط");
+        break;
+      case "draft":
+        result = result.filter(c => c.status === "مسودة" || c.status === "draft");
+        break;
+      case "renewal":
+        result = result.filter(c => {
+          if (c.status !== "نشط") return false;
+          const endDate = new Date(c.end_date);
+          const daysUntilExpiry = differenceInDays(endDate, now);
+          return daysUntilExpiry <= 60 && daysUntilExpiry > 0;
+        });
+        break;
+      case "autoRenew":
+        result = result.filter(c => (c as any).auto_renew_enabled && c.status === "نشط");
+        break;
+      case "expired":
+        result = result.filter(c => c.status === "منتهي" || c.status === "expired");
+        break;
+    }
+    
     // فلترة بالبحث
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -149,7 +181,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
     }
     
     return result;
-  }, [contracts, searchQuery, advancedFilters]);
+  }, [contracts, searchQuery, advancedFilters, activeTabFilter]);
 
   // Bulk Selection
   const {
@@ -234,34 +266,31 @@ export const ContractsTab = ({ onEdit }: Props) => {
         />
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">إجمالي العقود</div>
-          <div className="text-2xl font-bold">{pagination.totalCount}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">عقود نشطة</div>
-          <div className="text-2xl font-bold text-success">
-            {contracts?.filter(c => c.status === 'نشط').length || 0}
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">عقود منتهية</div>
-          <div className="text-2xl font-bold text-warning">
-            {contracts?.filter(c => c.status === 'منتهي').length || 0}
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground">الإيرادات السنوية</div>
-          <div className="text-2xl font-bold text-primary">
-            {(contracts?.reduce((sum, c) => {
-              const rent = Number(c.monthly_rent);
-              return sum + (c.payment_frequency === 'سنوي' ? rent : rent * 12);
-            }, 0) || 0).toLocaleString()} ر.س
-          </div>
-        </Card>
-      </div>
+      {/* بطاقات الإحصائيات المحسّنة */}
+      <ContractsStatsCards
+        total={stats.total}
+        active={stats.active}
+        draft={stats.draft}
+        readyForRenewal={stats.readyForRenewal}
+        autoRenewing={stats.autoRenewing}
+        expired={stats.expired}
+        activeFilter={activeTabFilter}
+        onFilterClick={setActiveTabFilter}
+      />
+
+      {/* تبويبات الفلترة */}
+      <ContractsFilterTabs
+        activeFilter={activeTabFilter}
+        onFilterChange={setActiveTabFilter}
+        counts={{
+          all: stats.total,
+          active: stats.active,
+          draft: stats.draft,
+          renewal: stats.readyForRenewal,
+          autoRenew: stats.autoRenewing,
+          expired: stats.expired,
+        }}
+      />
 
       {/* Contracts Table */}
       <UnifiedDataTable
