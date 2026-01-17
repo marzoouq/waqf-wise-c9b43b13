@@ -181,7 +181,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                 {/* الإيرادات والمصروفات */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="total_revenues">إجمالي الإيرادات</Label>
+                    <Label htmlFor="total_revenues">إيرادات السنة المالية</Label>
                     <Input
                       id="total_revenues"
                       type="number"
@@ -246,7 +246,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="beneficiary_distributions">توزيعات الورثة</Label>
+                    <Label htmlFor="beneficiary_distributions">توزيعات المستفيدين</Label>
                     <Input
                       id="beneficiary_distributions"
                       type="number"

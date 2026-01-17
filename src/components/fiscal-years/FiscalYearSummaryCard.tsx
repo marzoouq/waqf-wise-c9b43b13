@@ -43,7 +43,7 @@ export function FiscalYearSummaryCard({ fiscalYearId, closing }: FiscalYearSumma
 
   const stats = [
     {
-      label: "إجمالي الإيرادات",
+      label: "إيرادات السنة المالية",
       value: closing?.total_revenues || summary?.total_revenues || 0,
       icon: TrendingUp,
       color: "text-success",

@@ -149,12 +149,12 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
         show: variant === 'nazer' || variant === 'accountant'
       },
       {
-        title: "إجمالي الإيرادات",
+        title: "إجمالي المحصّل",
         value: kpis.totalRevenue > 0 ? formatCurrency(kpis.totalRevenue) : '—',
         icon: TrendingUp,
         variant: "success" as const,
         trend: variant === 'admin' ? `مصروفات: ${formatCurrency(kpis.totalExpenses)}` : undefined,
-        subtitle: kpis.totalRevenue === 0 ? "غير متاح" : undefined,
+        subtitle: kpis.totalRevenue === 0 ? "غير متاح" : "من التحصيل الفعلي",
         show: true
       },
       {
@@ -166,7 +166,7 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
         show: variant === 'admin' || variant === 'accountant'
       },
       {
-        title: "العائد الشهري",
+        title: "الإيراد الشهري من العقود",
         value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn) : '—',
         icon: PieChart,
         variant: "default" as const,
@@ -174,7 +174,7 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
         show: variant === 'nazer'
       },
       {
-        title: "العائد السنوي المتوقع",
+        title: "الإيراد السنوي المتوقع",
         value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn * 12) : '—',
         icon: TrendingUp,
         variant: "success" as const,

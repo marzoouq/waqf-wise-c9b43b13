@@ -235,7 +235,7 @@ export default function WaqfUnits() {
               <TrendingUp className="h-5 w-5 text-success" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">إجمالي الإيرادات</p>
+              <p className="text-sm text-muted-foreground">إجمالي المحصّل</p>
               <p className="text-xl font-bold text-success">
                 {stats.totalIncome.toLocaleString('ar-SA')} ريال
               </p>

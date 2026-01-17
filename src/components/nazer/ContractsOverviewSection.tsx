@@ -45,8 +45,8 @@ export const ContractsOverviewSection = memo(function ContractsOverviewSection()
     { label: "جاهز للتجديد", value: stats.readyForRenewal, icon: AlertTriangle, color: "text-warning", highlight: stats.readyForRenewal > 0 },
     { label: "المتجددة تلقائياً", value: stats.autoRenewing, icon: RefreshCw, color: "text-success" },
     { label: "المنتهية", value: stats.expired, icon: XCircle, color: "text-destructive" },
-    { label: "الإيراد الشهري", value: `${stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ر.س`, icon: DollarSign, color: "text-primary" },
-    { label: "الإيراد السنوي", value: `${stats.totalAnnualRevenue.toLocaleString('ar-SA')} ر.س`, icon: TrendingUp, color: "text-success" },
+    { label: "الإيراد الشهري من العقود", value: `${stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ر.س`, icon: DollarSign, color: "text-primary" },
+    { label: "الإيراد السنوي المتوقع", value: `${stats.totalAnnualRevenue.toLocaleString('ar-SA')} ر.س`, icon: TrendingUp, color: "text-success" },
   ];
 
   return (

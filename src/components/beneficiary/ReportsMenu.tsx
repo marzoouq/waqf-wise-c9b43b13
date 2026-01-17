@@ -170,8 +170,8 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       yPos += 12;
       
       const financialData = [
-        ["إجمالي الإيرادات", disclosure.total_revenues.toLocaleString("ar-SA") + " ر.س"],
-        ["إجمالي المصروفات", disclosure.total_expenses.toLocaleString("ar-SA") + " ر.س"],
+        ["إيرادات السنة المالية", disclosure.total_revenues.toLocaleString("ar-SA") + " ر.س"],
+        ["مصروفات السنة المالية", disclosure.total_expenses.toLocaleString("ar-SA") + " ر.س"],
         ["صافي الدخل", disclosure.net_income.toLocaleString("ar-SA") + " ر.س"],
         ["نصيب الناظر", disclosure.nazer_share.toLocaleString("ar-SA") + " ر.س"],
         ["نصيب الخيرية", disclosure.charity_share.toLocaleString("ar-SA") + " ر.س"],
