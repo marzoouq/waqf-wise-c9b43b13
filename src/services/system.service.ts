@@ -4,6 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { matchesStatus } from "@/lib/constants";
 
 export interface SystemSetting {
   id: string;
@@ -337,20 +338,20 @@ export class SystemService {
     const alerts = alertsResult.data || [];
 
     const resolvedCount = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved").length;
-    const resolvedAlerts = alerts.filter(a => a.status === "resolved").length;
+    const resolvedAlerts = alerts.filter(a => matchesStatus(a.status, 'resolved')).length;
     const totalErrors = errorsResult.count || 0;
     
     const resolutionRate = totalErrors > 0 
       ? Math.round((resolvedCount / totalErrors) * 100) 
       : 100;
     
-    const criticalErrors = errors.filter(e => e.severity === "critical" && e.status === "new").length;
-    const highErrors = errors.filter(e => e.severity === "high" && e.status === "new").length;
-    const activeAlerts = alerts.filter(a => a.status === "active").length;
-    const criticalAlerts = alerts.filter(a => a.severity === "critical" && a.status === "active").length;
-    const highAlerts = alerts.filter(a => a.severity === "high" && a.status === "active").length;
+    const criticalErrors = errors.filter(e => e.severity === "critical" && matchesStatus(e.status, 'new')).length;
+    const highErrors = errors.filter(e => e.severity === "high" && matchesStatus(e.status, 'new')).length;
+    const activeAlerts = alerts.filter(a => matchesStatus(a.status, 'active')).length;
+    const criticalAlerts = alerts.filter(a => a.severity === "critical" && matchesStatus(a.status, 'active')).length;
+    const highAlerts = alerts.filter(a => a.severity === "high" && matchesStatus(a.status, 'active')).length;
     
-    const totalResolvable = errors.filter(e => e.status !== "new").length;
+    const totalResolvable = errors.filter(e => !matchesStatus(e.status, 'new')).length;
     const successfulFixes = resolvedCount;
     const failedFixes = Math.max(0, totalResolvable - resolvedCount);
     const fixSuccessRate = totalResolvable > 0 ? Math.round((successfulFixes / totalResolvable) * 100) : 100;
