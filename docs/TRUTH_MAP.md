@@ -450,6 +450,109 @@ const isActive = tenant.status === 'نشط';
 
 ---
 
+## 13. فحص الأداء (المرحلة 10)
+
+### 13.1 إعدادات Cache (staleTime)
+
+| الفئة | staleTime | refetchInterval | الاستخدام |
+|-------|-----------|-----------------|-----------|
+| `DEFAULT` | 2 دقائق | - | الاستعلامات العامة |
+| `REALTIME` | 30 ثانية | - | البيانات الحية |
+| `STATIC` | 30 دقيقة | - | البيانات الثابتة |
+| `DASHBOARD_KPIS` | 2 دقائق | 5 دقائق | مؤشرات الأداء |
+| `REPORTS` | 2 دقائق | ❌ يدوي | التقارير |
+| `CHARTS` | 1 ساعة | ❌ | الرسوم البيانية |
+| `LOANS` | 1 ساعة | ❌ | القروض |
+
+**✅ إيجابي:**
+- إعدادات موحدة عبر `src/infrastructure/react-query/queryConfig.ts`
+- 86 ملف يستخدم staleTime بشكل صحيح
+- gcTime محدد لمنع تراكم الذاكرة
+
+### 13.2 آلية Retry
+
+| الخدمة | withRetry | المحاولات | التأخير |
+|--------|-----------|-----------|---------|
+| `kpi.service.ts` | ✅ | 3 | 500ms-5s |
+| `property-stats.service.ts` | ✅ | 3 | 500ms-5s |
+| `maintenance.service.ts` | ✅ | 3 | 500ms-5s |
+| `contract.service.ts` | ✅ | 3 | 500ms-5s |
+| `beneficiary/core.service.ts` | ✅ | 3 | 500ms-5s |
+| `trial-balance.service.ts` | ✅ | 3 | 500ms-5s |
+
+**الإعدادات (`SUPABASE_RETRY_OPTIONS`):**
+```typescript
+{
+  maxRetries: 3,
+  initialDelay: 500,
+  backoffMultiplier: 2,
+  maxDelay: 5000,
+  shouldRetry: (error) => {
+    // لا يعيد المحاولة لأخطاء RLS/401
+    // يعيد المحاولة لـ: failed to fetch, network, timeout
+  }
+}
+```
+
+### 13.3 Pagination
+
+| الصفحة | Pagination | PageSize | التقييم |
+|--------|------------|----------|---------|
+| `GovernanceDecisions` | ✅ | 15 | ممتاز |
+| `AllTransactions` | ✅ | متغير | ممتاز |
+| `AuditLogs` | ✅ | 50-100 | جيد |
+| `Beneficiaries` | ✅ | عبر filters | جيد |
+| `Contracts` | ✅ | getPaginated | ممتاز |
+
+**إعدادات Pagination:**
+- `DEFAULT_PAGE_SIZE`: 15
+- `PAGE_SIZE_OPTIONS`: [10, 15, 25, 50, 100]
+
+### 13.4 أحجام الجداول الكبيرة
+
+| الجدول | الحجم | السجلات | ملاحظات |
+|--------|-------|---------|---------|
+| `audit_logs_archive` | 7.3 MB | 1,256 | ⚠️ يحتاج أرشفة دورية |
+| `audit_logs` | 5.7 MB | 2,904 | ⚠️ يحتاج تنظيف |
+| `beneficiary_activity_log` | 2.5 MB | 1,384 | طبيعي |
+| `system_alerts` | 1.9 MB | 31 | طبيعي |
+| `notifications` | 440 KB | 686 | طبيعي |
+
+### 13.5 أخطاء قاعدة البيانات الأخيرة
+
+| الخطأ | النوع | التوصية |
+|-------|-------|---------|
+| `column "status" does not exist` | ERROR | فحص الاستعلام |
+| `UNION types text and entry_status cannot be matched` | ERROR | توحيد الأنواع |
+
+### 13.6 ميزانية الأداء (performance-budget.json)
+
+| المقياس | الهدف | الحالة |
+|---------|-------|--------|
+| JavaScript Initial | 250KB | ✅ |
+| CSS Total | 100KB | ✅ |
+| FCP | 1.5s | ✅ |
+| LCP | 2.5s | ✅ |
+| TTI | 3s | ✅ |
+| Max API Calls | 10 | ✅ |
+| Max Rerenders | 3 | ✅ |
+
+### 13.7 توصيات التحسين
+
+**✅ مطبق:**
+- withRetry على الخدمات الحرجة
+- staleTime موحد عبر QUERY_CONFIG
+- Pagination في القوائم الكبيرة
+- Lazy loading للصفحات (lazyWithRetry)
+
+**⚠️ مقترح:**
+1. إضافة فهارس لجدول `audit_logs` على `created_at`
+2. أرشفة سجلات أقدم من 3 أشهر
+3. تفعيل `refetchOnWindowFocus: false` للصفحات غير الحساسة
+4. إضافة `gcTime` لجميع الاستعلامات
+
+---
+
 ## ✅ ملخص المراحل المكتملة
 
 | المرحلة | الوصف | الحالة |
@@ -463,6 +566,6 @@ const isActive = tenant.status === 'نشط';
 | 7 | فحص قاعدة البيانات | ✅ مكتمل |
 | 8 | فحص الصلاحيات | ✅ مكتمل |
 | 9 | فحص Edge Functions | ✅ مكتمل |
-| 10 | فحص الأداء | ⏳ قيد التنفيذ |
+| 10 | فحص الأداء | ✅ مكتمل |
 | 11 | فحص صحة النظام | ⏳ قيد التنفيذ |
 | 12 | التوثيق النهائي | ⏳ قيد التنفيذ |
