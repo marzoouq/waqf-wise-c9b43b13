@@ -15,6 +15,8 @@ export { useSelfHealing } from './useSelfHealing';
 export { useAlertCleanup } from './useAlertCleanup';
 export { useSecurityAlerts } from './useSecurityAlerts';
 export { useAuditLogs } from './useAuditLogs';
+export { useAuditLogsEnhanced, useAuditLogsStats, useAuditLogDetails, useAuditLogTables, useAuditLogUsers } from './useAuditLogsEnhanced';
+export { useAuditAlerts, useAuditAlertsStats, useRealtimeAuditAlerts } from './useAuditAlerts';
 export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
 export { useSelfHealingStats } from './useSelfHealingStats';
