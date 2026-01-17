@@ -19,6 +19,7 @@ import { useSelfHealing } from "@/hooks/system/useSelfHealing";
 import { useToast } from "@/hooks/ui/use-toast";
 import { selfHealing } from "@/lib/selfHealing";
 import { useSelfHealingStats } from "@/hooks/system/useSelfHealingStats";
+import { matchesStatus } from "@/lib/constants";
 
 export function SelfHealingToolsPanel() {
   const { toast } = useToast();
@@ -120,13 +121,13 @@ export function SelfHealingToolsPanel() {
                   <h4 className="font-semibold">{tool.name}</h4>
                   <Badge 
                     variant={
-                      tool.status === "active" ? "default" : 
-                      tool.status === "stopped" ? "secondary" : 
+                      matchesStatus(tool.status, 'active') ? "default" : 
+                      matchesStatus(tool.status, 'stopped') ? "secondary" : 
                       "outline"
                     }
                   >
-                    {tool.status === "active" ? "نشط" : 
-                     tool.status === "stopped" ? "متوقف" : 
+                    {matchesStatus(tool.status, 'active') ? "نشط" : 
+                     matchesStatus(tool.status, 'stopped') ? "متوقف" : 
                      "استعداد"}
                   </Badge>
                 </div>

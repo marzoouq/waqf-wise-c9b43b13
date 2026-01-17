@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Users } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useFamilyMembersDialog } from "@/hooks/distributions/useDistributionTabsData";
+import { matchesStatus } from "@/lib/constants";
 
 interface FamilyMembersDialogProps {
   open: boolean;
@@ -95,7 +96,7 @@ export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }
                           : "-"}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={member.status === "نشط" ? "default" : "secondary"}>
+                        <Badge variant={matchesStatus(member.status, 'active') ? "default" : "secondary"}>
                           {member.status}
                         </Badge>
                       </TableCell>

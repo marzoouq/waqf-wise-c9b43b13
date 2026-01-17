@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { matchesStatus } from "@/lib/constants";
 import {
   Dialog,
   DialogContent,
@@ -309,7 +310,7 @@ export function CreateMaintenanceRequestDialog({
                                 {selectedContractData.property_location && ` • ${selectedContractData.property_location}`}
                               </p>
                             </div>
-                            <Badge variant={selectedContractData.status === "نشط" ? "default" : "secondary"}>
+                            <Badge variant={matchesStatus(selectedContractData.status, 'active') ? "default" : "secondary"}>
                               {selectedContractData.status}
                             </Badge>
                           </div>

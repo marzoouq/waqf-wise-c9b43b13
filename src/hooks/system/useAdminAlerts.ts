@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemService } from '@/services/system.service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
+import { matchesStatus } from '@/lib/constants';
 
 export interface SystemAlert {
   id: string;
@@ -48,8 +49,8 @@ export function useAdminAlerts() {
   });
 
   // تجميع التنبيهات
-  const activeAlerts = alerts.filter((a: SystemAlert) => a.status === 'active');
-  const acknowledgedAlerts = alerts.filter((a: SystemAlert) => a.status === 'acknowledged');
+  const activeAlerts = alerts.filter((a: SystemAlert) => matchesStatus(a.status, 'active'));
+  const acknowledgedAlerts = alerts.filter((a: SystemAlert) => matchesStatus(a.status, 'acknowledged'));
 
   return {
     alerts: alerts as SystemAlert[],

@@ -5,6 +5,7 @@ import { Bell, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
 import { formatRelative } from "@/lib/date";
 import { useAdminAlerts } from '@/hooks/system/useAdminAlerts';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { matchesStatus } from '@/lib/constants';
 
 export function AdminAlertsPanel() {
   const { 
@@ -119,7 +120,7 @@ export function AdminAlertsPanel() {
               </div>
 
               <div className="flex gap-2">
-                {alert.status === 'active' && (
+                {matchesStatus(alert.status, 'active') && (
                   <>
                     <Button
                       size="sm"
@@ -138,7 +139,7 @@ export function AdminAlertsPanel() {
                     </Button>
                   </>
                 )}
-                {alert.status === 'acknowledged' && (
+                {matchesStatus(alert.status, 'acknowledged') && (
                   <Button
                     size="sm"
                     onClick={() => resolve(alert.id)}
