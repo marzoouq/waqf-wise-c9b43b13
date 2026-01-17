@@ -65,18 +65,31 @@ export default function Login() {
 
     try {
       if (loginType === 'beneficiary') {
+        // ✅ تنظيف رقم الهوية من الفراغات
+        const cleanedNationalId = identifier.trim();
+        
+        // ✅ التحقق من صحة صيغة رقم الهوية
+        if (!/^\d{10}$/.test(cleanedNationalId)) {
+          throw new Error('رقم الهوية يجب أن يكون 10 أرقام بالضبط');
+        }
+        
         // تسجيل دخول المستفيد برقم الهوية عبر AuthService
-        const beneficiaryData = await AuthService.getBeneficiaryEmailByNationalId(identifier);
+        productionLogger.debug('Attempting beneficiary login with national ID:', cleanedNationalId);
+        
+        const beneficiaryData = await AuthService.getBeneficiaryEmailByNationalId(cleanedNationalId);
 
         if (!beneficiaryData) {
-          throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول. يرجى التواصل مع الإدارة');
+          productionLogger.warn('No beneficiary found for national ID:', cleanedNationalId);
+          throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول مفعّل. يرجى التواصل مع الإدارة لتفعيل الحساب');
         }
+        
+        productionLogger.debug('Beneficiary found, attempting sign in with email:', beneficiaryData.email);
         
         // تسجيل الدخول بالبريد الإلكتروني المرتبط
         await signIn(beneficiaryData.email, password);
       } else {
         // تسجيل دخول الموظفين بالبريد الإلكتروني
-        await signIn(identifier, password);
+        await signIn(identifier.trim(), password);
       }
 
       toast({
@@ -86,6 +99,8 @@ export default function Login() {
       // ✅ تفعيل التوجيه التلقائي عبر useEffect
       setLoginSuccess(true);
     } catch (error) {
+      productionLogger.warn('Login error:', error);
+      
       // تحليل نوع الخطأ وعرض رسالة مناسبة
       let errorTitle = 'خطأ في تسجيل الدخول';
       let errorMessage = 'البيانات المدخلة غير صحيحة';
@@ -94,22 +109,28 @@ export default function Login() {
         const msg = error.message.toLowerCase();
         
         if (msg.includes('invalid_credentials') || msg.includes('invalid login credentials')) {
-          errorTitle = 'بيانات الدخول غير صحيحة';
+          errorTitle = 'كلمة المرور غير صحيحة';
           errorMessage = loginType === 'beneficiary' 
-            ? 'رقم الهوية أو كلمة المرور غير صحيحة. تأكد من البيانات وحاول مرة أخرى'
-            : 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تأكد من البيانات وحاول مرة أخرى';
+            ? 'كلمة المرور غير صحيحة. إذا نسيت كلمة المرور، يرجى التواصل مع الإدارة'
+            : 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+        } else if (msg.includes('10 أرقام')) {
+          errorTitle = 'رقم الهوية غير صحيح';
+          errorMessage = error.message;
+        } else if (msg.includes('غير مسجل') || msg.includes('ليس لديه حساب')) {
+          errorTitle = 'رقم الهوية غير مسجل';
+          errorMessage = error.message;
         } else if (msg.includes('email not confirmed')) {
-          errorTitle = 'البريد الإلكتروني غير مؤكد';
-          errorMessage = 'يرجى تأكيد بريدك الإلكتروني أولاً من خلال الرابط المرسل إليك';
+          errorTitle = 'الحساب غير مفعّل';
+          errorMessage = 'يرجى التواصل مع الإدارة لتفعيل حسابك';
         } else if (msg.includes('too many requests') || msg.includes('rate limit')) {
           errorTitle = 'محاولات كثيرة';
-          errorMessage = 'لقد قمت بمحاولات كثيرة. يرجى الانتظار قليلاً ثم المحاولة مجدداً';
-        } else if (msg.includes('network') || msg.includes('fetch')) {
+          errorMessage = 'لقد قمت بمحاولات كثيرة. يرجى الانتظار 5 دقائق ثم المحاولة مجدداً';
+        } else if (msg.includes('network') || msg.includes('fetch') || msg.includes('failed to fetch')) {
           errorTitle = 'خطأ في الاتصال';
           errorMessage = 'تأكد من اتصالك بالإنترنت وحاول مرة أخرى';
         } else if (msg.includes('session') || msg.includes('expired') || msg.includes('bad_jwt')) {
           errorTitle = 'انتهت الجلسة';
-          errorMessage = 'انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى';
+          errorMessage = 'انتهت صلاحية جلستك. يرجى تحديث الصفحة والمحاولة مجدداً';
           // تنظيف localStorage عند أخطاء الجلسة
           const keysToClean = Object.keys(localStorage).filter(key => 
             key.includes('supabase') || key.includes('sb-')
