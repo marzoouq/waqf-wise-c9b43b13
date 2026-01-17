@@ -44,3 +44,4 @@ export * from './version';
 // ==================== UX Integration ====================
 export * from './ux-integration';
 export * from './microcopy';
+export { runFullVerification, logVerificationReport, getPhaseSummary, PHASES_SUMMARY, type VerificationReport, type VerificationResult } from './ux-verification';
