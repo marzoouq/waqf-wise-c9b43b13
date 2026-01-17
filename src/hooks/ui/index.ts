@@ -54,3 +54,9 @@ export {
 // Data State & Debounce
 export { useDataState, getDataStateStatus, type UseDataStateOptions, type DataStateResult } from './useDataState';
 export { useDebouncedSearch } from './useDebouncedSearch';
+
+// Accessibility & UX
+export { useAnnounce } from './useAnnounce';
+export { useFocusTrap, useRovingTabindex, useFocusVisible, useFocusWithin } from './useFocusManagement';
+export { useReducedMotion, useHighContrast, useColorScheme, useSafeAnimation } from './useReducedMotion';
+export { useUXIntegration, useNetworkStatus as useNetworkStatusHook, useInteractionTracking, usePagePerformance, useUserPreferences } from './useUXIntegration';

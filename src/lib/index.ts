@@ -40,3 +40,7 @@ export * from './filters';
 // Role labels moved to src/types/roles.ts
 export * from './design-tokens';
 export * from './version';
+
+// ==================== UX Integration ====================
+export * from './ux-integration';
+export * from './microcopy';
