@@ -97,8 +97,8 @@ export const FinancialCardsService = {
         .select("amount")
         .eq("voucher_type", "receipt")
         .eq("status", "paid")
-        .gte("voucher_date", fiscalYear.start_date)
-        .lte("voucher_date", fiscalYear.end_date),
+        .gte("created_at", fiscalYear.start_date)
+        .lte("created_at", fiscalYear.end_date),
       // العقود النشطة
       supabase
         .from("contracts")
