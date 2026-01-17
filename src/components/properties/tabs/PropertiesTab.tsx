@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
 import { useProperties, type Property } from "@/hooks/property/useProperties";
+import { usePropertiesStats } from "@/hooks/property/usePropertiesStats";
 import { useTableSort } from "@/hooks/ui/useTableSort";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
 import { Input } from "@/components/ui/input";
@@ -161,19 +162,15 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
     setCurrentPage(1);
   }, [searchQuery, advancedFilters]);
 
+  // استخدام الإحصائيات الموحدة من الـ hook الرئيسي
+  const { data: unifiedStats } = usePropertiesStats();
+
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
     const occupiedUnits = properties?.reduce((sum, p) => sum + p.occupied, 0) || 0;
     
-    // حساب الإيراد الشهري الصحيح (مع مراعاة revenue_type)
-    const totalMonthlyRevenue = properties?.reduce((sum, p) => {
-      const revenue = Number(p.monthly_revenue || 0);
-      // إذا كان النوع سنوي، نقسم على 12 للحصول على الشهري
-      return sum + (p.revenue_type === 'سنوي' ? revenue / 12 : revenue);
-    }, 0) || 0;
-    
-    // الإيراد السنوي = الشهري × 12
-    const totalAnnualRevenue = totalMonthlyRevenue * 12;
+    // استخدام الإيراد السنوي من العقود النشطة (مصدر الحقيقة الموحد)
+    const totalAnnualRevenue = unifiedStats?.expectedAnnualRevenue || 0;
 
     return [
       {
@@ -184,13 +181,13 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
       },
       {
         label: "الوحدات المؤجرة",
-        value: occupiedUnits.toString(),
+        value: (unifiedStats?.occupiedUnits || occupiedUnits).toString(),
         icon: Home,
         color: "text-success",
       },
       {
         label: "الوحدات الشاغرة",
-        value: (totalUnits - occupiedUnits).toString(),
+        value: (unifiedStats?.vacantUnits || (totalUnits - occupiedUnits)).toString(),
         icon: MapPin,
         color: "text-warning",
       },
@@ -201,7 +198,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
         color: "text-accent",
       },
     ];
-  }, [properties]);
+  }, [properties, unifiedStats]);
 
   const handleDelete = (id: string, name?: string) => {
     confirmDelete(id, name);

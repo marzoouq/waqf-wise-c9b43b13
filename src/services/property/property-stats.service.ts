@@ -156,8 +156,21 @@ export class PropertyStatsService {
       const activeProperties = properties?.filter(p => p.status === "نشط" || p.status === "active").length || 0;
       
       const totalUnits = units?.length || 0;
-      const occupiedUnits = units?.filter(u => u.occupancy_status === 'مشغول').length || 0;
-      const vacantUnits = totalUnits - occupiedUnits;
+      
+      // حساب الوحدات المشغولة بناءً على الوحدات المرتبطة بعقود نشطة
+      const contractUnitIds = contracts?.map(c => c.unit_id).filter(Boolean) || [];
+      const occupiedFromContracts = contractUnitIds.length;
+      
+      // الوحدات المشغولة من جدول الوحدات (كـ fallback)
+      const occupiedFromUnits = units?.filter(u => 
+        u.occupancy_status === 'مشغول' || 
+        u.status === 'مشغول' ||
+        u.occupancy_status === 'occupied'
+      ).length || 0;
+      
+      // استخدام الأكبر بين العقود أو حالة الوحدات
+      const occupiedUnits = Math.max(occupiedFromContracts, occupiedFromUnits, contracts?.length || 0);
+      const vacantUnits = Math.max(0, totalUnits - occupiedUnits);
       const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
       const totalCollected = payments?.reduce((sum, p) => sum + (Number(p.amount_paid) || 0), 0) || 0;
