@@ -62,17 +62,41 @@ export function useCollectionStats() {
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
+      // جلب السنة المالية النشطة
+      const { data: fiscalYear } = await supabase
+        .from('fiscal_years')
+        .select('id, start_date, end_date')
+        .eq('is_active', true)
+        .single();
+
       // جلب جميع البيانات بشكل متوازي
       const [
-        paymentsResult,
+        // مصادر التحصيل الموحدة
+        rentalPaymentsResult,
+        paymentVouchersResult,
+        contractsResult,
+        // البيانات الإضافية
         overdueResult,
         todayDueResult,
         expiringContractsResult,
       ] = await Promise.all([
-        // جميع دفعات الإيجار
+        // دفعات الإيجار
         supabase
           .from('rental_payments')
           .select('id, amount_due, amount_paid, status, due_date'),
+        
+        // سندات القبض المدفوعة (مصدر التحصيل الرئيسي)
+        supabase
+          .from('payment_vouchers')
+          .select('id, amount, status')
+          .eq('voucher_type', 'receipt')
+          .eq('status', 'paid'),
+        
+        // العقود النشطة لحساب المتوقع
+        supabase
+          .from('contracts')
+          .select('id, monthly_rent, payment_frequency, status, end_date, tenant_name, tenant_id, property_id')
+          .eq('status', 'نشط'),
         
         // الدفعات المتأخرة
         supabase
@@ -108,36 +132,62 @@ export function useCollectionStats() {
           .limit(5),
       ]);
 
-      const payments = paymentsResult.data || [];
+      const rentalPayments = rentalPaymentsResult.data || [];
+      const paymentVouchers = paymentVouchersResult.data || [];
+      const contracts = contractsResult.data || [];
       const overdueData = overdueResult.data || [];
       const todayDueData = todayDueResult.data || [];
       const expiringData = expiringContractsResult.data || [];
 
-      // حساب الإحصائيات
-      const totalExpected = payments.reduce((sum, p) => sum + (p.amount_due || 0), 0);
-      const totalCollected = payments
+      // ========== حساب الإيراد المتوقع من العقود النشطة ==========
+      const totalExpected = contracts.reduce((sum, c) => {
+        const rent = c.monthly_rent || 0;
+        const frequency = c.payment_frequency || 'شهري';
+        
+        if (frequency === 'سنوي' || frequency === 'annual') {
+          return sum + rent;
+        } else if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
+          return sum + (rent * 4);
+        } else {
+          // شهري (الافتراضي) - حساب سنوي
+          return sum + (rent * 12);
+        }
+      }, 0);
+
+      // ========== حساب المحصّل من مصادر متعددة ==========
+      // 1. من دفعات الإيجار المدفوعة
+      const rentalCollected = rentalPayments
         .filter(p => p.status === 'مدفوع' || p.status === 'paid')
-        .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+        .reduce((sum, p) => sum + (p.amount_paid || p.amount_due || 0), 0);
+      
+      // 2. من سندات القبض المدفوعة
+      const vouchersCollected = paymentVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+      
+      // إجمالي المحصّل = أعلى قيمة لتجنب التكرار أو المجموع حسب الحالة
+      const totalCollected = Math.max(rentalCollected, vouchersCollected) || rentalCollected + vouchersCollected;
       
       const collectionRate = totalExpected > 0 
         ? Math.round((totalCollected / totalExpected) * 100) 
         : 0;
 
-      const pendingPayments = payments.filter(p => 
+      // ========== إحصائيات الدفعات ==========
+      const pendingPayments = rentalPayments.filter(p => 
         p.status === 'معلقة' || p.status === 'pending'
       ).length;
       
-      const overduePayments = payments.filter(p => 
+      const overduePayments = rentalPayments.filter(p => 
         (p.status === 'معلقة' || p.status === 'pending' || p.status === 'متأخرة' || p.status === 'overdue') &&
         new Date(p.due_date) < new Date(today)
       ).length;
       
-      const paidPayments = payments.filter(p => 
+      // الدفعات المدفوعة = من rental_payments + عدد سندات القبض
+      const paidFromRentals = rentalPayments.filter(p => 
         p.status === 'مدفوع' || p.status === 'paid'
       ).length;
+      const paidPayments = paidFromRentals + paymentVouchers.length;
 
       // المتأخرات
-      const totalOverdueAmount = payments
+      const totalOverdueAmount = rentalPayments
         .filter(p => 
           (p.status === 'معلقة' || p.status === 'pending' || p.status === 'متأخرة') &&
           new Date(p.due_date) < new Date(today)
