@@ -18,6 +18,8 @@ export interface QuickAction {
   color: string;
   bgColor: string;
   path: string;
+  showBadge?: boolean;
+  badgeType?: 'count' | 'critical';
 }
 
 export const NAZER_QUICK_ACTIONS: QuickAction[] = [
@@ -84,6 +86,8 @@ export const NAZER_QUICK_ACTIONS: QuickAction[] = [
     color: "text-amber-600",
     bgColor: "bg-amber-500/10",
     path: "/audit-logs",
+    showBadge: true,
+    badgeType: "critical",
   },
   {
     icon: Settings,
