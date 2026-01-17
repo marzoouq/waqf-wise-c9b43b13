@@ -150,12 +150,15 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
   
   if (!disclosure) return null;
 
+  // البحث عن السنة السابقة للتصدير
+  const prevYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
+
   // وظيفة تصدير PDF
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
-      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      await generateDisclosurePDF(disclosure, beneficiaries || [], prevYear);
       toast.success("تم تحميل ملف PDF بنجاح");
     } catch (error) {
       toast.error("فشل تحميل ملف PDF");

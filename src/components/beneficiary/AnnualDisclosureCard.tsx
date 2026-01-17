@@ -26,10 +26,12 @@ export const AnnualDisclosureCard = () => {
   const publishedDisclosures = disclosures.filter(d => d.status === 'published');
   const latestDisclosure = publishedDisclosures[0];
 
-  const handleExportPDF = async (disclosure: AnnualDisclosure) => {
+  const handleExportPDF = async (disclosure: AnnualDisclosure, index: number = 0) => {
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
-      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      // السنة السابقة
+      const previousYear = publishedDisclosures[index + 1] || null;
+      await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
     } catch (error) {
       // Error already handled in generateDisclosurePDF
     }
@@ -147,7 +149,7 @@ export const AnnualDisclosureCard = () => {
             
             <Button
               variant="outline"
-              onClick={() => handleExportPDF(latestDisclosure)}
+              onClick={() => handleExportPDF(latestDisclosure, 0)}
               className="gap-2"
             >
               <Download className="h-4 w-4" />
@@ -177,7 +179,7 @@ export const AnnualDisclosureCard = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleExportPDF(disclosure)}
+                        onClick={() => handleExportPDF(disclosure, publishedDisclosures.indexOf(disclosure))}
                       >
                         <Download className="h-3 w-3" />
                       </Button>

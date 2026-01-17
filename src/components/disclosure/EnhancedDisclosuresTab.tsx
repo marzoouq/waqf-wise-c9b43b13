@@ -95,11 +95,11 @@ export function EnhancedDisclosuresTab() {
     navigate(`/beneficiary-portal?tab=disclosure-details&id=${disclosure.id}`);
   };
 
-  const handleDownloadPDF = async (disclosure: AnnualDisclosure) => {
+  const handleDownloadPDF = async (disclosure: AnnualDisclosure, previousYear?: AnnualDisclosure | null) => {
     setIsExporting(disclosure.id);
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
-      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
       toast.success("تم تحميل ملف PDF بنجاح");
     } catch (error) {
       toast.error("فشل تحميل ملف PDF");
@@ -258,7 +258,7 @@ export function EnhancedDisclosuresTab() {
                     <Button 
                       variant="outline" 
                       className="flex-1 sm:flex-initial"
-                      onClick={() => handleDownloadPDF(disclosure as AnnualDisclosure)}
+                      onClick={() => handleDownloadPDF(disclosure as AnnualDisclosure, previousYear as AnnualDisclosure | null)}
                       disabled={isExporting === disclosure.id}
                     >
                       {isExporting === disclosure.id ? (

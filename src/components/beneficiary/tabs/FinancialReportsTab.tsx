@@ -148,7 +148,8 @@ export function FinancialReportsTab() {
     setIsGenerating('disclosure');
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
-      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      // لا توجد سنة سابقة متوفرة هنا، نمرر null
+      await generateDisclosurePDF(disclosure, beneficiaries || [], null);
       toast.success("تم تحميل ملف PDF بنجاح");
     } catch (error) {
       console.error('Error generating PDF:', error);
