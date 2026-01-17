@@ -107,24 +107,27 @@ export const FINANCIAL_TERMS = {
   },
 } as const;
 
+/** نوع مفاتيح المصطلحات المالية */
+export type FinancialTermKey = keyof typeof FINANCIAL_TERMS;
+
 /**
  * دالة للحصول على المسمى العربي للمصطلح
  */
-export function getTermLabel(termKey: keyof typeof FINANCIAL_TERMS): string {
+export function getTermLabel(termKey: FinancialTermKey): string {
   return FINANCIAL_TERMS[termKey].ar;
 }
 
 /**
  * دالة للحصول على وصف المصطلح
  */
-export function getTermDescription(termKey: keyof typeof FINANCIAL_TERMS): string {
+export function getTermDescription(termKey: FinancialTermKey): string {
   return FINANCIAL_TERMS[termKey].description;
 }
 
 /**
  * دالة للحصول على مصدر البيانات
  */
-export function getTermSource(termKey: keyof typeof FINANCIAL_TERMS): string {
+export function getTermSource(termKey: FinancialTermKey): string {
   return FINANCIAL_TERMS[termKey].source;
 }
 

@@ -11,12 +11,23 @@ type AccountRow = Database['public']['Tables']['accounts']['Row'];
 type JournalEntryRow = Database['public']['Tables']['journal_entries']['Row'];
 type JournalEntryLineRow = Database['public']['Tables']['journal_entry_lines']['Row'];
 
+/**
+ * ملخص البيانات المالية
+ * 
+ * ملاحظة: هذه البيانات من القيود المحاسبية وليست من التحصيل الفعلي
+ * - totalRevenue: إيرادات الفترة المحاسبية (المصدر: accounts.current_balance لحسابات الإيرادات)
+ * - totalExpenses: مصروفات الفترة (المصدر: accounts.current_balance لحسابات المصروفات)
+ * - netIncome: صافي الدخل المحاسبي
+ */
 export interface FinancialSummary {
   totalAssets: number;
   totalLiabilities: number;
   totalEquity: number;
+  /** إيرادات الفترة المحاسبية - المصدر: accounts (type = revenue).current_balance */
   totalRevenue: number;
+  /** مصروفات الفترة - المصدر: accounts (type = expense).current_balance */
   totalExpenses: number;
+  /** صافي الدخل - الحساب: totalRevenue - totalExpenses */
   netIncome: number;
 }
 

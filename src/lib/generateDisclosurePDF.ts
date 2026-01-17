@@ -85,7 +85,7 @@ export const generateDisclosurePDF = async (
     yPos += 8;
 
     const financialData = processArabicTableData([
-      ["إجمالي الإيرادات", formatCurrency(disclosure.total_revenues)],
+      ["إيرادات السنة المالية", formatCurrency(disclosure.total_revenues)],
       ["إجمالي المصروفات", formatCurrency(disclosure.total_expenses)],
       ["صافي الدخل", formatCurrency(disclosure.net_income)],
     ]);

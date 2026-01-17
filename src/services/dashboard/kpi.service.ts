@@ -23,6 +23,14 @@ export interface SystemOverviewStats {
   documents: number;
 }
 
+/**
+ * بيانات مؤشرات الأداء الموحدة
+ * 
+ * ملاحظة هامة حول مصادر البيانات:
+ * - totalRevenue: إجمالي المحصّل فعلياً (المصدر: rental_payments + payment_vouchers)
+ * - monthlyReturn: الإيراد الشهري من العقود (المصدر: contracts.monthly_rent)
+ * - netIncome: صافي الدخل المحاسبي (الحساب: إيرادات - مصروفات)
+ */
 export interface UnifiedKPIsData {
   totalBeneficiaries: number;
   activeBeneficiaries: number;
@@ -30,10 +38,13 @@ export interface UnifiedKPIsData {
   totalProperties: number;
   activeProperties: number;
   occupiedProperties: number;
+  /** إجمالي المحصّل فعلياً - المصدر: rental_payments (مدفوع) + payment_vouchers (receipt) */
   totalRevenue: number;
   totalExpenses: number;
+  /** صافي الدخل - الحساب: totalRevenue - totalExpenses */
   netIncome: number;
   availableBudget: number;
+  /** الإيراد الشهري من العقود - المصدر: contracts.monthly_rent للعقود النشطة */
   monthlyReturn: number;
   totalAssets: number;
   totalFunds: number;
