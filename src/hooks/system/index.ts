@@ -4,6 +4,7 @@
 
 export { useSystemHealth } from './useSystemHealth';
 export { useSystemHealthIndicator, type HealthIndicatorStatus, type HealthIndicatorDetails } from './useSystemHealthIndicator';
+export { useSystemHealthLive, type SystemHealthStats } from './useSystemHealthLive';
 export { useAdminAlerts, type SystemAlert } from './useAdminAlerts';
 export { logErrorToSupport } from './useGlobalErrorLogging';
 export { useSystemMonitoring } from './useSystemMonitoring';

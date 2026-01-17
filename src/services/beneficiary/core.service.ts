@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 import type { Beneficiary } from '@/types/beneficiary';
 
 export interface BeneficiaryFilters {
@@ -211,11 +212,13 @@ export class BeneficiaryCoreService {
    */
   static async getStats(): Promise<BeneficiaryStats> {
     try {
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('status, total_received, pending_amount');
-
-      if (error) throw error;
+      const { data, error } = await withRetry(async () => {
+        const result = await supabase
+          .from('beneficiaries')
+          .select('status, total_received, pending_amount');
+        if (result.error) throw result.error;
+        return result;
+      }, SUPABASE_RETRY_OPTIONS);
 
       const stats: BeneficiaryStats = {
         total: data?.length || 0,
