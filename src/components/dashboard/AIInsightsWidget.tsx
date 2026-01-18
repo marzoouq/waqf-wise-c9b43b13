@@ -91,6 +91,11 @@ export function AIInsightsWidget() {
                     <p className="text-xs text-muted-foreground line-clamp-2">
                       {insight.description}
                     </p>
+                    {insight.created_at && (
+                      <p className="text-xs text-muted-foreground/70 mt-1">
+                        {new Date(insight.created_at).toLocaleDateString('ar-SA')}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

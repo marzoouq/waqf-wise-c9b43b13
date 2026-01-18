@@ -26,6 +26,7 @@ const ADMIN_WATCHED_TABLES = [
   "beneficiary_requests",
   "system_error_logs",
   "system_health_checks",
+  "fiscal_years",
 ] as const;
 
 // مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
@@ -43,6 +44,7 @@ const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
   beneficiary_requests: [QUERY_KEYS.ADMIN_KPIS, QUERY_KEYS.REQUESTS],
   system_error_logs: [QUERY_KEYS.SYSTEM_ERROR_LOGS, QUERY_KEYS.RECENT_ERRORS, QUERY_KEYS.SYSTEM_STATS],
   system_health_checks: [QUERY_KEYS.SYSTEM_HEALTH, QUERY_KEYS.SYSTEM_STATS],
+  fiscal_years: [['fiscal-year', 'active'], ['fiscal-years', 'all']],
 };
 
 interface UseAdminDashboardRealtimeOptions {
@@ -126,6 +128,9 @@ export function useAdminDashboardRefresh() {
     adminQueryKeys.forEach((queryKey) => {
       queryClient.invalidateQueries({ queryKey: [...queryKey] });
     });
+    
+    // Revenue Progress - invalidate separately as it uses a function-based key
+    queryClient.invalidateQueries({ queryKey: ['revenue-progress'] });
   };
 
   return { refreshAll };
