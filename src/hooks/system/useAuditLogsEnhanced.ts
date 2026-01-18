@@ -114,7 +114,7 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
         query = query.lte("created_at", dateRange.end);
       }
 
-      const { data, error, count } = await query.limit(10000);
+      const { data, error, count } = await query.limit(500);
 
       if (error) throw error;
 
@@ -192,7 +192,7 @@ export const useAuditLogUsers = () => {
         .from("audit_logs")
         .select("user_email")
         .not("user_email", "is", null)
-        .limit(5000);
+        .limit(200);
 
       if (error) throw error;
 
