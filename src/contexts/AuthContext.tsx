@@ -55,7 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setRoles(freshRoles);
           }
         })
-        .catch(() => {});
+        .catch((err) => {
+          productionLogger.debug('تجاهل خطأ تحديث الأدوار في الخلفية', err);
+        });
       return rolesCache.current;
     }
 

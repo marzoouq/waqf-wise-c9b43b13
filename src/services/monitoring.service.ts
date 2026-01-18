@@ -6,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { matchesStatus } from "@/lib/constants";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 
@@ -321,7 +322,9 @@ export class MonitoringService {
             p_entity_type: 'contract',
             p_action_url: '/properties?tab=contracts'
           } as never);
-        } catch {}
+        } catch (alertError) {
+          productionLogger.debug('تجاهل خطأ حفظ تنبيه انتهاء العقد - غير حرج', alertError);
+        }
         
         allAlerts.push({
           id: contract.id,
@@ -359,7 +362,9 @@ export class MonitoringService {
             p_entity_type: 'payment',
             p_action_url: '/properties?tab=payments'
           } as never);
-        } catch {}
+        } catch (alertError) {
+          productionLogger.debug('تجاهل خطأ حفظ تنبيه الإيجار المتأخر - غير حرج', alertError);
+        }
         
         allAlerts.push({
           id: payment.id,
@@ -400,7 +405,9 @@ export class MonitoringService {
             p_entity_type: 'loan_installment',
             p_action_url: '/loans'
           } as never);
-        } catch {}
+        } catch (alertError) {
+          productionLogger.debug('تجاهل خطأ حفظ تنبيه قسط القرض - غير حرج', alertError);
+        }
         
         allAlerts.push({
           id: installment.id,
@@ -434,7 +441,9 @@ export class MonitoringService {
             p_entity_type: 'request',
             p_action_url: '/requests'
           } as never);
-        } catch {}
+        } catch (alertError) {
+          productionLogger.debug('تجاهل خطأ حفظ تنبيه الطلب المتأخر - غير حرج', alertError);
+        }
         
         allAlerts.push({
           id: request.id,
