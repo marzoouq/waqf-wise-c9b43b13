@@ -62,7 +62,12 @@ export function AuditLogsPreview() {
         <Button 
           size="sm" 
           variant="outline"
-          onClick={() => navigate('/audit-logs')}
+          onClick={() => navigate('/audit-logs', { 
+            state: { 
+              fromDashboard: true,
+              previewCount: logs?.length || 0 
+            } 
+          })}
         >
           عرض الكل
         </Button>

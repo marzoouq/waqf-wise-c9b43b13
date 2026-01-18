@@ -113,7 +113,14 @@ export const AdminKPIs = memo(() => {
     return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات المشرف" onRetry={refresh} />;
   }
 
-  if (!kpis || stats.length === 0) return null;
+  if (!kpis || stats.length === 0) {
+    return (
+      <div className="p-6 text-center border rounded-lg bg-card">
+        <Users className="h-12 w-12 mx-auto mb-2 text-muted-foreground opacity-50" />
+        <p className="text-muted-foreground">لا توجد بيانات KPIs متاحة حالياً</p>
+      </div>
+    );
+  }
 
   return (
     <UnifiedStatsGrid className="mb-8">

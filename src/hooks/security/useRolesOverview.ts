@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RoleStats {
   role: string;
@@ -28,8 +29,9 @@ export function useRolesOverview() {
     data: rolesData = [],
     isLoading,
     error,
+    refetch,
   } = useQuery<RoleStats[]>({
-    queryKey: ['roles-overview'],
+    queryKey: QUERY_KEYS.ROLES_OVERVIEW,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
@@ -61,5 +63,6 @@ export function useRolesOverview() {
     adminCount,
     isLoading,
     error,
+    refetch,
   };
 }

@@ -3,9 +3,10 @@ import { useSystemHealth } from "@/hooks/system";
 import { Database, HardDrive, Clock, Activity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function SystemHealthMonitor() {
-  const { data: health, isLoading } = useSystemHealth();
+  const { data: health, isLoading, isError, refetch } = useSystemHealth();
 
   if (isLoading) {
     return (
@@ -27,7 +28,44 @@ export function SystemHealthMonitor() {
     );
   }
 
-  if (!health) return null;
+  if (isError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            صحة النظام
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ErrorState 
+            title="خطأ في تحميل صحة النظام"
+            message="فشل الاتصال بخدمة المراقبة"
+            onRetry={refetch}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!health) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            صحة النظام
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>لا توجد بيانات صحة النظام</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
