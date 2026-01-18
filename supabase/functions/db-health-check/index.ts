@@ -1,6 +1,11 @@
 /**
+ * 🔒 PROTECTED FILE - ADR-005
  * Edge Function لفحص صحة قاعدة البيانات الشامل
  * Comprehensive Database Health Check Edge Function
+ * 
+ * Uses SERVICE_ROLE_KEY for database access.
+ * Any change requires: ADR update + Security review
+ * See: docs/ARCHITECTURE_DECISIONS.md
  * 
  * ✅ محمي بـ: JWT + Role Check (admin/nazer) + Rate Limiting
  */

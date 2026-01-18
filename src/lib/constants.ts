@@ -1,3 +1,12 @@
+/**
+ * 🔒 PROTECTED FILE
+ * Central constants for status matching across the system.
+ * Any change may break multiple services and UI components.
+ * 
+ * See: docs/TRUTH_MAP.md
+ * Requires: Full regression testing after any modification
+ */
+
 // Pagination Constants
 export const PAGINATION = {
   DEFAULT_PAGE_SIZE: 20,

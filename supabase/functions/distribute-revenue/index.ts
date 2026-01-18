@@ -1,3 +1,12 @@
+/**
+ * 🔒 PROTECTED FILE - ADR-005
+ * Critical financial operation - Revenue Distribution
+ * 
+ * Uses SERVICE_ROLE_KEY for database access.
+ * Any change requires: ADR update + Security review + Financial approval
+ * See: docs/ARCHITECTURE_DECISIONS.md
+ */
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { 
   handleCors, 

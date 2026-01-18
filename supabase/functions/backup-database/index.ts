@@ -1,3 +1,11 @@
+/**
+ * 🔒 PROTECTED FILE - ADR-005
+ * Database Backup Function with full SERVICE_ROLE access.
+ * 
+ * Any change requires: ADR update + Security review
+ * See: docs/ARCHITECTURE_DECISIONS.md
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { 
