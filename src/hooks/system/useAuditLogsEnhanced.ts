@@ -114,6 +114,7 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
         query = query.lte("created_at", dateRange.end);
       }
 
+      // ADR-004: Max limit is 500 without pagination
       const { data, error, count } = await query.limit(500);
 
       if (error) throw error;

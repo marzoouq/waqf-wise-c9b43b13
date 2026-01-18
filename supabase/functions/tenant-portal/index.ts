@@ -2,6 +2,10 @@
  * Tenant Portal Edge Function
  * API موحدة لبوابة المستأجرين
  * @version 1.0.0
+ * 
+ * ADR-001: tenant_* tables are intentionally closed via USING(false)
+ * All access must go through this Edge Function with SERVICE_ROLE_KEY
+ * See: docs/ARCHITECTURE_DECISIONS.md
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
