@@ -1,3 +1,9 @@
+/**
+ * Generate Smart Alerts Edge Function
+ * توليد التنبيهات الذكية للنظام
+ * @version 2.0.0 - إضافة Rate Limiting و Audit Logging
+ */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { 
@@ -5,6 +11,28 @@ import {
   jsonResponse, 
   errorResponse 
 } from '../_shared/cors.ts';
+
+// ============ Rate Limiting - 5 تشغيلات/ساعة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
 
 interface SmartAlert {
   alert_type: 'contract_expiring' | 'rent_overdue' | 'loan_due' | 'request_overdue' | 'anomaly' | 'recommendation';
@@ -51,11 +79,22 @@ serve(async (req) => {
       return errorResponse("Unauthorized: يتطلب JWT أو CRON_SECRET صالح", 401);
     }
 
-    console.log(`[generate-smart-alerts] Authenticated via ${hasValidCronSecret ? 'CRON_SECRET' : 'JWT'}`);
+    const authMethod = hasValidCronSecret ? 'CRON_SECRET' : 'JWT';
+    console.log(`[generate-smart-alerts] Authenticated via ${authMethod}`);
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // ✅ Rate Limiting للمستخدمين (ليس للمهام المجدولة)
+    if (!hasValidCronSecret && hasAuthHeader) {
+      const token = authHeader!.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user && !checkRateLimit(user.id)) {
+        console.warn(`[generate-smart-alerts] Rate limit exceeded for user: ${user.id}`);
+        return errorResponse("تجاوزت الحد المسموح (5 تشغيلات/ساعة)", 429);
+      }
+    }
 
     const alerts: SmartAlert[] = [];
 
@@ -195,10 +234,43 @@ serve(async (req) => {
 
     console.log(`[generate-smart-alerts] Generated: ${alerts.length}, New: ${newAlerts.length}, Skipped duplicates: ${alerts.length - newAlerts.length}`);
 
+    // ✅ تسجيل في audit_logs للتدقيق الجنائي
+    try {
+      let userId: string | null = null;
+      let userEmail: string | null = 'cron_job@system';
+      
+      if (!hasValidCronSecret && hasAuthHeader) {
+        const token = authHeader!.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+        userId = user?.id || null;
+        userEmail = user?.email || null;
+      }
+      
+      await supabase.from('audit_logs').insert({
+        action_type: 'generate_smart_alerts',
+        table_name: 'smart_alerts',
+        user_id: userId,
+        user_email: userEmail,
+        description: `توليد التنبيهات الذكية: ${alerts.length} تنبيه، ${newAlerts.length} جديد`,
+        severity: 'info',
+        ip_address: req.headers.get('x-forwarded-for') || 'system',
+        user_agent: req.headers.get('user-agent') || 'cron_job',
+        metadata: { 
+          alerts_generated: alerts.length, 
+          new_alerts: newAlerts.length,
+          skipped_duplicates: alerts.length - newAlerts.length,
+          authMethod 
+        }
+      });
+    } catch (auditError) {
+      console.warn('[generate-smart-alerts] Failed to log audit:', auditError);
+    }
+
     return jsonResponse({ 
       success: true, 
       alerts_generated: alerts.length,
-      message: `تم إنشاء ${alerts.length} تنبيه ذكي` 
+      new_alerts: newAlerts.length,
+      message: `تم إنشاء ${newAlerts.length} تنبيه ذكي جديد` 
     });
 
   } catch (error) {

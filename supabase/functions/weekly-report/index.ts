@@ -1,6 +1,7 @@
 /**
  * Weekly Report Edge Function
  * إنشاء وإرسال تقرير أسبوعي للإدارة
+ * @version 2.0.0 - إضافة Rate Limiting و Audit Logging
  */
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
@@ -10,6 +11,28 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// ============ Rate Limiting - 5 تشغيلات/ساعة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
 
 interface WeeklyStats {
   period: { start: string; end: string };
@@ -196,17 +219,58 @@ serve(async (req) => {
       );
     }
 
-    console.log(`[weekly-report] Authenticated via ${hasValidCronSecret ? 'CRON_SECRET' : 'JWT'}`);
+    const authMethod = hasValidCronSecret ? 'CRON_SECRET' : 'JWT';
+    console.log(`[weekly-report] Authenticated via ${authMethod}`);
     
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // ✅ Rate Limiting للمستخدمين (ليس للمهام المجدولة)
+    if (!hasValidCronSecret && hasAuthHeader) {
+      const token = authHeader!.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user && !checkRateLimit(user.id)) {
+        console.warn(`[weekly-report] Rate limit exceeded for user: ${user.id}`);
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded", message: "تجاوزت الحد المسموح (5 تشغيلات/ساعة)" }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // توليد التقرير
     const report = await generateWeeklyReport(supabase);
 
     // إرسال الإشعارات
     await sendReportNotification(supabase, report);
+
+    // ✅ تسجيل في audit_logs للتدقيق الجنائي
+    try {
+      let userId: string | null = null;
+      let userEmail: string | null = 'cron_job@system';
+      
+      if (!hasValidCronSecret && hasAuthHeader) {
+        const token = authHeader!.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+        userId = user?.id || null;
+        userEmail = user?.email || null;
+      }
+      
+      await supabase.from('audit_logs').insert({
+        action_type: 'weekly_report',
+        table_name: 'notifications',
+        user_id: userId,
+        user_email: userEmail,
+        description: `تشغيل التقرير الأسبوعي: ${report.beneficiaries.active} مستفيد نشط، ${report.financials.totalRevenue} ريال إيرادات`,
+        severity: 'info',
+        ip_address: req.headers.get('x-forwarded-for') || 'system',
+        user_agent: req.headers.get('user-agent') || 'cron_job',
+        metadata: { report_period: report.period, authMethod }
+      });
+    } catch (auditError) {
+      console.warn('[weekly-report] Failed to log audit:', auditError);
+    }
 
     console.log("Weekly report generated successfully:", JSON.stringify(report));
 

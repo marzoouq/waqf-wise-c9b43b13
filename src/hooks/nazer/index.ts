@@ -1,6 +1,6 @@
 /**
  * Nazer Hooks
- * @version 2.8.39
+ * @version 2.8.44 - إضافة تصديرات مفقودة
  */
 
 export { 
@@ -15,3 +15,7 @@ export {
 } from './useDistributeRevenue';
 
 export { usePublishFiscalYear } from './usePublishFiscalYear';
+
+// ✅ إضافة التصديرات المفقودة
+export { useNazerBeneficiariesQuick, type NazerBeneficiary } from './useNazerBeneficiariesQuick';
+export { useWaqfBranding, type WaqfBranding } from './useWaqfBranding';
