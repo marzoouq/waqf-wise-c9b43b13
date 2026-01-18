@@ -6,6 +6,8 @@ export { PageErrorBoundary } from './PageErrorBoundary';
 export { LazyErrorBoundary } from './LazyErrorBoundary';
 export { ErrorState } from './ErrorState';
 export { SelfHealingComponent } from './SelfHealingComponent';
+export { UnifiedErrorFallback } from './UnifiedErrorFallback';
+export type { UnifiedErrorType } from './UnifiedErrorFallback';
 
 // Loading States
 export { LoadingState } from './LoadingState';
