@@ -32,4 +32,7 @@ export const USERS_KEYS = {
   SECURITY_ALERTS: ['security-alerts'] as const,
   SECURITY_EVENTS: ['security-events'] as const,
   LOGIN_ATTEMPTS: ['login-attempts'] as const,
+  
+  // Roles Overview
+  ROLES_OVERVIEW: ['roles-overview'] as const,
 } as const;
