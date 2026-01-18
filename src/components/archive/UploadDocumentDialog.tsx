@@ -26,6 +26,7 @@ import { useFolders } from "@/hooks/archive/useFolders";
 import { Upload, Loader2, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { DocumentUploadData } from "@/types/documents";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 const uploadSchema = z.object({
   name: z
@@ -95,7 +96,7 @@ export function UploadDocumentDialog({
     }
 
     try {
-      console.log('[UploadDocument] Starting upload...', { name: data.name, category: data.category });
+      productionLogger.debug('[UploadDocument] بدء الرفع', { name: data.name, category: data.category });
       
       await uploadDocument({
         file,
@@ -105,12 +106,12 @@ export function UploadDocumentDialog({
         folder_id: data.folder_id || undefined,
       });
       
-      console.log('[UploadDocument] Upload successful!');
+      productionLogger.debug('[UploadDocument] تم الرفع بنجاح');
       form.reset();
       setSelectedFile(null);
       onOpenChange(false);
     } catch (error) {
-      console.error('[UploadDocument] Upload failed:', error);
+      productionLogger.error('[UploadDocument] فشل الرفع', error);
       // Error handled by hook toast
     }
   };

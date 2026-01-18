@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { productionLogger } from "@/lib/logger/production-logger";
 import type { Database } from "@/integrations/supabase/types";
 import { matchesStatus } from '@/lib/constants';
 
@@ -95,7 +96,7 @@ export class VoucherService {
               metadata: { voucher_id: voucher.id },
             });
           } else {
-            console.log('[VoucherService] ✅ تم ربط السند بقيد محاسبي:', voucher.voucher_number);
+            productionLogger.debug('[VoucherService] ✅ تم ربط السند بقيد محاسبي', { voucher_number: voucher.voucher_number });
           }
         } catch (linkErr) {
           // تسجيل الخطأ لكن لا نوقف العملية
@@ -146,7 +147,7 @@ export class VoucherService {
           await supabase.functions.invoke('link-voucher-journal', {
             body: { voucher_id: voucherId, create_journal: true }
           });
-          console.log('[VoucherService] ✅ تم إنشاء قيد للسند:', existingVoucher.voucher_number);
+          productionLogger.debug('[VoucherService] ✅ تم إنشاء قيد للسند', { voucher_number: existingVoucher.voucher_number });
         } catch (linkErr) {
           logger.error(linkErr, {
             context: 'mark_paid_link_journal',
