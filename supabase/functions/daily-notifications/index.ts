@@ -255,13 +255,33 @@ serve(async (req) => {
 
     console.log('🎉 اكتمل تشغيل نظام الإشعارات اليومية الموحد');
 
+    // ✅ تسجيل في audit_logs للتدقيق الجنائي
+    const successful = Object.values(results).filter(v => v === true).length;
+    const failed = Object.values(results).filter(v => v === false).length - 1;
+    
+    try {
+      await supabase.from('audit_logs').insert({
+        action_type: 'daily_notifications',
+        table_name: 'notifications',
+        user_id: authMethod === 'jwt' ? (await supabase.auth.getUser(req.headers.get('Authorization')?.replace('Bearer ', '') || '')).data.user?.id : null,
+        user_email: authMethod === 'cron_secret' ? 'cron_job@system' : null,
+        description: `تشغيل الإشعارات اليومية: ${successful} ناجح, ${failed} فاشل`,
+        severity: failed > 0 ? 'warning' : 'info',
+        ip_address: req.headers.get('x-forwarded-for') || 'system',
+        user_agent: req.headers.get('user-agent') || 'cron_job',
+        metadata: { results, authMethod }
+      });
+    } catch (auditError) {
+      console.warn('[daily-notifications] Failed to log audit:', auditError);
+    }
+
     return jsonResponse({
       success: true,
       message: 'تم تنفيذ جميع المهام اليومية',
       results: results,
       summary: {
-        successful: Object.values(results).filter(v => v === true).length,
-        failed: Object.values(results).filter(v => v === false).length - 1, // -1 for deletedNotifications
+        successful,
+        failed,
         total: 8
       }
     });
