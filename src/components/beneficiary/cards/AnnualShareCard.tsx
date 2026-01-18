@@ -37,12 +37,20 @@ const { data, isLoading } = useQuery({
 
       if (distributions) {
         distributions.forEach((d: any) => {
-          const fiscalYearName = d.fiscal_years?.name || '';
-          // استخراج السنة من الاسم مثل "السنة المالية 2025-2026"
-          const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
-          if (match) {
-            const fiscalYearKey = `${match[1]}-${match[2]}`;
+          // استخدام start_date بدلاً من الاعتماد على اسم السنة المالية
+          const startDate = d.fiscal_years?.start_date;
+          if (startDate) {
+            const startYear = new Date(startDate).getFullYear();
+            const fiscalYearKey = `${startYear}-${startYear + 1}`;
             yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (d.share_amount || 0);
+          } else {
+            // fallback: محاولة استخراج السنة من الاسم
+            const fiscalYearName = d.fiscal_years?.name || '';
+            const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
+            if (match) {
+              const fiscalYearKey = `${match[1]}-${match[2]}`;
+              yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (d.share_amount || 0);
+            }
           }
         });
       }
