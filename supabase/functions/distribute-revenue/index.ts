@@ -161,7 +161,7 @@ Deno.serve(async (req) => {
 
     const beneficiaryMap = new Map(beneficiaries?.map(b => [b.id, b]) || []);
 
-    // Create heir_distributions records
+    // Create heir_distributions records with executed_by_user_id for judicial chain of custody
     const distributionRecords = heirShares.map((heir: HeirShare) => ({
       fiscal_year_id: fiscalYearId,
       beneficiary_id: heir.beneficiary_id,
@@ -170,6 +170,7 @@ Deno.serve(async (req) => {
       distribution_date: distributionDate,
       notes: notes || `توزيع غلة الوقف - ${new Date(distributionDate).toLocaleDateString('ar-SA')}`,
       is_historical: false,
+      executed_by_user_id: user.id, // ✅ تسجيل هوية المنفذ للتدقيق الجنائي
     }));
 
     const { data: insertedDistributions, error: insertError } = await supabase
@@ -184,7 +185,7 @@ Deno.serve(async (req) => {
 
     console.log(`[distribute-revenue] Created ${insertedDistributions?.length} distribution records`);
 
-    // Create payment records for each heir
+    // Create payment records for each heir with executed_by_user_id
     const paymentRecords = heirShares.map((heir: HeirShare) => {
       const distribution = insertedDistributions?.find(d => d.beneficiary_id === heir.beneficiary_id);
       return {
@@ -198,6 +199,7 @@ Deno.serve(async (req) => {
         reference_id: distribution?.id,
         status: 'completed',
         description: `حصة ${heir.heir_type} من توزيع غلة الوقف`,
+        executed_by_user_id: user.id, // ✅ تسجيل هوية المنفذ للتدقيق الجنائي
       };
     });
 

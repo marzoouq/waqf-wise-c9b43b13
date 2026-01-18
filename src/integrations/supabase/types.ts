@@ -6846,6 +6846,7 @@ export type Database = {
           beneficiary_id: string | null
           created_at: string | null
           distribution_date: string
+          executed_by_user_id: string | null
           fiscal_year_id: string | null
           heir_type: string
           id: string
@@ -6861,6 +6862,7 @@ export type Database = {
           beneficiary_id?: string | null
           created_at?: string | null
           distribution_date: string
+          executed_by_user_id?: string | null
           fiscal_year_id?: string | null
           heir_type: string
           id?: string
@@ -6876,6 +6878,7 @@ export type Database = {
           beneficiary_id?: string | null
           created_at?: string | null
           distribution_date?: string
+          executed_by_user_id?: string | null
           fiscal_year_id?: string | null
           heir_type?: string
           id?: string
@@ -10180,6 +10183,7 @@ export type Database = {
           contract_id: string | null
           created_at: string
           description: string
+          executed_by_user_id: string | null
           id: string
           journal_entry_id: string | null
           notes: string | null
@@ -10202,6 +10206,7 @@ export type Database = {
           contract_id?: string | null
           created_at?: string
           description: string
+          executed_by_user_id?: string | null
           id?: string
           journal_entry_id?: string | null
           notes?: string | null
@@ -10224,6 +10229,7 @@ export type Database = {
           contract_id?: string | null
           created_at?: string
           description?: string
+          executed_by_user_id?: string | null
           id?: string
           journal_entry_id?: string | null
           notes?: string | null
