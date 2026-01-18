@@ -264,7 +264,45 @@ Deno.serve(async (req) => {
       })),
     };
 
-    console.log('[distribute-revenue] Distribution completed successfully');
+    // ========== تسجيل التدقيق الجنائي ==========
+    const auditRecord = {
+      action_type: 'distribute_revenue',
+      table_name: 'heir_distributions',
+      record_id: fiscalYearId,
+      user_id: user.id,
+      user_email: user.email,
+      user_role: userRole.role,
+      description: `توزيع غلة الوقف بمبلغ ${totalAmount.toLocaleString('ar-SA')} ريال على ${heirShares.length} ورثة`,
+      new_values: {
+        totalAmount,
+        fiscalYearId,
+        distributionDate,
+        heirsCount: heirShares.length,
+        distributionIds: insertedDistributions?.map(d => d.id),
+        summary: {
+          wivesShare: summary.wivesShare,
+          sonsShare: summary.sonsShare,
+          daughtersShare: summary.daughtersShare
+        }
+      },
+      severity: 'critical',
+      ip_address: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown',
+      user_agent: req.headers.get('user-agent') || 'unknown',
+      metadata: {
+        timestamp: new Date().toISOString(),
+        notifyHeirs: notifyHeirs || false,
+        notes: notes || null
+      }
+    };
+
+    const { error: auditError } = await supabase.from('audit_logs').insert(auditRecord);
+
+    if (auditError) {
+      console.error('[distribute-revenue] Audit log error:', auditError);
+      // لا نوقف العملية، لكن نسجل الخطأ
+    }
+
+    console.log('[distribute-revenue] Distribution completed successfully with audit trail');
 
     return jsonResponse({
       success: true,

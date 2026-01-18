@@ -7,6 +7,28 @@ import {
   forbiddenResponse 
 } from '../_shared/cors.ts';
 
+// ============ Rate Limiting - 3 عمليات نشر/ساعة لكل مستخدم ============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 3;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 interface PublishRequest {
   fiscalYearId: string;
   notifyHeirs?: boolean;
@@ -58,6 +80,12 @@ Deno.serve(async (req) => {
 
     if (!userRole) {
       return forbiddenResponse('غير مصرح لك بنشر السنة المالية');
+    }
+
+    // ✅ Rate Limiting
+    if (!checkRateLimit(user.id)) {
+      console.warn(`[publish-fiscal-year] Rate limit exceeded for user: ${user.id}`);
+      return errorResponse('تجاوزت الحد المسموح. يرجى الانتظار ساعة قبل المحاولة مرة أخرى.', 429);
     }
 
     const body: PublishRequest = await req.json();
