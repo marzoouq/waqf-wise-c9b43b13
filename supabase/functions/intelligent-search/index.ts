@@ -2,6 +2,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
 
+// ============ SQL Injection Protection ============
+function sanitizeLikePattern(input: string): string {
+  // إزالة الأحرف الخاصة في LIKE patterns لمنع SQL Injection
+  return input.replace(/[%_\\]/g, '\\$&');
+}
+
 // ============ Rate Limiting Configuration ============
 const RATE_LIMIT = {
   maxRequests: 60,    // 60 بحث
@@ -99,6 +105,8 @@ serve(async (req) => {
     }
 
     const searchTerm = query.trim();
+    const sanitizedTerm = sanitizeLikePattern(searchTerm); // ✅ حماية من SQL Injection
+    
     const results: Array<{
       id: string;
       type: string;
@@ -113,7 +121,7 @@ serve(async (req) => {
       const { data: docs } = await supabase
         .from('documents')
         .select('id, name, description, category, file_type, created_at')
-        .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+        .or(`name.ilike.%${sanitizedTerm}%,description.ilike.%${sanitizedTerm}%`)
         .limit(limit);
 
       docs?.forEach(doc => {
@@ -146,7 +154,7 @@ serve(async (req) => {
           confidence_score,
           documents (name, category)
         `)
-        .ilike('extracted_text', `%${searchTerm}%`)
+        .ilike('extracted_text', `%${sanitizedTerm}%`)
         .limit(limit);
 
       ocrResults?.forEach(ocr => {
