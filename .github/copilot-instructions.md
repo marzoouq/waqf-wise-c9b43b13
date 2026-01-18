@@ -223,4 +223,41 @@ const createWrapper = () => ({ children }) => (
 
 ---
 
-**آخر تحديث:** 2025-12-22 | **الإصدار:** 2.9.90
+## 🔒 Protected Files
+
+### Before Modifying Protected Files
+
+Any file with `🔒 PROTECTED FILE` comment requires:
+1. Read the associated ADR in `docs/ARCHITECTURE_DECISIONS.md`
+2. Ensure changes comply with existing decisions
+3. If breaking an ADR, propose a new ADR first
+4. Get security review for security-related files
+
+### ADR References in Code
+
+When you see these comments, understand their meaning:
+- `// ADR-001` - Tenant table closure (USING false)
+- `// ADR-004` - Limit restrictions (max 500 without pagination)
+- `// ADR-005` - Service Role usage in Edge Functions
+
+### Protected File List
+
+| File | Protection Level | Reason |
+|------|-----------------|--------|
+| `supabase/functions/*` | 🔴 Critical | Backend security |
+| `src/lib/constants.ts` | 🟠 High | System-wide impact |
+| `src/hooks/dashboard/*` | 🟡 Medium | KPI accuracy |
+| `docs/ARCHITECTURE_DECISIONS.md` | 🔴 Critical | Governance |
+
+### Golden Rule
+
+> ❗ **No ADR = No architectural change**
+
+If you need to break an existing ADR, you MUST:
+1. Document why in a new ADR
+2. Get explicit approval
+3. Update all affected files
+
+---
+
+**آخر تحديث:** 2026-01-18 | **الإصدار:** 2.9.91

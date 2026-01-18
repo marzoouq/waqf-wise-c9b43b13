@@ -1,0 +1,36 @@
+# 🔒 Code Owners - Waqf Management System
+# أي تعديل على هذه الملفات يتطلب موافقة المالكين
+# Any modification to these files requires owner approval
+
+# ============================================
+# Supabase & Database - الأكثر حساسية
+# ============================================
+supabase/**                     @waqf-owner
+
+# ============================================
+# Core Security & Auth
+# ============================================
+src/hooks/auth/**               @waqf-owner
+src/services/security/**        @waqf-owner
+
+# ============================================
+# Architecture Decisions - قرارات معمارية
+# ============================================
+docs/ARCHITECTURE_DECISIONS.md  @waqf-owner
+docs/SECURITY_GUIDELINES.md     @waqf-owner
+docs/ARCHITECTURE_RULES.md      @waqf-owner
+docs/TRUTH_MAP.md               @waqf-owner
+
+# ============================================
+# Core Infrastructure
+# ============================================
+src/hooks/dashboard/**          @waqf-owner
+src/hooks/system/**             @waqf-owner
+src/infrastructure/**           @waqf-owner
+src/lib/query-keys/**           @waqf-owner
+src/lib/constants.ts            @waqf-owner
+
+# ============================================
+# GitHub Workflows & Config
+# ============================================
+.github/**                      @waqf-owner

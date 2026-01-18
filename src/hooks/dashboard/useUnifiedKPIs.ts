@@ -1,6 +1,10 @@
 /**
- * Hook موحد لمؤشرات الأداء الرئيسية
+ * 🔒 PROTECTED FILE
+ * Hook موحد لمؤشرات الأداء الرئيسية - Single Source of Truth
  * يستخدم DashboardService كطبقة خدمة
+ * 
+ * See: docs/TRUTH_MAP.md
+ * Any change requires: Review of all dashboards using this hook
  * 
  * @version 2.6.36
  */
