@@ -171,7 +171,7 @@ export class SystemService {
       .select("id, action_type, severity, description, table_name, user_email, ip_address, created_at")
       .in("severity", ["error", "warn"])
       .order("created_at", { ascending: false })
-      .limit(5);
+      .limit(15);
 
     if (error) throw error;
 

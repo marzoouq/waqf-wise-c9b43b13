@@ -5,9 +5,8 @@
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { FiscalYearService, RealtimeService } from "@/services";
+import { FiscalYearService } from "@/services";
 
 export interface ActiveFiscalYear {
   id: string;
@@ -38,17 +37,8 @@ export function useActiveFiscalYear() {
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      'fiscal_years',
-      () => {
-        queryClient.invalidateQueries({ queryKey: ACTIVE_FISCAL_YEAR_QUERY_KEY });
-        queryClient.invalidateQueries({ queryKey: FISCAL_YEARS_QUERY_KEY });
-      }
-    );
-
-    return () => { subscription.unsubscribe(); };
-  }, [queryClient]);
+  // Realtime subscription removed - now handled by useAdminDashboardRealtime
+  // to prevent duplicate subscriptions and race conditions
 
   return {
     activeFiscalYear: query.data as ActiveFiscalYear | null,
