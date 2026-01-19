@@ -168,10 +168,7 @@ export class UserService {
 
   /**
    * جلب المستخدمين مع أدوارهم
-   */
-  /**
-   * جلب المستخدمين مع أدوارهم
-   * يستخدم View: user_profile_with_roles
+   * يستخدم دالة: get_all_user_profiles()
    */
   static async getUsersWithRoles(): Promise<{
     id: string;
@@ -183,25 +180,25 @@ export class UserService {
     roles_array: string[];
     roles_count: number;
   }[]> {
-    const { data, error } = await supabase
-      .from("user_profile_with_roles")
-      .select("*")
-      .order("created_at", { ascending: false });
+    // استخدام الدالة الآمنة بدلاً من الـ View المحذوف
+    const { data, error } = await supabase.rpc("get_all_user_profiles");
 
     if (error) throw error;
     
     return (data || []).map((u) => {
       // استخراج الأدوار من user_roles JSON array
-      const rolesArray = Array.isArray(u.user_roles) 
-        ? u.user_roles.map((r: { role: string }) => r.role)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userRoles = u.user_roles as any;
+      const rolesArray: string[] = Array.isArray(userRoles) 
+        ? userRoles.map((r: { role: string }) => r.role)
         : [];
       
       return {
-        id: u.id,
-        user_id: u.user_id || u.id,
-        full_name: u.full_name || u.email || "",
-        email: u.email || "",
-        avatar_url: u.avatar_url || null,
+        id: u.id as string,
+        user_id: (u.user_id || u.id) as string,
+        full_name: (u.full_name || u.email || "") as string,
+        email: (u.email || "") as string,
+        avatar_url: (u.avatar_url || null) as string | null,
         roles: rolesArray,
         roles_array: rolesArray,
         roles_count: rolesArray.length,

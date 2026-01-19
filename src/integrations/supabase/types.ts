@@ -2993,13 +2993,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "cashier_shifts_closed_by_fkey"
-            columns: ["closed_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       chatbot_conversations: {
@@ -4578,13 +4571,6 @@ export type Database = {
             columns: ["changed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentation_changelog_changed_by_fkey"
-            columns: ["changed_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
           {
@@ -7329,13 +7315,6 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: "internal_messages_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["user_id"]
-          },
-          {
             foreignKeyName: "internal_messages_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
@@ -7347,13 +7326,6 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "internal_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -8552,13 +8524,6 @@ export type Database = {
             columns: ["approved_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "loans_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["user_id"]
           },
           {
@@ -10577,13 +10542,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "pos_transactions_cashier_id_fkey"
-            columns: ["cashier_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "pos_transactions_contract_id_fkey"
             columns: ["contract_id"]
             isOneToOne: false
@@ -10630,13 +10588,6 @@ export type Database = {
             columns: ["voided_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pos_transactions_voided_by_fkey"
-            columns: ["voided_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
           {
@@ -10754,24 +10705,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "project_documentation_assigned_to_fkey"
-            columns: ["assigned_to"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "project_documentation_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_documentation_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -13992,24 +13929,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "user_permissions_granted_by_fkey"
-            columns: ["granted_by"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "user_permissions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_permissions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -14114,13 +14037,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -14850,16 +14766,6 @@ export type Database = {
         }
         Relationships: []
       }
-      current_user_roles: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          role: Database["public"]["Enums"]["app_role"] | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       distribution_statistics: {
         Row: {
           beneficiaries_count: number | null
@@ -15264,13 +15170,6 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: "internal_messages_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["user_id"]
-          },
-          {
             foreignKeyName: "internal_messages_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
@@ -15282,13 +15181,6 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "internal_messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["user_id"]
           },
         ]
@@ -15715,51 +15607,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      user_profile_with_roles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          id: string | null
-          is_active: boolean | null
-          last_login_at: string | null
-          phone: string | null
-          position: string | null
-          updated_at: string | null
-          user_id: string | null
-          user_roles: Json | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          last_login_at?: string | null
-          phone?: string | null
-          position?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          user_roles?: never
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          last_login_at?: string | null
-          phone?: string | null
-          position?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          user_roles?: never
-        }
-        Relationships: []
       }
       waqf_balance_summary: {
         Row: {
@@ -16193,6 +16040,23 @@ export type Database = {
         Returns: string
       }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
+      get_all_user_profiles: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          last_login_at: string
+          phone: string
+          updated_at: string
+          user_id: string
+          user_position: string
+          user_roles: Json
+        }[]
+      }
       get_approval_summary: {
         Args: never
         Returns: {
@@ -16329,6 +16193,12 @@ export type Database = {
         }[]
       }
       get_current_user_role: { Args: never; Returns: string }
+      get_current_user_roles: {
+        Args: never
+        Returns: {
+          role: string
+        }[]
+      }
       get_dashboard_stats: {
         Args: never
         Returns: {
@@ -16631,6 +16501,23 @@ export type Database = {
           permission_id: string
           permission_name: string
           source: string
+        }[]
+      }
+      get_user_profile_by_id: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          last_login_at: string
+          phone: string
+          updated_at: string
+          user_id: string
+          user_position: string
+          user_roles: Json
         }[]
       }
       get_users_by_target: {
