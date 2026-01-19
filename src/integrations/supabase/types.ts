@@ -16870,6 +16870,23 @@ export type Database = {
         }
         Returns: string
       }
+      secure_calculate_distribution_shares: {
+        Args: {
+          p_daughters_count: number
+          p_sons_count: number
+          p_total_amount: number
+          p_wives_count: number
+        }
+        Returns: {
+          daughter_share: number
+          son_share: number
+          wife_share: number
+        }[]
+      }
+      secure_check_distribution_approvals: {
+        Args: { p_distribution_id: string }
+        Returns: boolean
+      }
       seed_demo_data: { Args: never; Returns: Json }
       seed_journal_entries: { Args: never; Returns: Json }
       setup_demo_accounts: {
