@@ -20,7 +20,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
 import { useSupportTickets } from "@/hooks/support/useSupportTickets";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
-import { beneficiaryNavigationItems } from "@/components/beneficiary/config/bottomNavConfig";
+import { beneficiaryNavigationItems } from "@/config/navigation";
 
 export default function BeneficiarySupport() {
   const { user } = useAuth();

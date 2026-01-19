@@ -1,21 +1,13 @@
 /**
  * Beneficiary Bottom Navigation Configuration
- * بيانات ثابتة لشريط التنقل السفلي - محسّنة للمستفيد
+ * شريط التنقل السفلي للمستفيد
  * @version 2.0.0
  */
 
 import { Home, Wallet, FileText, User, MoreHorizontal } from "lucide-react";
+import type { NavigationItem } from "@/types/navigation";
 
-export interface NavigationItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  matchPaths?: string[];
-  badge?: number;
-}
-
-export const beneficiaryNavigationItems: NavigationItem[] = [
+export const beneficiaryNavigationItems: readonly NavigationItem[] = [
   {
     id: "home",
     label: "الرئيسية",
@@ -51,4 +43,4 @@ export const beneficiaryNavigationItems: NavigationItem[] = [
     path: "/beneficiary-portal?tab=reports",
     matchPaths: ["/beneficiary-portal?tab=reports", "/beneficiary-settings", "/beneficiary-support"],
   },
-];
+] as const;

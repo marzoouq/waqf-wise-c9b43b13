@@ -3,15 +3,7 @@ import { Home, Users, FileText, Bell, MoreHorizontal } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
-export interface NavigationItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  matchPaths?: string[];
-  badge?: number;
-}
+import type { NavigationItem } from '@/types/navigation';
 
 const defaultNavigationItems: NavigationItem[] = [
   {
@@ -48,7 +40,7 @@ const defaultNavigationItems: NavigationItem[] = [
 ];
 
 interface BottomNavigationProps {
-  items?: NavigationItem[];
+  items?: readonly NavigationItem[];
   ariaLabel?: string;
 }
 

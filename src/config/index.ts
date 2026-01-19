@@ -5,3 +5,4 @@
 
 export * from './permissions';
 export * from './roleThemes';
+export * from './navigation';

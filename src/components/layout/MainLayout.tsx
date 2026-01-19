@@ -13,7 +13,7 @@ import { GovernanceGuideButton } from "./GovernanceGuideButton";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
-import { beneficiaryNavigationItems } from "@/components/beneficiary/config/bottomNavConfig";
+import { getNavigationByRole, getNavigationAriaLabel } from "@/config/navigation";
 import { useUserRole } from "@/hooks/auth/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -256,8 +256,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Mobile Bottom Navigation */}
         <div className="md:hidden">
           <BottomNavigation 
-            items={(isBeneficiary || isWaqfHeir) ? beneficiaryNavigationItems : undefined}
-            ariaLabel={(isBeneficiary || isWaqfHeir) ? "التنقل السفلي للمستفيد" : "التنقل السفلي"}
+            items={getNavigationByRole(primaryRole)}
+            ariaLabel={getNavigationAriaLabel(primaryRole)}
           />
         </div>
         
