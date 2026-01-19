@@ -276,75 +276,137 @@ const GovernanceBoards = () => {
                 ))}
               </div>
             ) : boards && boards.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>اسم المجلس</TableHead>
-                    <TableHead>النوع</TableHead>
-                    <TableHead>رئيس المجلس</TableHead>
-                    <TableHead>عدد الأعضاء</TableHead>
-                    <TableHead>النصاب</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead>الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
                   {boards.map((board) => (
-                    <TableRow key={board.id}>
-                      <TableCell className="font-medium">{board.board_name_ar}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{board.board_type}</Badge>
-                      </TableCell>
-                      <TableCell>{board.chairman_name}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{board.member_count} عضو</Badge>
-                      </TableCell>
-                      <TableCell>{board.quorum_requirement}</TableCell>
-                      <TableCell>
+                    <Card key={board.id} className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="font-semibold text-base">{board.board_name_ar}</h3>
+                          <p className="text-sm text-muted-foreground">{board.chairman_name}</p>
+                        </div>
                         <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
                           {board.status}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openMembersDialog(board.id)}
-                            title="عرض الأعضاء"
-                          >
-                            <Users className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" title="حذف">
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع الأعضاء المرتبطين به.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteBoard(board.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  حذف
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant="outline">{board.board_type}</Badge>
+                        <Badge variant="secondary">{board.member_count} عضو</Badge>
+                        <Badge variant="outline">نصاب: {board.quorum_requirement}</Badge>
+                      </div>
+                      <div className="flex gap-2 pt-2 border-t">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 gap-1"
+                          onClick={() => openMembersDialog(board.id)}
+                        >
+                          <Users className="h-4 w-4" />
+                          الأعضاء
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع الأعضاء المرتبطين به.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteBoard(board.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>اسم المجلس</TableHead>
+                        <TableHead>النوع</TableHead>
+                        <TableHead className="hidden lg:table-cell">رئيس المجلس</TableHead>
+                        <TableHead>عدد الأعضاء</TableHead>
+                        <TableHead className="hidden lg:table-cell">النصاب</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {boards.map((board) => (
+                        <TableRow key={board.id}>
+                          <TableCell className="font-medium">{board.board_name_ar}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{board.board_type}</Badge>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">{board.chairman_name}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{board.member_count} عضو</Badge>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">{board.quorum_requirement}</TableCell>
+                          <TableCell>
+                            <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
+                              {board.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openMembersDialog(board.id)}
+                                title="عرض الأعضاء"
+                              >
+                                <Users className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" title="حذف">
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع الأعضاء المرتبطين به.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteBoard(board.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      حذف
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />

@@ -282,78 +282,142 @@ const GovernancePolicies = () => {
                 ))}
               </div>
             ) : filteredPolicies.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>رمز السياسة</TableHead>
-                    <TableHead>اسم السياسة</TableHead>
-                    <TableHead>الفئة</TableHead>
-                    <TableHead>الوصف</TableHead>
-                    <TableHead>الإصدار</TableHead>
-                    <TableHead>تاريخ السريان</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead>الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
                   {filteredPolicies.map((policy) => (
-                    <TableRow key={policy.id}>
-                      <TableCell>
-                        <Badge variant="outline" className="font-mono">
-                          {policy.policy_code}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">{policy.policy_name_ar}</TableCell>
-                      <TableCell>
+                    <Card key={policy.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {policy.policy_code}
+                            </Badge>
+                            {getStatusBadge(policy.status)}
+                          </div>
+                          <h3 className="font-semibold text-base">{policy.policy_name_ar}</h3>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="shrink-0">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                هل أنت متأكد من حذف السياسة "{policy.policy_name_ar}"؟
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeletePolicy(policy.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                      {policy.description && (
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {policy.description}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap gap-2">
                         <Badge className={getCategoryColor(policy.category)}>
                           {policy.category}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate text-muted-foreground">
-                        {policy.description || '-'}
-                      </TableCell>
-                      <TableCell>
                         <Badge variant="secondary">v{policy.version}</Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {policy.effective_date 
-                          ? format(new Date(policy.effective_date), 'dd MMM yyyy', { locale: ar })
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell>{getStatusBadge(policy.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" title="حذف">
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  هل أنت متأكد من حذف السياسة "{policy.policy_name_ar}"؟
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeletePolicy(policy.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  حذف
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                        {policy.effective_date && (
+                          <Badge variant="outline" className="text-xs">
+                            {format(new Date(policy.effective_date), 'dd MMM yyyy', { locale: ar })}
+                          </Badge>
+                        )}
+                      </div>
+                    </Card>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>رمز السياسة</TableHead>
+                        <TableHead>اسم السياسة</TableHead>
+                        <TableHead>الفئة</TableHead>
+                        <TableHead className="hidden lg:table-cell">الوصف</TableHead>
+                        <TableHead className="hidden lg:table-cell">الإصدار</TableHead>
+                        <TableHead className="hidden xl:table-cell">تاريخ السريان</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredPolicies.map((policy) => (
+                        <TableRow key={policy.id}>
+                          <TableCell>
+                            <Badge variant="outline" className="font-mono">
+                              {policy.policy_code}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">{policy.policy_name_ar}</TableCell>
+                          <TableCell>
+                            <Badge className={getCategoryColor(policy.category)}>
+                              {policy.category}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell max-w-[200px] truncate text-muted-foreground">
+                            {policy.description || '-'}
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            <Badge variant="secondary">v{policy.version}</Badge>
+                          </TableCell>
+                          <TableCell className="hidden xl:table-cell text-muted-foreground">
+                            {policy.effective_date 
+                              ? format(new Date(policy.effective_date), 'dd MMM yyyy', { locale: ar })
+                              : '-'
+                            }
+                          </TableCell>
+                          <TableCell>{getStatusBadge(policy.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" title="حذف">
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      هل أنت متأكد من حذف السياسة "{policy.policy_name_ar}"؟
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeletePolicy(policy.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      حذف
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <ScrollText className="h-12 w-12 mx-auto mb-4 opacity-50" />
