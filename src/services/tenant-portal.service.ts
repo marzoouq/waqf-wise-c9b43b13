@@ -123,9 +123,9 @@ export class TenantPortalService {
     }
 
     if (data.success && data.sessionToken) {
-      // حفظ الجلسة
-      localStorage.setItem(TENANT_SESSION_KEY, data.sessionToken);
-      localStorage.setItem(TENANT_DATA_KEY, JSON.stringify(data.tenant));
+      // حفظ الجلسة - استخدام sessionStorage بدلاً من localStorage للأمان
+      sessionStorage.setItem(TENANT_SESSION_KEY, data.sessionToken);
+      sessionStorage.setItem(TENANT_DATA_KEY, JSON.stringify(data.tenant));
     }
 
     return { success: data.success, tenant: data.tenant, error: data.error };
@@ -135,14 +135,14 @@ export class TenantPortalService {
    * جلب توكن الجلسة
    */
   static getSessionToken(): string | null {
-    return localStorage.getItem(TENANT_SESSION_KEY);
+    return sessionStorage.getItem(TENANT_SESSION_KEY);
   }
 
   /**
    * جلب بيانات المستأجر المحفوظة
    */
   static getCachedTenant(): TenantData | null {
-    const data = localStorage.getItem(TENANT_DATA_KEY);
+    const data = sessionStorage.getItem(TENANT_DATA_KEY);
     return data ? JSON.parse(data) : null;
   }
 
@@ -242,8 +242,8 @@ export class TenantPortalService {
         });
       }
     } finally {
-      localStorage.removeItem(TENANT_SESSION_KEY);
-      localStorage.removeItem(TENANT_DATA_KEY);
+      sessionStorage.removeItem(TENANT_SESSION_KEY);
+      sessionStorage.removeItem(TENANT_DATA_KEY);
     }
   }
 

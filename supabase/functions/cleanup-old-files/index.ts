@@ -62,17 +62,44 @@ serve(async (req) => {
       return unauthorizedResponse('Unauthorized');
     }
 
-    // 2. التحقق من دور admin
+    // 2. التحقق من دور admin أو nazer
     const { data: roleData } = await supabaseClient
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .in('role', ['admin', 'nazer']);
 
-    if (!roleData || roleData.role !== 'admin') {
+    if (!roleData || roleData.length === 0) {
       console.warn('Unauthorized cleanup attempt by:', user.id);
-      return forbiddenResponse('Forbidden: Admin role required');
+      return forbiddenResponse('Forbidden: Admin or Nazer role required');
     }
+
+    // 2.5 Rate Limiting - 3 عمليات تنظيف/يوم لكل مستخدم
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    const today = new Date().toISOString().split('T')[0];
+    const { count: todayCount } = await supabaseAdmin
+      .from('audit_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('action_type', 'CLEANUP_FILES')
+      .eq('user_id', user.id)
+      .gte('created_at', `${today}T00:00:00.000Z`);
+    
+    if ((todayCount ?? 0) >= 3) {
+      console.warn(`[cleanup-old-files] Rate limit exceeded for user: ${user.id}`);
+      return errorResponse('تجاوزت الحد المسموح (3 مرات/يوم). حاول غداً.', 429);
+    }
+    
+    // تسجيل محاولة التنظيف
+    await supabaseAdmin.from('audit_logs').insert({
+      user_id: user.id,
+      action_type: 'CLEANUP_FILES',
+      description: 'بدء عملية تنظيف الملفات القديمة',
+      severity: 'info'
+    });
 
     // 3. استخدام Service Role للعمليات
     const supabase = createClient(
