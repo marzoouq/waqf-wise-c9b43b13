@@ -79,6 +79,8 @@ export const Messages = lazyWithRetry(() => import("@/pages/Messages"));
 export const GovernanceDecisions = lazyWithRetry(() => import("@/pages/GovernanceDecisions"));
 export const DecisionDetails = lazyWithRetry(() => import("@/pages/DecisionDetails"));
 export const WaqfGovernanceGuide = lazyWithRetry(() => import("@/pages/WaqfGovernanceGuide"));
+export const GovernanceBoards = lazyWithRetry(() => import("@/pages/GovernanceBoards"));
+export const GovernancePolicies = lazyWithRetry(() => import("@/pages/GovernancePolicies"));
 
 // ==================== الإعدادات ====================
 export const Settings = lazyWithRetry(() => import("@/pages/Settings"));

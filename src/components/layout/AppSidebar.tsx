@@ -35,6 +35,8 @@ import {
   HeartHandshake,
   MoreHorizontal,
   TrendingUp,
+  Building,
+  FileCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -158,7 +160,9 @@ const moreMenuGroups = [
     roles: ["admin", "nazer", "archivist", "waqf_heir"],
     subItems: [
       { icon: Archive, label: "الأرشيف", path: "/archive" },
-      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions" },
+      { icon: Building, label: "مجالس الحوكمة", path: "/governance/boards" },
+      { icon: FileCheck, label: "السياسات", path: "/governance/policies" },
+      { icon: Vote, label: "القرارات والتصويت", path: "/governance/decisions" },
       { icon: ScrollText, label: "الدليل الإرشادي", path: "/governance/guide" },
     ]
   },

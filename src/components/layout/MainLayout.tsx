@@ -7,7 +7,8 @@ import { IdleTimeoutManager } from "@/components/auth/IdleTimeoutManager";
 import { SessionManager } from "@/components/auth/SessionManager";
 import AppVersionFooter from "./AppVersionFooter";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
-import { Menu, LogOut, Search } from "lucide-react";
+import { Menu, LogOut, Search, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { NotificationsBell } from "./NotificationsBell";
 import { GovernanceGuideButton } from "./GovernanceGuideButton";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
@@ -34,6 +35,27 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 interface MainLayoutProps {
   children: ReactNode;
 }
+
+// مكون زر تبديل الوضع الليلي
+const ThemeToggle = memo(function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      aria-label="تبديل الوضع الليلي"
+      className="h-9 w-9"
+    >
+      {theme === 'dark' ? (
+        <Sun className="h-4 w-4" aria-hidden="true" />
+      ) : (
+        <Moon className="h-4 w-4" aria-hidden="true" />
+      )}
+    </Button>
+  );
+});
 
 // مكون Header للجوال - محسّن ومنفصل
 const MobileHeader = memo(function MobileHeader({ 
@@ -68,6 +90,7 @@ const MobileHeader = memo(function MobileHeader({
       >
         <Search className="h-4 w-4" aria-hidden="true" />
       </Button>
+      <ThemeToggle />
       <GovernanceGuideButton />
       <NotificationsBell />
       
@@ -135,6 +158,7 @@ const DesktopHeader = memo(function DesktopHeader({
               <span className="text-xs">Ctrl+K</span>
             </kbd>
           </Button>
+          <ThemeToggle />
           <GovernanceGuideButton />
           <NotificationsBell />
           

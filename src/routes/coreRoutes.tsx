@@ -36,6 +36,8 @@ import {
   GovernanceDecisions,
   DecisionDetails,
   WaqfGovernanceGuide,
+  GovernanceBoards,
+  GovernancePolicies,
   Settings,
   TransparencySettings,
   NotificationSettingsPage,
@@ -324,6 +326,24 @@ export const coreRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary", "waqf_heir"]}>
         <DecisionDetails />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="governance-boards"
+    path="/governance/boards" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+        <GovernanceBoards />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="governance-policies"
+    path="/governance/policies" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "archivist"]}>
+        <GovernancePolicies />
       </ProtectedRoute>
     } 
   />,
