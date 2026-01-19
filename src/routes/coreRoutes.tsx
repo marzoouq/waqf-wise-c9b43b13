@@ -163,6 +163,15 @@ export const coreRoutes = [
     } 
   />,
   <Route 
+    key="fiscal-years-management"
+    path="/fiscal-years-management" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <FiscalYearsManagement />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
     key="budgets"
     path="/budgets"
     element={
