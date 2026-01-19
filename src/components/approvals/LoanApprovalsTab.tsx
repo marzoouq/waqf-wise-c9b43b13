@@ -87,46 +87,59 @@ export function LoanApprovalsTab() {
           const canApprove = pendingApproval !== undefined;
 
           return (
-            <Card key={loan.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
+            <Card 
+              key={loan.id}
+              className="overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300"
+            >
+              <CardHeader className="bg-gradient-to-l from-amber-50 to-transparent dark:from-amber-950/30 dark:to-transparent border-b border-border/30 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
+                    <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                      <DollarSign className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    </div>
                     قرض رقم {loan.loan_number}
                   </CardTitle>
                   {getStatusBadge(loan.status)}
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">المستفيد</p>
+              <CardContent className="pt-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border/30">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">المستفيد</p>
                     <p className="text-base font-semibold">{loan.beneficiaries?.full_name}</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">مبلغ القرض</p>
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">مبلغ القرض</p>
                     <p className="text-lg font-bold text-primary">
                       {loan.loan_amount?.toLocaleString("ar-SA")} ريال
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">المدة</p>
-                    <p className="text-base">{loan.term_months} شهر</p>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border/30">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">المدة</p>
+                    <p className="text-base font-medium">{loan.term_months} شهر</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">تقدم الموافقات</p>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border/30">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">تقدم الموافقات</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-semibold">
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-amber-500 rounded-full transition-all"
+                          style={{ 
+                            width: `${(parseInt(getApprovalProgress(loan.loan_approvals).split('/')[0]) / 3) * 100}%` 
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold">
                         {getApprovalProgress(loan.loan_approvals)}
-                      </p>
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* عرض الموافقات */}
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm font-semibold mb-2">مستويات الموافقة:</p>
-                  <div className="flex gap-2">
+                <div className="mt-4 pt-4 border-t border-border/30">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">مستويات الموافقة:</p>
+                  <div className="flex flex-wrap gap-2">
                     {loan.loan_approvals?.map((approval) => (
                       <Badge
                         key={approval.id}
@@ -137,7 +150,11 @@ export function LoanApprovalsTab() {
                             ? "destructive"
                             : "secondary"
                         }
+                        className="gap-1"
                       >
+                        {approval.status === "موافق" && <CheckCircle className="h-3 w-3" />}
+                        {approval.status === "مرفوض" && <XCircle className="h-3 w-3" />}
+                        {approval.status === "معلق" && <Clock className="h-3 w-3" />}
                         {approval.approver_name}: {approval.status}
                       </Badge>
                     ))}
@@ -146,23 +163,25 @@ export function LoanApprovalsTab() {
 
                 {/* أزرار الموافقة */}
                 {canApprove && (
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 pt-4 border-t border-border/30 flex gap-2">
                     <Button
                       variant="default"
                       size="sm"
+                      className="gap-1.5"
                       onClick={() => handleApprovalClick(loan, "approve")}
                       disabled={isApproving}
                     >
-                      <CheckCircle className="h-4 w-4 ms-1" />
+                      <CheckCircle className="h-4 w-4" />
                       موافقة
                     </Button>
                     <Button
                       variant="destructive"
                       size="sm"
+                      className="gap-1.5"
                       onClick={() => handleApprovalClick(loan, "reject")}
                       disabled={isApproving}
                     >
-                      <XCircle className="h-4 w-4 ms-1" />
+                      <XCircle className="h-4 w-4" />
                       رفض
                     </Button>
                   </div>
@@ -173,10 +192,13 @@ export function LoanApprovalsTab() {
         })}
 
         {loans?.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">لا توجد قروض بحاجة للموافقة</p>
+          <Card className="border-dashed border-2 border-muted-foreground/20">
+            <CardContent className="text-center py-16">
+              <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <p className="text-lg font-medium text-muted-foreground">لا توجد قروض بحاجة للموافقة</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">ستظهر القروض المعلقة هنا عند إضافتها</p>
             </CardContent>
           </Card>
         )}

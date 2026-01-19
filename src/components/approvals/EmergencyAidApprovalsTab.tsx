@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { format, arLocale as ar } from "@/lib/date";
 import {
@@ -112,81 +112,136 @@ export function EmergencyAidApprovalsTab() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden border-border/50">
+        <CardHeader className="bg-gradient-to-l from-rose-50 to-transparent dark:from-rose-950/30 dark:to-transparent border-b border-border/30">
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
+            <div className="h-8 w-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
+              <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+            </div>
             طلبات الفزعة المعلقة ({requests.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-start">رقم الطلب</TableHead>
-                  <TableHead className="text-start">المستفيد</TableHead>
-                  <TableHead className="text-start">المبلغ</TableHead>
-                  <TableHead className="text-start hidden md:table-cell">مستوى العجلة</TableHead>
-                  <TableHead className="text-start hidden lg:table-cell">SLA</TableHead>
-                  <TableHead className="text-start hidden lg:table-cell">تاريخ التقديم</TableHead>
-                  <TableHead className="text-start">الإجراء</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requests.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      لا توجد طلبات معلقة
-                    </TableCell>
+        <CardContent className="p-0">
+          {/* Mobile Card View */}
+          <div className="md:hidden divide-y divide-border/50">
+            {requests.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-lg font-medium text-muted-foreground">لا توجد طلبات معلقة</p>
+                <p className="text-sm text-muted-foreground/70 mt-1">ستظهر الطلبات العاجلة هنا</p>
+              </div>
+            ) : (
+              requests.map((request) => (
+                <div key={request.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-medium">{request.request_number}</span>
+                    <div className="flex gap-2">
+                      {getUrgencyBadge(request.urgency_level)}
+                      {getSLAStatus(request.sla_due_at)}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium">{request.beneficiaries?.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{request.beneficiaries?.national_id}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-primary">{request.amount_requested.toLocaleString("ar-SA")} ريال</span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button size="sm" variant="default" className="flex-1 gap-1" onClick={() => openApproveDialog(request)}>
+                      <CheckCircle className="h-3 w-3" />
+                      موافقة
+                    </Button>
+                    <Button size="sm" variant="destructive" className="flex-1 gap-1" onClick={() => openRejectDialog(request)}>
+                      <XCircle className="h-3 w-3" />
+                      رفض
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          {/* Desktop Table View */}
+          <div className="hidden md:block">
+            <div className="rounded-lg border-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="text-start font-semibold">رقم الطلب</TableHead>
+                    <TableHead className="text-start font-semibold">المستفيد</TableHead>
+                    <TableHead className="text-start font-semibold">المبلغ</TableHead>
+                    <TableHead className="text-start font-semibold">مستوى العجلة</TableHead>
+                    <TableHead className="text-start font-semibold hidden lg:table-cell">SLA</TableHead>
+                    <TableHead className="text-start font-semibold hidden lg:table-cell">تاريخ التقديم</TableHead>
+                    <TableHead className="text-start font-semibold">الإجراء</TableHead>
                   </TableRow>
-                ) : (
-                  requests.map((request) => (
-                    <TableRow key={request.id}>
-                      <TableCell className="font-medium">{request.request_number}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{request.beneficiaries?.full_name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {request.beneficiaries?.national_id}
-                          </div>
+                </TableHeader>
+                <TableBody>
+                  {requests.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-16">
+                        <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                          <Clock className="h-8 w-8 text-muted-foreground" />
                         </div>
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        {request.amount_requested.toLocaleString("ar-SA")} ريال
-                      </TableCell>
-                      <TableCell>{getUrgencyBadge(request.urgency_level)}</TableCell>
-                      <TableCell>{getSLAStatus(request.sla_due_at)}</TableCell>
-                      <TableCell>
-                        {format(new Date(request.created_at), "dd/MM/yyyy - HH:mm", {
-                          locale: ar,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="default"
-                            onClick={() => openApproveDialog(request)}
-                          >
-                            <CheckCircle className="h-3 w-3 ms-1" />
-                            موافقة
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => openRejectDialog(request)}
-                          >
-                            <XCircle className="h-3 w-3 ms-1" />
-                            رفض
-                          </Button>
-                        </div>
+                        <p className="text-lg font-medium text-muted-foreground">لا توجد طلبات معلقة</p>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    requests.map((request) => (
+                      <TableRow key={request.id} className="hover:bg-muted/30">
+                        <TableCell className="font-mono font-medium">{request.request_number}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{request.beneficiaries?.full_name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {request.beneficiaries?.national_id}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold text-primary">
+                          {request.amount_requested.toLocaleString("ar-SA")} ريال
+                        </TableCell>
+                        <TableCell>{getUrgencyBadge(request.urgency_level)}</TableCell>
+                        <TableCell className="hidden lg:table-cell">{getSLAStatus(request.sla_due_at)}</TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {format(new Date(request.created_at), "dd/MM/yyyy - HH:mm", {
+                            locale: ar,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              className="gap-1"
+                              onClick={() => openApproveDialog(request)}
+                            >
+                              <CheckCircle className="h-3 w-3" />
+                              موافقة
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="gap-1"
+                              onClick={() => openRejectDialog(request)}
+                            >
+                              <XCircle className="h-3 w-3" />
+                              رفض
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </CardContent>
       </Card>

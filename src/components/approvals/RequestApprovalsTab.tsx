@@ -51,51 +51,61 @@ export function RequestApprovalsTab() {
   return (
     <div className="space-y-4">
       {requests?.map((request) => (
-        <Card key={request.id}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">{request.request_number}</CardTitle>
+        <Card 
+          key={request.id}
+          className="overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300"
+        >
+          <CardHeader className="bg-gradient-to-l from-blue-50 to-transparent dark:from-blue-950/30 dark:to-transparent border-b border-border/30 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <span className="text-blue-600 dark:text-blue-400 text-lg">📋</span>
+                </div>
+                {request.request_number}
+              </CardTitle>
               {getStatusBadge(request.status)}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">نوع الطلب</p>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">نوع الطلب</p>
                 <p className="text-base font-semibold">{request.request_types?.name_ar}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">المستفيد</p>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">المستفيد</p>
                 <p className="text-base">{request.beneficiaries?.full_name}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">تاريخ الطلب</p>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">تاريخ الطلب</p>
                 <p className="text-base">
                   {format(new Date(request.submitted_at), "dd MMM yyyy", { locale: ar })}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-end gap-2">
                 <Button
                   size="sm"
+                  className="gap-1.5"
                   onClick={() => approveDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
-                  <CheckCircle className="h-4 w-4 ms-1" />
+                  <CheckCircle className="h-4 w-4" />
                   موافقة
                 </Button>
                 <Button
                   size="sm"
                   variant="destructive"
+                  className="gap-1.5"
                   onClick={() => rejectDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
-                  <XCircle className="h-4 w-4 ms-1" />
+                  <XCircle className="h-4 w-4" />
                   رفض
                 </Button>
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-1">الوصف:</p>
+            <div className="mt-4 p-3 bg-muted/30 rounded-lg border border-border/30">
+              <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">الوصف:</p>
               <p className="text-sm">{request.description}</p>
             </div>
           </CardContent>
@@ -103,10 +113,13 @@ export function RequestApprovalsTab() {
       ))}
 
       {requests?.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">لا توجد طلبات بحاجة للموافقة</p>
+        <Card className="border-dashed border-2 border-muted-foreground/20">
+          <CardContent className="text-center py-16">
+            <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-lg font-medium text-muted-foreground">لا توجد طلبات بحاجة للموافقة</p>
+            <p className="text-sm text-muted-foreground/70 mt-1">ستظهر الطلبات المعلقة هنا عند إضافتها</p>
           </CardContent>
         </Card>
       )}
