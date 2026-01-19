@@ -87,7 +87,7 @@ export function DeadRowsTable({ deadRows, isLoading, onVacuumTable, isVacuuming 
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -136,7 +136,7 @@ export function DeadRowsTable({ deadRows, isLoading, onVacuumTable, isVacuuming 
                         onClick={() => onVacuumTable(row.table_name)}
                         disabled={isVacuuming}
                       >
-                        <RefreshCw className="h-3 w-3 mr-1" />
+                        <RefreshCw className="h-3 w-3 me-1" />
                         VACUUM
                       </Button>
                     </TableCell>

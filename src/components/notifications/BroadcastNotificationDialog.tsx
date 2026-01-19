@@ -300,12 +300,12 @@ export function BroadcastNotificationDialog({
           >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                <Loader2 className="h-4 w-4 animate-spin ms-2" />
                 جاري الإرسال...
               </>
             ) : (
               <>
-                <Send className="h-4 w-4 ml-2" />
+                <Send className="h-4 w-4 ms-2" />
                 إرسال للـ {recipientCount} مستخدم
               </>
             )}

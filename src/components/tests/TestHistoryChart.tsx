@@ -78,7 +78,7 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
           <CardTitle className="flex items-center justify-between">
             <span>تطور نسبة النجاح</span>
             <Badge variant="outline" className={trendColor}>
-              <TrendIcon className="h-4 w-4 mr-1" />
+              <TrendIcon className="h-4 w-4 me-1" />
               {trendLabel}
             </Badge>
           </CardTitle>

@@ -217,7 +217,7 @@ export function ZATCAComplianceChecker() {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="mr-2">جارٍ فحص الامتثال...</span>
+        <span className="me-2">جارٍ فحص الامتثال...</span>
       </div>
     );
   }
@@ -234,7 +234,7 @@ export function ZATCAComplianceChecker() {
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={performChecks}>
-                <RefreshCw className="h-4 w-4 ml-1" />
+                <RefreshCw className="h-4 w-4 ms-1" />
                 تحديث
               </Button>
               <Badge 

@@ -127,15 +127,15 @@ export const RequestGridCard = memo(({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onViewDetails(request); }}>
-                <Eye className="h-4 w-4 ml-2" />
+                <Eye className="h-4 w-4 ms-2" />
                 عرض التفاصيل
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onApproval(request); }}>
-                <GitBranch className="h-4 w-4 ml-2" />
+                <GitBranch className="h-4 w-4 ms-2" />
                 مسار الموافقات
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComments(request); }}>
-                <MessageSquare className="h-4 w-4 ml-2" />
+                <MessageSquare className="h-4 w-4 ms-2" />
                 التعليقات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -143,7 +143,7 @@ export const RequestGridCard = memo(({
                 onClick={(e) => { e.stopPropagation(); onDelete(request); }}
                 className="text-destructive focus:text-destructive"
               >
-                <Trash2 className="h-4 w-4 ml-2" />
+                <Trash2 className="h-4 w-4 ms-2" />
                 حذف
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -209,7 +209,7 @@ export const RequestGridCard = memo(({
                 <Loader2 className="h-3 w-3 animate-spin" />
               ) : (
                 <>
-                  <CheckCircle className="h-3 w-3 ml-1" />
+                  <CheckCircle className="h-3 w-3 ms-1" />
                   موافقة
                 </>
               )}
@@ -225,7 +225,7 @@ export const RequestGridCard = memo(({
                 <Loader2 className="h-3 w-3 animate-spin" />
               ) : (
                 <>
-                  <XCircle className="h-3 w-3 ml-1" />
+                  <XCircle className="h-3 w-3 ms-1" />
                   رفض
                 </>
               )}

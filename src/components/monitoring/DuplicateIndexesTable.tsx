@@ -69,7 +69,7 @@ export function DuplicateIndexesTable({ indexes, isLoading }: DuplicateIndexesTa
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

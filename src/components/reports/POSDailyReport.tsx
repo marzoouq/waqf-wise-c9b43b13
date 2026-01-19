@@ -153,14 +153,14 @@ export const POSDailyReport = () => {
         </div>
 
         {/* Transactions Table */}
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>رقم العملية</TableHead>
                 <TableHead>النوع</TableHead>
                 <TableHead>الاسم</TableHead>
-                <TableHead className="text-left">المبلغ</TableHead>
+                <TableHead className="text-end">المبلغ</TableHead>
                 <TableHead>طريقة الدفع</TableHead>
                 <TableHead>الوقت</TableHead>
               </TableRow>

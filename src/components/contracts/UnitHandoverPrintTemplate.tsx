@@ -60,11 +60,11 @@ export function UnitHandoverPrintTemplate({
       {/* أزرار الطباعة - تظهر فقط على الشاشة */}
       <div className="print:hidden flex justify-end gap-2 mb-4">
         <Button variant="outline" onClick={handlePrint}>
-          <Printer className="h-4 w-4 ml-2" />
+          <Printer className="h-4 w-4 ms-2" />
           طباعة
         </Button>
         <Button variant="outline">
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تحميل PDF
         </Button>
       </div>

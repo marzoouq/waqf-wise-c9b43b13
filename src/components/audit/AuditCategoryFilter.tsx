@@ -100,7 +100,7 @@ export function AuditCategoryFilter({ selectedCategory, onCategoryChange }: Audi
             <Icon className="h-4 w-4" />
             {cat.label}
             {isSelected && (
-              <X className="h-3 w-3 mr-1" />
+              <X className="h-3 w-3 me-1" />
             )}
           </Button>
         );

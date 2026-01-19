@@ -81,7 +81,7 @@ export function ContractHandoversHistory({
           <CardTitle className="flex items-center gap-2 text-lg">
             <ClipboardCheck className="h-5 w-5 text-primary" />
             سجل استلام/تسليم الوحدة
-            <Badge variant="outline" className="mr-2">
+            <Badge variant="outline" className="me-2">
               {handovers.length} نموذج
             </Badge>
           </CardTitle>

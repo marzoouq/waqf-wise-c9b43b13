@@ -91,7 +91,7 @@ export function ContractRequestsSection({
           <AlertCircle className="h-5 w-5 text-primary" />
           طلبات العقد
           {stats.terminationRequests.pending + stats.rentAdjustmentRequests.pending > 0 && (
-            <Badge variant="destructive" className="mr-2">
+            <Badge variant="destructive" className="me-2">
               {stats.terminationRequests.pending + stats.rentAdjustmentRequests.pending} قيد المراجعة
             </Badge>
           )}
@@ -104,7 +104,7 @@ export function ContractRequestsSection({
               <FileX className="h-4 w-4" />
               طلبات الفسخ
               {terminationRequests?.length ? (
-                <Badge variant="outline" className="mr-1">
+                <Badge variant="outline" className="me-1">
                   {terminationRequests.length}
                 </Badge>
               ) : null}
@@ -113,7 +113,7 @@ export function ContractRequestsSection({
               <TrendingUp className="h-4 w-4" />
               تعديل الإيجار
               {rentAdjustmentRequests?.length ? (
-                <Badge variant="outline" className="mr-1">
+                <Badge variant="outline" className="me-1">
                   {rentAdjustmentRequests.length}
                 </Badge>
               ) : null}

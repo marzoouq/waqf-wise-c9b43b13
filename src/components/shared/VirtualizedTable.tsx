@@ -71,7 +71,7 @@ export function VirtualizedTable<T>({
   }
 
   return (
-    <div className={cn('rounded-md border', className)}>
+    <div className={cn('rounded-lg border', className)}>
       <Table>
         <TableHeader className="sticky top-0 z-10 bg-background">
           <TableRow>

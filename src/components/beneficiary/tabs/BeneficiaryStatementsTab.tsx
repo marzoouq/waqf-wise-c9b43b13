@@ -249,15 +249,15 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
             </div>
           ) : (
             <ScrollArea className="w-full">
-              <div className="rounded-md border">
+              <div className="rounded-lg border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-right">التاريخ</TableHead>
-                      <TableHead className="text-right">الوصف</TableHead>
-                      <TableHead className="text-right">النوع</TableHead>
-                      <TableHead className="text-right">المبلغ</TableHead>
-                      <TableHead className="text-right">الرصيد</TableHead>
+                      <TableHead className="text-start">التاريخ</TableHead>
+                      <TableHead className="text-start">الوصف</TableHead>
+                      <TableHead className="text-start">النوع</TableHead>
+                      <TableHead className="text-start">المبلغ</TableHead>
+                      <TableHead className="text-start">الرصيد</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

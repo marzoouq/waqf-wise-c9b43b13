@@ -195,7 +195,7 @@ export function TestHistoryPanel({ onSelectRun }: TestHistoryPanelProps) {
                     }`}
                   >
                     <AccordionTrigger className="hover:no-underline py-3">
-                      <div className="flex items-center justify-between w-full ml-4">
+                      <div className="flex items-center justify-between w-full ms-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-3 h-3 rounded-full ${
                             Number(run.pass_rate) >= 90 ? 'bg-green-500' :

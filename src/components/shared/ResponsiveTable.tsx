@@ -81,7 +81,7 @@ export function ResponsiveTable<T extends TableRowType = TableRowType>({
   // عرض Table على الشاشات الكبيرة أو عند تعطيل card view
   return (
     <ScrollableTableWrapper showScrollIndicator={isMobile}>
-      <div className="rounded-md border min-w-max">
+      <div className="rounded-lg border min-w-max">
         <Table>
           <TableHeader>
             <TableRow>
