@@ -123,10 +123,10 @@ export function UnifiedDataTable<T extends { id?: string }>({
 
   // Render virtualized table for large datasets
   const renderVirtualizedTable = () => (
-    <div className="rounded-md overflow-hidden">
+    <div className="rounded-lg border border-border/50 overflow-hidden bg-card shadow-sm">
       {/* Fixed header */}
       <Table>
-        <TableHeader className="sticky top-0 z-10 bg-background">
+        <TableHeader>
           <TableRow className="bg-muted/30">
             {columns.map((column) => (
               <TableHead 
@@ -206,7 +206,7 @@ export function UnifiedDataTable<T extends { id?: string }>({
       </div>
 
       {/* Row count indicator */}
-      <div className="px-3 py-2 text-xs text-muted-foreground border-t bg-muted/30">
+      <div className="px-4 py-2.5 text-xs text-muted-foreground border-t border-border/50 bg-muted/30">
         إجمالي السجلات: {data.length.toLocaleString('ar-SA')}
       </div>
     </div>
@@ -265,7 +265,7 @@ export function UnifiedDataTable<T extends { id?: string }>({
       </ScrollableTableWrapper>
 
       {pagination && pagination.totalPages > 1 && (
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-border/50 bg-muted/20">
           <Pagination
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}
