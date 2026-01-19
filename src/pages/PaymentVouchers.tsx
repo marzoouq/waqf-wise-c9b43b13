@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherDialog";
@@ -143,80 +145,49 @@ export default function PaymentVouchers() {
         />
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                إجمالي السندات
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي السندات"
+            value={stats.total}
+            icon={FileText}
+            variant="default"
+          />
+          <UnifiedKPICard
+            title="مسودات"
+            value={stats.draft}
+            icon={Clock}
+            variant="warning"
+          />
+          <UnifiedKPICard
+            title="معتمدة"
+            value={stats.approved}
+            icon={CheckCircle}
+            variant="info"
+          />
+          <UnifiedKPICard
+            title="مدفوعة"
+            value={stats.paid}
+            icon={CheckCircle}
+            variant="success"
+          />
+        </UnifiedStatsGrid>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                مسودات
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-warning">{stats.draft}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                معتمدة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-info">{stats.approved}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                مدفوعة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">{stats.paid}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                <DollarSign className="h-4 w-4" />
-                إجمالي المبالغ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.totalAmount.toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">ريال سعودي</p>
-            </CardContent>
-          </Card>
-
-          {/* بطاقة السندات غير المرتبطة */}
-          <Card className={unlinkedCount > 0 ? "border-warning/50 bg-warning/5" : ""}>
-            <CardHeader className="pb-3">
-              <CardTitle className={`text-sm font-medium flex items-center gap-1 ${unlinkedCount > 0 ? 'text-warning' : 'text-muted-foreground'}`}>
-                <Link2Off className="h-4 w-4" />
-                غير مرتبطة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${unlinkedCount > 0 ? 'text-warning' : ''}`}>{unlinkedCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">تحتاج ربط</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Financial Stats */}
+        <UnifiedStatsGrid columns={3}>
+          <UnifiedKPICard
+            title="إجمالي المبالغ"
+            value={`${stats.totalAmount.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س`}
+            icon={DollarSign}
+            variant="primary"
+          />
+          <UnifiedKPICard
+            title="غير مرتبطة بقيود"
+            value={unlinkedCount}
+            icon={Link2Off}
+            variant={unlinkedCount > 0 ? "warning" : "default"}
+            subtitle="تحتاج ربط محاسبي"
+          />
+        </UnifiedStatsGrid>
 
         {/* Filters */}
         <Card>

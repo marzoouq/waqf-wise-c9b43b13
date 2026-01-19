@@ -6,6 +6,8 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -230,29 +232,26 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
         </Card>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="py-4 text-center">
-              <Clock className="h-6 w-6 mx-auto text-yellow-600 mb-2" />
-              <p className="text-2xl font-bold">{pendingCount}</p>
-              <p className="text-sm text-muted-foreground">معلق</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4 text-center">
-              <Wrench className="h-6 w-6 mx-auto text-blue-600 mb-2" />
-              <p className="text-2xl font-bold">{inProgressCount}</p>
-              <p className="text-sm text-muted-foreground">قيد التنفيذ</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4 text-center">
-              <CheckCircle2 className="h-6 w-6 mx-auto text-green-600 mb-2" />
-              <p className="text-2xl font-bold">{completedCount}</p>
-              <p className="text-sm text-muted-foreground">مكتمل</p>
-            </CardContent>
-          </Card>
-        </div>
+        <UnifiedStatsGrid columns={3}>
+          <UnifiedKPICard
+            title="معلق"
+            value={pendingCount}
+            icon={Clock}
+            variant="warning"
+          />
+          <UnifiedKPICard
+            title="قيد التنفيذ"
+            value={inProgressCount}
+            icon={Wrench}
+            variant="info"
+          />
+          <UnifiedKPICard
+            title="مكتمل"
+            value={completedCount}
+            icon={CheckCircle2}
+            variant="success"
+          />
+        </UnifiedStatsGrid>
 
         {/* New Request Button */}
         <Button className="w-full" size="lg" onClick={() => setShowCreateDialog(true)}>

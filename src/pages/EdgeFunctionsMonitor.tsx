@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -131,50 +133,47 @@ export default function EdgeFunctionsMonitor() {
       </Card>
 
       {/* ملخص الصحة */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Server className="h-8 w-8 mx-auto text-primary mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.total || functions.length}</p>
-            <p className="text-sm text-muted-foreground">إجمالي</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <CheckCircle className="h-8 w-8 mx-auto text-green-500 mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.healthy}</p>
-            <p className="text-sm text-muted-foreground">صحية</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Shield className="h-8 w-8 mx-auto text-purple-500 mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.protected}</p>
-            <p className="text-sm text-muted-foreground">محمية</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <AlertTriangle className="h-8 w-8 mx-auto text-yellow-500 mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.degraded}</p>
-            <p className="text-sm text-muted-foreground">بطيئة</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <XCircle className="h-8 w-8 mx-auto text-destructive mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.unhealthy}</p>
-            <p className="text-sm text-muted-foreground">معطلة</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Clock className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-2xl font-bold">{healthSummary.avgResponseTime}ms</p>
-            <p className="text-sm text-muted-foreground">متوسط الاستجابة</p>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي"
+          value={healthSummary.total || functions.length}
+          icon={Server}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="صحية"
+          value={healthSummary.healthy}
+          icon={CheckCircle}
+          variant="success"
+        />
+        <UnifiedKPICard
+          title="محمية"
+          value={healthSummary.protected}
+          icon={Shield}
+          variant="primary"
+        />
+        <UnifiedKPICard
+          title="بطيئة"
+          value={healthSummary.degraded}
+          icon={AlertTriangle}
+          variant="warning"
+        />
+      </UnifiedStatsGrid>
+
+      <UnifiedStatsGrid columns={2}>
+        <UnifiedKPICard
+          title="معطلة"
+          value={healthSummary.unhealthy}
+          icon={XCircle}
+          variant="danger"
+        />
+        <UnifiedKPICard
+          title="متوسط الاستجابة"
+          value={`${healthSummary.avgResponseTime}ms`}
+          icon={Clock}
+          variant="info"
+        />
+      </UnifiedStatsGrid>
 
       {/* فلتر نوع الفحص */}
       <div className="flex gap-2 flex-wrap">
