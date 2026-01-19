@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, PieChart as PieChartIcon } from 'lucide-react';
+import { Download, PieChart as PieChartIcon, DollarSign, TrendingUp, Wallet, Percent } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/ui/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))', 'hsl(var(--chart-5))'];
 
@@ -69,46 +71,32 @@ export function FundsPerformanceReport() {
   return (
     <div className="space-y-6">
       {/* ملخص الأداء */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المخصصات</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totals.totalAllocated.toLocaleString('ar-SA')} ريال</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المنفق</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">{totals.totalSpent.toLocaleString('ar-SA')} ريال</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">المتبقي</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-info">
-              {(totals.totalAllocated - totals.totalSpent).toLocaleString('ar-SA')} ريال
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">نسبة الاستخدام</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totals.overallUtilization.toFixed(1)}%</div>
-            <Progress value={totals.overallUtilization} className="mt-2" />
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي المخصصات"
+          value={`${totals.totalAllocated.toLocaleString('ar-SA')} ريال`}
+          icon={DollarSign}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="إجمالي المنفق"
+          value={`${totals.totalSpent.toLocaleString('ar-SA')} ريال`}
+          icon={TrendingUp}
+          variant="success"
+        />
+        <UnifiedKPICard
+          title="المتبقي"
+          value={`${(totals.totalAllocated - totals.totalSpent).toLocaleString('ar-SA')} ريال`}
+          icon={Wallet}
+          variant="info"
+        />
+        <UnifiedKPICard
+          title="نسبة الاستخدام"
+          value={`${totals.overallUtilization.toFixed(1)}%`}
+          icon={Percent}
+          variant="warning"
+        />
+      </UnifiedStatsGrid>
 
       {/* الرسوم البيانية */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -12,6 +12,8 @@ import { MobilePropertyCard } from "../cards/MobilePropertyCard";
 import { MobileContractCard } from "../cards/MobileContractCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBeneficiaryProperties } from "@/hooks/beneficiary/useBeneficiaryProperties";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
@@ -46,66 +48,57 @@ export function BeneficiaryPropertiesTab() {
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي العقارات</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{properties.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">عقارات الوقف</p>
-          </CardContent>
-        </Card>
+      <UnifiedStatsGrid columns={3}>
+        <UnifiedKPICard
+          title="إجمالي العقارات"
+          value={properties.length}
+          subtitle="عقارات الوقف"
+          icon={Building2}
+          variant="default"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">الوحدات المؤجرة</CardTitle>
-            <Home className="h-4 w-4 text-success" />
-          </CardHeader>
-          <CardContent>
-            {isCurrentYearPublished ? (
-              <>
-                <div className="text-xl sm:text-2xl font-bold">{contracts.length}</div>
-                <p className="text-xs text-muted-foreground mt-1">عقود نشطة</p>
-              </>
+        <UnifiedKPICard
+          title="الوحدات المؤجرة"
+          value={
+            isCurrentYearPublished ? (
+              contracts.length
             ) : (
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <EyeOff className="h-4 w-4" />
-                <span className="text-sm">ستظهر عند النشر</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                ستظهر عند النشر
+              </span>
+            )
+          }
+          subtitle="عقود نشطة"
+          icon={Home}
+          variant="success"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">الإيرادات الشهرية</CardTitle>
-            <Calendar className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            {!isCurrentYearPublished ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
+        <UnifiedKPICard
+          title="الإيرادات الشهرية"
+          value={
+            !isCurrentYearPublished ? (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <EyeOff className="h-4 w-4" />
-                <span className="text-sm">ستظهر عند النشر</span>
-              </div>
+                ستظهر عند النشر
+              </span>
             ) : settings?.show_property_revenues ? (
               <>
-                <div className="text-xl sm:text-2xl font-bold">
-                  <MaskedValue
-                    value={contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")}
-                    type="amount"
-                    masked={settings?.mask_exact_amounts || false}
-                  /> ريال
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">من الإيجارات</p>
+                <MaskedValue
+                  value={contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")}
+                  type="amount"
+                  masked={settings?.mask_exact_amounts || false}
+                /> ريال
               </>
             ) : (
-              <div className="text-sm text-muted-foreground">غير مصرح</div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              <span className="text-sm text-muted-foreground">غير مصرح</span>
+            )
+          }
+          subtitle="من الإيجارات"
+          icon={Calendar}
+          variant="info"
+        />
+      </UnifiedStatsGrid>
 
       {/* Properties Table/Cards */}
       <Card>
