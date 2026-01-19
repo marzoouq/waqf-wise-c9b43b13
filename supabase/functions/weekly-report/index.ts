@@ -164,16 +164,38 @@ async function sendReportNotification(supabase: any, report: WeeklyStats) {
     .in("role", ["admin", "nazer"]);
 
   if (admins && admins.length > 0) {
-    const notifications = admins.map((admin: { user_id: string }) => ({
-      user_id: admin.user_id,
-      title: "📊 التقرير الأسبوعي جاهز",
-      message: `تقرير الأسبوع: ${report.beneficiaries.active} مستفيد نشط، ${report.financials.totalRevenue.toLocaleString('ar-SA')} ريال إيرادات، ${report.requests.approved} طلب تمت الموافقة عليه`,
-      type: "info",
-      priority: "medium",
-      action_url: "/system-monitoring",
-    }));
+    const today = new Date().toISOString().split('T')[0];
+    
+    // ✅ فحص الإشعارات المرسلة اليوم لتجنب التكرار
+    const { data: existingNotifications } = await supabase
+      .from("notifications")
+      .select("user_id")
+      .eq("title", "📊 التقرير الأسبوعي جاهز")
+      .gte("created_at", `${today}T00:00:00.000Z`);
+    
+    const alreadyNotifiedUsers = new Set(
+      existingNotifications?.map((n: { user_id: string }) => n.user_id) || []
+    );
+    
+    // إرسال فقط للمستخدمين الذين لم يتلقوا إشعار اليوم
+    const newNotifications = admins
+      .filter((admin: { user_id: string }) => !alreadyNotifiedUsers.has(admin.user_id))
+      .map((admin: { user_id: string }) => ({
+        user_id: admin.user_id,
+        title: "📊 التقرير الأسبوعي جاهز",
+        message: `تقرير الأسبوع: ${report.beneficiaries.active} مستفيد نشط، ${report.financials.totalRevenue.toLocaleString('ar-SA')} ريال إيرادات، ${report.requests.approved} طلب تمت الموافقة عليه`,
+        type: "info",
+        priority: "medium",
+        action_url: "/system-monitoring",
+        delivery_status: "pending"
+      }));
 
-    await supabase.from("notifications").insert(notifications);
+    if (newNotifications.length > 0) {
+      await supabase.from("notifications").insert(newNotifications);
+      console.log(`[weekly-report] أرسل ${newNotifications.length} إشعار جديد`);
+    } else {
+      console.log('[weekly-report] تم تجاهل الإشعارات - موجودة مسبقاً');
+    }
   }
 
   return { success: true };

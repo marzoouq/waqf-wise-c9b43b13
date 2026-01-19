@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 import type { Database } from '@/integrations/supabase/types';
 
 type JournalEntryRow = Database['public']['Tables']['journal_entries']['Row'];
@@ -42,23 +43,25 @@ export class JournalEntryService {
   }
 
   /**
-   * جلب القيود مع سطورها
+   * جلب القيود مع سطورها (مع آلية إعادة المحاولة)
    */
   static async getJournalEntriesWithLines() {
     try {
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .select(`
-          *,
-          journal_entry_lines (
+      return await withRetry(async () => {
+        const { data, error } = await supabase
+          .from('journal_entries')
+          .select(`
             *,
-            accounts (code, name_ar, account_type)
-          )
-        `)
-        .order('entry_date', { ascending: false });
+            journal_entry_lines (
+              *,
+              accounts (code, name_ar, account_type)
+            )
+          `)
+          .order('entry_date', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+        if (error) throw error;
+        return data || [];
+      }, SUPABASE_RETRY_OPTIONS);
     } catch (error) {
       productionLogger.error('Error fetching journal entries with lines', error);
       throw error;
@@ -66,7 +69,7 @@ export class JournalEntryService {
   }
 
   /**
-   * جلب القيود المحاسبية
+   * جلب القيود المحاسبية (مع آلية إعادة المحاولة)
    */
   static async getJournalEntries(filters?: {
     status?: string;
@@ -74,24 +77,26 @@ export class JournalEntryService {
     toDate?: string;
   }): Promise<JournalEntryRow[]> {
     try {
-      let query = supabase
-        .from('journal_entries')
-        .select('*');
+      return await withRetry(async () => {
+        let query = supabase
+          .from('journal_entries')
+          .select('*');
 
-      if (filters?.status && filters.status !== 'all') {
-        query = query.eq('status', filters.status as JournalEntryRow['status']);
-      }
-      if (filters?.fromDate) {
-        query = query.gte('entry_date', filters.fromDate);
-      }
-      if (filters?.toDate) {
-        query = query.lte('entry_date', filters.toDate);
-      }
+        if (filters?.status && filters.status !== 'all') {
+          query = query.eq('status', filters.status as JournalEntryRow['status']);
+        }
+        if (filters?.fromDate) {
+          query = query.gte('entry_date', filters.fromDate);
+        }
+        if (filters?.toDate) {
+          query = query.lte('entry_date', filters.toDate);
+        }
 
-      const { data, error } = await query.order('entry_date', { ascending: false });
+        const { data, error } = await query.order('entry_date', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+        if (error) throw error;
+        return data || [];
+      }, SUPABASE_RETRY_OPTIONS);
     } catch (error) {
       productionLogger.error('Error fetching journal entries', error);
       throw error;
@@ -99,18 +104,20 @@ export class JournalEntryService {
   }
 
   /**
-   * جلب قيد محاسبي واحد
+   * جلب قيد محاسبي واحد (مع آلية إعادة المحاولة)
    */
   static async getJournalEntryById(id: string): Promise<JournalEntryRow | null> {
     try {
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
+      return await withRetry(async () => {
+        const { data, error } = await supabase
+          .from('journal_entries')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      }, SUPABASE_RETRY_OPTIONS);
     } catch (error) {
       productionLogger.error('Error fetching journal entry', error);
       throw error;
