@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff, ArrowLeft, ChevronLeft } from "lucide-react";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff, ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,11 +37,11 @@ export function PropertyStatsCards() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <UnifiedStatsGrid columns={4}>
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-32" />
           ))}
-        </div>
+        </UnifiedStatsGrid>
         <Skeleton className="h-64" />
       </div>
     );
@@ -76,12 +77,12 @@ export function PropertyStatsCards() {
           <Building2 className="h-4 w-4" />
           إحصائيات العقارات
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <StatsCard title="إجمالي العقارات" value={totalProperties} icon={Building2} colorClass="text-info" />
-          <StatsCard title="إجمالي الوحدات" value={totalUnits} colorClass="text-info" icon={Home} />
-          <StatsCard title="الوحدات المشغولة" value={occupiedUnits} colorClass="text-success" icon={CheckCircle} />
-          <StatsCard title="معدل الإشغال" value={`${occupancyRate.toFixed(1)}%`} icon={TrendingUp} colorClass="text-warning" />
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard title="إجمالي العقارات" value={totalProperties} icon={Building2} variant="info" />
+          <UnifiedKPICard title="إجمالي الوحدات" value={totalUnits} icon={Home} variant="info" />
+          <UnifiedKPICard title="الوحدات المشغولة" value={occupiedUnits} icon={CheckCircle} variant="success" />
+          <UnifiedKPICard title="معدل الإشغال" value={`${occupancyRate.toFixed(1)}%`} icon={TrendingUp} variant="warning" />
+        </UnifiedStatsGrid>
       </div>
 
       {/* الإيرادات المحصلة */}
@@ -91,12 +92,12 @@ export function PropertyStatsCards() {
             <Wallet className="h-4 w-4" />
             الإيرادات المحصلة
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <StatsCard title="المحصّل فعلياً" value={formatCurrency(totalCollected)} icon={DollarSign} colorClass="text-success" />
-            <StatsCard title="الإيجارات السنوية" value={formatCurrency(totalAnnualCollected)} icon={Receipt} colorClass="text-primary" trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined} />
-            <StatsCard title="الإيجارات الشهرية" value={formatCurrency(totalMonthlyCollected)} icon={Receipt} colorClass="text-accent" trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined} />
-            <StatsCard title="صافي المحصّل" value={formatCurrency(netRevenue)} icon={TrendingUp} colorClass="text-success" trend="بعد الضريبة" />
-          </div>
+          <UnifiedStatsGrid columns={4}>
+            <UnifiedKPICard title="المحصّل فعلياً" value={formatCurrency(totalCollected)} icon={DollarSign} variant="success" />
+            <UnifiedKPICard title="الإيجارات السنوية" value={formatCurrency(totalAnnualCollected)} icon={Receipt} variant="primary" subtitle={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined} />
+            <UnifiedKPICard title="الإيجارات الشهرية" value={formatCurrency(totalMonthlyCollected)} icon={Receipt} variant="default" subtitle={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined} />
+            <UnifiedKPICard title="صافي المحصّل" value={formatCurrency(netRevenue)} icon={TrendingUp} variant="success" subtitle="بعد الضريبة" />
+          </UnifiedStatsGrid>
         </div>
       ) : (
         <Alert className="border-warning/30 bg-warning-light">
@@ -115,10 +116,10 @@ export function PropertyStatsCards() {
             <Landmark className="h-4 w-4" />
             الاستقطاعات الحكومية
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <StatsCard title="ضريبة القيمة المضافة" value={formatCurrency(totalTax)} icon={Landmark} colorClass="text-destructive" trend="هيئة الزكاة والضريبة والجمارك" />
-            <StatsCard title="الزكاة" value={formatCurrency(0)} icon={Landmark} colorClass="text-muted-foreground" trend="لم يتم احتسابها" />
-          </div>
+          <UnifiedStatsGrid columns={2}>
+            <UnifiedKPICard title="ضريبة القيمة المضافة" value={formatCurrency(totalTax)} icon={Landmark} variant="destructive" subtitle="هيئة الزكاة والضريبة والجمارك" />
+            <UnifiedKPICard title="الزكاة" value={formatCurrency(0)} icon={Landmark} variant="default" subtitle="لم يتم احتسابها" />
+          </UnifiedStatsGrid>
         </div>
       )}
 
@@ -148,7 +149,7 @@ export function PropertyStatsCards() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-gradient-to-l from-muted/30 to-transparent hover:border-primary/30 hover:bg-muted/50 transition-all"
+                    className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-gradient-to-s from-muted/30 to-transparent hover:border-primary/30 hover:bg-muted/50 transition-all"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-lg bg-primary/10 shrink-0">
@@ -163,7 +164,7 @@ export function PropertyStatsCards() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <div className="text-left">
+                      <div className="text-start">
                         <div className="flex items-center gap-1.5">
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                             {property.total_units || 0} وحدة

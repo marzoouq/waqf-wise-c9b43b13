@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Clock, CheckCircle, Star } from 'lucide-react';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 interface StatsData {
   ticketsByStatus?: {
@@ -18,74 +19,38 @@ interface SupportStatsCardsProps {
 
 export function SupportStatsCards({ stats }: SupportStatsCardsProps) {
   return (
-    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium">
-            التذاكر المفتوحة
-          </CardTitle>
-          <MessageSquare className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold">
-            {stats?.ticketsByStatus?.open || 0}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            بحاجة للمراجعة
-          </p>
-        </CardContent>
-      </Card>
+    <UnifiedStatsGrid columns={4}>
+      <UnifiedKPICard
+        title="التذاكر المفتوحة"
+        value={stats?.ticketsByStatus?.open || 0}
+        icon={MessageSquare}
+        variant="warning"
+        subtitle="بحاجة للمراجعة"
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium">
-            قيد المعالجة
-          </CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold">
-            {stats?.ticketsByStatus?.in_progress || 0}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            جاري العمل عليها
-          </p>
-        </CardContent>
-      </Card>
+      <UnifiedKPICard
+        title="قيد المعالجة"
+        value={stats?.ticketsByStatus?.in_progress || 0}
+        icon={Clock}
+        variant="info"
+        subtitle="جاري العمل عليها"
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium">
-            تم الحل
-          </CardTitle>
-          <CheckCircle className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold">
-            {stats?.ticketsByStatus?.resolved || 0}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            بانتظار الإغلاق
-          </p>
-        </CardContent>
-      </Card>
+      <UnifiedKPICard
+        title="تم الحل"
+        value={stats?.ticketsByStatus?.resolved || 0}
+        icon={CheckCircle}
+        variant="success"
+        subtitle="بانتظار الإغلاق"
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium">
-            معدل الرضا
-          </CardTitle>
-          <Star className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold">
-            {stats?.avgSatisfaction?.toFixed(1) || '0.0'}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            من 5.0 ({stats?.totalRatings || 0} تقييم)
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+      <UnifiedKPICard
+        title="معدل الرضا"
+        value={stats?.avgSatisfaction?.toFixed(1) || '0.0'}
+        icon={Star}
+        variant="primary"
+        subtitle={`من 5.0 (${stats?.totalRatings || 0} تقييم)`}
+      />
+    </UnifiedStatsGrid>
   );
 }

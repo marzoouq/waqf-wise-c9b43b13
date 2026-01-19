@@ -54,7 +54,7 @@ export { EditPhoneDialog } from './EditPhoneDialog';
 export { NotificationsCard } from './NotificationsCard';
 export { AnnualDisclosureCard } from './AnnualDisclosureCard';
 export { PropertyStatsCards } from './PropertyStatsCards';
-export { StatsCard } from './StatsCard';
+// StatsCard removed - use UnifiedKPICard from @/components/unified
 export { StatsCardSkeleton } from './StatsCardSkeleton';
 export { ReportsExplanationCard } from './ReportsExplanationCard';
 
