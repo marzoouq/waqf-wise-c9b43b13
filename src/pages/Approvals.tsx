@@ -30,30 +30,48 @@ const Approvals = () => {
         {/* Tabs for different approval types */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <ScrollArea className="w-full whitespace-nowrap">
-            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 mb-2">
-              <TabsTrigger value="journal" className="flex items-center gap-1 px-3 sm:px-2">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 mb-2 h-auto p-1.5 bg-muted/60 rounded-xl">
+              <TabsTrigger 
+                value="journal" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <FileText className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">القيود</span>
+                <span className="text-xs sm:text-sm font-medium">القيود</span>
               </TabsTrigger>
-              <TabsTrigger value="distributions" className="flex items-center gap-1 px-3 sm:px-2">
+              <TabsTrigger 
+                value="distributions" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <DollarSign className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">التوزيعات</span>
+                <span className="text-xs sm:text-sm font-medium">التوزيعات</span>
               </TabsTrigger>
-              <TabsTrigger value="payments" className="flex items-center gap-1 px-3 sm:px-2">
+              <TabsTrigger 
+                value="payments" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <Wallet className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">المدفوعات</span>
+                <span className="text-xs sm:text-sm font-medium">المدفوعات</span>
               </TabsTrigger>
-              <TabsTrigger value="loans" className="flex items-center gap-1 px-3 sm:px-2">
+              <TabsTrigger 
+                value="loans" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <Coins className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">القروض</span>
+                <span className="text-xs sm:text-sm font-medium">القروض</span>
               </TabsTrigger>
-              <TabsTrigger value="emergency" className="flex items-center gap-1 px-3 sm:px-2">
+              <TabsTrigger 
+                value="emergency" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <AlertTriangle className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">الفزعات</span>
+                <span className="text-xs sm:text-sm font-medium">الفزعات</span>
               </TabsTrigger>
-              <TabsTrigger value="requests" className="flex items-center gap-1 px-3 sm:px-2">
+              <TabsTrigger 
+                value="requests" 
+                className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              >
                 <Users className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">الطلبات</span>
+                <span className="text-xs sm:text-sm font-medium">الطلبات</span>
               </TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" className="sm:hidden" />
