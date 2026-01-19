@@ -6,7 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
-import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
+import { withRetry, SUPABASE_RETRY_OPTIONS, isUniqueViolation } from '@/lib/retry-helper';
 import type { Database } from '@/integrations/supabase/types';
 
 type PropertyUnitRow = Database['public']['Tables']['property_units']['Row'];
@@ -143,10 +143,27 @@ export class PropertyUnitsService {
           .maybeSingle();
       }, SUPABASE_RETRY_OPTIONS);
 
+      // ✅ Idempotency: معالجة خطأ التكرار كـ success
+      if (error && isUniqueViolation(error)) {
+        productionLogger.info('[Idempotency] وحدة موجودة مسبقاً', { 
+          property_id: unit.property_id, 
+          unit_number: unit.unit_number 
+        });
+        // جلب الوحدة الموجودة
+        const { data: existing } = await supabase
+          .from('property_units')
+          .select()
+          .eq('property_id', unit.property_id!)
+          .eq('unit_number', unit.unit_number!)
+          .single();
+        if (existing) return existing;
+      }
+
       if (error) throw error;
       if (!data) throw new Error("فشل في إنشاء الوحدة");
 
-      // تحديث عدد الوحدات في العقار
+      // ⚠️ Fallback: Trigger update_property_units_count_trigger يقوم بنفس العمل
+      // هذا الكود للتوافق مع الأنظمة التي قد لا يعمل فيها الـ trigger
       if (unit.property_id) {
         const { data: units } = await supabase
           .from('property_units')
@@ -215,7 +232,8 @@ export class PropertyUnitsService {
 
       if (error) throw error;
 
-      // تحديث عدد الوحدات في العقار
+      // ⚠️ Fallback: Trigger update_property_units_count_trigger يقوم بنفس العمل
+      // هذا الكود للتوافق مع الأنظمة التي قد لا يعمل فيها الـ trigger
       if (unit?.property_id) {
         const { data: units } = await supabase
           .from('property_units')
