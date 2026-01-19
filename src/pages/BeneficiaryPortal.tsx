@@ -13,7 +13,7 @@ import { TabRenderer } from "@/components/beneficiary/TabRenderer";
 import { useMemo, useCallback } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
-import { beneficiaryNavigationItems } from "@/components/beneficiary/config/bottomNavConfig";
+import { beneficiaryNavigationItems } from "@/config/navigation";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
 import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
