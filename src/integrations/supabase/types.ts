@@ -16024,6 +16024,10 @@ export type Database = {
           table_name: string
         }[]
       }
+      close_fiscal_year: {
+        Args: { p_fiscal_year_id: string }
+        Returns: undefined
+      }
       count_users_by_target: {
         Args: { p_target_type: string; p_target_value?: string }
         Returns: number
@@ -16783,6 +16787,10 @@ export type Database = {
           payment_id: string
           success: boolean
         }[]
+      }
+      process_payment_voucher: {
+        Args: { p_voucher_id: string }
+        Returns: undefined
       }
       refresh_financial_views: { Args: never; Returns: undefined }
       refresh_table_statistics: { Args: never; Returns: undefined }
