@@ -13,6 +13,8 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
 import { useUnifiedTransactions, UnifiedTransaction } from "@/hooks/transactions/useUnifiedTransactions";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export default function AllTransactions() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,53 +117,32 @@ export default function AllTransactions() {
         </div>
 
         {/* إحصائيات */}
-        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الوارد</CardTitle>
-              <TrendingUp className="h-4 w-4 text-success" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">
-                {stats.totalIncome.toLocaleString("ar-SA")} ريال
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الصادر</CardTitle>
-              <TrendingDown className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">
-                {stats.totalExpense.toLocaleString("ar-SA")} ريال
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">الصافي</CardTitle>
-              <DollarSign className="h-4 w-4" />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${stats.netAmount >= 0 ? "text-success" : "text-destructive"}`}>
-                {stats.netAmount.toLocaleString("ar-SA")} ريال
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">عدد المعاملات</CardTitle>
-              <FileText className="h-4 w-4" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalTransactions}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي الوارد"
+            value={`${stats.totalIncome.toLocaleString("ar-SA")} ريال`}
+            icon={TrendingUp}
+            variant="success"
+          />
+          <UnifiedKPICard
+            title="إجمالي الصادر"
+            value={`${stats.totalExpense.toLocaleString("ar-SA")} ريال`}
+            icon={TrendingDown}
+            variant="destructive"
+          />
+          <UnifiedKPICard
+            title="الصافي"
+            value={`${stats.netAmount.toLocaleString("ar-SA")} ريال`}
+            icon={DollarSign}
+            variant={stats.netAmount >= 0 ? "success" : "destructive"}
+          />
+          <UnifiedKPICard
+            title="عدد المعاملات"
+            value={stats.totalTransactions}
+            icon={FileText}
+            variant="default"
+          />
+        </UnifiedStatsGrid>
 
         {/* الفلاتر */}
         <Card>

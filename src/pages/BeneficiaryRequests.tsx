@@ -6,11 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle, ListFilter, AlertTriangle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/beneficiary/useMyBeneficiaryRequests';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -156,51 +158,32 @@ export default function BeneficiaryRequests() {
         </div>
 
         {/* الإحصائيات */}
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                إجمالي الطلبات
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                قيد المعالجة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-warning">{stats.pending}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                موافق عليها
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">{stats.approved}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                مرفوضة
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي الطلبات"
+            value={stats.total}
+            icon={FileText}
+            variant="default"
+          />
+          <UnifiedKPICard
+            title="قيد المعالجة"
+            value={stats.pending}
+            icon={Clock}
+            variant="warning"
+          />
+          <UnifiedKPICard
+            title="موافق عليها"
+            value={stats.approved}
+            icon={CheckCircle}
+            variant="success"
+          />
+          <UnifiedKPICard
+            title="مرفوضة"
+            value={stats.rejected}
+            icon={XCircle}
+            variant="destructive"
+          />
+        </UnifiedStatsGrid>
 
         {/* قائمة الطلبات */}
         <Card>

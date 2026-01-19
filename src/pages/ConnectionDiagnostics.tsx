@@ -31,6 +31,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 interface DiagnosticTest {
   id: string;
@@ -485,45 +487,35 @@ export default function ConnectionDiagnostics() {
         </TabsContent>
 
         <TabsContent value="stats" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">إجمالي الانقطاعات</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.totalDisconnections}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">آخر انقطاع</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl font-bold">
-                  {stats.lastDisconnection 
-                    ? formatDistanceToNow(stats.lastDisconnection, { addSuffix: true, locale: ar })
-                    : 'لا يوجد'
-                  }
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">أخطاء API</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.eventsByType.api || 0}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">أخطاء قاعدة البيانات</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.eventsByType.database || 0}</div>
-              </CardContent>
-            </Card>
-          </div>
+          <UnifiedStatsGrid columns={4}>
+            <UnifiedKPICard
+              title="إجمالي الانقطاعات"
+              value={stats.totalDisconnections}
+              icon={WifiOff}
+              variant="destructive"
+            />
+            <UnifiedKPICard
+              title="آخر انقطاع"
+              value={stats.lastDisconnection 
+                ? formatDistanceToNow(stats.lastDisconnection, { addSuffix: true, locale: ar })
+                : 'لا يوجد'
+              }
+              icon={Clock}
+              variant="warning"
+            />
+            <UnifiedKPICard
+              title="أخطاء API"
+              value={stats.eventsByType.api || 0}
+              icon={Server}
+              variant="info"
+            />
+            <UnifiedKPICard
+              title="أخطاء قاعدة البيانات"
+              value={stats.eventsByType.database || 0}
+              icon={Database}
+              variant="default"
+            />
+          </UnifiedStatsGrid>
 
           {/* توزيع الأخطاء */}
           <Card>
