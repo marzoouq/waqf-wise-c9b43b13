@@ -1,8 +1,9 @@
 import { useBeneficiaryProfileStats } from '@/hooks/beneficiary/useBeneficiaryProfileStats';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, FileText, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
+import { DollarSign, FileText, Users, TrendingUp, Calendar } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 interface ProfileStatsProps {
   beneficiaryId: string;
@@ -19,69 +20,52 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
     return <ErrorState title="خطأ في التحميل" message="فشل تحميل الإحصائيات" onRetry={refetch} />;
   }
 
-  const statCards = [
-    {
-      title: 'إجمالي المدفوعات',
-      value: `${stats?.totalPayments?.toLocaleString('ar-SA') || 0} ريال`,
-      icon: DollarSign,
-      color: 'text-success bg-success-light',
-      subtext: `من ${stats?.paymentsCount || 0} دفعة`,
-    },
-    {
-      title: 'الطلبات المقدمة',
-      value: stats?.approvedRequests || 0,
-      icon: FileText,
-      color: 'text-info bg-info-light',
-      subtext: `من ${stats?.totalRequests || 0} طلب`,
-    },
-    {
-      title: 'الطلبات المعلقة',
-      value: stats?.pendingRequests || 0,
-      icon: Calendar,
-      color: 'text-warning bg-warning-light',
-      subtext: 'قيد المراجعة',
-    },
-    {
-      title: 'المستندات',
-      value: stats?.attachmentsCount || 0,
-      icon: FileText,
-      color: 'text-secondary-foreground bg-secondary',
-      subtext: 'مرفق',
-    },
-    {
-      title: 'أفراد العائلة',
-      value: stats?.familyMembersCount || 0,
-      icon: Users,
-      color: 'text-accent bg-accent/10',
-      subtext: 'فرد مسجل',
-    },
-    {
-      title: 'متوسط الدفعة',
-      value: stats?.paymentsCount 
-        ? `${Math.round((stats.totalPayments || 0) / stats.paymentsCount).toLocaleString('ar-SA')} ريال`
-        : '0 ريال',
-      icon: TrendingUp,
-      color: 'text-warning bg-warning-light',
-      subtext: 'لكل دفعة',
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {statCards.map((stat) => (
-        <Card key={stat.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <div className={`p-2 rounded-lg ${stat.color}`}>
-              <stat.icon className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground mt-1">{stat.subtext}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <UnifiedStatsGrid columns={3}>
+      <UnifiedKPICard
+        title="إجمالي المدفوعات"
+        value={`${stats?.totalPayments?.toLocaleString('ar-SA') || 0} ريال`}
+        subtitle={`من ${stats?.paymentsCount || 0} دفعة`}
+        icon={DollarSign}
+        variant="success"
+      />
+      <UnifiedKPICard
+        title="الطلبات المقدمة"
+        value={stats?.approvedRequests || 0}
+        subtitle={`من ${stats?.totalRequests || 0} طلب`}
+        icon={FileText}
+        variant="info"
+      />
+      <UnifiedKPICard
+        title="الطلبات المعلقة"
+        value={stats?.pendingRequests || 0}
+        subtitle="قيد المراجعة"
+        icon={Calendar}
+        variant="warning"
+      />
+      <UnifiedKPICard
+        title="المستندات"
+        value={stats?.attachmentsCount || 0}
+        subtitle="مرفق"
+        icon={FileText}
+        variant="default"
+      />
+      <UnifiedKPICard
+        title="أفراد العائلة"
+        value={stats?.familyMembersCount || 0}
+        subtitle="فرد مسجل"
+        icon={Users}
+        variant="primary"
+      />
+      <UnifiedKPICard
+        title="متوسط الدفعة"
+        value={stats?.paymentsCount 
+          ? `${Math.round((stats.totalPayments || 0) / stats.paymentsCount).toLocaleString('ar-SA')} ريال`
+          : '0 ريال'}
+        subtitle="لكل دفعة"
+        icon={TrendingUp}
+        variant="warning"
+      />
+    </UnifiedStatsGrid>
   );
 }

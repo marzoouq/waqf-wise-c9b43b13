@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { StatCard } from "@/components/dashboard/DashboardStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
@@ -244,17 +245,22 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <UnifiedStatsGrid columns={4}>
         {stats.map((stat) => (
-          <StatCard
+          <UnifiedKPICard
             key={stat.label}
-            label={stat.label}
+            title={stat.label}
             value={stat.value}
             icon={stat.icon}
-            color={stat.color}
+            variant={
+              stat.color === "text-primary" ? "primary" :
+              stat.color === "text-success" ? "success" :
+              stat.color === "text-warning" ? "warning" :
+              stat.color === "text-accent" ? "info" : "default"
+            }
           />
         ))}
-      </div>
+      </UnifiedStatsGrid>
 
       {/* Properties Table */}
       <UnifiedDataTable
