@@ -122,19 +122,20 @@ export default function BeneficiaryAccountStatement() {
   return (
     <div className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <FileText className="h-8 w-8" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+            <FileText className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
             كشف الحساب التفصيلي
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             عرض تفصيلي لجميع المعاملات المالية
           </p>
         </div>
-        <Button onClick={exportToPDF} variant="outline">
+        <Button onClick={exportToPDF} variant="outline" size="sm" className="w-full sm:w-auto">
           <Download className="h-4 w-4 ms-2" />
-          تصدير PDF
+          <span className="hidden sm:inline">تصدير PDF</span>
+          <span className="sm:hidden">تصدير</span>
         </Button>
       </div>
 

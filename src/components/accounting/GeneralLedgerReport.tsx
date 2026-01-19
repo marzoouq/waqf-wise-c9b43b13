@@ -124,18 +124,21 @@ const GeneralLedgerReport = () => {
           </div>
 
           {selectedAccountId && ledgerData && ledgerData.length > 0 && (
-            <div className="flex justify-end gap-2 mb-4 print:hidden flex-wrap">
-              <Button variant="outline" size="sm" onClick={handlePrint}>
+            <div className="flex flex-wrap justify-end gap-2 mb-4 print:hidden">
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={handlePrint}>
                 <Printer className="h-4 w-4 ms-2" />
-                طباعة
+                <span className="hidden sm:inline">طباعة</span>
+                <span className="sm:hidden">طباعة</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={handleExportPDF}>
                 <FileText className="h-4 w-4 ms-2" />
-                تصدير PDF
+                <span className="hidden sm:inline">تصدير PDF</span>
+                <span className="sm:hidden">PDF</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleExportExcel}>
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={handleExportExcel}>
                 <Download className="h-4 w-4 ms-2" />
-                تصدير Excel
+                <span className="hidden sm:inline">تصدير Excel</span>
+                <span className="sm:hidden">Excel</span>
               </Button>
             </div>
           )}

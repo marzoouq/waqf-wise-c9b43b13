@@ -123,14 +123,15 @@ export function BeneficiaryDistributionReport({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold">تقرير المستفيدين والتوزيعات</h2>
-          <p className="text-muted-foreground">تحليل شامل للمستفيدين والمبالغ الموزعة</p>
+          <h2 className="text-xl sm:text-2xl font-bold">تقرير المستفيدين والتوزيعات</h2>
+          <p className="text-sm text-muted-foreground">تحليل شامل للمستفيدين والمبالغ الموزعة</p>
         </div>
-        <Button>
+        <Button size="sm" className="w-full sm:w-auto">
           <Download className="h-4 w-4 ms-2" />
-          تصدير التقرير
+          <span className="hidden sm:inline">تصدير التقرير</span>
+          <span className="sm:hidden">تصدير</span>
         </Button>
       </div>
 
