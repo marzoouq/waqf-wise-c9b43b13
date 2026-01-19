@@ -16142,6 +16142,7 @@ export type Database = {
         Returns: boolean
       }
       escalate_overdue_requests: { Args: never; Returns: undefined }
+      extract_date_immutable: { Args: { ts: string }; Returns: string }
       find_duplicate_distributions: {
         Args: never
         Returns: {
