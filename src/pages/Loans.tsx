@@ -275,97 +275,163 @@ export default function Loans() {
               </p>
             </div>
           ) : (
-            <ScrollableTableWrapper>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm">رقم القرض</TableHead>
-                    <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
-                    <TableHead className="text-xs sm:text-sm">مبلغ القرض</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">نسبة الفائدة</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">المدة</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">القسط الشهري</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">تاريخ البداية</TableHead>
-                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                    <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredLoans.map((loan: Loan) => (
-                    <TableRow key={loan.id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium text-xs sm:text-sm">
-                        {loan.loan_number}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredLoans.map((loan: Loan) => (
+                  <Card key={loan.id} className="border-border/50">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-medium">
-                            {loan.beneficiary?.full_name}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {loan.beneficiary?.national_id}
-                          </div>
+                          <p className="font-medium">{loan.beneficiary?.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{loan.loan_number}</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-semibold">
-                            {loan.loan_amount.toLocaleString("ar-SA")}
-                          </span>
+                        {getStatusBadge(loan.status)}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs">مبلغ القرض</p>
+                          <p className="font-semibold">{loan.loan_amount.toLocaleString("ar-SA")} ر.س</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
-                        <div className="flex items-center gap-1">
-                          <Percent className="h-3 w-3 text-muted-foreground" />
-                          <span>{loan.interest_rate}%</span>
+                        <div>
+                          <p className="text-muted-foreground text-xs">القسط الشهري</p>
+                          <p className="font-semibold text-primary">{loan.monthly_installment.toLocaleString("ar-SA")} ر.س</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-muted-foreground" />
-                          <span>{loan.term_months} شهر</span>
+                        <div>
+                          <p className="text-muted-foreground text-xs">المدة</p>
+                          <p>{loan.term_months} شهر</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
-                        <span className="font-semibold text-primary">
-                          {loan.monthly_installment.toLocaleString("ar-SA")}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
-                        {new Date(loan.start_date).toLocaleDateString("ar-SA")}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">{getStatusBadge(loan.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
+                        <div>
+                          <p className="text-muted-foreground text-xs">نسبة الفائدة</p>
+                          <p>{loan.interest_rate}%</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            setSelectedLoan(loan);
+                            setIsScheduleDialogOpen(true);
+                          }}
+                        >
+                          الأقساط
+                        </Button>
+                        {matchesStatus(loan.status, 'active') && (
                           <Button
-                            variant="ghost"
+                            variant="default"
                             size="sm"
+                            className="flex-1"
                             onClick={() => {
                               setSelectedLoan(loan);
-                              setIsScheduleDialogOpen(true);
+                              setIsPaymentDialogOpen(true);
                             }}
                           >
-                            الأقساط
+                            سداد
                           </Button>
-                          {matchesStatus(loan.status, 'active') && (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedLoan(loan);
-                                setIsPaymentDialogOpen(true);
-                              }}
-                            >
-                              سداد
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollableTableWrapper>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block">
+                <ScrollableTableWrapper>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">رقم القرض</TableHead>
+                        <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
+                        <TableHead className="text-xs sm:text-sm">مبلغ القرض</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden lg:table-cell">نسبة الفائدة</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden lg:table-cell">المدة</TableHead>
+                        <TableHead className="text-xs sm:text-sm">القسط الشهري</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden lg:table-cell">تاريخ البداية</TableHead>
+                        <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                        <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredLoans.map((loan: Loan) => (
+                        <TableRow key={loan.id} className="hover:bg-muted/50">
+                          <TableCell className="font-medium text-xs sm:text-sm">
+                            {loan.loan_number}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <div>
+                              <div className="font-medium">
+                                {loan.beneficiary?.full_name}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {loan.beneficiary?.national_id}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <div className="flex items-center gap-1">
+                              <DollarSign className="h-3 w-3 text-muted-foreground" />
+                              <span className="font-semibold">
+                                {loan.loan_amount.toLocaleString("ar-SA")}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                            <div className="flex items-center gap-1">
+                              <Percent className="h-3 w-3 text-muted-foreground" />
+                              <span>{loan.interest_rate}%</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3 text-muted-foreground" />
+                              <span>{loan.term_months} شهر</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            <span className="font-semibold text-primary">
+                              {loan.monthly_installment.toLocaleString("ar-SA")}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                            {new Date(loan.start_date).toLocaleDateString("ar-SA")}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">{getStatusBadge(loan.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedLoan(loan);
+                                  setIsScheduleDialogOpen(true);
+                                }}
+                              >
+                                الأقساط
+                              </Button>
+                              {matchesStatus(loan.status, 'active') && (
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedLoan(loan);
+                                    setIsPaymentDialogOpen(true);
+                                  }}
+                                >
+                                  سداد
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollableTableWrapper>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

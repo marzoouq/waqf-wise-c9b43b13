@@ -137,7 +137,47 @@ const PermissionsManagement = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {isLoading ? (
+                    <p className="text-center py-8 text-muted-foreground">جاري التحميل...</p>
+                  ) : permissions.length === 0 ? (
+                    <p className="text-center py-8 text-muted-foreground">لا توجد صلاحيات</p>
+                  ) : (
+                    permissions.map((perm) => {
+                      const isGranted = isPermissionGranted(perm.id);
+                      const isModified = modifications.has(perm.id);
+                      return (
+                        <div 
+                          key={perm.id} 
+                          className={`p-4 rounded-lg border ${isModified ? 'bg-muted/50 border-primary/30' : 'border-border/50'}`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-mono text-xs truncate">
+                                {perm.name}
+                                {isModified && (
+                                  <Badge variant="outline" className="me-2 text-[10px]">معدل</Badge>
+                                )}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">{perm.description || "-"}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={isGranted}
+                                onCheckedChange={() => togglePermission(perm.id, isGranted)}
+                              />
+                              {isGranted && <CheckCircle className="h-4 w-4 text-success" />}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
