@@ -1,8 +1,8 @@
 # تقرير الفحص الجنائي العميق قبل النشر
 ## منصة إدارة الوقف - Waqf Management Platform
-**تاريخ الفحص:** 2026-01-19 17:55 UTC
-**الإصدار:** v3.1.0+
-**الحالة:** ✅ جاهز للنشر (Score: 9.5/10)
+**تاريخ الفحص:** 2026-01-19 18:05 UTC
+**الإصدار:** v3.1.1+
+**الحالة:** ✅ جاهز للنشر (Score: 9.6/10)
 
 ---
 
@@ -13,9 +13,10 @@
 تم إجراء فحص جنائي عميق وشامل شمل جميع طبقات التطبيق:
 - ✅ **250 جدول** - جميعها محمية بـ RLS
 - ✅ **623 فهرس** - جميعها تعمل بكفاءة
-- ✅ **701 سياسة أمان** - لا توجد ثغرات
+- ✅ **~695 سياسة أمان** - لا توجد ثغرات (بعد التنظيف)
 - ✅ **0 أخطاء** في آخر 24 ساعة
 - ✅ **0 Dead Rows** - قاعدة بيانات نظيفة
+- ✅ **0 أخطاء Auth** - لا توجد أخطاء مصادقة
 
 ---
 
@@ -29,16 +30,20 @@
 | contracts | 5 | ✅ محمي (has_full_read_access) |
 | distributions | 4 | ✅ محمي (heir + staff access) |
 | emergency_aid_requests | 6 | ✅ محمي (owner + staff access) |
-| payments | موحد | ✅ محمي |
-| loans | موحد | ✅ محمي |
-| invoices | موحد | ✅ محمي |
+| approvals | 6 | ✅ محمي (staff + first_class_beneficiary) |
+| distribution_approvals | 6 | ✅ محمي (staff + heir access) |
+| loan_approvals | 5 | ✅ محمي (staff access) |
+| payment_approvals | 5 | ✅ محمي (staff access) |
+| request_approvals | 2 | ✅ محمي (staff access) |
 
-### 1.2 إصلاحات أمنية تم تنفيذها
-- ✅ إصلاح سياسة `chatbot_quick_replies` - الآن للموظفين فقط
-- ✅ إصلاح سياسة `landing_page_settings` - الآن للمصادقين فقط
-- ✅ إزالة `DEV_BYPASS_AUTH` (سابقاً)
-- ✅ استبدال localStorage بـ sessionStorage للجلسات (سابقاً)
-- ✅ DOMPurify للحماية من XSS
+### 1.2 إصلاحات أمنية تم تنفيذها (2026-01-19)
+- ✅ إصلاح `useRequestApprovals.ts` - استبدال `'current-user-id'` بـ `user.id` الفعلي
+- ✅ إزالة سياسة `"Authenticated users can view approvals"` من `distribution_approvals`
+- ✅ إزالة سياسة `"Authenticated users can view request approvals"` من `request_approvals`
+- ✅ توحيد سياسات `loan_approvals` - إزالة 3 سياسات مكررة
+- ✅ توحيد سياسات `payment_approvals` - إزالة 3 سياسات مكررة
+- ✅ إصلاح سياسة `chatbot_quick_replies` - للموظفين فقط
+- ✅ إصلاح سياسة `landing_page_settings` - للمصادقين فقط
 
 ### 1.3 نتائج Supabase Linter
 ```
