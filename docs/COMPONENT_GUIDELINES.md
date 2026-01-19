@@ -184,6 +184,61 @@ className="pb-safe" // padding-bottom: env(safe-area-inset-bottom)
 
 ---
 
+## 📊 بطاقات الإحصائيات (Canonical Pattern)
+
+### القاعدة الإلزامية:
+جميع بطاقات الإحصائيات يجب أن تستخدم النمط الموحد التالي:
+
+```tsx
+// ✅ صحيح - النمط الموحد
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+
+<UnifiedStatsGrid columns={4}>
+  <UnifiedKPICard
+    title="المستفيدين"
+    value={14}
+    icon={Users}
+    variant="success"
+  />
+  <UnifiedKPICard
+    title="العقارات"
+    value={5}
+    icon={Building2}
+    variant="primary"
+  />
+</UnifiedStatsGrid>
+
+// ❌ خطأ - لا تستخدم هذا
+<div className="grid grid-cols-4 gap-4">
+  <Card>...</Card>
+</div>
+```
+
+### الخصائص المتاحة:
+
+| الخاصية | النوع | الوصف |
+|---------|-------|-------|
+| `title` | string | عنوان البطاقة |
+| `value` | string \| number \| ReactNode | القيمة الرئيسية |
+| `icon` | LucideIcon | أيقونة البطاقة |
+| `variant` | 'default' \| 'success' \| 'warning' \| 'destructive' \| 'primary' \| 'danger' | نمط اللون |
+| `subtitle` | string | نص فرعي (اختياري) |
+| `size` | 'default' \| 'compact' | حجم البطاقة |
+| `onClick` | () => void | دالة النقر (اختياري) |
+
+### أمثلة الـ Variants:
+
+```tsx
+<UnifiedKPICard variant="success" />    // أخضر - للإيجابي
+<UnifiedKPICard variant="warning" />    // برتقالي - للتنبيهات
+<UnifiedKPICard variant="destructive" /> // أحمر - للسلبي
+<UnifiedKPICard variant="primary" />    // أزرق - للعام
+<UnifiedKPICard variant="default" />    // رمادي - للمحايد
+```
+
+---
+
 ## ⚡ الأداء
 
 ### React.memo:

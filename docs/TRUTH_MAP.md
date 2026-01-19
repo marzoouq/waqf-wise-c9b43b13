@@ -1,5 +1,5 @@
 # Truth Map - خريطة مصادر الحقيقة
-> آخر تحديث: 2026-01-17
+> آخر تحديث: 2026-01-19 | الإصدار: 3.2.0
 
 ## 📊 مصادر البيانات الموحدة
 
@@ -236,6 +236,12 @@ const isActive = tenant.status === 'نشط';
 | 2026-01-17 | → تحديث STATUS_MAPPINGS: إضافة occupied/vacant/published/posted/موافق |
 | 2026-01-17 | → المكونات المحدثة: PropertyAccordionView, ViewJournalEntryDialog, AccountingKPIs |
 | 2026-01-17 | → المكونات المحدثة: PaymentApprovalsTab, DistributionApprovalsTab, EnhancedDisclosuresTab |
+| 2026-01-19 | **التوحيد البصري مكتمل**: جميع بطاقات الإحصائيات تستخدم `UnifiedKPICard` + `UnifiedStatsGrid` |
+| 2026-01-19 | → الصفحات الموحدة: PaymentVouchers, WaqfUnits, SystemMonitoring, EdgeFunctionsMonitor, TenantPortal |
+| 2026-01-19 | → الصفحات الموحدة: Loans, AllTransactions, BeneficiaryRequests, ConnectionDiagnostics |
+| 2026-01-19 | → المكونات الموحدة: WaqfSummaryTab, BeneficiaryPropertiesTab, OverviewTab, MaintenanceCostReport, FundsPerformanceReport |
+| 2026-01-19 | → حذف المكونات القديمة: DashboardStats.tsx, StatsCardSkeleton.tsx |
+| 2026-01-19 | → توثيق Canonical Pattern في COMPONENT_GUIDELINES.md |
 ---
 
 ## 9. إحصائيات النظام الحالية
