@@ -15589,12 +15589,15 @@ export type Database = {
       }
       unmatched_bank_transactions: {
         Row: {
+          account_number: string | null
           amount: number | null
           bank_account_id: string | null
           bank_name: string | null
           description: string | null
           id: string | null
+          is_matched: boolean | null
           reference_number: string | null
+          statement_id: string | null
           transaction_date: string | null
           transaction_type: string | null
         }
@@ -15604,6 +15607,13 @@ export type Database = {
             columns: ["bank_account_id"]
             isOneToOne: false
             referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_statement_id_fkey"
+            columns: ["statement_id"]
+            isOneToOne: false
+            referencedRelation: "bank_statements"
             referencedColumns: ["id"]
           },
         ]
