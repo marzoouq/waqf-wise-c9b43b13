@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Wrench } from 'lucide-react';
+import { Download, Wrench, CheckCircle, Clock, DollarSign } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/ui/use-toast';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMaintenanceCostReport } from '@/hooks/reports/useMaintenanceCostReport';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))'];
 
@@ -65,34 +67,26 @@ export function MaintenanceCostReport() {
   return (
     <div className="space-y-6">
       {/* إحصائيات إجمالية */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">التكلفة الإجمالية</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totals.totalCost.toLocaleString('ar-SA')} ريال</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">العمليات المكتملة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">{totals.totalCompleted}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">العمليات المعلقة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-warning">{totals.totalPending}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={3}>
+        <UnifiedKPICard
+          title="التكلفة الإجمالية"
+          value={`${totals.totalCost.toLocaleString('ar-SA')} ريال`}
+          icon={DollarSign}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="العمليات المكتملة"
+          value={totals.totalCompleted}
+          icon={CheckCircle}
+          variant="success"
+        />
+        <UnifiedKPICard
+          title="العمليات المعلقة"
+          value={totals.totalPending}
+          icon={Clock}
+          variant="warning"
+        />
+      </UnifiedStatsGrid>
 
       {/* الرسوم البيانية */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

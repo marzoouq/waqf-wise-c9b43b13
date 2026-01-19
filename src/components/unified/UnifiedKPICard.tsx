@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
@@ -5,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 interface UnifiedKPICardProps {
   title: string;
-  value: string | number;
+  /** القيمة - يمكن أن تكون نص، رقم، أو عنصر React (مثل MaskedValue) */
+  value: string | number | ReactNode;
   subtitle?: string;
   icon: LucideIcon;
   /** يمكن أن يكون اتجاه ('up' | 'down' | 'neutral') أو نص مثل '+5%' */

@@ -4,6 +4,8 @@ import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings"
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useWaqfSummary } from "@/hooks/beneficiary/useWaqfSummary";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export function WaqfSummaryTab() {
   const { settings } = useVisibilitySettings();
@@ -21,98 +23,81 @@ export function WaqfSummaryTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <UnifiedStatsGrid columns={{ sm: 2, md: 2, lg: 3 }}>
         {/* إجمالي العائد السنوي */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي العائد السنوي</CardTitle>
-            <Landmark className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isCurrentYearPublished ? (
-              <>
-                <div className="text-xl sm:text-2xl font-bold">
-                  <MaskedValue
-                    value={summary?.totalPropertyValue.toLocaleString("ar-SA")}
-                    type="amount"
-                    masked={settings?.mask_exact_amounts || false}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">من العقود النشطة</p>
-              </>
+        <UnifiedKPICard
+          title="إجمالي العائد السنوي"
+          value={
+            isCurrentYearPublished ? (
+              <MaskedValue
+                value={summary?.totalPropertyValue.toLocaleString("ar-SA")}
+                type="amount"
+                masked={settings?.mask_exact_amounts || false}
+              />
             ) : (
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <EyeOff className="h-4 w-4" />
-                <span className="text-sm">ستظهر عند نشر السنة المالية</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                ستظهر عند النشر
+              </span>
+            )
+          }
+          subtitle="من العقود النشطة"
+          icon={Landmark}
+          variant="default"
+        />
 
         {/* عدد العقارات */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">العقارات</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{summary?.propertiesCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">عقار في الوقف</p>
-          </CardContent>
-        </Card>
+        <UnifiedKPICard
+          title="العقارات"
+          value={summary?.propertiesCount || 0}
+          subtitle="عقار في الوقف"
+          icon={Building2}
+          variant="info"
+        />
 
         {/* عدد المستفيدين */}
         {settings?.show_total_beneficiaries_count && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">المستفيدون</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{summary?.beneficiariesCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">مستفيد نشط</p>
-            </CardContent>
-          </Card>
+          <UnifiedKPICard
+            title="المستفيدون"
+            value={summary?.beneficiariesCount || 0}
+            subtitle="مستفيد نشط"
+            icon={Users}
+            variant="success"
+          />
         )}
 
         {/* الأرصدة البنكية */}
         {settings?.show_bank_balances && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">الأرصدة البنكية</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">
-                <MaskedValue
-                  value={summary?.totalBankBalance.toLocaleString("ar-SA")}
-                  type="amount"
-                  masked={settings?.mask_exact_amounts || false}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">رصيد متاح</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* إجمالي مخصصات الصناديق */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي مخصصات الصناديق</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
+          <UnifiedKPICard
+            title="الأرصدة البنكية"
+            value={
               <MaskedValue
-                value={(summary?.totalFunds || 0).toLocaleString("ar-SA")}
+                value={summary?.totalBankBalance.toLocaleString("ar-SA")}
                 type="amount"
                 masked={settings?.mask_exact_amounts || false}
               />
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">مجموع المبالغ المخصصة</p>
-          </CardContent>
-        </Card>
-      </div>
+            }
+            subtitle="رصيد متاح"
+            icon={DollarSign}
+            variant="warning"
+          />
+        )}
+
+        {/* إجمالي مخصصات الصناديق */}
+        <UnifiedKPICard
+          title="إجمالي مخصصات الصناديق"
+          value={
+            <MaskedValue
+              value={(summary?.totalFunds || 0).toLocaleString("ar-SA")}
+              type="amount"
+              masked={settings?.mask_exact_amounts || false}
+            />
+          }
+          subtitle="مجموع المبالغ المخصصة"
+          icon={TrendingUp}
+          variant="default"
+        />
+      </UnifiedStatsGrid>
 
       {/* معلومات إضافية */}
       <Card>
