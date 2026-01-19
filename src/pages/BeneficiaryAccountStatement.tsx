@@ -310,38 +310,65 @@ export default function BeneficiaryAccountStatement() {
               <p className="text-muted-foreground">لا توجد مدفوعات مطابقة للفلتر</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>التاريخ</TableHead>
-                    <TableHead>الوصف</TableHead>
-                    <TableHead>طريقة الدفع</TableHead>
-                    <TableHead className="text-left">المبلغ</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPayments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">
-                        {format(new Date(payment.payment_date), 'dd/MM/yyyy')}
-                      </TableCell>
-                      <TableCell>{payment.description || '-'}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs bg-muted">
-                          {payment.payment_method || '-'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-left">
-                        <span className="font-semibold text-success">
-                          {formatCurrency(payment.amount)}
-                        </span>
-                      </TableCell>
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredPayments.map((payment) => (
+                  <div key={payment.id} className="p-4 rounded-lg border border-border/50 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{payment.description || '-'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(payment.payment_date), 'dd/MM/yyyy')}
+                        </p>
+                      </div>
+                      <span className="font-semibold text-success">
+                        {formatCurrency(payment.amount)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="inline-flex items-center rounded-full px-2 py-1 bg-muted">
+                        {payment.payment_method || '-'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>التاريخ</TableHead>
+                      <TableHead>الوصف</TableHead>
+                      <TableHead>طريقة الدفع</TableHead>
+                      <TableHead className="text-start">المبلغ</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPayments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">
+                          {format(new Date(payment.payment_date), 'dd/MM/yyyy')}
+                        </TableCell>
+                        <TableCell>{payment.description || '-'}</TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center rounded-full px-2 py-1 text-xs bg-muted">
+                            {payment.payment_method || '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-start">
+                          <span className="font-semibold text-success">
+                            {formatCurrency(payment.amount)}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
