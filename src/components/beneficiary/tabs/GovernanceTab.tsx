@@ -117,7 +117,7 @@ export function GovernanceTab() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right text-[10px] sm:text-xs shrink-0">
+                  <div className="text-start text-[10px] sm:text-xs shrink-0">
                     <p className="text-muted-foreground">{meeting.attendees_count || 0} حاضر</p>
                   </div>
                 </div>

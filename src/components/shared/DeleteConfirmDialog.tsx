@@ -43,7 +43,7 @@ export const DeleteConfirmDialog = ({
             )}
             <AlertDialogTitle>{title}</AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-right space-y-2">
+          <AlertDialogDescription className="text-start space-y-2">
             <p>{description}</p>
             {itemName && (
               <p className="font-semibold text-foreground">

@@ -96,9 +96,9 @@ export function BudgetVarianceReport() {
                   <TableRow>
                     <TableHead>الحساب</TableHead>
                     <TableHead>الفترة</TableHead>
-                    <TableHead className="text-right">المخطط</TableHead>
-                    <TableHead className="text-right">الفعلي</TableHead>
-                    <TableHead className="text-right">الانحراف</TableHead>
+                    <TableHead className="text-end">المخطط</TableHead>
+                    <TableHead className="text-end">الفعلي</TableHead>
+                    <TableHead className="text-end">الانحراف</TableHead>
                     <TableHead>نسبة التنفيذ</TableHead>
                     <TableHead>الحالة</TableHead>
                   </TableRow>
@@ -135,13 +135,13 @@ export function BudgetVarianceReport() {
                           <TableCell>
                             {budget.period_type === 'annual' ? 'سنوي' : `الفترة ${budget.period_number}`}
                           </TableCell>
-                          <TableCell className="text-right font-mono">
+                          <TableCell className="text-end font-mono">
                             {formatCurrency(budget.budgeted_amount)}
                           </TableCell>
-                          <TableCell className="text-right font-mono">
+                          <TableCell className="text-end font-mono">
                             {formatCurrency(budget.actual_amount || 0)}
                           </TableCell>
-                          <TableCell className="text-right font-mono">
+                          <TableCell className="text-end font-mono">
                             <span className={variance >= 0 ? 'text-success' : 'text-destructive'}>
                               {variance >= 0 ? '+' : ''}{formatCurrency(Math.abs(variance))}
                             </span>

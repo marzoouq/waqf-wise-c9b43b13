@@ -238,7 +238,7 @@ export default function BeneficiaryRequests() {
                           )}
                         </div>
 
-                        <div className="text-left text-xs text-muted-foreground">
+                        <div className="text-start text-xs text-muted-foreground">
                           <p>{new Date(request.created_at).toLocaleDateString('ar-SA')}</p>
                           <p>{new Date(request.created_at).toLocaleTimeString('ar-SA')}</p>
                         </div>

@@ -368,13 +368,13 @@ export default function WaqfUnits() {
                     </TableHead>
                     <SortableTableHeader label="الكود" sortKey="code" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
                     <SortableTableHeader label="الاسم" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
-                    <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
-                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الموقع</TableHead>
+                    <TableHead className="text-start whitespace-nowrap">النوع</TableHead>
+                    <TableHead className="text-start whitespace-nowrap hidden lg:table-cell">الموقع</TableHead>
                     <SortableTableHeader label="الرصيد" sortKey="current_balance" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
                     <SortableTableHeader label="الإيرادات" sortKey="total_income" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell whitespace-nowrap" />
                     <SortableTableHeader label="المصروفات" sortKey="total_expenses" currentSort={sortConfig} onSort={handleSort} className="hidden xl:table-cell whitespace-nowrap" />
-                    <TableHead className="text-right whitespace-nowrap">الحالة</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
+                    <TableHead className="text-start whitespace-nowrap">الحالة</TableHead>
+                    <TableHead className="text-start whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

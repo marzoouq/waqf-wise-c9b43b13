@@ -123,11 +123,11 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-right">السنة المالية</TableHead>
-                        <TableHead className="text-right">الحالة</TableHead>
-                        <TableHead className="text-right">الرصيد الافتتاحي</TableHead>
-                        <TableHead className="text-right">رقبة الوقف</TableHead>
-                        <TableHead className="text-right">الرصيد الختامي</TableHead>
+                        <TableHead className="text-start">السنة المالية</TableHead>
+                        <TableHead className="text-start">الحالة</TableHead>
+                        <TableHead className="text-start">الرصيد الافتتاحي</TableHead>
+                        <TableHead className="text-start">رقبة الوقف</TableHead>
+                        <TableHead className="text-start">الرصيد الختامي</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

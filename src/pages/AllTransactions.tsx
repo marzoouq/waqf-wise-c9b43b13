@@ -238,19 +238,19 @@ export default function AllTransactions() {
                 </div>
 
                 {/* Desktop Table View */}
-                <div className="hidden md:block rounded-md border overflow-x-auto">
+                <div className="hidden md:block rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-right">التاريخ</TableHead>
-                        <TableHead className="text-right">المصدر</TableHead>
-                        <TableHead className="text-right">النوع</TableHead>
-                        <TableHead className="text-right">الطرف</TableHead>
-                        <TableHead className="text-right">المبلغ</TableHead>
-                        <TableHead className="text-right hidden lg:table-cell">طريقة الدفع</TableHead>
-                        <TableHead className="text-right hidden lg:table-cell">البيان</TableHead>
-                        <TableHead className="text-right hidden xl:table-cell">المرجع</TableHead>
-                        <TableHead className="text-right">الحالة</TableHead>
+                        <TableHead className="text-start">التاريخ</TableHead>
+                        <TableHead className="text-start">المصدر</TableHead>
+                        <TableHead className="text-start">النوع</TableHead>
+                        <TableHead className="text-start">الطرف</TableHead>
+                        <TableHead className="text-start">المبلغ</TableHead>
+                        <TableHead className="text-start hidden lg:table-cell">طريقة الدفع</TableHead>
+                        <TableHead className="text-start hidden lg:table-cell">البيان</TableHead>
+                        <TableHead className="text-start hidden xl:table-cell">المرجع</TableHead>
+                        <TableHead className="text-start">الحالة</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
