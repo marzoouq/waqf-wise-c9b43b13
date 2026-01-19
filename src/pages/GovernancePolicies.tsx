@@ -150,20 +150,21 @@ const GovernancePolicies = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="p-4 md:p-6 space-y-6"
+        className="space-y-6"
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">سياسات الحوكمة</h1>
-            <p className="text-muted-foreground mt-1">إدارة سياسات ولوائح الوقف</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">سياسات الحوكمة</h1>
+            <p className="text-sm text-muted-foreground mt-1">إدارة سياسات ولوائح الوقف</p>
           </div>
           
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button size="sm" className="w-full sm:w-auto gap-2">
                 <Plus className="h-4 w-4" />
-                إضافة سياسة جديدة
+                <span className="hidden sm:inline">إضافة سياسة جديدة</span>
+                <span className="sm:hidden">إضافة سياسة</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">

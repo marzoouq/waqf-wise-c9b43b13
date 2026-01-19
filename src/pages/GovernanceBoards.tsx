@@ -160,20 +160,21 @@ const GovernanceBoards = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="p-4 md:p-6 space-y-6"
+        className="space-y-6"
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">مجالس الحوكمة</h1>
-            <p className="text-muted-foreground mt-1">إدارة مجالس الحوكمة وأعضائها</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">مجالس الحوكمة</h1>
+            <p className="text-sm text-muted-foreground mt-1">إدارة مجالس الحوكمة وأعضائها</p>
           </div>
           
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button size="sm" className="w-full sm:w-auto gap-2">
                 <Plus className="h-4 w-4" />
-                إنشاء مجلس جديد
+                <span className="hidden sm:inline">إنشاء مجلس جديد</span>
+                <span className="sm:hidden">إنشاء مجلس</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">

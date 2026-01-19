@@ -242,21 +242,26 @@ export function EnhancedAccountsTree() {
     <>
       <Card className="p-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold">شجرة الحسابات</h2>
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
               <ExportButton
                 data={flattenAccounts(accountTree)}
                 filename="شجرة_الحسابات"
                 title="شجرة الحسابات"
                 headers={['الكود', 'الاسم', 'النوع', 'الطبيعة', 'الرصيد', 'الحالة']}
               />
-              <Button onClick={() => {
-                setSelectedAccount(null);
-                setDialogOpen(true);
-              }}>
+              <Button 
+                onClick={() => {
+                  setSelectedAccount(null);
+                  setDialogOpen(true);
+                }}
+                size="sm"
+                className="flex-1 sm:flex-none"
+              >
                 <Plus className="ms-2 h-4 w-4" />
-                إضافة حساب رئيسي
+                <span className="hidden sm:inline">إضافة حساب رئيسي</span>
+                <span className="sm:hidden">إضافة حساب</span>
               </Button>
             </div>
           </div>

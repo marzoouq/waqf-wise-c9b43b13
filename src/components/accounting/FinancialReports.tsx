@@ -43,14 +43,15 @@ export function FinancialReports() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <FileText className="h-6 w-6" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
           التقارير المالية
         </h2>
-        <Button variant="outline">
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">
           <Download className="h-4 w-4 ms-2" />
-          تصدير PDF
+          <span className="hidden sm:inline">تصدير PDF</span>
+          <span className="sm:hidden">تصدير</span>
         </Button>
       </div>
 

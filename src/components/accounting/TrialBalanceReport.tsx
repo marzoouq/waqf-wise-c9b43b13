@@ -100,25 +100,28 @@ export function TrialBalanceReport() {
   return (
     <Card className="print:shadow-none">
       <CardHeader className="print:border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-2xl">ميزان المراجعة</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
+            <CardTitle className="text-xl sm:text-2xl">ميزان المراجعة</CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               التاريخ: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2 print:hidden flex-wrap">
-            <Button variant="outline" size="sm" onClick={handlePrint}>
+          <div className="flex gap-2 print:hidden flex-wrap w-full sm:w-auto">
+            <Button variant="outline" size="sm" onClick={handlePrint} className="flex-1 sm:flex-none">
               <Printer className="ms-2 h-4 w-4" />
-              طباعة
+              <span className="hidden sm:inline">طباعة</span>
+              <span className="sm:hidden">طباعة</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+            <Button variant="outline" size="sm" onClick={handleExportPDF} className="flex-1 sm:flex-none">
               <FileText className="ms-2 h-4 w-4" />
-              تصدير PDF
+              <span className="hidden sm:inline">تصدير PDF</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportExcel}>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="flex-1 sm:flex-none">
               <Download className="ms-2 h-4 w-4" />
-              تصدير Excel
+              <span className="hidden sm:inline">تصدير Excel</span>
+              <span className="sm:hidden">Excel</span>
             </Button>
           </div>
         </div>

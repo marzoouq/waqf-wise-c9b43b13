@@ -137,20 +137,20 @@ export function ChartOfAccounts() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <FolderTree className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
+          <FolderTree className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+          <h2 className="text-xl sm:text-2xl font-bold">شجرة الحسابات</h2>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="w-full sm:w-auto">
               <Plus className="h-4 w-4 ms-2" />
               إضافة حساب
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>إضافة حساب جديد</DialogTitle>
             </DialogHeader>
