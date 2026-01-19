@@ -209,12 +209,12 @@ const Families = memo(() => {
                           />
                         </TableHead>
                         <SortableTableHeader label="اسم العائلة" sortKey="family_name" currentSort={sortConfig} onSort={handleSort} />
-                        <TableHead className="text-right">رب الأسرة</TableHead>
+                        <TableHead className="text-start">رب الأسرة</TableHead>
                         <SortableTableHeader label="القبيلة" sortKey="tribe" currentSort={sortConfig} onSort={handleSort} className="hidden md:table-cell" />
                         <SortableTableHeader label="عدد الأفراد" sortKey="total_members" currentSort={sortConfig} onSort={handleSort} />
                         <SortableTableHeader label="الحالة" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell" />
                         <SortableTableHeader label="تاريخ التسجيل" sortKey="created_at" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell" />
-                        <TableHead className="text-right w-[100px]">الإجراءات</TableHead>
+                        <TableHead className="text-start w-[100px]">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

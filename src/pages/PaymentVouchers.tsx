@@ -302,7 +302,7 @@ export default function PaymentVouchers() {
                     </div>
 
                     <div className="flex flex-col items-end justify-between gap-3">
-                      <div className="text-left">
+                      <div className="text-start">
                         <p className="text-2xl font-bold text-primary">
                           {voucher.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
                         </p>

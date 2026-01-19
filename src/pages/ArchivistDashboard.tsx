@@ -187,7 +187,7 @@ export default function ArchivistDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground text-left flex-shrink-0">
+                  <div className="text-xs text-muted-foreground text-start flex-shrink-0">
                     {format(new Date(doc.uploaded_at), 'dd MMM yyyy', { locale: ar })}
                   </div>
                 </div>

@@ -193,7 +193,7 @@ export function LoanApprovalsTab() {
       >
         {selectedLoan && (
           <div className="space-y-4">
-            <div className="bg-muted p-3 rounded-md">
+            <div className="bg-muted p-3 rounded-lg">
               <p className="text-sm">
                 <strong>المستفيد:</strong> {selectedLoan.beneficiaries?.full_name}
               </p>

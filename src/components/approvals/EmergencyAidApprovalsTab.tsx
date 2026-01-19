@@ -120,17 +120,17 @@ export function EmergencyAidApprovalsTab() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-right">رقم الطلب</TableHead>
-                  <TableHead className="text-right">المستفيد</TableHead>
-                  <TableHead className="text-right">المبلغ</TableHead>
-                  <TableHead className="text-right">مستوى العجلة</TableHead>
-                  <TableHead className="text-right">SLA</TableHead>
-                  <TableHead className="text-right">تاريخ التقديم</TableHead>
-                  <TableHead className="text-right">الإجراء</TableHead>
+                  <TableHead className="text-start">رقم الطلب</TableHead>
+                  <TableHead className="text-start">المستفيد</TableHead>
+                  <TableHead className="text-start">المبلغ</TableHead>
+                  <TableHead className="text-start hidden md:table-cell">مستوى العجلة</TableHead>
+                  <TableHead className="text-start hidden lg:table-cell">SLA</TableHead>
+                  <TableHead className="text-start hidden lg:table-cell">تاريخ التقديم</TableHead>
+                  <TableHead className="text-start">الإجراء</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,7 +212,7 @@ export function EmergencyAidApprovalsTab() {
               <label className="text-sm font-medium">المبلغ المعتمد (ريال):</label>
               <input
                 type="number"
-                className="w-full mt-1 p-2 border rounded"
+                className="w-full mt-1 p-2 border rounded-lg"
                 value={approvedAmount}
                 onChange={(e) => setApprovedAmount(Number(e.target.value))}
               />

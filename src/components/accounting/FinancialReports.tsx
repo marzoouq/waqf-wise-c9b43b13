@@ -73,11 +73,11 @@ export function FinancialReports() {
                 <table className="w-full">
                   <thead className="bg-muted">
                     <tr>
-                      <th className="p-3 text-right">رمز الحساب</th>
-                      <th className="p-3 text-right">اسم الحساب</th>
-                      <th className="p-3 text-left">مدين</th>
-                      <th className="p-3 text-left">دائن</th>
-                      <th className="p-3 text-left">الرصيد</th>
+                      <th className="p-3 text-start">رمز الحساب</th>
+                      <th className="p-3 text-start">اسم الحساب</th>
+                      <th className="p-3 text-end">مدين</th>
+                      <th className="p-3 text-end">دائن</th>
+                      <th className="p-3 text-end">الرصيد</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -72,7 +72,7 @@ export default function FAQ() {
               value={`item-${index}`}
               className="bg-card rounded-xl border border-border px-6"
             >
-              <AccordionTrigger className="text-right hover:no-underline py-6">
+              <AccordionTrigger className="text-start hover:no-underline py-6">
                 <span className="text-foreground font-medium">{item.question}</span>
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">

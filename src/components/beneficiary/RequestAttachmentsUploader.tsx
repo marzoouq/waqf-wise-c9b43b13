@@ -149,7 +149,7 @@ export function RequestAttachmentsUploader({
             {selectedFile ? (
               <div className="flex items-center justify-center gap-3">
                 {getFileIcon(selectedFile.type)}
-                <div className="text-right">
+                <div className="text-start">
                   <p className="font-medium text-sm">{selectedFile.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {formatBytes(selectedFile.size)}

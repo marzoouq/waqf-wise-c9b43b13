@@ -221,7 +221,7 @@ export function PaymentApprovalsTab() {
       >
         {selectedPayment && (
           <div className="space-y-4">
-            <div className="bg-muted p-3 rounded-md">
+            <div className="bg-muted p-3 rounded-lg">
               <p className="text-sm">
                 <strong>رقم السند:</strong> {selectedPayment.payment_number}
               </p>

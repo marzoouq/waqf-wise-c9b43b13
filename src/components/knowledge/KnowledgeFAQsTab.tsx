@@ -23,7 +23,7 @@ export function KnowledgeFAQsTab({ faqs }: KnowledgeFAQsTabProps) {
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq) => (
             <AccordionItem key={faq.id} value={faq.id}>
-              <AccordionTrigger className="text-right">
+              <AccordionTrigger className="text-start">
                 {faq.question}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">

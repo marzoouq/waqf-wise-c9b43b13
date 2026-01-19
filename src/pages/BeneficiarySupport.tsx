@@ -196,10 +196,10 @@ export default function BeneficiarySupport() {
                 <Accordion type="single" collapsible className="w-full">
                   {faqs.map((faq) => (
                     <AccordionItem key={faq.question} value={faq.question}>
-                      <AccordionTrigger className="text-right hover:no-underline">
+                      <AccordionTrigger className="text-start hover:no-underline">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground text-right">
+                      <AccordionContent className="text-muted-foreground text-start">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
