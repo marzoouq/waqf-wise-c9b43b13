@@ -679,7 +679,7 @@ export default function EdgeFunctionTest() {
                             <span className="font-medium">{cat.label}</span>
                             <Badge variant="outline">{cat.functions.length}</Badge>
                             {categoryResults.length > 0 && (
-                              <div className="flex gap-1 mr-4">
+                              <div className="flex gap-1 me-4">
                                 <Badge variant="default" className="bg-green-500">
                                   {categoryResults.filter(r => r.success).length}
                                 </Badge>

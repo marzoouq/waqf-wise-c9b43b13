@@ -367,12 +367,12 @@ export default function ConnectionDiagnostics() {
         <div className="flex items-center gap-3">
           {isOnline ? (
             <Badge className="bg-green-500">
-              <Wifi className="h-4 w-4 ml-1" />
+              <Wifi className="h-4 w-4 ms-1" />
               متصل
             </Badge>
           ) : (
             <Badge variant="destructive">
-              <WifiOff className="h-4 w-4 ml-1" />
+              <WifiOff className="h-4 w-4 ms-1" />
               غير متصل
             </Badge>
           )}
@@ -402,14 +402,14 @@ export default function ConnectionDiagnostics() {
                 className="w-full"
                 size="lg"
               >
-                {isRunning ? (
+              {isRunning ? (
                   <>
-                    <RefreshCw className="h-4 w-4 ml-2 animate-spin" />
+                    <RefreshCw className="h-4 w-4 ms-2 animate-spin" />
                     جاري الفحص...
                   </>
                 ) : (
                   <>
-                    <Activity className="h-4 w-4 ml-2" />
+                    <Activity className="h-4 w-4 ms-2" />
                     بدء الفحص الشامل
                   </>
                 )}
