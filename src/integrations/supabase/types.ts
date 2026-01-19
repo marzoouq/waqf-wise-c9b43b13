@@ -15986,6 +15986,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      check_journal_entry_balance: {
+        Args: { p_entry_id: string }
+        Returns: boolean
+      }
       check_overdue_requests: { Args: never; Returns: undefined }
       check_rate_limit: {
         Args: {
@@ -16052,6 +16056,14 @@ export type Database = {
           p_total_amount: number
           p_waqf_name: string
         }
+        Returns: string
+      }
+      create_journal_entry_for_payment: {
+        Args: { p_payment_id: string }
+        Returns: string
+      }
+      create_journal_entry_from_voucher: {
+        Args: { p_voucher_id: string }
         Returns: string
       }
       create_loan_installments: {
