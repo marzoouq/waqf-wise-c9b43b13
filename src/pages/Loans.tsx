@@ -45,10 +45,12 @@ import { LoanDialog } from "@/components/loans/LoanDialog";
 import { InstallmentScheduleDialog } from "@/components/loans/InstallmentScheduleDialog";
 import { LoanPaymentDialog } from "@/components/loans/LoanPaymentDialog";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 // Skeleton loaders
 const StatsSkeleton = () => (
-  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  <UnifiedStatsGrid columns={4}>
     {[1, 2, 3, 4].map((i) => (
       <Card key={i} className="animate-pulse">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -61,7 +63,7 @@ const StatsSkeleton = () => (
         </CardContent>
       </Card>
     ))}
-  </div>
+  </UnifiedStatsGrid>
 );
 
 const TableSkeleton = () => (
@@ -192,71 +194,36 @@ export default function Loans() {
       {isLoading ? (
         <StatsSkeleton />
       ) : (
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                إجمالي القروض
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <FileText className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.active} قرض نشط
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                قروض نشطة
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-info-light flex items-center justify-center group-hover:bg-info/20 transition-colors">
-                <TrendingUp className="h-4 w-4 text-info" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.active}</div>
-              <p className="text-xs text-muted-foreground mt-1">قيد السداد</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                قروض مسددة
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-success-light flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                <CheckCircle className="h-4 w-4 text-success" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.paid}</div>
-              <p className="text-xs text-muted-foreground mt-1">مكتملة السداد</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                إجمالي المبالغ
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center group-hover:bg-warning/20 transition-colors">
-                <DollarSign className="h-4 w-4 text-warning" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.totalAmount.toLocaleString("ar-SA")}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">ريال سعودي</p>
-            </CardContent>
-          </Card>
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي القروض"
+            value={stats.total}
+            subtitle={`${stats.active} قرض نشط`}
+            icon={FileText}
+            variant="default"
+          />
+          <UnifiedKPICard
+            title="قروض نشطة"
+            value={stats.active}
+            subtitle="قيد السداد"
+            icon={TrendingUp}
+            variant="info"
+          />
+          <UnifiedKPICard
+            title="قروض مسددة"
+            value={stats.paid}
+            subtitle="مكتملة السداد"
+            icon={CheckCircle}
+            variant="success"
+          />
+          <UnifiedKPICard
+            title="إجمالي المبالغ"
+            value={`${stats.totalAmount.toLocaleString("ar-SA")}`}
+            subtitle="ريال سعودي"
+            icon={DollarSign}
+            variant="warning"
+          />
+        </UnifiedStatsGrid>
       )}
 
       {/* Filters and Search */}

@@ -54,8 +54,7 @@ export { EditPhoneDialog } from './EditPhoneDialog';
 export { NotificationsCard } from './NotificationsCard';
 export { AnnualDisclosureCard } from './AnnualDisclosureCard';
 export { PropertyStatsCards } from './PropertyStatsCards';
-// StatsCard removed - use UnifiedKPICard from @/components/unified
-export { StatsCardSkeleton } from './StatsCardSkeleton';
+// StatsCardSkeleton removed - use unified skeletons from @/components/dashboard/KPISkeleton
 export { ReportsExplanationCard } from './ReportsExplanationCard';
 
 // ==================== Chart Components ====================
