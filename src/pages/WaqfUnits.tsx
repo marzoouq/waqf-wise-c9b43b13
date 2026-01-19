@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays, Trash2, Wallet } from "lucide-react";
+import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays, Trash2, Wallet, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Input } from "@/components/ui/input";
@@ -304,148 +304,133 @@ export default function WaqfUnits() {
         />
       ) : (
         <Card>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">
-                    <Checkbox
-                      checked={isAllSelected}
-                      onCheckedChange={toggleAll}
-                      aria-label="تحديد الكل"
-                    />
-                  </TableHead>
-                  <SortableTableHeader
-                    label="الكود"
-                    sortKey="code"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="whitespace-nowrap"
-                  />
-                  <SortableTableHeader
-                    label="الاسم"
-                    sortKey="name"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="whitespace-nowrap"
-                  />
-                  <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
-                  <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الموقع</TableHead>
-                  {/* عمود الرصيد المالي الفعلي */}
-                  <SortableTableHeader
-                    label="الرصيد"
-                    sortKey="current_balance"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="whitespace-nowrap"
-                  />
-                  <SortableTableHeader
-                    label="الإيرادات"
-                    sortKey="total_income"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="hidden md:table-cell whitespace-nowrap"
-                  />
-                  <SortableTableHeader
-                    label="المصروفات"
-                    sortKey="total_expenses"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="hidden lg:table-cell whitespace-nowrap"
-                  />
-                  <SortableTableHeader
-                    label="قيمة الأصل"
-                    sortKey="current_value"
-                    currentSort={sortConfig}
-                    onSort={handleSort}
-                    className="hidden lg:table-cell whitespace-nowrap"
-                  />
-                  <TableHead className="text-right whitespace-nowrap">الحالة</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedData.map((unit) => (
-                  <TableRow key={unit.id}>
-                    <TableCell>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden p-4 space-y-3">
+              {sortedData.map((unit) => (
+                <Card key={unit.id} className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
                       <Checkbox
                         checked={isSelected(unit.id)}
                         onCheckedChange={() => toggleSelection(unit.id)}
-                        aria-label={`تحديد ${unit.name}`}
                       />
-                    </TableCell>
-                    <TableCell className="font-medium text-xs sm:text-sm">{unit.code}</TableCell>
-                    <TableCell className="min-w-[150px]">
                       <div>
-                        <p className="font-medium text-xs sm:text-sm">{unit.name}</p>
-                        {unit.description && (
-                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">
-                            {unit.description}
-                          </p>
-                        )}
+                        <p className="font-medium text-sm">{unit.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{unit.code}</p>
                       </div>
-                    </TableCell>
-                    <TableCell>{getTypeBadge(unit.waqf_type)}</TableCell>
-                    <TableCell className="hidden md:table-cell text-xs sm:text-sm">{unit.location || "-"}</TableCell>
-                    {/* الرصيد المالي الفعلي */}
-                    <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap">
-                      {(unit.current_balance || 0).toLocaleString('ar-SA')} ريال
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell font-semibold text-success text-xs sm:text-sm whitespace-nowrap">
-                      {(unit.total_income || 0).toLocaleString('ar-SA')} ريال
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell font-semibold text-destructive text-xs sm:text-sm whitespace-nowrap">
-                      {(unit.total_expenses || 0).toLocaleString('ar-SA')} ريال
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap">
-                      {(unit.current_value || 0).toLocaleString('ar-SA')} ريال
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={unit.is_active ? "outline" : "secondary"} className="text-xs whitespace-nowrap">
-                        {unit.is_active ? "نشط" : "غير نشط"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedDetailsUnit(unit as WaqfUnit);
-                          setDetailsDialogOpen(true);
-                        }}
-                        className="text-xs sm:text-sm gap-1"
-                      >
-                        <Eye className="h-4 w-4" />
-                        عرض
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedUnit(unit as WaqfUnit);
-                          setIsDialogOpen(true);
-                        }}
-                        className="text-xs sm:text-sm"
-                      >
-                        تعديل
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setUnitToDelete(unit as WaqfUnit);
-                          setDeleteDialogOpen(true);
-                        }}
-                        className="text-xs sm:text-sm text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                    </div>
+                    <Badge variant={unit.is_active ? "outline" : "secondary"} className="text-xs">
+                      {unit.is_active ? "نشط" : "غير نشط"}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {getTypeBadge(unit.waqf_type)}
+                    {unit.location && <Badge variant="outline" className="text-xs">{unit.location}</Badge>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                    <div>
+                      <span className="text-muted-foreground text-xs">الرصيد:</span>
+                      <p className="font-bold text-primary">{(unit.current_balance || 0).toLocaleString('ar-SA')} ريال</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground text-xs">الإيرادات:</span>
+                      <p className="font-semibold text-success">{(unit.total_income || 0).toLocaleString('ar-SA')} ريال</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { setSelectedDetailsUnit(unit as WaqfUnit); setDetailsDialogOpen(true); }}>
+                      <Eye className="h-4 w-4 ms-1" />
+                      عرض
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => { setSelectedUnit(unit as WaqfUnit); setIsDialogOpen(true); }}>
+                      تعديل
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-destructive" onClick={() => { setUnitToDelete(unit as WaqfUnit); setDeleteDialogOpen(true); }}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={toggleAll}
+                        aria-label="تحديد الكل"
+                      />
+                    </TableHead>
+                    <SortableTableHeader label="الكود" sortKey="code" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
+                    <SortableTableHeader label="الاسم" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
+                    <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
+                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الموقع</TableHead>
+                    <SortableTableHeader label="الرصيد" sortKey="current_balance" currentSort={sortConfig} onSort={handleSort} className="whitespace-nowrap" />
+                    <SortableTableHeader label="الإيرادات" sortKey="total_income" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell whitespace-nowrap" />
+                    <SortableTableHeader label="المصروفات" sortKey="total_expenses" currentSort={sortConfig} onSort={handleSort} className="hidden xl:table-cell whitespace-nowrap" />
+                    <TableHead className="text-right whitespace-nowrap">الحالة</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {sortedData.map((unit) => (
+                    <TableRow key={unit.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected(unit.id)}
+                          onCheckedChange={() => toggleSelection(unit.id)}
+                          aria-label={`تحديد ${unit.name}`}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">{unit.code}</TableCell>
+                      <TableCell className="min-w-[150px]">
+                        <div>
+                          <p className="font-medium text-xs sm:text-sm">{unit.name}</p>
+                          {unit.description && (
+                            <p className="text-xs text-muted-foreground truncate max-w-[200px]">{unit.description}</p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>{getTypeBadge(unit.waqf_type)}</TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{unit.location || "-"}</TableCell>
+                      <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap">
+                        {(unit.current_balance || 0).toLocaleString('ar-SA')} ريال
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell font-semibold text-success text-xs sm:text-sm whitespace-nowrap">
+                        {(unit.total_income || 0).toLocaleString('ar-SA')} ريال
+                      </TableCell>
+                      <TableCell className="hidden xl:table-cell font-semibold text-destructive text-xs sm:text-sm whitespace-nowrap">
+                        {(unit.total_expenses || 0).toLocaleString('ar-SA')} ريال
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={unit.is_active ? "outline" : "secondary"} className="text-xs whitespace-nowrap">
+                          {unit.is_active ? "نشط" : "غير نشط"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="flex gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedDetailsUnit(unit as WaqfUnit); setDetailsDialogOpen(true); }} className="text-xs sm:text-sm gap-1">
+                          <Eye className="h-4 w-4" />
+                          <span className="hidden lg:inline">عرض</span>
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => { setSelectedUnit(unit as WaqfUnit); setIsDialogOpen(true); }} className="text-xs sm:text-sm">
+                          <span className="hidden lg:inline">تعديل</span>
+                          <Pencil className="h-4 w-4 lg:hidden" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => { setUnitToDelete(unit as WaqfUnit); setDeleteDialogOpen(true); }} className="text-xs sm:text-sm text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         </Card>
       )}
 

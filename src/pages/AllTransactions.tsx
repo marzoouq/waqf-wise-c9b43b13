@@ -201,74 +201,95 @@ export default function AllTransactions() {
             <CardTitle>سجل المعاملات ({filteredTransactions.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right">التاريخ</TableHead>
-                    <TableHead className="text-right">المصدر</TableHead>
-                    <TableHead className="text-right">النوع</TableHead>
-                    <TableHead className="text-right">الطرف</TableHead>
-                    <TableHead className="text-right">المبلغ</TableHead>
-                    <TableHead className="text-right">طريقة الدفع</TableHead>
-                    <TableHead className="text-right">البيان</TableHead>
-                    <TableHead className="text-right">المرجع</TableHead>
-                    <TableHead className="text-right">الحالة</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedTransactions.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground">
-                        لا توجد معاملات
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    paginatedTransactions.map((transaction) => (
-                      <TableRow key={`${transaction.source}-${transaction.id}`}>
-                        <TableCell>
-                          {format(new Date(transaction.transaction_date), "dd/MM/yyyy", {
-                            locale: ar,
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{transaction.source_name_ar}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={transaction.transaction_type === "قبض" ? "default" : "secondary"}
-                          >
-                            {transaction.transaction_type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">{transaction.party_name}</TableCell>
-                        <TableCell className="font-semibold">
-                          <span
-                            className={
-                              transaction.transaction_type === "قبض"
-                                ? "text-success"
-                                : "text-destructive"
-                            }
-                          >
-                            {transaction.amount.toLocaleString("ar-SA")} ريال
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {transaction.payment_method}
-                        </TableCell>
-                        <TableCell className="text-sm max-w-xs truncate">
-                          {transaction.description}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {transaction.reference_number}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+            {paginatedTransactions.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>لا توجد معاملات</p>
+              </div>
+            ) : (
+              <>
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {paginatedTransactions.map((transaction) => (
+                    <Card key={`${transaction.source}-${transaction.id}`} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium text-sm">{transaction.party_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(transaction.transaction_date), "dd/MM/yyyy", { locale: ar })}
+                          </p>
+                        </div>
+                        <Badge variant={transaction.transaction_type === "قبض" ? "default" : "secondary"}>
+                          {transaction.transaction_type}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant="outline">{transaction.source_name_ar}</Badge>
+                        {getStatusBadge(transaction.status)}
+                      </div>
+                      <div className="flex justify-between items-center pt-2 border-t">
+                        <span className="text-xs text-muted-foreground">{transaction.payment_method}</span>
+                        <span className={`font-semibold ${transaction.transaction_type === "قبض" ? "text-success" : "text-destructive"}`}>
+                          {transaction.amount.toLocaleString("ar-SA")} ريال
+                        </span>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">التاريخ</TableHead>
+                        <TableHead className="text-right">المصدر</TableHead>
+                        <TableHead className="text-right">النوع</TableHead>
+                        <TableHead className="text-right">الطرف</TableHead>
+                        <TableHead className="text-right">المبلغ</TableHead>
+                        <TableHead className="text-right hidden lg:table-cell">طريقة الدفع</TableHead>
+                        <TableHead className="text-right hidden lg:table-cell">البيان</TableHead>
+                        <TableHead className="text-right hidden xl:table-cell">المرجع</TableHead>
+                        <TableHead className="text-right">الحالة</TableHead>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedTransactions.map((transaction) => (
+                        <TableRow key={`${transaction.source}-${transaction.id}`}>
+                          <TableCell>
+                            {format(new Date(transaction.transaction_date), "dd/MM/yyyy", { locale: ar })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{transaction.source_name_ar}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={transaction.transaction_type === "قبض" ? "default" : "secondary"}>
+                              {transaction.transaction_type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">{transaction.party_name}</TableCell>
+                          <TableCell className="font-semibold">
+                            <span className={transaction.transaction_type === "قبض" ? "text-success" : "text-destructive"}>
+                              {transaction.amount.toLocaleString("ar-SA")} ريال
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
+                            {transaction.payment_method}
+                          </TableCell>
+                          <TableCell className="text-sm max-w-xs truncate hidden lg:table-cell">
+                            {transaction.description}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground hidden xl:table-cell">
+                            {transaction.reference_number}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
