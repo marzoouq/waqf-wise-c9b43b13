@@ -29,7 +29,7 @@ export { default as FinancialStats } from './FinancialStats';
 export { default as AccountingStats } from './AccountingStats';
 export { default as FamiliesStats } from './FamiliesStats';
 export { default as RequestsStats } from './RequestsStats';
-export { StatCard } from './DashboardStats';
+// Note: StatCard is deprecated - use UnifiedKPICard from @/components/unified/UnifiedKPICard instead
 
 // ============= Chart Components =============
 export { default as RevenueExpenseChart } from './RevenueExpenseChart';
