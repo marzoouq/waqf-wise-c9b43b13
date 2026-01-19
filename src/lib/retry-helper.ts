@@ -123,3 +123,61 @@ export const SUPABASE_RETRY_OPTIONS: RetryOptions = {
     );
   },
 };
+
+// ============================================
+// دوال Idempotency للـ INSERT الآمن
+// ============================================
+
+/**
+ * PostgreSQL error codes
+ * 23505 = unique_violation (التكرار)
+ */
+const POSTGRES_UNIQUE_VIOLATION = '23505';
+
+/**
+ * التحقق من كون الخطأ هو خطأ تكرار (unique violation)
+ * @param error الخطأ من Supabase
+ * @returns true إذا كان الخطأ بسبب unique constraint
+ */
+export function isUniqueViolation(error: unknown): boolean {
+  if (error && typeof error === 'object' && 'code' in error) {
+    return (error as { code: string }).code === POSTGRES_UNIQUE_VIOLATION;
+  }
+  return false;
+}
+
+/**
+ * نتيجة INSERT مع Idempotency
+ */
+export interface IdempotentInsertResult<T> {
+  /** البيانات المُدخلة أو null إذا كانت موجودة مسبقاً */
+  data: T | null;
+  /** الخطأ (يُحذف إذا كان unique violation) */
+  error: unknown;
+  /** true إذا كان السجل موجوداً مسبقاً */
+  isDuplicate: boolean;
+}
+
+/**
+ * معالجة نتيجة INSERT لتحويل unique_violation إلى idempotency
+ * يُستخدم لجعل عمليات INSERT آمنة مع retry
+ * 
+ * @example
+ * const result = await supabase.from('table').insert(data).select().single();
+ * const { data, error, isDuplicate } = handleUniqueViolation(result);
+ * if (isDuplicate) {
+ *   // السجل موجود مسبقاً - يمكن جلبه
+ * }
+ */
+export function handleUniqueViolation<T>(
+  result: { data: T | null; error: unknown },
+  options: { logMessage?: string } = {}
+): IdempotentInsertResult<T> {
+  if (result.error && isUniqueViolation(result.error)) {
+    productionLogger.info(
+      options.logMessage || '[Idempotency] سجل موجود مسبقاً - تم تجاهل التكرار'
+    );
+    return { data: null, error: null, isDuplicate: true };
+  }
+  return { ...result, isDuplicate: false };
+}
