@@ -129,80 +129,123 @@ const Invoices = () => {
           onDateToChange={setDateTo}
         />
 
-        <div className="border rounded-lg overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-xs sm:text-sm">رقم الفاتورة</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden md:table-cell">التاريخ</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">العميل</TableHead>
-                <TableHead className="text-center text-xs sm:text-sm">المبلغ</TableHead>
-                <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {!filteredInvoices || filteredInvoices.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <Card>
-                      <CardContent className="py-12 text-center">
-                        <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                        <h3 className="text-lg font-semibold mb-2">لا توجد فواتير بعد</h3>
-                        <p className="text-sm text-muted-foreground mb-4">ابدأ بإنشاء أول فاتورة</p>
-                        <Button size="sm" onClick={handleAddNew}>
-                          <Plus className="h-4 w-4 ms-2" />
-                          إنشاء فاتورة
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedInvoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-mono text-xs sm:text-sm font-semibold">{invoice.invoice_number}</TableCell>
-                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+        {/* Empty State */}
+        {(!filteredInvoices || filteredInvoices.length === 0) ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-lg font-semibold mb-2">لا توجد فواتير بعد</h3>
+              <p className="text-sm text-muted-foreground mb-4">ابدأ بإنشاء أول فاتورة</p>
+              <Button size="sm" onClick={handleAddNew}>
+                <Plus className="h-4 w-4 ms-2" />
+                إنشاء فاتورة
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {paginatedInvoices.map((invoice) => (
+                <Card key={invoice.id} className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-mono font-semibold text-sm">{invoice.invoice_number}</p>
+                      <p className="text-xs text-muted-foreground">{invoice.customer_name}</p>
+                    </div>
+                    <InvoiceStatusBadge status={invoice.status} />
+                  </div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs text-muted-foreground">
                       {format(new Date(invoice.invoice_date), "dd MMM yyyy", { locale: ar })}
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{invoice.customer_name}</TableCell>
-                    <TableCell className="text-center font-mono text-xs sm:text-sm font-semibold">
-                      {Number(invoice.total_amount).toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm">
-                      <InvoiceStatusBadge status={invoice.status} />
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
-                            <Eye className="ms-2 h-4 w-4" /> معاينة
-                          </DropdownMenuItem>
-                          {matchesStatus(invoice.status, 'draft') && (
-                            <DropdownMenuItem onClick={() => handleEditClick(invoice)}>
-                              <Edit className="ms-2 h-4 w-4" /> تعديل
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            disabled={matchesStatus(invoice.status, 'paid')}
-                            onClick={() => handleDeleteClick(invoice.id, invoice.status)}
-                          >
-                            <Trash2 className="ms-2 h-4 w-4" /> حذف
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                    </span>
+                    <span className="font-semibold text-primary">
+                      {Number(invoice.total_amount).toFixed(2)} ريال
+                    </span>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewInvoice(invoice.id)}>
+                      <Eye className="h-4 w-4 ms-1" />
+                      معاينة
+                    </Button>
+                    {matchesStatus(invoice.status, 'draft') && (
+                      <Button variant="outline" size="sm" onClick={() => handleEditClick(invoice)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive"
+                      disabled={matchesStatus(invoice.status, 'paid')}
+                      onClick={() => handleDeleteClick(invoice.id, invoice.status)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block border rounded-lg overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">رقم الفاتورة</TableHead>
+                    <TableHead className="text-xs sm:text-sm">التاريخ</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">العميل</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm">المبلغ</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                </TableHeader>
+                <TableBody>
+                  {paginatedInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-mono text-xs sm:text-sm font-semibold">{invoice.invoice_number}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        {format(new Date(invoice.invoice_date), "dd MMM yyyy", { locale: ar })}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{invoice.customer_name}</TableCell>
+                      <TableCell className="text-center font-mono text-xs sm:text-sm font-semibold">
+                        {Number(invoice.total_amount).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        <InvoiceStatusBadge status={invoice.status} />
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
+                              <Eye className="ms-2 h-4 w-4" /> معاينة
+                            </DropdownMenuItem>
+                            {matchesStatus(invoice.status, 'draft') && (
+                              <DropdownMenuItem onClick={() => handleEditClick(invoice)}>
+                                <Edit className="ms-2 h-4 w-4" /> تعديل
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              disabled={matchesStatus(invoice.status, 'paid')}
+                              onClick={() => handleDeleteClick(invoice.id, invoice.status)}
+                            >
+                              <Trash2 className="ms-2 h-4 w-4" /> حذف
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
 
         {totalPages > 1 && (
           <Pagination

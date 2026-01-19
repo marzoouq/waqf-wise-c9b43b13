@@ -162,82 +162,125 @@ export default function Budgets() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs sm:text-sm">الحساب</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الفترة</TableHead>
-                    <TableHead className="text-xs sm:text-sm">المقدّر</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الفعلي</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الانحراف</TableHead>
-                    <TableHead className="text-xs sm:text-sm">نسبة التنفيذ</TableHead>
-                    <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-              <TableBody>
-                {budgets.map((budget) => {
-                  const utilization = budget.budgeted_amount > 0 
-                    ? ((budget.actual_amount || 0) / budget.budgeted_amount * 100)
-                    : 0;
-
-                  return (
-                    <TableRow key={budget.id}>
-                      <TableCell className="font-medium text-xs sm:text-sm">
-                        <div>
-                          <div className="text-xs sm:text-sm">{budget.accounts?.name_ar}</div>
-                          <div className="text-xs text-muted-foreground">{budget.accounts?.code}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-xs sm:text-sm">
-                        {budget.period_type} {budget.period_number}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">{formatCurrency(budget.budgeted_amount)}</TableCell>
-                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{formatCurrency(budget.actual_amount || 0)}</TableCell>
-                      <TableCell className={`hidden lg:table-cell text-xs sm:text-sm ${getVarianceColor(budget.variance_amount)}`}>
-                        {formatCurrency(Math.abs(budget.variance_amount || 0))}
-                        {budget.variance_amount !== null && (
-                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2 text-xs">
-                            {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
+            {budgets.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>لا توجد ميزانيات. قم بإضافة ميزانية جديدة للبدء.</p>
+              </div>
+            ) : (
+              <>
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {budgets.map((budget) => {
+                    const utilization = budget.budgeted_amount > 0 
+                      ? ((budget.actual_amount || 0) / budget.budgeted_amount * 100)
+                      : 0;
+                    return (
+                      <Card key={budget.id} className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium text-sm">{budget.accounts?.name_ar}</p>
+                            <p className="text-xs text-muted-foreground">{budget.accounts?.code}</p>
+                          </div>
+                          <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"} className="text-xs">
+                            {utilization.toFixed(1)}%
                           </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                          <div>
+                            <span className="text-muted-foreground text-xs">المقدّر:</span>
+                            <p className="font-semibold">{formatCurrency(budget.budgeted_amount)}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground text-xs">الفعلي:</span>
+                            <p className="font-semibold">{formatCurrency(budget.actual_amount || 0)}</p>
+                          </div>
+                        </div>
+                        {budget.variance_amount !== null && (
+                          <div className={`text-sm mb-3 ${getVarianceColor(budget.variance_amount)}`}>
+                            الانحراف: {formatCurrency(Math.abs(budget.variance_amount || 0))}
+                            <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2 text-xs">
+                              {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
+                            </Badge>
+                          </div>
                         )}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"} className="text-xs">
-                          {utilization.toFixed(1)}%
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenDialog(budget)}
-                          >
-                            <Pencil className="h-4 w-4" />
+                        <div className="flex gap-2 pt-2 border-t">
+                          <Button variant="outline" size="sm" className="flex-1" onClick={() => handleOpenDialog(budget)}>
+                            <Pencil className="h-4 w-4 ms-1" />
+                            تعديل
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => confirmDelete(budget.id, budget.accounts?.name_ar)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                          <Button variant="outline" size="sm" className="text-destructive" onClick={() => confirmDelete(budget.id, budget.accounts?.name_ar)}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                {budgets.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                      لا توجد ميزانيات. قم بإضافة ميزانية جديدة للبدء.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-              </Table>
-            </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">الحساب</TableHead>
+                        <TableHead className="text-xs sm:text-sm">الفترة</TableHead>
+                        <TableHead className="text-xs sm:text-sm">المقدّر</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الفعلي</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الانحراف</TableHead>
+                        <TableHead className="text-xs sm:text-sm">نسبة التنفيذ</TableHead>
+                        <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {budgets.map((budget) => {
+                        const utilization = budget.budgeted_amount > 0 
+                          ? ((budget.actual_amount || 0) / budget.budgeted_amount * 100)
+                          : 0;
+                        return (
+                          <TableRow key={budget.id}>
+                            <TableCell className="font-medium text-xs sm:text-sm">
+                              <div>
+                                <div className="text-xs sm:text-sm">{budget.accounts?.name_ar}</div>
+                                <div className="text-xs text-muted-foreground">{budget.accounts?.code}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs sm:text-sm">
+                              {budget.period_type} {budget.period_number}
+                            </TableCell>
+                            <TableCell className="text-xs sm:text-sm">{formatCurrency(budget.budgeted_amount)}</TableCell>
+                            <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{formatCurrency(budget.actual_amount || 0)}</TableCell>
+                            <TableCell className={`hidden lg:table-cell text-xs sm:text-sm ${getVarianceColor(budget.variance_amount)}`}>
+                              {formatCurrency(Math.abs(budget.variance_amount || 0))}
+                              {budget.variance_amount !== null && (
+                                <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2 text-xs">
+                                  {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs sm:text-sm">
+                              <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"} className="text-xs">
+                                {utilization.toFixed(1)}%
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(budget)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => confirmDelete(budget.id, budget.accounts?.name_ar)}>
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
