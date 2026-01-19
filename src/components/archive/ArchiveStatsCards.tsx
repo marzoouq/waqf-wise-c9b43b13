@@ -1,5 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+/**
+ * بطاقات إحصائيات الأرشيف
+ * تستخدم UnifiedStatsGrid + UnifiedKPICard
+ */
+
 import { FileText, FolderOpen, Download, Upload } from 'lucide-react';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 interface ArchiveStats {
   totalDocuments: number;
@@ -14,46 +20,31 @@ interface ArchiveStatsCardsProps {
 
 export function ArchiveStatsCards({ stats }: ArchiveStatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">إجمالي المستندات</CardTitle>
-          <FileText className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats?.totalDocuments || 0}</div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">المجلدات</CardTitle>
-          <FolderOpen className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats?.totalFolders || 0}</div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">الحجم الإجمالي</CardTitle>
-          <Download className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats?.totalSize || '0 B'}</div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">هذا الشهر</CardTitle>
-          <Upload className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats?.thisMonthAdditions || 0}</div>
-        </CardContent>
-      </Card>
-    </div>
+    <UnifiedStatsGrid columns={4}>
+      <UnifiedKPICard
+        title="إجمالي المستندات"
+        value={stats?.totalDocuments || 0}
+        icon={FileText}
+        variant="default"
+      />
+      <UnifiedKPICard
+        title="المجلدات"
+        value={stats?.totalFolders || 0}
+        icon={FolderOpen}
+        variant="info"
+      />
+      <UnifiedKPICard
+        title="الحجم الإجمالي"
+        value={stats?.totalSize || '0 B'}
+        icon={Download}
+        variant="default"
+      />
+      <UnifiedKPICard
+        title="هذا الشهر"
+        value={stats?.thisMonthAdditions || 0}
+        icon={Upload}
+        variant="success"
+      />
+    </UnifiedStatsGrid>
   );
 }

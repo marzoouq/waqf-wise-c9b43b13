@@ -1,10 +1,10 @@
 /**
  * بطاقات إحصائيات الطلبات للمستفيد
- * @version 1.0.0
+ * تستخدم CompactKPICard للعرض المضغوط مع دعم الفلترة
+ * @version 2.0.0
  */
 
 import { memo } from "react";
-import { Card } from "@/components/ui/card";
 import { 
   FileText, 
   Clock, 
@@ -13,6 +13,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 interface RequestStats {
   total: number;
@@ -28,48 +29,61 @@ interface BeneficiaryRequestsStatsCardsProps {
   onFilterChange: (filter: string) => void;
 }
 
-const statItems = [
+type VariantType = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'destructive';
+
+const statItems: Array<{
+  key: string;
+  label: string;
+  icon: typeof FileText;
+  variant: VariantType;
+  getValue: (s: RequestStats) => number;
+}> = [
   { 
     key: "all", 
     label: "الكل", 
     icon: FileText, 
-    colorClass: "text-primary",
-    bgClass: "bg-primary/10",
+    variant: "primary",
     getValue: (s: RequestStats) => s.total
   },
   { 
     key: "pending", 
     label: "قيد الانتظار", 
     icon: Clock, 
-    colorClass: "text-warning",
-    bgClass: "bg-warning/10",
+    variant: "warning",
     getValue: (s: RequestStats) => s.pending
   },
   { 
     key: "approved", 
     label: "معتمدة", 
     icon: CheckCircle2, 
-    colorClass: "text-success",
-    bgClass: "bg-success/10",
+    variant: "success",
     getValue: (s: RequestStats) => s.approved
   },
   { 
     key: "rejected", 
     label: "مرفوضة", 
     icon: XCircle, 
-    colorClass: "text-destructive",
-    bgClass: "bg-destructive/10",
+    variant: "destructive",
     getValue: (s: RequestStats) => s.rejected
   },
   { 
     key: "overdue", 
     label: "متأخرة", 
     icon: AlertTriangle, 
-    colorClass: "text-destructive",
-    bgClass: "bg-destructive/10",
+    variant: "danger",
     getValue: (s: RequestStats) => s.overdue
   },
 ];
+
+const variantStyles: Record<VariantType, { bg: string; text: string }> = {
+  default: { bg: "bg-muted/50", text: "text-foreground" },
+  primary: { bg: "bg-primary/10", text: "text-primary" },
+  success: { bg: "bg-success/10", text: "text-success" },
+  warning: { bg: "bg-warning/10", text: "text-warning" },
+  danger: { bg: "bg-destructive/10", text: "text-destructive" },
+  destructive: { bg: "bg-destructive/10", text: "text-destructive" },
+  info: { bg: "bg-info/10", text: "text-info" },
+};
 
 export const BeneficiaryRequestsStatsCards = memo(function BeneficiaryRequestsStatsCards({
   stats,
@@ -82,6 +96,7 @@ export const BeneficiaryRequestsStatsCards = memo(function BeneficiaryRequestsSt
         const Icon = item.icon;
         const value = item.getValue(stats);
         const isActive = activeFilter === item.key;
+        const styles = variantStyles[item.variant];
         
         return (
           <Card
@@ -96,12 +111,12 @@ export const BeneficiaryRequestsStatsCards = memo(function BeneficiaryRequestsSt
             )}
           >
             <div className="flex items-center gap-2">
-              <div className={cn("p-1.5 rounded-lg", item.bgClass)}>
-                <Icon className={cn("h-4 w-4", item.colorClass)} />
+              <div className={cn("p-1.5 rounded-lg", styles.bg)}>
+                <Icon className={cn("h-4 w-4", styles.text)} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground truncate">{item.label}</p>
-                <p className={cn("text-lg font-bold", item.colorClass)}>{value}</p>
+                <p className={cn("text-lg font-bold", styles.text)}>{value}</p>
               </div>
             </div>
           </Card>
