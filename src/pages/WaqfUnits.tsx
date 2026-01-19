@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -189,88 +191,54 @@ export default function WaqfUnits() {
       />
 
       {/* Statistics Cards - تشمل الأرصدة المالية الفعلية */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Building2 className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">إجمالي الأقلام</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
-            </div>
-          </div>
-        </Card>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي الأقلام"
+          value={stats.total}
+          icon={Building2}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="أقلام نشطة"
+          value={stats.active}
+          icon={AlertCircle}
+          variant="success"
+        />
+        <UnifiedKPICard
+          title="الرصيد الحالي"
+          value={`${stats.totalBalance.toLocaleString('ar-SA')} ريال`}
+          icon={Wallet}
+          variant="primary"
+          subtitle="من السندات والقيود"
+        />
+        <UnifiedKPICard
+          title="إجمالي المحصّل"
+          value={`${stats.totalIncome.toLocaleString('ar-SA')} ريال`}
+          icon={TrendingUp}
+          variant="success"
+        />
+      </UnifiedStatsGrid>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-success/10 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-success" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">أقلام نشطة</p>
-              <p className="text-2xl font-bold">{stats.active}</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* الرصيد المالي الفعلي - من السندات والقيود */}
-        <Card className="p-4 border-2 border-primary/30 bg-primary/5">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/20 rounded-lg">
-              <Wallet className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">الرصيد الحالي</p>
-              <p className="text-xl font-bold text-primary">
-                {stats.totalBalance.toLocaleString('ar-SA')} ريال
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-success/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-success" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">إجمالي المحصّل</p>
-              <p className="text-xl font-bold text-success">
-                {stats.totalIncome.toLocaleString('ar-SA')} ريال
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-destructive/10 rounded-lg">
-              <DollarSign className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">إجمالي المصروفات</p>
-              <p className="text-xl font-bold text-destructive">
-                {stats.totalExpenses.toLocaleString('ar-SA')} ريال
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-accent/10 rounded-lg">
-              <DollarSign className="h-5 w-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">قيمة الأصول</p>
-              <p className="text-xl font-bold">
-                {stats.totalValue.toLocaleString('ar-SA')} ريال
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={3}>
+        <UnifiedKPICard
+          title="إجمالي المصروفات"
+          value={`${stats.totalExpenses.toLocaleString('ar-SA')} ريال`}
+          icon={DollarSign}
+          variant="danger"
+        />
+        <UnifiedKPICard
+          title="قيمة الأصول"
+          value={`${stats.totalValue.toLocaleString('ar-SA')} ريال`}
+          icon={DollarSign}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="العائد السنوي"
+          value={`${stats.totalReturn.toLocaleString('ar-SA')} ريال`}
+          icon={TrendingUp}
+          variant="info"
+        />
+      </UnifiedStatsGrid>
 
       {/* Filters */}
       <Card className="p-4">

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,55 +79,36 @@ export default function SystemMonitoring() {
         </div>
 
         {/* الإحصائيات السريعة */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">إجمالي الأخطاء</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalErrors}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats?.unresolvedErrors} غير محلولة
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">أخطاء حرجة</CardTitle>
-              <Zap className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">
-                {stats?.criticalErrors}
-              </div>
-              <p className="text-xs text-muted-foreground">تتطلب تدخل فوري</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">صحة النظام</CardTitle>
-              <Activity className="h-4 w-4 text-success" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">{healthPercentage}%</div>
-              <p className="text-xs text-muted-foreground">من الفحوصات ناجحة</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">الإصلاح التلقائي</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-info" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-info">{fixSuccessRate}%</div>
-              <p className="text-xs text-muted-foreground">معدل النجاح</p>
-            </CardContent>
-          </Card>
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي الأخطاء"
+            value={stats?.totalErrors || 0}
+            icon={AlertTriangle}
+            variant="default"
+            subtitle={`${stats?.unresolvedErrors || 0} غير محلولة`}
+          />
+          <UnifiedKPICard
+            title="أخطاء حرجة"
+            value={stats?.criticalErrors || 0}
+            icon={Zap}
+            variant="danger"
+            subtitle="تتطلب تدخل فوري"
+          />
+          <UnifiedKPICard
+            title="صحة النظام"
+            value={`${healthPercentage}%`}
+            icon={Activity}
+            variant="success"
+            subtitle="من الفحوصات ناجحة"
+          />
+          <UnifiedKPICard
+            title="الإصلاح التلقائي"
+            value={`${fixSuccessRate}%`}
+            icon={CheckCircle2}
+            variant="info"
+            subtitle="معدل النجاح"
+          />
+        </UnifiedStatsGrid>
 
         {/* لوحة الصحة الحية */}
         <SystemHealthDashboard />
