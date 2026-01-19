@@ -327,7 +327,7 @@ export default function Tenants() {
               </div>
 
               {/* Desktop Table View */}
-              <div className="hidden md:block rounded-md border overflow-x-auto">
+              <div className="hidden md:block rounded-lg border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -336,7 +336,7 @@ export default function Tenants() {
                       <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم الهوية</TableHead>
                       <TableHead className="text-xs sm:text-sm hidden xl:table-cell">التواصل</TableHead>
                       <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                      <TableHead className="text-left text-xs sm:text-sm">الرصيد</TableHead>
+                      <TableHead className="text-end text-xs sm:text-sm">الرصيد</TableHead>
                       <TableHead className="w-12"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -375,7 +375,7 @@ export default function Tenants() {
                             {statusLabels[tenant.status]?.label || tenant.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-left text-xs sm:text-sm">
+                        <TableCell className="text-end text-xs sm:text-sm">
                           <span
                             className={
                               tenant.current_balance > 0

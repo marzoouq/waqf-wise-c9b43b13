@@ -70,12 +70,12 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">الجدول</TableHead>
-                <TableHead className="text-right">Seq Scan</TableHead>
-                <TableHead className="text-right">Idx Scan</TableHead>
-                <TableHead className="text-right">نسبة Seq</TableHead>
-                <TableHead className="text-right">Dead Rows</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
+                <TableHead className="text-start">الجدول</TableHead>
+                <TableHead className="text-start">Seq Scan</TableHead>
+                <TableHead className="text-start">Idx Scan</TableHead>
+                <TableHead className="text-start">نسبة Seq</TableHead>
+                <TableHead className="text-start">Dead Rows</TableHead>
+                <TableHead className="text-start">الحالة</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

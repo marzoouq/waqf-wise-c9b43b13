@@ -104,11 +104,11 @@ export function TestProgressLive({
             {/* إحصائيات سريعة */}
             <div className="flex gap-2">
               <Badge variant="outline" className="text-green-500 bg-green-500/10">
-                <CheckCircle className="h-3 w-3 mr-1" />
+                <CheckCircle className="h-3 w-3 me-1" />
                 {passed}
               </Badge>
               <Badge variant="outline" className="text-red-500 bg-red-500/10">
-                <XCircle className="h-3 w-3 mr-1" />
+                <XCircle className="h-3 w-3 me-1" />
                 {failed}
               </Badge>
             </div>

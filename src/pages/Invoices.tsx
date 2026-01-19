@@ -197,7 +197,7 @@ const Invoices = () => {
                     <TableHead className="text-xs sm:text-sm hidden lg:table-cell">العميل</TableHead>
                     <TableHead className="text-center text-xs sm:text-sm">المبلغ</TableHead>
                     <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                    <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
+                    <TableHead className="text-end text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

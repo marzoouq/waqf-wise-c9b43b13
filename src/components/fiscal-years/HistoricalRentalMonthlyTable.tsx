@@ -80,11 +80,11 @@ export function HistoricalRentalMonthlyTable({
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block rounded-md border">
+      <div className="hidden md:block rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">الشهر</TableHead>
+              <TableHead className="text-start">الشهر</TableHead>
               <TableHead className="text-center">الوحدات</TableHead>
               <TableHead className="text-center">
                 <span className="flex items-center justify-center gap-1">
@@ -104,7 +104,7 @@ export function HistoricalRentalMonthlyTable({
                   شاغر
                 </span>
               </TableHead>
-              <TableHead className="text-left">المحصّل</TableHead>
+              <TableHead className="text-end">المحصّل</TableHead>
               <TableHead className="text-center">الإجراء</TableHead>
             </TableRow>
           </TableHeader>
@@ -140,7 +140,7 @@ export function HistoricalRentalMonthlyTable({
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
-                <TableCell className="text-left font-semibold text-success">
+                <TableCell className="text-end font-semibold text-success">
                   {formatCurrency(Number(month.paid_amount))}
                 </TableCell>
                 <TableCell className="text-center">

@@ -197,7 +197,7 @@ const Families = memo(() => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="rounded-md border overflow-x-auto">
+                <div className="rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>

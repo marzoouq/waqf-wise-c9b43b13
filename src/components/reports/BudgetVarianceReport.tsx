@@ -90,7 +90,7 @@ export function BudgetVarianceReport() {
       {selectedFiscalYear && (
         <Card>
           <CardContent className="pt-6">
-            <div className="rounded-md border">
+            <div className="rounded-lg border">
               <Table>
                 <TableHeader>
                   <TableRow>

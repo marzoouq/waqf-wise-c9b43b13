@@ -82,7 +82,7 @@ export function DashboardQuickSwitch() {
               <Icon className={cn("h-4 w-4", dashboard.color)} />
               <span>{dashboard.label}</span>
               {isActive && (
-                <span className="mr-auto text-xs text-muted-foreground">الحالية</span>
+                <span className="me-auto text-xs text-muted-foreground">الحالية</span>
               )}
             </DropdownMenuItem>
           );

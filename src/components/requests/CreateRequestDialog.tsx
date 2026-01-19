@@ -231,7 +231,7 @@ export const CreateRequestDialog = memo(({
         {/* أزرار الإجراء */}
         <div className="flex gap-2 pt-4">
           <Button type="submit" disabled={isSubmitting} className="flex-1">
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin ms-2" />}
             إنشاء الطلب
           </Button>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

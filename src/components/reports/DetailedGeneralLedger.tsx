@@ -98,14 +98,14 @@ export function DetailedGeneralLedger() {
             </div>
           ) : (
             <>
-              <div className="rounded-md border overflow-x-auto">
+              <div className="rounded-lg border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>التاريخ</TableHead>
                       <TableHead>رقم القيد</TableHead>
                       <TableHead>البيان</TableHead>
-                      <TableHead className="text-right">مدين</TableHead>
+                      <TableHead className="text-start">مدين</TableHead>
                       <TableHead className="text-right">دائن</TableHead>
                       <TableHead className="text-right">الرصيد</TableHead>
                     </TableRow>

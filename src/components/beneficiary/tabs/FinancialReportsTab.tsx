@@ -533,11 +533,11 @@ export function FinancialReportsTab() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">نوع التقرير:</span>
-                  <span className="mr-2 font-medium">{selectedReport?.report_type}</span>
+                  <span className="me-2 font-medium">{selectedReport?.report_type}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">الحالة:</span>
-                  <Badge variant="outline" className="mr-2">
+                  <Badge variant="outline" className="me-2">
                     {selectedReport?.is_public ? 'عام' : 'خاص'}
                   </Badge>
                 </div>

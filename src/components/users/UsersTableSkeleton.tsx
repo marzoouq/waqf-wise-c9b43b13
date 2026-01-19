@@ -26,13 +26,13 @@ export function UsersTableSkeleton({ rows = 5 }: UsersTableSkeletonProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right"><Skeleton className="h-4 w-16" /></TableHead>
-                <TableHead className="text-right"><Skeleton className="h-4 w-28" /></TableHead>
-                <TableHead className="text-right hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableHead>
-                <TableHead className="text-right"><Skeleton className="h-4 w-16" /></TableHead>
-                <TableHead className="text-right hidden lg:table-cell"><Skeleton className="h-4 w-14" /></TableHead>
-                <TableHead className="text-right hidden lg:table-cell"><Skeleton className="h-4 w-24" /></TableHead>
-                <TableHead className="text-right"><Skeleton className="h-4 w-20" /></TableHead>
+                <TableHead className="text-start"><Skeleton className="h-4 w-16" /></TableHead>
+                <TableHead className="text-start"><Skeleton className="h-4 w-28" /></TableHead>
+                <TableHead className="text-start hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableHead>
+                <TableHead className="text-start"><Skeleton className="h-4 w-16" /></TableHead>
+                <TableHead className="text-start hidden lg:table-cell"><Skeleton className="h-4 w-14" /></TableHead>
+                <TableHead className="text-start hidden lg:table-cell"><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead className="text-start"><Skeleton className="h-4 w-20" /></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

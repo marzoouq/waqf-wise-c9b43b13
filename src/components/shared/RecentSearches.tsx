@@ -53,7 +53,7 @@ export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesPro
               >
                 <button
                   onClick={() => onSelectSearch(search.search_query, search.filters)}
-                  className="flex-1 text-right"
+                  className="flex-1 text-start"
                 >
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-3 w-3 text-muted-foreground" />
