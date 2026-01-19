@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Clock, AlertTriangle, FileText } from 'lucide-react';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 interface InvoicesStats {
   totalSales: number;
@@ -16,58 +17,38 @@ interface InvoicesStatsCardsProps {
 
 export function InvoicesStatsCards({ stats }: InvoicesStatsCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">إجمالي المبيعات</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.totalSales.toFixed(2)} ر.س
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {stats.paidCount} فاتورة مدفوعة
-          </p>
-        </CardContent>
-      </Card>
+    <UnifiedStatsGrid columns={4}>
+      <UnifiedKPICard
+        title="إجمالي المبيعات"
+        value={`${stats.totalSales.toFixed(2)} ر.س`}
+        icon={DollarSign}
+        variant="success"
+        subtitle={`${stats.paidCount} فاتورة مدفوعة`}
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">الفواتير المعلقة</CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.pendingCount}</div>
-          <p className="text-xs text-muted-foreground mt-1">بانتظار الدفع</p>
-        </CardContent>
-      </Card>
+      <UnifiedKPICard
+        title="الفواتير المعلقة"
+        value={stats.pendingCount}
+        icon={Clock}
+        variant="warning"
+        subtitle="بانتظار الدفع"
+      />
 
-      <Card className="border-destructive">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">المتأخرات</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-destructive" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-destructive">
-            {stats.overdueAmount.toFixed(2)} ر.س
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {stats.overdueCount} فاتورة متأخرة
-          </p>
-        </CardContent>
-      </Card>
+      <UnifiedKPICard
+        title="المتأخرات"
+        value={`${stats.overdueAmount.toFixed(2)} ر.س`}
+        icon={AlertTriangle}
+        variant="destructive"
+        subtitle={`${stats.overdueCount} فاتورة متأخرة`}
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">إجمالي الفواتير</CardTitle>
-          <FileText className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalCount}</div>
-          <p className="text-xs text-muted-foreground mt-1">فاتورة مسجلة</p>
-        </CardContent>
-      </Card>
-    </div>
+      <UnifiedKPICard
+        title="إجمالي الفواتير"
+        value={stats.totalCount}
+        icon={FileText}
+        variant="default"
+        subtitle="فاتورة مسجلة"
+      />
+    </UnifiedStatsGrid>
   );
 }

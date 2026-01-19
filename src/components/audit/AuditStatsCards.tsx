@@ -1,14 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   FileText, 
   Plus, 
   Edit, 
   Trash2, 
   AlertTriangle,
-  TrendingUp,
-  Users,
-  Database
+  Users
 } from "lucide-react";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { useAuditLogsStats } from "@/hooks/system/useAuditLogsEnhanced";
 
 interface AuditStatsCardsProps {
@@ -18,79 +17,55 @@ interface AuditStatsCardsProps {
 export function AuditStatsCards({ dateRange }: AuditStatsCardsProps) {
   const { data: stats, isLoading } = useAuditLogsStats(dateRange);
 
-  const statItems = [
-    {
-      title: "إجمالي السجلات",
-      value: stats?.totalLogs || 0,
-      icon: FileText,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-    },
-    {
-      title: "عمليات الإضافة",
-      value: stats?.insertCount || 0,
-      icon: Plus,
-      color: "text-status-success",
-      bgColor: "bg-status-success/10",
-    },
-    {
-      title: "عمليات التعديل",
-      value: stats?.updateCount || 0,
-      icon: Edit,
-      color: "text-info",
-      bgColor: "bg-info/10",
-    },
-    {
-      title: "عمليات الحذف",
-      value: stats?.deleteCount || 0,
-      icon: Trash2,
-      color: "text-destructive",
-      bgColor: "bg-destructive/10",
-    },
-    {
-      title: "تنبيهات حرجة",
-      value: stats?.criticalCount || 0,
-      icon: AlertTriangle,
-      color: "text-warning",
-      bgColor: "bg-warning/10",
-    },
-    {
-      title: "المستخدمون النشطون",
-      value: stats?.uniqueUsers || 0,
-      icon: Users,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {statItems.map((item, index) => {
-        const Icon = item.icon;
-        return (
-          <Card key={index} className="overflow-hidden">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${item.bgColor}`}>
-                  <Icon className={`h-5 w-5 ${item.color}`} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground truncate">
-                    {item.title}
-                  </p>
-                  <p className="text-xl font-bold">
-                    {isLoading ? (
-                      <span className="inline-block h-6 w-12 bg-muted animate-pulse rounded" />
-                    ) : (
-                      item.value.toLocaleString('ar-SA')
-                    )}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
+    <UnifiedStatsGrid columns={{ sm: 2, md: 3, lg: 6 }}>
+      <UnifiedKPICard
+        title="إجمالي السجلات"
+        value={stats?.totalLogs?.toLocaleString('ar-SA') || 0}
+        icon={FileText}
+        variant="primary"
+        loading={isLoading}
+      />
+
+      <UnifiedKPICard
+        title="عمليات الإضافة"
+        value={stats?.insertCount?.toLocaleString('ar-SA') || 0}
+        icon={Plus}
+        variant="success"
+        loading={isLoading}
+      />
+
+      <UnifiedKPICard
+        title="عمليات التعديل"
+        value={stats?.updateCount?.toLocaleString('ar-SA') || 0}
+        icon={Edit}
+        variant="info"
+        loading={isLoading}
+      />
+
+      <UnifiedKPICard
+        title="عمليات الحذف"
+        value={stats?.deleteCount?.toLocaleString('ar-SA') || 0}
+        icon={Trash2}
+        variant="destructive"
+        loading={isLoading}
+      />
+
+      <UnifiedKPICard
+        title="تنبيهات حرجة"
+        value={stats?.criticalCount?.toLocaleString('ar-SA') || 0}
+        icon={AlertTriangle}
+        variant="warning"
+        loading={isLoading}
+      />
+
+      <UnifiedKPICard
+        title="المستخدمون النشطون"
+        value={stats?.uniqueUsers?.toLocaleString('ar-SA') || 0}
+        icon={Users}
+        variant="default"
+        loading={isLoading}
+      />
+    </UnifiedStatsGrid>
   );
 }
