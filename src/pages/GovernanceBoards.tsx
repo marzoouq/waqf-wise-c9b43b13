@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Building2, Users, Plus, UserPlus, Trash2, Edit, Eye } from "lucide-react";
-import MainLayout from "@/components/layout/MainLayout";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { Button } from "@/components/ui/button";
@@ -155,7 +155,7 @@ const GovernanceBoards = () => {
   };
 
   return (
-    <MainLayout>
+    <MobileOptimizedLayout>
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -492,7 +492,7 @@ const GovernanceBoards = () => {
           </DialogContent>
         </Dialog>
       </motion.div>
-    </MainLayout>
+    </MobileOptimizedLayout>
   );
 };
 

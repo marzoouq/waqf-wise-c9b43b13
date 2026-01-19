@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ScrollText, FileText, Plus, Trash2, Edit, CheckCircle, Clock, XCircle } from "lucide-react";
-import MainLayout from "@/components/layout/MainLayout";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { Button } from "@/components/ui/button";
@@ -145,7 +145,7 @@ const GovernancePolicies = () => {
   };
 
   return (
-    <MainLayout>
+    <MobileOptimizedLayout>
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -391,7 +391,7 @@ const GovernancePolicies = () => {
           </Card>
         )}
       </motion.div>
-    </MainLayout>
+    </MobileOptimizedLayout>
   );
 };
 
