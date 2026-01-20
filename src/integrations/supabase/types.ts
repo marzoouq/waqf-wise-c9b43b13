@@ -12271,6 +12271,9 @@ export type Database = {
       saved_filters: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           filter_criteria: Json
           filter_type: string
           id: string
@@ -12281,6 +12284,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           filter_criteria: Json
           filter_type: string
           id?: string
@@ -12291,6 +12297,9 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           filter_criteria?: Json
           filter_type?: string
           id?: string
@@ -12352,6 +12361,9 @@ export type Database = {
         Row: {
           avg_execution_time_ms: number | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           execution_count: number | null
           id: string
@@ -12370,6 +12382,9 @@ export type Database = {
         Insert: {
           avg_execution_time_ms?: number | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           execution_count?: number | null
           id?: string
@@ -12388,6 +12403,9 @@ export type Database = {
         Update: {
           avg_execution_time_ms?: number | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           execution_count?: number | null
           id?: string
@@ -12527,6 +12545,9 @@ export type Database = {
       search_history: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           filters: Json | null
           id: string
           results_count: number | null
@@ -12536,6 +12557,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           filters?: Json | null
           id?: string
           results_count?: number | null
@@ -12545,6 +12569,9 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           filters?: Json | null
           id?: string
           results_count?: number | null
@@ -14028,6 +14055,9 @@ export type Database = {
         Row: {
           ar: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           en: string | null
           fr: string | null
           id: string
@@ -14037,6 +14067,9 @@ export type Database = {
         Insert: {
           ar: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           en?: string | null
           fr?: string | null
           id?: string
@@ -14046,6 +14079,9 @@ export type Database = {
         Update: {
           ar?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           en?: string | null
           fr?: string | null
           id?: string
@@ -14284,6 +14320,9 @@ export type Database = {
       }
       user_permissions: {
         Row: {
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           expires_at: string | null
           granted: boolean | null
           granted_at: string | null
@@ -14293,6 +14332,9 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           expires_at?: string | null
           granted?: boolean | null
           granted_at?: string | null
@@ -14302,6 +14344,9 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           expires_at?: string | null
           granted?: boolean | null
           granted_at?: string | null

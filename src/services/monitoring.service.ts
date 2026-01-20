@@ -128,12 +128,17 @@ export class MonitoringService {
   }
 
   /**
-   * حذف الأخطاء المحلولة
+   * أرشفة الأخطاء المحلولة (تحديث الحالة بدلاً من الحذف)
+   * ⚠️ الحذف الفيزيائي ممنوع للحفاظ على سجل التدقيق
    */
   static async deleteResolvedErrors(): Promise<void> {
+    // تغيير الحالة إلى 'archived' بدلاً من الحذف الفيزيائي
     const { error } = await supabase
       .from("system_error_logs")
-      .delete()
+      .update({
+        status: "archived",
+        resolved_at: new Date().toISOString(),
+      })
       .eq("status", "resolved");
 
     if (error) throw error;

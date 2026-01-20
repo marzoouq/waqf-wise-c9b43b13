@@ -119,18 +119,25 @@ export class ReportTemplateService {
   }
 
   /**
-   * حذف قالب تقرير
+   * حذف قالب تقرير (Soft Delete)
+   * ⚠️ الحذف الفيزيائي ممنوع
    */
-  static async deleteTemplate(templateId: string) {
+  static async deleteTemplate(templateId: string, reason: string = 'تم الإلغاء') {
     try {
+      const { data: userData } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from("report_templates")
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userData?.user?.id || null,
+          deletion_reason: reason,
+        })
         .eq("id", templateId);
 
       if (error) throw error;
 
-      await this.logActivity(`تم حذف قالب تقرير`);
+      await this.logActivity(`تم أرشفة قالب تقرير`);
 
       return { success: true };
     } catch (error) {

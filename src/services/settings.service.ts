@@ -156,12 +156,19 @@ export class SettingsService {
   }
 
   /**
-   * حذف فلتر
+   * حذف فلتر (Soft Delete)
+   * ⚠️ الحذف الفيزيائي ممنوع
    */
-  static async deleteFilter(id: string): Promise<void> {
+  static async deleteFilter(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    const { data: userData } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('saved_filters')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userData?.user?.id || null,
+        deletion_reason: reason,
+      })
       .eq('id', id);
 
     if (error) throw error;

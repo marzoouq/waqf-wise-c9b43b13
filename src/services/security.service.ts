@@ -114,12 +114,18 @@ export class SecurityService {
   }
 
   /**
-   * حذف تجاوز صلاحية من المستخدم
+   * حذف تجاوز صلاحية من المستخدم (Soft Delete)
    */
-  static async removeUserPermissionOverride(userId: string, permissionKey: string): Promise<void> {
+  static async removeUserPermissionOverride(userId: string, permissionKey: string, reason: string = 'إلغاء الصلاحية'): Promise<void> {
+    const { data: userData } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from("user_permissions")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userData?.user?.id || null,
+        deletion_reason: reason,
+      })
       .eq("user_id", userId)
       .eq("permission_key", permissionKey);
     

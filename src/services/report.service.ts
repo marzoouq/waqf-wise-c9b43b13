@@ -164,7 +164,17 @@ export const CustomReportsService = {
   },
 
   async deleteCustomTemplate(id: string): Promise<void> {
-    const { error } = await supabase.from('report_templates').delete().eq('id', id);
+    const { data: userData } = await supabase.auth.getUser();
+    
+    // Soft Delete بدلاً من الحذف الفيزيائي
+    const { error } = await supabase
+      .from('report_templates')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userData?.user?.id || null,
+        deletion_reason: 'حذف قالب مخصص',
+      })
+      .eq('id', id);
     if (error) throw error;
     
     // Remove from favorites if exists
