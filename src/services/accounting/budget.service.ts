@@ -122,18 +122,23 @@ export class BudgetService {
   }
 
   /**
-   * حذف ميزانية
+   * حذف ميزانية (Soft Delete - الامتثال الوقفي)
+   * ⚠️ الحذف الفيزيائي ممنوع في النظام المالي
    */
-  static async deleteBudget(id: string): Promise<void> {
+  static async deleteBudget(id: string, userId?: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('budgets')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userId || null,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        } as Record<string, unknown>)
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting budget', error);
+      productionLogger.error('Error soft-deleting budget', error);
       throw error;
     }
   }

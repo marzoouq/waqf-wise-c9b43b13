@@ -116,6 +116,9 @@ export type Database = {
           code: string
           created_at: string
           current_balance: number | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           id: string
           is_active: boolean
@@ -131,6 +134,9 @@ export type Database = {
           code: string
           created_at?: string
           current_balance?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -146,6 +152,9 @@ export type Database = {
           code?: string
           created_at?: string
           current_balance?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -658,6 +667,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action_type: string
+          archived_at: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -677,6 +687,7 @@ export type Database = {
         }
         Insert: {
           action_type: string
+          archived_at?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -696,6 +707,7 @@ export type Database = {
         }
         Update: {
           action_type?: string
+          archived_at?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -2808,6 +2820,9 @@ export type Database = {
           actual_amount: number | null
           budgeted_amount: number
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           fiscal_year_id: string
           id: string
           notes: string | null
@@ -2823,6 +2838,9 @@ export type Database = {
           actual_amount?: number | null
           budgeted_amount: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           fiscal_year_id: string
           id?: string
           notes?: string | null
@@ -2838,6 +2856,9 @@ export type Database = {
           actual_amount?: number | null
           budgeted_amount?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           fiscal_year_id?: string
           id?: string
           notes?: string | null
@@ -7505,6 +7526,9 @@ export type Database = {
         Row: {
           account_id: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           id: string
           invoice_id: string
@@ -7519,6 +7543,9 @@ export type Database = {
         Insert: {
           account_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           id?: string
           invoice_id: string
@@ -7533,6 +7560,9 @@ export type Database = {
         Update: {
           account_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           id?: string
           invoice_id?: string
@@ -8809,6 +8839,9 @@ export type Database = {
           average_response_time: number | null
           contact_person: string | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           email: string | null
           id: string
           is_active: boolean | null
@@ -8827,6 +8860,9 @@ export type Database = {
           average_response_time?: number | null
           contact_person?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           id?: string
           is_active?: boolean | null
@@ -8845,6 +8881,9 @@ export type Database = {
           average_response_time?: number | null
           contact_person?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           id?: string
           is_active?: boolean | null
@@ -8871,6 +8910,9 @@ export type Database = {
           contact_preference: string | null
           contract_id: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           estimated_cost: number | null
           id: string
@@ -8912,6 +8954,9 @@ export type Database = {
           contact_preference?: string | null
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           estimated_cost?: number | null
           id?: string
@@ -8953,6 +8998,9 @@ export type Database = {
           contact_preference?: string | null
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           estimated_cost?: number | null
           id?: string

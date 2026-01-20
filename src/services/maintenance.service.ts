@@ -134,12 +134,17 @@ export class MaintenanceService {
   }
 
   /**
-   * حذف طلب صيانة
+   * حذف طلب صيانة (Soft Delete - الامتثال الوقفي)
+   * ⚠️ الحذف الفيزيائي ممنوع - يتم وضع علامة deleted_at فقط
    */
-  static async deleteRequest(id: string) {
+  static async deleteRequest(id: string, userId?: string) {
     const { error } = await supabase
       .from('maintenance_requests')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userId || null,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      } as Record<string, unknown>)
       .eq('id', id);
 
     if (error) throw error;
@@ -162,12 +167,16 @@ export class MaintenanceService {
   }
 
   /**
-   * حذف مقدم خدمة
+   * حذف مقدم خدمة (Soft Delete - الامتثال الوقفي)
    */
-  static async deleteProvider(id: string): Promise<void> {
+  static async deleteProvider(id: string, userId?: string): Promise<void> {
     const { error } = await supabase
       .from('maintenance_providers')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userId || null,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      } as Record<string, unknown>)
       .eq('id', id);
 
     if (error) throw error;

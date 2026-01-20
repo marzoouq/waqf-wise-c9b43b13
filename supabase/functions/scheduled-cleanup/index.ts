@@ -1,6 +1,11 @@
 /**
  * Edge Function للتنظيف المجدول
  * يمكن استدعاؤها من Cron Job أو يدوياً
+ * 
+ * ⚠️ ملاحظة هامة - الامتثال الوقفي:
+ * - لا يتم حذف سجلات التدقيق (audit_logs) نهائياً
+ * - يتم نسخها للأرشيف مع وضع علامة archived_at فقط
+ * - هذا يضمن سلامة المسار التدقيقي الكامل
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
@@ -47,6 +52,7 @@ Deno.serve(async (req) => {
         }
       } catch { /* not JSON, continue */ }
     }
+
     // يمكن استدعاؤها بدون مصادقة للـ Cron Jobs
     // أو مع مصادقة للاستدعاء اليدوي
     const authHeader = req.headers.get('authorization');
@@ -64,7 +70,7 @@ Deno.serve(async (req) => {
 
     console.log('Starting scheduled cleanup...');
 
-    // 1. استدعاء دالة التنظيف المخزنة
+    // 1. استدعاء دالة التنظيف المخزنة (للسجلات غير المالية فقط)
     const { data, error } = await supabase.rpc('run_scheduled_cleanup');
 
     if (error) {
@@ -77,24 +83,46 @@ Deno.serve(async (req) => {
     console.log('Cleanup completed:', JSON.stringify(result));
 
     // 2. أرشفة سجلات التدقيق القديمة (أكثر من 7 أيام)
-    const { data: archivedData, error: archiveError } = await supabase
+    // ⚠️ هام: لا نحذف سجلات التدقيق - فقط نضع علامة أنها مؤرشفة
+    // هذا يتوافق مع متطلبات الامتثال الوقفي والشرعي
+    const archiveCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    
+    const { data: logsToArchive, error: selectError } = await supabase
       .from('audit_logs')
       .select('*')
-      .lt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+      .lt('created_at', archiveCutoff)
+      .is('archived_at', null) // فقط السجلات غير المؤرشفة
+      .limit(1000); // معالجة على دفعات
 
     let archivedCount = 0;
-    if (!archiveError && archivedData && archivedData.length > 0) {
-      // نقل إلى جدول الأرشيف
+    if (!selectError && logsToArchive && logsToArchive.length > 0) {
+      const now = new Date().toISOString();
+      
+      // 2.1 نسخ إلى جدول الأرشيف (نسخة احتياطية)
       const { error: insertError } = await supabase
         .from('audit_logs_archive')
-        .insert(archivedData.map(log => ({ ...log, archived_at: new Date().toISOString() })));
+        .insert(logsToArchive.map(log => ({ 
+          ...log, 
+          archived_at: now 
+        })));
       
       if (!insertError) {
-        // حذف من الجدول الأصلي
-        const ids = archivedData.map(log => log.id);
-        await supabase.from('audit_logs').delete().in('id', ids);
-        archivedCount = archivedData.length;
-        console.log(`Archived ${archivedCount} audit logs`);
+        // 2.2 وضع علامة على السجلات الأصلية أنها مؤرشفة (بدون حذف!)
+        // ✅ الامتثال الوقفي: نحتفظ بالسجلات الأصلية للأبد
+        const ids = logsToArchive.map(log => log.id);
+        const { error: updateError } = await supabase
+          .from('audit_logs')
+          .update({ archived_at: now })
+          .in('id', ids);
+        
+        if (!updateError) {
+          archivedCount = logsToArchive.length;
+          console.log(`[Waqf Compliance] Archived ${archivedCount} audit logs (records preserved, not deleted)`);
+        } else {
+          console.error('Error marking logs as archived:', updateError);
+        }
+      } else {
+        console.error('Error copying to archive:', insertError);
       }
     }
 
@@ -114,7 +142,7 @@ Deno.serve(async (req) => {
       await supabase.from('audit_logs').insert({
         action_type: 'SCHEDULED_CLEANUP',
         table_name: 'multiple',
-        description: `تنظيف مجدول: حذف ${result.total_deleted} سجل، أرشفة ${archivedCount} سجل تدقيق`,
+        description: `تنظيف مجدول: حذف ${result.total_deleted} سجل غير مالي، أرشفة ${archivedCount} سجل تدقيق (محفوظة)`,
         severity: 'info',
       });
     }
@@ -123,8 +151,10 @@ Deno.serve(async (req) => {
       success: true,
       total_deleted: result.total_deleted,
       archived_audit_logs: archivedCount,
+      waqf_compliance: true, // ✅ علامة الامتثال الوقفي
+      audit_logs_preserved: true, // ✅ السجلات محفوظة وليست محذوفة
       details: result.details,
-      message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف، ${archivedCount} سجل مؤرشف`,
+      message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف، ${archivedCount} سجل تدقيق مؤرشف (محفوظ)`,
     });
 
   } catch (error) {

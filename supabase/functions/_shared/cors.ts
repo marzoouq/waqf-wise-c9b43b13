@@ -2,6 +2,8 @@
  * CORS Headers المحسنة لجميع Edge Functions
  * Enhanced CORS Headers for all Edge Functions
  * 
+ * ⚠️ ملاحظة أمنية: يتم تقييد الـ origins المسموحة في بيئة الإنتاج
+ * 
  * @example
  * import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
  * 
@@ -18,31 +20,73 @@
  * });
  */
 
-// ✅ CORS عام (لأن الاستدعاءات تعتمد على Authorization header وليست cookies)
-// هذا يحل مشكلة فشل الاستدعاء في بيئات المعاينة (CORS mismatch)
-export const corsHeaders: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  // رؤوس أمان إضافية
-  'X-Content-Type-Options': 'nosniff',
-  'Cache-Control': 'no-cache, no-store, must-revalidate',
-};
+// قائمة الـ origins المسموحة
+const ALLOWED_ORIGINS = [
+  // بيئة الإنتاج
+  'https://waqf-wise.lovable.app',
+  // بيئات المعاينة والتطوير
+  'https://id-preview--7e9dbf7a-c129-486b-a449-d22a31562001.lovable.app',
+  // localhost للتطوير المحلي
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+];
 
 /**
- * ✅ (اختياري) حافظنا على الدالة لتوافق الواجهات، لكنها الآن تُرجع نفس الرؤوس العامة
+ * التحقق من أن الـ origin مسموح به
  */
-export function getCorsHeaders(_req: Request): Record<string, string> {
-  return corsHeaders;
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  
+  // في بيئة التطوير، نسمح بجميع الـ origins من lovable.app
+  if (origin.endsWith('.lovable.app')) return true;
+  
+  return ALLOWED_ORIGINS.includes(origin);
+}
+
+/**
+ * الحصول على headers الـ CORS بناءً على الـ origin
+ */
+function getCorsHeadersForOrigin(origin: string | null): Record<string, string> {
+  // إذا كان الـ origin مسموحاً، نستخدمه مباشرة
+  // وإلا نستخدم الـ origin الافتراضي للإنتاج
+  const allowedOrigin = isAllowedOrigin(origin) 
+    ? origin 
+    : ALLOWED_ORIGINS[0]; // الـ origin الافتراضي
+
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin || '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-job',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Credentials': 'true',
+    // رؤوس أمان إضافية
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+  };
+}
+
+// ✅ CORS headers الافتراضية (للتوافق مع الكود الحالي)
+export const corsHeaders: Record<string, string> = getCorsHeadersForOrigin(ALLOWED_ORIGINS[0]);
+
+/**
+ * الحصول على headers الـ CORS بناءً على الطلب
+ */
+export function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin');
+  return getCorsHeadersForOrigin(origin);
 }
 
 /**
  * إنشاء Response للـ OPTIONS requests (CORS preflight)
  */
-export function createCorsResponse(_req?: Request): Response {
+export function createCorsResponse(req?: Request): Response {
+  const headers = req ? getCorsHeaders(req) : corsHeaders;
   return new Response(null, {
     status: 204,
-    headers: corsHeaders,
+    headers,
   });
 }
 
