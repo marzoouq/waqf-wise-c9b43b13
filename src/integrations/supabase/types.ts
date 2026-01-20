@@ -884,6 +884,9 @@ export type Database = {
           created_by: string | null
           credit_accounts: Json
           debit_accounts: Json
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           id: string
           is_active: boolean | null
@@ -897,6 +900,9 @@ export type Database = {
           created_by?: string | null
           credit_accounts: Json
           debit_accounts: Json
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
@@ -910,6 +916,9 @@ export type Database = {
           created_by?: string | null
           credit_accounts?: Json
           debit_accounts?: Json
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
@@ -1012,6 +1021,9 @@ export type Database = {
           created_at: string
           currency: string
           current_balance: number
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           iban: string | null
           id: string
           is_active: boolean
@@ -1025,6 +1037,9 @@ export type Database = {
           created_at?: string
           currency?: string
           current_balance?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           iban?: string | null
           id?: string
           is_active?: boolean
@@ -1038,6 +1053,9 @@ export type Database = {
           created_at?: string
           currency?: string
           current_balance?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           iban?: string | null
           id?: string
           is_active?: boolean
@@ -3017,6 +3035,9 @@ export type Database = {
         Row: {
           context: Json | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           id: string
           message: string
           message_type: string
@@ -3027,6 +3048,9 @@ export type Database = {
         Insert: {
           context?: Json | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           message: string
           message_type: string
@@ -3037,6 +3061,9 @@ export type Database = {
         Update: {
           context?: Json | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           message?: string
           message_type?: string
@@ -3184,6 +3211,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           created_by_name: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           delivered_at: string | null
           delivery_method: string[] | null
           failure_reason: string | null
@@ -3204,6 +3234,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivered_at?: string | null
           delivery_method?: string[] | null
           failure_reason?: string | null
@@ -3224,6 +3257,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_name?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivered_at?: string | null
           delivery_method?: string[] | null
           failure_reason?: string | null
@@ -6102,6 +6138,9 @@ export type Database = {
           attendance_mandatory: boolean | null
           board_id: string | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           email: string | null
           end_date: string | null
           expertise_areas: string[] | null
@@ -6123,6 +6162,9 @@ export type Database = {
           attendance_mandatory?: boolean | null
           board_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           end_date?: string | null
           expertise_areas?: string[] | null
@@ -6144,6 +6186,9 @@ export type Database = {
           attendance_mandatory?: boolean | null
           board_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           end_date?: string | null
           expertise_areas?: string[] | null
@@ -6179,6 +6224,9 @@ export type Database = {
           chairman_name: string
           created_at: string | null
           decision_authority: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           dissolution_date: string | null
           established_date: string | null
@@ -6199,6 +6247,9 @@ export type Database = {
           chairman_name: string
           created_at?: string | null
           decision_authority?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           dissolution_date?: string | null
           established_date?: string | null
@@ -6219,6 +6270,9 @@ export type Database = {
           chairman_name?: string
           created_at?: string | null
           decision_authority?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           dissolution_date?: string | null
           established_date?: string | null
@@ -6607,6 +6661,9 @@ export type Database = {
           beneficiary_eligibility: Json | null
           category: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           distribution_rules: Json | null
           effective_date: string
@@ -6633,6 +6690,9 @@ export type Database = {
           beneficiary_eligibility?: Json | null
           category: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           distribution_rules?: Json | null
           effective_date: string
@@ -6659,6 +6719,9 @@ export type Database = {
           beneficiary_eligibility?: Json | null
           category?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           distribution_rules?: Json | null
           effective_date?: string
@@ -7137,6 +7200,9 @@ export type Database = {
           contract_number: string | null
           contract_start_date: string | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           fiscal_year_closing_id: string
           floor_number: number | null
           id: string
@@ -7155,6 +7221,9 @@ export type Database = {
           contract_number?: string | null
           contract_start_date?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           fiscal_year_closing_id: string
           floor_number?: number | null
           id?: string
@@ -7173,6 +7242,9 @@ export type Database = {
           contract_number?: string | null
           contract_start_date?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           fiscal_year_closing_id?: string
           floor_number?: number | null
           id?: string
@@ -7334,6 +7406,9 @@ export type Database = {
         Row: {
           body: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           id: string
           is_read: boolean | null
           parent_message_id: string | null
@@ -7348,6 +7423,9 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           is_read?: boolean | null
           parent_message_id?: string | null
@@ -7362,6 +7440,9 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           is_read?: boolean | null
           parent_message_id?: string | null
@@ -9968,6 +10049,9 @@ export type Database = {
         Row: {
           batch_number: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           distribution_id: string | null
           error_message: string | null
           id: string
@@ -9981,6 +10065,9 @@ export type Database = {
         Insert: {
           batch_number?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           distribution_id?: string | null
           error_message?: string | null
           id?: string
@@ -9994,6 +10081,9 @@ export type Database = {
         Update: {
           batch_number?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           distribution_id?: string | null
           error_message?: string | null
           id?: string
@@ -10264,6 +10354,9 @@ export type Database = {
           beneficiary_id: string | null
           contract_id: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           executed_by_user_id: string | null
           id: string
@@ -10287,6 +10380,9 @@ export type Database = {
           beneficiary_id?: string | null
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           executed_by_user_id?: string | null
           id?: string
@@ -10310,6 +10406,9 @@ export type Database = {
           beneficiary_id?: string | null
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           executed_by_user_id?: string | null
           id?: string
@@ -11611,6 +11710,9 @@ export type Database = {
           columns: Json | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           filters: Json | null
           id: string
@@ -11623,6 +11725,9 @@ export type Database = {
           columns?: Json | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           filters?: Json | null
           id?: string
@@ -11635,6 +11740,9 @@ export type Database = {
           columns?: Json | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           filters?: Json | null
           id?: string
@@ -13838,6 +13946,9 @@ export type Database = {
       tribes: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           id: string
           name: string
@@ -13847,6 +13958,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           name: string
@@ -13856,6 +13970,9 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           name?: string
@@ -13947,6 +14064,9 @@ export type Database = {
           created_by: string | null
           created_by_name: string | null
           damages: Json | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           electricity_meter_reading: number | null
           gas_meter_reading: number | null
           general_condition: string | null
@@ -13977,6 +14097,9 @@ export type Database = {
           created_by?: string | null
           created_by_name?: string | null
           damages?: Json | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           electricity_meter_reading?: number | null
           gas_meter_reading?: number | null
           general_condition?: string | null
@@ -14007,6 +14130,9 @@ export type Database = {
           created_by?: string | null
           created_by_name?: string | null
           damages?: Json | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           electricity_meter_reading?: number | null
           gas_meter_reading?: number | null
           general_condition?: string | null

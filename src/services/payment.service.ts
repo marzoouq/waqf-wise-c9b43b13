@@ -1,11 +1,13 @@
 /**
  * Payment Service - خدمة المدفوعات والسندات
- * @version 2.7.2
+ * @version 2.8.0
+ * @description تم تحديثه لاستخدام Soft Delete
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { matchesStatus } from '@/lib/constants';
+import { SoftDeleteService } from "@/services/shared/soft-delete.service";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
@@ -63,6 +65,7 @@ export class PaymentService {
     let query = supabase
       .from("payments")
       .select("*")
+      .is("deleted_at", null)
       .order("payment_date", { ascending: false });
 
     if (filters?.payment_type) {
@@ -136,13 +139,8 @@ export class PaymentService {
   /**
    * حذف مدفوعة
    */
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from("payments")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+  static async delete(id: string, userId?: string): Promise<void> {
+    await SoftDeleteService.softDelete('payments', id, userId, 'حذف المدفوعة');
   }
 
   /**
@@ -224,6 +222,7 @@ export class PaymentService {
     const { data, error } = await supabase
       .from("bank_accounts")
       .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
+      .is("deleted_at", null)
       .order("bank_name", { ascending: true });
 
     if (error) throw error;
@@ -263,13 +262,8 @@ export class PaymentService {
   /**
    * حذف حساب بنكي
    */
-  static async deleteBankAccount(id: string): Promise<void> {
-    const { error } = await supabase
-      .from("bank_accounts")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+  static async deleteBankAccount(id: string, userId?: string): Promise<void> {
+    await SoftDeleteService.softDelete('bank_accounts', id, userId, 'حذف الحساب البنكي');
   }
 
   /**
@@ -292,6 +286,7 @@ export class PaymentService {
     let query = supabase
       .from('payment_schedules')
       .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
+      .is('deleted_at', null)
       .order('scheduled_date', { ascending: true });
 
     if (distributionId) {
@@ -337,13 +332,8 @@ export class PaymentService {
   /**
    * حذف جدول مدفوعات
    */
-  static async deletePaymentSchedule(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('payment_schedules')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+  static async deletePaymentSchedule(id: string, userId?: string): Promise<void> {
+    await SoftDeleteService.softDelete('payment_schedules', id, userId, 'حذف جدول المدفوعات');
   }
 
   /**
