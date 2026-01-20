@@ -160,7 +160,8 @@ export class AuthService {
       supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId),
+        .eq('user_id', userId)
+        .is('deleted_at', null), // استبعاد السجلات المحذوفة
     ]);
 
     if (profileRes.error || !profileRes.data) return null;
@@ -178,7 +179,8 @@ export class AuthService {
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .is('deleted_at', null); // استبعاد السجلات المحذوفة
     
     if (error) throw error;
     return (data || []).map(r => r.role);
@@ -306,7 +308,8 @@ export class AuthService {
     const { data: allRoles, error: rolesError } = await supabase
       .from("user_roles")
       .select("user_id, role")
-      .in("user_id", userIds);
+      .in("user_id", userIds)
+      .is("deleted_at", null); // استبعاد السجلات المحذوفة
 
     if (rolesError) throw rolesError;
 
@@ -344,10 +347,22 @@ export class AuthService {
   }
 
   /**
-   * تحديث أدوار المستخدم
+   * تحديث أدوار المستخدم (Soft Delete للأدوار القديمة ثم إضافة الجديدة)
    */
   static async updateUserRoles(userId: string, roles: AppRole[]): Promise<void> {
-    await supabase.from("user_roles").delete().eq("user_id", userId);
+    const { data: user } = await supabase.auth.getUser();
+    
+    // Soft-delete الأدوار الحالية بدلاً من الحذف الفيزيائي
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from("user_roles")
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.user?.id || null,
+        deletion_reason: 'تحديث أدوار المستخدم'
+      })
+      .eq("user_id", userId)
+      .is("deleted_at", null);
 
     if (roles.length > 0) {
       const rolesToInsert = roles.map(role => ({ 
