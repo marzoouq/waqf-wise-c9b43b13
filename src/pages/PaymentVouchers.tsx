@@ -12,7 +12,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { usePaymentVouchersData } from "@/hooks/payments/usePaymentVouchersData";
 import { useToast } from "@/hooks/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { VoucherLinkingService } from "@/services/voucher-linking.service";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
@@ -36,11 +36,7 @@ export default function PaymentVouchers() {
   const handleLinkVoucher = async (voucherId: string, voucherNumber: string) => {
     setLinkingVoucherId(voucherId);
     try {
-      const { error } = await supabase.functions.invoke('link-voucher-journal', {
-        body: { voucher_id: voucherId, create_journal: true }
-      });
-      
-      if (error) throw error;
+      await VoucherLinkingService.linkVoucherToJournal(voucherId);
       
       toast({
         title: "تم الربط بنجاح",
