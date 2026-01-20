@@ -145,24 +145,37 @@ export const HistoricalRentalService = {
   },
 
   /**
-   * حذف سجل
+   * حذف سجل (Soft Delete)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('historical_rental_details')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
       .eq('id', id);
 
     if (error) throw error;
   },
 
   /**
-   * حذف جميع سجلات شهر محدد
+   * حذف جميع سجلات شهر محدد (Soft Delete)
    */
-  async deleteByMonth(closingId: string, monthDate: string): Promise<void> {
+  async deleteByMonth(closingId: string, monthDate: string, reason: string = 'أرشفة الشهر'): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('historical_rental_details')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
       .eq('fiscal_year_closing_id', closingId)
       .eq('month_date', monthDate);
 

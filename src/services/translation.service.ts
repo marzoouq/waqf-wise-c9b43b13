@@ -71,14 +71,34 @@ export const TranslationService = {
   },
 
   /**
-   * حذف ترجمة
+   * حذف ترجمة (Soft Delete)
+   * ⚠️ الحذف الفيزيائي ممنوع
    */
-  async delete(key: string): Promise<void> {
+  async delete(key: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('translations')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
       .eq('key', key);
 
     if (error) throw error;
+  },
+
+  /**
+   * جلب جميع الترجمات (يستبعد المحذوفة)
+   */
+  async fetchAllActive(): Promise<Translation[]> {
+    const { data, error } = await supabase
+      .from('translations')
+      .select('key, ar, en, fr')
+      .is('deleted_at', null);
+
+    if (error) throw error;
+    return data || [];
   },
 };

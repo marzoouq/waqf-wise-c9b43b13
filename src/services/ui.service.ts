@@ -147,12 +147,18 @@ export class UIService {
   }
 
   /**
-   * حذف بحث محفوظ
+   * حذف بحث محفوظ (Soft Delete)
    */
-  static async deleteSearch(id: string): Promise<void> {
+  static async deleteSearch(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    const { data: userData } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from("saved_searches")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userData?.user?.id || null,
+        deletion_reason: reason,
+      })
       .eq("id", id);
 
     if (error) throw error;

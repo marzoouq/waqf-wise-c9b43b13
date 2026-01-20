@@ -220,27 +220,38 @@ export const SearchService = {
   },
 
   /**
-   * حذف عملية بحث
+   * حذف عملية بحث (Soft Delete)
+   * ⚠️ الحذف الفيزيائي ممنوع
    */
-  async deleteSearch(id: string): Promise<void> {
+  async deleteSearch(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('search_history')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
       .eq('id', id);
 
     if (error) throw error;
   },
 
   /**
-   * مسح جميع عمليات البحث
+   * مسح جميع عمليات البحث (Soft Delete)
    */
-  async clearAllSearches(searchType: string): Promise<void> {
+  async clearAllSearches(searchType: string, reason: string = 'مسح السجل'): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const { error } = await supabase
       .from('search_history')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user.id,
+        deletion_reason: reason,
+      })
       .eq('user_id', user.id)
       .eq('search_type', searchType);
 
