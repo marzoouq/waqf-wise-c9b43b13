@@ -326,13 +326,18 @@ export class AuthService {
   }
 
   /**
-   * حذف مستخدم
+   * حذف مستخدم (Soft Delete للـ profiles فقط)
+   * ملاحظة: user_roles لا تحتوي على أعمدة soft delete - الـ trigger سيمنع الحذف
    */
   static async deleteUser(userId: string): Promise<void> {
-    await supabase.from("user_roles").delete().eq("user_id", userId);
+    // Soft delete profile فقط
     const { error } = await supabase
       .from("profiles")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userId,
+        deletion_reason: 'حذف المستخدم'
+      })
       .eq("user_id", userId);
 
     if (error) throw error;

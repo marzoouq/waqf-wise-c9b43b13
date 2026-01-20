@@ -72,12 +72,16 @@ export class ChatbotService {
   }
 
   /**
-   * مسح المحادثات
+   * مسح المحادثات (Soft Delete)
    */
   static async clearConversations(userId: string) {
     const { error } = await supabase
       .from("chatbot_conversations")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: userId,
+        deletion_reason: 'مسح بواسطة المستخدم'
+      })
       .eq("user_id", userId);
 
     if (error) throw error;

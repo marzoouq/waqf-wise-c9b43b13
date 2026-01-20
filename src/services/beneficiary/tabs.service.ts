@@ -649,15 +649,16 @@ export class BeneficiaryTabsService {
    * حذف مرفق المستفيد
    */
   static async deleteAttachment(attachmentId: string, filePath: string): Promise<void> {
-    const { error: storageError } = await supabase.storage
-      .from('beneficiary-attachments')
-      .remove([filePath]);
-
-    if (storageError) throw storageError;
-
+    // لا نحذف الملف من Storage، نقوم فقط بـ soft delete للسجل
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error: dbError } = await supabase
       .from('beneficiary_attachments')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      })
       .eq('id', attachmentId);
 
     if (dbError) throw dbError;

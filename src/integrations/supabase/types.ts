@@ -235,6 +235,9 @@ export type Database = {
           completed_at: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           findings: Json
           fixed_issues: number | null
           id: string
@@ -251,6 +254,9 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           findings?: Json
           fixed_issues?: number | null
           id?: string
@@ -267,6 +273,9 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           findings?: Json
           fixed_issues?: number | null
           id?: string
@@ -1948,6 +1957,9 @@ export type Database = {
         Row: {
           beneficiary_id: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           file_name: string
           file_path: string
@@ -1965,6 +1977,9 @@ export type Database = {
         Insert: {
           beneficiary_id: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           file_name: string
           file_path: string
@@ -1982,6 +1997,9 @@ export type Database = {
         Update: {
           beneficiary_id?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           file_name?: string
           file_path?: string
@@ -3859,6 +3877,9 @@ export type Database = {
         Row: {
           created_at: string | null
           dashboard_name: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           id: string
           is_default: boolean | null
           is_shared: boolean | null
@@ -3869,6 +3890,9 @@ export type Database = {
         Insert: {
           created_at?: string | null
           dashboard_name: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           is_default?: boolean | null
           is_shared?: boolean | null
@@ -3879,6 +3903,9 @@ export type Database = {
         Update: {
           created_at?: string | null
           dashboard_name?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           is_default?: boolean | null
           is_shared?: boolean | null
@@ -4530,6 +4557,9 @@ export type Database = {
           confidence_score: number | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           document_id: string
           id: string
           tag_name: string
@@ -4539,6 +4569,9 @@ export type Database = {
           confidence_score?: number | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           document_id: string
           id?: string
           tag_name: string
@@ -4548,6 +4581,9 @@ export type Database = {
           confidence_score?: number | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           document_id?: string
           id?: string
           tag_name?: string
@@ -10876,6 +10912,9 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           email: string | null
           full_name: string | null
           id: string
@@ -10889,6 +10928,9 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -10902,6 +10944,9 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -12365,6 +12410,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           cron_expression: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           delivery_method: string | null
           id: string
           is_active: boolean | null
@@ -12379,6 +12427,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           cron_expression?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivery_method?: string | null
           id?: string
           is_active?: boolean | null
@@ -12393,6 +12444,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           cron_expression?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivery_method?: string | null
           id?: string
           is_active?: boolean | null
@@ -14819,6 +14873,9 @@ export type Database = {
           counter: number | null
           created_at: string | null
           credential_id: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           device_name: string | null
           device_type: string | null
           id: string
@@ -14830,6 +14887,9 @@ export type Database = {
           counter?: number | null
           created_at?: string | null
           credential_id: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           device_name?: string | null
           device_type?: string | null
           id?: string
@@ -14841,6 +14901,9 @@ export type Database = {
           counter?: number | null
           created_at?: string | null
           credential_id?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           device_name?: string | null
           device_type?: string | null
           id?: string
