@@ -187,29 +187,43 @@ export class VoucherService {
   }
 
   /**
-   * حذف سند
+   * حذف سند (Soft Delete - الحذف اللين)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً في نظام الوقف المالي
    */
-  static async delete(voucherId: string) {
+  static async delete(voucherId: string, reason: string = 'تم الإلغاء') {
     try {
       const { data: voucher } = await supabase
         .from("payment_vouchers")
         .select("voucher_number, status")
         .eq("id", voucherId)
+        .is("deleted_at", null)
         .maybeSingle();
+
+      if (!voucher) {
+        throw new Error("السند غير موجود أو محذوف مسبقاً");
+      }
 
       if (matchesStatus(voucher?.status, 'paid')) {
         throw new Error("لا يمكن حذف سند مدفوع");
       }
 
-      const { error: deleteError } = await supabase
+      // الحصول على معرف المستخدم الحالي
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Soft Delete بدلاً من الحذف الفيزيائي
+      const { error: softDeleteError } = await supabase
         .from("payment_vouchers")
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: reason,
+        })
         .eq("id", voucherId);
 
-      if (deleteError) throw deleteError;
+      if (softDeleteError) throw softDeleteError;
 
       if (voucher) {
-        await this.logActivity(`تم حذف السند ${voucher.voucher_number}`);
+        await this.logActivity(`تم حذف السند ${voucher.voucher_number} (حذف لين)`);
       }
 
       return {
@@ -217,7 +231,7 @@ export class VoucherService {
       };
     } catch (error) {
       logger.error(error, {
-        context: "delete_voucher",
+        context: "soft_delete_voucher",
         severity: "high",
       });
       throw error;
@@ -430,7 +444,7 @@ export class VoucherService {
   }
 
   /**
-   * جلب السندات مع الفلترة
+   * جلب السندات مع الفلترة (يستبعد المحذوفة تلقائياً)
    */
   static async getWithFilters(searchTerm?: string, status?: string): Promise<VoucherWithDetails[]> {
     let query = supabase
@@ -440,6 +454,7 @@ export class VoucherService {
         beneficiaries (full_name, national_id),
         distributions (total_amount, distribution_date)
       `)
+      .is('deleted_at', null) // استبعاد المحذوفة
       .order('created_at', { ascending: false });
 
     if (searchTerm) {

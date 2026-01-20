@@ -75,6 +75,7 @@ export class RentalPaymentService {
     let query = supabase
       .from("rental_payments")
       .select(RENTAL_PAYMENT_SELECT)
+      .is("deleted_at", null) // استبعاد المحذوفة
       .order("due_date", { ascending: false });
 
     if (filters?.contractId) {
@@ -133,12 +134,21 @@ export class RentalPaymentService {
   }
 
   /**
-   * حذف دفعة
+   * حذف دفعة (Soft Delete - الحذف اللين)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً في نظام الوقف المالي
    */
-  static async delete(id: string): Promise<void> {
+  static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    // الحصول على معرف المستخدم الحالي
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Soft Delete بدلاً من الحذف الفيزيائي
     const { error } = await supabase
       .from("rental_payments")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
       .eq("id", id);
 
     if (error) throw error;

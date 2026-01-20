@@ -35,6 +35,7 @@ export class LoansService {
     let query = supabase
       .from('loans')
       .select('*')
+      .is('deleted_at', null) // استبعاد المحذوفة
       .order('created_at', { ascending: false });
     
     if (status) {

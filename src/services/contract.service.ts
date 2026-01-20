@@ -18,7 +18,9 @@ type ContractInsert = Database['public']['Tables']['contracts']['Insert'];
 
 export class ContractService {
   static async getAll(filters?: { status?: string; propertyId?: string }): Promise<Contract[]> {
-    let query = supabase.from('contracts').select('*').order('created_at', { ascending: false });
+    let query = supabase.from('contracts').select('*')
+      .is('deleted_at', null) // استبعاد المحذوفة
+      .order('created_at', { ascending: false });
     if (filters?.status) query = query.eq('status', filters.status);
     if (filters?.propertyId) query = query.eq('property_id', filters.propertyId);
     const { data, error } = await query;
@@ -212,8 +214,21 @@ export class ContractService {
     return data;
   }
 
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('contracts').delete().eq('id', id);
+  /**
+   * حذف عقد (Soft Delete - الحذف اللين)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً في نظام الوقف المالي
+   */
+  static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
+    // الحصول على معرف المستخدم الحالي
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Soft Delete بدلاً من الحذف الفيزيائي
+    const { error } = await supabase.from('contracts').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason,
+    }).eq('id', id);
+    
     if (error) throw error;
   }
 

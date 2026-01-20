@@ -136,15 +136,15 @@ export const useRentalPayments = (
     },
   });
 
-  // Delete payment mutation
+  // Delete payment mutation (Soft Delete)
   const deletePayment = useMutation({
     mutationKey: ['delete_rental_payment'],
-    mutationFn: RentalPaymentService.delete,
+    mutationFn: (id: string) => RentalPaymentService.delete(id, 'تم الحذف من قبل المستخدم'),
     onSuccess: () => {
       invalidateRelatedQueries();
       toast({
         title: "تم الحذف",
-        description: "تم حذف الدفعة بنجاح",
+        description: "تم حذف الدفعة بنجاح (حذف لين)",
       });
     },
     onError: (error) => {
