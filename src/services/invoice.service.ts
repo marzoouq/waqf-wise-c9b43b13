@@ -25,7 +25,9 @@ export interface InvoiceSummary {
 
 export class InvoiceService {
   static async getAll(filters?: { status?: string }): Promise<Invoice[]> {
-    let query = supabase.from('invoices').select('*').order('invoice_date', { ascending: false });
+    let query = supabase.from('invoices').select('*')
+      .is('deleted_at', null) // استبعاد المحذوفة
+      .order('invoice_date', { ascending: false });
     if (filters?.status) query = query.eq('status', filters.status);
     const { data, error } = await query;
     if (error) throw error;
@@ -117,26 +119,43 @@ export class InvoiceService {
     return invoiceData;
   }
 
-  static async delete(id: string): Promise<void> {
+  /**
+   * حذف فاتورة (Soft Delete - الحذف اللين)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً في نظام الوقف المالي
+   */
+  static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
     const { data: invoice } = await supabase
       .from('invoices')
       .select('status, journal_entry_id')
       .eq('id', id)
+      .is('deleted_at', null)
       .maybeSingle();
     
-    if (!invoice) throw new Error('الفاتورة غير موجودة');
+    if (!invoice) throw new Error('الفاتورة غير موجودة أو محذوفة مسبقاً');
     
     if (matchesStatus(invoice.status, 'paid')) {
       throw new Error('لا يمكن حذف فاتورة مدفوعة');
     }
     
-    await supabase.from('invoice_lines').delete().eq('invoice_id', id);
+    // الحصول على معرف المستخدم الحالي
+    const { data: { user } } = await supabase.auth.getUser();
     
+    // Soft Delete للقيد المحاسبي المرتبط
     if (invoice.journal_entry_id) {
-      await supabase.from('journal_entries').delete().eq('id', invoice.journal_entry_id);
+      await supabase.from('journal_entries').update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: `حذف مرتبط بفاتورة: ${reason}`,
+      }).eq('id', invoice.journal_entry_id);
     }
     
-    const { error } = await supabase.from('invoices').delete().eq('id', id);
+    // Soft Delete للفاتورة
+    const { error } = await supabase.from('invoices').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason,
+    }).eq('id', id);
+    
     if (error) throw error;
   }
 

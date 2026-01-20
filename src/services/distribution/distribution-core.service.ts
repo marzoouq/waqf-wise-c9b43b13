@@ -31,6 +31,7 @@ export class DistributionCoreService {
       const query = supabase
         .from('distributions')
         .select('*')
+        .is('deleted_at', null) // استبعاد المحذوفة
         .order('distribution_date', { ascending: false });
 
       const { data, error } = status && status !== 'all' 
@@ -105,23 +106,32 @@ export class DistributionCoreService {
   }
 
   /**
-   * حذف توزيع (فقط المسودات)
+   * حذف توزيع (Soft Delete - الحذف اللين)
+   * ⚠️ الحذف الفيزيائي ممنوع شرعاً في نظام الوقف المالي
    */
-  static async delete(id: string): Promise<void> {
+  static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
     try {
       const distribution = await this.getById(id);
       if (distribution && distribution.status !== 'draft') {
         throw new Error('لا يمكن حذف توزيع غير مسودة');
       }
 
+      // الحصول على معرف المستخدم الحالي
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Soft Delete بدلاً من الحذف الفيزيائي
       const { error } = await supabase
         .from('distributions')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: reason,
+        })
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting distribution', error);
+      productionLogger.error('Error soft deleting distribution', error);
       throw error;
     }
   }
