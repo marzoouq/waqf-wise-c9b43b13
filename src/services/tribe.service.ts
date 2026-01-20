@@ -1,19 +1,22 @@
 /**
  * Tribe Service - خدمة القبائل
+ * @description تم تحديثه لاستخدام Soft Delete
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { SoftDeleteService } from "@/services/shared/soft-delete.service";
 import type { Tribe, TribeInsert, TribeUpdate } from "@/types/tribes";
 
 export class TribeService {
   /**
-   * جلب جميع القبائل
+   * جلب جميع القبائل (باستثناء المحذوفة)
    */
   static async getAll(): Promise<Tribe[]> {
     const { data, error } = await supabase
       .from("tribes")
       .select("*")
+      .is("deleted_at", null)
       .order("name");
 
     if (error) {
@@ -61,15 +64,12 @@ export class TribeService {
   }
 
   /**
-   * حذف قبيلة
+   * حذف قبيلة (Soft Delete)
    */
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from("tribes")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
+  static async delete(id: string, userId?: string): Promise<void> {
+    try {
+      await SoftDeleteService.softDelete('tribes', id, userId, 'حذف القبيلة');
+    } catch (error) {
       productionLogger.error("Error deleting tribe", error);
       throw error;
     }
