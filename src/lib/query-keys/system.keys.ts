@@ -98,6 +98,9 @@ export const SYSTEM_KEYS = {
   WAQF_UNITS: ['waqf_units'] as const,
   WAQF_UNIT: (id: string) => ['waqf_unit', id] as const,
 
+  // Waqf Branding
+  WAQF_BRANDING: ['waqf-branding'] as const,
+
   // Live Performance & Monitoring
   LIVE_PERFORMANCE: ['live-performance'] as const,
   LIVE_METRICS: ['live-metrics'] as const,

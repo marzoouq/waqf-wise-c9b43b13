@@ -1,14 +1,15 @@
 /**
  * Connection Diagnostics Page
  * صفحة تشخيص الاتصال
+ * 
+ * @version 2.0.0 - تم إعادة الكتابة لاستخدام DiagnosticsService
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { 
   Wifi, 
@@ -16,19 +17,17 @@ import {
   AlertTriangle, 
   CheckCircle2,
   RefreshCw,
-  Server,
-  Database,
-  Zap,
-  Globe,
   Clock,
   Activity,
-  TrendingUp,
-  ArrowLeft
+  ArrowLeft,
+  Server,
+  Database,
+  Zap
 } from 'lucide-react';
 import { useConnectionMonitor } from '@/hooks/system/useConnectionMonitor';
 import { ConnectionStatusPanel } from '@/components/monitoring/ConnectionStatusPanel';
-import { supabase } from '@/integrations/supabase/client';
-import { formatDistanceToNow, format } from 'date-fns';
+import { DiagnosticsService, type DiagnosticResult } from '@/services/diagnostics.service';
+import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
@@ -82,30 +81,40 @@ export default function ConnectionDiagnostics() {
       let result: Partial<DiagnosticTest> = {};
 
       try {
+        let diagnosticResult: DiagnosticResult;
+        
         switch (test.id) {
           case 'network':
-            result = await testNetworkConnection();
+            diagnosticResult = DiagnosticsService.testNetworkConnection();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'dns':
-            result = await testDNS();
+            diagnosticResult = await DiagnosticsService.testDNS();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'supabase_api':
-            result = await testSupabaseAPI();
+            diagnosticResult = await DiagnosticsService.testSupabaseAPI();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'database':
-            result = await testDatabase();
+            diagnosticResult = await DiagnosticsService.testDatabase();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'auth':
-            result = await testAuth();
+            diagnosticResult = await DiagnosticsService.testAuth();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'realtime':
-            result = await testRealtime();
+            diagnosticResult = await DiagnosticsService.testRealtime();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'edge_functions':
-            result = await testEdgeFunctions();
+            diagnosticResult = await DiagnosticsService.testEdgeFunctions();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
           case 'latency':
-            result = await testLatency();
+            diagnosticResult = await DiagnosticsService.testLatency();
+            result = { status: diagnosticResult.status, details: diagnosticResult.details };
             break;
         }
       } catch (error) {
@@ -128,183 +137,6 @@ export default function ConnectionDiagnostics() {
     }
 
     setIsRunning(false);
-  };
-
-  const testNetworkConnection = async (): Promise<Partial<DiagnosticTest>> => {
-    if (!navigator.onLine) {
-      return { status: 'error', details: 'الجهاز غير متصل بالإنترنت' };
-    }
-    
-    const connection = (navigator as any).connection;
-    if (connection) {
-      const effectiveType = connection.effectiveType;
-      if (effectiveType === '2g' || effectiveType === 'slow-2g') {
-        return { 
-          status: 'warning', 
-          details: `اتصال بطيء: ${effectiveType} - ${connection.downlink} Mbps` 
-        };
-      }
-      return { 
-        status: 'success', 
-        details: `نوع الاتصال: ${effectiveType} - ${connection.downlink} Mbps` 
-      };
-    }
-    
-    return { status: 'success', details: 'الاتصال متاح' };
-  };
-
-  const testDNS = async (): Promise<Partial<DiagnosticTest>> => {
-    try {
-      const response = await fetch('https://dns.google/resolve?name=supabase.co', {
-        method: 'GET',
-      });
-      if (response.ok) {
-        return { status: 'success', details: 'تحليل DNS يعمل بشكل طبيعي' };
-      }
-      return { status: 'warning', details: 'استجابة غير متوقعة من خادم DNS' };
-    } catch {
-      return { status: 'warning', details: 'تعذر التحقق من DNS - قد يكون محظوراً' };
-    }
-  };
-
-  const testSupabaseAPI = async (): Promise<Partial<DiagnosticTest>> => {
-    try {
-      const start = Date.now();
-      const { error } = await supabase.from('system_settings').select('id').limit(1);
-      const latency = Date.now() - start;
-      
-      if (error) {
-        return { status: 'error', details: error.message };
-      }
-      
-      if (latency > 3000) {
-        return { status: 'warning', details: `استجابة بطيئة: ${latency}ms` };
-      }
-      
-      return { status: 'success', details: `الاتصال سريع: ${latency}ms` };
-    } catch (error) {
-      return { 
-        status: 'error', 
-        details: error instanceof Error ? error.message : 'فشل الاتصال بالخادم' 
-      };
-    }
-  };
-
-  const testDatabase = async (): Promise<Partial<DiagnosticTest>> => {
-    try {
-      const start = Date.now();
-      const { count, error } = await supabase
-        .from('system_settings')
-        .select('*', { count: 'exact', head: true });
-      const latency = Date.now() - start;
-      
-      if (error) {
-        return { status: 'error', details: error.message };
-      }
-      
-      return { status: 'success', details: `الاستعلام ناجح: ${latency}ms` };
-    } catch (error) {
-      return { 
-        status: 'error', 
-        details: error instanceof Error ? error.message : 'فشل الاستعلام' 
-      };
-    }
-  };
-
-  const testAuth = async (): Promise<Partial<DiagnosticTest>> => {
-    try {
-      const start = Date.now();
-      const { data, error } = await supabase.auth.getSession();
-      const latency = Date.now() - start;
-      
-      if (error) {
-        return { status: 'error', details: error.message };
-      }
-      
-      return { 
-        status: 'success', 
-        details: data.session ? `جلسة نشطة: ${latency}ms` : `لا يوجد جلسة: ${latency}ms` 
-      };
-    } catch (error) {
-      return { 
-        status: 'error', 
-        details: error instanceof Error ? error.message : 'فشل فحص المصادقة' 
-      };
-    }
-  };
-
-  const testRealtime = async (): Promise<Partial<DiagnosticTest>> => {
-    return new Promise((resolve) => {
-      const channel = supabase.channel('test-connection');
-      const timeout = setTimeout(() => {
-        channel.unsubscribe();
-        resolve({ status: 'warning', details: 'انتهت مهلة الاتصال المباشر' });
-      }, 5000);
-
-      channel
-        .on('system', { event: '*' }, () => {})
-        .subscribe((status) => {
-          clearTimeout(timeout);
-          channel.unsubscribe();
-          
-          if (status === 'SUBSCRIBED') {
-            resolve({ status: 'success', details: 'الاتصال المباشر يعمل' });
-          } else if (status === 'CHANNEL_ERROR') {
-            resolve({ status: 'error', details: 'فشل الاتصال المباشر' });
-          } else {
-            resolve({ status: 'warning', details: `حالة: ${status}` });
-          }
-        });
-    });
-  };
-
-  const testEdgeFunctions = async (): Promise<Partial<DiagnosticTest>> => {
-    try {
-      const start = Date.now();
-      const { error } = await supabase.functions.invoke('test-auth', {
-        body: { test: true }
-      });
-      const latency = Date.now() - start;
-      
-      if (error) {
-        return { status: 'warning', details: `تحذير: ${error.message}` };
-      }
-      
-      return { status: 'success', details: `الوظائف تعمل: ${latency}ms` };
-    } catch (error) {
-      return { 
-        status: 'warning', 
-        details: error instanceof Error ? error.message : 'تعذر اختبار الوظائف' 
-      };
-    }
-  };
-
-  const testLatency = async (): Promise<Partial<DiagnosticTest>> => {
-    const times: number[] = [];
-    
-    for (let i = 0; i < 3; i++) {
-      const start = Date.now();
-      try {
-        await supabase.from('system_settings').select('id').limit(1);
-        times.push(Date.now() - start);
-      } catch {
-        // تجاهل الأخطاء
-      }
-    }
-    
-    if (times.length === 0) {
-      return { status: 'error', details: 'فشل قياس زمن الاستجابة' };
-    }
-    
-    const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-    
-    if (avg > 3000) {
-      return { status: 'error', details: `بطيء جداً: ${avg}ms` };
-    } else if (avg > 1000) {
-      return { status: 'warning', details: `بطيء: ${avg}ms` };
-    }
-    
-    return { status: 'success', details: `ممتاز: ${avg}ms` };
   };
 
   const getStatusIcon = (status: DiagnosticTest['status']) => {
