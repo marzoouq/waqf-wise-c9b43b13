@@ -82,7 +82,7 @@ export function useUnitHandovers(contractId?: string) {
         .from('unit_handovers')
         .insert(handover)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -108,7 +108,7 @@ export function useUnitHandovers(contractId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -169,7 +169,7 @@ export function useUnitHandovers(contractId?: string) {
         .update({ [field]: signed })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

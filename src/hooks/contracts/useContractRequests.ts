@@ -102,7 +102,7 @@ export function useContractRequests(contractId?: string) {
           status: 'pending',
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -139,7 +139,7 @@ export function useContractRequests(contractId?: string) {
           status: 'pending',
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -174,7 +174,7 @@ export function useContractRequests(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -216,7 +216,7 @@ export function useContractRequests(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

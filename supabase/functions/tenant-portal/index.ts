@@ -249,7 +249,7 @@ serve(async (req) => {
           requested_by: tenant.full_name || tenant.phone,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (createError) {
         console.error("Error creating request:", createError);

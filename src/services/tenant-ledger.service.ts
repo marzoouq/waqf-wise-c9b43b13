@@ -54,9 +54,10 @@ export const TenantLedgerService = {
         reference_number: receiptNumber,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!entry) throw new Error('فشل إنشاء قيد الدفعة');
 
     return {
       entry: entry as TenantLedgerEntry,

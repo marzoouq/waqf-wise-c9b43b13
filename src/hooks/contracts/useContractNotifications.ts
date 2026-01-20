@@ -77,7 +77,7 @@ export function useContractNotifications(contractId?: string) {
           status: 'pending',
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -104,7 +104,7 @@ export function useContractNotifications(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -139,7 +139,7 @@ export function useContractNotifications(contractId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

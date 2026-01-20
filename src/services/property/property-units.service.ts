@@ -155,7 +155,7 @@ export class PropertyUnitsService {
           .select()
           .eq('property_id', unit.property_id!)
           .eq('unit_number', unit.unit_number!)
-          .single();
+          .maybeSingle();
         if (existing) return existing;
       }
 

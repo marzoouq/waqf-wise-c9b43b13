@@ -151,7 +151,7 @@ export const useAuditLogDetails = (logId: string | null) => {
         .from("audit_logs")
         .select("*")
         .eq("id", logId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data as EnhancedAuditLog;

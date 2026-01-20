@@ -68,7 +68,7 @@ export function useCollectionStats() {
         .from('fiscal_years')
         .select('id, start_date, end_date')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       // جلب جميع البيانات بشكل متوازي
       const [
@@ -210,7 +210,7 @@ export function useCollectionStats() {
               .from('contracts')
               .select('tenant_name, properties:property_id(name)')
               .eq('id', p.contract_id)
-              .single();
+              .maybeSingle();
             if (contract) {
               tenantName = contract.tenant_name || 'مستأجر';
               const prop = contract.properties as unknown as { name: string } | null;
@@ -240,7 +240,7 @@ export function useCollectionStats() {
               .from('contracts')
               .select('tenant_name, property_units:unit_id(unit_number)')
               .eq('id', p.contract_id)
-              .single();
+              .maybeSingle();
             if (contract) {
               tenantName = contract.tenant_name || 'مستأجر';
               const unit = contract.property_units as unknown as { unit_number: string } | null;
