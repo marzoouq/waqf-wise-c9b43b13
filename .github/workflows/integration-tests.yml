@@ -34,6 +34,9 @@ env:
   NODE_VERSION: '20'
   VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
   VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+  # Enable debug logging
+  ACTIONS_RUNNER_DEBUG: true
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════════
