@@ -154,6 +154,8 @@ export const useAuditLogDetails = (logId: string | null) => {
         .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('Audit log not found');
+      
       return data as EnhancedAuditLog;
     },
     enabled: !!logId,
