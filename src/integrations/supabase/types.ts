@@ -3554,6 +3554,9 @@ export type Database = {
           contract_type: string
           created_at: string
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           ejar_document_name: string | null
           ejar_document_url: string | null
           end_date: string
@@ -3589,6 +3592,9 @@ export type Database = {
           contract_type: string
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           ejar_document_name?: string | null
           ejar_document_url?: string | null
           end_date: string
@@ -3624,6 +3630,9 @@ export type Database = {
           contract_type?: string
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           ejar_document_name?: string | null
           ejar_document_url?: string | null
           end_date?: string
@@ -4241,6 +4250,9 @@ export type Database = {
           corpus_percentage: number | null
           created_at: string
           daughters_count: number | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           distributable_amount: number | null
           distribution_date: string
           distribution_type: string | null
@@ -4282,6 +4294,9 @@ export type Database = {
           corpus_percentage?: number | null
           created_at?: string
           daughters_count?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           distributable_amount?: number | null
           distribution_date: string
           distribution_type?: string | null
@@ -4323,6 +4338,9 @@ export type Database = {
           corpus_percentage?: number | null
           created_at?: string
           daughters_count?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           distributable_amount?: number | null
           distribution_date?: string
           distribution_type?: string | null
@@ -7439,6 +7457,9 @@ export type Database = {
           customer_phone: string | null
           customer_tax_number: string | null
           customer_vat_number: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           due_date: string | null
           id: string
           invoice_date: string
@@ -7483,6 +7504,9 @@ export type Database = {
           customer_phone?: string | null
           customer_tax_number?: string | null
           customer_vat_number?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           due_date?: string | null
           id?: string
           invoice_date: string
@@ -7527,6 +7551,9 @@ export type Database = {
           customer_phone?: string | null
           customer_tax_number?: string | null
           customer_vat_number?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           due_date?: string | null
           id?: string
           invoice_date?: string
@@ -7614,6 +7641,9 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           distribution_id: string | null
           entry_date: string
@@ -7634,6 +7664,9 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           distribution_id?: string | null
           entry_date: string
@@ -7654,6 +7687,9 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           distribution_id?: string | null
           entry_date?: string
@@ -8457,6 +8493,9 @@ export type Database = {
           approved_by: string | null
           beneficiary_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           disbursement_date: string | null
           end_date: string | null
           id: string
@@ -8479,6 +8518,9 @@ export type Database = {
           approved_by?: string | null
           beneficiary_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disbursement_date?: string | null
           end_date?: string | null
           id?: string
@@ -8501,6 +8543,9 @@ export type Database = {
           approved_by?: string | null
           beneficiary_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disbursement_date?: string | null
           end_date?: string | null
           id?: string
@@ -9938,6 +9983,9 @@ export type Database = {
           contract_id: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           distribution_id: string | null
           id: string
@@ -9966,6 +10014,9 @@ export type Database = {
           contract_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           distribution_id?: string | null
           id?: string
@@ -9994,6 +10045,9 @@ export type Database = {
           contract_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           distribution_id?: string | null
           id?: string
@@ -11226,6 +11280,9 @@ export type Database = {
           amount_paid: number | null
           contract_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           discount: number | null
           due_date: string
           id: string
@@ -11250,6 +11307,9 @@ export type Database = {
           amount_paid?: number | null
           contract_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           discount?: number | null
           due_date: string
           id?: string
@@ -11274,6 +11334,9 @@ export type Database = {
           amount_paid?: number | null
           contract_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           discount?: number | null
           due_date?: string
           id?: string
@@ -14246,6 +14309,39 @@ export type Database = {
           },
         ]
       }
+      waqf_governance_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       waqf_nazers: {
         Row: {
           address: string | null
@@ -16621,6 +16717,7 @@ export type Database = {
       is_fiscal_year_published: { Args: { fy_id: string }; Returns: boolean }
       is_heir: { Args: never; Returns: boolean }
       is_heir_own_data: { Args: { _beneficiary_id: string }; Returns: boolean }
+      is_nazer_or_admin: { Args: { user_id: string }; Returns: boolean }
       is_own_activity: { Args: { p_beneficiary_id: string }; Returns: boolean }
       is_own_beneficiary: {
         Args: { p_beneficiary_id: string }
