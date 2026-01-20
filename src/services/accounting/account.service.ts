@@ -108,18 +108,24 @@ export class AccountService {
   }
 
   /**
-   * حذف حساب
+   * حذف حساب (Soft Delete - الامتثال الوقفي)
+   * ⚠️ الحذف الفيزيائي ممنوع في النظام المحاسبي
    */
-  static async deleteAccount(id: string): Promise<void> {
+  static async deleteAccount(id: string, userId?: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('accounts')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userId || null,
+          deletion_reason: 'حذف بواسطة المستخدم',
+          is_active: false // تعطيل الحساب أيضاً
+        } as Record<string, unknown>)
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting account', error);
+      productionLogger.error('Error soft-deleting account', error);
       throw error;
     }
   }

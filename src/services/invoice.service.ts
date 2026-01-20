@@ -102,7 +102,17 @@ export class InvoiceService {
     if (!invoiceData) throw new Error('فشل في تحديث الفاتورة');
 
     if (lines && lines.length > 0) {
-      await supabase.from('invoice_lines').delete().eq('invoice_id', id);
+      // ✅ الامتثال الوقفي: Soft Delete بدلاً من الحذف الفيزيائي
+      // نضع علامة على الأسطر القديمة أنها محذوفة بدلاً من حذفها نهائياً
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('invoice_lines')
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: 'تحديث الفاتورة - استبدال الأسطر'
+        } as Record<string, unknown>)
+        .eq('invoice_id', id)
+        .is('deleted_at', null);
 
       const linesWithInvoiceId = lines.map((line) => ({
         ...line,
