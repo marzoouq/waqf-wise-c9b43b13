@@ -13,7 +13,7 @@ export function useTenantLedger(tenantId: string | undefined) {
   const queryClient = useQueryClient();
 
   const { data: entries = [], isLoading, error, refetch } = useQuery({
-    queryKey: QUERY_KEYS.TENANT_LEDGER(tenantId || ''),
+    queryKey: QUERY_KEYS.TENANT_LEDGER_BY_ID(tenantId || ''),
     queryFn: async (): Promise<TenantLedgerEntry[]> => {
       if (!tenantId) return [];
       return TenantService.getLedger(tenantId) as Promise<TenantLedgerEntry[]>;
@@ -24,7 +24,7 @@ export function useTenantLedger(tenantId: string | undefined) {
   const addEntry = useMutation({
     mutationFn: (entry: TenantLedgerInsert) => TenantService.addLedgerEntry(entry),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER(tenantId || '') });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER_BY_ID(tenantId || '') });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
     },
     onError: (error: Error) => {

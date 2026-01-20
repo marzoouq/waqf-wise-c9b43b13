@@ -19,12 +19,12 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
 import { Banknote, Loader2, Receipt, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
 import { RentalPaymentService } from '@/services/rental-payment.service';
-
+import { TenantLedgerService } from '@/services/tenant-ledger.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 interface QuickPaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -63,27 +63,15 @@ export function QuickPaymentDialog({
 
     setIsSubmitting(true);
     try {
-      // 1. توليد رقم سند فريد
-      const receiptNumber = `RCP-${Date.now().toString(36).toUpperCase()}`;
-      const paymentDate = new Date().toISOString().split('T')[0];
+      // 1. تسجيل الدفعة عبر الخدمة
+      const { entry: ledgerEntry, receiptNumber } = await TenantLedgerService.recordQuickPayment({
+        tenantId: tenant.id,
+        amount: parseFloat(amount),
+        paymentMethod,
+        notes: notes || undefined,
+      });
       
-      // 2. إنشاء سجل دفعة في tenant_ledger
-      const { data: ledgerEntry, error: ledgerError } = await supabase
-        .from('tenant_ledger')
-        .insert({
-          tenant_id: tenant.id,
-          transaction_type: 'payment',
-          transaction_date: paymentDate,
-          credit_amount: parseFloat(amount),
-          debit_amount: 0,
-          description: `دفعة إيجار - ${paymentMethod}${notes ? ` - ${notes}` : ''}`,
-          reference_type: 'quick_payment',
-          reference_number: receiptNumber,
-        })
-        .select()
-        .single();
-
-      if (ledgerError) throw ledgerError;
+      const paymentDate = new Date().toISOString().split('T')[0];
 
       // 3. توليد سند القبض PDF
       try {
@@ -124,9 +112,9 @@ export function QuickPaymentDialog({
         </div>
       );
       
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
-      queryClient.invalidateQueries({ queryKey: ['tenant-receipts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_RECEIPTS });
       
       // إغلاق بعد ثانيتين لإظهار رسالة النجاح
       setTimeout(() => {
