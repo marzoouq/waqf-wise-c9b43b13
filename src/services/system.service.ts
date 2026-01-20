@@ -281,13 +281,20 @@ export class SystemService {
   }
 
   /**
-   * حذف الأخطاء المحلولة
+   * أرشفة الأخطاء المحلولة (Soft Delete)
    */
   static async deleteResolvedErrors() {
-    const { error } = await supabase
+    const { data: user } = await supabase.auth.getUser();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from("system_error_logs")
-      .delete()
-      .eq("status", "resolved");
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.user?.id || null,
+        deletion_reason: 'أرشفة تلقائية للأخطاء المحلولة'
+      })
+      .eq("status", "resolved")
+      .is("deleted_at", null);
     
     if (error) throw error;
   }
@@ -305,13 +312,19 @@ export class SystemService {
   }
 
   /**
-   * حذف جميع الأخطاء
+   * أرشفة جميع الأخطاء (Soft Delete)
    */
   static async deleteAllErrors() {
-    const { error } = await supabase
+    const { data: user } = await supabase.auth.getUser();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from("system_error_logs")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000");
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.user?.id || null,
+        deletion_reason: 'أرشفة شاملة بأمر إداري'
+      })
+      .is("deleted_at", null);
     
     if (error) throw error;
   }
@@ -528,16 +541,21 @@ export class SystemService {
   }
 
   /**
-   * مسح الأخطاء المحلولة القديمة (أكثر من أسبوع)
+   * أرشفة الأخطاء المحلولة القديمة (أكثر من أسبوع) - Soft Delete
    */
   static async cleanupResolvedErrors(): Promise<void> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('system_error_logs')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deletion_reason: 'أرشفة تلقائية للأخطاء القديمة المحلولة'
+      })
       .in('status', ['resolved', 'auto_resolved'])
-      .lt('resolved_at', oneWeekAgo);
+      .lt('resolved_at', oneWeekAgo)
+      .is('deleted_at', null);
 
     if (error) throw error;
   }

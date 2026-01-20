@@ -27,12 +27,14 @@ export class UserService {
       supabase
         .from("user_roles")
         .select("user_id, role, created_at")
+        .is("deleted_at", null) // استبعاد السجلات المحذوفة
         .order("created_at", { ascending: false })
         .limit(100),
       
       supabase
         .from("profiles")
         .select("id, email, created_at, last_login_at")
+        .is("deleted_at", null) // استبعاد السجلات المحذوفة
         .order("created_at", { ascending: false })
         .limit(5),
     ]);
@@ -108,11 +110,12 @@ export class UserService {
    * جلب صلاحيات المستخدم
    */
   static async getUserPermissions(userId: string) {
-    // Get user's roles
+    // Get user's roles (excluding soft-deleted)
     const { data: userRoles, error: rolesError } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .is("deleted_at", null);
 
     if (rolesError) throw rolesError;
     if (!userRoles || userRoles.length === 0) return [];
@@ -160,7 +163,8 @@ export class UserService {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .is("deleted_at", null); // استبعاد السجلات المحذوفة
 
     if (error) throw error;
     return data?.map(r => r.role) || [];
@@ -230,14 +234,21 @@ export class UserService {
   }
 
   /**
-   * حذف دور من المستخدم
+   * إلغاء دور من المستخدم (Soft Delete للتتبع)
    */
   static async removeRole(userId: string, role: AppRole): Promise<void> {
-    const { error } = await supabase
+    const { data: user } = await supabase.auth.getUser();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from("user_roles")
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.user?.id || null,
+        deletion_reason: `إلغاء دور ${role} بواسطة المسؤول`
+      })
       .eq("user_id", userId)
-      .eq("role", role);
+      .eq("role", role)
+      .is("deleted_at", null);
     if (error) throw error;
   }
 

@@ -123,23 +123,28 @@ export function useUnitHandovers(contractId?: string) {
     },
   });
 
-  // حذف نموذج استلام
+  // أرشفة نموذج استلام (Soft Delete)
   const deleteHandover = useMutation({
     mutationFn: async (id: string) => {
+      const { data: user } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('unit_handovers')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.user?.id || null,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        })
         .eq('id', id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
-      toast.success('تم حذف النموذج بنجاح');
+      toast.success('تم أرشفة النموذج بنجاح');
     },
     onError: (error) => {
-      console.error('Error deleting handover:', error);
-      toast.error('حدث خطأ أثناء حذف النموذج');
+      console.error('Error archiving handover:', error);
+      toast.error('حدث خطأ أثناء أرشفة النموذج');
     },
   });
 

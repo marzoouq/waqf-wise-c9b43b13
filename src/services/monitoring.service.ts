@@ -53,10 +53,12 @@ export class MonitoringService {
     const [errorsResult, alertsResult, healthResult] = await Promise.all([
       supabase
         .from("system_error_logs")
-        .select("id, severity, status", { count: "exact" }),
+        .select("id, severity, status", { count: "exact" })
+        .is("deleted_at", null), // استبعاد السجلات المحذوفة
       supabase
         .from("system_alerts")
-        .select("id, severity, status", { count: "exact" }),
+        .select("id, severity, status", { count: "exact" })
+        .is("deleted_at", null), // استبعاد السجلات المحذوفة
       supabase
         .from("system_health_checks")
         .select("id, status", { count: "exact" })
@@ -92,6 +94,7 @@ export class MonitoringService {
     const { data, error } = await supabase
       .from("system_error_logs")
       .select("*")
+      .is("deleted_at", null) // استبعاد السجلات المحذوفة
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -107,6 +110,7 @@ export class MonitoringService {
       .from("system_alerts")
       .select("*")
       .eq("status", "active")
+      .is("deleted_at", null) // استبعاد السجلات المحذوفة
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -120,6 +124,7 @@ export class MonitoringService {
     const { data, error } = await supabase
       .from("system_error_logs")
       .select("*")
+      .is("deleted_at", null) // استبعاد السجلات المحذوفة
       .order("created_at", { ascending: false })
       .limit(limit);
 
