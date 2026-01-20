@@ -14,13 +14,14 @@ type GovernanceDecisionInsert = Database['public']['Tables']['governance_decisio
 
 export class GovernanceDecisionsService {
   /**
-   * جلب جميع قرارات الحوكمة
+   * جلب جميع قرارات الحوكمة (مع استثناء المحذوفة)
    */
   static async getDecisions(): Promise<GovernanceDecisionRow[]> {
     try {
       const { data, error } = await supabase
         .from('governance_decisions')
         .select('*')
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -133,18 +134,22 @@ export class GovernanceDecisionsService {
   }
 
   /**
-   * حذف قرار
+   * حذف قرار (Soft Delete - للامتثال الوقفي)
    */
-  static async deleteDecision(id: string): Promise<void> {
+  static async deleteDecision(id: string, userId?: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('governance_decisions')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userId || null,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        })
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting governance decision', error);
+      productionLogger.error('Error soft-deleting governance decision', error);
       throw error;
     }
   }
@@ -158,6 +163,7 @@ export class GovernanceDecisionsService {
         .from("governance_decisions")
         .select("*")
         .eq("decision_status", "قيد التصويت")
+        .is('deleted_at', null)
         .order("created_at", { ascending: false })
         .limit(3);
       return data || [];

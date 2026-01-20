@@ -66,7 +66,7 @@ export const TribeManagementDialog = ({
     setSelectedTribeId(null);
   };
 
-  const handleEdit = (tribe: Database['public']['Tables']['tribes']['Row']) => {
+  const handleEdit = (tribe: { id: string; name: string; description: string | null }) => {
     setEditMode("edit");
     setSelectedTribeId(tribe.id);
     setFormData({

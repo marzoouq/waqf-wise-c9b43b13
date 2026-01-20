@@ -6300,6 +6300,9 @@ export type Database = {
           decision_text: string
           decision_title: string
           decision_type: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           id: string
           implementation_deadline: string | null
           implementation_notes: string | null
@@ -6332,6 +6335,9 @@ export type Database = {
           decision_text: string
           decision_title: string
           decision_type: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           implementation_deadline?: string | null
           implementation_notes?: string | null
@@ -6364,6 +6370,9 @@ export type Database = {
           decision_text?: string
           decision_title?: string
           decision_type?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           implementation_deadline?: string | null
           implementation_notes?: string | null

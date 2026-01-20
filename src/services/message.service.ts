@@ -158,18 +158,22 @@ export class MessageService {
   }
 
   /**
-   * حذف رسالة
+   * حذف رسالة (Soft Delete - للامتثال الوقفي)
    */
-  static async deleteMessage(messageId: string): Promise<void> {
+  static async deleteMessage(messageId: string, userId: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('internal_messages')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: userId,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        })
         .eq('id', messageId);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting message', error);
+      productionLogger.error('Error soft-deleting message', error);
       throw error;
     }
   }
@@ -183,7 +187,8 @@ export class MessageService {
         .from('internal_messages')
         .select('id', { count: 'exact', head: true })
         .eq('receiver_id', userId)
-        .eq('is_read', false);
+        .eq('is_read', false)
+        .is('deleted_at', null);
 
       if (error) throw error;
       return count || 0;
