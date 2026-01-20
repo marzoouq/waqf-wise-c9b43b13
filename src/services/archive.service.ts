@@ -85,15 +85,24 @@ export class ArchiveService {
   }
 
   /**
-   * حذف مستند
+   * حذف مستند (Soft Delete)
    */
-  static async deleteDocument(id: string, storagePath?: string | null): Promise<void> {
+  static async deleteDocument(id: string, storagePath?: string | null, reason?: string): Promise<void> {
+    // نقل الملف إلى مجلد المحذوفات بدلاً من الحذف النهائي
     if (storagePath) {
-      await supabase.storage.from('archive-documents').remove([storagePath]);
+      const archivedPath = `archived/${new Date().toISOString().split('T')[0]}/${storagePath}`;
+      await supabase.storage.from('archive-documents').move(storagePath, archivedPath).catch(() => {
+        // إذا فشل النقل، نتجاهل لأن الملف قد يكون غير موجود
+      });
     }
+    const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase
       .from('documents')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason || 'تم أرشفة المستند',
+      })
       .eq('id', id);
     
     if (error) throw error;
@@ -243,13 +252,20 @@ export class ArchiveService {
   }
 
   /**
-   * حذف مستند مع الملف
+   * حذف مستند مع الملف (Soft Delete)
    */
-  static async deleteDocumentWithFile(id: string, storagePath?: string | null): Promise<void> {
+  static async deleteDocumentWithFile(id: string, storagePath?: string | null, reason?: string): Promise<void> {
+    // نقل الملف إلى مجلد المحذوفات
     if (storagePath) {
-      await supabase.storage.from('archive-documents').remove([storagePath]);
+      const archivedPath = `archived/${new Date().toISOString().split('T')[0]}/${storagePath}`;
+      await supabase.storage.from('archive-documents').move(storagePath, archivedPath).catch(() => {});
     }
-    const { error } = await supabase.from('documents').delete().eq('id', id);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('documents').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason || 'تم أرشفة المستند مع ملفاته',
+    }).eq('id', id);
     if (error) throw error;
   }
 

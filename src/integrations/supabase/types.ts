@@ -1593,6 +1593,9 @@ export type Database = {
           city: string | null
           created_at: string
           date_of_birth: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           disabilities: Json | null
           eligibility_notes: string | null
           eligibility_status: string | null
@@ -1660,6 +1663,9 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disabilities?: Json | null
           eligibility_notes?: string | null
           eligibility_status?: string | null
@@ -1727,6 +1733,9 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disabilities?: Json | null
           eligibility_notes?: string | null
           eligibility_status?: string | null
@@ -2125,6 +2134,9 @@ export type Database = {
           beneficiary_id: string
           created_at: string | null
           decision_notes: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           id: string
           is_overdue: boolean | null
@@ -2148,6 +2160,9 @@ export type Database = {
           beneficiary_id: string
           created_at?: string | null
           decision_notes?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           id?: string
           is_overdue?: boolean | null
@@ -2171,6 +2186,9 @@ export type Database = {
           beneficiary_id?: string
           created_at?: string | null
           decision_notes?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           id?: string
           is_overdue?: boolean | null
@@ -4606,6 +4624,9 @@ export type Database = {
           category: string
           contract_id: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           file_path: string | null
           file_size: string
@@ -4628,6 +4649,9 @@ export type Database = {
           category: string
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           file_path?: string | null
           file_size: string
@@ -4650,6 +4674,9 @@ export type Database = {
           category?: string
           contract_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           file_path?: string | null
           file_size?: string
@@ -4906,6 +4933,9 @@ export type Database = {
           approved_date: string | null
           beneficiary_id: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           disbursed_by: string | null
           disbursed_date: string | null
           id: string
@@ -4926,6 +4956,9 @@ export type Database = {
           approved_date?: string | null
           beneficiary_id: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disbursed_by?: string | null
           disbursed_date?: string | null
           id?: string
@@ -4946,6 +4979,9 @@ export type Database = {
           approved_date?: string | null
           beneficiary_id?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           disbursed_by?: string | null
           disbursed_date?: string | null
           id?: string
@@ -5149,6 +5185,9 @@ export type Database = {
           average_age: number | null
           contact_person_id: string | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           dependents_count: number | null
           emergency_contact: Json | null
           family_metadata: Json | null
@@ -5169,6 +5208,9 @@ export type Database = {
           average_age?: number | null
           contact_person_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           dependents_count?: number | null
           emergency_contact?: Json | null
           family_metadata?: Json | null
@@ -5189,6 +5231,9 @@ export type Database = {
           average_age?: number | null
           contact_person_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           dependents_count?: number | null
           emergency_contact?: Json | null
           family_metadata?: Json | null
@@ -5282,6 +5327,9 @@ export type Database = {
         Row: {
           beneficiary_id: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           family_id: string
           id: string
           is_dependent: boolean | null
@@ -5292,6 +5340,9 @@ export type Database = {
         Insert: {
           beneficiary_id: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           family_id: string
           id?: string
           is_dependent?: boolean | null
@@ -5302,6 +5353,9 @@ export type Database = {
         Update: {
           beneficiary_id?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           family_id?: string
           id?: string
           is_dependent?: boolean | null
@@ -5987,6 +6041,9 @@ export type Database = {
           beneficiaries_count: number
           category: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           id: string
           is_active: boolean
@@ -6001,6 +6058,9 @@ export type Database = {
           beneficiaries_count?: number
           category: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -6015,6 +6075,9 @@ export type Database = {
           beneficiaries_count?: number
           category?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -10772,6 +10835,9 @@ export type Database = {
           apartment_count: number | null
           available_units: number | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           floors: number | null
           id: string
@@ -10795,6 +10861,9 @@ export type Database = {
           apartment_count?: number | null
           available_units?: number | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           floors?: number | null
           id?: string
@@ -10818,6 +10887,9 @@ export type Database = {
           apartment_count?: number | null
           available_units?: number | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           floors?: number | null
           id?: string
@@ -10936,6 +11008,9 @@ export type Database = {
           created_at: string | null
           current_contract_id: string | null
           current_tenant_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           estimated_value: number | null
           floor_number: number | null
@@ -10969,6 +11044,9 @@ export type Database = {
           created_at?: string | null
           current_contract_id?: string | null
           current_tenant_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           estimated_value?: number | null
           floor_number?: number | null
@@ -11002,6 +11080,9 @@ export type Database = {
           created_at?: string | null
           current_contract_id?: string | null
           current_tenant_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           estimated_value?: number | null
           floor_number?: number | null
@@ -13569,6 +13650,9 @@ export type Database = {
           city: string | null
           commercial_register: string | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           email: string | null
           full_name: string
           id: string
@@ -13588,6 +13672,9 @@ export type Database = {
           city?: string | null
           commercial_register?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           full_name: string
           id?: string
@@ -13607,6 +13694,9 @@ export type Database = {
           city?: string | null
           commercial_register?: string | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           email?: string | null
           full_name?: string
           id?: string
@@ -14478,6 +14568,9 @@ export type Database = {
           created_at: string
           current_balance: number | null
           current_value: number | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string | null
           documents: Json | null
           id: string
@@ -14498,6 +14591,9 @@ export type Database = {
           created_at?: string
           current_balance?: number | null
           current_value?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           documents?: Json | null
           id?: string
@@ -14518,6 +14614,9 @@ export type Database = {
           created_at?: string
           current_balance?: number | null
           current_value?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string | null
           documents?: Json | null
           id?: string

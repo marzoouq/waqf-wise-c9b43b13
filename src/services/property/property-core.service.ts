@@ -19,13 +19,14 @@ export interface PropertyFilters {
 
 export class PropertyCoreService {
   /**
-   * جلب جميع العقارات
+   * جلب جميع العقارات (مع استثناء المحذوفة)
    */
   static async getAll(filters?: PropertyFilters): Promise<PropertyRow[]> {
     try {
       let query = supabase
         .from('properties')
-        .select('*');
+        .select('*')
+        .is('deleted_at', null);
 
       if (filters?.type && filters.type !== 'all') {
         query = query.eq('type', filters.type);
@@ -111,18 +112,23 @@ export class PropertyCoreService {
   }
 
   /**
-   * حذف عقار
+   * حذف عقار (Soft Delete - أرشفة)
    */
-  static async delete(id: string): Promise<void> {
+  static async delete(id: string, reason?: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('properties')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: reason || 'تم أرشفة العقار',
+        })
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting property', error);
+      productionLogger.error('Error archiving property', error);
       throw error;
     }
   }

@@ -9,7 +9,7 @@ import type { Family, FamilyMember } from "@/types";
 
 export class FamilyService {
   /**
-   * جلب جميع العائلات
+   * جلب جميع العائلات (مع استثناء المحذوفة)
    */
   static async getAll(): Promise<Family[]> {
     try {
@@ -23,6 +23,7 @@ export class FamilyService {
             national_id
           )
         `)
+        .is('deleted_at', null)
         .order('family_name', { ascending: true });
 
       if (error) throw error;
@@ -112,18 +113,23 @@ export class FamilyService {
   }
 
   /**
-   * حذف عائلة
+   * حذف عائلة (Soft Delete - أرشفة)
    */
-  static async delete(id: string): Promise<void> {
+  static async delete(id: string, reason?: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('families')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: reason || 'تم الأرشفة بواسطة المستخدم',
+        })
         .eq('id', id);
 
       if (error) throw error;
     } catch (error) {
-      productionLogger.error('Error deleting family', error);
+      productionLogger.error('Error archiving family', error);
       throw error;
     }
   }
@@ -199,13 +205,18 @@ export class FamilyService {
   }
 
   /**
-   * حذف فرد من العائلة
+   * حذف فرد من العائلة (Soft Delete)
    */
-  static async removeMember(id: string): Promise<void> {
+  static async removeMember(id: string, reason?: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('family_members')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id || null,
+          deletion_reason: reason || 'تمت الإزالة من العائلة',
+        })
         .eq('id', id);
 
       if (error) throw error;

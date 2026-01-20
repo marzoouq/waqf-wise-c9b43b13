@@ -44,8 +44,13 @@ export class FundService {
     return data;
   }
 
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('funds').delete().eq('id', id);
+  static async delete(id: string, reason?: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('funds').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason || 'تم أرشفة الصندوق',
+    }).eq('id', id);
     if (error) throw error;
   }
 
@@ -118,28 +123,35 @@ export class FundService {
     return data;
   }
 
-  static async deleteWaqfUnit(id: string): Promise<void> {
+  static async deleteWaqfUnit(id: string, reason?: string): Promise<void> {
     // التحقق من وجود عقارات مرتبطة
     const { count: propertiesCount } = await supabase
       .from('properties')
       .select('*', { count: 'exact', head: true })
-      .eq('waqf_unit_id', id);
+      .eq('waqf_unit_id', id)
+      .is('deleted_at', null);
 
     if (propertiesCount && propertiesCount > 0) {
-      throw new Error(`لا يمكن حذف قلم الوقف لأنه مرتبط بـ ${propertiesCount} عقار. يرجى إلغاء ربط العقارات أولاً.`);
+      throw new Error(`لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${propertiesCount} عقار نشط. يرجى إلغاء ربط العقارات أولاً.`);
     }
 
     // التحقق من وجود صناديق مرتبطة
     const { count: fundsCount } = await supabase
       .from('funds')
       .select('*', { count: 'exact', head: true })
-      .eq('waqf_unit_id', id);
+      .eq('waqf_unit_id', id)
+      .is('deleted_at', null);
 
     if (fundsCount && fundsCount > 0) {
-      throw new Error(`لا يمكن حذف قلم الوقف لأنه مرتبط بـ ${fundsCount} صندوق. يرجى إلغاء ربط الصناديق أولاً.`);
+      throw new Error(`لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${fundsCount} صندوق نشط. يرجى إلغاء ربط الصناديق أولاً.`);
     }
 
-    const { error } = await supabase.from('waqf_units').delete().eq('id', id);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('waqf_units').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason || 'تم أرشفة قلم الوقف',
+    }).eq('id', id);
     if (error) throw error;
   }
 
