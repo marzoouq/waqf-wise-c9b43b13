@@ -129,13 +129,19 @@ export class GovernancePoliciesService {
   }
 
   /**
-   * حذف سياسة
+   * حذف سياسة (Soft Delete)
    */
   static async deletePolicy(id: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from('governance_policies')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        })
         .eq('id', id);
 
       if (error) throw error;

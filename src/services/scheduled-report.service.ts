@@ -36,6 +36,7 @@ export class ScheduledReportService {
         *,
         report_template:report_template_id(*)
       `)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -66,7 +67,10 @@ export class ScheduledReportService {
 
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء التقرير المجدول');
-    return data as ScheduledReport;
+    return {
+      ...data,
+      recipients: data.recipients as Array<{ user_id: string; email: string }>
+    } as ScheduledReport;
   }
 
   /**
@@ -81,16 +85,27 @@ export class ScheduledReportService {
       .maybeSingle();
 
     if (error) throw error;
-    return data as ScheduledReport | null;
+    if (!data) return null;
+    return {
+      ...data,
+      recipients: data.recipients as Array<{ user_id: string; email: string }>
+    } as ScheduledReport;
   }
 
   /**
-   * حذف تقرير مجدول
+   * حذف تقرير مجدول (Soft Delete)
    */
   static async delete(id: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('scheduled_report_jobs')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم',
+        is_active: false
+      })
       .eq('id', id);
 
     if (error) throw error;

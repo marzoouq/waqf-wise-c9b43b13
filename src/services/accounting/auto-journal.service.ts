@@ -127,12 +127,19 @@ export class AutoJournalService {
   }
 
   /**
-   * حذف قالب قيد تلقائي
+   * حذف قالب قيد تلقائي (Soft Delete)
    */
   static async deleteTemplate(id: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('auto_journal_templates')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم',
+        is_active: false
+      })
       .eq('id', id);
 
     if (error) throw error;

@@ -71,12 +71,18 @@ export const BiometricService = {
   },
 
   /**
-   * حذف credential
+   * حذف credential (Soft Delete)
    */
   async deleteCredential(credentialId: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('webauthn_credentials')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      })
       .eq('id', credentialId);
 
     if (error) throw error;

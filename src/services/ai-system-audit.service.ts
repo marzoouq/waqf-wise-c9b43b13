@@ -275,13 +275,19 @@ export class AISystemAuditService {
   }
 
   /**
-   * حذف تقرير فحص
+   * حذف تقرير فحص (Soft Delete)
    */
   static async deleteAudit(auditId: string): Promise<{ success: boolean; error?: string }> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from('ai_system_audits')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id,
+          deletion_reason: 'حذف بواسطة المستخدم'
+        })
         .eq('id', auditId);
 
       if (error) throw error;

@@ -278,12 +278,18 @@ export class LoansService {
   }
 
   /**
-   * حذف فزعة طارئة
+   * حذف فزعة طارئة (Soft Delete)
    */
   static async deleteEmergencyAid(id: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('emergency_aid')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      })
       .eq('id', id);
     
     if (error) throw error;

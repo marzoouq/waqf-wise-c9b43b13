@@ -172,13 +172,20 @@ export class BeneficiaryCoreService {
   }
 
   /**
-   * حذف مستفيد
+   * حذف مستفيد (Soft Delete)
    */
   static async delete(id: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from('beneficiaries')
-        .delete()
+        .update({
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id,
+          deletion_reason: 'حذف بواسطة المستخدم',
+          status: 'محذوف'
+        })
         .eq('id', id);
 
       if (error) throw error;

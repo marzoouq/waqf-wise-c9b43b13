@@ -68,12 +68,18 @@ export const DashboardConfigService = {
   },
 
   /**
-   * حذف تكوين لوحة التحكم
+   * حذف تكوين لوحة التحكم (Soft Delete)
    */
   async deleteDashboardConfig(id: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('dashboard_configurations')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id,
+        deletion_reason: 'حذف بواسطة المستخدم'
+      })
       .eq('id', id);
 
     if (error) throw error;

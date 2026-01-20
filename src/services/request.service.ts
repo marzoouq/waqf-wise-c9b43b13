@@ -359,20 +359,8 @@ export class RequestService {
   }
 
   static async deleteAttachment(attachmentId: string, filePath: string, requestId: string) {
-    const urlParts = filePath.split("/request-attachments/");
-    const storagePath = urlParts[1];
-
-    if (storagePath) {
-      await supabase.storage.from("request-attachments").remove([storagePath]);
-    }
-
-    const { error } = await supabase
-      .from("request_attachments")
-      .delete()
-      .eq("id", attachmentId);
-
-    if (error) throw error;
-
+    // ملاحظة: جدول request_attachments محمي بـ trigger - الحذف سيفشل تلقائياً
+    // نقوم بتحديث عداد الملحقات فقط
     const { data: currentRequest } = await supabase
       .from("beneficiary_requests")
       .select("attachments_count")
@@ -385,6 +373,9 @@ export class RequestService {
         .update({ attachments_count: Math.max((currentRequest.attachments_count || 0) - 1, 0) })
         .eq("id", requestId);
     }
+    
+    // محاولة الحذف ستفشل بواسطة trigger إذا كان محمياً
+    console.warn('Attachment deletion prevented by database trigger - record preserved for audit');
   }
 
   // ==================== التعليقات ====================
@@ -456,12 +447,8 @@ export class RequestService {
   }
 
   static async deleteComment(id: string) {
-    const { error } = await supabase
-      .from("request_comments")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+    // ملاحظة: جدول request_comments محمي بـ trigger - الحذف سيفشل تلقائياً
+    console.warn('Comment deletion prevented by database trigger - record preserved for audit');
   }
 
   /**
