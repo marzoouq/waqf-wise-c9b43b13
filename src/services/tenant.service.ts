@@ -13,7 +13,7 @@ type TenantInsert = Database['public']['Tables']['tenants']['Insert'];
 
 export class TenantService {
   static async getAll(filters?: { search?: string }): Promise<Tenant[]> {
-    let query = supabase.from('tenants').select('*').order('created_at', { ascending: false });
+    let query = supabase.from('tenants').select('*').is('deleted_at', null).order('created_at', { ascending: false });
     if (filters?.search) {
       query = query.or(`full_name.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
     }
@@ -100,8 +100,13 @@ export class TenantService {
     };
   }
 
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('tenants').delete().eq('id', id);
+  static async delete(id: string, reason?: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('tenants').update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+      deletion_reason: reason || 'تم أرشفة المستأجر',
+    }).eq('id', id);
     if (error) throw error;
   }
 

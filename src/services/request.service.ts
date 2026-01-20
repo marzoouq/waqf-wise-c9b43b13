@@ -121,12 +121,17 @@ export class RequestService {
   }
 
   /**
-   * حذف طلب
+   * حذف طلب (Soft Delete)
    */
-  static async delete(id: string) {
+  static async delete(id: string, reason?: string) {
+    const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase
       .from('beneficiary_requests')
-      .delete()
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason || 'تم أرشفة الطلب',
+      })
       .eq('id', id);
 
     if (error) throw error;

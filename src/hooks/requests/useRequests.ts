@@ -74,7 +74,7 @@ export const useRequests = (beneficiaryId?: string) => {
       // Fetch the created request to return
       if (result.id) {
         const created = await RequestService.getById(result.id);
-        return created as BeneficiaryRequest;
+        return created as unknown as BeneficiaryRequest;
       }
       throw new Error('Failed to get created request');
     },
