@@ -206,6 +206,9 @@ export type Database = {
         Row: {
           action: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           id: string
           timestamp: string
           user_name: string
@@ -213,6 +216,9 @@ export type Database = {
         Insert: {
           action: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           timestamp?: string
           user_name: string
@@ -220,6 +226,9 @@ export type Database = {
         Update: {
           action?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           id?: string
           timestamp?: string
           user_name?: string
@@ -9692,6 +9701,9 @@ export type Database = {
           action_url: string | null
           channel: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           delivery_status: string | null
           error_message: string | null
           id: string
@@ -9712,6 +9724,9 @@ export type Database = {
           action_url?: string | null
           channel?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivery_status?: string | null
           error_message?: string | null
           id?: string
@@ -9732,6 +9747,9 @@ export type Database = {
           action_url?: string | null
           channel?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           delivery_status?: string | null
           error_message?: string | null
           id?: string
@@ -13437,6 +13455,9 @@ export type Database = {
           acknowledged_by: string | null
           alert_type: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           id: string
           metadata: Json | null
@@ -13456,6 +13477,9 @@ export type Database = {
           acknowledged_by?: string | null
           alert_type: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           id?: string
           metadata?: Json | null
@@ -13475,6 +13499,9 @@ export type Database = {
           acknowledged_by?: string | null
           alert_type?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           id?: string
           metadata?: Json | null
@@ -13495,6 +13522,9 @@ export type Database = {
         Row: {
           additional_data: Json | null
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           error_message: string
           error_stack: string | null
           error_type: string
@@ -13511,6 +13541,9 @@ export type Database = {
         Insert: {
           additional_data?: Json | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           error_message: string
           error_stack?: string | null
           error_type: string
@@ -13527,6 +13560,9 @@ export type Database = {
         Update: {
           additional_data?: Json | null
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           error_message?: string
           error_stack?: string | null
           error_type?: string

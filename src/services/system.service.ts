@@ -264,6 +264,7 @@ export class SystemService {
     let query = supabase
       .from("system_error_logs")
       .select("*")
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(50);
     
@@ -285,8 +286,7 @@ export class SystemService {
    */
   static async deleteResolvedErrors() {
     const { data: user } = await supabase.auth.getUser();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("system_error_logs")
       .update({
         deleted_at: new Date().toISOString(),
@@ -316,8 +316,7 @@ export class SystemService {
    */
   static async deleteAllErrors() {
     const { data: user } = await supabase.auth.getUser();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("system_error_logs")
       .update({
         deleted_at: new Date().toISOString(),
@@ -340,10 +339,12 @@ export class SystemService {
       supabase
         .from("system_error_logs")
         .select("id, severity, status, created_at", { count: "exact" })
+        .is("deleted_at", null)
         .gte("created_at", last7d),
       supabase
         .from("system_alerts")
         .select("id, severity, status, created_at", { count: "exact" })
+        .is("deleted_at", null)
         .gte("created_at", last7d),
     ]);
 
@@ -429,6 +430,7 @@ export class SystemService {
       .from('system_alerts')
       .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
       .in('status', ['active', 'acknowledged'])
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(20);
 
