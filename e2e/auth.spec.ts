@@ -2,7 +2,7 @@
  * E2E Tests - Authentication Flow
  * @version 1.0.0
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './playwright-fixture';
 
 test.describe('Authentication', () => {
   test('should display login page', async ({ page }) => {

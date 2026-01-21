@@ -8,6 +8,33 @@ import { PropertyService } from "@/services/property.service";
 import { DistributionService } from "@/services/distribution.service";
 import { supabase } from "@/integrations/supabase/client";
 
+// أنواع محددة للنماذج
+interface BeneficiaryFormData {
+  full_name: string;
+  national_id: string;
+  phone: string;
+  category: string;
+  status?: string;
+  email?: string;
+  address?: string;
+}
+
+interface PropertyFormData {
+  name: string;
+  type: string;
+  status: string;
+  location: string;
+  total_units?: number;
+  description?: string;
+}
+
+interface DistributionFormData {
+  totalAmount: number;
+  beneficiaries: number;
+  notes?: string;
+  month: string;
+}
+
 interface DashboardDialogsProps {
   beneficiaryDialogOpen: boolean;
   setBeneficiaryDialogOpen: (open: boolean) => void;
@@ -32,7 +59,7 @@ export function DashboardDialogs({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSaveBeneficiary = async (data: any) => {
+  const handleSaveBeneficiary = async (data: BeneficiaryFormData) => {
     try {
       const { error } = await supabase.from("beneficiaries").insert(data);
       if (error) throw error;
@@ -53,7 +80,7 @@ export function DashboardDialogs({
     }
   };
 
-  const handleSaveProperty = async (data: any) => {
+  const handleSaveProperty = async (data: PropertyFormData) => {
     try {
       await PropertyService.create(data);
       toast({
@@ -72,7 +99,7 @@ export function DashboardDialogs({
     }
   };
 
-  const handleDistribute = async (data: any) => {
+  const handleDistribute = async (data: DistributionFormData) => {
     try {
       await DistributionService.create({
         distribution_date: new Date().toISOString(),

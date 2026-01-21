@@ -32,11 +32,18 @@ const { data, isLoading } = useQuery({
         `)
         .eq('beneficiary_id', beneficiaryId);
 
+      // نوع التوزيع
+      interface DistributionRecord {
+        share_amount: number | null;
+        fiscal_year_id: string;
+        fiscal_years: { name: string; start_date: string } | null;
+      }
+
       // تجميع التوزيعات حسب السنة المالية
       const yearTotals: Record<string, number> = {};
 
       if (distributions) {
-        distributions.forEach((d: any) => {
+        (distributions as DistributionRecord[]).forEach((d) => {
           // استخدام start_date بدلاً من الاعتماد على اسم السنة المالية
           const startDate = d.fiscal_years?.start_date;
           if (startDate) {
