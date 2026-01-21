@@ -3,7 +3,7 @@
  * E2E Tests for Complete Beneficiary Lifecycle
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './playwright-fixture';
 
 test.describe('Beneficiary Lifecycle E2E', () => {
   test.describe('Beneficiary Registration Flow', () => {

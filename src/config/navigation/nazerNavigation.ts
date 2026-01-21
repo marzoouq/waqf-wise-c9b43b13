@@ -41,6 +41,6 @@ export const nazerNavigationItems: readonly NavigationItem[] = [
     label: "المزيد",
     icon: MoreHorizontal,
     path: "/settings",
-    matchPaths: ["/settings", "/governance-decisions"],
+    matchPaths: ["/settings", "/governance/decisions"],
   },
 ] as const;

@@ -54,14 +54,29 @@ export const BottomNavigation = memo(function BottomNavigation({
   const navigationItems = items || defaultNavigationItems;
   const location = useLocation();
 
-  // تحديد العنصر النشط
+  // تحديد العنصر النشط (يدعم query params)
   const isItemActive = useMemo(() => {
     return (item: NavigationItem) => {
-      if (location.pathname === item.path) return true;
-      if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
+      const fullPath = location.pathname + location.search;
+      
+      // مطابقة دقيقة للمسار الكامل (مع query params)
+      if (fullPath === item.path) return true;
+      if (item.path.includes('?') && fullPath.startsWith(item.path)) return true;
+      
+      // مطابقة pathname فقط للمسارات بدون query
+      if (!item.path.includes('?') && location.pathname === item.path) return true;
+      
+      // مطابقة matchPaths
+      if (item.matchPaths?.some(p => {
+        if (p.includes('?')) {
+          return fullPath.startsWith(p) || fullPath === p;
+        }
+        return location.pathname.startsWith(p);
+      })) return true;
+      
       return false;
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <nav 

@@ -2,7 +2,7 @@
  * E2E Tests - Accessibility
  * @version 1.0.0
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './playwright-fixture';
 import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Accessibility', () => {

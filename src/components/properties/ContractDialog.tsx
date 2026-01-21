@@ -181,26 +181,27 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       }
       onOpenChange(false);
       form.reset(getDefaultValues());
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving contract:', error);
       
+      const err = error as { code?: string; message?: string };
       // رسائل خطأ واضحة للمستخدم
-      if (error?.code === '23503' || error?.message?.includes('23503')) {
+      if (err?.code === '23503' || err?.message?.includes('23503')) {
         toast({
           title: "خطأ في البيانات",
           description: "يرجى التأكد من صحة بيانات المستأجر والوحدات المختارة",
           variant: "destructive",
         });
-      } else if (error?.code === 'occupied_units_check' || error?.message?.includes('occupied_units_check')) {
+      } else if (err?.code === 'occupied_units_check' || err?.message?.includes('occupied_units_check')) {
         toast({
           title: "خطأ في العقار",
           description: "يوجد تعارض في عدد الوحدات المشغولة",
           variant: "destructive",
         });
-      } else if (error?.message) {
+      } else if (err?.message) {
         toast({
           title: "خطأ",
-          description: error.message,
+          description: err.message,
           variant: "destructive",
         });
       }

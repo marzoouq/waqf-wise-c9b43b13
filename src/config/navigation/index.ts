@@ -1,7 +1,7 @@
 /**
  * Navigation Configuration - إعداد التنقل المركزي
  * المصدر الوحيد للحقيقة لشريط التنقل السفلي
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 import type { AppRole } from "@/types/roles";
@@ -14,6 +14,17 @@ import { adminNavigationItems } from "./adminNavigation";
 import { accountantNavigationItems } from "./accountantNavigation";
 import { cashierNavigationItems } from "./cashierNavigation";
 import { archivistNavigationItems } from "./archivistNavigation";
+
+// استيراد السجل المركزي
+import {
+  NAVIGATION_REGISTRY,
+  REGISTERED_ROUTES,
+  extractAllNavigationPaths,
+  validateNavigationPath,
+  auditNavigationPaths,
+  getValidatedNavigation,
+  getNavigationStats,
+} from "./navigationRegistry";
 
 /**
  * خريطة التنقل حسب الدور
@@ -63,11 +74,24 @@ export function getNavigationAriaLabel(role: AppRole | string): string {
   return NAVIGATION_ARIA_LABELS[role as AppRole] || "التنقل السفلي";
 }
 
-// Re-exports
+// Re-exports from individual files
 export { beneficiaryNavigationItems } from "./beneficiaryNavigation";
 export { nazerNavigationItems } from "./nazerNavigation";
 export { adminNavigationItems } from "./adminNavigation";
 export { accountantNavigationItems } from "./accountantNavigation";
 export { cashierNavigationItems } from "./cashierNavigation";
 export { archivistNavigationItems } from "./archivistNavigation";
+
+// Re-exports from registry
+export {
+  NAVIGATION_REGISTRY,
+  REGISTERED_ROUTES,
+  extractAllNavigationPaths,
+  validateNavigationPath,
+  auditNavigationPaths,
+  getValidatedNavigation,
+  getNavigationStats,
+};
+
 export type { NavigationItem } from "@/types/navigation";
+export type { RegisteredRoute } from "./navigationRegistry";

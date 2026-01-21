@@ -257,7 +257,7 @@ export function TestHistoryPanel({ onSelectRun }: TestHistoryPanelProps) {
                               الاختبارات الفاشلة:
                             </h4>
                             <div className="space-y-1">
-                              {(run.failed_tests_details as any[])?.slice(0, 5).map((test, i) => (
+                              {(run.failed_tests_details as Array<{ testName: string; message?: string }>)?.slice(0, 5).map((test, i) => (
                                 <div 
                                   key={i}
                                   className="flex items-center gap-2 p-2 bg-red-500/10 rounded text-sm"
@@ -269,9 +269,9 @@ export function TestHistoryPanel({ onSelectRun }: TestHistoryPanelProps) {
                                   </span>
                                 </div>
                               ))}
-                              {(run.failed_tests_details as any[])?.length > 5 && (
+                              {(run.failed_tests_details as Array<{ testName: string; message?: string }>)?.length > 5 && (
                                 <p className="text-xs text-muted-foreground">
-                                  و {(run.failed_tests_details as any[]).length - 5} أخرى...
+                                  و {(run.failed_tests_details as Array<{ testName: string; message?: string }>).length - 5} أخرى...
                                 </p>
                               )}
                             </div>

@@ -166,7 +166,7 @@ interface TestResult {
   success: boolean;
   statusCode?: number;
   responseTime: number;
-  response?: any;
+  response?: Record<string, unknown>;
   error?: string;
   timestamp: Date;
 }
@@ -196,7 +196,7 @@ export default function EdgeFunctionTest() {
     setTestLogs(prev => [...prev, `[${timestamp}] ${message}`]);
   }, []);
 
-  const testSingleFunction = async (funcName: string, body: any): Promise<TestResult> => {
+  const testSingleFunction = async (funcName: string, body: Record<string, unknown>): Promise<TestResult> => {
     const startTime = performance.now();
     
     try {
@@ -220,12 +220,12 @@ export default function EdgeFunctionTest() {
         response: data,
         timestamp: new Date()
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         functionName: funcName,
         success: false,
         responseTime: Math.round(performance.now() - startTime),
-        error: err.message,
+        error: err instanceof Error ? err.message : 'خطأ غير معروف',
         timestamp: new Date()
       };
     }
