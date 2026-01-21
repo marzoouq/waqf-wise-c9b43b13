@@ -20,14 +20,14 @@ export const adminNavigationItems: readonly NavigationItem[] = [
     label: "المستخدمون",
     icon: Users,
     path: "/users",
-    matchPaths: ["/users", "/roles-management"],
+    matchPaths: ["/users", "/settings/roles"],
   },
   {
     id: "security",
     label: "الأمان",
     icon: Shield,
-    path: "/security-dashboard",
-    matchPaths: ["/security-dashboard", "/audit-logs"],
+    path: "/security",
+    matchPaths: ["/security", "/audit-logs"],
   },
   {
     id: "audit",
