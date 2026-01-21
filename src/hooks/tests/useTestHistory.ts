@@ -122,7 +122,7 @@ export function useTestHistory() {
       queryClient.invalidateQueries({ queryKey: ['test-runs-history'] });
       toastSuccess('تم حفظ نتيجة الاختبار');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error saving test run:', error);
       toastError('فشل حفظ النتيجة: ' + error.message);
     }
@@ -142,7 +142,7 @@ export function useTestHistory() {
       queryClient.invalidateQueries({ queryKey: ['test-runs-history'] });
       toastSuccess('تم حذف السجل');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toastError('فشل الحذف: ' + error.message);
     }
   });

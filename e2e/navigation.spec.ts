@@ -2,7 +2,7 @@
  * E2E Tests - Navigation
  * @version 1.0.0
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './playwright-fixture';
 
 test.describe('Navigation', () => {
   test('should load landing page', async ({ page }) => {

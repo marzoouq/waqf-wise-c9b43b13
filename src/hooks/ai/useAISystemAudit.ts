@@ -67,10 +67,11 @@ export function useAISystemAudit() {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearInterval(progressInterval);
-      toastError(error.message);
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+      toastError(errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setIsAuditing(false);
       setTimeout(() => setAuditProgress(0), 1000);

@@ -3,7 +3,7 @@
  * Visual Regression Tests
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './playwright-fixture';
 
 test.describe('Visual Regression Tests', () => {
   test.describe('Landing Page Visual Tests', () => {
