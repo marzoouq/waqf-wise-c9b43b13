@@ -1,5 +1,4 @@
 
-
 # خطة إصلاح مخالفات التنقل P1
 
 ## الهدف
@@ -7,37 +6,74 @@
 
 ---
 
-## المرحلة 1: إصلاح المسارات الخاطئة (3 ملفات)
+## المخالفات المكتشفة
 
-### 1.1 إصلاح `src/config/navigation/adminNavigation.ts`
+| # | الملف | المشكلة | التأثير |
+|---|-------|---------|---------|
+| 1 | `adminNavigation.ts` | المسار `/security-dashboard` غير موجود (الصحيح: `/security`) | كسر التنقل |
+| 2 | `adminNavigation.ts` | `matchPaths` يشير لـ `/roles-management` (الصحيح: `/settings/roles`) | فشل التفعيل |
+| 3 | `nazerNavigation.ts` | `matchPaths` يشير لـ `/governance-decisions` (الصحيح: `/governance/decisions`) | فشل التفعيل |
+| 4 | `BottomNavigation.tsx` | لا يفحص `location.search` للـ query params | تبويبات المستفيد لا تتفعل |
 
-**التغييرات:**
+---
+
+## المرحلة 1: إصلاح مسارات المشرف
+
+### الملف: `src/config/navigation/adminNavigation.ts`
+
+**التغيير 1 - السطر 23:**
 ```typescript
-// السطر 29: تصحيح مسار الأمان
-path: "/security",  // بدلاً من "/security-dashboard"
-matchPaths: ["/security", "/audit-logs"],
+// قبل:
+matchPaths: ["/users", "/roles-management"],
 
-// السطر 23: تصحيح مسار الأدوار
-matchPaths: ["/users", "/settings/roles"],  // بدلاً من "/roles-management"
+// بعد:
+matchPaths: ["/users", "/settings/roles"],
 ```
 
-### 1.2 إصلاح `src/config/navigation/nazerNavigation.ts`
-
-**التغييرات:**
+**التغيير 2 - الأسطر 29-30:**
 ```typescript
-// السطر 44: تصحيح مسار قرارات الحوكمة
-matchPaths: ["/settings", "/governance/decisions"],  // بدلاً من "/governance-decisions"
+// قبل:
+path: "/security-dashboard",
+matchPaths: ["/security-dashboard", "/audit-logs"],
+
+// بعد:
+path: "/security",
+matchPaths: ["/security", "/audit-logs"],
 ```
 
 ---
 
-## المرحلة 2: إصلاح تفعيل tabs المستفيد
+## المرحلة 2: إصلاح مسارات الناظر
 
-### 2.1 تحديث `src/components/mobile/BottomNavigation.tsx`
+### الملف: `src/config/navigation/nazerNavigation.ts`
 
-**التغييرات:**
+**التغيير - السطر 44:**
 ```typescript
-// تعديل دالة isItemActive لفحص query params
+// قبل:
+matchPaths: ["/settings", "/governance-decisions"],
+
+// بعد:
+matchPaths: ["/settings", "/governance/decisions"],
+```
+
+---
+
+## المرحلة 3: تحسين منطق تفعيل التبويبات
+
+### الملف: `src/components/mobile/BottomNavigation.tsx`
+
+**التغيير - الأسطر 57-64:**
+```typescript
+// قبل:
+const isItemActive = useMemo(() => {
+  return (item: NavigationItem) => {
+    if (location.pathname === item.path) return true;
+    if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
+    return false;
+  };
+}, [location.pathname]);
+
+// بعد:
 const isItemActive = useMemo(() => {
   return (item: NavigationItem) => {
     const fullPath = location.pathname + location.search;
@@ -64,60 +100,25 @@ const isItemActive = useMemo(() => {
 
 ---
 
-## المرحلة 3: تحسين beneficiaryNavigation.ts
-
-### 3.1 تحديث `src/config/navigation/beneficiaryNavigation.ts`
-
-**التغييرات:**
-```typescript
-// تحسين matchPaths لتشمل pathname فقط كخيار بديل
-{
-  id: "distributions",
-  label: "التوزيعات",
-  icon: Wallet,
-  path: "/beneficiary-portal?tab=distributions",
-  matchPaths: ["/beneficiary-portal?tab=distributions"],
-},
-// لا حاجة للتغيير - المنطق الجديد في BottomNavigation سيتعامل معه
-```
-
----
-
 ## ملخص الملفات المتأثرة
 
-| الملف | نوع التغيير | الأسطر |
-|-------|-------------|--------|
-| `src/config/navigation/adminNavigation.ts` | تصحيح مسارات | 23, 29-30 |
-| `src/config/navigation/nazerNavigation.ts` | تصحيح مسار | 44 |
-| `src/components/mobile/BottomNavigation.tsx` | تحسين منطق التفعيل | 58-64 |
+| الملف | عدد التغييرات | نوع التغيير |
+|-------|--------------|-------------|
+| `src/config/navigation/adminNavigation.ts` | 3 أسطر | تصحيح مسارات |
+| `src/config/navigation/nazerNavigation.ts` | 1 سطر | تصحيح مسار |
+| `src/components/mobile/BottomNavigation.tsx` | 8 أسطر | تحسين منطق |
 
 ---
 
 ## التحقق بعد التنفيذ
 
-1. **اختبار التنقل السفلي للمشرف:**
-   - النقر على "الأمان" ← يجب أن يفتح `/security`
-   - التأكد من تفعيل عنصر "المستخدمون" عند زيارة `/settings/roles`
+1. **اختبار تنقل المشرف:**
+   - النقر على "الأمان" يفتح `/security`
+   - زيارة `/settings/roles` تفعّل "المستخدمون"
 
-2. **اختبار التنقل السفلي للناظر:**
-   - التأكد من تفعيل "المزيد" عند زيارة `/governance/decisions`
+2. **اختبار تنقل الناظر:**
+   - زيارة `/governance/decisions` تفعّل "المزيد"
 
-3. **اختبار التنقل السفلي للمستفيد:**
-   - النقر على "التوزيعات" ← يجب أن يفعّل العنصر بصرياً
-   - النقر على "الطلبات" ← يجب أن يفعّل العنصر بصرياً
-
----
-
-## التوصيات المستقبلية (Batch 2)
-
-1. **توحيد مصادر التنقل:**
-   - إنشاء `src/config/navigation/sidebarNavigation.ts` كمصدر موحد لـ AppSidebar
-   - ربط AppSidebar بالملف المركزي بدلاً من التعريف المباشر
-
-2. **إضافة اختبارات وحدة:**
-   - اختبار تطابق جميع مسارات التنقل مع routes الفعلية
-   - اختبار تفعيل العناصر النشطة
-
-3. **توثيق Navigation Matrix:**
-   - إنشاء جدول مرجعي موحد لجميع عناصر التنقل مع أدوارها
-
+3. **اختبار تنقل المستفيد:**
+   - النقر على "التوزيعات" يفعّل العنصر بصرياً
+   - النقر على "الطلبات" يفعّل العنصر بصرياً
