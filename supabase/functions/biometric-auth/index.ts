@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
   try {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
-    let bodyData: Record<string, any> = {};
+    let bodyData: Record<string, unknown> = {};
     
     if (bodyText) {
       try {

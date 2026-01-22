@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,6 +47,42 @@ interface AuditFinding {
   rollbackSql?: string;
   autoFixable: boolean;
   fixed: boolean;
+}
+
+// Interface للبيانات الخام من AI
+interface RawAIFinding {
+  id?: string;
+  category: string;
+  severity: 'critical' | 'warning' | 'info' | 'success';
+  title: string;
+  description: string;
+  suggestion?: string;
+  fixSql?: string;
+  rollbackSql?: string;
+  autoFixable: boolean;
+}
+
+// Interface لبيانات الجدول
+interface TableInfo {
+  table_name: string;
+  has_rls: boolean;
+  row_count: number;
+}
+
+// Interface للفهارس
+interface IndexInfo {
+  table_name: string;
+  index_name: string;
+}
+
+// Interface لبيانات النظام
+interface SystemData {
+  tables?: TableInfo[];
+  rlsPolicies?: unknown[];
+  indexes?: IndexInfo[];
+  systemStats?: unknown;
+  errorLogs?: unknown[];
+  roles?: unknown[];
 }
 
 // ============ Rate Limiting Configuration ============
@@ -200,7 +236,7 @@ serve(async (req) => {
     };
 
     // تنفيذ الإصلاحات الآمنة تلقائياً (معطل حالياً لعدم وجود execute_sql)
-    const autoFixResults: any[] = [];
+    const autoFixResults: { id: string; success: boolean; error?: string }[] = [];
     
     // حفظ الإصلاحات المعلقة
     const pendingFixes = findings.filter(f => !f.autoFixable && f.fixSql);
@@ -258,8 +294,8 @@ serve(async (req) => {
   }
 });
 
-async function gatherSystemData(supabase: any, categories: string[]) {
-  const data: Record<string, any> = {};
+async function gatherSystemData(supabase: SupabaseClient, categories: string[]) {
+  const data: Record<string, unknown> = {};
 
   console.log('[AI-SYSTEM-AUDIT] Gathering system data for categories:', categories);
 
@@ -343,7 +379,7 @@ async function gatherSystemData(supabase: any, categories: string[]) {
   return data;
 }
 
-async function analyzeWithAI(systemData: any, categories: string[], apiKey?: string): Promise<AuditFinding[]> {
+async function analyzeWithAI(systemData: Record<string, unknown>, categories: string[], apiKey?: string): Promise<AuditFinding[]> {
   // إذا لم يتوفر API key، استخدم التحليل المحلي المحسن
   if (!apiKey) {
     console.log('[AI-SYSTEM-AUDIT] No LOVABLE_API_KEY, using enhanced local analysis');
@@ -427,13 +463,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
       const directParse = JSON.parse(content.trim());
       if (Array.isArray(directParse)) {
         console.log(`[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`);
-        return directParse.map((f: any) => ({
+        return directParse.map((f: RawAIFinding) => ({
           ...f,
           categoryLabel: CATEGORY_LABELS[f.category] || f.category,
           fixed: false
         }));
       }
-    } catch (e) {
+    } catch {
       console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
     }
 
@@ -441,9 +477,9 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
     const jsonMatch = content.match(/\[[\s\S]*?\]/);
     if (jsonMatch) {
       try {
-        const aiFindings = JSON.parse(jsonMatch[0]);
+        const aiFindings = JSON.parse(jsonMatch[0]) as RawAIFinding[];
         console.log(`[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`);
-        return aiFindings.map((f: any) => ({
+        return aiFindings.map((f: RawAIFinding) => ({
           ...f,
           categoryLabel: CATEGORY_LABELS[f.category] || f.category,
           fixed: false
@@ -460,13 +496,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
         const aiFindings = JSON.parse(codeBlockMatch[1].trim());
         if (Array.isArray(aiFindings)) {
           console.log(`[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`);
-          return aiFindings.map((f: any) => ({
+          return (aiFindings as RawAIFinding[]).map((f: RawAIFinding) => ({
             ...f,
             categoryLabel: CATEGORY_LABELS[f.category] || f.category,
             fixed: false
           }));
         }
-      } catch (e) {
+      } catch {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
       }
     }
@@ -480,7 +516,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
   }
 }
 
-function buildAnalysisPrompt(systemData: any, categories: string[]): string {
+function buildAnalysisPrompt(systemData: SystemData, categories: string[]): string {
   let prompt = 'قم بفحص النظام وتحديد المشاكل في الفئات التالية:\n\n';
   
   categories.forEach(cat => {
@@ -497,7 +533,7 @@ function buildAnalysisPrompt(systemData: any, categories: string[]): string {
     systemStats: systemData.systemStats,
     errorLogsCount: systemData.errorLogs?.length || 0,
     rolesCount: systemData.roles?.length || 0,
-    tablesWithoutRLS: systemData.tables?.filter((t: any) => !t.has_rls)?.map((t: any) => t.table_name) || []
+    tablesWithoutRLS: systemData.tables?.filter((t: TableInfo) => !t.has_rls)?.map((t: TableInfo) => t.table_name) || []
   };
   
   prompt += JSON.stringify(dataToSend, null, 2);
@@ -505,7 +541,7 @@ function buildAnalysisPrompt(systemData: any, categories: string[]): string {
   return prompt;
 }
 
-function performEnhancedLocalAnalysis(systemData: any, categories: string[]): AuditFinding[] {
+function performEnhancedLocalAnalysis(systemData: SystemData, categories: string[]): AuditFinding[] {
   const findings: AuditFinding[] = [];
   let idCounter = 1;
 
@@ -515,9 +551,9 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
   if (categories.includes('database') || categories.includes('tables')) {
     // فحص الجداول بدون RLS
     if (systemData.tables && systemData.tables.length > 0) {
-      const tablesWithoutRLS = systemData.tables.filter((t: any) => !t.has_rls);
+      const tablesWithoutRLS = systemData.tables.filter((t: TableInfo) => !t.has_rls);
       
-      tablesWithoutRLS.forEach((table: any) => {
+      tablesWithoutRLS.forEach((table: TableInfo) => {
         findings.push({
           id: `db-${idCounter++}`,
           category: 'database',
@@ -534,10 +570,10 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
       });
 
       // فحص الجداول الكبيرة بدون فهارس كافية
-      const largeTables = systemData.tables.filter((t: any) => t.row_count > 10000);
+      const largeTables = systemData.tables.filter((t: TableInfo) => t.row_count > 10000);
       if (systemData.indexes) {
-        largeTables.forEach((table: any) => {
-          const tableIndexes = systemData.indexes.filter((i: any) => i.table_name === table.table_name);
+        largeTables.forEach((table: TableInfo) => {
+          const tableIndexes = systemData.indexes!.filter((i: IndexInfo) => i.table_name === table.table_name);
           if (tableIndexes.length < 2) {
             findings.push({
               id: `perf-${idCounter++}`,
@@ -604,7 +640,11 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
 
   // فحص الأخطاء المتكررة
   if (systemData.errorLogs && systemData.errorLogs.length > 0) {
-    const errorCounts = systemData.errorLogs.reduce((acc: any, log: any) => {
+    interface ErrorLog {
+      error_type?: string;
+      message?: string;
+    }
+    const errorCounts = (systemData.errorLogs as ErrorLog[]).reduce((acc: Record<string, number>, log: ErrorLog) => {
       const key = log.error_type || log.message?.slice(0, 50) || 'unknown';
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -735,7 +775,14 @@ function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): stri
   return analysis;
 }
 
-async function sendSlackNotification(supabase: any, auditId: string, summary: any, criticalFindings: AuditFinding[]) {
+interface SeveritySummary {
+  critical: number;
+  warning: number;
+  info: number;
+  success: number;
+}
+
+async function sendSlackNotification(_supabase: SupabaseClient, auditId: string, summary: SeveritySummary, criticalFindings: AuditFinding[]) {
   try {
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
     if (!slackWebhookUrl) {

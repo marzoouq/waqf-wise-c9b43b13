@@ -261,7 +261,7 @@ Deno.serve(async (req) => {
       } else {
         extractedData = JSON.parse(content);
       }
-    } catch (_parseError) {
+    } catch {
       console.error('❌ خطأ في تحليل JSON:', content);
       throw new Error('فشل في تحليل البيانات المستخرجة من الصورة');
     }

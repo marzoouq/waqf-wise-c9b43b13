@@ -28,13 +28,13 @@ Deno.serve(async (req) => {
   try {
     // ✅ Health Check Support / Test Mode - يجب فحصه أولاً قبل أي شيء
     let bodyText = '';
-    let parsedBody: any = null;
+    let parsedBody: Record<string, unknown> | null = null;
     
     try {
       bodyText = await req.clone().text();
       if (bodyText) {
         parsedBody = JSON.parse(bodyText);
-        if (parsedBody.ping || parsedBody.healthCheck || parsedBody.testMode) {
+        if (parsedBody && (parsedBody.ping || parsedBody.healthCheck || parsedBody.testMode)) {
           console.log('[auto-close-fiscal-year] Health check / test mode received');
           return jsonResponse({
             status: 'healthy',

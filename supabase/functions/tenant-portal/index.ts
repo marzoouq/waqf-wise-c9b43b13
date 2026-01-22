@@ -11,6 +11,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Interface للعقد مع العلاقات
+interface ContractWithProperty {
+  id: string;
+  contract_number: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  property_id: string;
+  properties: {
+    id: string;
+    name: string;
+    location?: string;
+    type?: string;
+  } | null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-tenant-session",
@@ -91,7 +107,7 @@ serve(async (req) => {
 
       // جلب الوحدات المرتبطة بكل عقد
       const contracts = [];
-      for (const contract of (contractsRaw || [])) {
+      for (const contract of (contractsRaw || []) as ContractWithProperty[]) {
         // جلب الوحدات التي تنتمي لهذا العقد
         const { data: units } = await supabaseAdmin
           .from("property_units")
@@ -109,9 +125,9 @@ serve(async (req) => {
               end_date: contract.end_date,
               status: contract.status,
               property_id: contract.property_id,
-              property_name: (contract as any).properties?.name || "غير محدد",
-              property_location: (contract as any).properties?.location,
-              property_type: (contract as any).properties?.type,
+              property_name: contract.properties?.name || "غير محدد",
+              property_location: contract.properties?.location,
+              property_type: contract.properties?.type,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -128,9 +144,9 @@ serve(async (req) => {
             end_date: contract.end_date,
             status: contract.status,
             property_id: contract.property_id,
-            property_name: (contract as any).properties?.name || "غير محدد",
-            property_location: (contract as any).properties?.location,
-            property_type: (contract as any).properties?.type,
+            property_name: contract.properties?.name || "غير محدد",
+            property_location: contract.properties?.location,
+            property_type: contract.properties?.type,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,
@@ -170,8 +186,16 @@ serve(async (req) => {
         .eq("tenant_id", tenant.id)
         .order("created_at", { ascending: false });
 
+      // Interface للطلب مع العلاقات
+      interface RequestWithRelations {
+        id: string;
+        properties?: { name?: string };
+        property_units?: { unit_name?: string; unit_number?: string };
+        [key: string]: unknown;
+      }
+
       // إضافة اسم العقار والوحدة للطلبات
-      const enrichedRequests = (requests || []).map((r: any) => ({
+      const enrichedRequests = (requests || []).map((r: RequestWithRelations) => ({
         ...r,
         property_name: r.properties?.name || "غير محدد",
         unit_name: r.property_units?.unit_name || r.property_units?.unit_number || null,

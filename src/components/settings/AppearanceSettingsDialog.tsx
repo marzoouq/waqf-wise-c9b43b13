@@ -85,6 +85,8 @@ export function AppearanceSettingsDialog({
     applyTheme(theme);
     applyAccentColor(accentColor);
     applyFont(font);
+    // مقصود: نريد تطبيق الإعدادات مرة واحدة فقط عند التحميل
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleThemeChange = (value: string) => {

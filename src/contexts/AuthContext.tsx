@@ -263,6 +263,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
+    // isInitialized متعمد عدم إضافته لمنع إعادة الاشتراك عند تغييره
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchUserData, cleanupInvalidSession]);
 
   const signIn = async (email: string, password: string) => {

@@ -117,7 +117,13 @@ serve(async (req) => {
     };
 
     // بناء رسالة Slack
-    const blocks: any[] = [
+    interface SlackBlock {
+      type: string;
+      text?: { type: string; text: string; emoji?: boolean };
+      fields?: { type: string; text: string }[];
+    }
+    
+    const blocks: SlackBlock[] = [
       {
         type: 'header',
         text: {

@@ -97,6 +97,7 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
     return SETTING_CATEGORIES.reduce((acc, cat) => 
       acc + cat.settings.filter(s => getSettingValue(s.key)).length, 0
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, pendingChanges]);
 
   const toggleCategory = (categoryId: string) => {

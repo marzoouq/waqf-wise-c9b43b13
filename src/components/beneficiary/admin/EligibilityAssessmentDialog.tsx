@@ -50,6 +50,7 @@ export function EligibilityAssessmentDialog({
         max_score: 100,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, beneficiary?.id, latestAssessment]);
 
   // تشغيل التقييم عند الفتح
@@ -68,6 +69,8 @@ export function EligibilityAssessmentDialog({
         // معالجة الخطأ تتم في الـ hook
       });
     }
+    // مقصود: نريد تشغيل التقييم فقط عند فتح الـ dialog
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, beneficiary?.id]);
 
   const getStatusColor = (status: string) => {
