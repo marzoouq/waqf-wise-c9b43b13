@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { User, LogOut, Moon, Sun } from "lucide-react";
-import { sidebarItems } from "./config/sidebarConfig";
-import { APP_VERSION } from "@/lib/version";
-import { AuthService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { User, LogOut, Moon, Sun } from 'lucide-react';
+import { sidebarItems } from './config/sidebarConfig';
+import { APP_VERSION } from '@/lib/version';
+import { AuthService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +20,7 @@ import {
   SidebarHeader,
   SidebarFooter,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 interface BeneficiarySidebarProps {
   activeTab: string;
@@ -32,9 +32,9 @@ interface BeneficiarySidebarProps {
  * القائمة الجانبية للمستفيدين
  * موحدة مع مكونات Sidebar من shadcn/ui
  */
-export function BeneficiarySidebar({ 
-  activeTab, 
-  onTabChange, 
+export function BeneficiarySidebar({
+  activeTab,
+  onTabChange,
   beneficiaryName,
 }: BeneficiarySidebarProps) {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export function BeneficiarySidebar({
   const { setOpenMobile, state } = useSidebar();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = state === 'collapsed';
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleItemClick = (tab: string) => {
@@ -60,15 +60,15 @@ export function BeneficiarySidebar({
     try {
       await AuthService.logout();
       toast({
-        title: "تم تسجيل الخروج",
-        description: "نراك قريباً",
+        title: 'تم تسجيل الخروج',
+        description: 'نراك قريباً',
       });
-      navigate("/login");
+      navigate('/login');
     } catch {
       toast({
-        title: "خطأ",
-        description: "فشل تسجيل الخروج",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تسجيل الخروج',
+        variant: 'destructive',
       });
     } finally {
       setIsLoggingOut(false);
@@ -76,7 +76,7 @@ export function BeneficiarySidebar({
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // تصفية العناصر حسب إعدادات الشفافية
@@ -97,7 +97,7 @@ export function BeneficiarySidebar({
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-sm truncate text-sidebar-foreground">
-                  {beneficiaryName || "المستفيد"}
+                  {beneficiaryName || 'المستفيد'}
                 </h3>
                 <p className="text-xs text-sidebar-foreground/70">بوابة الوقف</p>
               </div>
@@ -158,30 +158,26 @@ export function BeneficiarySidebar({
       {/* Footer with Actions */}
       <SidebarFooter className="border-t border-sidebar-border p-3 space-y-2">
         {/* Theme Toggle & Logout Buttons */}
-        <div className={`flex ${isCollapsed ? 'flex-col items-center' : 'flex-row justify-center'} gap-2`}>
+        <div
+          className={`flex ${isCollapsed ? 'flex-col items-center' : 'flex-row justify-center'} gap-2`}
+        >
           <Button
             variant="ghost"
-            size={isCollapsed ? "icon" : "sm"}
+            size={isCollapsed ? 'icon' : 'sm'}
             onClick={toggleTheme}
-            className={isCollapsed ? "h-9 w-9" : "gap-2"}
-            title={theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}
+            className={isCollapsed ? 'h-9 w-9' : 'gap-2'}
+            title={theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-            {!isCollapsed && (
-              <span className="text-xs">{theme === "dark" ? "نهاري" : "ليلي"}</span>
-            )}
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {!isCollapsed && <span className="text-xs">{theme === 'dark' ? 'نهاري' : 'ليلي'}</span>}
           </Button>
-          
+
           <Button
             variant="ghost"
-            size={isCollapsed ? "icon" : "sm"}
+            size={isCollapsed ? 'icon' : 'sm'}
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className={`text-destructive hover:text-destructive hover:bg-destructive/10 ${isCollapsed ? "h-9 w-9" : "gap-2"}`}
+            className={`text-destructive hover:text-destructive hover:bg-destructive/10 ${isCollapsed ? 'h-9 w-9' : 'gap-2'}`}
             title="تسجيل الخروج"
           >
             <LogOut className="h-4 w-4" />

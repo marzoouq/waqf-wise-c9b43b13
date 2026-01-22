@@ -10,7 +10,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  
+
   // Visual Regression Settings
   expect: {
     toHaveScreenshot: {
@@ -23,17 +23,18 @@ export default defineConfig({
       maxDiffPixelRatio: 0.02,
     },
   },
-  
+
   // Snapshot directory
   snapshotDir: './e2e/__snapshots__',
-  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-projectName}{ext}',
-  
+  snapshotPathTemplate:
+    '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-projectName}{ext}',
+
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
   ],
-  
+
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',

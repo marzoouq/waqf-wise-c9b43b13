@@ -1,9 +1,9 @@
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { useBeneficiaryActivityLog } from "@/hooks/beneficiary/useBeneficiaryActivityLog";
-import { formatDate } from "@/lib/date";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Activity, UserPlus, Edit, Trash2, DollarSign, FileText } from "lucide-react";
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { useBeneficiaryActivityLog } from '@/hooks/beneficiary/useBeneficiaryActivityLog';
+import { formatDate } from '@/lib/date';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Activity, UserPlus, Edit, Trash2, DollarSign, FileText } from 'lucide-react';
 
 interface ActivityLogDialogProps {
   open: boolean;
@@ -12,20 +12,25 @@ interface ActivityLogDialogProps {
   beneficiaryName: string;
 }
 
-export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficiaryName }: ActivityLogDialogProps) {
+export function ActivityLogDialog({
+  open,
+  onOpenChange,
+  beneficiaryId,
+  beneficiaryName,
+}: ActivityLogDialogProps) {
   const { activities, isLoading } = useBeneficiaryActivityLog(beneficiaryId);
 
   const getActionIcon = (actionType: string) => {
     switch (actionType) {
-      case "created":
+      case 'created':
         return <UserPlus className="h-4 w-4" />;
-      case "updated":
+      case 'updated':
         return <Edit className="h-4 w-4" />;
-      case "deleted":
+      case 'deleted':
         return <Trash2 className="h-4 w-4" />;
-      case "payment_received":
+      case 'payment_received':
         return <DollarSign className="h-4 w-4" />;
-      case "document_added":
+      case 'document_added':
         return <FileText className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
@@ -34,67 +39,67 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
 
   const getActionColor = (actionType: string) => {
     switch (actionType) {
-      case "created":
-        return "default";
-      case "updated":
-        return "secondary";
-      case "deleted":
-        return "destructive";
-      case "payment_received":
-        return "default";
-      case "document_added":
-        return "outline";
+      case 'created':
+        return 'default';
+      case 'updated':
+        return 'secondary';
+      case 'deleted':
+        return 'destructive';
+      case 'payment_received':
+        return 'default';
+      case 'document_added':
+        return 'outline';
       default:
-        return "secondary";
+        return 'secondary';
     }
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title={`سجل النشاط: ${beneficiaryName}`}
       size="xl"
     >
       <ScrollArea className="h-[400px] sm:h-[600px] pe-4">
-          {isLoading ? (
-            <div className="text-center py-8">جاري التحميل...</div>
-          ) : activities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              لا توجد أنشطة مسجلة
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activities.map((activity) => (
-                <div key={activity.id} className="border-e-4 border-primary/20 pe-4 pb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1">
-                      <Badge variant={getActionColor(activity.action_type)} className="gap-1">
-                        {getActionIcon(activity.action_type)}
-                      </Badge>
+        {isLoading ? (
+          <div className="text-center py-8">جاري التحميل...</div>
+        ) : activities.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">لا توجد أنشطة مسجلة</div>
+        ) : (
+          <div className="space-y-4">
+            {activities.map((activity) => (
+              <div key={activity.id} className="border-e-4 border-primary/20 pe-4 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    <Badge variant={getActionColor(activity.action_type)} className="gap-1">
+                      {getActionIcon(activity.action_type)}
+                    </Badge>
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <p className="font-medium">{activity.action_description}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{activity.performed_by_name}</span>
+                      <span>•</span>
+                      <span>{formatDate(activity.created_at, 'dd MMMM yyyy - hh:mm a')}</span>
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="font-medium">{activity.action_description}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{activity.performed_by_name}</span>
-                        <span>•</span>
-                        <span>{formatDate(activity.created_at, "dd MMMM yyyy - hh:mm a")}</span>
-                      </div>
-                      {activity.new_values && (
-                        <details className="mt-2">
-                          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                            عرض التفاصيل
-                          </summary>
-                          <div className="mt-2 p-2 bg-muted rounded text-xs">
-                            <pre className="whitespace-pre-wrap">{JSON.stringify(activity.new_values, null, 2)}</pre>
-                          </div>
-                        </details>
-                      )}
-                    </div>
+                    {activity.new_values && (
+                      <details className="mt-2">
+                        <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                          عرض التفاصيل
+                        </summary>
+                        <div className="mt-2 p-2 bg-muted rounded text-xs">
+                          <pre className="whitespace-pre-wrap">
+                            {JSON.stringify(activity.new_values, null, 2)}
+                          </pre>
+                        </div>
+                      </details>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
         )}
       </ScrollArea>
     </ResponsiveDialog>

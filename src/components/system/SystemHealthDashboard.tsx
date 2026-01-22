@@ -3,29 +3,30 @@
  * 🔧 جزء من Phase 1: معالجة التنبيهات الحرجة
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { 
-  Activity, 
-  AlertTriangle, 
-  CheckCircle2, 
-  TrendingUp, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  TrendingUp,
   Zap,
   RefreshCw,
-  Trash2
-} from "lucide-react";
-import { errorTracker } from "@/lib/errors/tracker";
-import { useSystemHealthLive } from "@/hooks/system/useSystemHealthLive";
-import { useSystemHealthActions } from "@/hooks/system/useSystemHealthActions";
-import { ErrorState } from "@/components/shared/ErrorState";
+  Trash2,
+} from 'lucide-react';
+import { errorTracker } from '@/lib/errors/tracker';
+import { useSystemHealthLive } from '@/hooks/system/useSystemHealthLive';
+import { useSystemHealthActions } from '@/hooks/system/useSystemHealthActions';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function SystemHealthDashboard() {
   const { data: liveStats, isLoading, error, refetch } = useSystemHealthLive();
-  
+
   // استخدام hook مخصص للعمليات
-  const { handleBulkResolve, handleCleanupResolved, handleManualCleanup } = useSystemHealthActions(refetch);
+  const { handleBulkResolve, handleCleanupResolved, handleManualCleanup } =
+    useSystemHealthActions(refetch);
 
   // جلب إحصائيات Deduplication من Error Tracker
   const dedupStats = errorTracker.getDeduplicationStats();
@@ -43,15 +44,21 @@ export function SystemHealthDashboard() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل حالة النظام" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل حالة النظام"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   const healthScore = liveStats?.healthScore || 0;
 
   const getHealthColor = (score: number) => {
-    if (score >= 90) return "text-success";
-    if (score >= 70) return "text-warning";
-    return "text-destructive";
+    if (score >= 90) return 'text-success';
+    if (score >= 70) return 'text-warning';
+    return 'text-destructive';
   };
 
   return (
@@ -63,35 +70,19 @@ export function SystemHealthDashboard() {
             لوحة المراقبة الحية
           </CardTitle>
           <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => refetch()}
-            >
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4 ms-2" />
               تحديث
             </Button>
-            <Button 
-              size="sm" 
-              variant="default"
-              onClick={handleManualCleanup}
-            >
+            <Button size="sm" variant="default" onClick={handleManualCleanup}>
               <Zap className="h-4 w-4 ms-2" />
               تنظيف فوري
             </Button>
-            <Button 
-              size="sm" 
-              variant="destructive"
-              onClick={handleBulkResolve}
-            >
+            <Button size="sm" variant="destructive" onClick={handleBulkResolve}>
               <CheckCircle2 className="h-4 w-4 ms-2" />
               حل القديمة
             </Button>
-            <Button 
-              size="sm" 
-              variant="secondary"
-              onClick={handleCleanupResolved}
-            >
+            <Button size="sm" variant="secondary" onClick={handleCleanupResolved}>
               <Trash2 className="h-4 w-4 ms-2" />
               مسح المحلولة
             </Button>
@@ -131,9 +122,7 @@ export function SystemHealthDashboard() {
               <span className="text-sm font-medium">تنبيهات عالية</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-warning">
-                {liveStats?.highAlerts || 0}
-              </span>
+              <span className="text-3xl font-bold text-warning">{liveStats?.highAlerts || 0}</span>
               <Badge variant="secondary">نشط</Badge>
             </div>
           </div>
@@ -162,9 +151,7 @@ export function SystemHealthDashboard() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">معدل الإصلاح التلقائي</span>
-            <span className="text-lg font-bold text-info">
-              {liveStats?.fixSuccessRate || 0}%
-            </span>
+            <span className="text-lg font-bold text-info">{liveStats?.fixSuccessRate || 0}%</span>
           </div>
           <Progress value={liveStats?.fixSuccessRate || 0} className="h-2" />
           <div className="flex justify-between text-xs text-muted-foreground">

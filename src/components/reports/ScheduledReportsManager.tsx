@@ -53,7 +53,7 @@ export function ScheduledReportsManager() {
   const handleCreate = async () => {
     if (!selectedTemplate || !recipients) return;
 
-    const recipientList = recipients.split(',').map(email => ({
+    const recipientList = recipients.split(',').map((email) => ({
       email: email.trim(),
       user_id: '', // سيتم تحديده لاحقاً
     }));
@@ -87,9 +87,7 @@ export function ScheduledReportsManager() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">التقارير المجدولة</h2>
-          <p className="text-muted-foreground">
-            إدارة التقارير التي يتم إنشاؤها تلقائياً
-          </p>
+          <p className="text-muted-foreground">إدارة التقارير التي يتم إنشاؤها تلقائياً</p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 ms-2" />
@@ -107,9 +105,7 @@ export function ScheduledReportsManager() {
                     <CardTitle className="text-lg">
                       {report.report_template?.name || 'تقرير مجدول'}
                     </CardTitle>
-                    <CardDescription>
-                      {report.report_template?.description}
-                    </CardDescription>
+                    <CardDescription>{report.report_template?.description}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     {report.is_active ? (
@@ -124,7 +120,14 @@ export function ScheduledReportsManager() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>التكرار: {report.schedule_type === 'daily' ? 'يومي' : report.schedule_type === 'weekly' ? 'أسبوعي' : 'شهري'}</span>
+                    <span>
+                      التكرار:{' '}
+                      {report.schedule_type === 'daily'
+                        ? 'يومي'
+                        : report.schedule_type === 'weekly'
+                          ? 'أسبوعي'
+                          : 'شهري'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -133,13 +136,18 @@ export function ScheduledReportsManager() {
                   {report.last_run_at && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span>آخر تشغيل: {format(new Date(report.last_run_at), 'PPp', { locale: ar })}</span>
+                      <span>
+                        آخر تشغيل: {format(new Date(report.last_run_at), 'PPp', { locale: ar })}
+                      </span>
                     </div>
                   )}
                   {report.next_run_at && (
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span>التشغيل القادم: {format(new Date(report.next_run_at), 'PPp', { locale: ar })}</span>
+                      <span>
+                        التشغيل القادم:{' '}
+                        {format(new Date(report.next_run_at), 'PPp', { locale: ar })}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -156,10 +164,12 @@ export function ScheduledReportsManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => updateReport.mutate({
-                      id: report.id,
-                      report: { is_active: !report.is_active }
-                    })}
+                    onClick={() =>
+                      updateReport.mutate({
+                        id: report.id,
+                        report: { is_active: !report.is_active },
+                      })
+                    }
                   >
                     {report.is_active ? 'إيقاف' : 'تفعيل'}
                   </Button>
@@ -188,9 +198,7 @@ export function ScheduledReportsManager() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>جدولة تقرير جديد</DialogTitle>
-            <DialogDescription>
-              اختر قالب التقرير وحدد جدول التنفيذ والمستلمين
-            </DialogDescription>
+            <DialogDescription>اختر قالب التقرير وحدد جدول التنفيذ والمستلمين</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -212,7 +220,10 @@ export function ScheduledReportsManager() {
 
             <div className="space-y-2">
               <Label>التكرار</Label>
-              <Select value={scheduleType} onValueChange={(v) => setScheduleType(v as 'daily' | 'weekly' | 'monthly')}>
+              <Select
+                value={scheduleType}
+                onValueChange={(v) => setScheduleType(v as 'daily' | 'weekly' | 'monthly')}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -235,7 +246,10 @@ export function ScheduledReportsManager() {
 
             <div className="space-y-2">
               <Label>طريقة التسليم</Label>
-              <Select value={deliveryMethod} onValueChange={(v) => setDeliveryMethod(v as 'email' | 'storage' | 'both')}>
+              <Select
+                value={deliveryMethod}
+                onValueChange={(v) => setDeliveryMethod(v as 'email' | 'storage' | 'both')}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

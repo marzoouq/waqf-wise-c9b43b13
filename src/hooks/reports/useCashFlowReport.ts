@@ -3,12 +3,12 @@
  * @version 2.8.45
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { ReportService, type CashFlowData } from "@/services/report.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { ReportService, type CashFlowData } from '@/services/report.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { CashFlowData };
 
@@ -63,9 +63,10 @@ export function useCashFlowReport() {
     totalIncome: cashFlowData.reduce((sum, d) => sum + d.income, 0),
     totalExpense: cashFlowData.reduce((sum, d) => sum + d.expense, 0),
     netCashFlow: cashFlowData.reduce((sum, d) => sum + d.net, 0),
-    avgMonthlyIncome: cashFlowData.length > 0 
-      ? cashFlowData.reduce((sum, d) => sum + d.income, 0) / cashFlowData.length 
-      : 0,
+    avgMonthlyIncome:
+      cashFlowData.length > 0
+        ? cashFlowData.reduce((sum, d) => sum + d.income, 0) / cashFlowData.length
+        : 0,
   };
 
   return {

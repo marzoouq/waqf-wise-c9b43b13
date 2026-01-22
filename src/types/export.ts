@@ -17,7 +17,6 @@ export interface BeneficiaryExport {
   notes: string | null;
 }
 
-
 export interface PaymentExport {
   payment_number: string;
   payment_date: string;

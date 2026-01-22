@@ -32,24 +32,24 @@ graph TB
         D --> E[SECURITY DEFINER Functions]
         E --> F[البيانات المحمية]
     end
-    
+
     subgraph "🎯 React Frontend"
         G[AuthContext] --> H[useUserRole Hook]
         H --> I[usePermissions Hook]
         I --> J[PermissionGate Component]
     end
-    
+
     A --> G
 ```
 
 ### المبادئ الأساسية
 
-| المبدأ | الوصف |
-|--------|--------|
-| **فصل الأدوار** | الأدوار مخزنة في جدول منفصل `user_roles` وليس في `profiles` |
-| **SECURITY DEFINER** | جميع دوال التحقق تستخدم `SECURITY DEFINER` لمنع التكرار |
-| **التحقق المركزي** | دالة `has_role()` مركزية لجميع عمليات التحقق |
-| **حماية متعددة** | RLS على مستوى قاعدة البيانات + Frontend على مستوى React |
+| المبدأ               | الوصف                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| **فصل الأدوار**      | الأدوار مخزنة في جدول منفصل `user_roles` وليس في `profiles` |
+| **SECURITY DEFINER** | جميع دوال التحقق تستخدم `SECURITY DEFINER` لمنع التكرار     |
+| **التحقق المركزي**   | دالة `has_role()` مركزية لجميع عمليات التحقق                |
+| **حماية متعددة**     | RLS على مستوى قاعدة البيانات + Frontend على مستوى React     |
 
 ---
 
@@ -64,20 +64,20 @@ erDiagram
     USER_ROLES }o--|| ROLES : "references"
     ROLES ||--o{ ROLE_PERMISSIONS : "has"
     ROLE_PERMISSIONS }o--|| PERMISSIONS : "grants"
-    
+
     AUTH_USERS {
         uuid id PK
         string email
         timestamp created_at
     }
-    
+
     USER_ROLES {
         uuid id PK
         uuid user_id FK
         string role
         timestamp created_at
     }
-    
+
     ROLES {
         uuid id PK
         string role_name
@@ -85,21 +85,21 @@ erDiagram
         string[] permissions
         boolean is_system_role
     }
-    
+
     PERMISSIONS {
         uuid id PK
         string name
         string category
         string description
     }
-    
+
     ROLE_PERMISSIONS {
         uuid id PK
         uuid role_id FK
         uuid permission_id FK
         boolean granted
     }
-    
+
     PROFILES {
         uuid id PK
         uuid user_id FK
@@ -118,13 +118,13 @@ sequenceDiagram
     participant A as Supabase Auth
     participant DB as قاعدة البيانات
     participant RLS as سياسات RLS
-    
+
     U->>F: تسجيل الدخول
     F->>A: signInWithPassword()
     A->>DB: التحقق من البيانات
     DB-->>A: JWT Token
     A-->>F: Session + User
-    
+
     F->>DB: طلب بيانات
     DB->>RLS: التحقق من الصلاحيات
     RLS->>DB: has_role(auth.uid(), 'admin')
@@ -139,16 +139,16 @@ sequenceDiagram
 
 ### جدول الأدوار
 
-| الدور | الاسم العربي | الوصف | لوحة التحكم |
-|-------|-------------|--------|-------------|
-| `nazer` | الناظر | المسؤول الأعلى عن الوقف | `/nazer` |
-| `admin` | مدير النظام | إدارة المستخدمين والإعدادات | `/admin` |
-| `accountant` | المحاسب | إدارة المحاسبة والقيود | `/accountant` |
-| `cashier` | أمين الصندوق | إدارة نقطة البيع والتحصيل | `/cashier` |
-| `archivist` | أمين الأرشيف | إدارة المستندات والوثائق | `/archivist` |
-| `beneficiary` | مستفيد | الوصول لبوابة المستفيدين | `/beneficiary-portal` |
-| `waqf_heir` | وريث الوقف | عرض معلومات الوقف | `/waqf-heir` |
-| `user` | مستخدم عادي | صلاحيات أساسية | `/` |
+| الدور         | الاسم العربي | الوصف                       | لوحة التحكم           |
+| ------------- | ------------ | --------------------------- | --------------------- |
+| `nazer`       | الناظر       | المسؤول الأعلى عن الوقف     | `/nazer`              |
+| `admin`       | مدير النظام  | إدارة المستخدمين والإعدادات | `/admin`              |
+| `accountant`  | المحاسب      | إدارة المحاسبة والقيود      | `/accountant`         |
+| `cashier`     | أمين الصندوق | إدارة نقطة البيع والتحصيل   | `/cashier`            |
+| `archivist`   | أمين الأرشيف | إدارة المستندات والوثائق    | `/archivist`          |
+| `beneficiary` | مستفيد       | الوصول لبوابة المستفيدين    | `/beneficiary-portal` |
+| `waqf_heir`   | وريث الوقف   | عرض معلومات الوقف           | `/waqf-heir`          |
+| `user`        | مستخدم عادي  | صلاحيات أساسية              | `/`                   |
 
 ### هرمية الأدوار
 
@@ -157,26 +157,26 @@ graph TD
     subgraph "👑 الإدارة العليا"
         N[nazer<br/>الناظر]
     end
-    
+
     subgraph "⚙️ الإدارة"
         A[admin<br/>مدير النظام]
     end
-    
+
     subgraph "💼 الموظفون"
         AC[accountant<br/>المحاسب]
         C[cashier<br/>أمين الصندوق]
         AR[archivist<br/>أمين الأرشيف]
     end
-    
+
     subgraph "👥 المستفيدون"
         B[beneficiary<br/>مستفيد]
         W[waqf_heir<br/>وريث الوقف]
     end
-    
+
     subgraph "🔹 أساسي"
         U[user<br/>مستخدم عادي]
     end
-    
+
     N --> A
     A --> AC
     A --> C
@@ -190,14 +190,14 @@ graph TD
 
 ```typescript
 const ROLE_COLORS = {
-  nazer: "bg-gradient-to-r from-amber-500 to-amber-600 text-white",
-  admin: "bg-gradient-to-r from-purple-500 to-purple-600 text-white",
-  accountant: "bg-gradient-to-r from-blue-500 to-blue-600 text-white",
-  cashier: "bg-gradient-to-r from-green-500 to-green-600 text-white",
-  archivist: "bg-gradient-to-r from-teal-500 to-teal-600 text-white",
-  beneficiary: "bg-gradient-to-r from-pink-500 to-pink-600 text-white",
-  waqf_heir: "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white",
-  user: "bg-gradient-to-r from-gray-500 to-gray-600 text-white",
+  nazer: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white',
+  admin: 'bg-gradient-to-r from-purple-500 to-purple-600 text-white',
+  accountant: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white',
+  cashier: 'bg-gradient-to-r from-green-500 to-green-600 text-white',
+  archivist: 'bg-gradient-to-r from-teal-500 to-teal-600 text-white',
+  beneficiary: 'bg-gradient-to-r from-pink-500 to-pink-600 text-white',
+  waqf_heir: 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white',
+  user: 'bg-gradient-to-r from-gray-500 to-gray-600 text-white',
 };
 ```
 
@@ -243,24 +243,24 @@ mindmap
 
 ### مصفوفة الصلاحيات التفصيلية
 
-| الصلاحية | nazer | admin | accountant | cashier | archivist | beneficiary |
-|----------|:-----:|:-----:|:----------:|:-------:|:---------:|:-----------:|
-| **المستفيدين** ||||||| 
-| `beneficiaries.view` | ✅ | ✅ | ✅ | ✅ | ✅ | 🔶 |
-| `beneficiaries.create` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `beneficiaries.edit` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `beneficiaries.delete` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **المحاسبة** |||||||
-| `accounting.view` | ✅ | ✅ | ✅ | 🔶 | ❌ | ❌ |
-| `accounting.create` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `accounting.approve` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **العقارات** |||||||
-| `properties.view` | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
-| `properties.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **الإدارة** |||||||
-| `users.view` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `users.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `roles.manage` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| الصلاحية               | nazer | admin | accountant | cashier | archivist | beneficiary |
+| ---------------------- | :---: | :---: | :--------: | :-----: | :-------: | :---------: |
+| **المستفيدين**         |       |       |            |         |           |             |
+| `beneficiaries.view`   |  ✅   |  ✅   |     ✅     |   ✅    |    ✅     |     🔶      |
+| `beneficiaries.create` |  ✅   |  ✅   |     ❌     |   ❌    |    ❌     |     ❌      |
+| `beneficiaries.edit`   |  ✅   |  ✅   |     ❌     |   ❌    |    ❌     |     ❌      |
+| `beneficiaries.delete` |  ✅   |  ❌   |     ❌     |   ❌    |    ❌     |     ❌      |
+| **المحاسبة**           |       |       |            |         |           |             |
+| `accounting.view`      |  ✅   |  ✅   |     ✅     |   🔶    |    ❌     |     ❌      |
+| `accounting.create`    |  ✅   |  ❌   |     ✅     |   ❌    |    ❌     |     ❌      |
+| `accounting.approve`   |  ✅   |  ❌   |     ✅     |   ❌    |    ❌     |     ❌      |
+| **العقارات**           |       |       |            |         |           |             |
+| `properties.view`      |  ✅   |  ✅   |     ✅     |   ❌    |    ✅     |     ❌      |
+| `properties.manage`    |  ✅   |  ✅   |     ❌     |   ❌    |    ❌     |     ❌      |
+| **الإدارة**            |       |       |            |         |           |             |
+| `users.view`           |  ✅   |  ✅   |     ❌     |   ❌    |    ❌     |     ❌      |
+| `users.manage`         |  ✅   |  ✅   |     ❌     |   ❌    |    ❌     |     ❌      |
+| `roles.manage`         |  ✅   |  ❌   |     ❌     |   ❌    |    ❌     |     ❌      |
 
 > 🔶 = صلاحية جزئية (مثلاً: المستفيد يرى بياناته فقط)
 
@@ -292,6 +292,7 @@ $$;
 ```
 
 **الاستخدام في RLS:**
+
 ```sql
 CREATE POLICY "staff_access" ON public.beneficiaries
 FOR SELECT TO authenticated
@@ -396,26 +397,26 @@ graph LR
     subgraph "🔧 الدوال الأساسية"
         HR[has_role<br/>التحقق من دور محدد]
     end
-    
+
     subgraph "🎯 دوال مركبة"
         AON[is_admin_or_nazer<br/>124 سياسة]
         HSA[has_staff_access<br/>89 سياسة]
         IFS[is_financial_staff<br/>67 سياسة]
         ISO[is_staff_only<br/>45 سياسة]
     end
-    
+
     HR --> AON
     HR --> HSA
     HR --> IFS
     HR --> ISO
-    
+
     subgraph "🛡️ سياسات RLS"
         P1[سياسات المستفيدين]
         P2[سياسات المحاسبة]
         P3[سياسات العقارات]
         P4[سياسات الإدارة]
     end
-    
+
     AON --> P1
     AON --> P4
     HSA --> P1
@@ -434,9 +435,9 @@ graph LR
 
 ```sql
 -- الموظفون يمكنهم قراءة جميع المستفيدين
-CREATE POLICY "staff_read_beneficiaries" 
+CREATE POLICY "staff_read_beneficiaries"
 ON public.beneficiaries
-FOR SELECT 
+FOR SELECT
 TO authenticated
 USING (public.has_staff_access());
 
@@ -514,23 +515,23 @@ interface AuthContextValue {
 
 ```typescript
 // src/hooks/auth/useUserRole.ts
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useUserRole() {
   const { roles, rolesLoading, hasRole } = useAuth();
-  
+
   return {
     roles,
     isLoading: rolesLoading,
     hasRole,
     // اختصارات مفيدة
-    isNazer: hasRole("nazer"),
-    isAdmin: hasRole("admin"),
-    isAccountant: hasRole("accountant"),
-    isCashier: hasRole("cashier"),
-    isArchivist: hasRole("archivist"),
-    isBeneficiary: hasRole("beneficiary"),
-    isWaqfHeir: hasRole("waqf_heir"),
+    isNazer: hasRole('nazer'),
+    isAdmin: hasRole('admin'),
+    isAccountant: hasRole('accountant'),
+    isCashier: hasRole('cashier'),
+    isArchivist: hasRole('archivist'),
+    isBeneficiary: hasRole('beneficiary'),
+    isWaqfHeir: hasRole('waqf_heir'),
   };
 }
 ```
@@ -541,18 +542,18 @@ export function useUserRole() {
 // src/hooks/auth/usePermissions.ts
 export function usePermissions() {
   const { user } = useAuth();
-  
+
   const { data: permissions = [] } = useQuery({
     queryKey: ['user-permissions', user?.id],
     queryFn: () => UserService.getUserPermissions(user!.id),
     enabled: !!user,
   });
-  
+
   return {
     permissions,
     hasPermission: (perm: string) => permissions.includes(perm),
-    hasAnyPermission: (perms: string[]) => perms.some(p => permissions.includes(p)),
-    hasAllPermissions: (perms: string[]) => perms.every(p => permissions.includes(p)),
+    hasAnyPermission: (perms: string[]) => perms.some((p) => permissions.includes(p)),
+    hasAllPermissions: (perms: string[]) => perms.every((p) => permissions.includes(p)),
   };
 }
 ```
@@ -568,18 +569,20 @@ interface PermissionGateProps {
   requireAll?: boolean;
 }
 
-export function PermissionGate({ 
-  permission, 
-  fallback = null, 
+export function PermissionGate({
+  permission,
+  fallback = null,
   children,
-  requireAll = false 
+  requireAll = false,
 }: PermissionGateProps) {
   const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermissions();
-  
+
   const allowed = Array.isArray(permission)
-    ? (requireAll ? hasAllPermissions(permission) : hasAnyPermission(permission))
+    ? requireAll
+      ? hasAllPermissions(permission)
+      : hasAnyPermission(permission)
     : hasPermission(permission);
-  
+
   return allowed ? <>{children}</> : <>{fallback}</>;
 }
 ```
@@ -598,15 +601,15 @@ export function PermissionGate({
 </PermissionGate>
 
 // حماية بجميع الصلاحيات
-<PermissionGate 
-  permission={["users.view", "users.manage"]} 
+<PermissionGate
+  permission={["users.view", "users.manage"]}
   requireAll
 >
   <UsersManagement />
 </PermissionGate>
 
 // مع محتوى بديل
-<PermissionGate 
+<PermissionGate
   permission="admin.settings"
   fallback={<p>ليس لديك صلاحية</p>}
 >
@@ -631,13 +634,13 @@ graph LR
     end
 ```
 
-| المقياس | القيمة |
-|---------|--------|
-| عدد الأدوار | 8 |
-| الجداول المحمية بـ RLS | 231 |
-| إجمالي سياسات RLS | 758 |
-| دوال SECURITY DEFINER | 239 |
-| الصلاحيات المسجلة | 45+ |
+| المقياس                | القيمة |
+| ---------------------- | ------ |
+| عدد الأدوار            | 8      |
+| الجداول المحمية بـ RLS | 231    |
+| إجمالي سياسات RLS      | 758    |
+| دوال SECURITY DEFINER  | 239    |
+| الصلاحيات المسجلة      | 45+    |
 
 ### نقاط القوة
 

@@ -4,11 +4,11 @@
  * يدعم وضع المعاينة للناظر
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { useSearchParams } from "react-router-dom";
-import { BeneficiaryService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
+import { BeneficiaryService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BeneficiaryStatistics {
   total_received: number;
@@ -20,13 +20,14 @@ export interface BeneficiaryStatistics {
 export function useBeneficiaryPortalData() {
   const { user, hasRole } = useAuth();
   const [searchParams] = useSearchParams();
-  
+
   // التحقق من وضع المعاينة
-  const isPreviewMode = searchParams.get("preview") === "true";
-  const previewBeneficiaryId = searchParams.get("beneficiary_id");
-  
+  const isPreviewMode = searchParams.get('preview') === 'true';
+  const previewBeneficiaryId = searchParams.get('beneficiary_id');
+
   // هل المستخدم ناظر أو مسؤول في وضع المعاينة؟
-  const isNazerPreview = isPreviewMode && previewBeneficiaryId && (hasRole("nazer") || hasRole("admin"));
+  const isNazerPreview =
+    isPreviewMode && previewBeneficiaryId && (hasRole('nazer') || hasRole('admin'));
 
   // جلب بيانات المستفيد الحالي
   const {
@@ -35,8 +36,8 @@ export function useBeneficiaryPortalData() {
     error: beneficiaryError,
     refetch,
   } = useQuery({
-    queryKey: isNazerPreview 
-      ? ['preview-beneficiary', previewBeneficiaryId] 
+    queryKey: isNazerPreview
+      ? ['preview-beneficiary', previewBeneficiaryId]
       : QUERY_KEYS.CURRENT_BENEFICIARY(user?.id),
     queryFn: async () => {
       // وضع المعاينة للناظر
@@ -44,17 +45,14 @@ export function useBeneficiaryPortalData() {
         return BeneficiaryService.getById(previewBeneficiaryId);
       }
       // الوضع العادي للمستفيد
-      if (!user?.id) throw new Error("غير مصرح");
+      if (!user?.id) throw new Error('غير مصرح');
       return BeneficiaryService.getByUserId(user.id);
     },
     enabled: isNazerPreview ? !!previewBeneficiaryId : !!user?.id,
   });
 
   // جلب الإحصائيات
-  const {
-    data: statistics,
-    isLoading: statisticsLoading,
-  } = useQuery({
+  const { data: statistics, isLoading: statisticsLoading } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_STATISTICS(beneficiary?.id),
     queryFn: async () => {
       if (!beneficiary?.id) return null;

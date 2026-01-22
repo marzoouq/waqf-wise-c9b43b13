@@ -9,28 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIntelligentSearch, SearchType, SearchResult } from '@/hooks/ai/useIntelligentSearch';
-import { 
-  Search, 
-  FileText, 
-  User, 
-  Building, 
-  FileSignature, 
-  Clock,
-  X,
-  Sparkles
-} from 'lucide-react';
+import { Search, FileText, User, Building, FileSignature, Clock, X, Sparkles } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 
 const searchTypeOptions: { value: SearchType; label: string; icon: React.ReactNode }[] = [
@@ -66,16 +48,9 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
   const [query, setQuery] = useState('');
   const [searchType, setSearchType] = useState<SearchType>('all');
   const [isOpen, setIsOpen] = useState(false);
-  
-  const { 
-    search, 
-    isSearching, 
-    results, 
-    totalResults,
-    recentSearches,
-    clearRecentSearches,
-    reset 
-  } = useIntelligentSearch();
+
+  const { search, isSearching, results, totalResults, recentSearches, clearRecentSearches, reset } =
+    useIntelligentSearch();
 
   const handleSearch = () => {
     if (query.trim().length >= 2) {
@@ -115,7 +90,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {searchTypeOptions.map(option => (
+            {searchTypeOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 <div className="flex items-center gap-2">
                   {option.icon}
@@ -125,7 +100,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
             ))}
           </SelectContent>
         </Select>
-        
+
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <div className="flex-1 relative">
@@ -165,9 +140,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
                         className="cursor-pointer"
                       >
                         <div className="flex items-start gap-3 w-full">
-                          <div className="mt-1">
-                            {typeIcons[result.type]}
-                          </div>
+                          <div className="mt-1">{typeIcons[result.type]}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="font-medium truncate">{result.title}</span>
@@ -179,7 +152,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
                               {result.description}
                             </p>
                           </div>
-                          <Badge 
+                          <Badge
                             variant={result.relevanceScore > 0.7 ? 'default' : 'secondary'}
                             className="text-xs"
                           >
@@ -223,13 +196,11 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
                 أدخل حرفين على الأقل للبحث
               </div>
             ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                لم يتم العثور على نتائج
-              </div>
+              <div className="p-4 text-center text-muted-foreground">لم يتم العثور على نتائج</div>
             )}
           </PopoverContent>
         </Popover>
-        
+
         <Button onClick={handleSearch} disabled={isSearching || query.length < 2}>
           <Search className="h-4 w-4 ms-2" />
           بحث

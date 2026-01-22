@@ -33,7 +33,12 @@ function getAgeCategory(daysPastDue: number): string {
 }
 
 export function useAgingReport() {
-  const { data: agingResult, isLoading, error, refetch } = useQuery({
+  const {
+    data: agingResult,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['aging_report'],
     queryFn: () => CustomReportsService.getAgingReport(),
   });
@@ -41,11 +46,11 @@ export function useAgingReport() {
   // تحويل البيانات الخام إلى الشكل المتوقع
   const rawItems = agingResult?.items || [];
   const today = new Date();
-  
+
   const agingData: AgingItem[] = rawItems.map((item) => {
     const dueDate = new Date(item.due_date);
     const daysPastDue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     return {
       id: item.id,
       beneficiary_name: item.customer_name || 'غير معروف',

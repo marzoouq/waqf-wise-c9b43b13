@@ -18,7 +18,7 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
 
   const handleToggle = (id: string) => {
     if (selected.includes(id)) {
-      onChange(selected.filter(s => s !== id));
+      onChange(selected.filter((s) => s !== id));
     } else {
       onChange([...selected, id]);
     }
@@ -28,7 +28,7 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
     if (selected.length === filteredBeneficiaries.length) {
       onChange([]);
     } else {
-      onChange(filteredBeneficiaries.map(b => b.id));
+      onChange(filteredBeneficiaries.map((b) => b.id));
     }
   };
 
@@ -51,7 +51,9 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
 
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Users className="h-4 w-4" />
-        <span>تم تحديد {selected.length} من {filteredBeneficiaries.length} مستفيد</span>
+        <span>
+          تم تحديد {selected.length} من {filteredBeneficiaries.length} مستفيد
+        </span>
       </div>
 
       {loading ? (

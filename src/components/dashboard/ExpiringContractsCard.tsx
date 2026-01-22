@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Calendar, Eye } from "lucide-react";
-import { useContracts } from "@/hooks/property/useContracts";
-import { differenceInDays, formatDate } from "@/lib/date";
-import { useNavigate } from "react-router-dom";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { matchesStatus } from "@/lib/constants";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, Calendar, Eye } from 'lucide-react';
+import { useContracts } from '@/hooks/property/useContracts';
+import { differenceInDays, formatDate } from '@/lib/date';
+import { useNavigate } from 'react-router-dom';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { matchesStatus } from '@/lib/constants';
 
 export const ExpiringContractsCard = () => {
   const { contracts, isLoading, error, refetch } = useContracts();
@@ -14,7 +14,13 @@ export const ExpiringContractsCard = () => {
   const today = new Date();
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل العقود" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل العقود"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   // فحص البيانات بشكل آمن
@@ -28,9 +34,7 @@ export const ExpiringContractsCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            جاري التحميل...
-          </div>
+          <div className="text-center py-6 text-muted-foreground">جاري التحميل...</div>
         </CardContent>
       </Card>
     );
@@ -47,9 +51,7 @@ export const ExpiringContractsCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            لا توجد بيانات
-          </div>
+          <div className="text-center py-6 text-muted-foreground">لا توجد بيانات</div>
         </CardContent>
       </Card>
     );
@@ -60,7 +62,7 @@ export const ExpiringContractsCard = () => {
     .filter((contract) => {
       // التأكد من وجود تاريخ الانتهاء والحالة
       if (!contract?.end_date || !contract?.status) return false;
-      
+
       try {
         const endDate = new Date(contract.end_date);
         const daysRemaining = differenceInDays(endDate, today);
@@ -76,8 +78,8 @@ export const ExpiringContractsCard = () => {
     })
     .slice(0, 5); // أول 5 عقود فقط
 
-  const critical = expiringContracts.filter(c => 
-    differenceInDays(new Date(c.end_date), today) <= 30
+  const critical = expiringContracts.filter(
+    (c) => differenceInDays(new Date(c.end_date), today) <= 30
   ).length;
 
   const getDaysRemaining = (endDate: string) => {
@@ -86,12 +88,24 @@ export const ExpiringContractsCard = () => {
 
   const getSeverityBadge = (days: number) => {
     if (days <= 30) {
-      return { variant: "destructive" as const, label: "عاجل", color: "bg-destructive/10 text-destructive border-destructive/20" };
+      return {
+        variant: 'destructive' as const,
+        label: 'عاجل',
+        color: 'bg-destructive/10 text-destructive border-destructive/20',
+      };
     }
     if (days <= 60) {
-      return { variant: "secondary" as const, label: "تحذير", color: "bg-warning/10 text-warning border-warning/20" };
+      return {
+        variant: 'secondary' as const,
+        label: 'تحذير',
+        color: 'bg-warning/10 text-warning border-warning/20',
+      };
     }
-    return { variant: "outline" as const, label: "قريب", color: "bg-info/10 text-info border-info/20" };
+    return {
+      variant: 'outline' as const,
+      label: 'قريب',
+      color: 'bg-info/10 text-info border-info/20',
+    };
   };
 
   if (expiringContracts.length === 0) {
@@ -108,9 +122,7 @@ export const ExpiringContractsCard = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-success/10 mb-3">
               <Calendar className="h-6 w-6 text-success" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              لا توجد عقود قريبة من الانتهاء
-            </p>
+            <p className="text-sm text-muted-foreground">لا توجد عقود قريبة من الانتهاء</p>
           </div>
         </CardContent>
       </Card>
@@ -118,7 +130,7 @@ export const ExpiringContractsCard = () => {
   }
 
   return (
-    <Card className={critical > 0 ? "border-destructive" : ""}>
+    <Card className={critical > 0 ? 'border-destructive' : ''}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
           <div className="flex items-center gap-2">
@@ -140,19 +152,14 @@ export const ExpiringContractsCard = () => {
             const severity = getSeverityBadge(daysRemaining);
 
             return (
-              <div 
-                key={contract.id} 
+              <div
+                key={contract.id}
                 className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm truncate">
-                      {contract.contract_number}
-                    </span>
-                    <Badge 
-                      variant={severity.variant}
-                      className={`text-xs ${severity.color}`}
-                    >
+                    <span className="font-medium text-sm truncate">{contract.contract_number}</span>
+                    <Badge variant={severity.variant} className={`text-xs ${severity.color}`}>
                       {daysRemaining} يوم
                     </Badge>
                   </div>
@@ -161,7 +168,7 @@ export const ExpiringContractsCard = () => {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                     <Calendar className="h-3 w-3" />
-                    {formatDate(contract.end_date, "dd MMM yyyy")}
+                    {formatDate(contract.end_date, 'dd MMM yyyy')}
                   </div>
                 </div>
                 <Button
@@ -178,11 +185,7 @@ export const ExpiringContractsCard = () => {
           })}
 
           {expiringContracts.length >= 5 && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate('/properties')}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate('/properties')}>
               عرض جميع العقود
             </Button>
           )}

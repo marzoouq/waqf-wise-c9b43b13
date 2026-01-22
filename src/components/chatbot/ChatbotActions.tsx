@@ -1,5 +1,5 @@
-import { Download, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Download, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,14 +10,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/ui/use-toast";
-import { format, arLocale as ar } from "@/lib/date";
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/ui/use-toast';
+import { format, arLocale as ar } from '@/lib/date';
 
 interface ChatMessage {
   id: string;
   message: string;
-  message_type: "user" | "bot";
+  message_type: 'user' | 'bot';
   created_at: string;
 }
 
@@ -27,7 +27,11 @@ interface ChatbotActionsProps {
   hasConversations: boolean;
 }
 
-export function ChatbotActions({ conversations, onClearHistory, hasConversations }: ChatbotActionsProps) {
+export function ChatbotActions({
+  conversations,
+  onClearHistory,
+  hasConversations,
+}: ChatbotActionsProps) {
   const { toast } = useToast();
 
   const handleExport = () => {
@@ -35,34 +39,34 @@ export function ChatbotActions({ conversations, onClearHistory, hasConversations
       const exportData = {
         exportedAt: new Date().toISOString(),
         conversationCount: conversations.length,
-        conversations: conversations.map(msg => ({
-          type: msg.message_type === "user" ? "المستخدم" : "المساعد",
+        conversations: conversations.map((msg) => ({
+          type: msg.message_type === 'user' ? 'المستخدم' : 'المساعد',
           message: msg.message,
-          timestamp: format(new Date(msg.created_at), "dd/MM/yyyy HH:mm", { locale: ar }),
+          timestamp: format(new Date(msg.created_at), 'dd/MM/yyyy HH:mm', { locale: ar }),
         })),
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: "application/json",
+        type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
-      link.download = `chatbot-conversations-${format(new Date(), "yyyy-MM-dd-HH-mm", { locale: ar })}.json`;
+      link.download = `chatbot-conversations-${format(new Date(), 'yyyy-MM-dd-HH-mm', { locale: ar })}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
       toast({
-        title: "تم التصدير",
-        description: "تم تصدير المحادثات بنجاح",
+        title: 'تم التصدير',
+        description: 'تم تصدير المحادثات بنجاح',
       });
     } catch {
       toast({
-        title: "خطأ",
-        description: "فشل تصدير المحادثات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تصدير المحادثات',
+        variant: 'destructive',
       });
     }
   };
@@ -96,13 +100,16 @@ export function ChatbotActions({ conversations, onClearHistory, hasConversations
           <AlertDialogHeader>
             <AlertDialogTitle>مسح سجل المحادثات</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من رغبتك في حذف جميع المحادثات ({conversations.length} رسالة)؟ 
-              لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من رغبتك في حذف جميع المحادثات ({conversations.length} رسالة)؟ لا يمكن
+              التراجع عن هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={onClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={onClearHistory}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               مسح
             </AlertDialogAction>
           </AlertDialogFooter>

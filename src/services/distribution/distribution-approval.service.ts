@@ -68,13 +68,16 @@ export class DistributionApprovalService {
   /**
    * جلب الجدول الزمني للتوزيع
    */
-  static async getTimeline(distributionId: string, distribution: {
-    created_at: string;
-    approved_at: string | null;
-    approved_by: string | null;
-    status: string;
-    updated_at: string;
-  }): Promise<{ events: { date: string; action: string; user?: string; notes?: string }[] }> {
+  static async getTimeline(
+    distributionId: string,
+    distribution: {
+      created_at: string;
+      approved_at: string | null;
+      approved_by: string | null;
+      status: string;
+      updated_at: string;
+    }
+  ): Promise<{ events: { date: string; action: string; user?: string; notes?: string }[] }> {
     const events: { date: string; action: string; user?: string; notes?: string }[] = [];
 
     events.push({

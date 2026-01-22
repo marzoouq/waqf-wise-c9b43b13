@@ -5,11 +5,11 @@
  * @version 2.9.2
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useActiveFiscalYear } from "@/hooks/fiscal-years";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { DashboardService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { useActiveFiscalYear } from '@/hooks/fiscal-years';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { DashboardService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface RevenueProgressData {
   totalCollected: number;

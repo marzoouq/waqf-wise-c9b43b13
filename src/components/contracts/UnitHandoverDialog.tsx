@@ -34,16 +34,7 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Loader2, 
-  ClipboardCheck, 
-  Zap, 
-  Droplets,
-  Key,
-  Car,
-  CreditCard,
-  Save
-} from 'lucide-react';
+import { Loader2, ClipboardCheck, Zap, Droplets, Key, Car, CreditCard, Save } from 'lucide-react';
 import { useUnitHandovers } from '@/hooks/contracts/useUnitHandovers';
 import { type Contract } from '@/hooks/property/useContracts';
 
@@ -72,11 +63,7 @@ interface UnitHandoverDialogProps {
   contract: Contract | null;
 }
 
-export function UnitHandoverDialog({
-  open,
-  onOpenChange,
-  contract,
-}: UnitHandoverDialogProps) {
+export function UnitHandoverDialog({ open, onOpenChange, contract }: UnitHandoverDialogProps) {
   const { addHandover } = useUnitHandovers(contract?.id);
 
   const form = useForm<HandoverFormValues>({
@@ -102,28 +89,35 @@ export function UnitHandoverDialog({
   const onSubmit = (data: HandoverFormValues) => {
     if (!contract) return;
 
-    addHandover.mutate({
-      contract_id: contract.id,
-      handover_type: data.handover_type,
-      handover_date: data.handover_date,
-      electricity_meter_reading: data.electricity_meter_reading ? parseFloat(data.electricity_meter_reading) : null,
-      water_meter_reading: data.water_meter_reading ? parseFloat(data.water_meter_reading) : null,
-      gas_meter_reading: data.gas_meter_reading ? parseFloat(data.gas_meter_reading) : null,
-      keys_count: data.keys_count ? parseInt(data.keys_count) : 0,
-      parking_cards_count: data.parking_cards_count ? parseInt(data.parking_cards_count) : 0,
-      access_cards_count: data.access_cards_count ? parseInt(data.access_cards_count) : 0,
-      remote_controls_count: data.remote_controls_count ? parseInt(data.remote_controls_count) : 0,
-      general_condition: data.general_condition,
-      cleanliness: data.cleanliness,
-      condition_notes: data.condition_notes,
-      witness_name: data.witness_name,
-      notes: data.notes,
-    }, {
-      onSuccess: () => {
-        onOpenChange(false);
-        form.reset();
+    addHandover.mutate(
+      {
+        contract_id: contract.id,
+        handover_type: data.handover_type,
+        handover_date: data.handover_date,
+        electricity_meter_reading: data.electricity_meter_reading
+          ? parseFloat(data.electricity_meter_reading)
+          : null,
+        water_meter_reading: data.water_meter_reading ? parseFloat(data.water_meter_reading) : null,
+        gas_meter_reading: data.gas_meter_reading ? parseFloat(data.gas_meter_reading) : null,
+        keys_count: data.keys_count ? parseInt(data.keys_count) : 0,
+        parking_cards_count: data.parking_cards_count ? parseInt(data.parking_cards_count) : 0,
+        access_cards_count: data.access_cards_count ? parseInt(data.access_cards_count) : 0,
+        remote_controls_count: data.remote_controls_count
+          ? parseInt(data.remote_controls_count)
+          : 0,
+        general_condition: data.general_condition,
+        cleanliness: data.cleanliness,
+        condition_notes: data.condition_notes,
+        witness_name: data.witness_name,
+        notes: data.notes,
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+        },
       }
-    });
+    );
   };
 
   if (!contract) return null;
@@ -418,11 +412,7 @@ export function UnitHandoverDialog({
                     <FormItem>
                       <FormLabel>ملاحظات إضافية</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="أي ملاحظات أخرى..."
-                          rows={2}
-                          {...field}
-                        />
+                        <Textarea placeholder="أي ملاحظات أخرى..." rows={2} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

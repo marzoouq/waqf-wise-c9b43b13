@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { useRequestTypes } from "@/hooks/requests/useRequests";
-import { useBeneficiaryRequests } from "@/hooks/beneficiary/useBeneficiaryRequests";
-import { Plus, FileText } from "lucide-react";
+} from '@/components/ui/dialog';
+import { useRequestTypes } from '@/hooks/requests/useRequests';
+import { useBeneficiaryRequests } from '@/hooks/beneficiary/useBeneficiaryRequests';
+import { Plus, FileText } from 'lucide-react';
 
 interface RequestSubmissionDialogProps {
   beneficiaryId: string;
@@ -36,8 +36,8 @@ export function RequestSubmissionDialog({
   const { requestTypes } = useRequestTypes();
   const { submitRequest } = useBeneficiaryRequests(beneficiaryId);
   const [internalOpen, setInternalOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState("");
-  
+  const [selectedType, setSelectedType] = useState('');
+
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = externalOnOpenChange || setInternalOpen;
 
@@ -79,7 +79,7 @@ export function RequestSubmissionDialog({
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            const amount = formData.get("amount");
+            const amount = formData.get('amount');
 
             if (!selectedType) {
               return;
@@ -87,9 +87,9 @@ export function RequestSubmissionDialog({
 
             handleSubmit({
               request_type_id: selectedType,
-              description: formData.get("description") as string,
+              description: formData.get('description') as string,
               amount: amount ? Number(amount) : undefined,
-              priority: formData.get("priority") as string,
+              priority: formData.get('priority') as string,
             });
           }}
           className="space-y-4"
@@ -115,9 +115,7 @@ export function RequestSubmissionDialog({
                 </SelectContent>
               </Select>
               {selectedTypeData?.description && (
-                <p className="text-xs text-muted-foreground">
-                  {selectedTypeData.description}
-                </p>
+                <p className="text-xs text-muted-foreground">{selectedTypeData.description}</p>
               )}
             </div>
 
@@ -176,15 +174,11 @@ export function RequestSubmissionDialog({
           )}
 
           <div className="flex gap-2 justify-end pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               إلغاء
             </Button>
             <Button type="submit" disabled={submitRequest.isPending || !selectedType}>
-              {submitRequest.isPending ? "جاري التقديم..." : "تقديم الطلب"}
+              {submitRequest.isPending ? 'جاري التقديم...' : 'تقديم الطلب'}
             </Button>
           </div>
         </form>

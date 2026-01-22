@@ -3,16 +3,23 @@
  * Dead Rows Table
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Trash2, RefreshCw, CheckCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
-import type { DeadRowsInfo } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Trash2, RefreshCw, CheckCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatDistanceToNow } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import type { DeadRowsInfo } from '@/services/monitoring/db-health.service';
 
 interface DeadRowsTableProps {
   deadRows: DeadRowsInfo[];
@@ -21,7 +28,12 @@ interface DeadRowsTableProps {
   isVacuuming?: boolean;
 }
 
-export function DeadRowsTable({ deadRows, isLoading, onVacuumTable, isVacuuming }: DeadRowsTableProps) {
+export function DeadRowsTable({
+  deadRows,
+  isLoading,
+  onVacuumTable,
+  isVacuuming,
+}: DeadRowsTableProps) {
   if (isLoading) {
     return (
       <Card>
@@ -82,9 +94,7 @@ export function DeadRowsTable({ deadRows, isLoading, onVacuumTable, isVacuuming 
           الصفوف الميتة
           <Badge variant="secondary">{deadRows.length} جدول</Badge>
         </CardTitle>
-        <CardDescription>
-          الجداول التي تحتوي على صفوف ميتة وتحتاج لـ VACUUM
-        </CardDescription>
+        <CardDescription>الجداول التي تحتوي على صفوف ميتة وتحتاج لـ VACUUM</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="rounded-lg border overflow-x-auto">
@@ -110,22 +120,24 @@ export function DeadRowsTable({ deadRows, isLoading, onVacuumTable, isVacuuming 
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Progress 
-                        value={Math.min(row.dead_pct, 100)} 
-                        className="h-2 w-16" 
-                      />
+                      <Progress value={Math.min(row.dead_pct, 100)} className="h-2 w-16" />
                       <span className={getSeverityColor(row.dead_pct)}>
                         {row.dead_pct.toFixed(1)}%
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
-                    {row.last_vacuum 
-                      ? formatDistanceToNow(new Date(row.last_vacuum), { addSuffix: true, locale: ar })
+                    {row.last_vacuum
+                      ? formatDistanceToNow(new Date(row.last_vacuum), {
+                          addSuffix: true,
+                          locale: ar,
+                        })
                       : row.last_autovacuum
-                        ? formatDistanceToNow(new Date(row.last_autovacuum), { addSuffix: true, locale: ar })
-                        : 'لم يتم'
-                    }
+                        ? formatDistanceToNow(new Date(row.last_autovacuum), {
+                            addSuffix: true,
+                            locale: ar,
+                          })
+                        : 'لم يتم'}
                   </TableCell>
                   <TableCell>{getSeverityBadge(row.dead_pct)}</TableCell>
                   {onVacuumTable && (

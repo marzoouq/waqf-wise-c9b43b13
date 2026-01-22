@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Shield, Lock, Key, Server, Eye, AlertTriangle } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { LandingHeader } from '@/components/landing/LandingHeader';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Shield, Lock, Key, Server, Eye, AlertTriangle } from 'lucide-react';
 
 export default function SecurityPolicy() {
   return (
@@ -23,7 +23,8 @@ export default function SecurityPolicy() {
               <h2 className="text-xl font-semibold text-foreground m-0">التشفير</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نستخدم تشفير TLS 1.3 لجميع الاتصالات، وتشفير AES-256 لتخزين البيانات الحساسة. جميع كلمات المرور مشفرة باستخدام خوارزميات آمنة.
+              نستخدم تشفير TLS 1.3 لجميع الاتصالات، وتشفير AES-256 لتخزين البيانات الحساسة. جميع
+              كلمات المرور مشفرة باستخدام خوارزميات آمنة.
             </p>
           </section>
 
@@ -59,7 +60,8 @@ export default function SecurityPolicy() {
               <h2 className="text-xl font-semibold text-foreground m-0">المراقبة والتدقيق</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نحتفظ بسجلات تدقيق شاملة لجميع العمليات الحساسة. يتم مراجعة هذه السجلات بانتظام للكشف عن أي نشاط مشبوه.
+              نحتفظ بسجلات تدقيق شاملة لجميع العمليات الحساسة. يتم مراجعة هذه السجلات بانتظام للكشف
+              عن أي نشاط مشبوه.
             </p>
           </section>
 
@@ -69,16 +71,14 @@ export default function SecurityPolicy() {
               <h2 className="text-xl font-semibold text-foreground m-0">الإبلاغ عن الثغرات</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              إذا اكتشفت أي ثغرة أمنية، يرجى إبلاغنا فوراً على security@waqf.sa. نقدر مساهمتك في الحفاظ على أمان المنصة.
+              إذا اكتشفت أي ثغرة أمنية، يرجى إبلاغنا فوراً على security@waqf.sa. نقدر مساهمتك في
+              الحفاظ على أمان المنصة.
             </p>
           </section>
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
-            to="/" 
-            className="text-primary hover:text-primary/80 font-medium"
-          >
+          <Link to="/" className="text-primary hover:text-primary/80 font-medium">
             ← العودة للصفحة الرئيسية
           </Link>
         </div>

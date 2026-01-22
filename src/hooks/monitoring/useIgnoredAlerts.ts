@@ -38,31 +38,43 @@ export function useIgnoredAlerts() {
   }, []);
 
   // تجاهل تنبيه
-  const ignoreAlert = useCallback((alertId: string, reason?: string) => {
-    setIgnoredAlerts(prev => {
-      const updated = [...prev, { 
-        id: alertId, 
-        ignoredAt: new Date().toISOString(),
-        reason 
-      }];
-      saveToStorage(updated);
-      return updated;
-    });
-  }, [saveToStorage]);
+  const ignoreAlert = useCallback(
+    (alertId: string, reason?: string) => {
+      setIgnoredAlerts((prev) => {
+        const updated = [
+          ...prev,
+          {
+            id: alertId,
+            ignoredAt: new Date().toISOString(),
+            reason,
+          },
+        ];
+        saveToStorage(updated);
+        return updated;
+      });
+    },
+    [saveToStorage]
+  );
 
   // إلغاء تجاهل تنبيه
-  const unignoreAlert = useCallback((alertId: string) => {
-    setIgnoredAlerts(prev => {
-      const updated = prev.filter(a => a.id !== alertId);
-      saveToStorage(updated);
-      return updated;
-    });
-  }, [saveToStorage]);
+  const unignoreAlert = useCallback(
+    (alertId: string) => {
+      setIgnoredAlerts((prev) => {
+        const updated = prev.filter((a) => a.id !== alertId);
+        saveToStorage(updated);
+        return updated;
+      });
+    },
+    [saveToStorage]
+  );
 
   // التحقق إذا كان التنبيه مُتجاهل
-  const isIgnored = useCallback((alertId: string) => {
-    return ignoredAlerts.some(a => a.id === alertId);
-  }, [ignoredAlerts]);
+  const isIgnored = useCallback(
+    (alertId: string) => {
+      return ignoredAlerts.some((a) => a.id === alertId);
+    },
+    [ignoredAlerts]
+  );
 
   // مسح جميع التنبيهات المُتجاهلة
   const clearAllIgnored = useCallback(() => {
@@ -71,9 +83,12 @@ export function useIgnoredAlerts() {
   }, [saveToStorage]);
 
   // فلترة التنبيهات لإزالة المُتجاهلة
-  const filterIgnoredAlerts = useCallback(<T extends { id: string }>(alerts: T[]): T[] => {
-    return alerts.filter(alert => !isIgnored(alert.id));
-  }, [isIgnored]);
+  const filterIgnoredAlerts = useCallback(
+    <T extends { id: string }>(alerts: T[]): T[] => {
+      return alerts.filter((alert) => !isIgnored(alert.id));
+    },
+    [isIgnored]
+  );
 
   return {
     ignoredAlerts,

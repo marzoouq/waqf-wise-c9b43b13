@@ -1,13 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw, type LucideIcon } from "lucide-react";
-import { useAIInsights } from "@/hooks/ai/useAIInsights";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EnhancedEmptyState } from "@/components/shared";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Sparkles,
+  TrendingUp,
+  AlertTriangle,
+  Lightbulb,
+  X,
+  RefreshCw,
+  type LucideIcon,
+} from 'lucide-react';
+import { useAIInsights } from '@/hooks/ai/useAIInsights';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EnhancedEmptyState } from '@/components/shared';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 
 const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,
@@ -23,7 +34,8 @@ const severityColors = {
 };
 
 export default function AIInsights() {
-  const { insights, isLoading, error, generateInsights, isGenerating, dismissInsight } = useAIInsights();
+  const { insights, isLoading, error, generateInsights, isGenerating, dismissInsight } =
+    useAIInsights();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الرؤى الذكية..." />;
@@ -31,8 +43,8 @@ export default function AIInsights() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الرؤى" 
+      <ErrorState
+        title="فشل تحميل الرؤى"
         message="حدث خطأ أثناء تحميل الرؤى الذكية"
         onRetry={() => window.location.reload()}
         fullScreen
@@ -78,7 +90,7 @@ export default function AIInsights() {
             description="اضغط على زر توليد الرؤى للحصول على تحليلات ذكية"
             icon={Sparkles}
             action={{
-              label: "توليد رؤى",
+              label: 'توليد رؤى',
               onClick: () => generateInsights('beneficiaries'),
             }}
           />
@@ -86,7 +98,9 @@ export default function AIInsights() {
           <div className="grid gap-4">
             {insights.map((insight) => {
               const Icon = categoryIcons[insight.alert_type] || Sparkles;
-              const severityColor = severityColors[insight.severity as keyof typeof severityColors] || severityColors.info;
+              const severityColor =
+                severityColors[insight.severity as keyof typeof severityColors] ||
+                severityColors.info;
 
               return (
                 <Card key={insight.id} className="relative">
@@ -104,9 +118,7 @@ export default function AIInsights() {
                             {insight.severity === 'info' && 'معلومة'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {insight.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{insight.description}</p>
                         {insight.data && (
                           <div className="mt-3 p-3 bg-muted rounded-lg text-sm">
                             <pre className="text-xs overflow-auto">

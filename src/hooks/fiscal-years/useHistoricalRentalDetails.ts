@@ -5,11 +5,11 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { 
+import {
   HistoricalRentalService,
   type HistoricalRentalDetail,
   type HistoricalRentalMonthlySummary,
-  type CreateHistoricalRentalInput
+  type CreateHistoricalRentalInput,
 } from '@/services/historical-rental.service';
 import { RealtimeService } from '@/services';
 import { toast } from 'sonner';
@@ -32,14 +32,13 @@ export function useHistoricalRentalDetails(fiscalYearClosingId: string | undefin
   useEffect(() => {
     if (!fiscalYearClosingId) return;
 
-    const subscription = RealtimeService.subscribeToTable(
-      'historical_rental_details',
-      () => {
-        queryClient.invalidateQueries({ queryKey: HISTORICAL_RENTAL_QUERY_KEY });
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('historical_rental_details', () => {
+      queryClient.invalidateQueries({ queryKey: HISTORICAL_RENTAL_QUERY_KEY });
+    });
 
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [fiscalYearClosingId, queryClient]);
 
   return {
@@ -67,16 +66,15 @@ export function useHistoricalRentalMonthlySummary(fiscalYearClosingId: string | 
   useEffect(() => {
     if (!fiscalYearClosingId) return;
 
-    const subscription = RealtimeService.subscribeToTable(
-      'historical_rental_details',
-      () => {
-        queryClient.invalidateQueries({ 
-          queryKey: [...HISTORICAL_RENTAL_QUERY_KEY, 'monthly-summary'] 
-        });
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('historical_rental_details', () => {
+      queryClient.invalidateQueries({
+        queryKey: [...HISTORICAL_RENTAL_QUERY_KEY, 'monthly-summary'],
+      });
+    });
 
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [fiscalYearClosingId, queryClient]);
 
   return {
@@ -92,7 +90,7 @@ export function useHistoricalRentalMonthlySummary(fiscalYearClosingId: string | 
  * جلب تفاصيل شهر محدد
  */
 export function useHistoricalRentalByMonth(
-  fiscalYearClosingId: string | undefined, 
+  fiscalYearClosingId: string | undefined,
   monthDate: string | undefined
 ) {
   return useQuery({
@@ -109,8 +107,7 @@ export function useHistoricalRentalMutations() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (input: CreateHistoricalRentalInput) => 
-      HistoricalRentalService.create(input),
+    mutationFn: (input: CreateHistoricalRentalInput) => HistoricalRentalService.create(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: HISTORICAL_RENTAL_QUERY_KEY });
       toast.success('تم إضافة السجل بنجاح');
@@ -121,7 +118,7 @@ export function useHistoricalRentalMutations() {
   });
 
   const createBatchMutation = useMutation({
-    mutationFn: (inputs: CreateHistoricalRentalInput[]) => 
+    mutationFn: (inputs: CreateHistoricalRentalInput[]) =>
       HistoricalRentalService.createBatch(inputs),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: HISTORICAL_RENTAL_QUERY_KEY });

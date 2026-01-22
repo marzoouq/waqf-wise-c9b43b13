@@ -3,17 +3,21 @@
  * @version 2.8.0 - مع دعم Retry و matchesStatus
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import { matchesStatus } from "@/lib/constants";
-import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import { matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 
 type Tenant = Database['public']['Tables']['tenants']['Row'];
 type TenantInsert = Database['public']['Tables']['tenants']['Insert'];
 
 export class TenantService {
   static async getAll(filters?: { search?: string }): Promise<Tenant[]> {
-    let query = supabase.from('tenants').select('*').is('deleted_at', null).order('created_at', { ascending: false });
+    let query = supabase
+      .from('tenants')
+      .select('*')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
     if (filters?.search) {
       query = query.or(`full_name.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
     }
@@ -36,13 +40,22 @@ export class TenantService {
   }
 
   static async update(id: string, updates: Partial<Tenant>): Promise<Tenant | null> {
-    const { data, error } = await supabase.from('tenants').update(updates).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('tenants')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async getLedger(tenantId: string) {
-    const { data, error } = await supabase.from('tenant_ledger').select('*').eq('tenant_id', tenantId).order('transaction_date', { ascending: false });
+    const { data, error } = await supabase
+      .from('tenant_ledger')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .order('transaction_date', { ascending: false });
     if (error) throw error;
     return data || [];
   }
@@ -54,10 +67,11 @@ export class TenantService {
 
   static async getContractsDetailed(tenantId: string) {
     if (!tenantId) return [];
-    
+
     const { data, error } = await supabase
       .from('contracts')
-      .select(`
+      .select(
+        `
         id,
         contract_number,
         property_id,
@@ -67,13 +81,14 @@ export class TenantService {
         status,
         payment_frequency,
         properties!inner (name)
-      `)
+      `
+      )
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    
-    return (data || []).map(contract => ({
+
+    return (data || []).map((contract) => ({
       id: contract.id,
       contract_number: contract.contract_number,
       property_id: contract.property_id,
@@ -94,24 +109,33 @@ export class TenantService {
 
   static async getStats() {
     const tenants = await withRetry(() => this.getAll(), SUPABASE_RETRY_OPTIONS);
-    return { 
-      total: tenants.length, 
-      active: tenants.filter(t => matchesStatus(t.status, 'active')).length 
+    return {
+      total: tenants.length,
+      active: tenants.filter((t) => matchesStatus(t.status, 'active')).length,
     };
   }
 
   static async delete(id: string, reason?: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from('tenants').update({
-      deleted_at: new Date().toISOString(),
-      deleted_by: user?.id || null,
-      deletion_reason: reason || 'تم أرشفة المستأجر',
-    }).eq('id', id);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('tenants')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason || 'تم أرشفة المستأجر',
+      })
+      .eq('id', id);
     if (error) throw error;
   }
 
   static async addLedgerEntry(entry: Database['public']['Tables']['tenant_ledger']['Insert']) {
-    const { data, error } = await supabase.from('tenant_ledger').insert(entry).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('tenant_ledger')
+      .insert(entry)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('فشل إضافة القيد');
     return data;
@@ -128,7 +152,7 @@ export class TenantService {
     if (!tenantsData?.length) return [];
 
     // جلب جميع سجلات الدفتر مرة واحدة
-    const tenantIds = tenantsData.map(t => t.id);
+    const tenantIds = tenantsData.map((t) => t.id);
     const { data: allLedger, error: ledgerError } = await supabase
       .from('tenant_ledger')
       .select('tenant_id, debit_amount, credit_amount, transaction_type')
@@ -137,20 +161,24 @@ export class TenantService {
     if (ledgerError) throw ledgerError;
 
     // تجميع البيانات لكل مستأجر
-    const ledgerByTenant = (allLedger || []).reduce((acc, entry) => {
-      if (!acc[entry.tenant_id]) {
-        acc[entry.tenant_id] = { debit: 0, credit: 0, invoices: 0, payments: 0 };
-      }
-      acc[entry.tenant_id].debit += entry.debit_amount || 0;
-      acc[entry.tenant_id].credit += entry.credit_amount || 0;
-      if (entry.transaction_type === 'invoice') acc[entry.tenant_id].invoices++;
-      if (entry.transaction_type === 'payment') acc[entry.tenant_id].payments++;
-      return acc;
-    }, {} as Record<string, { debit: number; credit: number; invoices: number; payments: number }>);
+    const ledgerByTenant = (allLedger || []).reduce(
+      (acc, entry) => {
+        if (!acc[entry.tenant_id]) {
+          acc[entry.tenant_id] = { debit: 0, credit: 0, invoices: 0, payments: 0 };
+        }
+        acc[entry.tenant_id].debit += entry.debit_amount || 0;
+        acc[entry.tenant_id].credit += entry.credit_amount || 0;
+        if (entry.transaction_type === 'invoice') acc[entry.tenant_id].invoices++;
+        if (entry.transaction_type === 'payment') acc[entry.tenant_id].payments++;
+        return acc;
+      },
+      {} as Record<string, { debit: number; credit: number; invoices: number; payments: number }>
+    );
 
-    return tenantsData.map(tenant => ({
+    return tenantsData.map((tenant) => ({
       ...tenant,
-      current_balance: (ledgerByTenant[tenant.id]?.debit || 0) - (ledgerByTenant[tenant.id]?.credit || 0),
+      current_balance:
+        (ledgerByTenant[tenant.id]?.debit || 0) - (ledgerByTenant[tenant.id]?.credit || 0),
       total_invoices: ledgerByTenant[tenant.id]?.invoices || 0,
       total_payments: ledgerByTenant[tenant.id]?.payments || 0,
     }));
@@ -158,7 +186,7 @@ export class TenantService {
 
   static async getTenantsAging() {
     const today = new Date();
-    
+
     // جلب المستأجرين النشطين
     const { data: tenants, error: tenantsError } = await supabase
       .from('tenants')
@@ -169,7 +197,7 @@ export class TenantService {
     if (!tenants?.length) return [];
 
     // جلب جميع الفواتير مرة واحدة (حل N+1)
-    const tenantIds = tenants.map(t => t.id);
+    const tenantIds = tenants.map((t) => t.id);
     const { data: allLedger, error: ledgerError } = await supabase
       .from('tenant_ledger')
       .select('tenant_id, transaction_date, debit_amount, credit_amount')
@@ -179,8 +207,11 @@ export class TenantService {
     if (ledgerError) throw ledgerError;
 
     // تجميع البيانات حسب المستأجر
-    const tenantMap = new Map(tenants.map(t => [t.id, t.full_name]));
-    const agingByTenant: Record<string, { current: number; days_30: number; days_60: number; days_90: number; over_90: number }> = {};
+    const tenantMap = new Map(tenants.map((t) => [t.id, t.full_name]));
+    const agingByTenant: Record<
+      string,
+      { current: number; days_30: number; days_60: number; days_90: number; over_90: number }
+    > = {};
 
     for (const entry of allLedger || []) {
       const transactionDate = new Date(entry.transaction_date);
@@ -192,7 +223,13 @@ export class TenantService {
       if (amount <= 0) continue;
 
       if (!agingByTenant[entry.tenant_id]) {
-        agingByTenant[entry.tenant_id] = { current: 0, days_30: 0, days_60: 0, days_90: 0, over_90: 0 };
+        agingByTenant[entry.tenant_id] = {
+          current: 0,
+          days_30: 0,
+          days_60: 0,
+          days_90: 0,
+          over_90: 0,
+        };
       }
 
       const aging = agingByTenant[entry.tenant_id];
@@ -215,7 +252,7 @@ export class TenantService {
         over_90: aging.over_90,
         total: aging.current + aging.days_30 + aging.days_60 + aging.days_90 + aging.over_90,
       }))
-      .filter(item => item.total > 0);
+      .filter((item) => item.total > 0);
 
     return agingData.sort((a, b) => b.total - a.total);
   }

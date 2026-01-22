@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -11,12 +11,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Users, Plus, Pencil, Trash2 } from "lucide-react";
-import { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from "@/hooks/beneficiary/useTribes";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Users, Plus, Pencil, Trash2 } from 'lucide-react';
+import {
+  useTribes,
+  useAddTribe,
+  useUpdateTribe,
+  useDeleteTribe,
+} from '@/hooks/beneficiary/useTribes';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { EmptyState } from '@/components/shared/EmptyState';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,27 +31,24 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 interface TribeManagementDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const TribeManagementDialog = ({
-  open,
-  onOpenChange,
-}: TribeManagementDialogProps) => {
+export const TribeManagementDialog = ({ open, onOpenChange }: TribeManagementDialogProps) => {
   const { data: tribes, isLoading } = useTribes();
   const addTribe = useAddTribe();
   const updateTribe = useUpdateTribe();
   const deleteTribe = useDeleteTribe();
 
-  const [editMode, setEditMode] = useState<"add" | "edit" | null>(null);
+  const [editMode, setEditMode] = useState<'add' | 'edit' | null>(null);
   const [selectedTribeId, setSelectedTribeId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tribeToDelete, setTribeToDelete] = useState<string | null>(null);
@@ -54,23 +56,23 @@ export const TribeManagementDialog = ({
   const handleSubmit = async () => {
     if (!formData.name.trim()) return;
 
-    if (editMode === "add") {
+    if (editMode === 'add') {
       await addTribe.mutateAsync(formData);
-    } else if (editMode === "edit" && selectedTribeId) {
+    } else if (editMode === 'edit' && selectedTribeId) {
       await updateTribe.mutateAsync({ id: selectedTribeId, ...formData });
     }
 
     setEditMode(null);
-    setFormData({ name: "", description: "" });
+    setFormData({ name: '', description: '' });
     setSelectedTribeId(null);
   };
 
   const handleEdit = (tribe: { id: string; name: string; description: string | null }) => {
-    setEditMode("edit");
+    setEditMode('edit');
     setSelectedTribeId(tribe.id);
     setFormData({
       name: tribe.name,
-      description: tribe.description || "",
+      description: tribe.description || '',
     });
   };
 
@@ -92,140 +94,122 @@ export const TribeManagementDialog = ({
         size="xl"
       >
         <div className="space-y-4">
-            {/* Add/Edit Form */}
-            {editMode && (
-              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                <h3 className="font-medium">
-                  {editMode === "add" ? "إضافة قبيلة جديدة" : "تعديل القبيلة"}
-                </h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label>اسم القبيلة *</Label>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="مثال: قبيلة عتيبة"
-                    />
-                  </div>
-                  <div>
-                    <Label>الوصف</Label>
-                    <Textarea
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({ ...formData, description: e.target.value })
-                      }
-                      placeholder="وصف موجز عن القبيلة..."
-                      rows={3}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button onClick={handleSubmit} className="flex-1">
-                      {editMode === "add" ? "إضافة" : "حفظ التعديلات"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setEditMode(null);
-                        setFormData({ name: "", description: "" });
-                        setSelectedTribeId(null);
-                      }}
-                      className="flex-1"
-                    >
-                      إلغاء
-                    </Button>
-                  </div>
+          {/* Add/Edit Form */}
+          {editMode && (
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <h3 className="font-medium">
+                {editMode === 'add' ? 'إضافة قبيلة جديدة' : 'تعديل القبيلة'}
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <Label>اسم القبيلة *</Label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="مثال: قبيلة عتيبة"
+                  />
+                </div>
+                <div>
+                  <Label>الوصف</Label>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="وصف موجز عن القبيلة..."
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleSubmit} className="flex-1">
+                    {editMode === 'add' ? 'إضافة' : 'حفظ التعديلات'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setEditMode(null);
+                      setFormData({ name: '', description: '' });
+                      setSelectedTribeId(null);
+                    }}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Add Button */}
-            {!editMode && (
-              <Button
-                onClick={() => setEditMode("add")}
-                className="w-full"
-                variant="outline"
-              >
-                <Plus className="h-4 w-4 ms-2" />
-                إضافة قبيلة جديدة
-              </Button>
-            )}
-
-            {/* Tribes List */}
-            {isLoading ? (
-              <LoadingState message="جاري تحميل القبائل..." />
-            ) : !tribes || tribes.length === 0 ? (
-              <EmptyState
-                icon={Users}
-                title="لا توجد قبائل"
-                description="لم يتم إضافة أي قبائل بعد"
-              />
-            ) : (
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>اسم القبيلة</TableHead>
-                      <TableHead>الوصف</TableHead>
-                      <TableHead className="text-center">العائلات</TableHead>
-                      <TableHead className="text-center">المستفيدون</TableHead>
-                      <TableHead className="text-left">الإجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tribes.map((tribe) => (
-                      <TableRow key={tribe.id}>
-                        <TableCell className="font-medium">
-                          {tribe.name}
-                        </TableCell>
-                        <TableCell className="max-w-md truncate">
-                          {tribe.description || "-"}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="secondary">
-                            {tribe.total_families}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="secondary">
-                            {tribe.total_beneficiaries}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-left">
-                          <div className="flex gap-2 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEdit(tribe)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                setTribeToDelete(tribe.id);
-                                setDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              إغلاق
+          {/* Add Button */}
+          {!editMode && (
+            <Button onClick={() => setEditMode('add')} className="w-full" variant="outline">
+              <Plus className="h-4 w-4 ms-2" />
+              إضافة قبيلة جديدة
             </Button>
-          </div>
+          )}
+
+          {/* Tribes List */}
+          {isLoading ? (
+            <LoadingState message="جاري تحميل القبائل..." />
+          ) : !tribes || tribes.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="لا توجد قبائل"
+              description="لم يتم إضافة أي قبائل بعد"
+            />
+          ) : (
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>اسم القبيلة</TableHead>
+                    <TableHead>الوصف</TableHead>
+                    <TableHead className="text-center">العائلات</TableHead>
+                    <TableHead className="text-center">المستفيدون</TableHead>
+                    <TableHead className="text-left">الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tribes.map((tribe) => (
+                    <TableRow key={tribe.id}>
+                      <TableCell className="font-medium">{tribe.name}</TableCell>
+                      <TableCell className="max-w-md truncate">
+                        {tribe.description || '-'}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary">{tribe.total_families}</Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary">{tribe.total_beneficiaries}</Badge>
+                      </TableCell>
+                      <TableCell className="text-left">
+                        <div className="flex gap-2 justify-end">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(tribe)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setTribeToDelete(tribe.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end pt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            إغلاق
+          </Button>
+        </div>
       </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
@@ -234,8 +218,7 @@ export const TribeManagementDialog = ({
           <AlertDialogHeader>
             <AlertDialogTitle>هل أنت متأكد؟</AlertDialogTitle>
             <AlertDialogDescription>
-              سيتم حذف القبيلة بشكل نهائي. لن يؤثر ذلك على العائلات والمستفيدين
-              المرتبطين بها.
+              سيتم حذف القبيلة بشكل نهائي. لن يؤثر ذلك على العائلات والمستفيدين المرتبطين بها.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

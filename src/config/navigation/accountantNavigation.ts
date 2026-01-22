@@ -4,43 +4,43 @@
  * @version 1.0.0
  */
 
-import { Home, Calculator, Receipt, FileBarChart, MoreHorizontal } from "lucide-react";
-import type { NavigationItem } from "@/types/navigation";
+import { Home, Calculator, Receipt, FileBarChart, MoreHorizontal } from 'lucide-react';
+import type { NavigationItem } from '@/types/navigation';
 
 export const accountantNavigationItems: readonly NavigationItem[] = [
   {
-    id: "home",
-    label: "الرئيسية",
+    id: 'home',
+    label: 'الرئيسية',
     icon: Home,
-    path: "/accountant-dashboard",
-    matchPaths: ["/accountant-dashboard"],
+    path: '/accountant-dashboard',
+    matchPaths: ['/accountant-dashboard'],
   },
   {
-    id: "accounting",
-    label: "القيود",
+    id: 'accounting',
+    label: 'القيود',
     icon: Calculator,
-    path: "/accounting",
-    matchPaths: ["/accounting", "/journal-entries"],
+    path: '/accounting',
+    matchPaths: ['/accounting', '/journal-entries'],
   },
   {
-    id: "vouchers",
-    label: "السندات",
+    id: 'vouchers',
+    label: 'السندات',
     icon: Receipt,
-    path: "/payment-vouchers",
-    matchPaths: ["/payment-vouchers", "/invoices"],
+    path: '/payment-vouchers',
+    matchPaths: ['/payment-vouchers', '/invoices'],
   },
   {
-    id: "reports",
-    label: "التقارير",
+    id: 'reports',
+    label: 'التقارير',
     icon: FileBarChart,
-    path: "/reports",
-    matchPaths: ["/reports", "/financial-reports"],
+    path: '/reports',
+    matchPaths: ['/reports', '/financial-reports'],
   },
   {
-    id: "more",
-    label: "المزيد",
+    id: 'more',
+    label: 'المزيد',
     icon: MoreHorizontal,
-    path: "/settings",
-    matchPaths: ["/settings"],
+    path: '/settings',
+    matchPaths: ['/settings'],
   },
 ] as const;

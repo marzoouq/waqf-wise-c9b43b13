@@ -34,21 +34,27 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Loader2, 
-  Bell, 
-  Mail,
-  MessageSquare,
-  Phone,
-  Send,
-} from 'lucide-react';
-import { useContractNotifications, type NotificationType, type DeliveryMethod } from '@/hooks/contracts/useContractNotifications';
+import { Loader2, Bell, Mail, MessageSquare, Phone, Send } from 'lucide-react';
+import {
+  useContractNotifications,
+  type NotificationType,
+  type DeliveryMethod,
+} from '@/hooks/contracts/useContractNotifications';
 import { type Contract } from '@/hooks/property/useContracts';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 const notificationSchema = z.object({
-  notification_type: z.enum(['تجديد', 'إنهاء', 'تعديل_إيجار', 'مخالفة', 'تحصيل', 'تذكير', 'إنذار', 'أخرى']),
+  notification_type: z.enum([
+    'تجديد',
+    'إنهاء',
+    'تعديل_إيجار',
+    'مخالفة',
+    'تحصيل',
+    'تذكير',
+    'إنذار',
+    'أخرى',
+  ]),
   title: z.string().min(1, 'العنوان مطلوب'),
   content: z.string().min(10, 'المحتوى يجب أن يكون 10 أحرف على الأقل'),
   delivery_email: z.boolean().default(true),
@@ -139,7 +145,7 @@ export function ContractNotificationDialog({
         .replace('{contract_number}', contract.contract_number)
         .replace('{end_date}', format(new Date(contract.end_date), 'yyyy/MM/dd', { locale: ar }))
         .replace('{tenant_name}', contract.tenant_name);
-      
+
       form.setValue('title', template.title);
       form.setValue('content', content);
     }
@@ -153,18 +159,21 @@ export function ContractNotificationDialog({
     if (data.delivery_sms) deliveryMethods.push('sms');
     if (data.delivery_whatsapp) deliveryMethods.push('whatsapp');
 
-    createNotification.mutate({
-      contract_id: contract.id,
-      notification_type: data.notification_type as NotificationType,
-      title: data.title,
-      content: data.content,
-      delivery_method: deliveryMethods,
-    }, {
-      onSuccess: () => {
-        onOpenChange(false);
-        form.reset();
+    createNotification.mutate(
+      {
+        contract_id: contract.id,
+        notification_type: data.notification_type as NotificationType,
+        title: data.title,
+        content: data.content,
+        delivery_method: deliveryMethods,
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+        },
       }
-    });
+    );
   };
 
   if (!contract) return null;
@@ -191,11 +200,11 @@ export function ContractNotificationDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>نوع الإشعار</FormLabel>
-                  <Select 
+                  <Select
                     onValueChange={(value) => {
                       field.onChange(value);
                       applyTemplate(value);
-                    }} 
+                    }}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -242,11 +251,7 @@ export function ContractNotificationDialog({
                 <FormItem>
                   <FormLabel>محتوى الإشعار</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="أدخل نص الإشعار..."
-                      rows={6}
-                      {...field}
-                    />
+                    <Textarea placeholder="أدخل نص الإشعار..." rows={6} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -264,10 +269,7 @@ export function ContractNotificationDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
                           <Mail className="h-4 w-4" />
@@ -283,10 +285,7 @@ export function ContractNotificationDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
                           <Phone className="h-4 w-4" />
@@ -302,10 +301,7 @@ export function ContractNotificationDialog({
                     render={({ field }) => (
                       <FormItem className="flex items-center gap-2">
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                         <FormLabel className="flex items-center gap-1 !mt-0 cursor-pointer">
                           <MessageSquare className="h-4 w-4" />

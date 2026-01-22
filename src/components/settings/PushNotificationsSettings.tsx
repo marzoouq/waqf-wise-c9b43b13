@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Bell, BellOff } from "lucide-react";
-import { usePushNotifications } from "@/hooks/notifications/usePushNotifications";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Bell, BellOff } from 'lucide-react';
+import { usePushNotifications } from '@/hooks/notifications/usePushNotifications';
+import { Badge } from '@/components/ui/badge';
 
 export function PushNotificationsSettings() {
   const {
@@ -23,9 +23,7 @@ export function PushNotificationsSettings() {
             <Bell className="h-5 w-5" />
             الإشعارات الفورية
           </CardTitle>
-          <CardDescription>
-            المتصفح الحالي لا يدعم الإشعارات الفورية
-          </CardDescription>
+          <CardDescription>المتصفح الحالي لا يدعم الإشعارات الفورية</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -38,9 +36,7 @@ export function PushNotificationsSettings() {
           <Bell className="h-5 w-5" />
           الإشعارات الفورية
         </CardTitle>
-        <CardDescription>
-          تلقي إشعارات فورية عند حدوث أحداث مهمة
-        </CardDescription>
+        <CardDescription>تلقي إشعارات فورية عند حدوث أحداث مهمة</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
@@ -75,29 +71,18 @@ export function PushNotificationsSettings() {
           {!isSubscribed ? (
             <>
               {permission !== 'granted' && (
-                <Button
-                  onClick={requestPermission}
-                  disabled={isLoading}
-                  variant="outline"
-                >
+                <Button onClick={requestPermission} disabled={isLoading} variant="outline">
                   <Bell className="h-4 w-4 ms-2" />
                   طلب الإذن
                 </Button>
               )}
-              <Button
-                onClick={subscribe}
-                disabled={isLoading || permission === 'denied'}
-              >
+              <Button onClick={subscribe} disabled={isLoading || permission === 'denied'}>
                 <Bell className="h-4 w-4 ms-2" />
                 تفعيل الإشعارات
               </Button>
             </>
           ) : (
-            <Button
-              onClick={unsubscribe}
-              disabled={isLoading}
-              variant="destructive"
-            >
+            <Button onClick={unsubscribe} disabled={isLoading} variant="destructive">
               <BellOff className="h-4 w-4 ms-2" />
               إلغاء الاشتراك
             </Button>

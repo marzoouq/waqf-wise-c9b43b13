@@ -1,13 +1,13 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Play, Shield, Users, Building2 } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Play, Shield, Users, Building2 } from 'lucide-react';
 
 export function HeroSection() {
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
-      style={{ contain: "layout" }}
+      style={{ contain: 'layout' }}
     >
       {/* Background - Simple for faster paint */}
       <div className="absolute inset-0 bg-background" />
@@ -24,14 +24,13 @@ export function HeroSection() {
 
           {/* Main Heading - LCP Element - No complex styles */}
           <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6 px-2 sm:px-0">
-            منصة إدارة{" "}
-            <span className="text-primary">الوقف الإلكترونية</span>
+            منصة إدارة <span className="text-primary">الوقف الإلكترونية</span>
           </h1>
 
           {/* Description */}
           <p className="text-sm xs:text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-6 sm:mb-10 leading-relaxed px-2 sm:px-0">
-            نظام شامل ومتكامل لإدارة الأوقاف الإسلامية بكفاءة عالية وشفافية تامة،
-            يدعم توزيع الغلة وإدارة المستفيدين والمحاسبة المتقدمة
+            نظام شامل ومتكامل لإدارة الأوقاف الإسلامية بكفاءة عالية وشفافية تامة، يدعم توزيع الغلة
+            وإدارة المستفيدين والمحاسبة المتقدمة
           </p>
 
           {/* CTA Buttons */}

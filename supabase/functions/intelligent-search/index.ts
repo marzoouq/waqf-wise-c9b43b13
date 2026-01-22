@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
 
 // ============ SQL Injection Protection ============
@@ -10,24 +10,24 @@ function sanitizeLikePattern(input: string): string {
 
 // ============ Rate Limiting Configuration ============
 const RATE_LIMIT = {
-  maxRequests: 60,    // 60 بحث
-  windowMs: 60000     // في الدقيقة
+  maxRequests: 60, // 60 بحث
+  windowMs: 60000, // في الدقيقة
 };
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
     return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
   }
-  
+
   if (userLimit.count >= RATE_LIMIT.maxRequests) {
     return { allowed: false, remaining: 0 };
   }
-  
+
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
 }
@@ -46,7 +46,7 @@ serve(async (req) => {
         return jsonResponse({
           status: 'healthy',
           function: 'intelligent-search',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
     } catch {
@@ -61,14 +61,17 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.error('Auth error:', authError);
       return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
@@ -78,16 +81,24 @@ serve(async (req) => {
     const rateCheck = checkRateLimit(user.id);
     if (!rateCheck.allowed) {
       console.warn('⚠️ Rate limit exceeded for user:', user.id);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'تم تجاوز الحد الأقصى للبحث (60 بحث/دقيقة). يرجى الانتظار.'
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'تم تجاوز الحد الأقصى للبحث (60 بحث/دقيقة). يرجى الانتظار.',
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        }
+      );
     }
 
-    console.log('Authenticated user for search:', user.id, 'Rate limit remaining:', rateCheck.remaining);
+    console.log(
+      'Authenticated user for search:',
+      user.id,
+      'Rate limit remaining:',
+      rateCheck.remaining
+    );
 
     // استخدام service role للبحث
     const supabase = createClient(
@@ -106,7 +117,7 @@ serve(async (req) => {
 
     const searchTerm = query.trim();
     const sanitizedTerm = sanitizeLikePattern(searchTerm); // ✅ حماية من SQL Injection
-    
+
     const results: Array<{
       id: string;
       type: string;
@@ -124,10 +135,12 @@ serve(async (req) => {
         .or(`name.ilike.%${sanitizedTerm}%,description.ilike.%${sanitizedTerm}%`)
         .limit(limit);
 
-      docs?.forEach(doc => {
+      docs?.forEach((doc) => {
         const nameMatch = doc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.5 : 0;
-        const descMatch = doc.description?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.3 : 0;
-        
+        const descMatch = doc.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          ? 0.3
+          : 0;
+
         results.push({
           id: doc.id,
           type: 'document',
@@ -137,8 +150,8 @@ serve(async (req) => {
           metadata: {
             category: doc.category,
             fileType: doc.file_type,
-            createdAt: doc.created_at
-          }
+            createdAt: doc.created_at,
+          },
         });
       });
     }
@@ -147,32 +160,36 @@ serve(async (req) => {
     if (searchType === 'all' || searchType === 'ocr') {
       const { data: ocrResults } = await supabase
         .from('document_ocr_results')
-        .select(`
+        .select(
+          `
           id,
           document_id,
           extracted_text,
           confidence_score,
           documents (name, category)
-        `)
+        `
+        )
         .ilike('extracted_text', `%${sanitizedTerm}%`)
         .limit(limit);
 
-      ocrResults?.forEach(ocr => {
+      ocrResults?.forEach((ocr) => {
         const text = ocr.extracted_text || '';
-        const matchCount = (text.toLowerCase().match(new RegExp(searchTerm.toLowerCase(), 'g')) || []).length;
+        const matchCount = (
+          text.toLowerCase().match(new RegExp(searchTerm.toLowerCase(), 'g')) || []
+        ).length;
         const doc = Array.isArray(ocr.documents) ? ocr.documents[0] : ocr.documents;
-        
+
         results.push({
           id: ocr.document_id,
           type: 'ocr_content',
           title: doc?.name || 'محتوى مستند',
           description: text.substring(0, 200) + '...',
-          relevanceScore: Math.min(0.95, 0.4 + (matchCount * 0.1)) * (ocr.confidence_score || 0.8),
+          relevanceScore: Math.min(0.95, 0.4 + matchCount * 0.1) * (ocr.confidence_score || 0.8),
           metadata: {
             ocrId: ocr.id,
             category: doc?.category,
-            matchCount
-          }
+            matchCount,
+          },
         });
       });
     }
@@ -185,16 +202,18 @@ serve(async (req) => {
         .or(`full_name.ilike.%${searchTerm}%`)
         .limit(limit);
 
-      beneficiaries?.forEach(ben => {
+      beneficiaries?.forEach((ben) => {
         results.push({
           id: ben.id,
           type: 'beneficiary',
           title: ben.full_name,
           description: `${ben.category} - ${ben.status}`,
-          relevanceScore: ben.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.9 : 0.6,
+          relevanceScore: ben.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+            ? 0.9
+            : 0.6,
           metadata: {
-            status: ben.status
-          }
+            status: ben.status,
+          },
         });
       });
     }
@@ -203,18 +222,22 @@ serve(async (req) => {
     if (searchType === 'all' || searchType === 'contracts') {
       const { data: contracts } = await supabase
         .from('contracts')
-        .select(`
+        .select(
+          `
           id, 
           contract_number, 
           tenant_name, 
           status,
           properties (name)
-        `)
+        `
+        )
         .or(`contract_number.ilike.%${searchTerm}%,tenant_name.ilike.%${searchTerm}%`)
         .limit(limit);
 
-      contracts?.forEach(contract => {
-        const prop = Array.isArray(contract.properties) ? contract.properties[0] : contract.properties;
+      contracts?.forEach((contract) => {
+        const prop = Array.isArray(contract.properties)
+          ? contract.properties[0]
+          : contract.properties;
         results.push({
           id: contract.id,
           type: 'contract',
@@ -223,8 +246,8 @@ serve(async (req) => {
           relevanceScore: 0.75,
           metadata: {
             tenantName: contract.tenant_name,
-            status: contract.status
-          }
+            status: contract.status,
+          },
         });
       });
     }
@@ -237,7 +260,7 @@ serve(async (req) => {
         .or(`name.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
         .limit(limit);
 
-      properties?.forEach(prop => {
+      properties?.forEach((prop) => {
         results.push({
           id: prop.id,
           type: 'property',
@@ -246,8 +269,8 @@ serve(async (req) => {
           relevanceScore: prop.name?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.85 : 0.6,
           metadata: {
             propertyType: prop.type,
-            status: prop.status
-          }
+            status: prop.status,
+          },
         });
       });
     }
@@ -256,32 +279,26 @@ serve(async (req) => {
     results.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
     // تسجيل البحث مع معرف المستخدم
-    await supabase
-      .from('audit_logs')
-      .insert({
-        action_type: 'intelligent_search',
-        description: `بحث ذكي: "${searchTerm}"`,
-        user_id: user.id,
-        new_values: {
-          query: searchTerm,
-          searchType,
-          resultsCount: results.length
-        }
-      });
+    await supabase.from('audit_logs').insert({
+      action_type: 'intelligent_search',
+      description: `بحث ذكي: "${searchTerm}"`,
+      user_id: user.id,
+      new_values: {
+        query: searchTerm,
+        searchType,
+        resultsCount: results.length,
+      },
+    });
 
     return jsonResponse({
       success: true,
       query: searchTerm,
       searchType,
       totalResults: results.length,
-      results: results.slice(0, limit)
+      results: results.slice(0, limit),
     });
-
   } catch (error) {
     console.error('Intelligent search error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'خطأ في البحث الذكي',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'خطأ في البحث الذكي', 500);
   }
 });

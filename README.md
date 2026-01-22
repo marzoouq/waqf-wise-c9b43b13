@@ -73,6 +73,7 @@
 ## 🛠️ التقنيات
 
 ### Frontend
+
 ```
 React 18.3 + TypeScript
 Vite + Tailwind CSS
@@ -81,6 +82,7 @@ React Query + React Router
 ```
 
 ### Backend
+
 ```
 Lovable Cloud (Supabase)
 PostgreSQL 15
@@ -90,6 +92,7 @@ Realtime Updates
 ```
 
 ### الأدوات
+
 ```
 ESLint + Prettier
 Vitest + Playwright
@@ -146,11 +149,13 @@ npm run dev
 - ✅ **0 مشاكل أمنية حرجة**
 
 **الوصول إلى التوثيق:**
+
 ```
 القائمة الجانبية ← الإعدادات ← توثيق المشروع
 ```
 
 **المميزات:**
+
 - 📊 إحصائيات حية للتقدم
 - ✅ قوائم مهام قابلة للتحديث
 - 📝 سجل تغييرات تفصيلي
@@ -172,6 +177,7 @@ npm run dev
 ### شفافية المستفيدين
 
 المنصة توفر **شفافية كاملة** للمستفيدين من الدرجة الأولى مع:
+
 - ✅ **وصول قراءة** لجميع البيانات المالية
 - ✅ **اطلاع كامل** على العقارات والعقود
 - ✅ **متابعة شاملة** للتوزيعات
@@ -182,25 +188,25 @@ npm run dev
 
 ### 📖 الوثائق الرئيسية
 
-| الوثيقة | الوصف |
-|---------|--------|
-| [`README.md`](README.md) | نظرة عامة على المشروع |
+| الوثيقة                                    | الوصف                          |
+| ------------------------------------------ | ------------------------------ |
+| [`README.md`](README.md)                   | نظرة عامة على المشروع          |
 | [`AI_CODING_AGENT.md`](AI_CODING_AGENT.md) | 🤖 دليل الـ AI Agent والمطورين |
-| [`CHANGELOG.md`](CHANGELOG.md) | سجل التغييرات التفصيلي |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | البنية المعمارية |
+| [`CHANGELOG.md`](CHANGELOG.md)             | سجل التغييرات التفصيلي         |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md)       | البنية المعمارية               |
 
 ### 📁 الوثائق التفصيلية (`/docs`)
 
-| الوثيقة | المحتوى |
-|---------|---------|
-| [`ROLES_AND_PERMISSIONS.md`](docs/ROLES_AND_PERMISSIONS.md) | 🔐 **نظام الصلاحيات والأدوار الشامل** |
-| [`SECURITY_GUIDELINES.md`](docs/SECURITY_GUIDELINES.md) | 🛡️ **إرشادات الأمان للمطورين** |
-| [`ARCHITECTURE_RULES.md`](docs/ARCHITECTURE_RULES.md) | قواعد الهيكل المعماري الصارمة |
-| [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل |
-| [`PERFORMANCE.md`](docs/PERFORMANCE.md) | تقرير الأداء |
-| [`SECURITY_FIX_PLAN.md`](docs/SECURITY_FIX_PLAN.md) | خطة الأمان |
-| [`DEBUGGING_GUIDE.md`](docs/DEBUGGING_GUIDE.md) | دليل التصحيح |
-| [`DEPLOYMENT.md`](docs/DEPLOYMENT.md) | دليل النشر |
+| الوثيقة                                                       | المحتوى                               |
+| ------------------------------------------------------------- | ------------------------------------- |
+| [`ROLES_AND_PERMISSIONS.md`](docs/ROLES_AND_PERMISSIONS.md)   | 🔐 **نظام الصلاحيات والأدوار الشامل** |
+| [`SECURITY_GUIDELINES.md`](docs/SECURITY_GUIDELINES.md)       | 🛡️ **إرشادات الأمان للمطورين**        |
+| [`ARCHITECTURE_RULES.md`](docs/ARCHITECTURE_RULES.md)         | قواعد الهيكل المعماري الصارمة         |
+| [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل                    |
+| [`PERFORMANCE.md`](docs/PERFORMANCE.md)                       | تقرير الأداء                          |
+| [`SECURITY_FIX_PLAN.md`](docs/SECURITY_FIX_PLAN.md)           | خطة الأمان                            |
+| [`DEBUGGING_GUIDE.md`](docs/DEBUGGING_GUIDE.md)               | دليل التصحيح                          |
+| [`DEPLOYMENT.md`](docs/DEPLOYMENT.md)                         | دليل النشر                            |
 
 ---
 
@@ -218,6 +224,7 @@ npm run test:e2e
 ```
 
 **التغطية الحالية:**
+
 - ✅ Unit Tests: 90%+
 - ✅ Integration Tests: 80%+
 - ✅ E2E Tests: 70%+
@@ -240,6 +247,7 @@ npm run preview
 ### النشر
 
 **باستخدام Lovable:**
+
 1. افتح المشروع في [Lovable](https://lovable.dev)
 2. انقر على **Share → Publish**
 3. اختر نطاق مخصص أو استخدم النطاق التلقائي
@@ -256,9 +264,9 @@ npm run preview
 import { logger } from '@/lib/logger';
 
 // تسجيل الأخطاء
-logger.error(error, { 
-  context: 'operation_name', 
-  severity: 'medium' 
+logger.error(error, {
+  context: 'operation_name',
+  severity: 'medium',
 });
 
 // تسجيل المعلومات
@@ -296,12 +304,12 @@ logger.info('Operation completed', { data });
 
 ## ⚡ الأداء
 
-| المقياس | القيمة |
-|---------|--------|
-| LCP (Landing) | <2.5s |
-| Dashboard Load | ~1.1s |
-| Initial Load | <1s |
-| Cache Hit Rate | 95% |
+| المقياس        | القيمة |
+| -------------- | ------ |
+| LCP (Landing)  | <2.5s  |
+| Dashboard Load | ~1.1s  |
+| Initial Load   | <1s    |
+| Cache Hit Rate | 95%    |
 
 ---
 
@@ -339,6 +347,7 @@ logger.info('Operation completed', { data });
 ## 📞 الدعم
 
 للمساعدة والدعم:
+
 - 📧 البريد الإلكتروني: support@waqf.sa
 - 📱 الهاتف: +966 XX XXX XXXX
 - 💬 الدردشة: متوفرة في لوحة التحكم

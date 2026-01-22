@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { useMessages, type Message } from "@/hooks/messages/useMessages";
-import { useAvailableUsers } from "@/hooks/messages/useAvailableUsers";
-import { useToast } from "@/hooks/ui/use-toast";
-import { format, arLocale as ar } from "@/lib/date";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useMessages, type Message } from '@/hooks/messages/useMessages';
+import { useAvailableUsers } from '@/hooks/messages/useAvailableUsers';
+import { useToast } from '@/hooks/ui/use-toast';
+import { format, arLocale as ar } from '@/lib/date';
 import {
   Mail,
   MailOpen,
@@ -23,21 +23,16 @@ import {
   Inbox,
   SendHorizontal,
   PenSquare,
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 export function MessageCenter() {
   const { user } = useAuth();
@@ -45,24 +40,24 @@ export function MessageCenter() {
   const { messages, isLoading, unreadCount, markAsRead, sendMessage } = useMessages();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposing, setIsComposing] = useState(false);
-  const [receiverId, setReceiverId] = useState<string>("");
-  const [activeTab, setActiveTab] = useState("inbox");
-  
+  const [receiverId, setReceiverId] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('inbox');
+
   const { data: availableUsers = [] } = useAvailableUsers();
 
-    if (isLoading) {
-      return (
-        <Card>
-          <CardContent className="p-6 text-center text-muted-foreground">
-            جاري تحميل الرسائل...
-          </CardContent>
-        </Card>
-      );
-    }
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center text-muted-foreground">
+          جاري تحميل الرسائل...
+        </CardContent>
+      </Card>
+    );
+  }
 
   // تقسيم الرسائل إلى واردة وصادرة
-  const inboxMessages = messages.filter(m => m.receiver_id === user?.id);
-  const sentMessages = messages.filter(m => m.sender_id === user?.id);
+  const inboxMessages = messages.filter((m) => m.receiver_id === user?.id);
+  const sentMessages = messages.filter((m) => m.sender_id === user?.id);
 
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message);
@@ -73,26 +68,26 @@ export function MessageCenter() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // التحقق من اختيار المستلم
     if (!receiverId) {
       toast({
-        title: "خطأ",
-        description: "يجب اختيار المستلم أولاً",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يجب اختيار المستلم أولاً',
+        variant: 'destructive',
       });
       return;
     }
 
     const formData = new FormData(e.currentTarget);
-    const subject = formData.get("subject") as string;
-    const body = formData.get("body") as string;
+    const subject = formData.get('subject') as string;
+    const body = formData.get('body') as string;
 
     if (!subject?.trim() || !body?.trim()) {
       toast({
-        title: "خطأ",
-        description: "يجب ملء جميع الحقول المطلوبة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يجب ملء جميع الحقول المطلوبة',
+        variant: 'destructive',
       });
       return;
     }
@@ -102,13 +97,13 @@ export function MessageCenter() {
         receiver_id: receiverId,
         subject: subject.trim(),
         body: body.trim(),
-        priority: formData.get("priority") as string || "عادي",
+        priority: (formData.get('priority') as string) || 'عادي',
       },
       {
         onSuccess: () => {
           setIsComposing(false);
-          setReceiverId("");
-          setActiveTab("sent");
+          setReceiverId('');
+          setActiveTab('sent');
           (e.target as HTMLFormElement).reset();
         },
       }
@@ -116,17 +111,20 @@ export function MessageCenter() {
   };
 
   const getPriorityBadge = (priority?: string) => {
-    if (!priority) priority = "عادي";
+    if (!priority) priority = 'عادي';
     const config: Record<
       string,
-      { icon: React.ComponentType<{ className?: string }>; variant: "default" | "secondary" | "destructive" }
+      {
+        icon: React.ComponentType<{ className?: string }>;
+        variant: 'default' | 'secondary' | 'destructive';
+      }
     > = {
-      عاجل: { icon: AlertCircle, variant: "destructive" },
-      مهم: { icon: AlertTriangle, variant: "default" },
-      عادي: { icon: Info, variant: "secondary" },
+      عاجل: { icon: AlertCircle, variant: 'destructive' },
+      مهم: { icon: AlertTriangle, variant: 'default' },
+      عادي: { icon: Info, variant: 'secondary' },
     };
 
-    const p = config[priority] || config["عادي"];
+    const p = config[priority] || config['عادي'];
     const Icon = p.icon;
 
     return (
@@ -142,7 +140,7 @@ export function MessageCenter() {
       return (
         <div className="p-8 text-center text-muted-foreground">
           <Mail className="h-12 w-12 mx-auto mb-4 opacity-30" />
-          <p>{isInbox ? "لا توجد رسائل واردة" : "لا توجد رسائل مرسلة"}</p>
+          <p>{isInbox ? 'لا توجد رسائل واردة' : 'لا توجد رسائل مرسلة'}</p>
         </div>
       );
     }
@@ -152,10 +150,8 @@ export function MessageCenter() {
         <button
           onClick={() => handleSelectMessage(message)}
           className={`w-full p-4 text-right hover:bg-accent transition-colors ${
-            selectedMessage?.id === message.id ? "bg-accent" : ""
-          } ${
-            !message.is_read && isInbox ? "font-semibold bg-primary/5" : ""
-          }`}
+            selectedMessage?.id === message.id ? 'bg-accent' : ''
+          } ${!message.is_read && isInbox ? 'font-semibold bg-primary/5' : ''}`}
         >
           <div className="flex items-start justify-between gap-2 mb-1">
             <div className="flex items-center gap-2">
@@ -170,17 +166,15 @@ export function MessageCenter() {
               )}
               <span className="text-sm">
                 {isInbox
-                  ? message.sender_name || "مرسل غير معروف"
-                  : message.receiver_name || "مستقبل غير معروف"}
+                  ? message.sender_name || 'مرسل غير معروف'
+                  : message.receiver_name || 'مستقبل غير معروف'}
               </span>
             </div>
             {getPriorityBadge(message.priority)}
           </div>
-          <div className="text-sm font-medium truncate">
-            {message.subject}
-          </div>
+          <div className="text-sm font-medium truncate">{message.subject}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            {format(new Date(message.created_at), "dd MMMM yyyy - HH:mm", {
+            {format(new Date(message.created_at), 'dd MMMM yyyy - HH:mm', {
               locale: ar,
             })}
           </div>
@@ -201,11 +195,7 @@ export function MessageCenter() {
                 <Mail className="h-5 w-5" />
                 صندوق الرسائل
               </CardTitle>
-              <Button 
-                size="sm" 
-                variant="default"
-                onClick={() => setIsComposing(true)}
-              >
+              <Button size="sm" variant="default" onClick={() => setIsComposing(true)}>
                 <PenSquare className="h-4 w-4 ms-2" />
                 رسالة جديدة
               </Button>
@@ -215,7 +205,10 @@ export function MessageCenter() {
                 <Inbox className="h-4 w-4" />
                 الوارد
                 {unreadCount > 0 && (
-                  <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="h-5 w-5 p-0 flex items-center justify-center text-xs"
+                  >
                     {unreadCount}
                   </Badge>
                 )}
@@ -229,14 +222,14 @@ export function MessageCenter() {
               </TabsTrigger>
             </TabsList>
           </CardHeader>
-          
+
           <CardContent className="p-0">
             <TabsContent value="inbox" className="m-0">
               <ScrollArea className="h-[450px]">
                 {renderMessageList(inboxMessages, true)}
               </ScrollArea>
             </TabsContent>
-            
+
             <TabsContent value="sent" className="m-0">
               <ScrollArea className="h-[450px]">
                 {renderMessageList(sentMessages, false)}
@@ -249,9 +242,7 @@ export function MessageCenter() {
       {/* محتوى الرسالة */}
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle>
-            {selectedMessage ? selectedMessage.subject : "اختر رسالة لعرضها"}
-          </CardTitle>
+          <CardTitle>{selectedMessage ? selectedMessage.subject : 'اختر رسالة لعرضها'}</CardTitle>
         </CardHeader>
         <CardContent>
           {selectedMessage ? (
@@ -261,21 +252,19 @@ export function MessageCenter() {
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">من:</span>
                     <span className="font-medium">
-                      {selectedMessage.sender_name || "مرسل غير معروف"}
+                      {selectedMessage.sender_name || 'مرسل غير معروف'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">إلى:</span>
                     <span className="font-medium">
-                      {selectedMessage.receiver_name || "مستقبل غير معروف"}
+                      {selectedMessage.receiver_name || 'مستقبل غير معروف'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    {format(
-                      new Date(selectedMessage.created_at),
-                      "dd MMMM yyyy - HH:mm",
-                      { locale: ar }
-                    )}
+                    {format(new Date(selectedMessage.created_at), 'dd MMMM yyyy - HH:mm', {
+                      locale: ar,
+                    })}
                   </div>
                 </div>
                 {getPriorityBadge(selectedMessage.priority)}
@@ -309,10 +298,13 @@ export function MessageCenter() {
       </Card>
 
       {/* نافذة إرسال رسالة جديدة */}
-      <Dialog open={isComposing} onOpenChange={(open) => {
-        setIsComposing(open);
-        if (!open) setReceiverId("");
-      }}>
+      <Dialog
+        open={isComposing}
+        onOpenChange={(open) => {
+          setIsComposing(open);
+          if (!open) setReceiverId('');
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>إرسال رسالة جديدة</DialogTitle>
@@ -320,10 +312,7 @@ export function MessageCenter() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="receiver_id">إلى *</Label>
-              <Select
-                value={receiverId}
-                onValueChange={setReceiverId}
-              >
+              <Select value={receiverId} onValueChange={setReceiverId}>
                 <SelectTrigger id="receiver_id">
                   <SelectValue placeholder="اختر المستقبل" />
                 </SelectTrigger>
@@ -357,29 +346,18 @@ export function MessageCenter() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="subject">الموضوع *</Label>
-              <Input
-                id="subject"
-                name="subject"
-                placeholder="موضوع الرسالة"
-                required
-              />
+              <Input id="subject" name="subject" placeholder="موضوع الرسالة" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="body">الرسالة *</Label>
-              <Textarea
-                id="body"
-                name="body"
-                rows={5}
-                placeholder="اكتب رسالتك هنا..."
-                required
-              />
+              <Textarea id="body" name="body" rows={5} placeholder="اكتب رسالتك هنا..." required />
             </div>
             <Button
               type="submit"
               disabled={sendMessage.isPending || !receiverId}
               className="w-full"
             >
-              {sendMessage.isPending ? "جاري الإرسال..." : "إرسال"}
+              {sendMessage.isPending ? 'جاري الإرسال...' : 'إرسال'}
             </Button>
           </form>
         </DialogContent>

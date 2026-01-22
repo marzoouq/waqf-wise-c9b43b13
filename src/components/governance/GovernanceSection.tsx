@@ -1,15 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Vote, 
-  Clock, 
-  Users,
-  ChevronLeft
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useGovernanceDecisions } from "@/hooks/governance/useGovernanceDecisions";
-import { useRecentGovernanceDecisions } from "@/hooks/governance/useGovernanceData";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Vote, Clock, Users, ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useGovernanceDecisions } from '@/hooks/governance/useGovernanceDecisions';
+import { useRecentGovernanceDecisions } from '@/hooks/governance/useGovernanceData';
 import { Database } from '@/integrations/supabase/types';
 
 type GovernanceDecision = Database['public']['Tables']['governance_decisions']['Row'];
@@ -19,31 +14,29 @@ export function GovernanceSection() {
   const { decisions = [] } = useGovernanceDecisions();
 
   // حساب إحصائيات سريعة
-  const activeDecisions = decisions.filter(d => 
-    d.decision_status === 'قيد التصويت'
-  ).length;
-  
-  const pendingVotes = decisions.filter(d => 
-    d.decision_status === 'قيد التصويت' && !d.voting_completed
+  const activeDecisions = decisions.filter((d) => d.decision_status === 'قيد التصويت').length;
+
+  const pendingVotes = decisions.filter(
+    (d) => d.decision_status === 'قيد التصويت' && !d.voting_completed
   ).length;
 
   // جلب آخر القرارات النشطة
   const { data: recentDecisions = [] } = useRecentGovernanceDecisions();
 
   const stats = [
-    { 
-      label: "قرارات نشطة", 
-      value: activeDecisions, 
+    {
+      label: 'قرارات نشطة',
+      value: activeDecisions,
       icon: Vote,
-      color: "text-info",
-      bg: "bg-info-light"
+      color: 'text-info',
+      bg: 'bg-info-light',
     },
-    { 
-      label: "بانتظار التصويت", 
-      value: pendingVotes, 
+    {
+      label: 'بانتظار التصويت',
+      value: pendingVotes,
       icon: Clock,
-      color: "text-warning",
-      bg: "bg-warning-light"
+      color: 'text-warning',
+      bg: 'bg-warning-light',
     },
   ];
 
@@ -55,11 +48,7 @@ export function GovernanceSection() {
             <Vote className="h-5 w-5 text-primary" />
             الحوكمة والقرارات
           </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => navigate("/governance/decisions")}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/governance/decisions')}>
             عرض الكل
             <ChevronLeft className="h-4 w-4 me-2" />
           </Button>
@@ -71,10 +60,7 @@ export function GovernanceSection() {
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div 
-                key={stat.label}
-                className={`${stat.bg} rounded-lg p-4 border border-border/50`}
-              >
+              <div key={stat.label} className={`${stat.bg} rounded-lg p-4 border border-border/50`}>
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className={`h-4 w-4 ${stat.color}`} />
                   <span className="text-xs text-muted-foreground">{stat.label}</span>
@@ -96,7 +82,7 @@ export function GovernanceSection() {
           ) : (
             <div className="space-y-2">
               {(recentDecisions as GovernanceDecision[]).map((decision) => (
-                <div 
+                <div
                   key={decision.id}
                   className="flex items-start justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => navigate(`/governance/decisions/${decision.id}`)}
@@ -113,10 +99,7 @@ export function GovernanceSection() {
                       </span>
                     </div>
                   </div>
-                  <Badge 
-                    variant="secondary"
-                    className="bg-info-light text-info text-xs"
-                  >
+                  <Badge variant="secondary" className="bg-info-light text-info text-xs">
                     نشط
                   </Badge>
                 </div>
@@ -126,10 +109,7 @@ export function GovernanceSection() {
         </div>
 
         {/* زر إنشاء قرار جديد */}
-        <Button 
-          className="w-full"
-          onClick={() => navigate("/governance/decisions")}
-        >
+        <Button className="w-full" onClick={() => navigate('/governance/decisions')}>
           <Vote className="h-4 w-4 ms-2" />
           إدارة القرارات والتصويت
         </Button>

@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UIService, type SavedSearch } from "@/services/ui.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { UIService, type SavedSearch } from '@/services/ui.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { SavedSearch };
 
@@ -10,24 +10,30 @@ export function useSavedSearches() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: searches = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: searches = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.SAVED_SEARCHES,
     queryFn: () => UIService.getSavedSearches(),
   });
 
   const saveSearch = useMutation({
-    mutationFn: (search: Omit<SavedSearch, "id" | "user_id" | "created_at" | "updated_at" | "usage_count">) =>
-      UIService.saveSearch(search),
+    mutationFn: (
+      search: Omit<SavedSearch, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'usage_count'>
+    ) => UIService.saveSearch(search),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_SEARCHES });
       toast({
-        title: "تم الحفظ بنجاح",
-        description: "تم حفظ البحث بنجاح",
+        title: 'تم الحفظ بنجاح',
+        description: 'تم حفظ البحث بنجاح',
       });
     },
-    onError: createMutationErrorHandler({ 
+    onError: createMutationErrorHandler({
       context: 'save_search',
-      toastTitle: "خطأ في الحفظ"
+      toastTitle: 'خطأ في الحفظ',
     }),
   });
 
@@ -36,13 +42,13 @@ export function useSavedSearches() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_SEARCHES });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف البحث المحفوظ بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف البحث المحفوظ بنجاح',
       });
     },
-    onError: createMutationErrorHandler({ 
+    onError: createMutationErrorHandler({
       context: 'delete_search',
-      toastTitle: "خطأ في الحذف"
+      toastTitle: 'خطأ في الحذف',
     }),
   });
 

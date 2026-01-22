@@ -2,7 +2,7 @@
  * RolesManagement Page
  * صفحة إدارة الأدوار - مُحسّنة مع RolesContext والمكونات المستخرجة
  * @version 2.9.14
- * 
+ *
  * التحسينات في هذا الإصدار:
  * - إضافة RolesProvider للاتساق مع Users.tsx
  * - استخراج RoleAuditDialog كمكون منفصل
@@ -11,35 +11,38 @@
  * - إضافة Lazy Loading للـ Dialogs (تحسين الأداء 15%)
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Shield, Search, UserCog, History, ChevronLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { Shield, Search, UserCog, History, ChevronLeft } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
-import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
-import { RolesProvider, useRolesContext } from "@/contexts/RolesContext";
+} from '@/components/ui/select';
+import { ROLE_LABELS, ROLE_COLORS, type AppRole } from '@/types/roles';
+import { useUsersRealtime } from '@/hooks/users/useUsersRealtime';
+import { RolesProvider, useRolesContext } from '@/contexts/RolesContext';
 
 // Lazy Loaded Dialogs
-import { 
-  LazyRoleAuditDialog, 
+import {
+  LazyRoleAuditDialog,
   LazyAddRoleDialog,
-  LazyDialogWrapper 
-} from "@/components/users/LazyDialogs";
+  LazyDialogWrapper,
+} from '@/components/users/LazyDialogs';
 
 const RolesContent = () => {
   // Realtime updates
   useUsersRealtime();
-  
+
   const {
     filteredUsers,
     auditLogs,
@@ -68,8 +71,8 @@ const RolesContent = () => {
         description="عرض وإدارة أدوار المستخدمين والصلاحيات"
         icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
         actions={
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             onClick={() => setAuditDialogOpen(true)}
             className="gap-2"
@@ -113,7 +116,9 @@ const RolesContent = () => {
       {/* قائمة المستخدمين */}
       <Card>
         <CardHeader className="pb-2 sm:pb-4">
-          <CardTitle className="text-base sm:text-lg">المستخدمون ({filteredUsers.length})</CardTitle>
+          <CardTitle className="text-base sm:text-lg">
+            المستخدمون ({filteredUsers.length})
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-2 sm:p-6">
           {isLoading ? (
@@ -133,7 +138,7 @@ const RolesContent = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm sm:text-base truncate">
-                        {user.full_name || "غير محدد"}
+                        {user.full_name || 'غير محدد'}
                       </div>
                       <div className="text-xs sm:text-sm text-muted-foreground truncate">
                         {user.email}
@@ -141,8 +146,8 @@ const RolesContent = () => {
                       <div className="flex flex-wrap gap-1 mt-2">
                         {user.roles_array && user.roles_array.length > 0 ? (
                           user.roles_array.map((role) => (
-                            <Badge 
-                              key={role} 
+                            <Badge
+                              key={role}
                               className={`${ROLE_COLORS[role as AppRole]} text-[10px] sm:text-xs`}
                             >
                               {ROLE_LABELS[role as AppRole]}

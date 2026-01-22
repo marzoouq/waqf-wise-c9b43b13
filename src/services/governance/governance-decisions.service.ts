@@ -6,7 +6,12 @@
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database } from '@/integrations/supabase/types';
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, type PaginatedResponse, type PaginationParams } from '@/lib/pagination.types';
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+  type PaginatedResponse,
+  type PaginationParams,
+} from '@/lib/pagination.types';
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 type GovernanceDecisionInsert = Database['public']['Tables']['governance_decisions']['Insert'];
@@ -43,7 +48,9 @@ export class GovernanceDecisionsService {
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
-      let countQuery = supabase.from('governance_decisions').select('*', { count: 'exact', head: true });
+      let countQuery = supabase
+        .from('governance_decisions')
+        .select('*', { count: 'exact', head: true });
       if (filters?.status) countQuery = countQuery.eq('decision_status', filters.status);
       const { count } = await countQuery;
 
@@ -52,9 +59,9 @@ export class GovernanceDecisionsService {
         .select('*')
         .order('created_at', { ascending: false })
         .range(from, to);
-      
+
       if (filters?.status) dataQuery = dataQuery.eq('decision_status', filters.status);
-      
+
       const { data, error } = await dataQuery;
       if (error) throw error;
 
@@ -114,7 +121,10 @@ export class GovernanceDecisionsService {
   /**
    * تحديث قرار
    */
-  static async updateDecision(id: string, updates: Partial<GovernanceDecisionRow>): Promise<GovernanceDecisionRow> {
+  static async updateDecision(
+    id: string,
+    updates: Partial<GovernanceDecisionRow>
+  ): Promise<GovernanceDecisionRow> {
     try {
       const { data, error } = await supabase
         .from('governance_decisions')
@@ -142,7 +152,7 @@ export class GovernanceDecisionsService {
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: userId || null,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         })
         .eq('id', id);
 
@@ -159,11 +169,11 @@ export class GovernanceDecisionsService {
   static async getRecentDecisions() {
     try {
       const { data } = await supabase
-        .from("governance_decisions")
-        .select("*")
-        .eq("decision_status", "قيد التصويت")
+        .from('governance_decisions')
+        .select('*')
+        .eq('decision_status', 'قيد التصويت')
         .is('deleted_at', null)
-        .order("created_at", { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(3);
       return data || [];
     } catch (error) {

@@ -3,8 +3,8 @@
  * Beneficiary routes - require beneficiary role
  */
 
-import { Route } from "react-router-dom";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import {
   BeneficiarySupport,
   BeneficiaryRequests,
@@ -12,40 +12,40 @@ import {
   BeneficiaryReports,
   BeneficiaryPortal,
   BeneficiarySettings,
-} from "./lazyPages";
+} from './lazyPages';
 
 /**
  * مسارات المستفيد المستقلة (خارج MainLayout)
  */
 export const beneficiaryStandaloneRoutes = [
   // المسار الرئيسي - beneficiary-portal
-  <Route 
+  <Route
     key="beneficiary-portal"
-    path="/beneficiary-portal" 
+    path="/beneficiary-portal"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir", "nazer", "admin"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir', 'nazer', 'admin']}>
         <BeneficiaryPortal />
       </ProtectedRoute>
-    } 
+    }
   />,
   // المسار القديم للتوافق - يعيد التوجيه إلى beneficiary-portal
-  <Route 
+  <Route
     key="beneficiary-dashboard"
-    path="/beneficiary-dashboard" 
+    path="/beneficiary-dashboard"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir", "nazer", "admin"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir', 'nazer', 'admin']}>
         <BeneficiaryPortal />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="beneficiary-support"
-    path="/beneficiary-support" 
+    path="/beneficiary-support"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir']}>
         <BeneficiarySupport />
       </ProtectedRoute>
-    } 
+    }
   />,
 ];
 
@@ -53,40 +53,40 @@ export const beneficiaryStandaloneRoutes = [
  * مسارات المستفيد داخل MainLayout
  */
 export const beneficiaryProtectedRoutes = [
-  <Route 
+  <Route
     key="beneficiary-requests"
-    path="/beneficiary/requests" 
+    path="/beneficiary/requests"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir']}>
         <BeneficiaryRequests />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="beneficiary-account-statement"
-    path="/beneficiary/account-statement" 
+    path="/beneficiary/account-statement"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir']}>
         <BeneficiaryAccountStatement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="beneficiary-reports"
-    path="/beneficiary/reports" 
+    path="/beneficiary/reports"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir']}>
         <BeneficiaryReports />
       </ProtectedRoute>
-    } 
+    }
   />,
   <Route
     key="beneficiary-settings"
     path="/beneficiary-settings"
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['beneficiary', 'waqf_heir']}>
         <BeneficiarySettings />
       </ProtectedRoute>
-    } 
+    }
   />,
 ];

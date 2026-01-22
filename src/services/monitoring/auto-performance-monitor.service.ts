@@ -3,7 +3,7 @@
  * خدمة مراقبة الأداء التلقائية مع تنبيهات
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 const RESPONSE_TIME_THRESHOLD_MS = 200;
 const ALERT_COOLDOWN_MS = 60000;
@@ -29,10 +29,7 @@ class AutoPerformanceMonitor {
   private metrics: PerformanceMetric[] = [];
   private isEnabled: boolean = true;
 
-  async measureOperation<T>(
-    operationName: string,
-    operation: () => Promise<T>
-  ): Promise<T> {
+  async measureOperation<T>(operationName: string, operation: () => Promise<T>): Promise<T> {
     if (!this.isEnabled) {
       return operation();
     }
@@ -57,7 +54,7 @@ class AutoPerformanceMonitor {
       operation,
       duration,
       timestamp: new Date(),
-      success
+      success,
     };
 
     this.metrics.push(metric);
@@ -73,9 +70,11 @@ class AutoPerformanceMonitor {
 
   private async handleSlowOperation(metric: PerformanceMetric) {
     const now = Date.now();
-    
+
     if (now - this.lastAlertTime < ALERT_COOLDOWN_MS) {
-      console.warn(`[Performance] عملية بطيئة: ${metric.operation} (${metric.duration.toFixed(0)}ms)`);
+      console.warn(
+        `[Performance] عملية بطيئة: ${metric.operation} (${metric.duration.toFixed(0)}ms)`
+      );
       return;
     }
 
@@ -87,7 +86,7 @@ class AutoPerformanceMonitor {
         severity: metric.duration > 500 ? 'error' : 'warning',
         title: 'تحذير أداء: عملية بطيئة',
         description: `العملية "${metric.operation}" استغرقت ${metric.duration.toFixed(0)}ms (الحد: ${RESPONSE_TIME_THRESHOLD_MS}ms)`,
-        status: 'active'
+        status: 'active',
       });
 
       console.warn(`[Performance Alert] ${metric.operation}: ${metric.duration.toFixed(0)}ms`);
@@ -98,11 +97,18 @@ class AutoPerformanceMonitor {
 
   getStats(): PerformanceStats {
     if (this.metrics.length === 0) {
-      return { avg: 0, max: 0, min: 0, count: 0, slowCount: 0, threshold: RESPONSE_TIME_THRESHOLD_MS };
+      return {
+        avg: 0,
+        max: 0,
+        min: 0,
+        count: 0,
+        slowCount: 0,
+        threshold: RESPONSE_TIME_THRESHOLD_MS,
+      };
     }
 
-    const durations = this.metrics.map(m => m.duration);
-    const slowCount = durations.filter(d => d > RESPONSE_TIME_THRESHOLD_MS).length;
+    const durations = this.metrics.map((m) => m.duration);
+    const slowCount = durations.filter((d) => d > RESPONSE_TIME_THRESHOLD_MS).length;
 
     return {
       avg: durations.reduce((a, b) => a + b, 0) / durations.length,
@@ -110,7 +116,7 @@ class AutoPerformanceMonitor {
       min: Math.min(...durations),
       count: durations.length,
       slowCount,
-      threshold: RESPONSE_TIME_THRESHOLD_MS
+      threshold: RESPONSE_TIME_THRESHOLD_MS,
     };
   }
 

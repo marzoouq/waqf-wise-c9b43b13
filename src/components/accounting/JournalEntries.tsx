@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus, Eye, FileText } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatDate } from "@/lib/date";
-import AddJournalEntryDialog from "./AddJournalEntryDialog";
-import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
-import { BadgeVariant } from "@/types";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { useAccountingFilters } from "@/hooks/accounting/useAccountingFilters";
-import { AccountingFilters } from "./AccountingFilters";
-import { EmptyAccountingState } from "./EmptyAccountingState";
-import { AccountingErrorState } from "./AccountingErrorState";
-import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
-import { useJournalEntriesList, type JournalEntry } from "@/hooks/accounting/useJournalEntriesList";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Plus, Eye, FileText } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { formatDate } from '@/lib/date';
+import AddJournalEntryDialog from './AddJournalEntryDialog';
+import ViewJournalEntryDialog from './ViewJournalEntryDialog';
+import { BadgeVariant } from '@/types';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { useAccountingFilters } from '@/hooks/accounting/useAccountingFilters';
+import { AccountingFilters } from './AccountingFilters';
+import { EmptyAccountingState } from './EmptyAccountingState';
+import { AccountingErrorState } from './AccountingErrorState';
+import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
+import { useJournalEntriesList, type JournalEntry } from '@/hooks/accounting/useJournalEntriesList';
 
 const JournalEntries = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -24,60 +24,56 @@ const JournalEntries = () => {
 
   const { filteredData: entries, filters } = useAccountingFilters({
     data: allEntries || [],
-    searchFields: ["entry_number", "description"],
-    dateField: "entry_date",
-    statusField: "status",
+    searchFields: ['entry_number', 'description'],
+    dateField: 'entry_date',
+    statusField: 'status',
   });
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: BadgeVariant }> = {
-      draft: { label: "مسودة", variant: "secondary" },
-      posted: { label: "مرحّل", variant: "default" },
-      cancelled: { label: "ملغى", variant: "destructive" },
+      draft: { label: 'مسودة', variant: 'secondary' },
+      posted: { label: 'مرحّل', variant: 'default' },
+      cancelled: { label: 'ملغى', variant: 'destructive' },
     };
-    const config = variants[status] || { label: status, variant: "outline" };
+    const config = variants[status] || { label: status, variant: 'outline' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   const columns: Column<JournalEntry>[] = [
     {
-      key: "entry_number",
-      label: "رقم القيد",
+      key: 'entry_number',
+      label: 'رقم القيد',
       render: (_, entry) => (
         <span className="font-mono text-xs sm:text-sm">{entry.entry_number}</span>
       ),
     },
     {
-      key: "entry_date",
-      label: "التاريخ",
+      key: 'entry_date',
+      label: 'التاريخ',
       render: (_, entry) => (
         <span className="text-xs sm:text-sm whitespace-nowrap">
-          {formatDate(entry.entry_date, "dd MMM yyyy")}
+          {formatDate(entry.entry_date, 'dd MMM yyyy')}
         </span>
       ),
       hideOnMobile: true,
     },
     {
-      key: "description",
-      label: "البيان",
-      render: (_, entry) => (
-        <span className="text-xs sm:text-sm">{entry.description}</span>
-      ),
+      key: 'description',
+      label: 'البيان',
+      render: (_, entry) => <span className="text-xs sm:text-sm">{entry.description}</span>,
       hideOnMobile: true,
     },
     {
-      key: "status",
-      label: "الحالة",
+      key: 'status',
+      label: 'الحالة',
       render: (_, entry) => getStatusBadge(entry.status),
     },
     {
-      key: "posted_at",
-      label: "تاريخ الترحيل",
+      key: 'posted_at',
+      label: 'تاريخ الترحيل',
       render: (_, entry) => (
         <span className="text-xs sm:text-sm whitespace-nowrap">
-          {entry.posted_at
-            ? formatDate(entry.posted_at, "dd MMM yyyy")
-            : "-"}
+          {entry.posted_at ? formatDate(entry.posted_at, 'dd MMM yyyy') : '-'}
         </span>
       ),
       hideOnMobile: true,
@@ -95,11 +91,11 @@ const JournalEntries = () => {
         <div className="flex gap-2">
           {entries.length > 0 && (
             <ExportButton
-              data={entries.map(e => ({
+              data={entries.map((e) => ({
                 'رقم القيد': e.entry_number,
-                'التاريخ': formatDate(e.entry_date, 'yyyy/MM/dd'),
-                'الوصف': e.description,
-                'الحالة': e.status === 'posted' ? 'مرحّل' : e.status === 'draft' ? 'مسودة' : 'ملغى',
+                التاريخ: formatDate(e.entry_date, 'yyyy/MM/dd'),
+                الوصف: e.description,
+                الحالة: e.status === 'posted' ? 'مرحّل' : e.status === 'draft' ? 'مسودة' : 'ملغى',
                 'تاريخ الترحيل': e.posted_at ? formatDate(e.posted_at, 'yyyy/MM/dd HH:mm') : '-',
               }))}
               filename="القيود_المحاسبية"
@@ -109,11 +105,7 @@ const JournalEntries = () => {
               size="sm"
             />
           )}
-          <Button 
-            onClick={() => setIsAddDialogOpen(true)}
-            size="sm"
-            className="w-full sm:w-auto"
-          >
+          <Button onClick={() => setIsAddDialogOpen(true)} size="sm" className="w-full sm:w-auto">
             <Plus className="h-4 w-4 ms-2" />
             إضافة قيد جديد
           </Button>
@@ -168,10 +160,7 @@ const JournalEntries = () => {
         />
       )}
 
-      <AddJournalEntryDialog
-        open={isAddDialogOpen}
-        onOpenChange={setIsAddDialogOpen}
-      />
+      <AddJournalEntryDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
       {selectedEntry && (
         <ViewJournalEntryDialog

@@ -23,7 +23,11 @@ export interface TransferStatus {
 export function useTransferStatusTracker(transferFileId: string) {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  const { data: transfers = [], isLoading: loading, refetch } = useQuery({
+  const {
+    data: transfers = [],
+    isLoading: loading,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.TRANSFER_STATUS(transferFileId),
     queryFn: () => DistributionService.getTransferDetails(transferFileId),
     enabled: !!transferFileId,
@@ -33,15 +37,25 @@ export function useTransferStatusTracker(transferFileId: string) {
   const typedTransfers = transfers as TransferStatus[];
   const stats = {
     total: typedTransfers.length,
-    completed: typedTransfers.filter(t => matchesStatus(t.status, 'completed')).length,
-    processing: typedTransfers.filter(t => matchesStatus(t.status, 'processing')).length,
-    failed: typedTransfers.filter(t => matchesStatus(t.status, 'failed')).length,
-    pending: typedTransfers.filter(t => matchesStatus(t.status, 'pending')).length,
+    completed: typedTransfers.filter((t) => matchesStatus(t.status, 'completed')).length,
+    processing: typedTransfers.filter((t) => matchesStatus(t.status, 'processing')).length,
+    failed: typedTransfers.filter((t) => matchesStatus(t.status, 'failed')).length,
+    pending: typedTransfers.filter((t) => matchesStatus(t.status, 'pending')).length,
     totalAmount: typedTransfers.reduce((sum, t) => sum + t.amount, 0),
-    completedAmount: typedTransfers.filter(t => matchesStatus(t.status, 'completed')).reduce((sum, t) => sum + t.amount, 0),
+    completedAmount: typedTransfers
+      .filter((t) => matchesStatus(t.status, 'completed'))
+      .reduce((sum, t) => sum + t.amount, 0),
   };
 
   const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
-  return { transfers: typedTransfers, loading, autoRefresh, setAutoRefresh, stats, progress, refetch };
+  return {
+    transfers: typedTransfers,
+    loading,
+    autoRefresh,
+    setAutoRefresh,
+    stats,
+    progress,
+    refetch,
+  };
 }

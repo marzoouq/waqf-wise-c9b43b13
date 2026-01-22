@@ -1,11 +1,11 @@
 /**
  * Edge Function Service - خدمة الدوال السحابية
  * @version 2.8.59
- * 
+ *
  * استدعاء Edge Functions المختلفة
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface EdgeFunctionResult<T = unknown> {
   success: boolean;
@@ -306,15 +306,15 @@ export class EdgeFunctionService {
   /**
    * إنشاء حسابات المستفيدين
    */
-  static async invokeCreateBeneficiaryAccounts(params: {
-    beneficiary_ids: string[];
-  }): Promise<EdgeFunctionResult<{
-    total: number;
-    created: number;
-    failed: number;
-    results: BeneficiaryAccountResult[];
-    errors: BeneficiaryAccountError[];
-  }>> {
+  static async invokeCreateBeneficiaryAccounts(params: { beneficiary_ids: string[] }): Promise<
+    EdgeFunctionResult<{
+      total: number;
+      created: number;
+      failed: number;
+      results: BeneficiaryAccountResult[];
+      errors: BeneficiaryAccountError[];
+    }>
+  > {
     const { data, error } = await supabase.functions.invoke('create-beneficiary-accounts', {
       body: params,
     });
@@ -335,19 +335,21 @@ export class EdgeFunctionService {
     distributionDate: string;
     notes: string;
     notifyHeirs: boolean;
-  }): Promise<EdgeFunctionResult<{
-    success: boolean;
-    summary: {
-      totalAmount: number;
-      heirsCount: number;
-      distributionDate: string;
-    };
-    distributions: Array<{
-      beneficiary_id: string;
-      amount: number;
-      heir_type: string;
-    }>;
-  }>> {
+  }): Promise<
+    EdgeFunctionResult<{
+      success: boolean;
+      summary: {
+        totalAmount: number;
+        heirsCount: number;
+        distributionDate: string;
+      };
+      distributions: Array<{
+        beneficiary_id: string;
+        amount: number;
+        heir_type: string;
+      }>;
+    }>
+  > {
     const { data, error } = await supabase.functions.invoke('distribute-revenue', {
       body: params,
     });

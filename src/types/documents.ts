@@ -32,7 +32,7 @@ export interface Folder {
   created_at: string;
 }
 
-export type DocumentCategory = 
+export type DocumentCategory =
   | 'contracts'
   | 'legal'
   | 'reports'

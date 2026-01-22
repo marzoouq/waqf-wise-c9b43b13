@@ -4,26 +4,28 @@
  * @version 1.0.0
  */
 
-import { useState, useCallback, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  TenantPortalService, 
-  type TenantData, 
-  type CreateMaintenanceRequestData 
-} from "@/services/tenant-portal.service";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState, useCallback, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  TenantPortalService,
+  type TenantData,
+  type CreateMaintenanceRequestData,
+} from '@/services/tenant-portal.service';
+import { useToast } from '@/hooks/ui/use-toast';
 
 // ===================== مفاتيح الاستعلام =====================
 export const TENANT_QUERY_KEYS = {
-  profile: ["tenant", "profile"],
-  requests: ["tenant", "requests"],
-  notifications: ["tenant", "notifications"],
+  profile: ['tenant', 'profile'],
+  requests: ['tenant', 'requests'],
+  notifications: ['tenant', 'notifications'],
 };
 
 // ===================== مصادقة المستأجر =====================
 export function useTenantAuth() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => TenantPortalService.isLoggedIn());
-  const [tenant, setTenant] = useState<TenantData | null>(() => TenantPortalService.getCachedTenant());
+  const [tenant, setTenant] = useState<TenantData | null>(() =>
+    TenantPortalService.getCachedTenant()
+  );
   const { toast } = useToast();
 
   // إرسال OTP
@@ -31,30 +33,39 @@ export function useTenantAuth() {
     mutationFn: (phone: string) => TenantPortalService.sendOtp(phone),
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "تم الإرسال", description: "تم إرسال رمز التحقق إلى هاتفك" });
+        toast({ title: 'تم الإرسال', description: 'تم إرسال رمز التحقق إلى هاتفك' });
       } else {
-        toast({ title: "خطأ", description: data.error || "فشل في إرسال الرمز", variant: "destructive" });
+        toast({
+          title: 'خطأ',
+          description: data.error || 'فشل في إرسال الرمز',
+          variant: 'destructive',
+        });
       }
     },
     onError: () => {
-      toast({ title: "خطأ", description: "فشل في إرسال رمز التحقق", variant: "destructive" });
+      toast({ title: 'خطأ', description: 'فشل في إرسال رمز التحقق', variant: 'destructive' });
     },
   });
 
   // التحقق من OTP
   const verifyOtpMutation = useMutation({
-    mutationFn: ({ phone, otp }: { phone: string; otp: string }) => TenantPortalService.verifyOtp(phone, otp),
+    mutationFn: ({ phone, otp }: { phone: string; otp: string }) =>
+      TenantPortalService.verifyOtp(phone, otp),
     onSuccess: (data) => {
       if (data.success && data.tenant) {
         setIsLoggedIn(true);
         setTenant(data.tenant);
-        toast({ title: "مرحباً", description: `أهلاً بك ${data.tenant.fullName}` });
+        toast({ title: 'مرحباً', description: `أهلاً بك ${data.tenant.fullName}` });
       } else {
-        toast({ title: "خطأ", description: data.error || "رمز التحقق غير صحيح", variant: "destructive" });
+        toast({
+          title: 'خطأ',
+          description: data.error || 'رمز التحقق غير صحيح',
+          variant: 'destructive',
+        });
       }
     },
     onError: () => {
-      toast({ title: "خطأ", description: "فشل في التحقق من الرمز", variant: "destructive" });
+      toast({ title: 'خطأ', description: 'فشل في التحقق من الرمز', variant: 'destructive' });
     },
   });
 
@@ -63,7 +74,7 @@ export function useTenantAuth() {
     await TenantPortalService.logout();
     setIsLoggedIn(false);
     setTenant(null);
-    toast({ title: "تسجيل الخروج", description: "تم تسجيل الخروج بنجاح" });
+    toast({ title: 'تسجيل الخروج', description: 'تم تسجيل الخروج بنجاح' });
   }, [toast]);
 
   // إعادة تحديث حالة تسجيل الدخول عند نجاح التحقق
@@ -113,16 +124,24 @@ export function useCreateTenantRequest() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (data: CreateMaintenanceRequestData) => TenantPortalService.createMaintenanceRequest(data),
+    mutationFn: (data: CreateMaintenanceRequestData) =>
+      TenantPortalService.createMaintenanceRequest(data),
     onSuccess: (data) => {
       if (data.success) {
         queryClient.invalidateQueries({ queryKey: TENANT_QUERY_KEYS.requests });
         queryClient.invalidateQueries({ queryKey: TENANT_QUERY_KEYS.notifications });
-        toast({ title: "تم الإرسال", description: `تم إنشاء طلب الصيانة رقم ${data.request.request_number}` });
+        toast({
+          title: 'تم الإرسال',
+          description: `تم إنشاء طلب الصيانة رقم ${data.request.request_number}`,
+        });
       }
     },
     onError: (error: Error) => {
-      toast({ title: "خطأ", description: error.message || "فشل في إنشاء الطلب", variant: "destructive" });
+      toast({
+        title: 'خطأ',
+        description: error.message || 'فشل في إنشاء الطلب',
+        variant: 'destructive',
+      });
     },
   });
 }
@@ -132,14 +151,21 @@ export function useRateRequest() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ requestId, rating, feedback }: { requestId: string; rating: number; feedback?: string }) =>
-      TenantPortalService.rateRequest(requestId, rating, feedback),
+    mutationFn: ({
+      requestId,
+      rating,
+      feedback,
+    }: {
+      requestId: string;
+      rating: number;
+      feedback?: string;
+    }) => TenantPortalService.rateRequest(requestId, rating, feedback),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TENANT_QUERY_KEYS.requests });
-      toast({ title: "شكراً", description: "تم حفظ تقييمك بنجاح" });
+      toast({ title: 'شكراً', description: 'تم حفظ تقييمك بنجاح' });
     },
     onError: () => {
-      toast({ title: "خطأ", description: "فشل في حفظ التقييم", variant: "destructive" });
+      toast({ title: 'خطأ', description: 'فشل في حفظ التقييم', variant: 'destructive' });
     },
   });
 }
@@ -156,7 +182,8 @@ export function useTenantNotifications() {
   });
 
   const markAsRead = useMutation({
-    mutationFn: (notificationId: string) => TenantPortalService.markNotificationRead(notificationId),
+    mutationFn: (notificationId: string) =>
+      TenantPortalService.markNotificationRead(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TENANT_QUERY_KEYS.notifications });
     },

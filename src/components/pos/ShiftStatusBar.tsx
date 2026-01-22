@@ -13,7 +13,12 @@ interface ShiftStatusBarProps {
   isOpeningShift?: boolean;
 }
 
-export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShift }: ShiftStatusBarProps) {
+export function ShiftStatusBar({
+  shift,
+  onOpenShift,
+  onCloseShift,
+  isOpeningShift,
+}: ShiftStatusBarProps) {
   if (!shift) {
     return (
       <Card className="bg-muted/50 border-dashed">
@@ -25,7 +30,9 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               </div>
               <div>
                 <p className="font-medium text-muted-foreground">لا توجد جلسة عمل نشطة</p>
-                <p className="text-sm text-muted-foreground">قم ببدء جلسة عمل جديدة للتحصيل والصرف</p>
+                <p className="text-sm text-muted-foreground">
+                  قم ببدء جلسة عمل جديدة للتحصيل والصرف
+                </p>
               </div>
             </div>
             <Button onClick={onOpenShift} disabled={isOpeningShift}>
@@ -88,10 +95,15 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               </div>
             </div>
 
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-md ${netAmount >= 0 ? 'bg-status-success/10' : 'bg-status-error/10'}`}>
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-md ${netAmount >= 0 ? 'bg-status-success/10' : 'bg-status-error/10'}`}
+            >
               <span className="text-sm text-muted-foreground">الصافي:</span>
-              <span className={`font-bold ${netAmount >= 0 ? 'text-status-success' : 'text-status-error'}`}>
-                {netAmount >= 0 ? '+' : ''}{netAmount.toLocaleString('ar-SA')} ر.س
+              <span
+                className={`font-bold ${netAmount >= 0 ? 'text-status-success' : 'text-status-error'}`}
+              >
+                {netAmount >= 0 ? '+' : ''}
+                {netAmount.toLocaleString('ar-SA')} ر.س
               </span>
             </div>
           </div>

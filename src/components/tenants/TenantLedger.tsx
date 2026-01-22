@@ -85,11 +85,13 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                   {/* Row 1: Type, Date, Balance */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-full ${
-                        entry.credit_amount > 0 
-                          ? 'bg-status-success/10 text-status-success' 
-                          : 'bg-destructive/10 text-destructive'
-                      }`}>
+                      <div
+                        className={`p-1.5 rounded-full ${
+                          entry.credit_amount > 0
+                            ? 'bg-status-success/10 text-status-success'
+                            : 'bg-destructive/10 text-destructive'
+                        }`}
+                      >
                         {transactionTypeIcons[entry.transaction_type]}
                       </div>
                       <div>
@@ -102,7 +104,7 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                       </div>
                     </div>
                     <div className="text-left">
-                    {entry.credit_amount > 0 && (
+                      {entry.credit_amount > 0 && (
                         <p className="font-bold text-status-success text-sm sm:text-base">
                           +{formatCurrency(entry.credit_amount)}
                         </p>
@@ -125,13 +127,15 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                   {/* Row 3: Balance */}
                   <div className="flex items-center justify-between pt-2 border-t text-xs sm:text-sm">
                     <span className="text-muted-foreground">الرصيد بعد العملية</span>
-                    <span className={`font-bold ${
-                      entry.balance > 0 
-                        ? 'text-destructive' 
-                        : entry.balance < 0 
-                          ? 'text-status-success' 
-                          : ''
-                    }`}>
+                    <span
+                      className={`font-bold ${
+                        entry.balance > 0
+                          ? 'text-destructive'
+                          : entry.balance < 0
+                            ? 'text-status-success'
+                            : ''
+                      }`}
+                    >
                       {formatCurrency(Math.abs(entry.balance))}
                       {entry.balance > 0 ? ' مدين' : entry.balance < 0 ? ' دائن' : ''}
                     </span>

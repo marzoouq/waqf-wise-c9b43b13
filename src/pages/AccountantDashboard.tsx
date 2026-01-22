@@ -1,50 +1,68 @@
-import { useState, lazy, Suspense } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { FileText, AlertCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail, RefreshCw } from "lucide-react";
-import { useAccountantDashboardData } from "@/hooks/accounting";
-import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
-import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
-import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { SectionSkeleton } from "@/components/dashboard";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { JournalApproval } from "@/types/approvals";
-import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
-import { CollectionOverviewCard } from "@/components/dashboard/shared/CollectionOverviewCard";
-import { OverduePaymentsCard } from "@/components/dashboard/shared/OverduePaymentsCard";
-import { PendingApprovalsList, QuickActionsGrid } from "@/components/dashboard/accountant";
-import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
-import { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from "@/hooks/dashboard/useAccountantDashboardRealtime";
+import { useState, lazy, Suspense } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import {
+  FileText,
+  AlertCircle,
+  TrendingUp,
+  FileCheck,
+  FileClock,
+  LayoutDashboard,
+  Mail,
+  RefreshCw,
+} from 'lucide-react';
+import { useAccountantDashboardData } from '@/hooks/accounting';
+import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
+import { ApproveJournalDialog } from '@/components/accounting/ApproveJournalDialog';
+import { UnifiedDashboardLayout } from '@/components/dashboard/UnifiedDashboardLayout';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { SectionSkeleton } from '@/components/dashboard';
+import { AdminSendMessageDialog } from '@/components/messages/AdminSendMessageDialog';
+import { JournalApproval } from '@/types/approvals';
+import {
+  CurrentFiscalYearCard,
+  RevenueProgressCard,
+  FinancialCardsRow,
+} from '@/components/dashboard/shared';
+import { CollectionOverviewCard } from '@/components/dashboard/shared/CollectionOverviewCard';
+import { OverduePaymentsCard } from '@/components/dashboard/shared/OverduePaymentsCard';
+import { PendingApprovalsList, QuickActionsGrid } from '@/components/dashboard/accountant';
+import { LastSyncIndicator } from '@/components/nazer/LastSyncIndicator';
+import {
+  useAccountantDashboardRealtime,
+  useAccountantDashboardRefresh,
+} from '@/hooks/dashboard/useAccountantDashboardRealtime';
 
 // Lazy load components
-const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
-const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
+const AccountingStats = lazy(() => import('@/components/dashboard/AccountingStats'));
+const RecentJournalEntries = lazy(() => import('@/components/dashboard/RecentJournalEntries'));
 
 const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  
+
   // تفعيل التحديثات المباشرة الموحدة
   useAccountantDashboardRealtime();
   const { refreshAll } = useAccountantDashboardRefresh();
-  
+
   const { data: unifiedKPIs, isLoading: kpisLoading } = useUnifiedKPIs();
   const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
-  
+
   // استخراج KPIs المحاسب من البيانات الموحدة
-  const kpis = unifiedKPIs ? {
-    pendingApprovals: unifiedKPIs.pendingApprovals,
-    draftEntries: unifiedKPIs.draftJournalEntries,
-    postedEntries: unifiedKPIs.postedJournalEntries,
-    todayEntries: unifiedKPIs.todayJournalEntries,
-    totalEntries: unifiedKPIs.totalJournalEntries,
-    cancelledEntries: unifiedKPIs.cancelledJournalEntries
-  } : null;
+  const kpis = unifiedKPIs
+    ? {
+        pendingApprovals: unifiedKPIs.pendingApprovals,
+        draftEntries: unifiedKPIs.draftJournalEntries,
+        postedEntries: unifiedKPIs.postedJournalEntries,
+        todayEntries: unifiedKPIs.todayJournalEntries,
+        totalEntries: unifiedKPIs.totalJournalEntries,
+        cancelledEntries: unifiedKPIs.cancelledJournalEntries,
+      }
+    : null;
 
   const handleReviewApproval = (approval: JournalApproval) => {
     setSelectedApproval(approval);
@@ -122,21 +140,21 @@ const AccountantDashboard = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <ScrollArea className="w-full whitespace-nowrap">
           <TabsList className="inline-flex h-auto p-1 bg-muted/50">
-            <TabsTrigger 
-              value="overview" 
+            <TabsTrigger
+              value="overview"
               className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
             >
               <LayoutDashboard className="h-4 w-4" />
               <span className="text-xs sm:text-sm">نظرة عامة</span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="approvals"
               className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
             >
               <AlertCircle className="h-4 w-4" />
               <span className="text-xs sm:text-sm">الموافقات</span>
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="entries"
               className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
             >
@@ -165,9 +183,9 @@ const AccountantDashboard = () => {
               {approvalsLoading ? (
                 <SectionSkeleton />
               ) : (
-                <PendingApprovalsList 
-                  approvals={pendingApprovals} 
-                  onReview={handleReviewApproval} 
+                <PendingApprovalsList
+                  approvals={pendingApprovals}
+                  onReview={handleReviewApproval}
                 />
               )}
             </CardContent>
@@ -211,10 +229,7 @@ const AccountantDashboard = () => {
       )}
 
       {/* Message Dialog */}
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
+      <AdminSendMessageDialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} />
     </UnifiedDashboardLayout>
   );
 };

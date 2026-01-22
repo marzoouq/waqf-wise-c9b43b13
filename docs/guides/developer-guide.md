@@ -7,11 +7,13 @@
 ## 🚀 البدء السريع
 
 ### المتطلبات
+
 - Node.js 18+
 - npm أو bun
 - حساب Lovable Cloud
 
 ### التثبيت
+
 ```bash
 # استنساخ المشروع
 git clone <repository-url>
@@ -95,15 +97,17 @@ src/
 ## 🎨 معايير الكود
 
 ### تسمية الملفات
-| النوع | التسمية | مثال |
-|-------|---------|------|
-| Component | PascalCase.tsx | `TenantDialog.tsx` |
-| Hook | useCamelCase.ts | `useTenantLedger.ts` |
-| Utility | camelCase.ts | `exportHelpers.ts` |
-| Type | camelCase.ts | `tenants.ts` |
-| Service | PascalCase.ts | `AuthService.ts` |
+
+| النوع     | التسمية         | مثال                 |
+| --------- | --------------- | -------------------- |
+| Component | PascalCase.tsx  | `TenantDialog.tsx`   |
+| Hook      | useCamelCase.ts | `useTenantLedger.ts` |
+| Utility   | camelCase.ts    | `exportHelpers.ts`   |
+| Type      | camelCase.ts    | `tenants.ts`         |
+| Service   | PascalCase.ts   | `AuthService.ts`     |
 
 ### هيكل المكون
+
 ```tsx
 // 1. Imports
 import { useState } from 'react';
@@ -120,20 +124,20 @@ interface TenantCardProps {
 export const TenantCard = ({ tenantId, onEdit }: TenantCardProps) => {
   // 4. Hooks (دائماً في الأعلى)
   const { tenants, isLoading } = useTenants();
-  
+
   // 5. State
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // 6. Derived Data
-  const tenant = tenants.find(t => t.id === tenantId);
-  
+  const tenant = tenants.find((t) => t.id === tenantId);
+
   // 7. Handlers
   const handleEdit = () => onEdit?.(tenantId);
-  
+
   // 8. Early Returns
   if (isLoading) return <Skeleton />;
   if (!tenant) return null;
-  
+
   // 9. Render
   return (
     <Card>
@@ -153,11 +157,13 @@ export const TenantCard = ({ tenantId, onEdit }: TenantCardProps) => {
 ## 🪝 إنشاء Hook جديد
 
 ### الموقع
+
 ```
 src/hooks/{category}/use{Name}.ts
 ```
 
 ### النمط الموصى به: Hook → Service → Supabase
+
 ```typescript
 // ✅ صحيح - Hook يستخدم Service
 import { useQuery } from '@tanstack/react-query';
@@ -174,6 +180,7 @@ export function useNazerSystemOverview() {
 ```
 
 ### قالب Hook للقراءة (استخدام مباشر - غير موصى)
+
 ```typescript
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -187,7 +194,7 @@ export function useTenants() {
         .from('tenants')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -197,6 +204,7 @@ export function useTenants() {
 ```
 
 ### قالب Hook مع Mutations
+
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -211,9 +219,7 @@ export function useTenants() {
   const { data: tenants = [], isLoading } = useQuery({
     queryKey: ['tenants'],
     queryFn: async (): Promise<Tenant[]> => {
-      const { data, error } = await supabase
-        .from('tenants')
-        .select('*');
+      const { data, error } = await supabase.from('tenants').select('*');
       if (error) throw error;
       return data;
     },
@@ -222,11 +228,7 @@ export function useTenants() {
   // Add Mutation
   const addTenant = useMutation({
     mutationFn: async (tenant: TenantInsert) => {
-      const { data, error } = await supabase
-        .from('tenants')
-        .insert(tenant)
-        .select()
-        .single();
+      const { data, error } = await supabase.from('tenants').insert(tenant).select().single();
       if (error) throw error;
       return data;
     },
@@ -253,6 +255,7 @@ export function useTenants() {
 ## 🎨 نظام التصميم
 
 ### ❌ لا تستخدم ألوان مباشرة
+
 ```tsx
 // ❌ خطأ
 <div className="bg-blue-500 text-white">
@@ -264,6 +267,7 @@ export function useTenants() {
 ```
 
 ### المتغيرات المتاحة (index.css)
+
 ```css
 /* ألوان أساسية */
 --background, --foreground
@@ -285,11 +289,13 @@ export function useTenants() {
 ## 🔧 إنشاء Edge Function
 
 ### الموقع
+
 ```
 supabase/functions/{function-name}/index.ts
 ```
 
 ### القالب
+
 ```typescript
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -312,18 +318,17 @@ serve(async (req) => {
     );
 
     const { data } = await req.json();
-    
+
     // Logic here...
 
-    return new Response(
-      JSON.stringify({ success: true, data }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ success: true, data }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 ```
@@ -333,6 +338,7 @@ serve(async (req) => {
 ## 📊 أفضل الممارسات
 
 ### 1. الاستعلامات المتوازية
+
 ```typescript
 // ❌ خطأ - متتابعة (بطيء)
 const tenants = await getTenants();
@@ -343,11 +349,12 @@ const contracts = await getContracts();
 const [tenants, properties, contracts] = await Promise.all([
   getTenants(),
   getProperties(),
-  getContracts()
+  getContracts(),
 ]);
 ```
 
 ### 2. Invalidate Queries بشكل محدد
+
 ```typescript
 // ❌ خطأ - يمسح كل الكاش
 queryClient.invalidateQueries();
@@ -358,6 +365,7 @@ queryClient.invalidateQueries({ queryKey: ['tenant-ledger', tenantId] });
 ```
 
 ### 3. استخدام Realtime موحد
+
 ```typescript
 // ❌ خطأ - قنوات متعددة في كل مكون
 useEffect(() => {
@@ -369,27 +377,28 @@ useEffect(() => {
 // ✅ صحيح - قناة موحدة في hook واحد
 export function useDashboardRealtime() {
   const queryClient = useQueryClient();
-  
+
   useEffect(() => {
     const channel = supabase
       .channel('dashboard-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tenants' }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tenants' },
         () => queryClient.invalidateQueries({ queryKey: ['tenants'] }))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' },
         () => queryClient.invalidateQueries({ queryKey: ['contracts'] }))
       .subscribe();
-      
+
     return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
 }
 ```
 
 ### 4. React Hooks Rules
+
 ```typescript
 // ❌ خطأ - شرط قبل hooks
 const MyComponent = ({ userId }) => {
   if (!userId) return null; // ⚠️ خطأ!
-  
+
   const { data } = useQuery(...); // سيفشل
 };
 
@@ -400,7 +409,7 @@ const MyComponent = ({ userId }) => {
     queryFn: () => fetchUser(userId),
     enabled: !!userId, // استخدم enabled بدلاً من الشرط
   });
-  
+
   if (!userId || isLoading) return <Skeleton />;
 };
 ```

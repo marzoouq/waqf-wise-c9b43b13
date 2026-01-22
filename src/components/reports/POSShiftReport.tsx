@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import {
   Table,
   TableBody,
@@ -9,14 +9,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { useDailySettlement } from "@/hooks/pos/useDailySettlement";
-import { format, subDays } from "date-fns";
-import { ar } from "date-fns/locale";
-import { FileDown, RefreshCw, Printer } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { exportToExcel } from "@/lib/excel-helper";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { useDailySettlement } from '@/hooks/pos/useDailySettlement';
+import { format, subDays } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { FileDown, RefreshCw, Printer } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
+import { exportToExcel } from '@/lib/excel-helper';
 
 export const POSShiftReport = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -31,33 +31,31 @@ export const POSShiftReport = () => {
 
   const handleExport = async () => {
     const data = shiftsReport.map((shift) => ({
-      "رقم الوردية": shift.shift_number,
-      "أمين الصندوق": shift.cashier_name || "-",
-      "وقت الفتح": format(new Date(shift.opened_at), "yyyy/MM/dd HH:mm"),
-      "وقت الإغلاق": shift.closed_at
-        ? format(new Date(shift.closed_at), "yyyy/MM/dd HH:mm")
-        : "-",
-      "الرصيد الافتتاحي": shift.opening_balance,
-      "الرصيد الختامي": shift.closing_balance || 0,
-      "إجمالي التحصيل": shift.total_collections,
-      "إجمالي الصرف": shift.total_payments,
+      'رقم الوردية': shift.shift_number,
+      'أمين الصندوق': shift.cashier_name || '-',
+      'وقت الفتح': format(new Date(shift.opened_at), 'yyyy/MM/dd HH:mm'),
+      'وقت الإغلاق': shift.closed_at ? format(new Date(shift.closed_at), 'yyyy/MM/dd HH:mm') : '-',
+      'الرصيد الافتتاحي': shift.opening_balance,
+      'الرصيد الختامي': shift.closing_balance || 0,
+      'إجمالي التحصيل': shift.total_collections,
+      'إجمالي الصرف': shift.total_payments,
       الفرق: shift.variance,
       الحالة: shift.status,
     }));
 
-    await exportToExcel(data, "تقرير الورديات", "shifts-report");
+    await exportToExcel(data, 'تقرير الورديات', 'shifts-report');
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "مفتوحة":
-        return "bg-status-success/20 text-status-success";
-      case "مغلقة":
-        return "bg-muted text-muted-foreground";
-      case "معلقة":
-        return "bg-status-warning/20 text-status-warning";
+      case 'مفتوحة':
+        return 'bg-status-success/20 text-status-success';
+      case 'مغلقة':
+        return 'bg-muted text-muted-foreground';
+      case 'معلقة':
+        return 'bg-status-warning/20 text-status-warning';
       default:
-        return "bg-muted text-muted-foreground";
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -90,29 +88,27 @@ export const POSShiftReport = () => {
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">إجمالي التحصيل</p>
             <p className="text-2xl font-bold text-status-success">
-              {summary.totalCollections.toLocaleString("ar-SA")}
+              {summary.totalCollections.toLocaleString('ar-SA')}
             </p>
           </Card>
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">إجمالي الصرف</p>
             <p className="text-2xl font-bold text-status-error">
-              {summary.totalPayments.toLocaleString("ar-SA")}
+              {summary.totalPayments.toLocaleString('ar-SA')}
             </p>
           </Card>
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">صافي العمليات</p>
-            <p className="text-2xl font-bold">
-              {summary.netAmount.toLocaleString("ar-SA")}
-            </p>
+            <p className="text-2xl font-bold">{summary.netAmount.toLocaleString('ar-SA')}</p>
           </Card>
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">إجمالي الفروقات</p>
             <p
               className={`text-2xl font-bold ${
-                summary.totalVariance !== 0 ? "text-status-warning" : ""
+                summary.totalVariance !== 0 ? 'text-status-warning' : ''
               }`}
             >
-              {summary.totalVariance.toLocaleString("ar-SA")}
+              {summary.totalVariance.toLocaleString('ar-SA')}
             </p>
           </Card>
         </div>
@@ -148,39 +144,35 @@ export const POSShiftReport = () => {
               ) : (
                 shiftsReport.map((shift) => (
                   <TableRow key={shift.shift_id}>
-                    <TableCell className="font-medium">
-                      {shift.shift_number}
-                    </TableCell>
-                    <TableCell>{shift.cashier_name || "-"}</TableCell>
+                    <TableCell className="font-medium">{shift.shift_number}</TableCell>
+                    <TableCell>{shift.cashier_name || '-'}</TableCell>
                     <TableCell>
-                      {format(new Date(shift.opened_at), "MM/dd HH:mm", {
+                      {format(new Date(shift.opened_at), 'MM/dd HH:mm', {
                         locale: ar,
                       })}
                     </TableCell>
                     <TableCell>
                       {shift.closed_at
-                        ? format(new Date(shift.closed_at), "MM/dd HH:mm", {
+                        ? format(new Date(shift.closed_at), 'MM/dd HH:mm', {
                             locale: ar,
                           })
-                        : "-"}
+                        : '-'}
                     </TableCell>
                     <TableCell className="text-left text-status-success">
-                      {(shift.total_collections || 0).toLocaleString("ar-SA")}
+                      {(shift.total_collections || 0).toLocaleString('ar-SA')}
                     </TableCell>
                     <TableCell className="text-left text-status-error">
-                      {(shift.total_payments || 0).toLocaleString("ar-SA")}
+                      {(shift.total_payments || 0).toLocaleString('ar-SA')}
                     </TableCell>
                     <TableCell
                       className={`text-left ${
-                        shift.variance !== 0 ? "text-status-warning font-bold" : ""
+                        shift.variance !== 0 ? 'text-status-warning font-bold' : ''
                       }`}
                     >
-                      {(shift.variance || 0).toLocaleString("ar-SA")}
+                      {(shift.variance || 0).toLocaleString('ar-SA')}
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(shift.status)}>
-                        {shift.status}
-                      </Badge>
+                      <Badge className={getStatusColor(shift.status)}>{shift.status}</Badge>
                     </TableCell>
                   </TableRow>
                 ))

@@ -4,11 +4,11 @@
  * @version 1.0.0
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
-import { useSmartDisclosureDocuments } from "@/hooks/reports/useSmartDisclosureDocuments";
-import { HistoricalRentalService } from "@/services/historical-rental.service";
-import { HISTORICAL_RENTAL_QUERY_KEY } from "@/hooks/fiscal-years/useHistoricalRentalDetails";
+import { useQuery } from '@tanstack/react-query';
+import { AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
+import { useSmartDisclosureDocuments } from '@/hooks/reports/useSmartDisclosureDocuments';
+import { HistoricalRentalService } from '@/services/historical-rental.service';
+import { HISTORICAL_RENTAL_QUERY_KEY } from '@/hooks/fiscal-years/useHistoricalRentalDetails';
 import {
   TrendingUp,
   TrendingDown,
@@ -20,8 +20,8 @@ import {
   CheckCircle2,
   Percent,
   BarChart3,
-  FileText
-} from "lucide-react";
+  FileText,
+} from 'lucide-react';
 
 interface ExpenseItem {
   name: string;
@@ -50,35 +50,35 @@ interface PrintableDisclosureContentProps {
 
 // ترجمة أسماء المصروفات
 const expenseNameTranslations: Record<string, string> = {
-  'audit_2024': 'تدقيق 2024',
-  'audit_2025': 'تدقيق 2025',
-  'cleaning_worker': 'عامل نظافة',
-  'ejar_platform': 'منصة إيجار',
-  'electrical_works': 'أعمال كهربائية',
-  'electricity_bills': 'فواتير الكهرباء',
-  'electricity_maintenance': 'صيانة كهربائية',
-  'gypsum_works': 'أعمال جبس',
-  'miscellaneous': 'مصروفات متنوعة',
-  'plumbing_maintenance': 'صيانة سباكة',
-  'plumbing_works': 'أعمال سباكة',
-  'rental_commission': 'عمولة إيجار',
-  'water_bills': 'فواتير المياه',
-  'zakat': 'الزكاة',
-  'maintenance': 'مصروفات الصيانة',
-  'administrative': 'مصروفات إدارية',
-  'development': 'مصروفات التطوير',
-  'other': 'مصروفات أخرى',
+  audit_2024: 'تدقيق 2024',
+  audit_2025: 'تدقيق 2025',
+  cleaning_worker: 'عامل نظافة',
+  ejar_platform: 'منصة إيجار',
+  electrical_works: 'أعمال كهربائية',
+  electricity_bills: 'فواتير الكهرباء',
+  electricity_maintenance: 'صيانة كهربائية',
+  gypsum_works: 'أعمال جبس',
+  miscellaneous: 'مصروفات متنوعة',
+  plumbing_maintenance: 'صيانة سباكة',
+  plumbing_works: 'أعمال سباكة',
+  rental_commission: 'عمولة إيجار',
+  water_bills: 'فواتير المياه',
+  zakat: 'الزكاة',
+  maintenance: 'مصروفات الصيانة',
+  administrative: 'مصروفات إدارية',
+  development: 'مصروفات التطوير',
+  other: 'مصروفات أخرى',
 };
 
 // ترجمة أسماء الإيرادات
 const revenueNameTranslations: Record<string, string> = {
-  'jeddah_properties': 'عقارات جدة',
-  'nahdi_rental': 'إيجار النهدي',
-  'remaining_2024': 'متبقي 2024',
-  'residential_monthly': 'الإيجارات السكنية الشهرية',
-  'rental_income': 'إيرادات الإيجار',
-  'investment_returns': 'عوائد الاستثمار',
-  'other_income': 'إيرادات أخرى',
+  jeddah_properties: 'عقارات جدة',
+  nahdi_rental: 'إيجار النهدي',
+  remaining_2024: 'متبقي 2024',
+  residential_monthly: 'الإيجارات السكنية الشهرية',
+  rental_income: 'إيرادات الإيجار',
+  investment_returns: 'عوائد الاستثمار',
+  other_income: 'إيرادات أخرى',
 };
 
 const translateExpenseName = (name: string): string => {
@@ -90,16 +90,19 @@ const translateRevenueName = (name: string): string => {
 };
 
 const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount === null || amount === undefined) return "0 ر.س";
-  return new Intl.NumberFormat("ar-SA", {
-    style: "currency",
-    currency: "SAR",
+  if (amount === null || amount === undefined) return '0 ر.س';
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'currency',
+    currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
 };
 
-const calculateChange = (current: number, previous: number): { value: number; isPositive: boolean | null } => {
+const calculateChange = (
+  current: number,
+  previous: number
+): { value: number; isPositive: boolean | null } => {
   if (previous === 0) return { value: 0, isPositive: null };
   const change = ((current - previous) / previous) * 100;
   return {
@@ -108,10 +111,13 @@ const calculateChange = (current: number, previous: number): { value: number; is
   };
 };
 
-export function PrintableDisclosureContent({ disclosure, previousYear }: PrintableDisclosureContentProps) {
+export function PrintableDisclosureContent({
+  disclosure,
+  previousYear,
+}: PrintableDisclosureContentProps) {
   // Parse expense breakdown
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
-  const expenseItems: ExpenseItem[] = expensesBreakdown 
+  const expenseItems: ExpenseItem[] = expensesBreakdown
     ? Object.entries(expensesBreakdown)
         .filter(([name]) => name.toLowerCase() !== 'total')
         .map(([name, amount]) => ({ name, amount: amount || 0 }))
@@ -158,7 +164,10 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
   const totalCollected = monthlySummary.reduce((sum, m) => sum + Number(m.paid_amount || 0), 0);
 
   return (
-    <div className="hidden print:block print-content p-4" style={{ overflow: 'visible', height: 'auto' }}>
+    <div
+      className="hidden print:block print-content p-4"
+      style={{ overflow: 'visible', height: 'auto' }}
+    >
       <style>{`
         @media print {
           .print-content {
@@ -256,9 +265,13 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
 
       {/* عنوان الطباعة */}
       <div className="text-center mb-8 print-section">
-        <h1 className="text-2xl font-bold mb-2">الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}</h1>
+        <h1 className="text-2xl font-bold mb-2">
+          الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}
+        </h1>
         <p className="text-muted-foreground">{disclosure.waqf_name}</p>
-        <p className="text-sm text-muted-foreground mt-1">تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')}</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')}
+        </p>
       </div>
 
       {/* التوزيع البصري - نسخة مبسطة للطباعة */}
@@ -294,8 +307,12 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             <thead>
               <tr>
                 <th>البند</th>
-                <th>{previousYear.year - 1}-{previousYear.year}</th>
-                <th>{disclosure.year - 1}-{disclosure.year}</th>
+                <th>
+                  {previousYear.year - 1}-{previousYear.year}
+                </th>
+                <th>
+                  {disclosure.year - 1}-{disclosure.year}
+                </th>
                 <th>التغيير</th>
               </tr>
             </thead>
@@ -304,19 +321,26 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
                 <td>الإيرادات</td>
                 <td>{formatCurrency(previousYear.total_revenues)}</td>
                 <td>{formatCurrency(totalRevenues)}</td>
-                <td>{calculateChange(totalRevenues, previousYear.total_revenues).value.toFixed(1)}%</td>
+                <td>
+                  {calculateChange(totalRevenues, previousYear.total_revenues).value.toFixed(1)}%
+                </td>
               </tr>
               <tr>
                 <td>المصروفات</td>
                 <td>{formatCurrency(previousYear.total_expenses)}</td>
                 <td>{formatCurrency(totalExpenses)}</td>
-                <td>{calculateChange(totalExpenses, previousYear.total_expenses).value.toFixed(1)}%</td>
+                <td>
+                  {calculateChange(totalExpenses, previousYear.total_expenses).value.toFixed(1)}%
+                </td>
               </tr>
               <tr>
                 <td>صافي الدخل</td>
                 <td>{formatCurrency(previousYear.net_income)}</td>
                 <td>{formatCurrency(disclosure.net_income)}</td>
-                <td>{calculateChange(disclosure.net_income, previousYear.net_income).value.toFixed(1)}%</td>
+                <td>
+                  {calculateChange(disclosure.net_income, previousYear.net_income).value.toFixed(1)}
+                  %
+                </td>
               </tr>
             </tbody>
           </table>
@@ -337,8 +361,10 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             </div>
             <span className="font-bold text-success">{formatCurrency(totalRevenues)}</span>
           </div>
-          <div className="text-center"><ArrowDown className="h-4 w-4 mx-auto" /></div>
-          
+          <div className="text-center">
+            <ArrowDown className="h-4 w-4 mx-auto" />
+          </div>
+
           <div className="print-flow-item flex justify-between items-center">
             <div className="flex items-center gap-2">
               <TrendingDown className="h-4 w-4 text-destructive" />
@@ -346,8 +372,10 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             </div>
             <span className="font-bold text-destructive">({formatCurrency(totalExpenses)})</span>
           </div>
-          <div className="text-center"><ArrowDown className="h-4 w-4 mx-auto" /></div>
-          
+          <div className="text-center">
+            <ArrowDown className="h-4 w-4 mx-auto" />
+          </div>
+
           <div className="print-flow-item flex justify-between items-center">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-info" />
@@ -355,8 +383,10 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             </div>
             <span className="font-bold text-info">{formatCurrency(netAfterExpenses)}</span>
           </div>
-          <div className="text-center"><ArrowDown className="h-4 w-4 mx-auto" /></div>
-          
+          <div className="text-center">
+            <ArrowDown className="h-4 w-4 mx-auto" />
+          </div>
+
           <div className="print-flow-item flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-warning" />
@@ -364,8 +394,10 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             </div>
             <span className="font-bold text-warning">({formatCurrency(distributedAmount)})</span>
           </div>
-          <div className="text-center"><ArrowDown className="h-4 w-4 mx-auto" /></div>
-          
+          <div className="text-center">
+            <ArrowDown className="h-4 w-4 mx-auto" />
+          </div>
+
           <div className="print-flow-item flex justify-between items-center border-2 border-primary">
             <div className="flex items-center gap-2">
               <Wallet className="h-4 w-4 text-primary" />
@@ -457,21 +489,27 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
             <p className="text-sm text-muted-foreground">الأبناء</p>
             <p className="text-xl font-bold">{disclosure.sons_count}</p>
             {distributions?.sons_share && (
-              <p className="text-sm text-muted-foreground">{formatCurrency(distributions.sons_share)}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatCurrency(distributions.sons_share)}
+              </p>
             )}
           </div>
           <div className="print-stat-box">
             <p className="text-sm text-muted-foreground">البنات</p>
             <p className="text-xl font-bold">{disclosure.daughters_count}</p>
             {distributions?.daughters_share && (
-              <p className="text-sm text-muted-foreground">{formatCurrency(distributions.daughters_share)}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatCurrency(distributions.daughters_share)}
+              </p>
             )}
           </div>
           <div className="print-stat-box">
             <p className="text-sm text-muted-foreground">الزوجات</p>
             <p className="text-xl font-bold">{disclosure.wives_count}</p>
             {distributions?.wives_share && (
-              <p className="text-sm text-muted-foreground">{formatCurrency(distributions.wives_share)}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatCurrency(distributions.wives_share)}
+              </p>
             )}
           </div>
           <div className="print-stat-box">
@@ -524,7 +562,9 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
         ) : !closingId ? (
           <p className="text-sm text-muted-foreground">لا توجد بيانات إقفال للسنة المالية.</p>
         ) : monthlySummary.length === 0 ? (
-          <p className="text-sm text-muted-foreground">لا توجد تفاصيل إيجارات تاريخية لهذه السنة.</p>
+          <p className="text-sm text-muted-foreground">
+            لا توجد تفاصيل إيجارات تاريخية لهذه السنة.
+          </p>
         ) : (
           <>
             <div className="print-grid-3 mb-4">
@@ -539,7 +579,9 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
               <div className="print-stat-box">
                 <p className="text-sm text-muted-foreground">متوسط الشهر</p>
                 <p className="text-lg font-bold text-warning">
-                  {formatCurrency(monthlySummary.length ? totalCollected / monthlySummary.length : 0)}
+                  {formatCurrency(
+                    monthlySummary.length ? totalCollected / monthlySummary.length : 0
+                  )}
                 </p>
               </div>
             </div>
@@ -590,7 +632,9 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
                   <div key={cat.type} className="print-stat-box">
                     <p className="text-sm text-muted-foreground">{cat.label}</p>
                     <p className="text-lg font-bold">{cat.count} مستند</p>
-                    <p className="text-sm text-muted-foreground">{formatCurrency(cat.totalAmount)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatCurrency(cat.totalAmount)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -626,7 +670,12 @@ export function PrintableDisclosureContent({ disclosure, previousYear }: Printab
           تم إنشاء هذا التقرير آلياً من نظام إدارة الوقف
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          {new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          {new Date().toLocaleDateString('ar-SA', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
         </p>
       </div>
     </div>

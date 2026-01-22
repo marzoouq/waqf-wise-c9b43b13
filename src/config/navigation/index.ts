@@ -4,16 +4,16 @@
  * @version 1.0.0
  */
 
-import type { AppRole } from "@/types/roles";
-import type { NavigationItem } from "@/types/navigation";
+import type { AppRole } from '@/types/roles';
+import type { NavigationItem } from '@/types/navigation';
 
 // استيراد جميع Configs
-import { beneficiaryNavigationItems } from "./beneficiaryNavigation";
-import { nazerNavigationItems } from "./nazerNavigation";
-import { adminNavigationItems } from "./adminNavigation";
-import { accountantNavigationItems } from "./accountantNavigation";
-import { cashierNavigationItems } from "./cashierNavigation";
-import { archivistNavigationItems } from "./archivistNavigation";
+import { beneficiaryNavigationItems } from './beneficiaryNavigation';
+import { nazerNavigationItems } from './nazerNavigation';
+import { adminNavigationItems } from './adminNavigation';
+import { accountantNavigationItems } from './accountantNavigation';
+import { cashierNavigationItems } from './cashierNavigation';
+import { archivistNavigationItems } from './archivistNavigation';
 
 /**
  * خريطة التنقل حسب الدور
@@ -34,13 +34,13 @@ export const NAVIGATION_BY_ROLE: Partial<Record<AppRole, readonly NavigationItem
  * تسميات aria-label حسب الدور
  */
 const NAVIGATION_ARIA_LABELS: Partial<Record<AppRole, string>> = {
-  nazer: "التنقل السفلي للناظر",
-  admin: "التنقل السفلي للمشرف",
-  accountant: "التنقل السفلي للمحاسب",
-  cashier: "التنقل السفلي للصراف",
-  archivist: "التنقل السفلي للأرشيفي",
-  beneficiary: "التنقل السفلي للمستفيد",
-  waqf_heir: "التنقل السفلي للمستفيد",
+  nazer: 'التنقل السفلي للناظر',
+  admin: 'التنقل السفلي للمشرف',
+  accountant: 'التنقل السفلي للمحاسب',
+  cashier: 'التنقل السفلي للصراف',
+  archivist: 'التنقل السفلي للأرشيفي',
+  beneficiary: 'التنقل السفلي للمستفيد',
+  waqf_heir: 'التنقل السفلي للمستفيد',
 } as const;
 
 /**
@@ -48,11 +48,11 @@ const NAVIGATION_ARIA_LABELS: Partial<Record<AppRole, string>> = {
  */
 export function getNavigationByRole(role: AppRole | string): readonly NavigationItem[] | undefined {
   const navigation = NAVIGATION_BY_ROLE[role as AppRole];
-  
+
   if (!navigation && process.env.NODE_ENV === 'development') {
     console.warn(`⚠️ No navigation config for role: ${role}. Using default.`);
   }
-  
+
   return navigation;
 }
 
@@ -60,14 +60,14 @@ export function getNavigationByRole(role: AppRole | string): readonly Navigation
  * الحصول على aria-label للتنقل
  */
 export function getNavigationAriaLabel(role: AppRole | string): string {
-  return NAVIGATION_ARIA_LABELS[role as AppRole] || "التنقل السفلي";
+  return NAVIGATION_ARIA_LABELS[role as AppRole] || 'التنقل السفلي';
 }
 
 // Re-exports
-export { beneficiaryNavigationItems } from "./beneficiaryNavigation";
-export { nazerNavigationItems } from "./nazerNavigation";
-export { adminNavigationItems } from "./adminNavigation";
-export { accountantNavigationItems } from "./accountantNavigation";
-export { cashierNavigationItems } from "./cashierNavigation";
-export { archivistNavigationItems } from "./archivistNavigation";
-export type { NavigationItem } from "@/types/navigation";
+export { beneficiaryNavigationItems } from './beneficiaryNavigation';
+export { nazerNavigationItems } from './nazerNavigation';
+export { adminNavigationItems } from './adminNavigation';
+export { accountantNavigationItems } from './accountantNavigation';
+export { cashierNavigationItems } from './cashierNavigation';
+export { archivistNavigationItems } from './archivistNavigation';
+export type { NavigationItem } from '@/types/navigation';

@@ -5,19 +5,19 @@
  * ✅ عرض KPIs أولاً
  */
 
-import { lazy, Suspense, memo } from "react";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { useDatabasePerformance } from "@/hooks/monitoring/useDatabasePerformance";
-import { PerformanceKPICards } from "@/components/monitoring/PerformanceKPICards";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { lazy, Suspense, memo } from 'react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { useDatabasePerformance } from '@/hooks/monitoring/useDatabasePerformance';
+import { PerformanceKPICards } from '@/components/monitoring/PerformanceKPICards';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 // ✅ تحميل كسول للمكونات الثقيلة (تحتوي recharts)
-const SequentialScansChart = lazy(() => import("@/components/monitoring/SequentialScansChart"));
-const CacheHitChart = lazy(() => import("@/components/monitoring/CacheHitChart"));
-const ConnectionsChart = lazy(() => import("@/components/monitoring/ConnectionsChart"));
-const TablesPerformanceTable = lazy(() => import("@/components/monitoring/TablesPerformanceTable"));
-const PerformanceAlertsPanel = lazy(() => import("@/components/monitoring/PerformanceAlertsPanel"));
+const SequentialScansChart = lazy(() => import('@/components/monitoring/SequentialScansChart'));
+const CacheHitChart = lazy(() => import('@/components/monitoring/CacheHitChart'));
+const ConnectionsChart = lazy(() => import('@/components/monitoring/ConnectionsChart'));
+const TablesPerformanceTable = lazy(() => import('@/components/monitoring/TablesPerformanceTable'));
+const PerformanceAlertsPanel = lazy(() => import('@/components/monitoring/PerformanceAlertsPanel'));
 
 // ✅ Skeleton للرسوم البيانية
 const ChartSkeleton = memo(function ChartSkeleton() {
@@ -49,14 +49,8 @@ const TableSkeleton = memo(function TableSkeleton() {
 });
 
 export default function DatabasePerformanceDashboard() {
-  const {
-    stats,
-    isLoading,
-    refetch,
-    lastUpdated,
-    alerts,
-    topSequentialScans,
-  } = useDatabasePerformance();
+  const { stats, isLoading, refetch, lastUpdated, alerts, topSequentialScans } =
+    useDatabasePerformance();
 
   return (
     <div className="container-custom py-6 space-y-6 w-full max-w-full overflow-x-hidden">
@@ -66,11 +60,7 @@ export default function DatabasePerformanceDashboard() {
       />
 
       {/* ✅ بطاقات KPI - تُحمَّل أولاً (أهم شيء) */}
-      <PerformanceKPICards 
-        stats={stats} 
-        isLoading={isLoading}
-        alertsCount={alerts.length}
-      />
+      <PerformanceKPICards stats={stats} isLoading={isLoading} alertsCount={alerts.length} />
 
       {/* ✅ التنبيهات + Cache Hit - تحميل كسول */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -83,35 +73,23 @@ export default function DatabasePerformanceDashboard() {
           />
         </Suspense>
         <Suspense fallback={<ChartSkeleton />}>
-          <CacheHitChart 
-            ratio={stats?.cacheHitRatio || 0} 
-            isLoading={isLoading} 
-          />
+          <CacheHitChart ratio={stats?.cacheHitRatio || 0} isLoading={isLoading} />
         </Suspense>
       </div>
 
       {/* ✅ Sequential Scans + Connections - تحميل كسول */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Suspense fallback={<ChartSkeleton />}>
-          <SequentialScansChart 
-            data={topSequentialScans} 
-            isLoading={isLoading} 
-          />
+          <SequentialScansChart data={topSequentialScans} isLoading={isLoading} />
         </Suspense>
         <Suspense fallback={<ChartSkeleton />}>
-          <ConnectionsChart 
-            connections={stats?.connections || []} 
-            isLoading={isLoading} 
-          />
+          <ConnectionsChart connections={stats?.connections || []} isLoading={isLoading} />
         </Suspense>
       </div>
 
       {/* ✅ جدول الجداول - تحميل كسول */}
       <Suspense fallback={<TableSkeleton />}>
-        <TablesPerformanceTable 
-          tables={stats?.sequentialScans || []} 
-          isLoading={isLoading} 
-        />
+        <TablesPerformanceTable tables={stats?.sequentialScans || []} isLoading={isLoading} />
       </Suspense>
     </div>
   );

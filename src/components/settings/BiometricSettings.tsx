@@ -8,7 +8,16 @@ import { useBiometricAuth } from '@/hooks/auth/useBiometricAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Fingerprint, Trash2, Smartphone, Monitor, Loader2, AlertCircle, ShieldCheck, ExternalLink } from 'lucide-react';
+import {
+  Fingerprint,
+  Trash2,
+  Smartphone,
+  Monitor,
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
+  ExternalLink,
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -23,7 +32,7 @@ export function BiometricSettings() {
     removeCredential,
     fetchCredentials,
   } = useBiometricAuth();
-  
+
   const [isInIframe, setIsInIframe] = useState(false);
 
   useEffect(() => {
@@ -48,18 +57,14 @@ export function BiometricSettings() {
             <Fingerprint className="h-5 w-5" />
             المصادقة بالبصمة
           </CardTitle>
-          <CardDescription>
-            تسجيل الدخول باستخدام بصمة الإصبع أو Face ID
-          </CardDescription>
+          <CardDescription>تسجيل الدخول باستخدام بصمة الإصبع أو Face ID</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>افتح التطبيق في نافذة مستقلة</AlertTitle>
             <AlertDescription className="space-y-3">
-              <p>
-                لأسباب أمنية، المصادقة بالبصمة لا تعمل داخل نافذة المعاينة.
-              </p>
+              <p>لأسباب أمنية، المصادقة بالبصمة لا تعمل داخل نافذة المعاينة.</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -84,16 +89,15 @@ export function BiometricSettings() {
             <Fingerprint className="h-5 w-5" />
             المصادقة بالبصمة
           </CardTitle>
-          <CardDescription>
-            تسجيل الدخول باستخدام بصمة الإصبع أو Face ID
-          </CardDescription>
+          <CardDescription>تسجيل الدخول باستخدام بصمة الإصبع أو Face ID</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>غير مدعوم</AlertTitle>
             <AlertDescription>
-              جهازك أو المتصفح لا يدعم المصادقة بالبصمة. جرب استخدام متصفح حديث مثل Chrome أو Safari على جهاز يدعم البصمة أو Face ID.
+              جهازك أو المتصفح لا يدعم المصادقة بالبصمة. جرب استخدام متصفح حديث مثل Chrome أو Safari
+              على جهاز يدعم البصمة أو Face ID.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -114,9 +118,7 @@ export function BiometricSettings() {
             </Badge>
           )}
         </CardTitle>
-        <CardDescription>
-          تسجيل الدخول باستخدام بصمة الإصبع أو Face ID
-        </CardDescription>
+        <CardDescription>تسجيل الدخول باستخدام بصمة الإصبع أو Face ID</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* البصمات المسجلة */}
@@ -134,11 +136,15 @@ export function BiometricSettings() {
                     <div>
                       <p className="font-medium text-sm">{cred.device_name || 'جهاز غير معروف'}</p>
                       <p className="text-xs text-muted-foreground">
-                        تم التسجيل: {format(new Date(cred.created_at), 'dd MMMM yyyy', { locale: ar })}
+                        تم التسجيل:{' '}
+                        {format(new Date(cred.created_at), 'dd MMMM yyyy', { locale: ar })}
                       </p>
                       {cred.last_used_at && (
                         <p className="text-xs text-muted-foreground">
-                          آخر استخدام: {format(new Date(cred.last_used_at), 'dd MMMM yyyy HH:mm', { locale: ar })}
+                          آخر استخدام:{' '}
+                          {format(new Date(cred.last_used_at), 'dd MMMM yyyy HH:mm', {
+                            locale: ar,
+                          })}
                         </p>
                       )}
                     </div>
@@ -158,11 +164,7 @@ export function BiometricSettings() {
         )}
 
         {/* زر تسجيل بصمة جديدة */}
-        <Button
-          onClick={() => registerBiometric()}
-          disabled={isRegistering}
-          className="w-full"
-        >
+        <Button onClick={() => registerBiometric()} disabled={isRegistering} className="w-full">
           {isRegistering ? (
             <>
               <Loader2 className="ms-2 h-4 w-4 animate-spin" />

@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { logger } from "@/lib/logger";
-import { getErrorMessage } from "@/types/errors";
-import type { Database } from "@/integrations/supabase/types";
-import { ReportService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/errors';
+import type { Database } from '@/integrations/supabase/types';
+import { ReportService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 type DbAnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
 
@@ -43,16 +43,16 @@ export function useAnnualDisclosures() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURE_CURRENT });
       toast({
-        title: "تم إنشاء الإفصاح بنجاح",
-        description: "تم توليد الإفصاح السنوي بنجاح",
+        title: 'تم إنشاء الإفصاح بنجاح',
+        description: 'تم توليد الإفصاح السنوي بنجاح',
       });
     },
     onError: (error: unknown) => {
-      logger.error(error, { context: "generate_annual_disclosure" });
+      logger.error(error, { context: 'generate_annual_disclosure' });
       toast({
-        title: "خطأ في إنشاء الإفصاح",
+        title: 'خطأ في إنشاء الإفصاح',
         description: getErrorMessage(error),
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -62,16 +62,16 @@ export function useAnnualDisclosures() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES });
       toast({
-        title: "تم نشر الإفصاح",
-        description: "أصبح الإفصاح متاحاً للمستفيدين وتم إرسال الإشعارات",
+        title: 'تم نشر الإفصاح',
+        description: 'أصبح الإفصاح متاحاً للمستفيدين وتم إرسال الإشعارات',
       });
     },
     onError: (error: unknown) => {
-      logger.error(error, { context: "publish_disclosure" });
+      logger.error(error, { context: 'publish_disclosure' });
       toast({
-        title: "خطأ في النشر",
+        title: 'خطأ في النشر',
         description: getErrorMessage(error),
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

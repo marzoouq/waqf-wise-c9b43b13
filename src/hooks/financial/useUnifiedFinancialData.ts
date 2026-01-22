@@ -1,15 +1,20 @@
 /**
  * Hook للبيانات المالية الموحدة
  * Unified Financial Data Hook
- * 
+ *
  * يوفر واجهة موحدة للحصول على البيانات المالية من خدمة البيانات الموحدة
  * مع دعم التخزين المؤقت والتحديث التلقائي
- * 
+ *
  * @version 1.0.0
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { UnifiedFinancialService, UnifiedRevenueData, UnifiedDistributionData, UnifiedIncomeData } from '@/services/unified-financial.service';
+import {
+  UnifiedFinancialService,
+  UnifiedRevenueData,
+  UnifiedDistributionData,
+  UnifiedIncomeData,
+} from '@/services/unified-financial.service';
 
 // ==================== Query Keys ====================
 
@@ -18,8 +23,9 @@ export const UNIFIED_FINANCIAL_KEYS = {
   revenue: () => [...UNIFIED_FINANCIAL_KEYS.all, 'revenue'] as const,
   distribution: () => [...UNIFIED_FINANCIAL_KEYS.all, 'distribution'] as const,
   income: () => [...UNIFIED_FINANCIAL_KEYS.all, 'income'] as const,
-  collection: (propertyId?: string) => [...UNIFIED_FINANCIAL_KEYS.all, 'collection', propertyId] as const,
-  totalCollected: (startDate?: string, endDate?: string) => 
+  collection: (propertyId?: string) =>
+    [...UNIFIED_FINANCIAL_KEYS.all, 'collection', propertyId] as const,
+  totalCollected: (startDate?: string, endDate?: string) =>
     [...UNIFIED_FINANCIAL_KEYS.all, 'totalCollected', startDate, endDate] as const,
 };
 

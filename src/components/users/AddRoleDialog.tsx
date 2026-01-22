@@ -4,21 +4,21 @@
  * @version 2.9.13
  */
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Trash2 } from "lucide-react";
-import { DialogFooter } from "@/components/ui/dialog";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Trash2 } from 'lucide-react';
+import { DialogFooter } from '@/components/ui/dialog';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
-import type { UserWithRoles } from "@/hooks/users/useRolesManagement";
+} from '@/components/ui/select';
+import { ROLE_LABELS, ROLE_COLORS, type AppRole } from '@/types/roles';
+import type { UserWithRoles } from '@/hooks/users/useRolesManagement';
 
 interface AddRoleDialogProps {
   open: boolean;
@@ -42,11 +42,7 @@ export function AddRoleDialog({
   isAddingRole,
 }: AddRoleDialogProps) {
   return (
-    <ResponsiveDialog 
-      open={open} 
-      onOpenChange={onOpenChange}
-      title="إضافة دور جديد"
-    >
+    <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="إضافة دور جديد">
       <div className="space-y-4 py-4">
         <div>
           <Label>المستخدم</Label>

@@ -1,13 +1,13 @@
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MultiChannelNotifications } from "@/components/notifications/MultiChannelNotifications";
-import { Settings, Radio } from "lucide-react";
-import { useNotificationSettingsData } from "@/hooks/notifications/useNotificationSettingsData";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MultiChannelNotifications } from '@/components/notifications/MultiChannelNotifications';
+import { Settings, Radio } from 'lucide-react';
+import { useNotificationSettingsData } from '@/hooks/notifications/useNotificationSettingsData';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export default function NotificationSettings() {
   const { settings, isLoading, error, handleToggle } = useNotificationSettingsData();
@@ -18,8 +18,8 @@ export default function NotificationSettings() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الإعدادات" 
+      <ErrorState
+        title="فشل تحميل الإعدادات"
         message="حدث خطأ أثناء تحميل إعدادات الإشعارات"
         onRetry={() => window.location.reload()}
         fullScreen
@@ -29,10 +29,7 @@ export default function NotificationSettings() {
 
   return (
     <div className="container-custom py-6 space-y-6 w-full max-w-full overflow-x-hidden">
-      <PageHeader
-        title="إعدادات الإشعارات"
-        description="تخصيص طريقة استلام الإشعارات والتنبيهات"
-      />
+      <PageHeader title="إعدادات الإشعارات" description="تخصيص طريقة استلام الإشعارات والتنبيهات" />
 
       <Tabs defaultValue="channels" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto">
@@ -106,7 +103,9 @@ export default function NotificationSettings() {
                   <Switch
                     id="distribution"
                     checked={settings?.distribution_notifications ?? true}
-                    onCheckedChange={(checked) => handleToggle('distribution_notifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handleToggle('distribution_notifications', checked)
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">

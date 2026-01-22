@@ -1,14 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Settings, ArrowLeft } from "lucide-react";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  SettingsCategoryCard, 
-  SettingsQuickActions, 
-  useSettingsCategories 
-} from "./settings";
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { Settings, ArrowLeft } from 'lucide-react';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SettingsCategoryCard, SettingsQuickActions, useSettingsCategories } from './settings';
 
 export function AdminSettingsSection() {
   const navigate = useNavigate();
@@ -19,7 +15,13 @@ export function AdminSettingsSection() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الإعدادات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الإعدادات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -34,7 +36,7 @@ export function AdminSettingsSection() {
                 إدارة شاملة لجميع إعدادات النظام والتفضيلات
               </CardDescription>
             </div>
-            <Button onClick={() => navigate("/settings")} className="gap-2">
+            <Button onClick={() => navigate('/settings')} className="gap-2">
               <Settings className="h-4 w-4" />
               فتح جميع الإعدادات
               <ArrowLeft className="h-4 w-4" />

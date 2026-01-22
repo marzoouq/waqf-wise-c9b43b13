@@ -1,13 +1,13 @@
 /**
  * Hook لجلب إحصائيات النظام الشاملة للناظر
  * يستخدم DashboardService كطبقة خدمة
- * 
+ *
  * @version 2.6.36
  */
-import { useQuery } from "@tanstack/react-query";
-import { DashboardService, type SystemOverviewStats } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { QUERY_STALE_TIME } from "@/lib/constants";
+import { useQuery } from '@tanstack/react-query';
+import { DashboardService, type SystemOverviewStats } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { QUERY_STALE_TIME } from '@/lib/constants';
 
 export type { SystemOverviewStats };
 

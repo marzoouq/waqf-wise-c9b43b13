@@ -4,10 +4,10 @@
  * @version 2.9.2
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { EdgeFunctionService } from "@/services";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { EdgeFunctionService } from '@/services';
+import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface PublishParams {
   fiscalYearId: string;
@@ -29,16 +29,16 @@ export function usePublishFiscalYear(onSuccess?: () => void) {
       return result.data;
     },
     onSuccess: (_, variables) => {
-      toast.success("تم نشر السنة المالية بنجاح", {
-        description: variables.fiscalYearName 
+      toast.success('تم نشر السنة المالية بنجاح', {
+        description: variables.fiscalYearName
           ? `أصبحت بيانات ${variables.fiscalYearName} متاحة للورثة`
-          : "أصبحت البيانات متاحة للورثة",
+          : 'أصبحت البيانات متاحة للورثة',
       });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
       onSuccess?.();
     },
     onError: (error: Error) => {
-      toast.error("خطأ في النشر", { description: error.message });
+      toast.error('خطأ في النشر', { description: error.message });
     },
   });
 

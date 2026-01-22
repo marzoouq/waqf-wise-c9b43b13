@@ -1,23 +1,44 @@
-import { useState, useEffect } from "react";
-import { Building2, MapPin, TrendingUp, DollarSign, Home, Link2, CalendarDays, CalendarRange, Calculator, Receipt, Wallet, TrendingDown } from "lucide-react";
+import { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from "@/lib/date";
-import { matchesStatus } from "@/lib/constants";
-import type { WaqfUnit } from "@/hooks/distributions/useWaqfUnits";
-import { useWaqfRevenueByFiscalYear } from "@/hooks/reports/useWaqfRevenueByFiscalYear";
-import { useWaqfUnitProperties } from "@/hooks/waqf/useWaqfProperties";
-import { LinkPropertyDialog } from "./LinkPropertyDialog";
+  Building2,
+  MapPin,
+  TrendingUp,
+  DollarSign,
+  Home,
+  Link2,
+  CalendarDays,
+  CalendarRange,
+  Calculator,
+  Receipt,
+  Wallet,
+  TrendingDown,
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { format } from '@/lib/date';
+import { matchesStatus } from '@/lib/constants';
+import type { WaqfUnit } from '@/hooks/distributions/useWaqfUnits';
+import { useWaqfRevenueByFiscalYear } from '@/hooks/reports/useWaqfRevenueByFiscalYear';
+import { useWaqfUnitProperties } from '@/hooks/waqf/useWaqfProperties';
+import { LinkPropertyDialog } from './LinkPropertyDialog';
 
 interface WaqfUnitDetailsDialogProps {
   open: boolean;
@@ -35,10 +56,16 @@ export function WaqfUnitDetailsDialog({
   onRefresh,
 }: WaqfUnitDetailsDialogProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
-  const [currentFiscalYearId, setCurrentFiscalYearId] = useState<string | undefined>(selectedFiscalYearId);
+  const [currentFiscalYearId, setCurrentFiscalYearId] = useState<string | undefined>(
+    selectedFiscalYearId
+  );
 
   // جلب عقارات قلم الوقف
-  const { data: properties = [], isLoading, refetch: refetchProperties } = useWaqfUnitProperties(waqfUnit?.id);
+  const {
+    data: properties = [],
+    isLoading,
+    refetch: refetchProperties,
+  } = useWaqfUnitProperties(waqfUnit?.id);
 
   // جلب بيانات الإيرادات حسب السنة المالية
   const { revenueData, fiscalYears, activeFiscalYear } = useWaqfRevenueByFiscalYear(
@@ -66,7 +93,8 @@ export function WaqfUnitDetailsDialog({
     let annualFromContracts = 0;
 
     properties.forEach((property) => {
-      const activeContracts = property.contracts?.filter(c => matchesStatus(c.status, 'active')) || [];
+      const activeContracts =
+        property.contracts?.filter((c) => matchesStatus(c.status, 'active')) || [];
       activeContracts.forEach((contract) => {
         if (contract.payment_frequency === 'شهري') {
           monthlyFromContracts += contract.monthly_rent || 0;
@@ -76,7 +104,7 @@ export function WaqfUnitDetailsDialog({
       });
     });
 
-    const totalYearlyIncome = (monthlyFromContracts * 12) + annualFromContracts;
+    const totalYearlyIncome = monthlyFromContracts * 12 + annualFromContracts;
 
     return {
       monthlyRevenue: monthlyFromContracts,
@@ -104,9 +132,7 @@ export function WaqfUnitDetailsDialog({
           <Tabs defaultValue="info" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="info">المعلومات الأساسية</TabsTrigger>
-              <TabsTrigger value="properties">
-                العقارات المرتبطة ({properties.length})
-              </TabsTrigger>
+              <TabsTrigger value="properties">العقارات المرتبطة ({properties.length})</TabsTrigger>
             </TabsList>
 
             <TabsContent value="info" className="space-y-4 mt-4">
@@ -125,7 +151,7 @@ export function WaqfUnitDetailsDialog({
                     <MapPin className="h-4 w-4" />
                     <span className="text-xs">الموقع</span>
                   </div>
-                  <p className="font-semibold">{waqfUnit.location || "-"}</p>
+                  <p className="font-semibold">{waqfUnit.location || '-'}</p>
                 </Card>
 
                 <Card className="p-4">
@@ -134,7 +160,7 @@ export function WaqfUnitDetailsDialog({
                     <span className="text-xs">القيمة الحالية</span>
                   </div>
                   <p className="font-semibold text-primary">
-                    {(waqfUnit.current_value || 0).toLocaleString("ar-SA")} ريال
+                    {(waqfUnit.current_value || 0).toLocaleString('ar-SA')} ريال
                   </p>
                 </Card>
 
@@ -144,7 +170,7 @@ export function WaqfUnitDetailsDialog({
                     <span className="text-xs">العائد السنوي</span>
                   </div>
                   <p className="font-semibold text-success">
-                    {(waqfUnit.annual_return || 0).toLocaleString("ar-SA")} ريال
+                    {(waqfUnit.annual_return || 0).toLocaleString('ar-SA')} ريال
                   </p>
                 </Card>
               </div>
@@ -166,15 +192,13 @@ export function WaqfUnitDetailsDialog({
                       <span className="text-muted-foreground">تاريخ الاستحواذ:</span>
                       <span>
                         {waqfUnit.acquisition_date
-                          ? format(new Date(waqfUnit.acquisition_date), "dd/MM/yyyy")
-                          : "-"}
+                          ? format(new Date(waqfUnit.acquisition_date), 'dd/MM/yyyy')
+                          : '-'}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">قيمة الاستحواذ:</span>
-                      <span>
-                        {(waqfUnit.acquisition_value || 0).toLocaleString("ar-SA")} ريال
-                      </span>
+                      <span>{(waqfUnit.acquisition_value || 0).toLocaleString('ar-SA')} ريال</span>
                     </div>
                   </div>
                 </Card>
@@ -201,17 +225,14 @@ export function WaqfUnitDetailsDialog({
                     <CalendarDays className="h-5 w-5 text-primary" />
                     <span className="font-semibold">إيرادات السنة المالية</span>
                   </div>
-                  <Select 
-                    value={currentFiscalYearId || ''} 
-                    onValueChange={setCurrentFiscalYearId}
-                  >
+                  <Select value={currentFiscalYearId || ''} onValueChange={setCurrentFiscalYearId}>
                     <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder="اختر السنة المالية" />
                     </SelectTrigger>
                     <SelectContent>
                       {fiscalYears.map((fy) => (
                         <SelectItem key={fy.id} value={fy.id}>
-                          {fy.name} {fy.is_active && "(نشطة)"} {fy.is_closed && "(مغلقة)"}
+                          {fy.name} {fy.is_active && '(نشطة)'} {fy.is_closed && '(مغلقة)'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -229,9 +250,11 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">إجمالي الإيرادات</span>
                       </div>
                       <p className="text-2xl font-bold text-success">
-                        {revenueData.totalCollected.toLocaleString("ar-SA")} ريال
+                        {revenueData.totalCollected.toLocaleString('ar-SA')} ريال
                       </p>
-                      <Badge variant="secondary" className="mt-2">سنة مغلقة</Badge>
+                      <Badge variant="secondary" className="mt-2">
+                        سنة مغلقة
+                      </Badge>
                     </Card>
 
                     <Card className="p-4 border-destructive/30 bg-destructive/5">
@@ -240,7 +263,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">المصروفات</span>
                       </div>
                       <p className="text-2xl font-bold text-destructive">
-                        {(revenueData.totalExpenses || 0).toLocaleString("ar-SA")} ريال
+                        {(revenueData.totalExpenses || 0).toLocaleString('ar-SA')} ريال
                       </p>
                     </Card>
 
@@ -250,7 +273,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">صافي الدخل</span>
                       </div>
                       <p className="text-2xl font-bold text-primary">
-                        {(revenueData.netIncome || 0).toLocaleString("ar-SA")} ريال
+                        {(revenueData.netIncome || 0).toLocaleString('ar-SA')} ريال
                       </p>
                     </Card>
 
@@ -260,7 +283,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">رقبة الوقف</span>
                       </div>
                       <p className="text-2xl font-bold text-warning">
-                        {(revenueData.waqfCorpus || 0).toLocaleString("ar-SA")} ريال
+                        {(revenueData.waqfCorpus || 0).toLocaleString('ar-SA')} ريال
                       </p>
                     </Card>
                   </div>
@@ -272,7 +295,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">المحصّل الشهري</span>
                       </div>
                       <p className="text-2xl font-bold text-info">
-                        {revenueData.monthlyCollected.toLocaleString("ar-SA")} ريال
+                        {revenueData.monthlyCollected.toLocaleString('ar-SA')} ريال
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">من عقود شهرية</p>
                     </Card>
@@ -283,7 +306,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">المحصّل السنوي</span>
                       </div>
                       <p className="text-2xl font-bold text-success">
-                        {revenueData.annualCollected.toLocaleString("ar-SA")} ريال
+                        {revenueData.annualCollected.toLocaleString('ar-SA')} ريال
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">من عقود سنوية</p>
                     </Card>
@@ -294,7 +317,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">الضريبة</span>
                       </div>
                       <p className="text-2xl font-bold text-warning">
-                        {revenueData.totalTax.toLocaleString("ar-SA")} ريال
+                        {revenueData.totalTax.toLocaleString('ar-SA')} ريال
                       </p>
                     </Card>
 
@@ -304,7 +327,7 @@ export function WaqfUnitDetailsDialog({
                         <span className="font-semibold">صافي الإيراد</span>
                       </div>
                       <p className="text-2xl font-bold text-primary">
-                        {revenueData.netRevenue.toLocaleString("ar-SA")} ريال
+                        {revenueData.netRevenue.toLocaleString('ar-SA')} ريال
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">بعد خصم الضريبة</p>
                     </Card>
@@ -318,7 +341,7 @@ export function WaqfUnitDetailsDialog({
                       <span className="font-semibold">الإيراد الشهري</span>
                     </div>
                     <p className="text-2xl font-bold text-info">
-                      {revenues.monthlyRevenue.toLocaleString("ar-SA")} ريال
+                      {revenues.monthlyRevenue.toLocaleString('ar-SA')} ريال
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">من العقود الشهرية النشطة</p>
                   </Card>
@@ -329,7 +352,7 @@ export function WaqfUnitDetailsDialog({
                       <span className="font-semibold">الإيراد السنوي</span>
                     </div>
                     <p className="text-2xl font-bold text-success">
-                      {revenues.annualRevenue.toLocaleString("ar-SA")} ريال
+                      {revenues.annualRevenue.toLocaleString('ar-SA')} ريال
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">من العقود السنوية النشطة</p>
                   </Card>
@@ -340,7 +363,7 @@ export function WaqfUnitDetailsDialog({
                       <span className="font-semibold">إجمالي الدخل السنوي</span>
                     </div>
                     <p className="text-2xl font-bold text-primary">
-                      {revenues.totalYearlyIncome.toLocaleString("ar-SA")} ريال
+                      {revenues.totalYearlyIncome.toLocaleString('ar-SA')} ريال
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">(الشهري × 12) + السنوي</p>
                   </Card>
@@ -363,18 +386,12 @@ export function WaqfUnitDetailsDialog({
               </div>
 
               {isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  جاري التحميل...
-                </div>
+                <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
               ) : properties.length === 0 ? (
                 <div className="text-center py-8 border rounded-lg bg-muted/50">
                   <Home className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
                   <p className="text-muted-foreground">لا توجد عقارات مرتبطة</p>
-                  <Button
-                    variant="link"
-                    onClick={() => setLinkDialogOpen(true)}
-                    className="mt-2"
-                  >
+                  <Button variant="link" onClick={() => setLinkDialogOpen(true)} className="mt-2">
                     ربط عقار جديد
                   </Button>
                 </div>
@@ -393,9 +410,7 @@ export function WaqfUnitDetailsDialog({
                     <TableBody>
                       {properties.map((property) => (
                         <TableRow key={property.id}>
-                          <TableCell className="font-medium">
-                            {property.name}
-                          </TableCell>
+                          <TableCell className="font-medium">{property.name}</TableCell>
                           <TableCell>{property.type}</TableCell>
                           <TableCell>{property.location}</TableCell>
                           <TableCell>
@@ -404,9 +419,7 @@ export function WaqfUnitDetailsDialog({
                           <TableCell>
                             <Badge
                               variant={
-                                matchesStatus(property.status, 'active')
-                                  ? "default"
-                                  : "secondary"
+                                matchesStatus(property.status, 'active') ? 'default' : 'secondary'
                               }
                             >
                               {property.status}

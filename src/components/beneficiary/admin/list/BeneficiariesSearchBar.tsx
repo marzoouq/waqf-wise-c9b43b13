@@ -1,14 +1,14 @@
-import { memo, useCallback } from "react";
-import { Search, Filter, Save, Shield, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { memo, useCallback } from 'react';
+import { Search, Filter, Save, Shield, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 interface SavedSearch {
   id: string;
@@ -34,16 +34,22 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
   savedSearches,
   onLoadSearch,
 }: BeneficiariesSearchBarProps) {
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(e.target.value);
-  }, [onSearchChange]);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onSearchChange(e.target.value);
+    },
+    [onSearchChange]
+  );
 
   return (
     <Card className="shadow-soft">
       <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
         <div className="flex flex-col gap-3 sm:gap-4">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" aria-hidden="true" />
+            <Search
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground"
+              aria-hidden="true"
+            />
             <Input
               placeholder="البحث (الاسم، رقم الهوية، العائلة...)"
               value={searchQuery}
@@ -53,10 +59,10 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              onClick={onAdvancedSearchClick} 
-              className="flex-1 sm:flex-none gap-2 text-xs sm:text-sm" 
+            <Button
+              variant="outline"
+              onClick={onAdvancedSearchClick}
+              className="flex-1 sm:flex-none gap-2 text-xs sm:text-sm"
               size="sm"
             >
               <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -81,8 +87,8 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onTribeManagementClick}
               className="flex-1 sm:flex-none gap-2 text-xs sm:text-sm"
               size="sm"

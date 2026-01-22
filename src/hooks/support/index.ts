@@ -7,4 +7,10 @@ export { useSupportTickets, useSupportTicket } from './useSupportTickets';
 export { useSupportStats } from './useSupportStats';
 export { useTicketComments } from './useTicketComments';
 export { useTicketRating, useAddTicketRating } from './useTicketRatings';
-export { useAgentAvailability, useUpdateAvailability, useAgentStats, useEscalations, useAssignmentSettings } from './useAgentAvailability';
+export {
+  useAgentAvailability,
+  useUpdateAvailability,
+  useAgentStats,
+  useEscalations,
+  useAssignmentSettings,
+} from './useAgentAvailability';

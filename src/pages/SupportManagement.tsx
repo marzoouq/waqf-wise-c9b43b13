@@ -41,23 +41,20 @@ export default function SupportManagement() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { tickets, isLoading } = useSupportTickets(cleanFilters(filters));
-  const { 
-    overviewStats, 
-    overdueTickets, 
-    recentTickets, 
-    overviewLoading,
-    overviewError 
-  } = useSupportStats();
+  const { overviewStats, overdueTickets, recentTickets, overviewLoading, overviewError } =
+    useSupportStats();
 
   const handleFilterChange = (key: keyof SupportFilters, value: string | string[] | undefined) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleTicketClick = (id: string) => {
     setSelectedTicketId(id);
   };
 
-  const getPriorityColor = (priority: string): 'primary' | 'destructive' | 'warning' | 'success' => {
+  const getPriorityColor = (
+    priority: string
+  ): 'primary' | 'destructive' | 'warning' | 'success' => {
     if (priority === 'عاجلة') return 'destructive';
     if (priority === 'عالية') return 'warning';
     return 'primary';
@@ -73,16 +70,36 @@ export default function SupportManagement() {
               <span className="hidden sm:inline">إعدادات التعيين</span>
             </Button>
           </div>
-          
+
           <AgentAvailabilityCard />
 
           <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
             <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
               <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 gap-1 h-auto min-w-full sm:min-w-0">
-                <TabsTrigger value="overview" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">نظرة عامة</TabsTrigger>
-                <TabsTrigger value="tickets" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التذاكر</TabsTrigger>
-                <TabsTrigger value="analytics" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التحليلات</TabsTrigger>
-                <TabsTrigger value="performance" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">الأداء</TabsTrigger>
+                <TabsTrigger
+                  value="overview"
+                  className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                >
+                  نظرة عامة
+                </TabsTrigger>
+                <TabsTrigger
+                  value="tickets"
+                  className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                >
+                  التذاكر
+                </TabsTrigger>
+                <TabsTrigger
+                  value="analytics"
+                  className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                >
+                  التحليلات
+                </TabsTrigger>
+                <TabsTrigger
+                  value="performance"
+                  className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                >
+                  الأداء
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -96,9 +113,11 @@ export default function SupportManagement() {
                     <div className="text-center py-8">
                       <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">خطأ في تحميل البيانات</h3>
-                      <p className="text-muted-foreground">حدث خطأ أثناء تحميل إحصائيات الدعم الفني</p>
-                      <Button 
-                        variant="outline" 
+                      <p className="text-muted-foreground">
+                        حدث خطأ أثناء تحميل إحصائيات الدعم الفني
+                      </p>
+                      <Button
+                        variant="outline"
                         className="mt-4"
                         onClick={() => window.location.reload()}
                       >
@@ -121,9 +140,7 @@ export default function SupportManagement() {
                             تذاكر متأخرة ({overdueTickets.length})
                           </CardTitle>
                         </div>
-                        <CardDescription>
-                          تذاكر تجاوزت وقت الاستجابة المحدد
-                        </CardDescription>
+                        <CardDescription>تذاكر تجاوزت وقت الاستجابة المحدد</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
@@ -148,9 +165,7 @@ export default function SupportManagement() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-base sm:text-lg">التذاكر الأخيرة</CardTitle>
-                      <CardDescription>
-                        آخر التذاكر المُنشأة
-                      </CardDescription>
+                      <CardDescription>آخر التذاكر المُنشأة</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -187,9 +202,7 @@ export default function SupportManagement() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg">جميع التذاكر</CardTitle>
-                  <CardDescription>
-                    قائمة شاملة بجميع تذاكر الدعم الفني
-                  </CardDescription>
+                  <CardDescription>قائمة شاملة بجميع تذاكر الدعم الفني</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -202,7 +215,7 @@ export default function SupportManagement() {
                       />
                       <Select
                         value={filters.status?.[0] || 'all'}
-                        onValueChange={(value) => 
+                        onValueChange={(value) =>
                           handleFilterChange('status', value === 'all' ? [] : [value])
                         }
                       >
@@ -257,21 +270,24 @@ export default function SupportManagement() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base sm:text-lg">معدل الحل</CardTitle>
-                    <CardDescription>
-                      نسبة التذاكر المحلولة من الإجمالي
-                    </CardDescription>
+                    <CardDescription>نسبة التذاكر المحلولة من الإجمالي</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2">
                       <div className="text-2xl sm:text-3xl font-bold">
-                        {overviewStats?.ticketsByStatus ? 
-                          (() => {
-                            const resolved = Number(overviewStats.ticketsByStatus.resolved || 0);
-                            const closed = Number(overviewStats.ticketsByStatus.closed || 0);
-                            const total = Object.values(overviewStats.ticketsByStatus).reduce((a, b) => Number(a) + Number(b), 0);
-                            return Number(total) > 0 ? `${Math.round(((resolved + closed) / Number(total)) * 100)}%` : '0%';
-                          })() : 
-                          '0%'}
+                        {overviewStats?.ticketsByStatus
+                          ? (() => {
+                              const resolved = Number(overviewStats.ticketsByStatus.resolved || 0);
+                              const closed = Number(overviewStats.ticketsByStatus.closed || 0);
+                              const total = Object.values(overviewStats.ticketsByStatus).reduce(
+                                (a, b) => Number(a) + Number(b),
+                                0
+                              );
+                              return Number(total) > 0
+                                ? `${Math.round(((resolved + closed) / Number(total)) * 100)}%`
+                                : '0%';
+                            })()
+                          : '0%'}
                       </div>
                     </div>
                   </CardContent>
@@ -281,9 +297,7 @@ export default function SupportManagement() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base sm:text-lg">متوسط رضا العملاء</CardTitle>
-                    <CardDescription>
-                      من 5 نجوم
-                    </CardDescription>
+                    <CardDescription>من 5 نجوم</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2">
@@ -300,9 +314,7 @@ export default function SupportManagement() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg">توزيع التذاكر حسب الفئة</CardTitle>
-                  <CardDescription>
-                    عدد التذاكر في كل فئة
-                  </CardDescription>
+                  <CardDescription>عدد التذاكر في كل فئة</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <DistributionList
@@ -316,9 +328,7 @@ export default function SupportManagement() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg">توزيع التذاكر حسب الأولوية</CardTitle>
-                  <CardDescription>
-                    عدد التذاكر في كل مستوى أولوية
-                  </CardDescription>
+                  <CardDescription>عدد التذاكر في كل مستوى أولوية</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <DistributionList
@@ -342,10 +352,7 @@ export default function SupportManagement() {
             onOpenChange={(open) => !open && setSelectedTicketId(null)}
           />
 
-          <AssignmentSettingsDialog
-            open={settingsOpen}
-            onOpenChange={setSettingsOpen}
-          />
+          <AssignmentSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
         </div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>

@@ -3,9 +3,9 @@
  * إدارة بيانات ملخص الوقف
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { DashboardService } from "@/services/dashboard.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { DashboardService } from '@/services/dashboard.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface WaqfSummaryData {
   propertiesCount: number;
@@ -17,7 +17,12 @@ export interface WaqfSummaryData {
 }
 
 export function useWaqfSummary(enabled: boolean = true) {
-  const { data: summary, isLoading, error, refetch } = useQuery({
+  const {
+    data: summary,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.WAQF_SUMMARY,
     queryFn: () => DashboardService.getWaqfSummary(),
     enabled,

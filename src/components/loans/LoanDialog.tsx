@@ -1,18 +1,24 @@
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { useLoans, type Loan } from "@/hooks/payments/useLoans";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { useLoans, type Loan } from '@/hooks/payments/useLoans';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface LoanDialogProps {
   open: boolean;
@@ -26,13 +32,13 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    beneficiary_id: loan?.beneficiary_id || "",
+    beneficiary_id: loan?.beneficiary_id || '',
     loan_amount: loan?.loan_amount || 0,
     interest_rate: loan?.interest_rate || 0,
     term_months: loan?.term_months || 12,
-    start_date: loan?.start_date || format(new Date(), "yyyy-MM-dd"),
-    status: loan?.status || "active",
-    notes: loan?.notes || "",
+    start_date: loan?.start_date || format(new Date(), 'yyyy-MM-dd'),
+    status: loan?.status || 'active',
+    notes: loan?.notes || '',
   });
 
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -46,7 +52,7 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
     try {
       const data = {
         ...formData,
-        start_date: format(startDate || new Date(), "yyyy-MM-dd"),
+        start_date: format(startDate || new Date(), 'yyyy-MM-dd'),
         loan_amount: Number(formData.loan_amount),
         interest_rate: Number(formData.interest_rate),
         term_months: Number(formData.term_months),
@@ -57,18 +63,18 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
       } else {
         await addLoan(data);
       }
-      
+
       onOpenChange(false);
-      
+
       // Reset form
       setFormData({
-        beneficiary_id: "",
+        beneficiary_id: '',
         loan_amount: 0,
         interest_rate: 0,
         term_months: 12,
-        start_date: format(new Date(), "yyyy-MM-dd"),
-        status: "active",
-        notes: "",
+        start_date: format(new Date(), 'yyyy-MM-dd'),
+        status: 'active',
+        notes: '',
       });
       setStartDate(new Date());
     } catch (error) {
@@ -79,161 +85,141 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
-      title={loan ? "تعديل قرض" : "إضافة قرض جديد"}
+      title={loan ? 'تعديل قرض' : 'إضافة قرض جديد'}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="beneficiary">المستفيد *</Label>
+          <Select
+            value={formData.beneficiary_id}
+            onValueChange={(value) => setFormData({ ...formData, beneficiary_id: value })}
+            disabled={!!loan}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="اختر المستفيد" />
+            </SelectTrigger>
+            <SelectContent>
+              {beneficiaries.map((beneficiary) => (
+                <SelectItem key={beneficiary.id} value={beneficiary.id}>
+                  {beneficiary.full_name} - {beneficiary.national_id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="beneficiary">المستفيد *</Label>
-            <Select
-              value={formData.beneficiary_id}
-              onValueChange={(value) =>
-                setFormData({ ...formData, beneficiary_id: value })
-              }
-              disabled={!!loan}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر المستفيد" />
-              </SelectTrigger>
-              <SelectContent>
-                {beneficiaries.map((beneficiary) => (
-                  <SelectItem key={beneficiary.id} value={beneficiary.id}>
-                    {beneficiary.full_name} - {beneficiary.national_id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="loan_amount">مبلغ القرض (ريال) *</Label>
-              <Input
-                id="loan_amount"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.loan_amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, loan_amount: Number(e.target.value) })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="interest_rate">نسبة الفائدة (%) *</Label>
-              <Input
-                id="interest_rate"
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={formData.interest_rate}
-                onChange={(e) =>
-                  setFormData({ ...formData, interest_rate: Number(e.target.value) })
-                }
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="term_months">مدة القرض (شهر) *</Label>
-              <Input
-                id="term_months"
-                type="number"
-                min="1"
-                value={formData.term_months}
-                onChange={(e) =>
-                  setFormData({ ...formData, term_months: Number(e.target.value) })
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>تاريخ البداية *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-right font-normal",
-                      !startDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="ms-2 h-4 w-4" />
-                    {startDate ? (
-                      format(startDate, "PPP", { locale: ar })
-                    ) : (
-                      <span>اختر التاريخ</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          {loan && (
-            <div className="space-y-2">
-              <Label htmlFor="status">الحالة</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value as "active" | "cancelled" | "defaulted" | "paid" })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">نشط</SelectItem>
-                  <SelectItem value="paid">مسدد</SelectItem>
-                  <SelectItem value="defaulted">متعثر</SelectItem>
-                  <SelectItem value="cancelled">ملغي</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">ملاحظات</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              rows={3}
+            <Label htmlFor="loan_amount">مبلغ القرض (ريال) *</Label>
+            <Input
+              id="loan_amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.loan_amount}
+              onChange={(e) => setFormData({ ...formData, loan_amount: Number(e.target.value) })}
+              required
             />
           </div>
 
-          <div className="flex gap-2 justify-end pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              إلغاء
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "جاري الحفظ..." : loan ? "تحديث" : "إضافة"}
-            </Button>
+          <div className="space-y-2">
+            <Label htmlFor="interest_rate">نسبة الفائدة (%) *</Label>
+            <Input
+              id="interest_rate"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              value={formData.interest_rate}
+              onChange={(e) => setFormData({ ...formData, interest_rate: Number(e.target.value) })}
+              required
+            />
           </div>
-        </form>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="term_months">مدة القرض (شهر) *</Label>
+            <Input
+              id="term_months"
+              type="number"
+              min="1"
+              value={formData.term_months}
+              onChange={(e) => setFormData({ ...formData, term_months: Number(e.target.value) })}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>تاريخ البداية *</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start text-right font-normal',
+                    !startDate && 'text-muted-foreground'
+                  )}
+                >
+                  <CalendarIcon className="ms-2 h-4 w-4" />
+                  {startDate ? format(startDate, 'PPP', { locale: ar }) : <span>اختر التاريخ</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {loan && (
+          <div className="space-y-2">
+            <Label htmlFor="status">الحالة</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  status: value as 'active' | 'cancelled' | 'defaulted' | 'paid',
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">نشط</SelectItem>
+                <SelectItem value="paid">مسدد</SelectItem>
+                <SelectItem value="defaulted">متعثر</SelectItem>
+                <SelectItem value="cancelled">ملغي</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="notes">ملاحظات</Label>
+          <Textarea
+            id="notes"
+            value={formData.notes}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            rows={3}
+          />
+        </div>
+
+        <div className="flex gap-2 justify-end pt-4">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            إلغاء
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'جاري الحفظ...' : loan ? 'تحديث' : 'إضافة'}
+          </Button>
+        </div>
+      </form>
     </ResponsiveDialog>
   );
 }

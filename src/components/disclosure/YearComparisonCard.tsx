@@ -4,9 +4,9 @@
  * @version 2.8.66
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
+import { AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
 
 interface YearComparisonCardProps {
   currentYear: AnnualDisclosure;
@@ -14,14 +14,17 @@ interface YearComparisonCardProps {
 }
 
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("ar-SA", {
-    style: "decimal",
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
 };
 
-const calculateChange = (current: number, previous: number): { value: number; isPositive: boolean | null } => {
+const calculateChange = (
+  current: number,
+  previous: number
+): { value: number; isPositive: boolean | null } => {
   if (previous === 0) return { value: 0, isPositive: null };
   const change = ((current - previous) / previous) * 100;
   return {
@@ -37,13 +40,16 @@ interface ComparisonRowProps {
   isExpense?: boolean;
 }
 
-function ComparisonRow({ label, currentValue, previousValue, isExpense = false }: ComparisonRowProps) {
+function ComparisonRow({
+  label,
+  currentValue,
+  previousValue,
+  isExpense = false,
+}: ComparisonRowProps) {
   const change = calculateChange(currentValue, previousValue);
-  
+
   // للمصروفات: الزيادة سلبية، النقصان إيجابي
-  const isGood = isExpense 
-    ? change.isPositive === false 
-    : change.isPositive === true;
+  const isGood = isExpense ? change.isPositive === false : change.isPositive === true;
 
   return (
     <div className="grid grid-cols-4 gap-2 py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors text-xs sm:text-sm">
@@ -58,13 +64,15 @@ function ComparisonRow({ label, currentValue, previousValue, isExpense = false }
         ) : (
           <TrendingDown className={`h-3 w-3 ${isGood ? 'text-success' : 'text-destructive'}`} />
         )}
-        <span className={`font-medium ${
-          change.isPositive === null 
-            ? 'text-muted-foreground' 
-            : isGood 
-              ? 'text-success' 
-              : 'text-destructive'
-        }`}>
+        <span
+          className={`font-medium ${
+            change.isPositive === null
+              ? 'text-muted-foreground'
+              : isGood
+                ? 'text-success'
+                : 'text-destructive'
+          }`}
+        >
           {change.value.toFixed(1)}%
         </span>
       </div>
@@ -91,10 +99,16 @@ export function YearComparisonCard({ currentYear, previousYear }: YearComparison
   // حساب التنبيه الذكي
   const getInsight = () => {
     if (revenueChange.value > 20 && revenueChange.isPositive) {
-      return { text: `نمو ملحوظ في الإيرادات بنسبة ${revenueChange.value.toFixed(0)}%`, type: 'success' };
+      return {
+        text: `نمو ملحوظ في الإيرادات بنسبة ${revenueChange.value.toFixed(0)}%`,
+        type: 'success',
+      };
     }
     if (expenseChange.value > 30 && expenseChange.isPositive) {
-      return { text: `ارتفاع كبير في المصروفات بنسبة ${expenseChange.value.toFixed(0)}%`, type: 'warning' };
+      return {
+        text: `ارتفاع كبير في المصروفات بنسبة ${expenseChange.value.toFixed(0)}%`,
+        type: 'warning',
+      };
     }
     if (netChange.isPositive && netChange.value > 10) {
       return { text: `تحسن في صافي الدخل بنسبة ${netChange.value.toFixed(0)}%`, type: 'success' };
@@ -112,50 +126,57 @@ export function YearComparisonCard({ currentYear, previousYear }: YearComparison
           المقارنة السنوية
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          مقارنة الأداء المالي بين {previousYear.year - 1}-{previousYear.year} و {currentYear.year - 1}-{currentYear.year}
+          مقارنة الأداء المالي بين {previousYear.year - 1}-{previousYear.year} و{' '}
+          {currentYear.year - 1}-{currentYear.year}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-3 sm:p-4 pt-0 space-y-3">
         {/* رأس الجدول */}
         <div className="grid grid-cols-4 gap-2 py-2 px-3 bg-muted rounded-lg text-xs sm:text-sm font-medium">
           <div>البند</div>
-          <div className="text-center">{previousYear.year - 1}-{previousYear.year}</div>
-          <div className="text-center">{currentYear.year - 1}-{currentYear.year}</div>
+          <div className="text-center">
+            {previousYear.year - 1}-{previousYear.year}
+          </div>
+          <div className="text-center">
+            {currentYear.year - 1}-{currentYear.year}
+          </div>
           <div className="text-left">التغيير</div>
         </div>
 
         {/* الصفوف */}
         <div className="space-y-1 divide-y divide-border/50">
-          <ComparisonRow 
-            label="الإيرادات" 
-            currentValue={currentYear.total_revenues} 
-            previousValue={previousYear.total_revenues} 
+          <ComparisonRow
+            label="الإيرادات"
+            currentValue={currentYear.total_revenues}
+            previousValue={previousYear.total_revenues}
           />
-          <ComparisonRow 
-            label="المصروفات" 
-            currentValue={currentYear.total_expenses} 
+          <ComparisonRow
+            label="المصروفات"
+            currentValue={currentYear.total_expenses}
             previousValue={previousYear.total_expenses}
             isExpense={true}
           />
-          <ComparisonRow 
-            label="صافي الدخل" 
-            currentValue={currentYear.net_income} 
-            previousValue={previousYear.net_income} 
+          <ComparisonRow
+            label="صافي الدخل"
+            currentValue={currentYear.net_income}
+            previousValue={previousYear.net_income}
           />
-          <ComparisonRow 
-            label="التوزيعات" 
-            currentValue={currentYear.corpus_share + (currentYear.nazer_share || 0)} 
-            previousValue={previousYear.corpus_share + (previousYear.nazer_share || 0)} 
+          <ComparisonRow
+            label="التوزيعات"
+            currentValue={currentYear.corpus_share + (currentYear.nazer_share || 0)}
+            previousValue={previousYear.corpus_share + (previousYear.nazer_share || 0)}
           />
         </div>
 
         {/* التنبيه الذكي */}
         {insight && (
-          <div className={`flex items-center gap-2 p-3 rounded-lg text-xs sm:text-sm ${
-            insight.type === 'success' 
-              ? 'bg-success/10 text-success border border-success/20' 
-              : 'bg-warning/10 text-warning border border-warning/20'
-          }`}>
+          <div
+            className={`flex items-center gap-2 p-3 rounded-lg text-xs sm:text-sm ${
+              insight.type === 'success'
+                ? 'bg-success/10 text-success border border-success/20'
+                : 'bg-warning/10 text-warning border border-warning/20'
+            }`}
+          >
             <span className="text-lg">{insight.type === 'success' ? '💡' : '⚠️'}</span>
             {insight.text}
           </div>

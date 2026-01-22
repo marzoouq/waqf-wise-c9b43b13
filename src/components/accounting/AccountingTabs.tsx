@@ -1,8 +1,8 @@
-import { memo, useMemo, Suspense } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { lazyWithRetry, lazyWithRetryNamed } from "@/lib/lazyWithRetry";
+import { memo, useMemo, Suspense } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { lazyWithRetry, lazyWithRetryNamed } from '@/lib/lazyWithRetry';
 import {
   FileText,
   TreePine,
@@ -12,17 +12,32 @@ import {
   Building2,
   Activity,
   Sparkles,
-} from "lucide-react";
+} from 'lucide-react';
 
 // Lazy load components with retry for better reliability
-const EnhancedAccountsTree = lazyWithRetryNamed(() => import("./EnhancedAccountsTree"), "EnhancedAccountsTree");
-const JournalEntries = lazyWithRetry(() => import("./JournalEntries"));
-const BudgetsContent = lazyWithRetryNamed(() => import("./BudgetsContent"), "BudgetsContent");
-const TrialBalanceReport = lazyWithRetryNamed(() => import("./TrialBalanceReport"), "TrialBalanceReport");
-const GeneralLedgerReport = lazyWithRetry(() => import("./GeneralLedgerReport"));
-const BankAccountsManagement = lazyWithRetryNamed(() => import("./BankAccountsManagement"), "BankAccountsManagement");
-const CashFlowStatement = lazyWithRetryNamed(() => import("./CashFlowStatement"), "CashFlowStatement");
-const AdvancedAccountingTab = lazyWithRetryNamed(() => import("./AdvancedAccountingTab"), "AdvancedAccountingTab");
+const EnhancedAccountsTree = lazyWithRetryNamed(
+  () => import('./EnhancedAccountsTree'),
+  'EnhancedAccountsTree'
+);
+const JournalEntries = lazyWithRetry(() => import('./JournalEntries'));
+const BudgetsContent = lazyWithRetryNamed(() => import('./BudgetsContent'), 'BudgetsContent');
+const TrialBalanceReport = lazyWithRetryNamed(
+  () => import('./TrialBalanceReport'),
+  'TrialBalanceReport'
+);
+const GeneralLedgerReport = lazyWithRetry(() => import('./GeneralLedgerReport'));
+const BankAccountsManagement = lazyWithRetryNamed(
+  () => import('./BankAccountsManagement'),
+  'BankAccountsManagement'
+);
+const CashFlowStatement = lazyWithRetryNamed(
+  () => import('./CashFlowStatement'),
+  'CashFlowStatement'
+);
+const AdvancedAccountingTab = lazyWithRetryNamed(
+  () => import('./AdvancedAccountingTab'),
+  'AdvancedAccountingTab'
+);
 
 interface AccountingTabsProps {
   activeTab: string;
@@ -31,16 +46,19 @@ interface AccountingTabsProps {
 }
 
 export const AccountingTabs = memo(({ activeTab, onTabChange, isLoading }: AccountingTabsProps) => {
-  const tabContent = useMemo(() => ({
-    accounts: <EnhancedAccountsTree />,
-    entries: <JournalEntries />,
-    budgets: <BudgetsContent />,
-    "trial-balance": <TrialBalanceReport />,
-    ledger: <GeneralLedgerReport />,
-    "bank-accounts": <BankAccountsManagement />,
-    "cash-flow": <CashFlowStatement />,
-    advanced: <AdvancedAccountingTab />,
-  }), []);
+  const tabContent = useMemo(
+    () => ({
+      accounts: <EnhancedAccountsTree />,
+      entries: <JournalEntries />,
+      budgets: <BudgetsContent />,
+      'trial-balance': <TrialBalanceReport />,
+      ledger: <GeneralLedgerReport />,
+      'bank-accounts': <BankAccountsManagement />,
+      'cash-flow': <CashFlowStatement />,
+      advanced: <AdvancedAccountingTab />,
+    }),
+    []
+  );
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -93,9 +111,7 @@ export const AccountingTabs = memo(({ activeTab, onTabChange, isLoading }: Accou
           {isLoading ? (
             <LoadingState message="جاري التحميل..." />
           ) : (
-            <Suspense fallback={<LoadingState message="جاري التحميل..." />}>
-              {content}
-            </Suspense>
+            <Suspense fallback={<LoadingState message="جاري التحميل..." />}>{content}</Suspense>
           )}
         </TabsContent>
       ))}

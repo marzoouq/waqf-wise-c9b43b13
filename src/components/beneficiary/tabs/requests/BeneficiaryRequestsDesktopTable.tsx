@@ -3,9 +3,9 @@
  * @version 1.0.0
  */
 
-import { memo } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -13,19 +13,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
-  FileText, 
-  Eye,
-  LucideIcon
-} from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { SLAIndicator } from "../../SLAIndicator";
-import { RequestAttachmentsUploader } from "../../RequestAttachmentsUploader";
+} from '@/components/ui/table';
+import { Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye, LucideIcon } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { SLAIndicator } from '../../SLAIndicator';
+import { RequestAttachmentsUploader } from '../../RequestAttachmentsUploader';
 
 interface RequestType {
   name_ar: string;
@@ -52,17 +44,17 @@ interface BeneficiaryRequestsDesktopTableProps {
   onViewDetails: (requestId: string) => void;
 }
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 const getStatusBadge = (status: string) => {
   const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {
-    "معلق": { icon: Clock, variant: "secondary" },
-    "قيد المراجعة": { icon: FileText, variant: "default" },
-    "معتمد": { icon: CheckCircle2, variant: "outline" },
-    "مرفوض": { icon: XCircle, variant: "destructive" },
+    معلق: { icon: Clock, variant: 'secondary' },
+    'قيد المراجعة': { icon: FileText, variant: 'default' },
+    معتمد: { icon: CheckCircle2, variant: 'outline' },
+    مرفوض: { icon: XCircle, variant: 'destructive' },
   };
 
-  const s = config[status] || { icon: AlertCircle, variant: "secondary" };
+  const s = config[status] || { icon: AlertCircle, variant: 'secondary' };
   const Icon = s.icon;
 
   return (
@@ -75,17 +67,17 @@ const getStatusBadge = (status: string) => {
 
 const getPriorityBadge = (priority: string | null) => {
   if (!priority) return null;
-  
-  const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
-    "عاجلة": { variant: "destructive" },
-    "عاجل": { variant: "destructive" },
-    "عالية": { variant: "default" },
-    "مهمة": { variant: "default" },
-    "متوسطة": { variant: "secondary" },
-    "منخفضة": { variant: "secondary" },
+
+  const config: Record<string, { variant: 'default' | 'secondary' | 'destructive' }> = {
+    عاجلة: { variant: 'destructive' },
+    عاجل: { variant: 'destructive' },
+    عالية: { variant: 'default' },
+    مهمة: { variant: 'default' },
+    متوسطة: { variant: 'secondary' },
+    منخفضة: { variant: 'secondary' },
   };
 
-  const s = config[priority] || { variant: "secondary" };
+  const s = config[priority] || { variant: 'secondary' };
   return <Badge variant={s.variant}>{priority}</Badge>;
 };
 
@@ -129,27 +121,23 @@ export const BeneficiaryRequestsDesktopTable = memo(function BeneficiaryRequests
             </TableRow>
           ) : (
             requests.map((request) => (
-              <TableRow 
+              <TableRow
                 key={request.id}
                 className="cursor-pointer hover:bg-accent/50 transition-colors"
                 onClick={() => onViewDetails(request.id)}
               >
                 <TableCell className="font-medium font-mono">
-                  #{request.request_number || "—"}
+                  #{request.request_number || '—'}
                 </TableCell>
+                <TableCell>{request.request_types?.name_ar || '—'}</TableCell>
                 <TableCell>
-                  {request.request_types?.name_ar || "—"}
-                </TableCell>
-                <TableCell>
-                  {request.amount 
-                    ? `${Number(request.amount).toLocaleString("ar-SA")} ريال`
-                    : "—"}
+                  {request.amount ? `${Number(request.amount).toLocaleString('ar-SA')} ريال` : '—'}
                 </TableCell>
                 <TableCell>{getPriorityBadge(request.priority)}</TableCell>
                 <TableCell>
                   <SLAIndicator
                     slaDueAt={request.sla_due_at}
-                    status={request.status || "معلق"}
+                    status={request.status || 'معلق'}
                     showLabel={true}
                   />
                 </TableCell>
@@ -160,15 +148,12 @@ export const BeneficiaryRequestsDesktopTable = memo(function BeneficiaryRequests
                   />
                 </TableCell>
                 <TableCell>
-                  {request.created_at && format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
+                  {request.created_at &&
+                    format(new Date(request.created_at), 'dd/MM/yyyy', { locale: ar })}
                 </TableCell>
-                <TableCell>{getStatusBadge(request.status || "معلق")}</TableCell>
+                <TableCell>{getStatusBadge(request.status || 'معلق')}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onViewDetails(request.id)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => onViewDetails(request.id)}>
                     <Eye className="h-4 w-4 ms-1" />
                     عرض
                   </Button>

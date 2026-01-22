@@ -1,10 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse,
-  forbiddenResponse 
-} from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse, forbiddenResponse } from '../_shared/cors.ts';
 
 // ============ الأدوار المسموح لها بإقفال السنة المالية ============
 // السماح للناظر والمسؤول (admin) بإقفال السنة المالية
@@ -29,7 +24,7 @@ Deno.serve(async (req) => {
     // ✅ Health Check Support / Test Mode - يجب فحصه أولاً قبل أي شيء
     let bodyText = '';
     let parsedBody: any = null;
-    
+
     try {
       bodyText = await req.clone().text();
       if (bodyText) {
@@ -40,12 +35,12 @@ Deno.serve(async (req) => {
             status: 'healthy',
             function: 'auto-close-fiscal-year',
             timestamp: new Date().toISOString(),
-            testMode: parsedBody.testMode || false
+            testMode: parsedBody.testMode || false,
           });
         }
       }
-    } catch { 
-      // not JSON, continue 
+    } catch {
+      // not JSON, continue
     }
 
     // ============ التحقق من المصادقة والصلاحيات ============
@@ -56,14 +51,17 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.error('Invalid token for fiscal year close:', authError?.message);
       return forbiddenResponse('جلسة غير صالحة');
@@ -80,8 +78,8 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', user.id);
 
-    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
-    
+    const hasPermission = userRoles?.some((r) => ALLOWED_ROLES.includes(r.role));
+
     if (!hasPermission) {
       // تسجيل محاولة الوصول غير المصرح بها
       await supabase.from('audit_logs').insert({
@@ -90,7 +88,7 @@ Deno.serve(async (req) => {
         action_type: 'UNAUTHORIZED_FISCAL_CLOSE_ATTEMPT',
         table_name: 'fiscal_years',
         description: `محاولة إقفال سنة مالية غير مصرح بها من ${user.email}`,
-        severity: 'error'
+        severity: 'error',
       });
       return forbiddenResponse('ليس لديك صلاحية لإقفال السنة المالية. مطلوب دور ناظر.');
     }
@@ -99,7 +97,7 @@ Deno.serve(async (req) => {
     console.log(`Authorized fiscal year close by user: ${user.id}`);
 
     const body = await req.json();
-    
+
     // ✅ دعم وضع الاختبار حتى بعد التحقق من الصلاحيات
     if (body.testMode) {
       return jsonResponse({
@@ -107,10 +105,10 @@ Deno.serve(async (req) => {
         function: 'auto-close-fiscal-year',
         timestamp: new Date().toISOString(),
         testMode: true,
-        authorized: true
+        authorized: true,
       });
     }
-    
+
     const { fiscal_year_id, preview_only = false }: ClosingRequest = body;
 
     console.log('Starting fiscal year closing:', { fiscal_year_id, preview_only });
@@ -118,12 +116,14 @@ Deno.serve(async (req) => {
     // التحقق من صحة UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(fiscal_year_id)) {
-      console.log('[auto-close-fiscal-year] Invalid fiscal_year_id format, returning test response');
+      console.log(
+        '[auto-close-fiscal-year] Invalid fiscal_year_id format, returning test response'
+      );
       return jsonResponse({
         success: true,
         testMode: true,
         message: 'معرف السنة المالية غير صالح',
-        fiscal_year_id
+        fiscal_year_id,
       });
     }
 
@@ -143,10 +143,12 @@ Deno.serve(async (req) => {
     }
 
     // 2. حساب الملخص المالي
-    const { data: summary, error: summaryError } = await supabase
-      .rpc('calculate_fiscal_year_summary', {
-        p_fiscal_year_id: fiscal_year_id
-      });
+    const { data: summary, error: summaryError } = await supabase.rpc(
+      'calculate_fiscal_year_summary',
+      {
+        p_fiscal_year_id: fiscal_year_id,
+      }
+    );
 
     if (summaryError) {
       console.error('Error calculating summary:', summaryError);
@@ -158,20 +160,24 @@ Deno.serve(async (req) => {
     // 3. حساب الإيرادات والمصروفات التفصيلية
     const { data: revenues } = await supabase
       .from('journal_entry_lines')
-      .select(`
+      .select(
+        `
         account_id,
         credit_amount,
         accounts!inner(name_ar, account_type)
-      `)
+      `
+      )
       .eq('accounts.account_type', 'revenue');
 
     const { data: expenses } = await supabase
       .from('journal_entry_lines')
-      .select(`
+      .select(
+        `
         account_id,
         debit_amount,
         accounts!inner(name_ar, account_type)
-      `)
+      `
+      )
       .eq('accounts.account_type', 'expense');
 
     // 4. حساب توزيعات الورثة
@@ -201,7 +207,8 @@ Deno.serve(async (req) => {
     const corpusShare = (netIncome * corpusPercentage) / 100;
 
     // حساب رقبة الوقف (الفائض)
-    const waqfCorpus = netIncome - nazerShare - waqifShare - corpusShare - summary.beneficiary_distributions;
+    const waqfCorpus =
+      netIncome - nazerShare - waqifShare - corpusShare - summary.beneficiary_distributions;
 
     // 6. إنشاء قيد الإقفال المقترح
     const closingEntry = {
@@ -214,25 +221,25 @@ Deno.serve(async (req) => {
           account_name: 'الإيرادات',
           debit_amount: summary.total_revenues,
           credit_amount: 0,
-          description: 'إقفال حساب الإيرادات'
+          description: 'إقفال حساب الإيرادات',
         },
         {
           account_code: '5.1.1',
           account_name: 'المصروفات',
           debit_amount: 0,
           credit_amount: summary.total_expenses,
-          description: 'إقفال حساب المصروفات'
+          description: 'إقفال حساب المصروفات',
         },
         {
           account_code: '3.1.1',
           account_name: 'رقبة الوقف',
           debit_amount: 0,
           credit_amount: waqfCorpus,
-          description: 'الفائض المحول لرقبة الوقف'
-        }
+          description: 'الفائض المحول لرقبة الوقف',
+        },
       ],
       total_debit: summary.total_revenues,
-      total_credit: summary.total_expenses + waqfCorpus
+      total_credit: summary.total_expenses + waqfCorpus,
     };
 
     const response = {
@@ -255,7 +262,7 @@ Deno.serve(async (req) => {
       waqf_corpus: waqfCorpus,
       heir_distributions: typedHeirDistributions,
       can_close: true,
-      warnings: []
+      warnings: [],
     };
 
     // إذا كان preview_only، نرجع المعاينة فقط
@@ -277,16 +284,19 @@ Deno.serve(async (req) => {
 
     if (!accountsError && allAccounts) {
       for (const account of allAccounts) {
-        await supabase.from('account_year_balances').upsert({
-          account_id: account.id,
-          fiscal_year_id: fiscal_year_id,
-          closing_balance: account.current_balance || 0,
-          is_final: true,
-          closed_at: new Date().toISOString(),
-          closed_by: user.id
-        }, {
-          onConflict: 'account_id,fiscal_year_id'
-        });
+        await supabase.from('account_year_balances').upsert(
+          {
+            account_id: account.id,
+            fiscal_year_id: fiscal_year_id,
+            closing_balance: account.current_balance || 0,
+            is_final: true,
+            closed_at: new Date().toISOString(),
+            closed_by: user.id,
+          },
+          {
+            onConflict: 'account_id,fiscal_year_id',
+          }
+        );
       }
       console.log(`Saved closing balances for ${allAccounts.length} accounts`);
     }
@@ -301,7 +311,7 @@ Deno.serve(async (req) => {
         fiscal_year_id: fiscal_year_id,
         reference_type: 'fiscal_year_closing',
         reference_id: fiscal_year_id,
-        status: 'posted'
+        status: 'posted',
       })
       .select()
       .maybeSingle();
@@ -327,31 +337,29 @@ Deno.serve(async (req) => {
           line_number: i + 1,
           description: line.description,
           debit_amount: line.debit_amount,
-          credit_amount: line.credit_amount
+          credit_amount: line.credit_amount,
         });
       }
     }
 
     // إنشاء سجل الإقفال
-    const { error: closingError } = await supabase
-      .from('fiscal_year_closings')
-      .insert({
-        fiscal_year_id,
-        closing_date: new Date().toISOString(),
-        closing_type: 'automatic',
-        total_revenues: summary.total_revenues,
-        total_expenses: summary.total_expenses,
-        nazer_percentage: nazerPercentage,
-        nazer_share: nazerShare,
-        waqif_percentage: waqifPercentage,
-        waqif_share: waqifShare,
-        total_beneficiary_distributions: summary.beneficiary_distributions,
-        total_vat_collected: summary.vat_collected,
-        net_income: netIncome,
-        waqf_corpus: waqfCorpus,
-        closing_journal_entry_id: journalEntry.id,
-        heir_distributions: typedHeirDistributions
-      });
+    const { error: closingError } = await supabase.from('fiscal_year_closings').insert({
+      fiscal_year_id,
+      closing_date: new Date().toISOString(),
+      closing_type: 'automatic',
+      total_revenues: summary.total_revenues,
+      total_expenses: summary.total_expenses,
+      nazer_percentage: nazerPercentage,
+      nazer_share: nazerShare,
+      waqif_percentage: waqifPercentage,
+      waqif_share: waqifShare,
+      total_beneficiary_distributions: summary.beneficiary_distributions,
+      total_vat_collected: summary.vat_collected,
+      net_income: netIncome,
+      waqf_corpus: waqfCorpus,
+      closing_journal_entry_id: journalEntry.id,
+      heir_distributions: typedHeirDistributions,
+    });
 
     if (closingError) {
       console.error('Error creating closing record:', closingError);
@@ -373,7 +381,7 @@ Deno.serve(async (req) => {
 
     // 7.2 تصفير حسابات الإيرادات والمصروفات وإعداد السنة الجديدة
     console.log('Preparing for new fiscal year...');
-    
+
     // الحصول على السنة المالية النشطة الجديدة
     const { data: newFiscalYear } = await supabase
       .from('fiscal_years')
@@ -384,40 +392,49 @@ Deno.serve(async (req) => {
 
     if (newFiscalYear && allAccounts) {
       console.log('Creating opening balances for new fiscal year...');
-      
+
       for (const account of allAccounts) {
         // الأصول والالتزامات وحقوق الملكية تُرحّل
         // الإيرادات والمصروفات تبدأ من صفر
         const shouldCarryOver = ['asset', 'liability', 'equity'].includes(account.account_type);
-        const openingBalance = shouldCarryOver ? (account.current_balance || 0) : 0;
-        
-        await supabase.from('account_year_balances').upsert({
-          account_id: account.id,
-          fiscal_year_id: newFiscalYear.id,
-          opening_balance: openingBalance,
-          closing_balance: 0,
-          is_final: false
-        }, {
-          onConflict: 'account_id,fiscal_year_id'
-        });
+        const openingBalance = shouldCarryOver ? account.current_balance || 0 : 0;
+
+        await supabase.from('account_year_balances').upsert(
+          {
+            account_id: account.id,
+            fiscal_year_id: newFiscalYear.id,
+            opening_balance: openingBalance,
+            closing_balance: 0,
+            is_final: false,
+          },
+          {
+            onConflict: 'account_id,fiscal_year_id',
+          }
+        );
       }
-      
+
       // تصفير أرصدة حسابات الإيرادات والمصروفات في جدول الحسابات
       await supabase
         .from('accounts')
         .update({ current_balance: 0 })
         .in('account_type', ['revenue', 'expense']);
-      
+
       console.log('Opening balances created for new fiscal year');
     }
 
     // 8. إنشاء الإفصاح السنوي تلقائياً
     console.log('Creating annual disclosure...');
-    
+
     // حساب عدد الورثة حسب النوع
-    const sonsCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'ابن').length;
-    const daughtersCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'ابنة' || h.heir_type === 'بنت').length;
-    const wivesCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'زوجة').length;
+    const sonsCount = typedHeirDistributions.filter(
+      (h: HeirDistribution) => h.heir_type === 'ابن'
+    ).length;
+    const daughtersCount = typedHeirDistributions.filter(
+      (h: HeirDistribution) => h.heir_type === 'ابنة' || h.heir_type === 'بنت'
+    ).length;
+    const wivesCount = typedHeirDistributions.filter(
+      (h: HeirDistribution) => h.heir_type === 'زوجة'
+    ).length;
 
     // استخراج السنة من اسم السنة المالية
     const yearMatch = fiscalYear.name.match(/\d{4}/);
@@ -433,42 +450,40 @@ Deno.serve(async (req) => {
     const waqfName = waqfSettings?.waqf_name || 'وقف آل مرزوق';
 
     // إنشاء الإفصاح السنوي
-    const { error: disclosureError } = await supabase
-      .from('annual_disclosures')
-      .insert({
-        fiscal_year_id,
-        year: disclosureYear,
-        waqf_name: waqfName,
-        disclosure_date: new Date().toISOString().split('T')[0],
-        total_revenues: summary.total_revenues,
-        total_expenses: summary.total_expenses,
-        net_income: netIncome,
-        nazer_percentage: nazerPercentage,
-        nazer_share: nazerShare,
-        corpus_percentage: corpusPercentage,
-        corpus_share: waqfCorpus,
-        charity_percentage: waqifPercentage,
-        charity_share: waqifShare,
-        total_beneficiaries: typedHeirDistributions.length,
-        sons_count: sonsCount,
-        daughters_count: daughtersCount,
-        wives_count: wivesCount,
-        opening_balance: 0,
-        closing_balance: waqfCorpus,
-        administrative_expenses: summary.total_expenses * 0.3,
-        maintenance_expenses: summary.total_expenses * 0.4,
-        development_expenses: summary.total_expenses * 0.2,
-        other_expenses: summary.total_expenses * 0.1,
-        beneficiaries_details: typedHeirDistributions,
-        expenses_breakdown: {
-          administrative: summary.total_expenses * 0.3,
-          maintenance: summary.total_expenses * 0.4,
-          development: summary.total_expenses * 0.2,
-          other: summary.total_expenses * 0.1
-        },
-        status: 'draft',
-        published_at: null
-      });
+    const { error: disclosureError } = await supabase.from('annual_disclosures').insert({
+      fiscal_year_id,
+      year: disclosureYear,
+      waqf_name: waqfName,
+      disclosure_date: new Date().toISOString().split('T')[0],
+      total_revenues: summary.total_revenues,
+      total_expenses: summary.total_expenses,
+      net_income: netIncome,
+      nazer_percentage: nazerPercentage,
+      nazer_share: nazerShare,
+      corpus_percentage: corpusPercentage,
+      corpus_share: waqfCorpus,
+      charity_percentage: waqifPercentage,
+      charity_share: waqifShare,
+      total_beneficiaries: typedHeirDistributions.length,
+      sons_count: sonsCount,
+      daughters_count: daughtersCount,
+      wives_count: wivesCount,
+      opening_balance: 0,
+      closing_balance: waqfCorpus,
+      administrative_expenses: summary.total_expenses * 0.3,
+      maintenance_expenses: summary.total_expenses * 0.4,
+      development_expenses: summary.total_expenses * 0.2,
+      other_expenses: summary.total_expenses * 0.1,
+      beneficiaries_details: typedHeirDistributions,
+      expenses_breakdown: {
+        administrative: summary.total_expenses * 0.3,
+        maintenance: summary.total_expenses * 0.4,
+        development: summary.total_expenses * 0.2,
+        other: summary.total_expenses * 0.1,
+      },
+      status: 'draft',
+      published_at: null,
+    });
 
     if (disclosureError) {
       console.error('Error creating annual disclosure:', disclosureError);
@@ -485,17 +500,17 @@ Deno.serve(async (req) => {
       record_id: fiscal_year_id,
       description: `تم إقفال السنة المالية ${fiscalYear.name} بواسطة ${user.email}`,
       new_values: { waqf_corpus: waqfCorpus, net_income: netIncome },
-      severity: 'info'
+      severity: 'info',
     });
 
-    return jsonResponse({ 
-      success: true, 
+    return jsonResponse({
+      success: true,
       message: 'تم إقفال السنة المالية بنجاح',
-      data: response 
+      data: response,
     });
-
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إقفال السنة المالية';
+    const errorMessage =
+      error instanceof Error ? error.message : 'حدث خطأ أثناء إقفال السنة المالية';
     console.error('Error in auto-close-fiscal-year:', error);
     return errorResponse(errorMessage, 400);
   }

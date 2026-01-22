@@ -42,7 +42,12 @@ const PAYMENT_METHODS = [
   { value: 'شيك', label: 'شيك', icon: FileText },
 ];
 
-export function QuickPaymentDialog({ open, onOpenChange, onConfirm, isLoading }: QuickPaymentDialogProps) {
+export function QuickPaymentDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isLoading,
+}: QuickPaymentDialogProps) {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'نقدي' | 'شبكة' | 'تحويل' | 'شيك'>('نقدي');
   const [expenseCategory, setExpenseCategory] = useState('');
@@ -186,10 +191,17 @@ export function QuickPaymentDialog({ open, onOpenChange, onConfirm, isLoading }:
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               variant="destructive"
-              disabled={isLoading || !amount || !expenseCategory || !payeeName || !description || (needsReference && !referenceNumber)}
+              disabled={
+                isLoading ||
+                !amount ||
+                !expenseCategory ||
+                !payeeName ||
+                !description ||
+                (needsReference && !referenceNumber)
+              }
             >
               {isLoading ? 'جاري الصرف...' : 'تأكيد الصرف'}
             </Button>

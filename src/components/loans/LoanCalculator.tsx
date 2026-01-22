@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Calculator } from "lucide-react";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Calculator } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 interface LoanScheduleItem {
   month: number;
@@ -29,13 +29,14 @@ export function LoanCalculator() {
 
   const calculateLoan = () => {
     let monthlyPayment: number;
-    
+
     if (rate === 0) {
       monthlyPayment = principal / months;
     } else {
       const monthlyRate = rate / 12 / 100;
-      monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
-                       (Math.pow(1 + monthlyRate, months) - 1);
+      monthlyPayment =
+        (principal * (monthlyRate * Math.pow(1 + monthlyRate, months))) /
+        (Math.pow(1 + monthlyRate, months) - 1);
     }
 
     let remainingBalance = principal;
@@ -152,9 +153,7 @@ export function LoanCalculator() {
                     <TableBody>
                       {schedule.map((item) => (
                         <TableRow key={item.month}>
-                          <TableCell className="text-center font-medium">
-                            {item.month}
-                          </TableCell>
+                          <TableCell className="text-center font-medium">{item.month}</TableCell>
                           <TableCell className="text-center">
                             {item.payment.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                           </TableCell>

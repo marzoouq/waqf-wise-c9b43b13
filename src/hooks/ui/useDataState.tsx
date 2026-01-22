@@ -44,7 +44,7 @@ export interface DataStateResult {
 
 /**
  * Hook موحد لمعالجة حالات البيانات الثلاث (Loading/Error/Empty)
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading, error, refetch } = useQuery(...);
@@ -56,9 +56,9 @@ export interface DataStateResult {
  *   loadingMessage: "جاري التحميل...",
  *   emptyTitle: "لا توجد بيانات"
  * });
- * 
+ *
  * if (!isReady) return StateComponent;
- * 
+ *
  * // عرض البيانات
  * return <DataView data={data} />;
  * ```
@@ -88,13 +88,7 @@ export function useDataState<T>({
   if (error) {
     return {
       isReady: false,
-      StateComponent: (
-        <ErrorState
-          title={errorTitle}
-          message={errorMessage}
-          onRetry={refetch}
-        />
-      ),
+      StateComponent: <ErrorState title={errorTitle} message={errorMessage} onRetry={refetch} />,
     };
   }
 
@@ -106,13 +100,7 @@ export function useDataState<T>({
   if (isDataEmpty) {
     return {
       isReady: false,
-      StateComponent: (
-        <EmptyState
-          icon={emptyIcon}
-          title={emptyTitle}
-          description={emptyMessage}
-        />
-      ),
+      StateComponent: <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyMessage} />,
     };
   }
 

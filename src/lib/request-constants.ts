@@ -39,16 +39,34 @@ export const PRIORITY_OPTIONS = [
 ];
 
 // ألوان شارات الحالة
-export const STATUS_BADGE_STYLES: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }> = {
-  [REQUEST_STATUS.PENDING]: { variant: 'secondary', className: 'bg-warning/10 text-warning border-warning/30' },
-  [REQUEST_STATUS.IN_PROGRESS]: { variant: 'default', className: 'bg-primary/10 text-primary border-primary/30' },
-  [REQUEST_STATUS.APPROVED]: { variant: 'default', className: 'bg-success/10 text-success border-success/30' },
+export const STATUS_BADGE_STYLES: Record<
+  string,
+  { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string }
+> = {
+  [REQUEST_STATUS.PENDING]: {
+    variant: 'secondary',
+    className: 'bg-warning/10 text-warning border-warning/30',
+  },
+  [REQUEST_STATUS.IN_PROGRESS]: {
+    variant: 'default',
+    className: 'bg-primary/10 text-primary border-primary/30',
+  },
+  [REQUEST_STATUS.APPROVED]: {
+    variant: 'default',
+    className: 'bg-success/10 text-success border-success/30',
+  },
   [REQUEST_STATUS.REJECTED]: { variant: 'destructive' },
-  [REQUEST_STATUS.COMPLETED]: { variant: 'default', className: 'bg-success/10 text-success border-success/30' },
+  [REQUEST_STATUS.COMPLETED]: {
+    variant: 'default',
+    className: 'bg-success/10 text-success border-success/30',
+  },
 };
 
 // ألوان شارات الأولوية
-export const PRIORITY_BADGE_STYLES: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+export const PRIORITY_BADGE_STYLES: Record<
+  string,
+  { variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   [REQUEST_PRIORITY.LOW]: { variant: 'secondary' },
   [REQUEST_PRIORITY.MEDIUM]: { variant: 'outline' },
   [REQUEST_PRIORITY.HIGH]: { variant: 'default' },

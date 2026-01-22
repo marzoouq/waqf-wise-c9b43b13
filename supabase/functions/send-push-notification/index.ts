@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 100 إشعار/دقيقة لكل مستخدم ============
@@ -16,16 +16,16 @@ const RATE_WINDOW = 60 * 1000; // 1 minute
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -38,7 +38,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -54,7 +54,7 @@ serve(async (req) => {
         status: 'healthy',
         function: 'send-push-notification',
         timestamp: new Date().toISOString(),
-        version: '2.1.0'
+        version: '2.1.0',
       });
     }
 
@@ -70,20 +70,20 @@ serve(async (req) => {
     );
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return unauthorizedResponse('Invalid or expired token');
     }
 
     // التحقق من الصلاحيات - فقط المسؤولون يمكنهم إرسال إشعارات
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const isAdmin = roles?.some(r => ['admin', 'nazer'].includes(r.role));
-    
+    const isAdmin = roles?.some((r) => ['admin', 'nazer'].includes(r.role));
+
     if (!isAdmin) {
       return forbiddenResponse('Unauthorized - Admin access required');
     }
@@ -126,7 +126,7 @@ serve(async (req) => {
         // في الإنتاج، يجب استخدام web-push library
         // هنا نسجل فقط محاولة الإرسال
         console.log('Sending push notification to:', subscription.endpoint);
-        
+
         // تحديث آخر استخدام
         await supabase
           .from('push_subscriptions')
@@ -149,28 +149,23 @@ serve(async (req) => {
     }
 
     // إنشاء إشعار داخلي أيضاً
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: userId,
-        title,
-        message: notificationBody,
-        type: 'info',
-        action_url: actionUrl,
-        is_read: false,
-      });
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      title,
+      message: notificationBody,
+      type: 'info',
+      action_url: actionUrl,
+      is_read: false,
+    });
 
     return jsonResponse({
       success: true,
       results,
-      sent: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      sent: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
     });
   } catch (error) {
     console.error('Push notification error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

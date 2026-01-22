@@ -23,6 +23,7 @@
 ```
 
 **الحماية:**
+
 - `prevent_hard_delete_financial()` trigger يمنع DELETE
 - رسالة الخطأ: "الحذف الفيزيائي ممنوع في نظام الوقف المالي"
 
@@ -35,6 +36,7 @@
 ```
 
 **الحماية:**
+
 - `protect_created_at()` trigger يمنع تعديل created_at
 - رسالة الخطأ: "تعديل created_at ممنوع - الختم الزمني غير قابل للتغيير"
 
@@ -51,6 +53,7 @@
 ```
 
 **الحماية:**
+
 - `enforce_dual_control()` trigger يفحص الشرط
 - رسالة الخطأ: "المبالغ الكبيرة تتطلب موافقة من شخص مختلف عن المنشئ"
 
@@ -65,6 +68,7 @@
 ```
 
 **الحماية:**
+
 - `immutable_audit_logs()` trigger
 - REVOKE UPDATE, DELETE ON audit_logs FROM authenticated/anon
 
@@ -109,69 +113,69 @@ SET session_replication_role = replica; -- (maintenance mode فقط)
 
 ## 1. النزاهة المالية
 
-| القاعدة | الحماية | الجدول |
-|---------|---------|--------|
-| كل `payment_voucher` له `voucher_number` فريد | UNIQUE constraint | `payment_vouchers` |
-| كل `journal_entry` له `entry_number` فريد | UNIQUE constraint | `journal_entries` |
-| كل `invoice` له `invoice_number` فريد | UNIQUE constraint | `invoices` |
-| لا يمكن حذف `contract` له `payment_vouchers` | ON DELETE RESTRICT + Soft Delete | `payment_vouchers` |
-| لا يمكن حذف `beneficiary` له `loans` | ON DELETE RESTRICT + Soft Delete | `loans` |
-| لا يمكن حذف `beneficiary` له `distribution_details` | ON DELETE RESTRICT | `distribution_details` |
-| **الحذف الفيزيائي ممنوع** | Trigger + Soft Delete | جميع الجداول المالية |
+| القاعدة                                             | الحماية                          | الجدول                 |
+| --------------------------------------------------- | -------------------------------- | ---------------------- |
+| كل `payment_voucher` له `voucher_number` فريد       | UNIQUE constraint                | `payment_vouchers`     |
+| كل `journal_entry` له `entry_number` فريد           | UNIQUE constraint                | `journal_entries`      |
+| كل `invoice` له `invoice_number` فريد               | UNIQUE constraint                | `invoices`             |
+| لا يمكن حذف `contract` له `payment_vouchers`        | ON DELETE RESTRICT + Soft Delete | `payment_vouchers`     |
+| لا يمكن حذف `beneficiary` له `loans`                | ON DELETE RESTRICT + Soft Delete | `loans`                |
+| لا يمكن حذف `beneficiary` له `distribution_details` | ON DELETE RESTRICT               | `distribution_details` |
+| **الحذف الفيزيائي ممنوع**                           | Trigger + Soft Delete            | جميع الجداول المالية   |
 
 ---
 
 ## 2. نزاهة العقارات
 
-| القاعدة | الحماية | الجدول |
-|---------|---------|--------|
+| القاعدة                                             | الحماية                           | الجدول           |
+| --------------------------------------------------- | --------------------------------- | ---------------- |
 | كل `property_unit` له `unit_number` فريد ضمن العقار | UNIQUE (property_id, unit_number) | `property_units` |
-| `property.total_units` يُحدّث تلقائياً | Trigger + Fallback code | `properties` |
+| `property.total_units` يُحدّث تلقائياً              | Trigger + Fallback code           | `properties`     |
 
 ---
 
 ## 3. نزاهة الصلاحيات
 
-| القاعدة | الحماية |
-|---------|---------|
-| `user_roles` محمية بـ RLS | 4 policies + 5 audit triggers |
-| تغيير الدور يُسجّل في `audit_logs` | Trigger on UPDATE/DELETE |
-| المبالغ > 10,000 تتطلب صلاحية مالية | `enforce_dual_control()` trigger |
+| القاعدة                                | الحماية                          |
+| -------------------------------------- | -------------------------------- |
+| `user_roles` محمية بـ RLS              | 4 policies + 5 audit triggers    |
+| تغيير الدور يُسجّل في `audit_logs`     | Trigger on UPDATE/DELETE         |
+| المبالغ > 10,000 تتطلب صلاحية مالية    | `enforce_dual_control()` trigger |
 | التوزيعات > 50,000 تتطلب موافقة الناظر | `enforce_dual_control()` trigger |
 
 ---
 
 ## 4. نزاهة التوزيع
 
-| القاعدة | الحماية |
-|---------|---------|
-| 3 موافقات مطلوبة للاعتماد | Workflow system |
-| لا يمكن حذف توزيع له تفاصيل | ON DELETE RESTRICT + Soft Delete |
+| القاعدة                      | الحماية                          |
+| ---------------------------- | -------------------------------- |
+| 3 موافقات مطلوبة للاعتماد    | Workflow system                  |
+| لا يمكن حذف توزيع له تفاصيل  | ON DELETE RESTRICT + Soft Delete |
 | فصل الولاية للمبالغ > 50,000 | `enforce_dual_control()` trigger |
 
 ---
 
 ## 5. Idempotency Rules
 
-| العملية | الحماية | السلوك عند التكرار |
-|---------|---------|-------------------|
-| إنشاء وحدة عقارية | UNIQUE + isUniqueViolation() | إرجاع الوحدة الموجودة |
-| إنشاء سند قبض | UNIQUE voucher_number | رفض مع error |
-| إنشاء قيد محاسبي | UNIQUE entry_number | رفض مع error |
-| حذف سجل مالي | Soft Delete | تحديث deleted_at (idempotent) |
+| العملية           | الحماية                      | السلوك عند التكرار            |
+| ----------------- | ---------------------------- | ----------------------------- |
+| إنشاء وحدة عقارية | UNIQUE + isUniqueViolation() | إرجاع الوحدة الموجودة         |
+| إنشاء سند قبض     | UNIQUE voucher_number        | رفض مع error                  |
+| إنشاء قيد محاسبي  | UNIQUE entry_number          | رفض مع error                  |
+| حذف سجل مالي      | Soft Delete                  | تحديث deleted_at (idempotent) |
 
 ---
 
 ## 6. Retry Safety
 
-| العملية | آمنة للـ Retry | السبب |
-|---------|---------------|-------|
-| SELECT | ✅ نعم | لا تغيير |
-| INSERT مع UNIQUE | ✅ نعم | Constraint يمنع التكرار |
-| INSERT بدون UNIQUE | ❌ لا | قد يُنشئ تكرارات |
-| UPDATE | ⚠️ حذر | Idempotent إذا كانت القيم ثابتة |
-| DELETE (Hard) | ⛔ ممنوع | استخدم Soft Delete |
-| Soft Delete | ✅ نعم | تحديث deleted_at = idempotent |
+| العملية            | آمنة للـ Retry | السبب                           |
+| ------------------ | -------------- | ------------------------------- |
+| SELECT             | ✅ نعم         | لا تغيير                        |
+| INSERT مع UNIQUE   | ✅ نعم         | Constraint يمنع التكرار         |
+| INSERT بدون UNIQUE | ❌ لا          | قد يُنشئ تكرارات                |
+| UPDATE             | ⚠️ حذر         | Idempotent إذا كانت القيم ثابتة |
+| DELETE (Hard)      | ⛔ ممنوع       | استخدم Soft Delete              |
+| Soft Delete        | ✅ نعم         | تحديث deleted_at = idempotent   |
 
 ---
 
@@ -236,11 +240,12 @@ if (isUniqueViolation(error)) {
 }
 
 // ✅ صحيح (Soft Delete بدلاً من Hard Delete)
-await supabase.from('payment_vouchers')
-  .update({ 
+await supabase
+  .from('payment_vouchers')
+  .update({
     deleted_at: new Date().toISOString(),
     deleted_by: userId,
-    deletion_reason: 'سبب الحذف'
+    deletion_reason: 'سبب الحذف',
   })
   .eq('id', voucherId);
 ```

@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, Building2 } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { useToast } from "@/hooks/ui/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, Building2 } from 'lucide-react';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { useToast } from '@/hooks/ui/use-toast';
 import {
   Table,
   TableBody,
@@ -12,20 +12,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
-import { usePropertiesReport } from "@/hooks/reports/usePropertiesReport";
-import { matchesStatus } from "@/lib/constants";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { ReportRefreshIndicator } from './ReportRefreshIndicator';
+import { usePropertiesReport } from '@/hooks/reports/usePropertiesReport';
+import { matchesStatus } from '@/lib/constants';
 
 export function PropertiesReports() {
   const { toast } = useToast();
-  const { properties, isLoading, isRefetching, lastUpdated, handleRefresh, error } = usePropertiesReport();
+  const { properties, isLoading, isRefetching, lastUpdated, handleRefresh, error } =
+    usePropertiesReport();
 
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
-    const { exportToPDF } = await import("@/lib/exportHelpers");
-    const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
+    const { exportToPDF } = await import('@/lib/exportHelpers');
+    const headers = ['اسم العقار', 'الموقع', 'نوع العقار', 'الحالة', 'الإيجار الشهري'];
     const data = properties.map((p) => {
       const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
       return [
@@ -34,42 +35,40 @@ export function PropertiesReports() {
         p.type,
         p.status,
         activeContract
-          ? `${Number(activeContract.monthly_rent).toLocaleString("ar-SA")} ريال`
-          : "-",
+          ? `${Number(activeContract.monthly_rent).toLocaleString('ar-SA')} ريال`
+          : '-',
       ];
     });
 
-    exportToPDF("تقرير العقارات", headers, data, "properties_report");
+    exportToPDF('تقرير العقارات', headers, data, 'properties_report');
 
     toast({
-      title: "تم التصدير",
-      description: "تم تصدير تقرير العقارات بنجاح",
+      title: 'تم التصدير',
+      description: 'تم تصدير تقرير العقارات بنجاح',
     });
   };
 
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportExcel = async () => {
-    const { exportToExcel } = await import("@/lib/exportHelpers");
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = properties.map((p) => {
       const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
       return {
-        "اسم العقار": p.name,
+        'اسم العقار': p.name,
         الموقع: p.location,
-        "نوع العقار": p.type,
+        'نوع العقار': p.type,
         الحالة: p.status,
-        "المستأجر الحالي": activeContract?.tenant_name || "-",
-        "الإيجار الشهري": activeContract
-          ? Number(activeContract.monthly_rent)
-          : 0,
-        "تاريخ الإضافة": new Date(p.created_at).toLocaleDateString("ar-SA"),
+        'المستأجر الحالي': activeContract?.tenant_name || '-',
+        'الإيجار الشهري': activeContract ? Number(activeContract.monthly_rent) : 0,
+        'تاريخ الإضافة': new Date(p.created_at).toLocaleDateString('ar-SA'),
       };
     });
 
-    exportToExcel(data, "properties_report", "العقارات");
+    exportToExcel(data, 'properties_report', 'العقارات');
 
     toast({
-      title: "تم التصدير",
-      description: "تم تصدير تقرير العقارات بنجاح",
+      title: 'تم التصدير',
+      description: 'تم تصدير تقرير العقارات بنجاح',
     });
   };
 
@@ -78,7 +77,13 @@ export function PropertiesReports() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل تقرير العقارات" onRetry={handleRefresh} />;
+    return (
+      <ErrorState
+        title="خطأ في التحميل"
+        message="فشل تحميل تقرير العقارات"
+        onRetry={handleRefresh}
+      />
+    );
   }
 
   if (properties.length === 0) {
@@ -95,15 +100,15 @@ export function PropertiesReports() {
   const totalMonthlyRent = properties.reduce((sum, p) => {
     const activeContract = p.contracts?.find((c) => matchesStatus(c.status, 'active'));
     if (!activeContract) return sum;
-    
+
     const rent = Number(activeContract.monthly_rent) || 0;
     const frequency = activeContract.payment_frequency;
-    
+
     // تحويل إلى قيمة شهرية موحدة
     if (frequency === 'سنوي' || frequency === 'annual') {
-      return sum + (rent / 12);
+      return sum + rent / 12;
     } else if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
-      return sum + (rent / 3);
+      return sum + rent / 3;
     }
     return sum + rent; // شهري
   }, 0);
@@ -146,8 +151,8 @@ export function PropertiesReports() {
             </TableHeader>
             <TableBody>
               {properties.map((property) => {
-                const activeContract = property.contracts?.find(
-                  (c: { status: string }) => matchesStatus(c.status, 'active')
+                const activeContract = property.contracts?.find((c: { status: string }) =>
+                  matchesStatus(c.status, 'active')
                 );
                 return (
                   <TableRow key={property.id}>
@@ -157,21 +162,15 @@ export function PropertiesReports() {
                       <Badge variant="outline">{property.type}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          property.status === "متاح" ? "default" : "secondary"
-                        }
-                      >
+                      <Badge variant={property.status === 'متاح' ? 'default' : 'secondary'}>
                         {property.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{activeContract?.tenant_name || "-"}</TableCell>
+                    <TableCell>{activeContract?.tenant_name || '-'}</TableCell>
                     <TableCell className="text-left font-mono">
                       {activeContract
-                        ? Number(activeContract.monthly_rent).toLocaleString(
-                            "ar-SA"
-                          ) + " ريال"
-                        : "-"}
+                        ? Number(activeContract.monthly_rent).toLocaleString('ar-SA') + ' ريال'
+                        : '-'}
                     </TableCell>
                   </TableRow>
                 );
@@ -180,12 +179,9 @@ export function PropertiesReports() {
           </Table>
         </div>
         <div className="mt-4 flex justify-between text-sm">
-          <span className="text-muted-foreground">
-            إجمالي العقارات: {properties.length}
-          </span>
+          <span className="text-muted-foreground">إجمالي العقارات: {properties.length}</span>
           <span className="font-semibold">
-            إجمالي الإيجارات الشهرية:{" "}
-            {totalMonthlyRent.toLocaleString("ar-SA")} ريال
+            إجمالي الإيجارات الشهرية: {totalMonthlyRent.toLocaleString('ar-SA')} ريال
           </span>
         </div>
       </CardContent>

@@ -3,8 +3,8 @@
  * @version 2.8.28
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 type BankIntegrationRow = Database['public']['Tables']['bank_integrations']['Row'];
 type PaymentGatewayRow = Database['public']['Tables']['payment_gateways']['Row'];
@@ -16,10 +16,10 @@ export class IntegrationService {
    */
   static async getBankIntegrations(): Promise<BankIntegrationRow[]> {
     const { data, error } = await supabase
-      .from("bank_integrations")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
+      .from('bank_integrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
   }
@@ -29,10 +29,10 @@ export class IntegrationService {
    */
   static async getPaymentGateways(): Promise<PaymentGatewayRow[]> {
     const { data, error } = await supabase
-      .from("payment_gateways")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
+      .from('payment_gateways')
+      .select('*')
+      .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
   }
@@ -42,10 +42,10 @@ export class IntegrationService {
    */
   static async getGovernmentIntegrations(): Promise<GovernmentIntegrationRow[]> {
     const { data, error } = await supabase
-      .from("government_integrations")
-      .select("*")
-      .order("created_at", { ascending: false });
-    
+      .from('government_integrations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
   }

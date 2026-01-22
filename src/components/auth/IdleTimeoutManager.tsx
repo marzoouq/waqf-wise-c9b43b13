@@ -1,18 +1,18 @@
-import { useEffect, useCallback, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/auth/useUserRole";
-import { useIdleTimeout } from "@/hooks/auth/useIdleTimeout";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { AuthService } from "@/services";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useEffect, useCallback, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/auth/useUserRole';
+import { useIdleTimeout } from '@/hooks/auth/useIdleTimeout';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { AuthService } from '@/services';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * مكون لإدارة الخروج التلقائي للمستفيدين عند عدم النشاط
  * - يعمل فقط للمستفيدين
  * - مهلة: 5 دقائق
  * - ينظف الحالة تلقائياً عند الخروج
- * 
+ *
  * ✅ آمن: يتحقق من وجود المستخدم قبل أي عملية
  */
 export function IdleTimeoutManager() {
@@ -30,7 +30,7 @@ export function IdleTimeoutManager() {
 
   // حساب حالة التفعيل - انتظار اكتمال تحميل الأدوار بالكامل
   const isReady = isInitialized && !authLoading && !roleLoading;
-  
+
   // ✅ إصلاح: تفعيل المؤقت فقط بعد التأكد من تحميل الأدوار بالكامل
   // وعدم كون المستخدم مشرف أو مدير نظام
   const shouldEnable = isReady && !!user && !isNazer && !isAdmin;
@@ -42,15 +42,15 @@ export function IdleTimeoutManager() {
 
     productionLogger.info('خروج تلقائي بسبب عدم النشاط');
 
-    toast.warning("تم تسجيل خروجك تلقائياً", {
-      description: "لم يتم اكتشاف أي نشاط لمدة 5 دقائق",
+    toast.warning('تم تسجيل خروجك تلقائياً', {
+      description: 'لم يتم اكتشاف أي نشاط لمدة 5 دقائق',
       duration: 5000,
     });
 
     try {
       // تنظيف localStorage
       const keysToKeep = ['theme'];
-      Object.keys(localStorage).forEach(key => {
+      Object.keys(localStorage).forEach((key) => {
         if (!keysToKeep.includes(key)) {
           localStorage.removeItem(key);
         }

@@ -9,14 +9,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Paperclip, 
-  Download, 
-  FileText, 
-  Image as ImageIcon, 
+import {
+  Paperclip,
+  Download,
+  FileText,
+  Image as ImageIcon,
   FileSpreadsheet,
   File,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -40,7 +40,8 @@ interface Attachment {
 const getFileIcon = (fileType: string) => {
   if (fileType.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
   if (fileType.includes('pdf')) return <FileText className="h-4 w-4" />;
-  if (fileType.includes('sheet') || fileType.includes('excel')) return <FileSpreadsheet className="h-4 w-4" />;
+  if (fileType.includes('sheet') || fileType.includes('excel'))
+    return <FileSpreadsheet className="h-4 w-4" />;
   return <File className="h-4 w-4" />;
 };
 
@@ -101,7 +102,7 @@ export const RequestAttachments = memo(({ requestId }: RequestAttachmentsProps) 
           </div>
           <Badge variant="secondary">{attachments.length}</Badge>
         </div>
-        
+
         <div className="space-y-2">
           {attachments.map((attachment) => (
             <div
@@ -113,9 +114,7 @@ export const RequestAttachments = memo(({ requestId }: RequestAttachmentsProps) 
                   {getFileIcon(attachment.file_type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {attachment.file_name}
-                  </p>
+                  <p className="text-sm font-medium truncate">{attachment.file_name}</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{formatFileSize(attachment.file_size)}</span>
                     <span>•</span>
@@ -125,7 +124,7 @@ export const RequestAttachments = memo(({ requestId }: RequestAttachmentsProps) 
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-1">
                 <Button
                   size="icon"
@@ -136,12 +135,7 @@ export const RequestAttachments = memo(({ requestId }: RequestAttachmentsProps) 
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  asChild
-                >
+                <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
                   <a href={attachment.file_path} download={attachment.file_name} title="تحميل">
                     <Download className="h-4 w-4" />
                   </a>

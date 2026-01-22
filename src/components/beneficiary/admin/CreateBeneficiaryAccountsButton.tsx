@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { UserPlus, Loader2 } from "lucide-react";
-import { BeneficiaryService, EdgeFunctionService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { logger } from "@/lib/logger";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { UserPlus, Loader2 } from 'lucide-react';
+import { BeneficiaryService, EdgeFunctionService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { logger } from '@/lib/logger';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,8 +14,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CreateResult {
   beneficiary_id: string;
@@ -58,9 +58,9 @@ export function CreateBeneficiaryAccountsButton() {
     setLoadingBeneficiaries(true);
     try {
       const { data } = await BeneficiaryService.getAll({ status: 'all' });
-      const eligible = data.filter(b => b.can_login);
-      
-      const mappedData = eligible.map(b => ({
+      const eligible = data.filter((b) => b.can_login);
+
+      const mappedData = eligible.map((b) => ({
         id: b.id,
         full_name: b.full_name,
         national_id: b.national_id,
@@ -69,22 +69,22 @@ export function CreateBeneficiaryAccountsButton() {
 
       setEligibleBeneficiaries(mappedData);
       // تحديد الكل افتراضياً
-      setSelectedIds(new Set(mappedData.map(b => b.id)));
-      
+      setSelectedIds(new Set(mappedData.map((b) => b.id)));
+
       if (mappedData.length > 0) {
         setShowSelectionDialog(true);
       } else {
         toast({
-          title: "لا توجد مستفيدين مؤهلين",
-          description: "لا يوجد مستفيدين مفعل لهم خاصية تسجيل الدخول",
+          title: 'لا توجد مستفيدين مؤهلين',
+          description: 'لا يوجد مستفيدين مفعل لهم خاصية تسجيل الدخول',
         });
       }
     } catch (error) {
       logger.error(error, { context: 'fetch_eligible_beneficiaries' });
       toast({
-        title: "خطأ في جلب البيانات",
-        description: "حدث خطأ أثناء جلب المستفيدين",
-        variant: "destructive",
+        title: 'خطأ في جلب البيانات',
+        description: 'حدث خطأ أثناء جلب المستفيدين',
+        variant: 'destructive',
       });
     } finally {
       setLoadingBeneficiaries(false);
@@ -105,16 +105,16 @@ export function CreateBeneficiaryAccountsButton() {
     if (selectedIds.size === eligibleBeneficiaries.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(eligibleBeneficiaries.map(b => b.id)));
+      setSelectedIds(new Set(eligibleBeneficiaries.map((b) => b.id)));
     }
   };
 
   const handleCreate = async () => {
     if (selectedIds.size === 0) {
       toast({
-        title: "لم يتم تحديد مستفيدين",
-        description: "يرجى تحديد مستفيد واحد على الأقل",
-        variant: "destructive",
+        title: 'لم يتم تحديد مستفيدين',
+        description: 'يرجى تحديد مستفيد واحد على الأقل',
+        variant: 'destructive',
       });
       return;
     }
@@ -122,7 +122,7 @@ export function CreateBeneficiaryAccountsButton() {
     setLoading(true);
     try {
       const result = await EdgeFunctionService.invokeCreateBeneficiaryAccounts({
-        beneficiary_ids: Array.from(selectedIds)
+        beneficiary_ids: Array.from(selectedIds),
       });
 
       if (!result.success) throw new Error(result.error);
@@ -138,13 +138,13 @@ export function CreateBeneficiaryAccountsButton() {
 
       if (data.created > 0) {
         toast({
-          title: "تم إنشاء الحسابات بنجاح",
+          title: 'تم إنشاء الحسابات بنجاح',
           description: `تم إنشاء ${data.created} حساب من أصل ${data.total}`,
         });
       } else {
         toast({
-          title: "لا توجد حسابات للإنشاء",
-          description: "جميع المستفيدين المحددين لديهم حسابات بالفعل",
+          title: 'لا توجد حسابات للإنشاء',
+          description: 'جميع المستفيدين المحددين لديهم حسابات بالفعل',
         });
       }
 
@@ -154,9 +154,9 @@ export function CreateBeneficiaryAccountsButton() {
       logger.error(error, { context: 'create_beneficiary_accounts' });
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحسابات';
       toast({
-        title: "خطأ في إنشاء الحسابات",
+        title: 'خطأ في إنشاء الحسابات',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -185,10 +185,11 @@ export function CreateBeneficiaryAccountsButton() {
           <AlertDialogHeader>
             <AlertDialogTitle>اختيار المستفيدين لإنشاء الحسابات</AlertDialogTitle>
             <AlertDialogDescription>
-              يرجى تحديد المستفيدين الذين تريد إنشاء حسابات لهم ({selectedIds.size} من {eligibleBeneficiaries.length} محدد)
+              يرجى تحديد المستفيدين الذين تريد إنشاء حسابات لهم ({selectedIds.size} من{' '}
+              {eligibleBeneficiaries.length} محدد)
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
+
           <div className="space-y-4">
             <div className="flex items-center space-x-2 space-x-reverse pb-2 border-b">
               <Checkbox
@@ -216,14 +217,9 @@ export function CreateBeneficiaryAccountsButton() {
                       checked={selectedIds.has(beneficiary.id)}
                       onCheckedChange={() => toggleSelection(beneficiary.id)}
                     />
-                    <label
-                      htmlFor={beneficiary.id}
-                      className="flex-1 cursor-pointer space-y-1"
-                    >
+                    <label htmlFor={beneficiary.id} className="flex-1 cursor-pointer space-y-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium leading-none">
-                          {beneficiary.full_name}
-                        </p>
+                        <p className="text-sm font-medium leading-none">{beneficiary.full_name}</p>
                         {beneficiary.user_id && (
                           <span className="text-xs bg-info/10 text-info px-2 py-0.5 rounded">
                             لديه حساب
@@ -244,7 +240,7 @@ export function CreateBeneficiaryAccountsButton() {
             <AlertDialogCancel onClick={() => setShowSelectionDialog(false)}>
               إلغاء
             </AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => {
                 setShowSelectionDialog(false);
                 setShowDialog(true);
@@ -263,9 +259,7 @@ export function CreateBeneficiaryAccountsButton() {
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد إنشاء الحسابات</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>
-                سيتم إنشاء حسابات تسجيل الدخول لـ {selectedIds.size} مستفيد.
-              </p>
+              <p>سيتم إنشاء حسابات تسجيل الدخول لـ {selectedIds.size} مستفيد.</p>
               <div className="bg-primary/10 p-3 rounded-lg space-y-1">
                 <p className="font-semibold text-sm">معلومات تسجيل الدخول:</p>
                 <p className="text-sm">• البريد الإلكتروني: رقم_الهوية@waqf.internal</p>
@@ -274,11 +268,9 @@ export function CreateBeneficiaryAccountsButton() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowSelectionDialog(true)}>
-              رجوع
-            </AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setShowSelectionDialog(true)}>رجوع</AlertDialogCancel>
             <AlertDialogAction onClick={handleCreate} disabled={loading}>
-              {loading ? "جاري الإنشاء..." : "إنشاء الحسابات"}
+              {loading ? 'جاري الإنشاء...' : 'إنشاء الحسابات'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -312,9 +304,7 @@ export function CreateBeneficiaryAccountsButton() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={() => setResults(null)}>
-                إغلاق
-              </AlertDialogAction>
+              <AlertDialogAction onClick={() => setResults(null)}>إغلاق</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

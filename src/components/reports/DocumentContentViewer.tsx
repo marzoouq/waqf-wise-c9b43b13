@@ -2,12 +2,12 @@
  * عارض محتوى المستندات الذكي
  * يعرض المحتوى المستخرج من الملفات كجداول تفاعلية
  */
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Table,
   TableBody,
@@ -15,20 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Search,
-  FileText,
-  Download,
-  Eye
-} from "lucide-react";
+} from '@/components/ui/table';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, ChevronUp, Search, FileText, Download, Eye } from 'lucide-react';
 
 export interface DocumentItem {
   date?: string;
@@ -61,7 +50,7 @@ export function DocumentContentViewer({
   onDownload,
 }: DocumentContentViewerProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const filteredItems = content.items.filter(
     (item) =>
@@ -70,8 +59,8 @@ export function DocumentContentViewer({
   );
 
   const formatAmount = (amount?: number) => {
-    if (amount === undefined || amount === null) return "-";
-    const formatted = Math.abs(amount).toLocaleString("ar-SA", {
+    if (amount === undefined || amount === null) return '-';
+    const formatted = Math.abs(amount).toLocaleString('ar-SA', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -141,14 +130,14 @@ export function DocumentContentViewer({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {content.items.some(i => i.date) && (
+                    {content.items.some((i) => i.date) && (
                       <TableHead className="text-right w-[120px]">التاريخ</TableHead>
                     )}
                     <TableHead className="text-right">الوصف</TableHead>
-                    {content.items.some(i => i.reference) && (
+                    {content.items.some((i) => i.reference) && (
                       <TableHead className="text-right w-[120px]">المرجع</TableHead>
                     )}
-                    {content.items.some(i => i.amount !== undefined) && (
+                    {content.items.some((i) => i.amount !== undefined) && (
                       <TableHead className="text-left w-[120px]">المبلغ</TableHead>
                     )}
                   </TableRow>
@@ -156,28 +145,24 @@ export function DocumentContentViewer({
                 <TableBody>
                   {filteredItems.map((item, index) => (
                     <TableRow key={`${item.description}-${index}`}>
-                      {content.items.some(i => i.date) && (
-                        <TableCell className="font-mono text-sm">
-                          {item.date || "-"}
-                        </TableCell>
+                      {content.items.some((i) => i.date) && (
+                        <TableCell className="font-mono text-sm">{item.date || '-'}</TableCell>
                       )}
                       <TableCell>
                         <div>
                           <p className="font-medium">{item.description}</p>
                           {item.details && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {item.details}
-                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">{item.details}</p>
                           )}
                         </div>
                       </TableCell>
-                      {content.items.some(i => i.reference) && (
-                        <TableCell className="font-mono text-sm">
-                          {item.reference || "-"}
-                        </TableCell>
+                      {content.items.some((i) => i.reference) && (
+                        <TableCell className="font-mono text-sm">{item.reference || '-'}</TableCell>
                       )}
-                      {content.items.some(i => i.amount !== undefined) && (
-                        <TableCell className={`font-mono text-left ${item.amount && item.amount < 0 ? 'text-destructive' : ''}`}>
+                      {content.items.some((i) => i.amount !== undefined) && (
+                        <TableCell
+                          className={`font-mono text-left ${item.amount && item.amount < 0 ? 'text-destructive' : ''}`}
+                        >
                           {formatAmount(item.amount)}
                         </TableCell>
                       )}
@@ -190,7 +175,9 @@ export function DocumentContentViewer({
             {content.total !== undefined && (
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <span className="font-semibold">الإجمالي</span>
-                <span className={`font-mono font-bold text-lg ${content.total < 0 ? 'text-destructive' : 'text-primary'}`}>
+                <span
+                  className={`font-mono font-bold text-lg ${content.total < 0 ? 'text-destructive' : 'text-primary'}`}
+                >
                   {formatAmount(content.total)} ريال
                 </span>
               </div>

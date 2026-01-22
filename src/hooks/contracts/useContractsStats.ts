@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { type Contract } from "@/hooks/property/useContracts";
-import { differenceInDays } from "date-fns";
-import { matchesStatus } from "@/lib/constants";
+import { useMemo } from 'react';
+import { type Contract } from '@/hooks/property/useContracts';
+import { differenceInDays } from 'date-fns';
+import { matchesStatus } from '@/lib/constants';
 
 interface ContractWithAutoRenew extends Contract {
   auto_renew_enabled?: boolean;
@@ -43,14 +43,14 @@ export function useContractsStats(contracts: Contract[] | undefined): ContractsS
         // العقود النشطة
         if (matchesStatus(contract.status, 'active')) {
           acc.active++;
-          
+
           // جاهز للتجديد (ينتهي خلال 60 يوم)
           const endDate = new Date(contract.end_date);
           const daysUntilExpiry = differenceInDays(endDate, now);
           if (daysUntilExpiry <= 60 && daysUntilExpiry > 0) {
             acc.readyForRenewal++;
           }
-          
+
           // العقود المتجددة تلقائياً
           if ((contract as ContractWithAutoRenew).auto_renew_enabled) {
             acc.autoRenewing++;
@@ -72,10 +72,10 @@ export function useContractsStats(contracts: Contract[] | undefined): ContractsS
           const rent = Number(contract.monthly_rent) || 0;
           const frequency = contract.payment_frequency;
 
-          if (frequency === "سنوي" || frequency === "annual") {
+          if (frequency === 'سنوي' || frequency === 'annual') {
             acc.totalMonthlyRevenue += rent / 12;
             acc.totalAnnualRevenue += rent;
-          } else if (frequency === "ربع سنوي" || frequency === "quarterly") {
+          } else if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
             acc.totalMonthlyRevenue += rent / 3;
             acc.totalAnnualRevenue += rent * 4;
           } else {

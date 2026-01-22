@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { POSService } from "@/services/pos.service";
-import { format } from "date-fns";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { POSService } from '@/services/pos.service';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface ShiftReport {
   shift_id: string;
@@ -21,29 +21,37 @@ export interface ShiftReport {
 export const useDailySettlement = (startDate: Date, endDate: Date) => {
   const queryClient = useQueryClient();
 
-  const { data: shiftsReport, isLoading, refetch } = useQuery({
-    queryKey: QUERY_KEYS.POS_SHIFTS_REPORT(format(startDate, "yyyy-MM-dd"), format(endDate, "yyyy-MM-dd")),
-    queryFn: () => POSService.getShiftsReport(
-      format(startDate, "yyyy-MM-dd"),
-      format(endDate, "yyyy-MM-dd")
+  const {
+    data: shiftsReport,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: QUERY_KEYS.POS_SHIFTS_REPORT(
+      format(startDate, 'yyyy-MM-dd'),
+      format(endDate, 'yyyy-MM-dd')
     ),
+    queryFn: () =>
+      POSService.getShiftsReport(format(startDate, 'yyyy-MM-dd'), format(endDate, 'yyyy-MM-dd')),
   });
 
   const settlementMutation = useMutation({
     mutationFn: (shiftId: string) => POSService.settleShift(shiftId),
     onSuccess: () => {
-      toast.success("تمت التسوية بنجاح");
+      toast.success('تمت التسوية بنجاح');
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS_SHIFTS_REPORT() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASHIER_SHIFT });
     },
     onError: () => {
-      toast.error("حدث خطأ أثناء التسوية");
+      toast.error('حدث خطأ أثناء التسوية');
     },
   });
 
-  const totalCollections = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_collections || 0), 0) || 0;
-  const totalPayments = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_payments || 0), 0) || 0;
-  const totalVariance = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.variance || 0), 0) || 0;
+  const totalCollections =
+    shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_collections || 0), 0) || 0;
+  const totalPayments =
+    shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_payments || 0), 0) || 0;
+  const totalVariance =
+    shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.variance || 0), 0) || 0;
 
   return {
     shiftsReport: shiftsReport || [],

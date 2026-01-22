@@ -12,11 +12,11 @@ interface PrintHeaderProps {
   className?: string;
 }
 
-export const PrintHeader = ({ 
-  title, 
-  subtitle, 
+export const PrintHeader = ({
+  title,
+  subtitle,
   showDate = true,
-  className = '' 
+  className = '',
 }: PrintHeaderProps) => {
   return (
     <div className={`print-header ${className}`}>
@@ -58,26 +58,24 @@ export const PrintHeader = ({
           margin-top: 10px;
         }
       `}</style>
-      
+
       {/* شعار الوقف */}
       <div className="print-header-logo">{WAQF_IDENTITY.logo}</div>
-      
+
       {/* اسم الوقف */}
       <div className="print-header-waqf-name">{WAQF_IDENTITY.name}</div>
-      
+
       {/* اسم المنصة */}
       <div className="print-header-platform-name">{WAQF_IDENTITY.platformName}</div>
-      
+
       {/* عنوان المستند */}
       <div className="print-header-title">{title}</div>
-      
+
       {/* العنوان الفرعي */}
       {subtitle && <div className="print-header-subtitle">{subtitle}</div>}
-      
+
       {/* التاريخ */}
-      {showDate && (
-        <div className="print-header-date">التاريخ: {getCurrentDateArabic()}</div>
-      )}
+      {showDate && <div className="print-header-date">التاريخ: {getCurrentDateArabic()}</div>}
     </div>
   );
 };

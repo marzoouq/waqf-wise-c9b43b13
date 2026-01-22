@@ -23,13 +23,19 @@ interface PendingRentalsTableProps {
   disabled?: boolean;
 }
 
-export function PendingRentalsTable({ rentals, isLoading, onCollect, disabled }: PendingRentalsTableProps) {
+export function PendingRentalsTable({
+  rentals,
+  isLoading,
+  onCollect,
+  disabled,
+}: PendingRentalsTableProps) {
   const [search, setSearch] = useState('');
 
-  const filteredRentals = rentals.filter((rental) =>
-    rental.tenant_name.toLowerCase().includes(search.toLowerCase()) ||
-    rental.property_name.toLowerCase().includes(search.toLowerCase()) ||
-    rental.contract_number.toLowerCase().includes(search.toLowerCase())
+  const filteredRentals = rentals.filter(
+    (rental) =>
+      rental.tenant_name.toLowerCase().includes(search.toLowerCase()) ||
+      rental.property_name.toLowerCase().includes(search.toLowerCase()) ||
+      rental.contract_number.toLowerCase().includes(search.toLowerCase())
   );
 
   if (isLoading) {
@@ -104,11 +110,7 @@ export function PendingRentalsTable({ rentals, isLoading, onCollect, disabled }:
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => onCollect(rental)}
-                        disabled={disabled}
-                      >
+                      <Button size="sm" onClick={() => onCollect(rental)} disabled={disabled}>
                         تحصيل
                       </Button>
                     </TableCell>

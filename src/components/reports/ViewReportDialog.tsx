@@ -2,16 +2,11 @@
  * Dialog لعرض التقرير المخصص
  */
 
-import { useState, useEffect, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Loader2, FileSpreadsheet, FileText } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect, useCallback } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Loader2, FileSpreadsheet, FileText } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Table,
   TableBody,
@@ -19,15 +14,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { ReportResult, CustomReportTemplate } from "@/services/report.service";
+} from '@/components/ui/table';
+import type { ReportResult, CustomReportTemplate } from '@/services/report.service';
 
 interface ViewReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   template: CustomReportTemplate | null;
   executeReport: (template: CustomReportTemplate) => Promise<ReportResult>;
-  onDownload: (template: CustomReportTemplate, format: "excel" | "pdf") => void;
+  onDownload: (template: CustomReportTemplate, format: 'excel' | 'pdf') => void;
 }
 
 export function ViewReportDialog({
@@ -50,7 +45,7 @@ export function ViewReportDialog({
       const data = await executeReport(template);
       setResult(data);
     } catch {
-      setError("حدث خطأ أثناء تحميل التقرير");
+      setError('حدث خطأ أثناء تحميل التقرير');
     } finally {
       setIsLoading(false);
     }
@@ -70,22 +65,14 @@ export function ViewReportDialog({
       <DialogContent className="max-w-4xl max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>{template?.name || "عرض التقرير"}</span>
+            <span>{template?.name || 'عرض التقرير'}</span>
             {result && template && (
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDownload(template, "excel")}
-                >
+                <Button variant="outline" size="sm" onClick={() => onDownload(template, 'excel')}>
                   <FileSpreadsheet className="h-4 w-4 me-1" />
                   Excel
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDownload(template, "pdf")}
-                >
+                <Button variant="outline" size="sm" onClick={() => onDownload(template, 'pdf')}>
                   <FileText className="h-4 w-4 me-1" />
                   PDF
                 </Button>
@@ -135,9 +122,7 @@ export function ViewReportDialog({
                       result.data.map((row, idx) => (
                         <TableRow key={idx}>
                           {result.columns.map((col) => (
-                            <TableCell key={col.key}>
-                              {formatCellValue(row[col.key])}
-                            </TableCell>
+                            <TableCell key={col.key}>{formatCellValue(row[col.key])}</TableCell>
                           ))}
                         </TableRow>
                       ))
@@ -154,16 +139,16 @@ export function ViewReportDialog({
 }
 
 function formatCellValue(value: unknown): string {
-  if (value === null || value === undefined) return "-";
-  if (typeof value === "boolean") return value ? "نعم" : "لا";
-  if (typeof value === "number") {
-    return value.toLocaleString("ar-SA");
+  if (value === null || value === undefined) return '-';
+  if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
+  if (typeof value === 'number') {
+    return value.toLocaleString('ar-SA');
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     // Check if it's a date
     if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
       try {
-        return new Date(value).toLocaleDateString("ar-SA");
+        return new Date(value).toLocaleDateString('ar-SA');
       } catch {
         return value;
       }

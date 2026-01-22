@@ -1,18 +1,18 @@
 /**
  * مكون البطاقة الأساسي للجوال
  * Base Mobile Card Component
- * 
+ *
  * يوفر هيكل موحد لجميع بطاقات الجوال مع:
  * - Header مع أيقونة وعنوان وBadge
  * - Content قابل للتخصيص
  * - Footer اختياري
  */
 
-import { ReactNode } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ReactNode } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface MobileCardBaseProps {
   /** أيقونة الرأس */
@@ -28,7 +28,7 @@ export interface MobileCardBaseProps {
   /** نص البادج */
   badgeText?: string;
   /** نوع البادج */
-  badgeVariant?: "default" | "secondary" | "destructive" | "outline";
+  badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
   /** أيقونة البادج */
   BadgeIcon?: LucideIcon;
   /** محتوى البطاقة */
@@ -43,12 +43,12 @@ export interface MobileCardBaseProps {
 
 export function MobileCardBase({
   icon: Icon,
-  iconBgClassName = "bg-primary/10",
-  iconClassName = "text-primary",
+  iconBgClassName = 'bg-primary/10',
+  iconClassName = 'text-primary',
   title,
   subtitle,
   badgeText,
-  badgeVariant = "secondary",
+  badgeVariant = 'secondary',
   BadgeIcon,
   children,
   footer,
@@ -67,16 +67,17 @@ export function MobileCardBase({
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "hover:shadow-md transition-shadow",
-        onClick && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+        'hover:shadow-md transition-shadow',
+        onClick &&
+          'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className
       )}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={onClick ? 0 : undefined}
-      role={onClick ? "button" : undefined}
+      role={onClick ? 'button' : undefined}
       aria-label={onClick ? title : undefined}
     >
       <CardContent className="p-4 space-y-3">
@@ -84,21 +85,21 @@ export function MobileCardBase({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 flex-1">
             {Icon && (
-              <div className={cn(
-                "h-10 w-10 rounded-lg flex items-center justify-center shrink-0",
-                iconBgClassName
-              )}>
-                <Icon className={cn("h-5 w-5", iconClassName)} />
+              <div
+                className={cn(
+                  'h-10 w-10 rounded-lg flex items-center justify-center shrink-0',
+                  iconBgClassName
+                )}
+              >
+                <Icon className={cn('h-5 w-5', iconClassName)} />
               </div>
             )}
             <div className="space-y-1 min-w-0">
               <p className="font-semibold leading-tight truncate">{title}</p>
-              {subtitle && (
-                <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
-              )}
+              {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
             </div>
           </div>
-          
+
           {badgeText && (
             <Badge variant={badgeVariant} className="shrink-0 gap-1">
               {BadgeIcon && <BadgeIcon className="h-3 w-3" />}
@@ -108,16 +109,10 @@ export function MobileCardBase({
         </div>
 
         {/* Content */}
-        <div className="pt-2 border-t">
-          {children}
-        </div>
+        <div className="pt-2 border-t">{children}</div>
 
         {/* Footer */}
-        {footer && (
-          <div className="pt-2 border-t">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="pt-2 border-t">{footer}</div>}
       </CardContent>
     </Card>
   );
@@ -135,7 +130,7 @@ export interface CardInfoRowProps {
 
 export function CardInfoRow({ icon: Icon, label, value, className }: CardInfoRowProps) {
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div className={cn('flex items-center justify-between', className)}>
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         {Icon && <Icon className="h-3 w-3" />}
         {label}
@@ -156,16 +151,12 @@ export interface CardInfoGridProps {
 
 export function CardInfoGrid({ children, columns = 2, className }: CardInfoGridProps) {
   const gridCols = {
-    1: "grid-cols-1",
-    2: "grid-cols-2",
-    3: "grid-cols-3",
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
   };
 
-  return (
-    <div className={cn("grid gap-3", gridCols[columns], className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('grid gap-3', gridCols[columns], className)}>{children}</div>;
 }
 
 /**
@@ -180,7 +171,7 @@ export interface CardInfoItemProps {
 
 export function CardInfoItem({ icon: Icon, label, value, className }: CardInfoItemProps) {
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={cn('space-y-1', className)}>
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         {Icon && <Icon className="h-3 w-3" />}
         {label}

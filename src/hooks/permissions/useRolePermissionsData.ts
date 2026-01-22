@@ -3,12 +3,12 @@
  * @version 2.8.42
  */
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { type AppRole } from "@/types/roles";
-import { SecurityService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { type AppRole } from '@/types/roles';
+import { SecurityService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface RolePermissionState {
   permissionId: string;
@@ -35,16 +35,16 @@ export function useRolePermissionsData(role: AppRole) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROLE_PERMISSIONS() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS() });
       toast({
-        title: "تم الحفظ",
-        description: "تم تحديث الصلاحيات بنجاح",
+        title: 'تم الحفظ',
+        description: 'تم تحديث الصلاحيات بنجاح',
       });
       setModifications(new Map());
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
-        description: error.message || "فشل تحديث الصلاحيات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: error.message || 'فشل تحديث الصلاحيات',
+        variant: 'destructive',
       });
     },
   });
@@ -67,18 +67,18 @@ export function useRolePermissionsData(role: AppRole) {
     if (modification !== undefined) {
       return modification.granted;
     }
-    
-    return (query.data || []).some(rp => rp.permission_id === permissionId && rp.granted);
+
+    return (query.data || []).some((rp) => rp.permission_id === permissionId && rp.granted);
   };
 
   const togglePermission = (permissionId: string, currentValue: boolean) => {
     const newValue = !currentValue;
-    setModifications(prev => {
+    setModifications((prev) => {
       const newMap = new Map(prev);
       newMap.set(permissionId, {
         permissionId,
         granted: newValue,
-        modified: true
+        modified: true,
       });
       return newMap;
     });

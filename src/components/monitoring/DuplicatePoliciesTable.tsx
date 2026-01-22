@@ -3,12 +3,19 @@
  * Duplicate RLS Policies Table
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Shield, AlertTriangle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { DuplicatePolicy } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Shield, AlertTriangle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { DuplicatePolicy } from '@/services/monitoring/db-health.service';
 
 interface DuplicatePoliciesTableProps {
   policies: DuplicatePolicy[];
@@ -74,9 +81,7 @@ export function DuplicatePoliciesTable({ policies, isLoading }: DuplicatePolicie
           سياسات RLS المكررة
           <Badge variant="secondary">{policies.length}</Badge>
         </CardTitle>
-        <CardDescription>
-          هذه السياسات لها نفس الشروط ويمكن دمجها في سياسة واحدة
-        </CardDescription>
+        <CardDescription>هذه السياسات لها نفس الشروط ويمكن دمجها في سياسة واحدة</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="rounded-lg border overflow-x-auto">
@@ -95,14 +100,10 @@ export function DuplicatePoliciesTable({ policies, isLoading }: DuplicatePolicie
                   <TableCell className="font-medium">{policy.table_name}</TableCell>
                   <TableCell>{getCommandBadge(policy.command)}</TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      {policy.policy1}
-                    </code>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded">{policy.policy1}</code>
                   </TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      {policy.policy2}
-                    </code>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded">{policy.policy2}</code>
                   </TableCell>
                 </TableRow>
               ))}

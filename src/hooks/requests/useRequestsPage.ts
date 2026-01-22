@@ -33,20 +33,26 @@ export function useRequestsPage() {
   }, []);
 
   const filteredRequests = useMemo(() => {
-    return requests.filter(request => {
-      const matchesSearch = 
+    return requests.filter((request) => {
+      const matchesSearch =
         request.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         request.request_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (request.beneficiary && 'full_name' in request.beneficiary && 
+        (request.beneficiary &&
+          'full_name' in request.beneficiary &&
           request.beneficiary.full_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
-      const matchesRequestType = requestTypeFilter === 'all' || request.request_type_id === requestTypeFilter;
-      const matchesPriority = !advancedFilters.priority || request.priority === advancedFilters.priority;
-      const matchesOverdue = advancedFilters.overdue === undefined || 
+      const matchesRequestType =
+        requestTypeFilter === 'all' || request.request_type_id === requestTypeFilter;
+      const matchesPriority =
+        !advancedFilters.priority || request.priority === advancedFilters.priority;
+      const matchesOverdue =
+        advancedFilters.overdue === undefined ||
         (advancedFilters.overdue === 'true' ? request.is_overdue : !request.is_overdue);
 
-      return matchesSearch && matchesStatus && matchesRequestType && matchesPriority && matchesOverdue;
+      return (
+        matchesSearch && matchesStatus && matchesRequestType && matchesPriority && matchesOverdue
+      );
     });
   }, [requests, searchQuery, statusFilter, requestTypeFilter, advancedFilters]);
 
@@ -67,18 +73,23 @@ export function useRequestsPage() {
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
   // إحصائيات مُصحّحة لتتوافق مع الحالات الفعلية في قاعدة البيانات
-  const stats = useMemo(() => ({
-    total: requests.length,
-    pending: requests.filter(r => r.status === REQUEST_STATUS.PENDING).length,
-    inProgress: requests.filter(r => r.status === REQUEST_STATUS.IN_PROGRESS).length,
-    approved: requests.filter(r => r.status === REQUEST_STATUS.APPROVED || r.status === REQUEST_STATUS.COMPLETED).length,
-    rejected: requests.filter(r => r.status === REQUEST_STATUS.REJECTED).length,
-    overdue: requests.filter(r => r.is_overdue).length,
-  }), [requests]);
+  const stats = useMemo(
+    () => ({
+      total: requests.length,
+      pending: requests.filter((r) => r.status === REQUEST_STATUS.PENDING).length,
+      inProgress: requests.filter((r) => r.status === REQUEST_STATUS.IN_PROGRESS).length,
+      approved: requests.filter(
+        (r) => r.status === REQUEST_STATUS.APPROVED || r.status === REQUEST_STATUS.COMPLETED
+      ).length,
+      rejected: requests.filter((r) => r.status === REQUEST_STATUS.REJECTED).length,
+      overdue: requests.filter((r) => r.is_overdue).length,
+    }),
+    [requests]
+  );
 
   const bulkDeleteConfirmation = useDeleteConfirmation<string[]>({
     onDelete: async (ids) => {
-      await Promise.all(ids.map(id => deleteRequest.mutateAsync(id)));
+      await Promise.all(ids.map((id) => deleteRequest.mutateAsync(id)));
       bulkSelection.clearSelection();
     },
     successMessage: `تم حذف ${bulkSelection.selectedCount} طلب بنجاح`,
@@ -129,14 +140,14 @@ export function useRequestsPage() {
     error,
     refetch,
     deleteRequest,
-    
+
     // Pagination
     currentPage,
     setCurrentPage,
     itemsPerPage,
     handleItemsPerPageChange,
     totalPages,
-    
+
     // Filters
     searchQuery,
     setSearchQuery,
@@ -146,17 +157,17 @@ export function useRequestsPage() {
     setRequestTypeFilter,
     advancedFilters,
     setAdvancedFilters,
-    
+
     // Sorting
     sortConfig,
     handleSort,
-    
+
     // Bulk Selection
     bulkSelection,
     handleBulkDelete,
     handleBulkExport,
     bulkDeleteConfirmation,
-    
+
     // Dialog States
     selectedRequest,
     setSelectedRequest,

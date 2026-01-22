@@ -2,9 +2,9 @@
  * TabContentWrapper - مكون موحد لعرض محتوى التبويبات مع التحقق من الصلاحيات
  */
 
-import { ReactNode } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Lock } from "lucide-react";
+import { ReactNode } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Lock } from 'lucide-react';
 
 interface TabContentWrapperProps {
   activeTab: string;

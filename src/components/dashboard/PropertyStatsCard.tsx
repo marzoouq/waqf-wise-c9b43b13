@@ -1,17 +1,31 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, TrendingUp, Home, Landmark, Receipt, Wallet, AlertCircle, RefreshCw } from "lucide-react";
-import { useProperties } from "@/hooks/property/useProperties";
-import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
-import { usePropertyRevenueStats } from "@/hooks/dashboard/usePropertyRevenueStats";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Building,
+  TrendingUp,
+  Home,
+  Landmark,
+  Receipt,
+  Wallet,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react';
+import { useProperties } from '@/hooks/property/useProperties';
+import { usePropertyUnits } from '@/hooks/property/usePropertyUnits';
+import { usePropertyRevenueStats } from '@/hooks/dashboard/usePropertyRevenueStats';
 import { safeFilter, safeLength } from '@/lib/utils/array-safe';
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { formatCurrency } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { formatCurrency } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const PropertyStatsCard = () => {
-  const { properties, isLoading: propertiesLoading, error: propertiesError, refetch: refetchProperties } = useProperties();
+  const {
+    properties,
+    isLoading: propertiesLoading,
+    error: propertiesError,
+    refetch: refetchProperties,
+  } = useProperties();
   const { units: propertyUnits, isLoading: unitsLoading } = usePropertyUnits();
   const { data: payments, isLoading: paymentsLoading } = usePropertyRevenueStats();
 
@@ -65,13 +79,13 @@ export const PropertyStatsCard = () => {
   // حساب إحصائيات العقارات
   const totalProperties = safeLength(properties);
   const totalUnits = safeLength(propertyUnits);
-  const occupiedUnits = safeFilter(propertyUnits, u => u.occupancy_status === 'مؤجرة').length;
-  const vacantUnits = safeFilter(propertyUnits, u => u.occupancy_status === 'شاغرة').length;
+  const occupiedUnits = safeFilter(propertyUnits, (u) => u.occupancy_status === 'مؤجرة').length;
+  const vacantUnits = safeFilter(propertyUnits, (u) => u.occupancy_status === 'شاغرة').length;
   const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
   // فصل المدفوعات حسب نوع الدفع (سنوي/شهري)
-  const annualPayments = payments?.filter(p => p.contracts?.payment_frequency === 'سنوي') || [];
-  const monthlyPayments = payments?.filter(p => p.contracts?.payment_frequency === 'شهري') || [];
+  const annualPayments = payments?.filter((p) => p.contracts?.payment_frequency === 'سنوي') || [];
+  const monthlyPayments = payments?.filter((p) => p.contracts?.payment_frequency === 'شهري') || [];
 
   // حساب الإيجارات المحصلة
   const totalAnnualCollected = annualPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
@@ -86,70 +100,70 @@ export const PropertyStatsCard = () => {
 
   const propertyStats = [
     {
-      title: "إجمالي العقارات",
+      title: 'إجمالي العقارات',
       value: totalProperties.toString(),
       icon: Building,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "إجمالي الوحدات",
+      title: 'إجمالي الوحدات',
       value: totalUnits.toString(),
       icon: Home,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "نسبة الإشغال",
+      title: 'نسبة الإشغال',
       value: `${occupancyRate}%`,
       subtitle: `${occupiedUnits} مؤجرة / ${vacantUnits} شاغرة`,
       icon: TrendingUp,
-      variant: occupancyRate >= 80 ? ("success" as const) : ("warning" as const),
+      variant: occupancyRate >= 80 ? ('success' as const) : ('warning' as const),
     },
   ];
 
   const revenueStats = [
     {
-      title: "المحصّل فعلياً",
+      title: 'المحصّل فعلياً',
       value: formatCurrency(totalCollected),
       icon: Wallet,
-      variant: "success" as const,
+      variant: 'success' as const,
     },
     {
-      title: "الإيجارات السنوية",
+      title: 'الإيجارات السنوية',
       value: formatCurrency(totalAnnualCollected),
       subtitle: annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined,
       icon: Receipt,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "الإيجارات الشهرية",
+      title: 'الإيجارات الشهرية',
       value: formatCurrency(totalMonthlyCollected),
       subtitle: monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined,
       icon: Receipt,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "صافي المحصّل",
+      title: 'صافي المحصّل',
       value: formatCurrency(netRevenue),
-      subtitle: "بعد الضريبة",
+      subtitle: 'بعد الضريبة',
       icon: TrendingUp,
-      variant: "success" as const,
+      variant: 'success' as const,
     },
   ];
 
   const taxStats = [
     {
-      title: "ضريبة القيمة المضافة",
+      title: 'ضريبة القيمة المضافة',
       value: formatCurrency(totalTax),
-      subtitle: "هيئة الزكاة والضريبة",
+      subtitle: 'هيئة الزكاة والضريبة',
       icon: Landmark,
-      variant: "danger" as const,
+      variant: 'danger' as const,
     },
     {
-      title: "الزكاة",
+      title: 'الزكاة',
       value: formatCurrency(0),
-      subtitle: "لم يتم احتسابها",
+      subtitle: 'لم يتم احتسابها',
       icon: Landmark,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
   ];
 

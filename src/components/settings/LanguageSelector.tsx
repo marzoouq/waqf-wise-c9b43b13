@@ -1,5 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useTranslation, Language } from '@/hooks/ui/useTranslation';
 import { Languages } from 'lucide-react';
 
@@ -39,10 +45,8 @@ export const LanguageSelector = () => {
           </Select>
 
           <div className="text-sm text-muted-foreground">
-            <p>اللغة الحالية: {languages.find(l => l.value === language)?.label}</p>
-            <p className="mt-2">
-              سيتم تطبيق اللغة المختارة على جميع عناصر الواجهة.
-            </p>
+            <p>اللغة الحالية: {languages.find((l) => l.value === language)?.label}</p>
+            <p className="mt-2">سيتم تطبيق اللغة المختارة على جميع عناصر الواجهة.</p>
           </div>
         </div>
       </CardContent>

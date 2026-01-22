@@ -1,32 +1,32 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
-import { AlertCircle } from "lucide-react";
-import type { Beneficiary } from "@/types/beneficiary";
-import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
-import { PreviewModeBanner } from "@/components/beneficiary/PreviewModeBanner";
-import { OverviewSection } from "@/components/beneficiary/sections/OverviewSection";
-import { TabRenderer } from "@/components/beneficiary/TabRenderer";
-import { useMemo, useCallback } from "react";
-import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
-import { BottomNavigation } from "@/components/mobile/BottomNavigation";
-import { beneficiaryNavigationItems } from "@/config/navigation";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
-import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useBeneficiaryDashboardRealtime } from "@/hooks/dashboard/useBeneficiaryDashboardRealtime";
-import { useQueryClient } from "@tanstack/react-query";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { ScrollToTopButton } from '@/components/shared/ScrollToTopButton';
+import { AlertCircle } from 'lucide-react';
+import type { Beneficiary } from '@/types/beneficiary';
+import { FiscalYearNotPublishedBanner } from '@/components/beneficiary/FiscalYearNotPublishedBanner';
+import { PreviewModeBanner } from '@/components/beneficiary/PreviewModeBanner';
+import { OverviewSection } from '@/components/beneficiary/sections/OverviewSection';
+import { TabRenderer } from '@/components/beneficiary/TabRenderer';
+import { useMemo, useCallback } from 'react';
+import { BeneficiarySidebar } from '@/components/beneficiary/BeneficiarySidebar';
+import { BottomNavigation } from '@/components/mobile/BottomNavigation';
+import { beneficiaryNavigationItems } from '@/config/navigation';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useBeneficiaryPortalData } from '@/hooks/beneficiary/useBeneficiaryPortalData';
+import { useBeneficiarySession } from '@/hooks/beneficiary/useBeneficiarySession';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { useBeneficiaryDashboardRealtime } from '@/hooks/dashboard/useBeneficiaryDashboardRealtime';
+import { useQueryClient } from '@tanstack/react-query';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "overview";
+  const activeTab = searchParams.get('tab') || 'overview';
   const { settings } = useVisibilitySettings();
 
   // استخدام Hook المخصص لجلب البيانات (يتضمن التحقق من وضع المعاينة)
@@ -51,12 +51,12 @@ export default function BeneficiaryPortal() {
 
   const handleTabChange = (value: string) => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.set("tab", value);
+    newParams.set('tab', value);
     setSearchParams(newParams);
   };
 
   const handleClosePreview = () => {
-    navigate("/nazer-dashboard");
+    navigate('/nazer-dashboard');
   };
 
   // إعادة جلب البيانات عند حدوث خطأ (استخدام React Query بدلاً من reload)
@@ -71,7 +71,14 @@ export default function BeneficiaryPortal() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل البيانات" message="فشل تحميل بيانات المستفيد" onRetry={handleRetry} fullScreen />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل البيانات"
+        message="فشل تحميل بيانات المستفيد"
+        onRetry={handleRetry}
+        fullScreen
+      />
+    );
   }
 
   if (!beneficiary) {
@@ -82,7 +89,7 @@ export default function BeneficiaryPortal() {
             <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
             <h3 className="text-lg font-semibold mb-2">خطأ في الوصول</h3>
             <p className="text-muted-foreground mb-4">لم يتم العثور على بيانات المستفيد</p>
-            <Button onClick={() => navigate("/login")}>العودة لتسجيل الدخول</Button>
+            <Button onClick={() => navigate('/login')}>العودة لتسجيل الدخول</Button>
           </CardContent>
         </Card>
       </div>
@@ -113,8 +120,8 @@ export default function BeneficiaryPortal() {
               <div className="px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 pb-20 lg:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-5 md:space-y-6 w-full">
                 {/* بانر وضع المعاينة */}
                 {isPreviewMode && (
-                  <PreviewModeBanner 
-                    beneficiaryName={beneficiaryName} 
+                  <PreviewModeBanner
+                    beneficiaryName={beneficiaryName}
                     onClose={handleClosePreview}
                   />
                 )}
@@ -123,7 +130,7 @@ export default function BeneficiaryPortal() {
                 <FiscalYearNotPublishedBanner />
 
                 {/* Overview Tab */}
-                {activeTab === "overview" && settings?.show_overview && (
+                {activeTab === 'overview' && settings?.show_overview && (
                   <OverviewSection beneficiary={beneficiary as Beneficiary} />
                 )}
 
@@ -138,10 +145,10 @@ export default function BeneficiaryPortal() {
             </main>
           </SidebarInset>
         </div>
-        
+
         {/* Mobile Bottom Navigation */}
         <BottomNavigation items={beneficiaryNavigationItems} ariaLabel="التنقل السفلي للمستفيد" />
-        
+
         {/* Scroll to Top Button */}
         <ScrollToTopButton threshold={300} />
       </SidebarProvider>

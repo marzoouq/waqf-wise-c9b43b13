@@ -1,20 +1,12 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  FileText, 
-  Eye, 
-  Download,
-  TrendingUp,
-  Users,
-  DollarSign,
-  Calendar
-} from "lucide-react";
-import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
-import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FileText, Eye, Download, TrendingUp, Users, DollarSign, Calendar } from 'lucide-react';
+import { useAnnualDisclosures, AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
+import { ViewDisclosureDialog } from '@/components/distributions/ViewDisclosureDialog';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
 
 export const AnnualDisclosureCard = () => {
   const { disclosures, isLoading } = useAnnualDisclosures();
@@ -23,7 +15,7 @@ export const AnnualDisclosureCard = () => {
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
 
   // عرض الإفصاحات المنشورة فقط
-  const publishedDisclosures = disclosures.filter(d => d.status === 'published');
+  const publishedDisclosures = disclosures.filter((d) => d.status === 'published');
   const latestDisclosure = publishedDisclosures[0];
 
   const handleExportPDF = async (disclosure: AnnualDisclosure, index: number = 0) => {
@@ -80,9 +72,7 @@ export const AnnualDisclosureCard = () => {
               <FileText className="h-5 w-5" />
               الإفصاح السنوي - {latestDisclosure.year}
             </CardTitle>
-            <Badge variant="default">
-              {latestDisclosure.waqf_name}
-            </Badge>
+            <Badge variant="default">{latestDisclosure.waqf_name}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -130,7 +120,8 @@ export const AnnualDisclosureCard = () => {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             <span>
-              تاريخ الإصدار: {new Date(latestDisclosure.disclosure_date).toLocaleDateString('ar-SA')}
+              تاريخ الإصدار:{' '}
+              {new Date(latestDisclosure.disclosure_date).toLocaleDateString('ar-SA')}
             </span>
           </div>
 
@@ -146,7 +137,7 @@ export const AnnualDisclosureCard = () => {
               <Eye className="h-4 w-4" />
               عرض التفاصيل الكاملة
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={() => handleExportPDF(latestDisclosure, 0)}
@@ -179,7 +170,9 @@ export const AnnualDisclosureCard = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleExportPDF(disclosure, publishedDisclosures.indexOf(disclosure))}
+                        onClick={() =>
+                          handleExportPDF(disclosure, publishedDisclosures.indexOf(disclosure))
+                        }
                       >
                         <Download className="h-3 w-3" />
                       </Button>

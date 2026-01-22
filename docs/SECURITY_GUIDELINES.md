@@ -32,7 +32,7 @@ if (userRole === 'admin') {
 ALTER TABLE profiles ADD COLUMN role TEXT;
 
 // ❌ خطأ: استخدام SECURITY INVOKER للتحقق
-CREATE FUNCTION check_role() 
+CREATE FUNCTION check_role()
 SECURITY INVOKER -- ❌ خطأ!
 AS $$...$$;
 ```
@@ -74,12 +74,12 @@ ALTER TYPE public.app_role ADD VALUE 'auditor';
 // src/types/roles.ts
 
 // إضافة الدور الجديد
-export type AppRole = 
-  | 'nazer' 
-  | 'admin' 
-  | 'accountant' 
+export type AppRole =
+  | 'nazer'
+  | 'admin'
+  | 'accountant'
   | 'cashier'
-  | 'archivist' 
+  | 'archivist'
   | 'beneficiary'
   | 'waqf_heir'
   | 'user'
@@ -142,11 +142,14 @@ USING (public.has_role(auth.uid(), 'auditor'));
 
 // تحديث التوجيه
 // src/App.tsx
-<Route path="/auditor" element={
-  <ProtectedRoute requiredRole="auditor">
-    <AuditorDashboard />
-  </ProtectedRoute>
-} />
+<Route
+  path="/auditor"
+  element={
+    <ProtectedRoute requiredRole="auditor">
+      <AuditorDashboard />
+    </ProtectedRoute>
+  }
+/>
 ```
 
 ---
@@ -352,10 +355,7 @@ sessionStorage.setItem('role', 'admin');
 const role = sessionStorage.getItem('role');
 
 // ✅ صحيح: جلب من قاعدة البيانات
-const { data } = await supabase
-  .from('user_roles')
-  .select('role')
-  .eq('user_id', user.id);
+const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 ```
 
 ---
@@ -408,7 +408,7 @@ const { data } = await supabase
 ### فحص سياسات RLS لجدول
 
 ```sql
-SELECT 
+SELECT
   policyname,
   cmd,
   qual::text as using_clause,
@@ -420,7 +420,7 @@ WHERE tablename = 'your_table_name';
 ### فحص دوال SECURITY DEFINER
 
 ```sql
-SELECT 
+SELECT
   proname as function_name,
   prosecdef as is_security_definer
 FROM pg_proc
@@ -459,33 +459,35 @@ RESET ROLE;
 ## 🔗 الربط بقرارات التصميم (ADR)
 
 جميع القرارات الأمنية موثقة في:
+
 - [قرارات التصميم المعمارية](./ARCHITECTURE_DECISIONS.md)
 
 ### القرارات الأمنية الموثقة
 
-| ADR | القرار | الملفات المتأثرة |
-|-----|--------|-----------------|
-| ADR-001 | إغلاق جداول Tenant بـ USING(false) | `tenant-portal/index.ts` |
-| ADR-003 | USING(true) للبيانات المرجعية فقط | RLS policies |
+| ADR     | القرار                                         | الملفات المتأثرة                                           |
+| ------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| ADR-001 | إغلاق جداول Tenant بـ USING(false)             | `tenant-portal/index.ts`                                   |
+| ADR-003 | USING(true) للبيانات المرجعية فقط              | RLS policies                                               |
 | ADR-005 | استخدام Service Role في Edge Functions الحساسة | `db-health-check`, `distribute-revenue`, `backup-database` |
 
 ### الملفات المحمية 🔒
 
 أي ملف يحتوي على `🔒 PROTECTED FILE` يتطلب:
+
 1. مراجعة ADR المرتبط
 2. موافقة أمنية
 3. تحديث ADR إذا لزم الأمر
 
 ### قائمة الملفات المحمية
 
-| الملف | ADR | السبب |
-|-------|-----|-------|
-| `supabase/functions/tenant-portal/index.ts` | ADR-001, ADR-005 | وصول tenant عبر SERVICE_ROLE |
-| `supabase/functions/db-health-check/index.ts` | ADR-005 | فحص قاعدة البيانات |
-| `supabase/functions/distribute-revenue/index.ts` | ADR-005 | عملية مالية حرجة |
-| `supabase/functions/backup-database/index.ts` | ADR-005 | نسخ احتياطي |
-| `src/hooks/dashboard/useUnifiedKPIs.ts` | - | مصدر الحقيقة للـ KPIs |
-| `src/lib/constants.ts` | - | ثوابت النظام المركزية |
+| الملف                                            | ADR              | السبب                        |
+| ------------------------------------------------ | ---------------- | ---------------------------- |
+| `supabase/functions/tenant-portal/index.ts`      | ADR-001, ADR-005 | وصول tenant عبر SERVICE_ROLE |
+| `supabase/functions/db-health-check/index.ts`    | ADR-005          | فحص قاعدة البيانات           |
+| `supabase/functions/distribute-revenue/index.ts` | ADR-005          | عملية مالية حرجة             |
+| `supabase/functions/backup-database/index.ts`    | ADR-005          | نسخ احتياطي                  |
+| `src/hooks/dashboard/useUnifiedKPIs.ts`          | -                | مصدر الحقيقة للـ KPIs        |
+| `src/lib/constants.ts`                           | -                | ثوابت النظام المركزية        |
 
 ---
 

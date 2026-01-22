@@ -1,21 +1,41 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PaymentVoucherDialog } from "./PaymentVoucherDialog";
-import { VoucherDetailsDialog } from "./VoucherDetailsDialog";
-import { BankTransferGenerator } from "./BankTransferGenerator";
-import { Receipt, Eye, Plus, FileText, CheckCircle, XCircle, Clock, AlertCircle, LucideIcon } from "lucide-react";
-import { formatRelative } from "@/lib/date";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useDistributionVouchers, VoucherRecord } from "@/hooks/distributions/useDistributionTabsData";
-import { useDialogState } from "@/hooks/ui/useDialogState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { PaymentVoucherDialog } from './PaymentVoucherDialog';
+import { VoucherDetailsDialog } from './VoucherDetailsDialog';
+import { BankTransferGenerator } from './BankTransferGenerator';
+import {
+  Receipt,
+  Eye,
+  Plus,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertCircle,
+  LucideIcon,
+} from 'lucide-react';
+import { formatRelative } from '@/lib/date';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  useDistributionVouchers,
+  VoucherRecord,
+} from '@/hooks/distributions/useDistributionTabsData';
+import { useDialogState } from '@/hooks/ui/useDialogState';
 
 interface DistributionVouchersTabProps {
   distributionId: string;
 }
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 export function DistributionVouchersTab({ distributionId }: DistributionVouchersTabProps) {
   const createDialog = useDialogState();
@@ -24,19 +44,32 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
   const { vouchers, stats, isLoading, refetch } = useDistributionVouchers(distributionId);
 
   const getStatusBadge = (status: string) => {
-    const configs: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }> = {
-      draft: { label: "مسودة", variant: "secondary", icon: Clock },
-      approved: { label: "معتمد", variant: "default", icon: CheckCircle, className: "bg-info text-info-foreground" },
-      paid: { label: "مدفوع", variant: "default", icon: CheckCircle, className: "bg-success text-success-foreground" },
-      cancelled: { label: "ملغي", variant: "outline", icon: XCircle },
-      rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
+    const configs: Record<
+      string,
+      { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }
+    > = {
+      draft: { label: 'مسودة', variant: 'secondary', icon: Clock },
+      approved: {
+        label: 'معتمد',
+        variant: 'default',
+        icon: CheckCircle,
+        className: 'bg-info text-info-foreground',
+      },
+      paid: {
+        label: 'مدفوع',
+        variant: 'default',
+        icon: CheckCircle,
+        className: 'bg-success text-success-foreground',
+      },
+      cancelled: { label: 'ملغي', variant: 'outline', icon: XCircle },
+      rejected: { label: 'مرفوض', variant: 'destructive', icon: XCircle },
     };
 
     const config = configs[status] || configs.draft;
     const Icon = config.icon;
 
     return (
-      <Badge variant={config.variant} className={config.className || ""}>
+      <Badge variant={config.variant} className={config.className || ''}>
         <Icon className="ms-1 h-3 w-3" />
         {config.label}
       </Badge>
@@ -122,7 +155,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
                           {voucher.voucher_number}
                         </div>
                       </TableCell>
-                      <TableCell>{voucher.beneficiary_id || "-"}</TableCell>
+                      <TableCell>{voucher.beneficiary_id || '-'}</TableCell>
                       <TableCell className="font-bold">
                         {voucher.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
                       </TableCell>

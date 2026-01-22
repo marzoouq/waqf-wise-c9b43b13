@@ -129,9 +129,7 @@ describe('RLS: TableName', () => {
   describe('SELECT', () => {
     it('role can read allowed data', async () => {
       const client = createMockUserClient({ role: 'role_name' });
-      const { data, error } = await client
-        .from('table_name')
-        .select('*');
+      const { data, error } = await client.from('table_name').select('*');
 
       expect(error).toBeNull();
       expect(data).toBeDefined();
@@ -140,9 +138,7 @@ describe('RLS: TableName', () => {
 
     it('role cannot read forbidden data', async () => {
       const client = createMockUserClient({ role: 'other_role' });
-      const { data } = await client
-        .from('table_name')
-        .select('*');
+      const { data } = await client.from('table_name').select('*');
 
       expect(data).toHaveLength(0);
     });
@@ -151,18 +147,14 @@ describe('RLS: TableName', () => {
   describe('INSERT', () => {
     it('authorized role can insert', async () => {
       const client = createMockUserClient({ role: 'authorized_role' });
-      const { error } = await client
-        .from('table_name')
-        .insert({ field: 'value' });
+      const { error } = await client.from('table_name').insert({ field: 'value' });
 
       expect(error).toBeNull();
     });
 
     it('unauthorized role cannot insert', async () => {
       const client = createMockUserClient({ role: 'unauthorized_role' });
-      const { error } = await client
-        .from('table_name')
-        .insert({ field: 'value' });
+      const { error } = await client.from('table_name').insert({ field: 'value' });
 
       expect(error).not.toBeNull();
     });
@@ -240,17 +232,17 @@ it('audit logs cannot be deleted', async () => {
 
 ### الجداول المختبرة
 
-| الجدول | RLS | الصلاحيات | التكامل |
-|--------|-----|-----------|---------|
-| beneficiaries | ✅ | ✅ | ✅ |
-| payment_vouchers | ✅ | ✅ | ✅ |
-| journal_entries | ✅ | ✅ | ✅ |
-| properties | ✅ | ✅ | ✅ |
-| user_roles | ✅ | ✅ | ✅ |
-| distributions | ✅ | ✅ | ✅ |
-| audit_logs | ✅ | ✅ | ✅ |
-| security_events | ✅ | ✅ | ✅ |
-| families | ✅ | ✅ | ✅ |
+| الجدول           | RLS | الصلاحيات | التكامل |
+| ---------------- | --- | --------- | ------- |
+| beneficiaries    | ✅  | ✅        | ✅      |
+| payment_vouchers | ✅  | ✅        | ✅      |
+| journal_entries  | ✅  | ✅        | ✅      |
+| properties       | ✅  | ✅        | ✅      |
+| user_roles       | ✅  | ✅        | ✅      |
+| distributions    | ✅  | ✅        | ✅      |
+| audit_logs       | ✅  | ✅        | ✅      |
+| security_events  | ✅  | ✅        | ✅      |
+| families         | ✅  | ✅        | ✅      |
 
 ### الأدوار المختبرة
 

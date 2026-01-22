@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
   errorResponse,
   unauthorizedResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // ✅ Rate Limiting للحماية من إساءة الاستخدام
@@ -16,16 +16,16 @@ const WINDOW_MS = 60 * 1000; // دقيقة واحدة
 function checkRateLimit(identifier: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
-  
+
   if (!record || now - record.lastAttempt > WINDOW_MS) {
     rateLimitMap.set(identifier, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   if (record.count >= MAX_ATTEMPTS) {
     return false;
   }
-  
+
   record.count++;
   record.lastAttempt = now;
   return true;
@@ -50,10 +50,12 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'check-leaked-password',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     const supabase = createClient(
@@ -68,8 +70,11 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return unauthorizedResponse('فشل التحقق من الهوية');
     }
@@ -90,23 +95,26 @@ serve(async (req) => {
     const msgUint8 = new TextEncoder().encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const sha1Hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const sha1Hash = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase();
 
     const prefix = sha1Hash.substring(0, 5);
     const suffix = sha1Hash.substring(5);
 
     // استخدام Have I Been Pwned API (k-Anonymity model)
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-    
+
     if (!response.ok) {
       throw new Error('Failed to check password');
     }
 
     const data = await response.text();
     const hashes = data.split('\n');
-    
+
     // البحث عن الـ suffix في القائمة
-    const foundHash = hashes.find(line => {
+    const foundHash = hashes.find((line) => {
       const [hashSuffix] = line.split(':');
       return hashSuffix === suffix;
     });
@@ -126,18 +134,13 @@ serve(async (req) => {
       is_leaked: isLeaked,
     });
 
-    return jsonResponse({ 
-      isLeaked, 
+    return jsonResponse({
+      isLeaked,
       count,
-      message: isLeaked 
-        ? `تم العثور على هذه الكلمة في ${count} تسريب` 
-        : 'كلمة المرور آمنة'
+      message: isLeaked ? `تم العثور على هذه الكلمة في ${count} تسريب` : 'كلمة المرور آمنة',
     });
   } catch (error) {
     console.error('Password check error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

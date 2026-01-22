@@ -1,6 +1,6 @@
-import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface FamiliesErrorStateProps {
   error: Error;
@@ -14,7 +14,7 @@ export function FamiliesErrorState({ error, onRetry }: FamiliesErrorStateProps) 
         <div className="rounded-full bg-destructive/10 p-6 mb-4">
           <AlertTriangle className="h-12 w-12 text-destructive" />
         </div>
-        
+
         <h3 className="text-xl font-semibold mb-2 text-destructive">حدث خطأ في تحميل البيانات</h3>
         <p className="text-muted-foreground mb-2 max-w-md">
           {error.message || 'فشل تحميل بيانات العائلات. يرجى المحاولة مرة أخرى.'}

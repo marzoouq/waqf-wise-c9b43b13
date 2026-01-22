@@ -3,11 +3,11 @@
  * @version 1.0.0
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { GovernanceBoardsService } from "@/services/governance/governance-boards.service";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { GovernanceBoardsService } from '@/services/governance/governance-boards.service';
+import type { Database } from '@/integrations/supabase/types';
 
 type BoardInsert = Database['public']['Tables']['governance_boards']['Insert'];
 type BoardUpdate = Database['public']['Tables']['governance_boards']['Update'];
@@ -82,16 +82,16 @@ export function useCreateBoard() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARDS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOARDS_STATS });
       toast({
-        title: "تم إنشاء المجلس بنجاح",
-        description: "تم إضافة مجلس الحوكمة الجديد",
+        title: 'تم إنشاء المجلس بنجاح',
+        description: 'تم إضافة مجلس الحوكمة الجديد',
       });
     },
     onError: (error) => {
       productionLogger.error('Create board mutation error:', error);
       toast({
-        title: "خطأ في إنشاء المجلس",
-        description: "حدث خطأ أثناء إنشاء المجلس، يرجى المحاولة مرة أخرى",
-        variant: "destructive",
+        title: 'خطأ في إنشاء المجلس',
+        description: 'حدث خطأ أثناء إنشاء المجلس، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
       });
     },
   });
@@ -111,16 +111,16 @@ export function useUpdateBoard() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARDS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARD(variables.id) });
       toast({
-        title: "تم تحديث المجلس",
-        description: "تم حفظ التغييرات بنجاح",
+        title: 'تم تحديث المجلس',
+        description: 'تم حفظ التغييرات بنجاح',
       });
     },
     onError: (error) => {
       productionLogger.error('Update board mutation error:', error);
       toast({
-        title: "خطأ في تحديث المجلس",
-        description: "حدث خطأ أثناء تحديث المجلس",
-        variant: "destructive",
+        title: 'خطأ في تحديث المجلس',
+        description: 'حدث خطأ أثناء تحديث المجلس',
+        variant: 'destructive',
       });
     },
   });
@@ -139,16 +139,16 @@ export function useDeleteBoard() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARDS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOARDS_STATS });
       toast({
-        title: "تم حذف المجلس",
-        description: "تم حذف المجلس وجميع أعضائه",
+        title: 'تم حذف المجلس',
+        description: 'تم حذف المجلس وجميع أعضائه',
       });
     },
     onError: (error) => {
       productionLogger.error('Delete board mutation error:', error);
       toast({
-        title: "خطأ في حذف المجلس",
-        description: "حدث خطأ أثناء حذف المجلس",
-        variant: "destructive",
+        title: 'خطأ في حذف المجلس',
+        description: 'حدث خطأ أثناء حذف المجلس',
+        variant: 'destructive',
       });
     },
   });
@@ -168,16 +168,16 @@ export function useAddBoardMember() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARDS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOARDS_STATS });
       toast({
-        title: "تم إضافة العضو",
-        description: "تم إضافة العضو للمجلس بنجاح",
+        title: 'تم إضافة العضو',
+        description: 'تم إضافة العضو للمجلس بنجاح',
       });
     },
     onError: (error) => {
       productionLogger.error('Add member mutation error:', error);
       toast({
-        title: "خطأ في إضافة العضو",
-        description: "حدث خطأ أثناء إضافة العضو",
-        variant: "destructive",
+        title: 'خطأ في إضافة العضو',
+        description: 'حدث خطأ أثناء إضافة العضو',
+        variant: 'destructive',
       });
     },
   });
@@ -198,16 +198,16 @@ export function useRemoveBoardMember() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_BOARDS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOARDS_STATS });
       toast({
-        title: "تم حذف العضو",
-        description: "تم إزالة العضو من المجلس",
+        title: 'تم حذف العضو',
+        description: 'تم إزالة العضو من المجلس',
       });
     },
     onError: (error) => {
       productionLogger.error('Remove member mutation error:', error);
       toast({
-        title: "خطأ في حذف العضو",
-        description: "حدث خطأ أثناء حذف العضو",
-        variant: "destructive",
+        title: 'خطأ في حذف العضو',
+        description: 'حدث خطأ أثناء حذف العضو',
+        variant: 'destructive',
       });
     },
   });

@@ -1,18 +1,31 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff, ChevronLeft } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { formatCurrency } from "@/lib/utils";
-import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
-import { usePropertyStats } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { motion } from "framer-motion";
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import {
+  Building2,
+  Home,
+  TrendingUp,
+  DollarSign,
+  Package,
+  MapPin,
+  CheckCircle,
+  Landmark,
+  Receipt,
+  Wallet,
+  EyeOff,
+  ChevronLeft,
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { formatCurrency } from '@/lib/utils';
+import { useFiscalYearPublishInfo } from '@/hooks/fiscal-years';
+import { usePropertyStats } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { motion } from 'framer-motion';
 
 const MAX_PROPERTIES_DISPLAY = 5;
 
@@ -48,7 +61,9 @@ export function PropertyStatsCards() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات العقارات" onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات العقارات" onRetry={refetch} />
+    );
   }
 
   const totalProperties = properties.length;
@@ -56,8 +71,8 @@ export function PropertyStatsCards() {
   const occupiedUnits = properties.reduce((sum, p) => sum + (p.occupied_units || 0), 0);
   const occupancyRate = totalUnits > 0 ? (occupiedUnits / totalUnits) * 100 : 0;
 
-  const annualPayments = payments.filter(p => p.contracts?.payment_frequency === 'سنوي');
-  const monthlyPayments = payments.filter(p => p.contracts?.payment_frequency === 'شهري');
+  const annualPayments = payments.filter((p) => p.contracts?.payment_frequency === 'سنوي');
+  const monthlyPayments = payments.filter((p) => p.contracts?.payment_frequency === 'شهري');
 
   const totalAnnualCollected = annualPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
   const totalMonthlyCollected = monthlyPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
@@ -66,7 +81,7 @@ export function PropertyStatsCards() {
   const netRevenue = totalCollected - totalTax;
 
   const handleViewAllProperties = () => {
-    navigate("/beneficiary-portal?tab=properties");
+    navigate('/beneficiary-portal?tab=properties');
   };
 
   return (
@@ -78,10 +93,25 @@ export function PropertyStatsCards() {
           إحصائيات العقارات
         </h3>
         <UnifiedStatsGrid columns={4}>
-          <UnifiedKPICard title="إجمالي العقارات" value={totalProperties} icon={Building2} variant="info" />
+          <UnifiedKPICard
+            title="إجمالي العقارات"
+            value={totalProperties}
+            icon={Building2}
+            variant="info"
+          />
           <UnifiedKPICard title="إجمالي الوحدات" value={totalUnits} icon={Home} variant="info" />
-          <UnifiedKPICard title="الوحدات المشغولة" value={occupiedUnits} icon={CheckCircle} variant="success" />
-          <UnifiedKPICard title="معدل الإشغال" value={`${occupancyRate.toFixed(1)}%`} icon={TrendingUp} variant="warning" />
+          <UnifiedKPICard
+            title="الوحدات المشغولة"
+            value={occupiedUnits}
+            icon={CheckCircle}
+            variant="success"
+          />
+          <UnifiedKPICard
+            title="معدل الإشغال"
+            value={`${occupancyRate.toFixed(1)}%`}
+            icon={TrendingUp}
+            variant="warning"
+          />
         </UnifiedStatsGrid>
       </div>
 
@@ -93,10 +123,33 @@ export function PropertyStatsCards() {
             الإيرادات المحصلة
           </h3>
           <UnifiedStatsGrid columns={4}>
-            <UnifiedKPICard title="المحصّل فعلياً" value={formatCurrency(totalCollected)} icon={DollarSign} variant="success" />
-            <UnifiedKPICard title="الإيجارات السنوية" value={formatCurrency(totalAnnualCollected)} icon={Receipt} variant="primary" subtitle={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined} />
-            <UnifiedKPICard title="الإيجارات الشهرية" value={formatCurrency(totalMonthlyCollected)} icon={Receipt} variant="default" subtitle={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined} />
-            <UnifiedKPICard title="صافي المحصّل" value={formatCurrency(netRevenue)} icon={TrendingUp} variant="success" subtitle="بعد الضريبة" />
+            <UnifiedKPICard
+              title="المحصّل فعلياً"
+              value={formatCurrency(totalCollected)}
+              icon={DollarSign}
+              variant="success"
+            />
+            <UnifiedKPICard
+              title="الإيجارات السنوية"
+              value={formatCurrency(totalAnnualCollected)}
+              icon={Receipt}
+              variant="primary"
+              subtitle={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined}
+            />
+            <UnifiedKPICard
+              title="الإيجارات الشهرية"
+              value={formatCurrency(totalMonthlyCollected)}
+              icon={Receipt}
+              variant="default"
+              subtitle={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined}
+            />
+            <UnifiedKPICard
+              title="صافي المحصّل"
+              value={formatCurrency(netRevenue)}
+              icon={TrendingUp}
+              variant="success"
+              subtitle="بعد الضريبة"
+            />
           </UnifiedStatsGrid>
         </div>
       ) : (
@@ -117,8 +170,20 @@ export function PropertyStatsCards() {
             الاستقطاعات الحكومية
           </h3>
           <UnifiedStatsGrid columns={2}>
-            <UnifiedKPICard title="ضريبة القيمة المضافة" value={formatCurrency(totalTax)} icon={Landmark} variant="destructive" subtitle="هيئة الزكاة والضريبة والجمارك" />
-            <UnifiedKPICard title="الزكاة" value={formatCurrency(0)} icon={Landmark} variant="default" subtitle="لم يتم احتسابها" />
+            <UnifiedKPICard
+              title="ضريبة القيمة المضافة"
+              value={formatCurrency(totalTax)}
+              icon={Landmark}
+              variant="destructive"
+              subtitle="هيئة الزكاة والضريبة والجمارك"
+            />
+            <UnifiedKPICard
+              title="الزكاة"
+              value={formatCurrency(0)}
+              icon={Landmark}
+              variant="default"
+              subtitle="لم يتم احتسابها"
+            />
           </UnifiedStatsGrid>
         </div>
       )}

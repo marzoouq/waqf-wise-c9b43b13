@@ -17,7 +17,7 @@ export function useAlertCleanup() {
       try {
         const lastCleanup = localStorage.getItem(CLEANUP_KEY);
         const now = Date.now();
-        
+
         // التحقق من آخر تنظيف
         if (lastCleanup) {
           const lastCleanupTime = parseInt(lastCleanup, 10);
@@ -30,9 +30,9 @@ export function useAlertCleanup() {
         if (import.meta.env.DEV) {
           console.log('Starting automatic alert cleanup...');
         }
-        
+
         const stats = await runFullCleanup();
-        
+
         if (import.meta.env.DEV) {
           console.log('Alert cleanup completed', {
             deletedAlerts: stats.deletedAlerts,

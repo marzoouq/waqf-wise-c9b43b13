@@ -4,7 +4,12 @@
  * v2.9.33
  */
 
-import { useState, useEffect, useTransition, useDeferredValue as useReactDeferredValue } from 'react';
+import {
+  useState,
+  useEffect,
+  useTransition,
+  useDeferredValue as useReactDeferredValue,
+} from 'react';
 
 /**
  * Hook لتأجيل البحث حتى توقف المستخدم عن الكتابة
@@ -38,19 +43,14 @@ export function useDeferredSearchValue(searchTerm: string) {
 /**
  * Hook لتنفيذ العمليات الثقيلة في الخلفية
  */
-export function useBackgroundTask<T>(
-  task: () => T | Promise<T>,
-  dependencies: unknown[] = []
-) {
+export function useBackgroundTask<T>(task: () => T | Promise<T>, dependencies: unknown[] = []) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     startTransition(() => {
-      Promise.resolve(task())
-        .then(setResult)
-        .catch(setError);
+      Promise.resolve(task()).then(setResult).catch(setError);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
@@ -61,10 +61,7 @@ export function useBackgroundTask<T>(
 /**
  * Hook لتحميل البيانات عند الحاجة فقط
  */
-export function useLazyData<T>(
-  fetcher: () => Promise<T>,
-  options: { immediate?: boolean } = {}
-) {
+export function useLazyData<T>(fetcher: () => Promise<T>, options: { immediate?: boolean } = {}) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

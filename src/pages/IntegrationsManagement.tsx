@@ -1,21 +1,24 @@
-import { useState } from "react";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Building2, CreditCard, Shield, Settings, Link } from "lucide-react";
-import { useIntegrationsData } from "@/hooks/system/useIntegrationsData";
-import { IntegrationSettingsDialog } from "@/components/settings/IntegrationSettingsDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState } from 'react';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Building2, CreditCard, Shield, Settings, Link } from 'lucide-react';
+import { useIntegrationsData } from '@/hooks/system/useIntegrationsData';
+import { IntegrationSettingsDialog } from '@/components/settings/IntegrationSettingsDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface SelectedIntegration {
   id: string;
-  type: "bank" | "payment" | "government";
+  type: 'bank' | 'payment' | 'government';
   name: string;
   is_active: boolean;
   api_endpoint?: string;
@@ -36,35 +39,37 @@ export default function IntegrationsManagement() {
 
   const handleToggleIntegration = async (
     id: string,
-    type: "bank" | "payment" | "government",
+    type: 'bank' | 'payment' | 'government',
     currentStatus: boolean
   ) => {
     try {
-      const tableName = type === "bank" 
-        ? "bank_integrations" 
-        : type === "payment" 
-          ? "payment_gateways" 
-          : "government_integrations";
+      const tableName =
+        type === 'bank'
+          ? 'bank_integrations'
+          : type === 'payment'
+            ? 'payment_gateways'
+            : 'government_integrations';
 
       const { error } = await supabase
         .from(tableName)
         .update({ is_active: !currentStatus })
-        .eq("id", id);
+        .eq('id', id);
 
       if (error) throw error;
 
       // Invalidate queries
-      const queryKey = type === "bank" 
-        ? QUERY_KEYS.BANK_INTEGRATIONS 
-        : type === "payment" 
-          ? QUERY_KEYS.PAYMENT_GATEWAYS 
-          : QUERY_KEYS.GOVERNMENT_INTEGRATIONS;
+      const queryKey =
+        type === 'bank'
+          ? QUERY_KEYS.BANK_INTEGRATIONS
+          : type === 'payment'
+            ? QUERY_KEYS.PAYMENT_GATEWAYS
+            : QUERY_KEYS.GOVERNMENT_INTEGRATIONS;
 
       queryClient.invalidateQueries({ queryKey });
-      toast.success(`تم ${!currentStatus ? "تفعيل" : "تعطيل"} التكامل بنجاح`);
+      toast.success(`تم ${!currentStatus ? 'تفعيل' : 'تعطيل'} التكامل بنجاح`);
     } catch (error) {
-      console.error("Error toggling integration:", error);
-      toast.error("فشل في تحديث حالة التكامل");
+      console.error('Error toggling integration:', error);
+      toast.error('فشل في تحديث حالة التكامل');
     }
   };
 
@@ -95,30 +100,35 @@ export default function IntegrationsManagement() {
           <CardContent>
             <div className="space-y-4">
               {bankIntegrations.map((bank) => (
-                <div key={bank.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={bank.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex-1">
                     <h3 className="font-semibold">{bank.bank_name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      التحويلات: {bank.supports_transfers ? "✓" : "✗"} | 
-                      الاستعلام: {bank.supports_balance_inquiry ? "✓" : "✗"} | 
-                      الكشوف: {bank.supports_statement ? "✓" : "✗"}
+                      التحويلات: {bank.supports_transfers ? '✓' : '✗'} | الاستعلام:{' '}
+                      {bank.supports_balance_inquiry ? '✓' : '✗'} | الكشوف:{' '}
+                      {bank.supports_statement ? '✓' : '✗'}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <Badge variant={bank.is_active ? "default" : "secondary"}>
-                      {bank.is_active ? "نشط" : "غير نشط"}
+                    <Badge variant={bank.is_active ? 'default' : 'secondary'}>
+                      {bank.is_active ? 'نشط' : 'غير نشط'}
                     </Badge>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
-                      onClick={() => handleOpenSettings({
-                        id: bank.id,
-                        type: "bank",
-                        name: bank.bank_name,
-                        is_active: bank.is_active ?? false,
-                        api_endpoint: bank.api_endpoint ?? undefined,
-                        api_version: bank.api_version ?? undefined,
-                      })}
+                      onClick={() =>
+                        handleOpenSettings({
+                          id: bank.id,
+                          type: 'bank',
+                          name: bank.bank_name,
+                          is_active: bank.is_active ?? false,
+                          api_endpoint: bank.api_endpoint ?? undefined,
+                          api_version: bank.api_version ?? undefined,
+                        })
+                      }
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
@@ -148,36 +158,38 @@ export default function IntegrationsManagement() {
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{gateway.gateway_name}</h3>
                     <div className="flex items-center gap-2">
-                      <Badge variant={gateway.is_active ? "default" : "secondary"}>
-                        {gateway.is_active ? "نشط" : "غير نشط"}
+                      <Badge variant={gateway.is_active ? 'default' : 'secondary'}>
+                        {gateway.is_active ? 'نشط' : 'غير نشط'}
                       </Badge>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="icon"
-                        onClick={() => handleOpenSettings({
-                          id: gateway.id,
-                          type: "payment",
-                          name: gateway.gateway_name,
-                          is_active: gateway.is_active ?? false,
-                        })}
+                        onClick={() =>
+                          handleOpenSettings({
+                            id: gateway.id,
+                            type: 'payment',
+                            name: gateway.gateway_name,
+                            is_active: gateway.is_active ?? false,
+                          })
+                        }
                       >
                         <Settings className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {gateway.supported_methods.join(" • ")}
+                    {gateway.supported_methods.join(' • ')}
                   </p>
                   <div className="flex items-center justify-between text-sm">
                     <span>المعاملات: {gateway.total_transactions}</span>
-                    {gateway.success_rate && (
-                      <span>النجاح: {gateway.success_rate}%</span>
-                    )}
+                    {gateway.success_rate && <span>النجاح: {gateway.success_rate}%</span>}
                   </div>
                 </div>
               ))}
               {paymentGateways.length === 0 && (
-                <p className="text-center text-muted-foreground py-4 col-span-2">لا توجد بوابات دفع</p>
+                <p className="text-center text-muted-foreground py-4 col-span-2">
+                  لا توجد بوابات دفع
+                </p>
               )}
             </div>
           </CardContent>
@@ -195,7 +207,10 @@ export default function IntegrationsManagement() {
           <CardContent>
             <div className="space-y-4">
               {governmentIntegrations.map((service) => (
-                <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={service.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex-1">
                     <h3 className="font-semibold">{service.service_name}</h3>
                     <p className="text-sm text-muted-foreground">
@@ -203,22 +218,30 @@ export default function IntegrationsManagement() {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <Badge variant={service.is_active ? "default" : "secondary"}>
-                      {service.is_active ? "نشط" : "غير نشط"}
+                    <Badge variant={service.is_active ? 'default' : 'secondary'}>
+                      {service.is_active ? 'نشط' : 'غير نشط'}
                     </Badge>
-                    <Switch 
-                      checked={service.is_active ?? false} 
-                      onCheckedChange={() => handleToggleIntegration(service.id, "government", service.is_active ?? false)}
+                    <Switch
+                      checked={service.is_active ?? false}
+                      onCheckedChange={() =>
+                        handleToggleIntegration(
+                          service.id,
+                          'government',
+                          service.is_active ?? false
+                        )
+                      }
                     />
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
-                      onClick={() => handleOpenSettings({
-                        id: service.id,
-                        type: "government",
-                        name: service.service_name,
-                        is_active: service.is_active ?? false,
-                      })}
+                      onClick={() =>
+                        handleOpenSettings({
+                          id: service.id,
+                          type: 'government',
+                          name: service.service_name,
+                          is_active: service.is_active ?? false,
+                        })
+                      }
                     >
                       <Settings className="h-4 w-4" />
                     </Button>

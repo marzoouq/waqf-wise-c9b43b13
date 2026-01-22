@@ -1,7 +1,7 @@
-import { TrendingUp, DollarSign, Users, PieChart } from "lucide-react";
-import { Distribution } from "@/hooks/distributions/useDistributions";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { TrendingUp, DollarSign, Users, PieChart } from 'lucide-react';
+import { Distribution } from '@/hooks/distributions/useDistributions';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 interface OverviewTabProps {
   summaryStats: {
@@ -15,9 +15,10 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ summaryStats, distributions }: OverviewTabProps) {
-  const spendingPercentage = summaryStats.totalAllocated > 0
-    ? (summaryStats.totalSpent / summaryStats.totalAllocated) * 100
-    : 0;
+  const spendingPercentage =
+    summaryStats.totalAllocated > 0
+      ? (summaryStats.totalSpent / summaryStats.totalAllocated) * 100
+      : 0;
 
   const totalDistributed = distributions.reduce((sum, d) => sum + (d.distributable_amount || 0), 0);
   const totalBeneficiaries = distributions.reduce((sum, d) => sum + d.beneficiaries_count, 0);

@@ -35,10 +35,12 @@ export class BudgetService {
   /**
    * جلب الميزانيات
    */
-  static async getBudgets(fiscalYearId?: string): Promise<Database['public']['Tables']['budgets']['Row'][]> {
+  static async getBudgets(
+    fiscalYearId?: string
+  ): Promise<Database['public']['Tables']['budgets']['Row'][]> {
     try {
       let query = supabase.from('budgets').select('*');
-      
+
       if (fiscalYearId) {
         query = query.eq('fiscal_year_id', fiscalYearId);
       }
@@ -56,7 +58,13 @@ export class BudgetService {
   /**
    * جلب الميزانيات مع بيانات الحسابات
    */
-  static async getBudgetsWithAccounts(fiscalYearId?: string): Promise<(Database['public']['Tables']['budgets']['Row'] & { accounts?: { code: string; name_ar: string; account_type: string } })[]> {
+  static async getBudgetsWithAccounts(
+    fiscalYearId?: string
+  ): Promise<
+    (Database['public']['Tables']['budgets']['Row'] & {
+      accounts?: { code: string; name_ar: string; account_type: string };
+    })[]
+  > {
     try {
       let query = supabase.from('budgets').select(`
         *,
@@ -66,7 +74,7 @@ export class BudgetService {
           account_type
         )
       `);
-      
+
       if (fiscalYearId) {
         query = query.eq('fiscal_year_id', fiscalYearId);
       }
@@ -84,7 +92,9 @@ export class BudgetService {
   /**
    * إنشاء ميزانية
    */
-  static async createBudget(budget: Database['public']['Tables']['budgets']['Insert']): Promise<Database['public']['Tables']['budgets']['Row']> {
+  static async createBudget(
+    budget: Database['public']['Tables']['budgets']['Insert']
+  ): Promise<Database['public']['Tables']['budgets']['Row']> {
     try {
       const { data, error } = await supabase
         .from('budgets')
@@ -104,7 +114,10 @@ export class BudgetService {
   /**
    * تحديث ميزانية
    */
-  static async updateBudget(id: string, updates: Partial<Database['public']['Tables']['budgets']['Row']>): Promise<Database['public']['Tables']['budgets']['Row'] | null> {
+  static async updateBudget(
+    id: string,
+    updates: Partial<Database['public']['Tables']['budgets']['Row']>
+  ): Promise<Database['public']['Tables']['budgets']['Row'] | null> {
     try {
       const { data, error } = await supabase
         .from('budgets')
@@ -132,7 +145,7 @@ export class BudgetService {
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: userId || null,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         } as Record<string, unknown>)
         .eq('id', id);
 
@@ -163,8 +176,11 @@ export class BudgetService {
 
         if (actualError) throw actualError;
 
-        const actualAmount = actualData?.reduce((sum, line) => 
-          sum + ((line.debit_amount || 0) - (line.credit_amount || 0)), 0) || 0;
+        const actualAmount =
+          actualData?.reduce(
+            (sum, line) => sum + ((line.debit_amount || 0) - (line.credit_amount || 0)),
+            0
+          ) || 0;
 
         const varianceAmount = budget.budgeted_amount - actualAmount;
 
@@ -187,17 +203,19 @@ export class BudgetService {
    */
   static async getBudgetsByPeriod(periodType: string) {
     const { data, error } = await supabase
-      .from("budgets")
-      .select(`
+      .from('budgets')
+      .select(
+        `
         *,
         accounts (
           code,
           name_ar
         )
-      `)
-      .eq("period_type", periodType)
-      .order("accounts(code)", { ascending: true });
-    
+      `
+      )
+      .eq('period_type', periodType)
+      .order('accounts(code)', { ascending: true });
+
     if (error) throw error;
     return data || [];
   }
@@ -207,7 +225,7 @@ export class BudgetService {
    */
   static async getBudgetsByFiscalYear(fiscalYearId: string) {
     if (!fiscalYearId) return [];
-    
+
     const { data, error } = await supabase
       .from('budgets')
       .select('*, accounts(code, name_ar)')
@@ -221,21 +239,25 @@ export class BudgetService {
   /**
    * جلب مؤشرات الأداء المالي
    */
-  static async getFinancialKPIs(fiscalYearId?: string): Promise<{
-    id: string;
-    kpi_name: string;
-    kpi_category: string;
-    kpi_value: number;
-    kpi_target?: number;
-    period_start: string;
-    period_end: string;
-    fiscal_year_id?: string;
-    metadata?: Record<string, number | undefined>;
-    created_at: string;
-  }[]> {
+  static async getFinancialKPIs(fiscalYearId?: string): Promise<
+    {
+      id: string;
+      kpi_name: string;
+      kpi_category: string;
+      kpi_value: number;
+      kpi_target?: number;
+      period_start: string;
+      period_end: string;
+      fiscal_year_id?: string;
+      metadata?: Record<string, number | undefined>;
+      created_at: string;
+    }[]
+  > {
     let query = supabase
       .from('financial_kpis')
-      .select('id, kpi_name, kpi_category, kpi_value, kpi_target, period_start, period_end, fiscal_year_id, metadata, created_at')
+      .select(
+        'id, kpi_name, kpi_category, kpi_value, kpi_target, period_start, period_end, fiscal_year_id, metadata, created_at'
+      )
       .order('created_at', { ascending: false });
 
     if (fiscalYearId) {
@@ -275,9 +297,7 @@ export class BudgetService {
    * حفظ مؤشرات الأداء
    */
   static async saveFinancialKPIs(kpis: FinancialKPIInsert[]): Promise<void> {
-    const { error } = await supabase
-      .from('financial_kpis')
-      .insert(kpis);
+    const { error } = await supabase.from('financial_kpis').insert(kpis);
 
     if (error) throw error;
   }
@@ -286,9 +306,7 @@ export class BudgetService {
    * حفظ التنبؤات المالية
    */
   static async saveFinancialForecasts(forecasts: FinancialForecastInsert[]): Promise<void> {
-    const { error } = await supabase
-      .from('financial_forecasts')
-      .insert(forecasts);
+    const { error } = await supabase.from('financial_forecasts').insert(forecasts);
 
     if (error) throw error;
   }

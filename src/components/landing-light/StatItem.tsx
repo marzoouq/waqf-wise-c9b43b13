@@ -1,7 +1,7 @@
 /**
  * مكون إحصائية
  */
-import React from "react";
+import React from 'react';
 
 interface StatItemProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -21,7 +21,7 @@ export function StatItem({ icon: Icon, value, suffix, label, color }: StatItemPr
           <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
         </div>
         <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
-          <span>{value.toLocaleString("ar-SA")}</span>
+          <span>{value.toLocaleString('ar-SA')}</span>
           <span className="text-primary">{suffix}</span>
         </div>
         <p className="text-muted-foreground text-sm sm:text-base font-medium">{label}</p>

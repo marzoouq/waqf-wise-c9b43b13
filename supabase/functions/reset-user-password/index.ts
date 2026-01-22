@@ -1,17 +1,17 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 import {
   checkRateLimit,
   createRateLimitResponse,
   getClientIdentifier,
-  RATE_LIMITS
+  RATE_LIMITS,
 } from '../_shared/rate-limiter.ts';
 
 serve(async (req) => {
@@ -30,16 +30,18 @@ serve(async (req) => {
             status: 'healthy',
             function: 'reset-user-password',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
     const clientId = getClientIdentifier(req);
     const rateLimitResult = checkRateLimit(clientId, {
       ...RATE_LIMITS.SENSITIVE,
-      keyPrefix: 'reset-password'
+      keyPrefix: 'reset-password',
     });
 
     if (!rateLimitResult.allowed) {
@@ -61,8 +63,11 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseAdmin.auth.getUser(token);
+
     if (userError || !user) {
       return unauthorizedResponse('غير مصرح', req);
     }
@@ -72,9 +77,9 @@ serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id);
-    
-    const hasPermission = roles?.some(r => r.role === 'admin' || r.role === 'nazer');
-    
+
+    const hasPermission = roles?.some((r) => r.role === 'admin' || r.role === 'nazer');
+
     if (!hasPermission) {
       // تسجيل المحاولة غير المصرح بها
       await supabaseAdmin.from('audit_logs').insert({
@@ -85,7 +90,7 @@ serve(async (req) => {
         severity: 'warning',
         description: 'محاولة غير مصرح بها لإعادة تعيين كلمة مرور',
         ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
-        user_agent: req.headers.get('User-Agent')
+        user_agent: req.headers.get('User-Agent'),
       });
 
       return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
@@ -106,7 +111,7 @@ serve(async (req) => {
         success: true,
         testMode: true,
         message: 'معرف المستخدم غير صالح',
-        user_id
+        user_id,
       });
     }
 
@@ -115,10 +120,9 @@ serve(async (req) => {
     }
 
     // تحديث كلمة المرور
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      user_id,
-      { password: new_password }
-    );
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
+      password: new_password,
+    });
 
     if (updateError) throw updateError;
 
@@ -138,23 +142,27 @@ serve(async (req) => {
       description: `تم تعيين كلمة مرور مؤقتة للمستخدم: ${targetProfile?.full_name || user_id}`,
       severity: 'warning',
       ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
-      user_agent: req.headers.get('User-Agent')
+      user_agent: req.headers.get('User-Agent'),
     });
 
     // إرسال إشعار للمستخدم المستهدف
     await supabaseAdmin.rpc('create_notification', {
       p_user_id: user_id,
       p_title: 'تم تغيير كلمة المرور',
-      p_message: 'تم تعيين كلمة مرور جديدة لحسابك من قبل المسؤول. يرجى تغييرها عند تسجيل الدخول التالي.',
+      p_message:
+        'تم تعيين كلمة مرور جديدة لحسابك من قبل المسؤول. يرجى تغييرها عند تسجيل الدخول التالي.',
       p_type: 'warning',
-      p_action_url: '/settings'
+      p_action_url: '/settings',
     });
 
-    return jsonResponse({ 
-      success: true,
-      message: 'تم تحديث كلمة المرور بنجاح'
-    }, 200, req);
-
+    return jsonResponse(
+      {
+        success: true,
+        message: 'تم تحديث كلمة المرور بنجاح',
+      },
+      200,
+      req
+    );
   } catch (error) {
     console.error('Error in reset-user-password:', error);
     return errorResponse(

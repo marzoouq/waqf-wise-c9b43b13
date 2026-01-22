@@ -1,30 +1,30 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Settings, Shield, Key, CheckCircle } from "lucide-react";
-import { toast } from "sonner";
-import { useZATCASettings } from "@/hooks/zatca/useZATCASettings";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Settings, Shield, Key, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { useZATCASettings } from '@/hooks/zatca/useZATCASettings';
 
 export function ZATCASettings() {
   const { settings, updateSettings, saveSettings, testConnection, isSaving } = useZATCASettings();
 
   const handleTestConnection = async () => {
-    toast.info("جاري الاختبار...", {
-      description: "يتم التحقق من الاتصال بخدمة الهيئة",
+    toast.info('جاري الاختبار...', {
+      description: 'يتم التحقق من الاتصال بخدمة الهيئة',
     });
 
     const success = await testConnection();
-    
+
     if (success) {
-      toast.success("نجح الاتصال", {
-        description: "تم التحقق من الاتصال بنجاح",
+      toast.success('نجح الاتصال', {
+        description: 'تم التحقق من الاتصال بنجاح',
         icon: <CheckCircle className="h-5 w-5 text-success" />,
       });
     } else {
-      toast.error("فشل الاتصال", {
-        description: "الرجاء التحقق من البيانات المدخلة",
+      toast.error('فشل الاتصال', {
+        description: 'الرجاء التحقق من البيانات المدخلة',
       });
     }
   };
@@ -37,9 +37,7 @@ export function ZATCASettings() {
             <Settings className="h-5 w-5" />
             <div>
               <CardTitle>إعدادات هيئة الزكاة والضريبة (ZATCA)</CardTitle>
-              <CardDescription>
-                قم بتكوين الاتصال مع منصة الفوترة الإلكترونية
-              </CardDescription>
+              <CardDescription>قم بتكوين الاتصال مع منصة الفوترة الإلكترونية</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -57,9 +55,7 @@ export function ZATCASettings() {
             </div>
             <Switch
               checked={settings.enabled}
-              onCheckedChange={(checked) =>
-                updateSettings({ enabled: checked })
-              }
+              onCheckedChange={(checked) => updateSettings({ enabled: checked })}
             />
           </div>
 
@@ -71,13 +67,9 @@ export function ZATCASettings() {
                 id="orgId"
                 placeholder="أدخل رقم المنشأة"
                 value={settings.organizationId}
-                onChange={(e) =>
-                  updateSettings({ organizationId: e.target.value })
-                }
+                onChange={(e) => updateSettings({ organizationId: e.target.value })}
               />
-              <p className="text-xs text-muted-foreground">
-                رقم التعريف الخاص بالمنشأة لدى الهيئة
-              </p>
+              <p className="text-xs text-muted-foreground">رقم التعريف الخاص بالمنشأة لدى الهيئة</p>
             </div>
 
             <div className="grid gap-2">
@@ -86,13 +78,9 @@ export function ZATCASettings() {
                 id="vatNumber"
                 placeholder="أدخل الرقم الضريبي"
                 value={settings.vatNumber}
-                onChange={(e) =>
-                  updateSettings({ vatNumber: e.target.value })
-                }
+                onChange={(e) => updateSettings({ vatNumber: e.target.value })}
               />
-              <p className="text-xs text-muted-foreground">
-                رقم التسجيل الضريبي (15 رقم)
-              </p>
+              <p className="text-xs text-muted-foreground">رقم التسجيل الضريبي (15 رقم)</p>
             </div>
 
             <div className="grid gap-2">
@@ -105,9 +93,7 @@ export function ZATCASettings() {
                 type="password"
                 placeholder="أدخل مفتاح API"
                 value={settings.apiKey}
-                onChange={(e) =>
-                  updateSettings({ apiKey: e.target.value })
-                }
+                onChange={(e) => updateSettings({ apiKey: e.target.value })}
               />
               <p className="text-xs text-muted-foreground">
                 مفتاح الوصول للربط مع منصة الفوترة الإلكترونية
@@ -123,9 +109,7 @@ export function ZATCASettings() {
               </div>
               <Switch
                 checked={settings.testMode}
-                onCheckedChange={(checked) =>
-                  updateSettings({ testMode: checked })
-                }
+                onCheckedChange={(checked) => updateSettings({ testMode: checked })}
               />
             </div>
           </div>
@@ -133,7 +117,7 @@ export function ZATCASettings() {
           {/* Actions */}
           <div className="flex gap-2 pt-4">
             <Button onClick={saveSettings} disabled={isSaving} className="flex-1">
-              {isSaving ? "جاري الحفظ..." : "حفظ الإعدادات"}
+              {isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </Button>
             <Button
               variant="outline"

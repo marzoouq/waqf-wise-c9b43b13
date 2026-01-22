@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Plus, Trash2 } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Plus, Trash2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ROLE_LABELS } from "@/types/roles";
-import type { ApprovalWorkflow, ApprovalLevel } from "@/hooks/requests/useApprovalWorkflows";
+} from '@/components/ui/select';
+import { ROLE_LABELS } from '@/types/roles';
+import type { ApprovalWorkflow, ApprovalLevel } from '@/hooks/requests/useApprovalWorkflows';
 
 const ENTITY_TYPES = [
   { value: 'journal_entry', label: 'قيد محاسبي' },
@@ -52,10 +52,7 @@ export function ApprovalWorkflowForm({
   ]);
 
   const addLevel = () => {
-    setLevels([
-      ...levels,
-      { level: levels.length + 1, role: 'nazer', required: true },
-    ]);
+    setLevels([...levels, { level: levels.length + 1, role: 'nazer', required: true }]);
   };
 
   const removeLevel = (index: number) => {
@@ -73,7 +70,7 @@ export function ApprovalWorkflowForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const conditions = {
       ...(formData.min_amount ? { min_amount: parseFloat(formData.min_amount) } : {}),
       ...(formData.max_amount ? { max_amount: parseFloat(formData.max_amount) } : {}),
@@ -168,11 +165,12 @@ export function ApprovalWorkflowForm({
 
         <div className="space-y-2">
           {levels.map((level, index) => (
-            <div key={`level-${level.level}`} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-              <span className="text-sm font-medium min-w-[80px]">
-                المستوى {level.level}
-              </span>
-              
+            <div
+              key={`level-${level.level}`}
+              className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg"
+            >
+              <span className="text-sm font-medium min-w-[80px]">المستوى {level.level}</span>
+
               <Select
                 value={level.role}
                 onValueChange={(value) => updateLevel(index, 'role', value)}
@@ -216,8 +214,8 @@ export function ApprovalWorkflowForm({
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           إلغاء
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={isSubmitting || !formData.workflow_name || !formData.entity_type}
         >
           {isSubmitting ? 'جاري الحفظ...' : 'إنشاء المسار'}

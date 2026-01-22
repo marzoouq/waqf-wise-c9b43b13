@@ -3,8 +3,8 @@
  * @version 2.9.2
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database, Json } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 type LandingSettingRow = Database['public']['Tables']['landing_page_settings']['Row'];
 
@@ -54,17 +54,18 @@ export class SettingsService {
    */
   static async saveZATCASettings(settings: ZATCASetting[]): Promise<void> {
     for (const { key, value } of settings) {
-      const { error } = await supabase
-        .from('system_settings')
-        .upsert({
+      const { error } = await supabase.from('system_settings').upsert(
+        {
           setting_key: key,
           setting_value: value,
           setting_type: 'text',
           category: 'zatca',
           updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'setting_key'
-        });
+        },
+        {
+          onConflict: 'setting_key',
+        }
+      );
 
       if (error) throw error;
     }
@@ -82,7 +83,7 @@ export class SettingsService {
     if (error) throw error;
 
     const settings: Record<string, string> = {};
-    (data || []).forEach(item => {
+    (data || []).forEach((item) => {
       settings[item.setting_key] = item.setting_value;
     });
     return settings;
@@ -94,7 +95,9 @@ export class SettingsService {
   static async getOrganizationSettings() {
     const { data, error } = await supabase
       .from('organization_settings')
-      .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
+      .select(
+        'id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number'
+      )
       .maybeSingle();
 
     if (error) throw error;
@@ -146,10 +149,7 @@ export class SettingsService {
    * تحديث فلتر
    */
   static async updateFilter(id: string, updates: Partial<SavedFilter>): Promise<void> {
-    const { error } = await supabase
-      .from('saved_filters')
-      .update(updates)
-      .eq('id', id);
+    const { error } = await supabase.from('saved_filters').update(updates).eq('id', id);
 
     if (error) throw error;
   }
@@ -160,7 +160,7 @@ export class SettingsService {
    */
   static async deleteFilter(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
     const { data: userData } = await supabase.auth.getUser();
-    
+
     const { error } = await supabase
       .from('saved_filters')
       .update({

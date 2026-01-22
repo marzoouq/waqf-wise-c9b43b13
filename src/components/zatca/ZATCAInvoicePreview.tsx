@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Send, Download, QrCode, CheckCircle, AlertCircle } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useZATCASubmit } from "@/hooks/zatca/useZATCASubmit";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Send, Download, QrCode, CheckCircle, AlertCircle } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useZATCASubmit } from '@/hooks/zatca/useZATCASubmit';
 
 interface ZATCAInvoicePreviewProps {
   invoice: {
@@ -45,19 +45,23 @@ export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
               رقم الفاتورة: {invoice.invoice_number}
             </p>
           </div>
-          <Badge 
+          <Badge
             variant={
-              zatcaStatus === 'success' ? 'default' : 
-              zatcaStatus === 'error' ? 'destructive' : 
-              'secondary'
+              zatcaStatus === 'success'
+                ? 'default'
+                : zatcaStatus === 'error'
+                  ? 'destructive'
+                  : 'secondary'
             }
             className="gap-2"
           >
             {zatcaStatus === 'success' && <CheckCircle className="h-4 w-4" />}
             {zatcaStatus === 'error' && <AlertCircle className="h-4 w-4" />}
-            {zatcaStatus === 'success' ? 'مرسلة للهيئة' : 
-             zatcaStatus === 'error' ? 'فشل الإرسال' : 
-             'معلقة'}
+            {zatcaStatus === 'success'
+              ? 'مرسلة للهيئة'
+              : zatcaStatus === 'error'
+                ? 'فشل الإرسال'
+                : 'معلقة'}
           </Badge>
         </div>
       </CardHeader>
@@ -67,7 +71,7 @@ export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
           <div>
             <p className="text-sm text-muted-foreground">التاريخ</p>
             <p className="font-semibold">
-              {format(new Date(invoice.invoice_date), "dd MMMM yyyy", { locale: ar })}
+              {format(new Date(invoice.invoice_date), 'dd MMMM yyyy', { locale: ar })}
             </p>
           </div>
           <div>
@@ -110,16 +114,14 @@ export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
         <div className="flex justify-center">
           <div className="border-2 border-dashed rounded-lg p-8 bg-muted/20">
             <QrCode className="h-32 w-32 text-muted-foreground" />
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              رمز الاستجابة السريع
-            </p>
+            <p className="text-center text-sm text-muted-foreground mt-2">رمز الاستجابة السريع</p>
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex gap-2 pt-4">
-          <Button 
-            className="flex-1 gap-2" 
+          <Button
+            className="flex-1 gap-2"
             onClick={handleSubmitToZATCA}
             disabled={isSubmitting || zatcaStatus === 'success'}
           >

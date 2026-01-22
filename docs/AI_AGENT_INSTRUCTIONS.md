@@ -28,30 +28,37 @@ src/
 ## Critical Rules
 
 ### 1. TypeScript
+
 - Explicit types only, **no `any`**
 - Use `unknown` for dynamic data, then narrow with type guards
 
 ### 2. Supabase Safety
+
 - Use `.maybeSingle()` instead of `.single()` to avoid errors on empty results
 - All queries go through services, never direct calls
 
 ### 3. Query Keys
+
 - Always use centralized `QUERY_KEYS` from `src/lib/query-keys.ts`
 - Use `QUERY_CONFIG` for staleTime and refetch settings
 
 ### 4. Service Pattern
+
 - Use facade pattern for large services (e.g., beneficiary, accounting)
 - Services split into subdirectories with index.ts re-exports
 
 ### 5. Cache Invalidation
+
 - Use batched invalidation via `src/lib/query-invalidation.ts`
 - Functions: `invalidateAccountingQueries`, `invalidateBeneficiaryQueries`, etc.
 
 ### 6. Realtime
+
 - Only in hooks via `useEffect`
 - Prefer unified subscriptions (e.g., `useNazerDashboardRealtime`)
 
 ### 7. Error Handling
+
 - Use `handleError` from error utilities
 - Use `showSuccess` for toast notifications
 
@@ -60,11 +67,13 @@ src/
 ## Design System
 
 ### Colors
+
 - **Semantic tokens only** (e.g., `text-foreground`, `bg-primary`)
 - Never use direct colors like `text-white`, `bg-black`
 - All colors must be HSL in `index.css`
 
 ### RTL Layout
+
 - Use `start/end` instead of `left/right`
 - Use `ms-*` / `me-*` instead of `ml-*` / `mr-*`
 
@@ -72,15 +81,15 @@ src/
 
 ## Role-Based Access
 
-| Role | Access Level |
-|------|-------------|
-| `nazer` | Full system control |
-| `admin` | System administration |
-| `accountant` | Financial operations |
-| `cashier` | Payment processing |
-| `archivist` | Document management |
-| `beneficiary` | Own data only |
-| `waqf_heir` | Full transparency |
+| Role          | Access Level          |
+| ------------- | --------------------- |
+| `nazer`       | Full system control   |
+| `admin`       | System administration |
+| `accountant`  | Financial operations  |
+| `cashier`     | Payment processing    |
+| `archivist`   | Document management   |
+| `beneficiary` | Own data only         |
+| `waqf_heir`   | Full transparency     |
 
 ---
 
@@ -95,6 +104,7 @@ src/
 ## Testing
 
 ### Commands
+
 ```bash
 npx vitest run          # Run all tests
 npx vitest --ui         # Interactive UI
@@ -102,6 +112,7 @@ npx vitest run --watch  # Watch mode
 ```
 
 ### Structure
+
 ```
 src/__tests__/
 ├── unit/
@@ -113,6 +124,7 @@ src/__tests__/
 ```
 
 ### Mocking
+
 - Use `setMockTableData` for Supabase query mocks
 - Import `mockSupabase` from `src/__tests__/utils/supabase.mock.ts`
 
@@ -131,13 +143,13 @@ npm run lint     # ESLint check
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `docs/ARCHITECTURE_RULES.md` | Detailed architecture rules |
-| `src/services/README.md` | Service layer documentation |
-| `src/hooks/README.md` | Hooks organization guide |
-| `src/lib/query-keys.ts` | Centralized query keys |
-| `src/lib/query-invalidation.ts` | Batched cache invalidation |
+| File                            | Purpose                     |
+| ------------------------------- | --------------------------- |
+| `docs/ARCHITECTURE_RULES.md`    | Detailed architecture rules |
+| `src/services/README.md`        | Service layer documentation |
+| `src/hooks/README.md`           | Hooks organization guide    |
+| `src/lib/query-keys.ts`         | Centralized query keys      |
+| `src/lib/query-invalidation.ts` | Batched cache invalidation  |
 
 ---
 

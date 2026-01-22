@@ -2,15 +2,19 @@
  * usePOSStats Hook - إحصائيات نقاط البيع
  * يستخدم POSService
  */
-import { useQuery } from "@tanstack/react-query";
-import { POSService, type POSDailyStats } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { POSService, type POSDailyStats } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { POSDailyStats };
 
 export const usePOSStats = (date: Date = new Date()) => {
   const dateStr = date.toISOString().split('T')[0];
-  const { data: dailyStats, isLoading, refetch } = useQuery({
+  const {
+    data: dailyStats,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.POS_DAILY_STATS(dateStr),
     queryFn: () => POSService.getDailyStats(date),
   });
@@ -31,7 +35,11 @@ export const usePOSStats = (date: Date = new Date()) => {
 };
 
 export const useShiftStats = (shiftId: string | null) => {
-  const { data: shiftStats, isLoading, refetch } = useQuery({
+  const {
+    data: shiftStats,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.POS_SHIFT_STATS(shiftId || ''),
     queryFn: () => POSService.getShiftStats(shiftId!),
     enabled: !!shiftId,

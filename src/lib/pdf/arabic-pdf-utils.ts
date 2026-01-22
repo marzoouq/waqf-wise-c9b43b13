@@ -1,25 +1,25 @@
 /**
  * أدوات PDF العربية الموحدة
  * Unified Arabic PDF Utilities
- * 
+ *
  * @version 5.0.0 - Arabic Shaping Only
- * 
+ *
  * الحل النهائي المثبت:
  * - استخدام Arabic Shaping فقط (js-arabic-reshaper) لتوصيل الحروف
  * - خط Amiri OpenType + jsPDF يتولى الترتيب RTL تلقائياً
  * - لا حاجة لـ BiDi reordering اليدوي
- * 
+ *
  * ⚠️ ملف governance-pdf.ts يعمل لأنه لا يستخدم أي معالجة - فقط الخط ⚠️
  * ⚠️ الحل: reshape فقط لتوصيل الحروف، بدون أي عكس ⚠️
  */
 
-import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
-import { logger } from "@/lib/logger";
-import { WAQF_IDENTITY, getCurrentDateArabic, getCurrentDateTimeArabic } from "@/lib/waqf-identity";
-import type { jsPDF } from "jspdf";
+import { loadAmiriFonts } from '@/lib/fonts/loadArabicFonts';
+import { logger } from '@/lib/logger';
+import { WAQF_IDENTITY, getCurrentDateArabic, getCurrentDateTimeArabic } from '@/lib/waqf-identity';
+import type { jsPDF } from 'jspdf';
 
 // Arabic reshaper for proper letter joining
-import { reshape } from "js-arabic-reshaper";
+import { reshape } from 'js-arabic-reshaper';
 
 // ============= أدوات مساعدة =============
 
@@ -39,26 +39,26 @@ function containsArabic(text: string): boolean {
 
 /**
  * معالجة النص العربي للعرض الصحيح في PDF
- * 
+ *
  * الحل النهائي المثبت:
  * - استخدام Arabic Shaping فقط (reshape) لتوصيل الحروف
  * - خط Amiri + jsPDF يتولى الترتيب RTL تلقائياً
  * - لا حاجة لـ BiDi reordering اليدوي
- * 
+ *
  * ⚠️ ملاحظة مهمة: ملف governance-pdf.ts يعمل بشكل صحيح لأنه:
  *    1. يستخدم خط Amiri (يدعم OpenType)
  *    2. يمرر النص مباشرة بدون أي معالجة
  *    3. jsPDF يتولى الترتيب RTL تلقائياً
- * 
+ *
  * لذا الحل هو: reshape فقط لتوصيل الحروف، بدون أي عكس أو BiDi
- * 
+ *
  * @version 5.0.0 - حل نهائي: Arabic Shaping فقط
  */
 export const processArabicText = (text: string | number | null | undefined): string => {
-  if (text === null || text === undefined) return "";
+  if (text === null || text === undefined) return '';
 
   const strText = String(text);
-  if (!strText.trim()) return "";
+  if (!strText.trim()) return '';
 
   try {
     // إذا لا يوجد عربي، إرجاع كما هو (مهم للأرقام/الأكواد)
@@ -68,7 +68,7 @@ export const processArabicText = (text: string | number | null | undefined): str
     // تجنّب doc.setR2L(true) لأنه يعكس ترتيب الأحرف/الأرقام ويؤدي لنص معكوس
     return reshape(strText);
   } catch (error) {
-    logger.error(error, { context: "process_arabic_text", severity: "low" });
+    logger.error(error, { context: 'process_arabic_text', severity: 'low' });
     return strText;
   }
 };
@@ -104,7 +104,7 @@ export const formatPercentageForPDF = (num: number): string => {
  * معالجة مصفوفة من الرؤوس للجداول
  */
 export const processArabicHeaders = (headers: string[]): string[] => {
-  return headers.map(header => processArabicText(header));
+  return headers.map((header) => processArabicText(header));
 };
 
 /**
@@ -113,8 +113,8 @@ export const processArabicHeaders = (headers: string[]): string[] => {
 export const processArabicTableData = (
   data: (string | number | boolean | null | undefined)[][]
 ): string[][] => {
-  return data.map(row => 
-    row.map(cell => {
+  return data.map((row) =>
+    row.map((cell) => {
       if (typeof cell === 'boolean') return cell ? 'نعم' : 'لا';
       return processArabicText(cell);
     })
@@ -130,34 +130,34 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
 
-    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
-    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    doc.addFileToVFS('Amiri-Regular.ttf', amiriRegular);
+    doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
 
-    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
-    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    doc.addFileToVFS('Amiri-Bold.ttf', amiriBold);
+    doc.addFont('Amiri-Bold.ttf', 'Amiri', 'bold');
 
-    doc.setFont("Amiri", "normal");
-    doc.setLanguage("ar");
+    doc.setFont('Amiri', 'normal');
+    doc.setLanguage('ar');
 
     // مهم: لا نفعّل setR2L(true) لأنه يعكس ترتيب الأحرف/الأرقام
     // نعتمد على processArabicText(reshape) + محاذاة يمين/توسيط عبر align
     type JsPdfWithR2L = { setR2L?: (value: boolean) => void };
     const docWithR2L: JsPdfWithR2L = doc as unknown as JsPdfWithR2L;
-    if (typeof docWithR2L.setR2L === "function") {
+    if (typeof docWithR2L.setR2L === 'function') {
       docWithR2L.setR2L(false);
     }
 
-    return "Amiri";
+    return 'Amiri';
   } catch (error) {
-    logger.error(error, { context: "load_arabic_font_pdf", severity: "low" });
-    doc.setLanguage("ar");
-    return "helvetica";
+    logger.error(error, { context: 'load_arabic_font_pdf', severity: 'low' });
+    doc.setLanguage('ar');
+    return 'helvetica';
   }
 };
 
 // ============= جلب بيانات الهوية البصرية =============
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface WaqfBrandingData {
   stamp_image_url: string | null;
@@ -174,8 +174,10 @@ export interface WaqfBrandingData {
 export const fetchWaqfBranding = async (): Promise<WaqfBrandingData | null> => {
   try {
     const { data, error } = await supabase
-      .from("waqf_branding")
-      .select("stamp_image_url, signature_image_url, waqf_logo_url, nazer_name, show_logo_in_pdf, show_stamp_in_pdf")
+      .from('waqf_branding')
+      .select(
+        'stamp_image_url, signature_image_url, waqf_logo_url, nazer_name, show_logo_in_pdf, show_stamp_in_pdf'
+      )
       .limit(1)
       .maybeSingle();
 
@@ -198,60 +200,69 @@ export interface WaqfHeaderOptions {
  * يدعم الشعار المخصص من قاعدة البيانات
  */
 export const addWaqfHeader = (
-  doc: jsPDF, 
-  fontName: string, 
+  doc: jsPDF,
+  fontName: string,
   title: string,
   options?: WaqfHeaderOptions
 ): number => {
   const pageWidth = doc.internal.pageSize.width;
   let yPosition = 15;
-  
+
   const { logoUrl, showLogo = true } = options || {};
-  
+
   // شعار الوقف (صورة مخصصة إذا وُجدت)
   if (showLogo && logoUrl) {
     // سيتم إضافة الشعار بشكل async في addWaqfHeaderWithLogo
     // هنا نترك مكان للشعار
     yPosition = 35; // نترك مساحة للشعار
   }
-  
+
   // شعار واسم الوقف (نص)
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(18);
   doc.setTextColor(22, 101, 52); // أخضر غامق
-  doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(
+    processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`),
+    pageWidth / 2,
+    yPosition,
+    { align: 'center' }
+  );
   yPosition += 8;
-  
+
   // اسم المنصة
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   doc.setTextColor(107, 114, 128); // رمادي
-  doc.text(processArabicText(WAQF_IDENTITY.platformName), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(WAQF_IDENTITY.platformName), pageWidth / 2, yPosition, {
+    align: 'center',
+  });
   yPosition += 5;
-  
+
   // خط فاصل
   doc.setDrawColor(22, 101, 52);
   doc.setLineWidth(0.5);
   doc.line(20, yPosition, pageWidth - 20, yPosition);
   yPosition += 10;
-  
+
   // عنوان التقرير
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(16);
   doc.setTextColor(31, 41, 55);
-  doc.text(processArabicText(title), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(title), pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 8;
-  
+
   // التاريخ
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   doc.setTextColor(107, 114, 128);
-  doc.text(processArabicText(`التاريخ: ${getCurrentDateArabic()}`), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(`التاريخ: ${getCurrentDateArabic()}`), pageWidth / 2, yPosition, {
+    align: 'center',
+  });
   yPosition += 10;
-  
+
   // إعادة الألوان للوضع الطبيعي
   doc.setTextColor(0, 0, 0);
-  
+
   return yPosition;
 };
 
@@ -259,14 +270,14 @@ export const addWaqfHeader = (
  * إضافة ترويسة الوقف مع الشعار المخصص (async)
  */
 export const addWaqfHeaderWithLogo = async (
-  doc: jsPDF, 
-  fontName: string, 
+  doc: jsPDF,
+  fontName: string,
   title: string
 ): Promise<number> => {
   const branding = await fetchWaqfBranding();
   const pageWidth = doc.internal.pageSize.width;
   let yPosition = 15;
-  
+
   // إضافة الشعار إذا وُجد ومفعّل
   if (branding?.show_logo_in_pdf && branding?.waqf_logo_url) {
     try {
@@ -278,43 +289,52 @@ export const addWaqfHeaderWithLogo = async (
       // تجاهل خطأ تحميل الشعار
     }
   }
-  
+
   // شعار واسم الوقف (نص)
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(18);
   doc.setTextColor(22, 101, 52);
-  doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(
+    processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`),
+    pageWidth / 2,
+    yPosition,
+    { align: 'center' }
+  );
   yPosition += 8;
-  
+
   // اسم المنصة
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   doc.setTextColor(107, 114, 128);
-  doc.text(processArabicText(WAQF_IDENTITY.platformName), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(WAQF_IDENTITY.platformName), pageWidth / 2, yPosition, {
+    align: 'center',
+  });
   yPosition += 5;
-  
+
   // خط فاصل
   doc.setDrawColor(22, 101, 52);
   doc.setLineWidth(0.5);
   doc.line(20, yPosition, pageWidth - 20, yPosition);
   yPosition += 10;
-  
+
   // عنوان التقرير
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(16);
   doc.setTextColor(31, 41, 55);
-  doc.text(processArabicText(title), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(title), pageWidth / 2, yPosition, { align: 'center' });
   yPosition += 8;
-  
+
   // التاريخ
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   doc.setTextColor(107, 114, 128);
-  doc.text(processArabicText(`التاريخ: ${getCurrentDateArabic()}`), pageWidth / 2, yPosition, { align: "center" });
+  doc.text(processArabicText(`التاريخ: ${getCurrentDateArabic()}`), pageWidth / 2, yPosition, {
+    align: 'center',
+  });
   yPosition += 10;
-  
+
   doc.setTextColor(0, 0, 0);
-  
+
   return yPosition;
 };
 
@@ -324,21 +344,30 @@ export const addWaqfHeaderWithLogo = async (
 export const addWaqfFooter = (doc: jsPDF, fontName: string) => {
   const pageHeight = doc.internal.pageSize.height;
   const pageWidth = doc.internal.pageSize.width;
-  
+
   // خط فاصل
   doc.setDrawColor(229, 231, 235);
   doc.setLineWidth(0.3);
   doc.line(20, pageHeight - 25, pageWidth - 20, pageHeight - 25);
-  
+
   // النص الرسمي
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(8);
   doc.setTextColor(107, 114, 128);
-  doc.text(processArabicText(`* ${WAQF_IDENTITY.footer}`), pageWidth / 2, pageHeight - 18, { align: "center" });
-  
+  doc.text(processArabicText(`* ${WAQF_IDENTITY.footer}`), pageWidth / 2, pageHeight - 18, {
+    align: 'center',
+  });
+
   // تاريخ الطباعة والإصدار
   doc.setFontSize(7);
-  doc.text(processArabicText(`تاريخ الطباعة: ${getCurrentDateTimeArabic()} | الإصدار: ${WAQF_IDENTITY.version}`), pageWidth / 2, pageHeight - 12, { align: "center" });
+  doc.text(
+    processArabicText(
+      `تاريخ الطباعة: ${getCurrentDateTimeArabic()} | الإصدار: ${WAQF_IDENTITY.version}`
+    ),
+    pageWidth / 2,
+    pageHeight - 12,
+    { align: 'center' }
+  );
 };
 
 // ============= ختم الناظر الإلكتروني =============
@@ -355,21 +384,16 @@ export interface NazerStampOptions {
  * يدعم صور مخصصة للختم والتوقيع
  */
 export const addNazerStamp = async (
-  doc: jsPDF, 
+  doc: jsPDF,
   fontName: string,
   options: NazerStampOptions = {}
 ): Promise<void> => {
-  const { 
-    nazerName = "ناظر الوقف", 
-    date, 
-    stampImageUrl, 
-    signatureImageUrl 
-  } = options;
-  
+  const { nazerName = 'ناظر الوقف', date, stampImageUrl, signatureImageUrl } = options;
+
   const pageWidth = doc.internal.pageSize.width;
   const stampX = pageWidth - 40;
   const stampY = 255;
-  
+
   // إذا توجد صورة ختم مخصصة
   if (stampImageUrl) {
     try {
@@ -383,7 +407,7 @@ export const addNazerStamp = async (
     // الختم المرسوم الافتراضي
     drawDefaultStamp(doc, fontName, stampX, stampY, nazerName, date);
   }
-  
+
   // إضافة التوقيع إذا وُجد
   if (signatureImageUrl) {
     try {
@@ -393,7 +417,7 @@ export const addNazerStamp = async (
       // تجاهل خطأ تحميل التوقيع
     }
   }
-  
+
   // إعادة الألوان للوضع الطبيعي
   doc.setTextColor(0, 0, 0);
 };
@@ -401,17 +425,14 @@ export const addNazerStamp = async (
 /**
  * إضافة ختم الناظر مع جلب البيانات من قاعدة البيانات تلقائياً
  */
-export const addNazerStampFromDB = async (
-  doc: jsPDF, 
-  fontName: string
-): Promise<void> => {
+export const addNazerStampFromDB = async (doc: jsPDF, fontName: string): Promise<void> => {
   const branding = await fetchWaqfBranding();
-  
+
   // تحقق من تفعيل إظهار الختم
   if (!branding?.show_stamp_in_pdf) return;
-  
+
   await addNazerStamp(doc, fontName, {
-    nazerName: branding?.nazer_name || "ناظر الوقف",
+    nazerName: branding?.nazer_name || 'ناظر الوقف',
     stampImageUrl: branding?.stamp_image_url,
     signatureImageUrl: branding?.signature_image_url,
   });
@@ -421,40 +442,40 @@ export const addNazerStampFromDB = async (
  * رسم الختم الافتراضي (في حالة عدم وجود صورة)
  */
 function drawDefaultStamp(
-  doc: jsPDF, 
-  fontName: string, 
-  stampX: number, 
-  stampY: number, 
-  nazerName: string, 
+  doc: jsPDF,
+  fontName: string,
+  stampX: number,
+  stampY: number,
+  nazerName: string,
   date?: string
 ): void {
   const stampRadius = 18;
-  
+
   // رسم الختم الدائري
   doc.setDrawColor(22, 101, 52);
   doc.setFillColor(240, 253, 244);
   doc.setLineWidth(1.5);
   doc.circle(stampX, stampY, stampRadius, 'FD');
-  
+
   // دائرة داخلية
   doc.setLineWidth(0.5);
   doc.circle(stampX, stampY, stampRadius - 3, 'S');
-  
+
   // نص "معتمد"
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(22, 101, 52);
-  doc.text(processArabicText("معتمد"), stampX, stampY - 4, { align: "center" });
-  
+  doc.text(processArabicText('معتمد'), stampX, stampY - 4, { align: 'center' });
+
   // اسم الناظر
   doc.setFontSize(7);
-  doc.setFont(fontName, "normal");
-  doc.text(processArabicText(nazerName), stampX, stampY + 3, { align: "center" });
-  
+  doc.setFont(fontName, 'normal');
+  doc.text(processArabicText(nazerName), stampX, stampY + 3, { align: 'center' });
+
   // التاريخ
   const stampDate = date || new Date().toLocaleDateString('en-GB');
   doc.setFontSize(6);
-  doc.text(stampDate, stampX, stampY + 8, { align: "center" });
+  doc.text(stampDate, stampX, stampY + 8, { align: 'center' });
 }
 
 /**
@@ -483,12 +504,12 @@ async function loadImageAsBase64(url: string): Promise<string> {
  * الألوان الرسمية للوقف
  */
 export const WAQF_COLORS = {
-  primary: [22, 101, 52] as [number, number, number],      // أخضر غامق
-  secondary: [34, 139, 34] as [number, number, number],    // أخضر فاتح
-  header: [71, 85, 105] as [number, number, number],       // رمادي أزرق
-  text: [31, 41, 55] as [number, number, number],          // أسود
-  muted: [107, 114, 128] as [number, number, number],      // رمادي
-  white: [255, 255, 255] as [number, number, number],      // أبيض
+  primary: [22, 101, 52] as [number, number, number], // أخضر غامق
+  secondary: [34, 139, 34] as [number, number, number], // أخضر فاتح
+  header: [71, 85, 105] as [number, number, number], // رمادي أزرق
+  text: [31, 41, 55] as [number, number, number], // أسود
+  muted: [107, 114, 128] as [number, number, number], // رمادي
+  white: [255, 255, 255] as [number, number, number], // أبيض
   alternateRow: [249, 250, 251] as [number, number, number], // رمادي فاتح
 };
 
@@ -499,12 +520,12 @@ export const getDefaultTableStyles = (fontName: string) => ({
   styles: {
     font: fontName,
     fontSize: 10,
-    halign: "right" as const,
+    halign: 'right' as const,
   },
   headStyles: {
     fillColor: WAQF_COLORS.primary,
     textColor: WAQF_COLORS.white,
-    fontStyle: "bold" as const,
+    fontStyle: 'bold' as const,
   },
   alternateRowStyles: {
     fillColor: WAQF_COLORS.alternateRow,

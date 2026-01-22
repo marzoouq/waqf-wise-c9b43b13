@@ -20,7 +20,7 @@ interface VerificationFormData {
 export function useIdentityVerification(beneficiary: Beneficiary | null) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [formData, setFormData] = useState<VerificationFormData>({
     verification_type: 'identity_card',
     verification_method: 'manual',
@@ -36,15 +36,35 @@ export function useIdentityVerification(beneficiary: Beneficiary | null) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary?.id || '') });
-      toast({ title: 'تم التحقق بنجاح', description: 'تم التحقق من هوية المستفيد وتحديث البيانات' });
+      toast({
+        title: 'تم التحقق بنجاح',
+        description: 'تم التحقق من هوية المستفيد وتحديث البيانات',
+      });
     },
     onError: (error: Error) => {
-      toast({ title: 'خطأ في التحقق', description: error.message || 'فشل التحقق من الهوية', variant: 'destructive' });
+      toast({
+        title: 'خطأ في التحقق',
+        description: error.message || 'فشل التحقق من الهوية',
+        variant: 'destructive',
+      });
     },
   });
 
-  const updateFormData = (updates: Partial<VerificationFormData>) => setFormData(prev => ({ ...prev, ...updates }));
-  const resetForm = () => setFormData({ verification_type: 'identity_card', verification_method: 'manual', verification_status: 'pending', notes: '' });
+  const updateFormData = (updates: Partial<VerificationFormData>) =>
+    setFormData((prev) => ({ ...prev, ...updates }));
+  const resetForm = () =>
+    setFormData({
+      verification_type: 'identity_card',
+      verification_method: 'manual',
+      verification_status: 'pending',
+      notes: '',
+    });
 
-  return { formData, updateFormData, resetForm, verify: verifyMutation.mutate, isVerifying: verifyMutation.isPending };
+  return {
+    formData,
+    updateFormData,
+    resetForm,
+    verify: verifyMutation.mutate,
+    isVerifying: verifyMutation.isPending,
+  };
 }

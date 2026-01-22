@@ -3,7 +3,7 @@
  * @version 2.8.65
  */
 
-import { AccountingService } from "@/services";
+import { AccountingService } from '@/services';
 
 export interface JournalExportEntry {
   entry_date: string;

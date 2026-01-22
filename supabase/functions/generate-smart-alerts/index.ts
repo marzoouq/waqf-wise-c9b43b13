@@ -4,13 +4,9 @@
  * @version 2.0.0 - إضافة Rate Limiting و Audit Logging
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 5 تشغيلات/ساعة لكل مستخدم ============
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -20,22 +16,28 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
 
 interface SmartAlert {
-  alert_type: 'contract_expiring' | 'rent_overdue' | 'loan_due' | 'request_overdue' | 'anomaly' | 'recommendation';
+  alert_type:
+    | 'contract_expiring'
+    | 'rent_overdue'
+    | 'loan_due'
+    | 'request_overdue'
+    | 'anomaly'
+    | 'recommendation';
   severity: 'critical' | 'warning' | 'info';
   title: string;
   description: string;
@@ -59,24 +61,26 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'generate-smart-alerts',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // ✅ CRON_SECRET Authentication Support (for scheduled jobs)
-    const cronSecret = Deno.env.get("CRON_SECRET");
-    const providedSecret = requestBody.cron_secret || req.headers.get("x-cron-secret");
-    const authHeader = req.headers.get("authorization");
-    
+    const cronSecret = Deno.env.get('CRON_SECRET');
+    const providedSecret = requestBody.cron_secret || req.headers.get('x-cron-secret');
+    const authHeader = req.headers.get('authorization');
+
     // السماح بالوصول إذا كان هناك JWT صالح أو CRON_SECRET صحيح
     const hasValidCronSecret = cronSecret && providedSecret === cronSecret;
-    const hasAuthHeader = authHeader && authHeader.startsWith("Bearer ");
-    
+    const hasAuthHeader = authHeader && authHeader.startsWith('Bearer ');
+
     if (!hasValidCronSecret && !hasAuthHeader) {
       console.log('[generate-smart-alerts] Unauthorized: No valid JWT or CRON_SECRET');
-      return errorResponse("Unauthorized: يتطلب JWT أو CRON_SECRET صالح", 401);
+      return errorResponse('Unauthorized: يتطلب JWT أو CRON_SECRET صالح', 401);
     }
 
     const authMethod = hasValidCronSecret ? 'CRON_SECRET' : 'JWT';
@@ -89,10 +93,12 @@ serve(async (req) => {
     // ✅ Rate Limiting للمستخدمين (ليس للمهام المجدولة)
     if (!hasValidCronSecret && hasAuthHeader) {
       const token = authHeader!.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(token);
       if (user && !checkRateLimit(user.id)) {
         console.warn(`[generate-smart-alerts] Rate limit exceeded for user: ${user.id}`);
-        return errorResponse("تجاوزت الحد المسموح (5 تشغيلات/ساعة)", 429);
+        return errorResponse('تجاوزت الحد المسموح (5 تشغيلات/ساعة)', 429);
       }
     }
 
@@ -113,7 +119,7 @@ serve(async (req) => {
         title: `${expiringContracts.length} عقد قارب على الانتهاء`,
         description: `يوجد ${expiringContracts.length} عقد سينتهي خلال 30 يوم. يُنصح بالتواصل مع المستأجرين لتجديد العقود.`,
         action_url: '/properties?tab=contracts',
-        data: { count: expiringContracts.length, contracts: expiringContracts.slice(0, 5) }
+        data: { count: expiringContracts.length, contracts: expiringContracts.slice(0, 5) },
       });
     }
 
@@ -132,7 +138,7 @@ serve(async (req) => {
         title: `${overdueRents.length} دفعة إيجار متأخرة`,
         description: `إجمالي المتأخرات: ${totalOverdue.toLocaleString('ar-SA')} ريال. يُنصح بالمتابعة مع المستأجرين.`,
         action_url: '/properties?tab=payments',
-        data: { count: overdueRents.length, total_amount: totalOverdue }
+        data: { count: overdueRents.length, total_amount: totalOverdue },
       });
     }
 
@@ -149,7 +155,7 @@ serve(async (req) => {
         title: `تنبيه: ${overdueLoans.length} قرض متأخر`,
         description: `يوجد ${overdueLoans.length} قرض متأخر. يُنصح بمتابعة المستفيدين وتفعيل خطط السداد.`,
         action_url: '/loans',
-        data: { count: overdueLoans.length, type: 'overdue_loans' }
+        data: { count: overdueLoans.length, type: 'overdue_loans' },
       });
     }
 
@@ -168,7 +174,7 @@ serve(async (req) => {
         title: `${oldRequests.length} طلب معلق منذ أكثر من أسبوع`,
         description: 'هناك طلبات تحتاج إلى مراجعة عاجلة لتحسين وقت الاستجابة.',
         action_url: '/requests',
-        data: { count: oldRequests.length, type: 'pending_requests' }
+        data: { count: oldRequests.length, type: 'pending_requests' },
       });
     }
 
@@ -179,17 +185,15 @@ serve(async (req) => {
 
     let totalUnits = 0;
     let occupiedUnits = 0;
-    
+
     if (propertiesData && propertiesData.length > 0) {
-      propertiesData.forEach(prop => {
+      propertiesData.forEach((prop) => {
         totalUnits += Number(prop.total_units) || 0;
         occupiedUnits += Number(prop.occupied_units) || 0;
       });
     }
 
-    const occupancyRate = totalUnits > 0 
-      ? ((occupiedUnits / totalUnits) * 100).toFixed(1) 
-      : 0;
+    const occupancyRate = totalUnits > 0 ? ((occupiedUnits / totalUnits) * 100).toFixed(1) : 0;
 
     if (Number(occupancyRate) < 70) {
       alerts.push({
@@ -198,16 +202,18 @@ serve(async (req) => {
         title: `معدل الإشغال: ${occupancyRate}%`,
         description: `معدل الإشغال منخفض (${occupiedUnits}/${totalUnits} وحدة). يُنصح بتفعيل حملة تسويقية لزيادة الإيجارات.`,
         action_url: '/properties',
-        data: { occupancy_rate: occupancyRate, occupied: occupiedUnits, total: totalUnits, type: 'low_occupancy' }
+        data: {
+          occupancy_rate: occupancyRate,
+          occupied: occupiedUnits,
+          total: totalUnits,
+          type: 'low_occupancy',
+        },
       });
     }
 
     // حذف التنبيهات القديمة (أكثر من 30 يوم)
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    await supabase
-      .from('smart_alerts')
-      .delete()
-      .lt('created_at', thirtyDaysAgo);
+    await supabase.from('smart_alerts').delete().lt('created_at', thirtyDaysAgo);
 
     // التحقق من التنبيهات المكررة قبل الإدراج
     const today = new Date().toISOString().split('T')[0];
@@ -216,36 +222,38 @@ serve(async (req) => {
       .select('title, alert_type')
       .gte('created_at', today);
 
-    const existingTitles = new Set(existingAlerts?.map(a => `${a.alert_type}:${a.title}`) || []);
+    const existingTitles = new Set(existingAlerts?.map((a) => `${a.alert_type}:${a.title}`) || []);
 
     // فلترة التنبيهات المكررة
-    const newAlerts = alerts.filter(alert => 
-      !existingTitles.has(`${alert.alert_type}:${alert.title}`)
+    const newAlerts = alerts.filter(
+      (alert) => !existingTitles.has(`${alert.alert_type}:${alert.title}`)
     );
 
     // إدراج التنبيهات الجديدة فقط
     if (newAlerts.length > 0) {
-      const { error: insertError } = await supabase
-        .from('smart_alerts')
-        .insert(newAlerts);
+      const { error: insertError } = await supabase.from('smart_alerts').insert(newAlerts);
 
       if (insertError) throw insertError;
     }
 
-    console.log(`[generate-smart-alerts] Generated: ${alerts.length}, New: ${newAlerts.length}, Skipped duplicates: ${alerts.length - newAlerts.length}`);
+    console.log(
+      `[generate-smart-alerts] Generated: ${alerts.length}, New: ${newAlerts.length}, Skipped duplicates: ${alerts.length - newAlerts.length}`
+    );
 
     // ✅ تسجيل في audit_logs للتدقيق الجنائي
     try {
       let userId: string | null = null;
       let userEmail: string | null = 'cron_job@system';
-      
+
       if (!hasValidCronSecret && hasAuthHeader) {
         const token = authHeader!.replace('Bearer ', '');
-        const { data: { user } } = await supabase.auth.getUser(token);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser(token);
         userId = user?.id || null;
         userEmail = user?.email || null;
       }
-      
+
       await supabase.from('audit_logs').insert({
         action_type: 'generate_smart_alerts',
         table_name: 'smart_alerts',
@@ -255,29 +263,25 @@ serve(async (req) => {
         severity: 'info',
         ip_address: req.headers.get('x-forwarded-for') || 'system',
         user_agent: req.headers.get('user-agent') || 'cron_job',
-        metadata: { 
-          alerts_generated: alerts.length, 
+        metadata: {
+          alerts_generated: alerts.length,
           new_alerts: newAlerts.length,
           skipped_duplicates: alerts.length - newAlerts.length,
-          authMethod 
-        }
+          authMethod,
+        },
       });
     } catch (auditError) {
       console.warn('[generate-smart-alerts] Failed to log audit:', auditError);
     }
 
-    return jsonResponse({ 
-      success: true, 
+    return jsonResponse({
+      success: true,
       alerts_generated: alerts.length,
       new_alerts: newAlerts.length,
-      message: `تم إنشاء ${newAlerts.length} تنبيه ذكي جديد` 
+      message: `تم إنشاء ${newAlerts.length} تنبيه ذكي جديد`,
     });
-
   } catch (error) {
     console.error('Error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

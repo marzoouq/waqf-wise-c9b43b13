@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Building2, MapPin } from 'lucide-react';
 
 interface MobilePropertyCardProps {
   property: {
@@ -14,13 +14,13 @@ interface MobilePropertyCardProps {
 
 export function MobilePropertyCard({ property }: MobilePropertyCardProps) {
   const getPropertyTypeBadge = (type: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "outline" }> = {
-      "سكني": { variant: "default" },
-      "تجاري": { variant: "secondary" },
-      "زراعي": { variant: "outline" },
+    const config: Record<string, { variant: 'default' | 'secondary' | 'outline' }> = {
+      سكني: { variant: 'default' },
+      تجاري: { variant: 'secondary' },
+      زراعي: { variant: 'outline' },
     };
 
-    return <Badge variant={config[type]?.variant || "secondary"}>{type}</Badge>;
+    return <Badge variant={config[type]?.variant || 'secondary'}>{type}</Badge>;
   };
 
   return (

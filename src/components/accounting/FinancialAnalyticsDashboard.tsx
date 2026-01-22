@@ -49,9 +49,13 @@ export function FinancialAnalyticsDashboard() {
 
   const getKPIStatus = (kpi: FinancialKPI) => {
     if (!kpi.kpi_target) return 'neutral';
-    
-    const isGoodAbove = ['current_ratio', 'quick_ratio', 'profit_margin', 'roa', 'roe'].includes(kpi.kpi_name);
-    const isGoodBelow = ['debt_to_assets', 'debt_to_equity', 'expense_ratio'].includes(kpi.kpi_name);
+
+    const isGoodAbove = ['current_ratio', 'quick_ratio', 'profit_margin', 'roa', 'roe'].includes(
+      kpi.kpi_name
+    );
+    const isGoodBelow = ['debt_to_assets', 'debt_to_equity', 'expense_ratio'].includes(
+      kpi.kpi_name
+    );
 
     if (isGoodAbove) {
       return kpi.kpi_value >= kpi.kpi_target ? 'good' : 'warning';
@@ -87,9 +91,7 @@ export function FinancialAnalyticsDashboard() {
                 <Activity className="h-5 w-5 text-primary" />
                 مؤشرات الأداء المالي
               </CardTitle>
-              <CardDescription>
-                تحليلات شاملة للوضع المالي ومؤشرات الأداء الرئيسية
-              </CardDescription>
+              <CardDescription>تحليلات شاملة للوضع المالي ومؤشرات الأداء الرئيسية</CardDescription>
             </div>
             <Button onClick={handleCalculate} disabled={isCalculating}>
               <RefreshCw className={`h-4 w-4 ms-2 ${isCalculating ? 'animate-spin' : ''}`} />
@@ -102,9 +104,7 @@ export function FinancialAnalyticsDashboard() {
       {Object.entries(groupedKPIs).map(([category, categoryKPIs]) => (
         <Card key={category}>
           <CardHeader>
-            <CardTitle className="text-lg">
-              {kpiCategories[category] || category}
-            </CardTitle>
+            <CardTitle className="text-lg">{kpiCategories[category] || category}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -124,9 +124,7 @@ export function FinancialAnalyticsDashboard() {
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex items-end gap-2">
-                          <div className="text-3xl font-bold">
-                            {kpi.kpi_value.toFixed(2)}
-                          </div>
+                          <div className="text-3xl font-bold">{kpi.kpi_value.toFixed(2)}</div>
                           {kpi.kpi_name.includes('ratio') || kpi.kpi_name.includes('margin') ? (
                             <div className="text-sm text-muted-foreground mb-1">
                               {kpi.kpi_name.includes('margin') ? '%' : 'x'}
@@ -137,9 +135,7 @@ export function FinancialAnalyticsDashboard() {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span>الهدف: {kpi.kpi_target.toFixed(2)}</span>
-                              <span>
-                                {((kpi.kpi_value / kpi.kpi_target) * 100).toFixed(0)}%
-                              </span>
+                              <span>{((kpi.kpi_value / kpi.kpi_target) * 100).toFixed(0)}%</span>
                             </div>
                             <Progress
                               value={Math.min((kpi.kpi_value / kpi.kpi_target) * 100, 100)}

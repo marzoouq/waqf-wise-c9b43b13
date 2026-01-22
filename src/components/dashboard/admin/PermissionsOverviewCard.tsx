@@ -2,24 +2,24 @@
  * Permissions Overview Card - بطاقة ملخص الأدوار والصلاحيات
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Shield, Users, Settings, ExternalLink } from "lucide-react";
-import { useRolesOverview } from "@/hooks/security/useRolesOverview";
-import { useNavigate } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Shield, Users, Settings, ExternalLink } from 'lucide-react';
+import { useRolesOverview } from '@/hooks/security/useRolesOverview';
+import { useNavigate } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-500",
-  nazer: "bg-purple-500",
-  accountant: "bg-blue-500",
-  cashier: "bg-green-500",
-  archivist: "bg-yellow-500",
-  user: "bg-gray-500",
-  beneficiary: "bg-teal-500",
-  waqf_heir: "bg-orange-500",
+  admin: 'bg-red-500',
+  nazer: 'bg-purple-500',
+  accountant: 'bg-blue-500',
+  cashier: 'bg-green-500',
+  archivist: 'bg-yellow-500',
+  user: 'bg-gray-500',
+  beneficiary: 'bg-teal-500',
+  waqf_heir: 'bg-orange-500',
 };
 
 export function PermissionsOverviewCard() {
@@ -54,16 +54,23 @@ export function PermissionsOverviewCard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-4 text-muted-foreground">
-            حدث خطأ في جلب البيانات
-          </div>
+          <div className="text-center py-4 text-muted-foreground">حدث خطأ في جلب البيانات</div>
         </CardContent>
       </Card>
     );
   }
 
   // ترتيب الأدوار حسب الأهمية
-  const roleOrder = ['admin', 'nazer', 'accountant', 'cashier', 'archivist', 'user', 'beneficiary', 'waqf_heir'];
+  const roleOrder = [
+    'admin',
+    'nazer',
+    'accountant',
+    'cashier',
+    'archivist',
+    'user',
+    'beneficiary',
+    'waqf_heir',
+  ];
   const sortedRoles = [...rolesData].sort((a, b) => {
     return roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role);
   });
@@ -75,10 +82,10 @@ export function PermissionsOverviewCard() {
           <Shield className="h-5 w-5 text-primary" />
           ملخص الأدوار والصلاحيات
         </CardTitle>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => navigate("/settings/roles")}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/settings/roles')}
           className="gap-2"
         >
           <Settings className="h-4 w-4" />
@@ -112,7 +119,9 @@ export function PermissionsOverviewCard() {
               <div key={role.role} className="space-y-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`h-3 w-3 rounded-full ${ROLE_COLORS[role.role] || 'bg-gray-400'}`} />
+                    <div
+                      className={`h-3 w-3 rounded-full ${ROLE_COLORS[role.role] || 'bg-gray-400'}`}
+                    />
                     <span className="text-sm font-medium">{role.label}</span>
                   </div>
                   <Badge variant="secondary" className="text-xs">
@@ -127,10 +136,10 @@ export function PermissionsOverviewCard() {
 
         {/* رابط لصفحة الصلاحيات */}
         <div className="mt-4 pt-4 border-t">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="w-full justify-between text-muted-foreground hover:text-foreground"
-            onClick={() => navigate("/settings/permissions")}
+            onClick={() => navigate('/settings/permissions')}
           >
             <span>إدارة الصلاحيات التفصيلية</span>
             <ExternalLink className="h-4 w-4" />

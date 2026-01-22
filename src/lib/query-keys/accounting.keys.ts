@@ -28,7 +28,8 @@ export const ACCOUNTING_KEYS = {
   CASH_FLOW: ['cash-flow'] as const,
   CASH_FLOWS: (fiscalYearId?: string) => ['cash_flows', fiscalYearId] as const,
   CASH_FLOW_REPORT: ['cash-flow-report'] as const,
-  GENERAL_LEDGER: (accountId?: string, dateFrom?: string, dateTo?: string) => ['general_ledger', accountId, dateFrom, dateTo] as const,
+  GENERAL_LEDGER: (accountId?: string, dateFrom?: string, dateTo?: string) =>
+    ['general_ledger', accountId, dateFrom, dateTo] as const,
   FINANCIAL_DATA: ['financial-data'] as const,
 
   // Budgets

@@ -6,16 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/dialog';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -28,14 +28,7 @@ import {
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { 
-  Search, 
-  Star, 
-  Trash2, 
-  Plus, 
-  Clock,
-  Filter 
-} from 'lucide-react';
+import { Search, Star, Trash2, Plus, Clock, Filter } from 'lucide-react';
 import { SearchCriteria } from './AdvancedSearchDialog';
 import { toast } from 'sonner';
 
@@ -48,7 +41,8 @@ interface SavedSearchesManagerProps {
  * إدارة وتنظيم عمليات البحث المحفوظة
  */
 export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps) {
-  const { searches, isLoading, saveSearch, deleteSearch, updateUsage, error, refetch } = useSavedSearches();
+  const { searches, isLoading, saveSearch, deleteSearch, updateUsage, error, refetch } =
+    useSavedSearches();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchToDelete, setSearchToDelete] = useState<SavedSearch | null>(null);
@@ -109,11 +103,17 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل عمليات البحث" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل عمليات البحث"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
-  const favoriteSearches = searches.filter(s => s.is_favorite);
-  const recentSearches = searches.filter(s => !s.is_favorite).slice(0, 5);
+  const favoriteSearches = searches.filter((s) => s.is_favorite);
+  const recentSearches = searches.filter((s) => !s.is_favorite).slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -138,9 +138,7 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
           <DialogContent>
             <DialogHeader>
               <DialogTitle>حفظ عملية بحث</DialogTitle>
-              <DialogDescription>
-                احفظ معايير البحث الحالية للاستخدام لاحقاً
-              </DialogDescription>
+              <DialogDescription>احفظ معايير البحث الحالية للاستخدام لاحقاً</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -167,9 +165,7 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 إلغاء
               </Button>
-              <Button onClick={handleSaveSearch}>
-                حفظ
-              </Button>
+              <Button onClick={handleSaveSearch}>حفظ</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -251,13 +247,16 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
           <AlertDialogHeader>
             <AlertDialogTitle>حذف عملية البحث</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف عملية البحث "{searchToDelete?.name}"؟
-              لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من حذف عملية البحث "{searchToDelete?.name}"؟ لا يمكن التراجع عن هذا
+              الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               حذف
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -275,7 +274,7 @@ interface SearchCardProps {
 
 function SearchCard({ search, onLoad, onDelete }: SearchCardProps) {
   const criteriaCount = Object.keys(search.search_criteria).length;
-  
+
   return (
     <Card className="hover:bg-accent/50 transition-colors cursor-pointer group">
       <CardContent className="p-4">
@@ -318,7 +317,7 @@ function SearchCard({ search, onLoad, onDelete }: SearchCardProps) {
               <span>
                 {new Date(search.last_used_at).toLocaleDateString('ar-SA', {
                   month: 'short',
-                  day: 'numeric'
+                  day: 'numeric',
                 })}
               </span>
             )}

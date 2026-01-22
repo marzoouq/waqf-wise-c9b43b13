@@ -35,10 +35,10 @@ export function useSystemHealthIndicator() {
 
   const checkHealth = useCallback(async () => {
     if (!mountedRef.current) return;
-    
+
     if (!navigator.onLine) {
       setStatus('offline');
-      setDetails(prev => ({ ...prev, networkOnline: false, database: 'unknown' }));
+      setDetails((prev) => ({ ...prev, networkOnline: false, database: 'unknown' }));
       return;
     }
 
@@ -48,12 +48,8 @@ export function useSystemHealthIndicator() {
     try {
       const { error } = await retryWithBackoff(
         async () => {
-          const result = await supabase
-            .from('activities')
-            .select('id')
-            .limit(1)
-            .maybeSingle();
-          
+          const result = await supabase.from('activities').select('id').limit(1).maybeSingle();
+
           if (result.error) throw result.error;
           return result;
         },
@@ -61,7 +57,7 @@ export function useSystemHealthIndicator() {
           maxRetries: 2,
           baseDelay: 500,
           maxDelay: 2000,
-          shouldRetry: isRetryableError
+          shouldRetry: isRetryableError,
         }
       );
 
@@ -102,10 +98,10 @@ export function useSystemHealthIndicator() {
       }
     } catch (error) {
       if (!mountedRef.current) return;
-      
+
       const responseTime = Math.round(performance.now() - startTime);
       const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-      
+
       if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
         setStatus('offline');
         setDetails({
@@ -137,13 +133,13 @@ export function useSystemHealthIndicator() {
     const interval = setInterval(checkHealth, THRESHOLDS.CHECK_INTERVAL_MS);
 
     const handleOnline = () => {
-      setDetails(prev => ({ ...prev, networkOnline: true }));
+      setDetails((prev) => ({ ...prev, networkOnline: true }));
       checkHealth();
     };
 
     const handleOffline = () => {
       setStatus('offline');
-      setDetails(prev => ({ ...prev, networkOnline: false }));
+      setDetails((prev) => ({ ...prev, networkOnline: false }));
     };
 
     window.addEventListener('online', handleOnline);

@@ -1,17 +1,22 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountingService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { logger } from "@/lib/logger";
-import { AccountWithBalance } from "@/types/supabase-helpers";
-import { AccountInsert, AccountUpdate } from "@/types/accounting";
-import { getErrorMessage } from "@/types/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AccountingService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { logger } from '@/lib/logger';
+import { AccountWithBalance } from '@/types/supabase-helpers';
+import { AccountInsert, AccountUpdate } from '@/types/accounting';
+import { getErrorMessage } from '@/types/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useAccounts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: accounts = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: accounts = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: () => AccountingService.getAccounts(),
   });
@@ -23,17 +28,17 @@ export function useAccounts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة الحساب بنجاح",
+        title: 'تمت الإضافة بنجاح',
+        description: 'تم إضافة الحساب بنجاح',
       });
     },
     onError: (error: unknown) => {
       const message = getErrorMessage(error);
       logger.error(error, { context: 'add_account', severity: 'medium' });
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -45,17 +50,17 @@ export function useAccounts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
-        title: "تم التحديث",
-        description: "تم تحديث الحساب بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تحديث الحساب بنجاح',
       });
     },
     onError: (error: unknown) => {
       const message = getErrorMessage(error);
       logger.error(error, { context: 'update_account', severity: 'medium' });
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -67,17 +72,17 @@ export function useAccounts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
-        title: "تم الحذف",
-        description: "تم حذف الحساب بنجاح",
+        title: 'تم الحذف',
+        description: 'تم حذف الحساب بنجاح',
       });
     },
     onError: (error: unknown) => {
       const message = getErrorMessage(error);
       logger.error(error, { context: 'delete_account', severity: 'medium' });
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -99,12 +104,12 @@ export function useAccounts() {
 
     // Create map
     accounts.forEach((account) => {
-      accountMap.set(account.id, { 
-        ...account, 
+      accountMap.set(account.id, {
+        ...account,
         balance: account.current_balance || 0,
         children: [],
         allows_transactions: !account.is_header,
-        is_system_account: false
+        is_system_account: false,
       });
     });
 

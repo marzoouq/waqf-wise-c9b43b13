@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Upload, LogIn, Send, CheckCircle } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, Upload, LogIn, Send, CheckCircle } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { useBeneficiaryActivity } from "@/hooks/beneficiary/useBeneficiaryActivity";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Skeleton } from '@/components/ui/skeleton';
+import { useBeneficiaryActivity } from '@/hooks/beneficiary/useBeneficiaryActivity';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface ActivityTimelineProps {
   beneficiaryId: string;
@@ -15,13 +15,13 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
 
   const getActivityIcon = (actionType: string) => {
     switch (actionType) {
-      case "login":
+      case 'login':
         return <LogIn className="h-4 w-4" />;
-      case "request_submitted":
+      case 'request_submitted':
         return <Send className="h-4 w-4" />;
-      case "document_uploaded":
+      case 'document_uploaded':
         return <Upload className="h-4 w-4" />;
-      case "data_updated":
+      case 'data_updated':
         return <CheckCircle className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
@@ -49,7 +49,13 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل سجل النشاط" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل سجل النشاط"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -69,12 +75,12 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
                 <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                   {getActivityIcon(activity.action_type)}
                 </div>
-                
+
                 {/* المحتوى */}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-xs truncate">{activity.action_description}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    {format(new Date(activity.created_at || ""), "d MMM - h:mm a", { locale: ar })}
+                    {format(new Date(activity.created_at || ''), 'd MMM - h:mm a', { locale: ar })}
                   </p>
                 </div>
               </div>

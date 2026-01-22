@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Control, ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
+import { ReactNode } from 'react';
+import { Control, ControllerRenderProps, FieldPath, FieldValues } from 'react-hook-form';
 import {
   FormControl,
   FormDescription,
@@ -7,38 +7,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { cn } from '@/lib/utils';
 
 // Field Types
 export type FieldType =
-  | "text"
-  | "number"
-  | "email"
-  | "tel"
-  | "password"
-  | "textarea"
-  | "select"
-  | "date"
-  | "custom";
+  | 'text'
+  | 'number'
+  | 'email'
+  | 'tel'
+  | 'password'
+  | 'textarea'
+  | 'select'
+  | 'date'
+  | 'custom';
 
 // Select Option Type
 export interface SelectOption {
@@ -56,7 +52,7 @@ export interface UnifiedFormFieldProps<TFieldValues extends FieldValues> {
   description?: string;
   disabled?: boolean;
   required?: boolean;
-  
+
   // Specific props for different types
   options?: SelectOption[]; // for select
   rows?: number; // for textarea
@@ -64,10 +60,10 @@ export interface UnifiedFormFieldProps<TFieldValues extends FieldValues> {
   max?: number; // for number
   step?: number; // for number
   maxLength?: number; // for text inputs
-  
+
   // Custom render - استخدام ControllerRenderProps مع FieldPath للأنواع الآمنة
   render?: (field: ControllerRenderProps<TFieldValues, FieldPath<TFieldValues>>) => ReactNode;
-  
+
   // Grid layout
   className?: string;
 }
@@ -76,7 +72,7 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
   control,
   name,
   label,
-  type = "text",
+  type = 'text',
   placeholder,
   description,
   disabled = false,
@@ -103,7 +99,7 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
           <FormControl>
             {render ? (
               render(field)
-            ) : type === "textarea" ? (
+            ) : type === 'textarea' ? (
               <Textarea
                 placeholder={placeholder}
                 disabled={disabled}
@@ -112,14 +108,10 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                 className="resize-none"
                 {...field}
               />
-            ) : type === "select" && options ? (
-              <Select
-                disabled={disabled}
-                value={field.value}
-                onValueChange={field.onChange}
-              >
+            ) : type === 'select' && options ? (
+              <Select disabled={disabled} value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder={placeholder || "اختر..."} />
+                  <SelectValue placeholder={placeholder || 'اختر...'} />
                 </SelectTrigger>
                 <SelectContent>
                   {options.map((option) => (
@@ -129,22 +121,22 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                   ))}
                 </SelectContent>
               </Select>
-            ) : type === "date" ? (
+            ) : type === 'date' ? (
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     disabled={disabled}
                     className={cn(
-                      "w-full justify-start text-right font-normal",
-                      !field.value && "text-muted-foreground"
+                      'w-full justify-start text-right font-normal',
+                      !field.value && 'text-muted-foreground'
                     )}
                   >
                     <CalendarIcon className="ms-2 h-4 w-4" />
                     {field.value ? (
-                      format(new Date(field.value), "PPP", { locale: ar })
+                      format(new Date(field.value), 'PPP', { locale: ar })
                     ) : (
-                      <span>{placeholder || "اختر التاريخ"}</span>
+                      <span>{placeholder || 'اختر التاريخ'}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -155,12 +147,12 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                     onSelect={(date) => field.onChange(date?.toISOString())}
                     disabled={disabled}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
+                    className={cn('p-3 pointer-events-auto')}
                     locale={ar}
                   />
                 </PopoverContent>
               </Popover>
-            ) : type === "number" ? (
+            ) : type === 'number' ? (
               <Input
                 type="number"
                 placeholder={placeholder}
@@ -168,11 +160,11 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                 min={min}
                 max={max}
                 step={step}
-                value={field.value === undefined || field.value === null ? "" : field.value}
+                value={field.value === undefined || field.value === null ? '' : field.value}
                 onChange={(e) => {
                   const val = e.target.value;
                   // السماح بالحقل الفارغ (undefined) بدلاً من إجبار 0
-                  field.onChange(val === "" ? undefined : Number(val));
+                  field.onChange(val === '' ? undefined : Number(val));
                 }}
                 onBlur={field.onBlur}
                 ref={field.ref}
@@ -205,17 +197,13 @@ interface FormGridProps {
 
 export function FormGrid({ children, columns = 2, className }: FormGridProps) {
   const gridClass = {
-    1: "grid-cols-1",
-    2: "grid-cols-1 md:grid-cols-2",
-    3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 md:grid-cols-2',
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
   }[columns];
 
-  return (
-    <div className={cn("grid gap-4", gridClass, className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('grid gap-4', gridClass, className)}>{children}</div>;
 }
 
 // Form Section Component
@@ -228,15 +216,11 @@ interface FormSectionProps {
 
 export function FormSection({ title, description, children, className }: FormSectionProps) {
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       {(title || description) && (
         <div className="space-y-1">
-          {title && (
-            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-          )}
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          )}
+          {title && <h3 className="text-lg font-semibold text-foreground">{title}</h3>}
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
         </div>
       )}
       {children}

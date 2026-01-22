@@ -22,11 +22,7 @@ export function useSelfHealing(options: UseSelfHealingOptions = {}) {
    * جلب بيانات مع استرجاع تلقائي من الـ Cache
    */
   const fetchWithRecovery = useCallback(
-    async <T,>(
-      cacheKey: string,
-      fetchFn: () => Promise<T>,
-      cacheTTL?: number
-    ): Promise<T> => {
+    async <T>(cacheKey: string, fetchFn: () => Promise<T>, cacheTTL?: number): Promise<T> => {
       try {
         const result = await selfHealing.fetch(cacheKey, fetchFn, { cacheTTL });
 
@@ -55,7 +51,7 @@ export function useSelfHealing(options: UseSelfHealingOptions = {}) {
    * تنفيذ عملية مع إعادة محاولة تلقائية
    */
   const executeWithRetry = useCallback(
-    async <T,>(operation: () => Promise<T>, maxAttempts: number = 3): Promise<T> => {
+    async <T>(operation: () => Promise<T>, maxAttempts: number = 3): Promise<T> => {
       try {
         return await retryOperation(operation);
       } catch (error) {

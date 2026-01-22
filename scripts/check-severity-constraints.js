@@ -2,7 +2,7 @@
 /**
  * 🔍 فحص تلقائي لتوافق severity مع قيود قاعدة البيانات
  * يُنفذ قبل كل commit عبر lint-staged وقبل النشر
- * 
+ *
  * القاعدة الأساسية:
  * - system_alerts: يقبل فقط ['low', 'medium', 'high', 'critical']
  * - system_error_logs: يقبل فقط ['low', 'medium', 'high', 'critical']
@@ -58,38 +58,39 @@ function scanFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   const errors = [];
-  
+
   // أنماط البحث عن استخدام الجداول مع severity
   const tablePatterns = [
     { table: 'system_alerts', regex: /from\s*\(\s*['"`]system_alerts['"`]\s*\)/gi },
     { table: 'system_error_logs', regex: /from\s*\(\s*['"`]system_error_logs['"`]\s*\)/gi },
   ];
-  
+
   // ابحث عن كل استخدام للجداول
   for (const { table, regex } of tablePatterns) {
     let match;
     const contentCopy = content;
-    
+
     // أعد تعيين الـ regex
     regex.lastIndex = 0;
-    
+
     while ((match = regex.exec(contentCopy)) !== null) {
       const matchPosition = match.index;
-      
+
       // ابحث عن severity في السياق القريب (500 حرف بعد الجدول)
       const contextAfter = contentCopy.substring(matchPosition, matchPosition + 800);
-      
+
       // ابحث عن severity: 'info' أو severity: "info"
       const severityInfoMatch = contextAfter.match(/severity\s*:\s*['"`]info['"`]/i);
-      
+
       if (severityInfoMatch) {
         // احسب رقم السطر
         const textBeforeMatch = contentCopy.substring(0, matchPosition);
         const lineNumber = textBeforeMatch.split('\n').length;
-        
+
         // ابحث عن السطر الذي يحتوي على severity
-        const severityLineOffset = contextAfter.substring(0, severityInfoMatch.index).split('\n').length - 1;
-        
+        const severityLineOffset =
+          contextAfter.substring(0, severityInfoMatch.index).split('\n').length - 1;
+
         errors.push({
           file: filePath,
           line: lineNumber + severityLineOffset,
@@ -101,7 +102,7 @@ function scanFile(filePath) {
       }
     }
   }
-  
+
   return errors;
 }
 
@@ -111,12 +112,15 @@ function scanFile(filePath) {
 function getLineContext(lines, lineIndex, range) {
   const start = Math.max(0, lineIndex - range);
   const end = Math.min(lines.length, lineIndex + range + 1);
-  
-  return lines.slice(start, end).map((line, i) => {
-    const actualLine = start + i + 1;
-    const marker = actualLine === lineIndex + 1 ? '>>>' : '   ';
-    return `${marker} ${actualLine}: ${line}`;
-  }).join('\n');
+
+  return lines
+    .slice(start, end)
+    .map((line, i) => {
+      const actualLine = start + i + 1;
+      const marker = actualLine === lineIndex + 1 ? '>>>' : '   ';
+      return `${marker} ${actualLine}: ${line}`;
+    })
+    .join('\n');
 }
 
 /**
@@ -124,19 +128,19 @@ function getLineContext(lines, lineIndex, range) {
  */
 function scanDirectory(dir) {
   const errors = [];
-  
+
   if (!fs.existsSync(dir)) {
     return errors;
   }
-  
+
   const items = fs.readdirSync(dir);
-  
+
   for (const item of items) {
     const fullPath = path.join(dir, item);
-    
+
     try {
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         // تجاهل node_modules و .git
         if (!['node_modules', '.git', 'dist', 'build'].includes(item)) {
@@ -149,7 +153,7 @@ function scanDirectory(dir) {
       // تجاهل الأخطاء في الوصول للملفات
     }
   }
-  
+
   return errors;
 }
 
@@ -158,13 +162,13 @@ function scanDirectory(dir) {
  */
 function scanFiles(files) {
   const errors = [];
-  
+
   for (const file of files) {
     if (fs.existsSync(file) && (file.endsWith('.ts') || file.endsWith('.tsx'))) {
       errors.push(...scanFile(file));
     }
   }
-  
+
   return errors;
 }
 
@@ -175,12 +179,12 @@ function scanFiles(files) {
 function main() {
   console.log('\n' + colorize('blue', '🔍 فحص توافق severity مع DB constraints...'));
   console.log('');
-  
+
   let errors = [];
-  
+
   // تحقق إذا تم تمرير ملفات محددة (من lint-staged)
   const args = process.argv.slice(2);
-  
+
   if (args.length > 0 && !args[0].startsWith('-')) {
     // فحص ملفات محددة
     errors = scanFiles(args);
@@ -190,20 +194,21 @@ function main() {
       path.join(__dirname, '..', 'supabase', 'functions'),
       path.join(__dirname, '..', 'src'),
     ];
-    
+
     for (const dir of dirsToScan) {
       errors.push(...scanDirectory(dir));
     }
   }
-  
+
   // إزالة الأخطاء المكررة
-  const uniqueErrors = errors.filter((error, index, self) =>
-    index === self.findIndex((e) => e.file === error.file && e.line === error.line)
+  const uniqueErrors = errors.filter(
+    (error, index, self) =>
+      index === self.findIndex((e) => e.file === error.file && e.line === error.line)
   );
-  
+
   if (uniqueErrors.length > 0) {
     console.log(colorize('red', '❌ فشل فحص توافق severity:\n'));
-    
+
     for (const err of uniqueErrors) {
       console.log(colorize('yellow', `  📍 ${path.relative(process.cwd(), err.file)}:${err.line}`));
       console.log(`     ${colorize('blue', 'الجدول:')} ${err.table}`);
@@ -211,10 +216,15 @@ function main() {
       console.log(`     ${colorize('green', 'القيم المسموحة:')} ${err.allowed.join(', ')}`);
       console.log('');
       console.log(colorize('blue', '     السياق:'));
-      console.log(err.context.split('\n').map(l => '     ' + l).join('\n'));
+      console.log(
+        err.context
+          .split('\n')
+          .map((l) => '     ' + l)
+          .join('\n')
+      );
       console.log('');
     }
-    
+
     console.log('═'.repeat(60));
     console.log('');
     console.log(colorize('yellow', `💡 الحل: استبدل severity: 'info' بـ severity: 'low'`));
@@ -226,10 +236,10 @@ function main() {
     console.log(`   ${colorize('blue', 'الجداول التي تقبل info:')}`);
     console.log(`   • audit_logs`);
     console.log('');
-    
+
     process.exit(1);
   }
-  
+
   console.log(colorize('green', '✅ جميع قيم severity متوافقة مع DB constraints'));
   console.log('');
   process.exit(0);

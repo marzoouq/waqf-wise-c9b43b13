@@ -6,10 +6,10 @@
 
 ## 📊 الإحصائيات
 
-| الفئة | العدد |
-|-------|-------|
+| الفئة       | العدد    |
+| ----------- | -------- |
 | **المجموع** | 50 وظيفة |
-| **الفئات** | 11 فئة |
+| **الفئات**  | 11 فئة   |
 
 ---
 
@@ -149,10 +149,10 @@ const { data } = await supabase.functions.invoke('ai-system-audit', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('intelligent-search', {
   body: {
-    query: "مستفيد محمد",
-    filters: { category: "beneficiary" },
-    limit: 10
-  }
+    query: 'مستفيد محمد',
+    filters: { category: 'beneficiary' },
+    limit: 10,
+  },
 });
 ```
 
@@ -164,9 +164,9 @@ const { data } = await supabase.functions.invoke('intelligent-search', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('property-ai-assistant', {
   body: {
-    propertyId: "uuid",
-    question: "ما هي توقعات الإيرادات؟"
-  }
+    propertyId: 'uuid',
+    question: 'ما هي توقعات الإيرادات؟',
+  },
 });
 ```
 
@@ -231,10 +231,10 @@ const { data } = await supabase.functions.invoke('simulate-distribution', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('auto-create-journal', {
   body: {
-    triggerEvent: "rental_payment",
-    referenceId: "uuid",
-    amount: 5000
-  }
+    triggerEvent: 'rental_payment',
+    referenceId: 'uuid',
+    amount: 5000,
+  },
 });
 ```
 
@@ -246,9 +246,9 @@ const { data } = await supabase.functions.invoke('auto-create-journal', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('publish-fiscal-year', {
   body: {
-    fiscalYearId: "uuid",
-    publishedBy: "uuid"
-  }
+    fiscalYearId: 'uuid',
+    publishedBy: 'uuid',
+  },
 });
 ```
 
@@ -260,8 +260,8 @@ const { data } = await supabase.functions.invoke('publish-fiscal-year', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('auto-close-fiscal-year', {
   body: {
-    fiscalYearId: "uuid"
-  }
+    fiscalYearId: 'uuid',
+  },
 });
 ```
 
@@ -273,8 +273,8 @@ const { data } = await supabase.functions.invoke('auto-close-fiscal-year', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('zatca-submit', {
   body: {
-    invoiceId: "uuid"
-  }
+    invoiceId: 'uuid',
+  },
 });
 ```
 
@@ -290,12 +290,12 @@ const { data } = await supabase.functions.invoke('zatca-submit', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('send-notification', {
   body: {
-    userId: "uuid",
-    title: "عنوان الإشعار",
-    message: "محتوى الإشعار",
-    type: "info",
-    actionUrl: "/dashboard"
-  }
+    userId: 'uuid',
+    title: 'عنوان الإشعار',
+    message: 'محتوى الإشعار',
+    type: 'info',
+    actionUrl: '/dashboard',
+  },
 });
 ```
 
@@ -307,10 +307,10 @@ const { data } = await supabase.functions.invoke('send-notification', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('send-push-notification', {
   body: {
-    userId: "uuid",
-    title: "إشعار عاجل",
-    body: "لديك توزيع جديد"
-  }
+    userId: 'uuid',
+    title: 'إشعار عاجل',
+    body: 'لديك توزيع جديد',
+  },
 });
 ```
 
@@ -332,10 +332,10 @@ const { data } = await supabase.functions.invoke('daily-notifications');
 // الاستدعاء
 const { data } = await supabase.functions.invoke('notify-admins', {
   body: {
-    title: "تنبيه أمني",
-    message: "تم اكتشاف نشاط مشبوه",
-    severity: "critical"
-  }
+    title: 'تنبيه أمني',
+    message: 'تم اكتشاف نشاط مشبوه',
+    severity: 'critical',
+  },
 });
 ```
 
@@ -347,10 +347,10 @@ const { data } = await supabase.functions.invoke('notify-admins', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('send-slack-alert', {
   body: {
-    title: "تنبيه النظام",
-    message: "حدث خطأ في...",
-    severity: "warning"
-  }
+    title: 'تنبيه النظام',
+    message: 'حدث خطأ في...',
+    severity: 'warning',
+  },
 });
 ```
 
@@ -375,8 +375,8 @@ const { data } = await supabase.functions.invoke('send-slack-alert', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('run-vacuum', {
   body: {
-    tables: ["audit_logs", "notifications"]
-  }
+    tables: ['audit_logs', 'notifications'],
+  },
 });
 ```
 
@@ -389,8 +389,8 @@ const { data } = await supabase.functions.invoke('run-vacuum', {
 const { data } = await supabase.functions.invoke('cleanup-old-files', {
   body: {
     olderThanDays: 90,
-    buckets: ["temp", "cache"]
-  }
+    buckets: ['temp', 'cache'],
+  },
 });
 ```
 
@@ -414,9 +414,9 @@ const { data } = await supabase.functions.invoke('cleanup-old-files', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('encrypt-file', {
   body: {
-    filePath: "documents/sensitive.pdf",
-    algorithm: "AES-256"
-  }
+    filePath: 'documents/sensitive.pdf',
+    algorithm: 'AES-256',
+  },
 });
 ```
 
@@ -428,8 +428,8 @@ const { data } = await supabase.functions.invoke('encrypt-file', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('decrypt-file', {
   body: {
-    filePath: "documents/sensitive.pdf.enc"
-  }
+    filePath: 'documents/sensitive.pdf.enc',
+  },
 });
 ```
 
@@ -441,9 +441,9 @@ const { data } = await supabase.functions.invoke('decrypt-file', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('biometric-auth', {
   body: {
-    userId: "uuid",
-    biometricData: "..."
-  }
+    userId: 'uuid',
+    biometricData: '...',
+  },
 });
 ```
 
@@ -500,8 +500,8 @@ const { data } = await supabase.functions.invoke('backup-database', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('restore-database', {
   body: {
-    backupId: "uuid"
-  }
+    backupId: 'uuid',
+  },
 });
 ```
 
@@ -525,9 +525,9 @@ const { data } = await supabase.functions.invoke('restore-database', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('reset-user-password', {
   body: {
-    userId: "uuid",
-    newPassword: "securePassword123"
-  }
+    userId: 'uuid',
+    newPassword: 'securePassword123',
+  },
 });
 ```
 
@@ -539,9 +539,9 @@ const { data } = await supabase.functions.invoke('reset-user-password', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('update-user-email', {
   body: {
-    userId: "uuid",
-    newEmail: "new@email.com"
-  }
+    userId: 'uuid',
+    newEmail: 'new@email.com',
+  },
 });
 ```
 
@@ -553,9 +553,9 @@ const { data } = await supabase.functions.invoke('update-user-email', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('create-beneficiary-accounts', {
   body: {
-    beneficiaryIds: ["uuid1", "uuid2"],
-    sendCredentials: true
-  }
+    beneficiaryIds: ['uuid1', 'uuid2'],
+    sendCredentials: true,
+  },
 });
 ```
 
@@ -614,8 +614,8 @@ const { data } = await supabase.functions.invoke('extract-invoice-data', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('extract-contract-data', {
   body: {
-    filePath: "contracts/contract-001.pdf"
-  }
+    filePath: 'contracts/contract-001.pdf',
+  },
 });
 ```
 
@@ -674,11 +674,11 @@ const { data } = await supabase.functions.invoke('generate-smart-alerts');
 {
   alerts: [
     {
-      type: "contract_expiry",
-      severity: "warning",
-      message: "3 عقود تنتهي خلال 30 يوم"
-    }
-  ]
+      type: 'contract_expiry',
+      severity: 'warning',
+      message: '3 عقود تنتهي خلال 30 يوم',
+    },
+  ];
 }
 ```
 
@@ -711,9 +711,9 @@ const { data } = await supabase.functions.invoke('generate-smart-alerts');
 // الاستدعاء
 const { data } = await supabase.functions.invoke('generate-scheduled-report', {
   body: {
-    reportType: "monthly_financial",
-    period: "2024-01"
-  }
+    reportType: 'monthly_financial',
+    period: '2024-01',
+  },
 });
 ```
 
@@ -733,8 +733,8 @@ const { data } = await supabase.functions.invoke('generate-scheduled-report', {
 // الاستدعاء
 const { data } = await supabase.functions.invoke('generate-distribution-summary', {
   body: {
-    distributionId: "uuid"
-  }
+    distributionId: 'uuid',
+  },
 });
 ```
 

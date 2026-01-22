@@ -32,6 +32,7 @@ src/types/
 ## 📋 الأنواع الرئيسية
 
 ### 🔷 Common Types
+
 ```typescript
 // أنواع شائعة
 type Status = 'active' | 'inactive' | 'pending' | 'archived';
@@ -56,6 +57,7 @@ interface PaginatedResponse<T> {
 ```
 
 ### 👥 Beneficiary Types
+
 ```typescript
 interface Beneficiary {
   id: string;
@@ -72,6 +74,7 @@ type BeneficiaryStatus = 'نشط' | 'موقوف' | 'متوفي' | 'قيد الم
 ```
 
 ### 🏢 Property Types
+
 ```typescript
 interface Property {
   id: string;
@@ -86,6 +89,7 @@ type PropertyType = 'مبنى' | 'أرض' | 'شقة' | 'محل تجاري' | 'م
 ```
 
 ### 📊 Distribution Types
+
 ```typescript
 interface Distribution {
   id: string;
@@ -101,11 +105,13 @@ type DistributionStatus = 'draft' | 'pending_approval' | 'approved' | 'executed'
 ## 🔄 طرق الاستيراد
 
 ### من الـ index الرئيسي
+
 ```typescript
 import { Beneficiary, Property, Distribution } from '@/types';
 ```
 
 ### من المجلد الفرعي
+
 ```typescript
 import { Beneficiary, BeneficiaryStatus } from '@/types/beneficiary';
 import { Distribution, DistributionDetail } from '@/types/distribution';

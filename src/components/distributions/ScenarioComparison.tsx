@@ -40,7 +40,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
 
   // حساب الإحصائيات المقارنة
   const beneficiaryComparison = scenarios[0].results.map((result, index) => {
-    const amounts = scenarios.map(s => s.results[index]?.allocated_amount || 0);
+    const amounts = scenarios.map((s) => s.results[index]?.allocated_amount || 0);
     const max = Math.max(...amounts);
     const min = Math.min(...amounts);
     const avg = amounts.reduce((a, b) => a + b, 0) / amounts.length;
@@ -66,9 +66,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>مقارنة السيناريوهات</CardTitle>
-              <CardDescription>
-                مقارنة {scenarios.length} نمط توزيع مختلف
-              </CardDescription>
+              <CardDescription>مقارنة {scenarios.length} نمط توزيع مختلف</CardDescription>
             </div>
             {onExport && (
               <Button onClick={onExport} variant="outline" size="sm">
@@ -100,9 +98,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">المستفيدون:</span>
-                <span className="font-semibold">
-                  {scenario.summary.beneficiaries_count}
-                </span>
+                <span className="font-semibold">{scenario.summary.beneficiaries_count}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">متوسط/مستفيد:</span>
@@ -153,23 +149,21 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
                           <div
                             key={`${scenario.pattern}-${comparison.beneficiary}-${sIndex}`}
                             className={`flex items-center justify-between p-2 rounded-lg ${
-                              isMax ? 'bg-success/10 dark:bg-success/20' : 
-                              isMin ? 'bg-destructive/10 dark:bg-destructive/20' : 
-                              'bg-muted/50'
+                              isMax
+                                ? 'bg-success/10 dark:bg-success/20'
+                                : isMin
+                                  ? 'bg-destructive/10 dark:bg-destructive/20'
+                                  : 'bg-muted/50'
                             }`}
                           >
                             <div className="flex items-center gap-2">
                               <div
                                 className={`w-3 h-3 rounded-full ${patternColors[scenario.pattern]}`}
                               />
-                              <span className="text-sm">
-                                {patternNames[scenario.pattern]}
-                              </span>
+                              <span className="text-sm">{patternNames[scenario.pattern]}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold">
-                                {amount.toLocaleString()} ر.س
-                              </span>
+                              <span className="font-semibold">{amount.toLocaleString()} ر.س</span>
                               {isMax && <TrendingUp className="h-3 w-3 text-success" />}
                               {isMin && <TrendingDown className="h-3 w-3 text-destructive" />}
                             </div>
@@ -211,7 +205,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">أعلى تباين</p>
               <p className="text-2xl font-bold">
-                {Math.max(...beneficiaryComparison.map(b => parseFloat(b.variancePercent)))}%
+                {Math.max(...beneficiaryComparison.map((b) => parseFloat(b.variancePercent)))}%
               </p>
             </div>
             <div className="space-y-1">
@@ -227,7 +221,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">مستفيدون متأثرون بشدة</p>
               <p className="text-2xl font-bold">
-                {beneficiaryComparison.filter(b => parseFloat(b.variancePercent) > 20).length}
+                {beneficiaryComparison.filter((b) => parseFloat(b.variancePercent) > 20).length}
               </p>
             </div>
           </div>

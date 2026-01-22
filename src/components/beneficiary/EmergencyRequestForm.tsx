@@ -1,15 +1,22 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 const emergencySchema = z.object({
-  amount: z.coerce.number().min(1, "المبلغ مطلوب"),
-  emergency_reason: z.string().min(10, "يجب ذكر سبب الفزعة بشكل تفصيلي"),
-  description: z.string().min(20, "يجب إضافة وصف تفصيلي للحالة"),
+  amount: z.coerce.number().min(1, 'المبلغ مطلوب'),
+  emergency_reason: z.string().min(10, 'يجب ذكر سبب الفزعة بشكل تفصيلي'),
+  description: z.string().min(20, 'يجب إضافة وصف تفصيلي للحالة'),
 });
 
 type EmergencyFormValues = z.infer<typeof emergencySchema>;
@@ -24,8 +31,8 @@ export function EmergencyRequestForm({ onSubmit, isLoading }: EmergencyRequestFo
     resolver: zodResolver(emergencySchema),
     defaultValues: {
       amount: 0,
-      emergency_reason: "",
-      description: "",
+      emergency_reason: '',
+      description: '',
     },
   });
 
@@ -53,11 +60,7 @@ export function EmergencyRequestForm({ onSubmit, isLoading }: EmergencyRequestFo
             <FormItem>
               <FormLabel>سبب الفزعة *</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="مرض، حادث، ظرف طارئ..."
-                  rows={2}
-                  {...field}
-                />
+                <Textarea placeholder="مرض، حادث، ظرف طارئ..." rows={2} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -71,11 +74,7 @@ export function EmergencyRequestForm({ onSubmit, isLoading }: EmergencyRequestFo
             <FormItem>
               <FormLabel>تفاصيل إضافية *</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="تفاصيل أكثر عن حالتك والظروف الطارئة"
-                  rows={2}
-                  {...field}
-                />
+                <Textarea placeholder="تفاصيل أكثر عن حالتك والظروف الطارئة" rows={2} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +82,7 @@ export function EmergencyRequestForm({ onSubmit, isLoading }: EmergencyRequestFo
         />
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "جاري الإرسال..." : "تقديم طلب الفزعة"}
+          {isLoading ? 'جاري الإرسال...' : 'تقديم طلب الفزعة'}
         </Button>
       </form>
     </Form>

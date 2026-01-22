@@ -1,11 +1,20 @@
-import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EyeOff } from "lucide-react";
-import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
-import { useMonthlyRevenue } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EyeOff } from 'lucide-react';
+import { useFiscalYearPublishInfo } from '@/hooks/fiscal-years';
+import { useMonthlyRevenue } from '@/hooks/beneficiary/useBeneficiaryTabsData';
 
 export function MonthlyRevenueChart() {
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
@@ -26,7 +35,13 @@ export function MonthlyRevenueChart() {
   if (isLoading) return <LoadingState message="جاري تحميل البيانات..." />;
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل البيانات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل البيانات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (data.length === 0) {

@@ -1,7 +1,7 @@
 /**
  * useFamilies Hook - إدارة العائلات
  * @version 2.8.65
- * 
+ *
  * يستخدم FamilyService للوصول لقاعدة البيانات
  */
 
@@ -21,19 +21,21 @@ export const useFamilies = () => {
   const queryClient = useQueryClient();
 
   // Fetch all families
-  const { data: families = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: families = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.FAMILIES,
     queryFn: () => FamilyService.getAll(),
   });
 
   // Real-time subscription
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      'families',
-      () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('families', () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -42,7 +44,7 @@ export const useFamilies = () => {
 
   // Add new family
   const addFamily = useMutation({
-    mutationFn: (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) => 
+    mutationFn: (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) =>
       FamilyService.create(newFamily),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
@@ -62,7 +64,7 @@ export const useFamilies = () => {
 
   // Update family
   const updateFamily = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Family> }) => 
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Family> }) =>
       FamilyService.update(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
@@ -119,16 +121,24 @@ export const useFamilyMembers = (familyId?: string) => {
   const queryClient = useQueryClient();
 
   // Fetch family members
-  const { data: members = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: members = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.FAMILY_MEMBERS(familyId),
-    queryFn: () => familyId ? FamilyService.getMembers(familyId) : Promise.resolve([]),
+    queryFn: () => (familyId ? FamilyService.getMembers(familyId) : Promise.resolve([])),
     enabled: !!familyId,
   });
 
   // Add family member
   const addMember = useMutation({
-    mutationFn: (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & { relationship_to_head: string }) => 
-      FamilyService.addMember(newMember),
+    mutationFn: (
+      newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & {
+        relationship_to_head: string;
+      }
+    ) => FamilyService.addMember(newMember),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
@@ -148,7 +158,7 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Update family member
   const updateMember = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) => 
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) =>
       FamilyService.updateMember(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });

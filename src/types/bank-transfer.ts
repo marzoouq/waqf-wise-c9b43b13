@@ -2,16 +2,16 @@
  * أنواع التحويلات البنكية
  */
 
-export type BankFileFormat = 
-  | "ISO20022" 
-  | "SWIFT_MT940" 
-  | "CSV" 
-  | "EXCEL" 
-  | "SEPA" 
-  | "ACH" 
-  | "BACS" 
-  | "NCB" 
-  | "ALRAJHI";
+export type BankFileFormat =
+  | 'ISO20022'
+  | 'SWIFT_MT940'
+  | 'CSV'
+  | 'EXCEL'
+  | 'SEPA'
+  | 'ACH'
+  | 'BACS'
+  | 'NCB'
+  | 'ALRAJHI';
 
 export interface BankTransferBeneficiary {
   full_name: string | null;

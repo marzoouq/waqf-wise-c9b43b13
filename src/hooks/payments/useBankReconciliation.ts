@@ -2,16 +2,12 @@
  * useBankReconciliation Hook - التسوية البنكية
  * يستخدم BankReconciliationService
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { BankReconciliationService } from "@/services";
-import { 
-  BankStatementInsert, 
-  BankTransactionInsert,
-  BankTransactionMatch 
-} from "@/types/banking";
-import { getErrorMessage } from "@/types/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { BankReconciliationService } from '@/services';
+import { BankStatementInsert, BankTransactionInsert, BankTransactionMatch } from '@/types/banking';
+import { getErrorMessage } from '@/types/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BankStatement {
   id: string;
@@ -56,50 +52,48 @@ export function useBankReconciliation() {
   });
 
   const createStatement = useMutation({
-    mutationFn: (statement: BankStatementInsert) => 
+    mutationFn: (statement: BankStatementInsert) =>
       BankReconciliationService.createStatement(statement),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_STATEMENTS_DATA });
-      toast({ title: "تم الإنشاء", description: "تم إنشاء كشف الحساب بنجاح" });
+      toast({ title: 'تم الإنشاء', description: 'تم إنشاء كشف الحساب بنجاح' });
     },
     onError: (error: unknown) => {
-      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
+      toast({ title: 'خطأ', description: getErrorMessage(error), variant: 'destructive' });
     },
   });
 
   const addTransaction = useMutation({
-    mutationFn: (transaction: BankTransactionInsert) => 
+    mutationFn: (transaction: BankTransactionInsert) =>
       BankReconciliationService.addTransaction(transaction),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS_DATA });
-      toast({ title: "تم الإضافة", description: "تم إضافة الحركة بنجاح" });
+      toast({ title: 'تم الإضافة', description: 'تم إضافة الحركة بنجاح' });
     },
     onError: (error: unknown) => {
-      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
+      toast({ title: 'خطأ', description: getErrorMessage(error), variant: 'destructive' });
     },
   });
 
   const matchTransaction = useMutation({
-    mutationFn: (match: BankTransactionMatch) => 
-      BankReconciliationService.matchTransaction(match),
+    mutationFn: (match: BankTransactionMatch) => BankReconciliationService.matchTransaction(match),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS_DATA });
-      toast({ title: "تمت المطابقة", description: "تمت مطابقة الحركة بنجاح" });
+      toast({ title: 'تمت المطابقة', description: 'تمت مطابقة الحركة بنجاح' });
     },
     onError: (error: unknown) => {
-      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
+      toast({ title: 'خطأ', description: getErrorMessage(error), variant: 'destructive' });
     },
   });
 
   const reconcileStatement = useMutation({
-    mutationFn: (statementId: string) => 
-      BankReconciliationService.reconcileStatement(statementId),
+    mutationFn: (statementId: string) => BankReconciliationService.reconcileStatement(statementId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_STATEMENTS_DATA });
-      toast({ title: "تمت التسوية", description: "تمت تسوية كشف الحساب بنجاح" });
+      toast({ title: 'تمت التسوية', description: 'تمت تسوية كشف الحساب بنجاح' });
     },
     onError: (error: unknown) => {
-      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
+      toast({ title: 'خطأ', description: getErrorMessage(error), variant: 'destructive' });
     },
   });
 

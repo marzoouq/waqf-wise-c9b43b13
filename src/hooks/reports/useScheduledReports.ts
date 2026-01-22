@@ -21,8 +21,9 @@ export function useCreateScheduledReport() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (report: Omit<ScheduledReport, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => 
-      ScheduledReportService.create(report),
+    mutationFn: (
+      report: Omit<ScheduledReport, 'id' | 'created_at' | 'updated_at' | 'created_by'>
+    ) => ScheduledReportService.create(report),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SCHEDULED_REPORTS });
       toast.success('تم جدولة التقرير بنجاح');

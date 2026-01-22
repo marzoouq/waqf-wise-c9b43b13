@@ -1,17 +1,34 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/ui/use-toast";
-import { BeneficiaryService } from "@/services/beneficiary.service";
-import { Phone } from "lucide-react";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/ui/use-toast';
+import { BeneficiaryService } from '@/services/beneficiary.service';
+import { Phone } from 'lucide-react';
 
 const phoneSchema = z.object({
-  phone: z.string().min(10, "رقم الجوال يجب أن يكون 10 أرقام على الأقل").regex(/^05[0-9]{8}$/, "رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام"),
+  phone: z
+    .string()
+    .min(10, 'رقم الجوال يجب أن يكون 10 أرقام على الأقل')
+    .regex(/^05[0-9]{8}$/, 'رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام'),
 });
 
 type PhoneFormValues = z.infer<typeof phoneSchema>;
@@ -24,7 +41,13 @@ interface EditPhoneDialogProps {
   onSuccess?: () => void;
 }
 
-export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhone, onSuccess }: EditPhoneDialogProps) {
+export function EditPhoneDialog({
+  open,
+  onOpenChange,
+  beneficiaryId,
+  currentPhone,
+  onSuccess,
+}: EditPhoneDialogProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,18 +64,19 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
       await BeneficiaryService.update(beneficiaryId, { phone: data.phone });
 
       toast({
-        title: "تم تحديث رقم الجوال",
-        description: "تم تحديث رقم الجوال بنجاح",
+        title: 'تم تحديث رقم الجوال',
+        description: 'تم تحديث رقم الجوال بنجاح',
       });
 
       onOpenChange(false);
       onSuccess?.();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء تحديث رقم الجوال";
+      const errorMessage =
+        error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث رقم الجوال';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -67,9 +91,7 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
             <Phone className="h-5 w-5 text-primary" />
             تعديل رقم الجوال
           </DialogTitle>
-          <DialogDescription>
-            يمكنك تعديل رقم الجوال الخاص بك مباشرة
-          </DialogDescription>
+          <DialogDescription>يمكنك تعديل رقم الجوال الخاص بك مباشرة</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -81,12 +103,7 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
                 <FormItem>
                   <FormLabel>رقم الجوال *</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="05xxxxxxxx" 
-                      {...field}
-                      dir="ltr"
-                      className="text-right"
-                    />
+                    <Input placeholder="05xxxxxxxx" {...field} dir="ltr" className="text-right" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,7 +111,12 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+              >
                 إلغاء
               </Button>
               <Button type="submit" disabled={isLoading}>

@@ -1,20 +1,21 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, Clock, Globe, AlertCircle, ExternalLink } from "lucide-react";
-import { useFiscalYearsList } from "@/hooks/fiscal-years";
-import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Calendar, Clock, Globe, AlertCircle, ExternalLink } from 'lucide-react';
+import { useFiscalYearsList } from '@/hooks/fiscal-years';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function CurrentFiscalYearCard() {
-  const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading, error, refetch } = useFiscalYearsList();
+  const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading, error, refetch } =
+    useFiscalYearsList();
   const { roles } = useAuth();
-  
+
   // التحقق من صلاحية المستخدم لنشر السنة المالية
-  const canPublish = roles.some(r => ['admin', 'nazer'].includes(r));
+  const canPublish = roles.some((r) => ['admin', 'nazer'].includes(r));
 
   if (isLoading) {
     return (
@@ -92,20 +93,19 @@ export function CurrentFiscalYearCard() {
         <div>
           <h3 className="text-xl font-bold text-primary">{activeFiscalYear.name}</h3>
           <p className="text-sm text-muted-foreground">
-            {format(new Date(activeFiscalYear.start_date), 'dd MMMM yyyy', { locale: ar })} 
-            {' '}-{' '}
+            {format(new Date(activeFiscalYear.start_date), 'dd MMMM yyyy', { locale: ar })} -{' '}
             {format(new Date(activeFiscalYear.end_date), 'dd MMMM yyyy', { locale: ar })}
           </p>
         </div>
-        
+
         {/* تنبيه السنة غير المنشورة */}
         {!activeFiscalYear.is_published && canPublish && (
           <Alert className="border-warning/30 bg-warning/10 py-2">
             <AlertCircle className="h-4 w-4 text-warning" />
             <AlertDescription className="text-xs text-warning flex items-center justify-between">
               <span>السنة المالية غير منشورة للمستفيدين</span>
-              <Link 
-                to="/fiscal-years-management" 
+              <Link
+                to="/fiscal-years-management"
                 className="inline-flex items-center gap-1 text-warning hover:underline font-medium"
               >
                 نشر الآن
@@ -114,7 +114,7 @@ export function CurrentFiscalYearCard() {
             </AlertDescription>
           </Alert>
         )}
-        
+
         <div className="grid grid-cols-2 gap-3 pt-2 border-t">
           <div className="text-center p-2 bg-muted/50 rounded-lg">
             <span className="text-lg font-bold text-foreground">{closedYearsCount}</span>

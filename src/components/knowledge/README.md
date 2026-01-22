@@ -16,12 +16,13 @@ src/components/knowledge/
 ## 📋 المكونات
 
 ### KnowledgeArticlesTab
+
 عرض المقالات التعليمية والإرشادية.
 
 ```typescript
 import { KnowledgeArticlesTab } from '@/components/knowledge';
 
-<KnowledgeArticlesTab 
+<KnowledgeArticlesTab
   articles={articles}
   onSelect={handleSelect}
   searchQuery={query}
@@ -29,12 +30,13 @@ import { KnowledgeArticlesTab } from '@/components/knowledge';
 ```
 
 ### KnowledgeFAQsTab
+
 عرض الأسئلة الشائعة مع إمكانية البحث.
 
 ```typescript
 import { KnowledgeFAQsTab } from '@/components/knowledge';
 
-<KnowledgeFAQsTab 
+<KnowledgeFAQsTab
   faqs={faqs}
   searchQuery={query}
   category={selectedCategory}
@@ -42,24 +44,26 @@ import { KnowledgeFAQsTab } from '@/components/knowledge';
 ```
 
 ### KnowledgeVideosTab
+
 عرض الفيديوهات التعليمية.
 
 ```typescript
 import { KnowledgeVideosTab } from '@/components/knowledge';
 
-<KnowledgeVideosTab 
+<KnowledgeVideosTab
   videos={videos}
   onPlay={handlePlay}
 />
 ```
 
 ### KnowledgeDownloadsTab
+
 عرض الملفات القابلة للتنزيل.
 
 ```typescript
 import { KnowledgeDownloadsTab } from '@/components/knowledge';
 
-<KnowledgeDownloadsTab 
+<KnowledgeDownloadsTab
   files={downloadableFiles}
   onDownload={handleDownload}
 />

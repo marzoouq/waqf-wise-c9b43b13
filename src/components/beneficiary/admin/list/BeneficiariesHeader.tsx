@@ -1,15 +1,15 @@
-import { memo } from "react";
-import { Plus, MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { BeneficiariesPrintButton } from "../BeneficiariesPrintButton";
-import { BeneficiariesImporter } from "../BeneficiariesImporter";
-import { CreateBeneficiaryAccountsButton } from "../CreateBeneficiaryAccountsButton";
-import { Beneficiary } from "@/types/beneficiary";
+import { memo } from 'react';
+import { Plus, MoreHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BeneficiariesPrintButton } from '../BeneficiariesPrintButton';
+import { BeneficiariesImporter } from '../BeneficiariesImporter';
+import { CreateBeneficiaryAccountsButton } from '../CreateBeneficiaryAccountsButton';
+import { Beneficiary } from '@/types/beneficiary';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 interface BeneficiariesHeaderProps {
   filteredBeneficiaries: Beneficiary[];
@@ -17,10 +17,10 @@ interface BeneficiariesHeaderProps {
   onImportSuccess: () => void;
 }
 
-export const BeneficiariesHeader = memo(function BeneficiariesHeader({ 
-  filteredBeneficiaries, 
+export const BeneficiariesHeader = memo(function BeneficiariesHeader({
+  filteredBeneficiaries,
   onAddBeneficiary,
-  onImportSuccess
+  onImportSuccess,
 }: BeneficiariesHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
@@ -32,13 +32,13 @@ export const BeneficiariesHeader = memo(function BeneficiariesHeader({
           إدارة بيانات الأفراد المستفيدين من الوقف
         </p>
       </div>
-      
+
       {/* Desktop Actions */}
       <div className="hidden sm:flex flex-wrap gap-2">
         <CreateBeneficiaryAccountsButton />
         <BeneficiariesPrintButton beneficiaries={filteredBeneficiaries} />
         <BeneficiariesImporter onSuccess={onImportSuccess} />
-        <Button 
+        <Button
           className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300"
           onClick={onAddBeneficiary}
           size="sm"
@@ -50,7 +50,7 @@ export const BeneficiariesHeader = memo(function BeneficiariesHeader({
 
       {/* Mobile Actions - Compact row */}
       <div className="flex sm:hidden items-center gap-2 w-full">
-        <Button 
+        <Button
           className="flex-1 bg-primary hover:bg-primary-hover text-primary-foreground text-xs"
           onClick={onAddBeneficiary}
           size="sm"
@@ -58,7 +58,7 @@ export const BeneficiariesHeader = memo(function BeneficiariesHeader({
           <Plus className="ms-1.5 h-3.5 w-3.5" />
           إضافة مستفيد
         </Button>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-9 w-9 p-0">

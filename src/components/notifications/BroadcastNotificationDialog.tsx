@@ -1,6 +1,6 @@
 /**
  * BroadcastNotificationDialog - نافذة إرسال إشعار جماعي
- * 
+ *
  * تتيح للمسؤولين إرسال إشعارات لمجموعات محددة من المستخدمين
  */
 
@@ -143,9 +143,7 @@ export function BroadcastNotificationDialog({
             <Send className="h-5 w-5" />
             إرسال إشعار جماعي
           </DialogTitle>
-          <DialogDescription>
-            أرسل إشعاراً لمجموعة من المستخدمين في النظام
-          </DialogDescription>
+          <DialogDescription>أرسل إشعاراً لمجموعة من المستخدمين في النظام</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -184,19 +182,27 @@ export function BroadcastNotificationDialog({
             >
               <div className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 cursor-pointer hover:bg-muted/50">
                 <RadioGroupItem value="all" id="all" />
-                <Label htmlFor="all" className="cursor-pointer">جميع المستخدمين</Label>
+                <Label htmlFor="all" className="cursor-pointer">
+                  جميع المستخدمين
+                </Label>
               </div>
               <div className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 cursor-pointer hover:bg-muted/50">
                 <RadioGroupItem value="beneficiaries" id="beneficiaries" />
-                <Label htmlFor="beneficiaries" className="cursor-pointer">المستفيدين</Label>
+                <Label htmlFor="beneficiaries" className="cursor-pointer">
+                  المستفيدين
+                </Label>
               </div>
               <div className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 cursor-pointer hover:bg-muted/50">
                 <RadioGroupItem value="staff" id="staff" />
-                <Label htmlFor="staff" className="cursor-pointer">الموظفين</Label>
+                <Label htmlFor="staff" className="cursor-pointer">
+                  الموظفين
+                </Label>
               </div>
               <div className="flex items-center space-x-2 space-x-reverse border rounded-lg p-3 cursor-pointer hover:bg-muted/50">
                 <RadioGroupItem value="role" id="role" />
-                <Label htmlFor="role" className="cursor-pointer">دور محدد</Label>
+                <Label htmlFor="role" className="cursor-pointer">
+                  دور محدد
+                </Label>
               </div>
             </RadioGroup>
 
@@ -221,7 +227,10 @@ export function BroadcastNotificationDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>نوع الإشعار</Label>
-              <Select value={notificationType} onValueChange={(v) => setNotificationType(v as NotificationType)}>
+              <Select
+                value={notificationType}
+                onValueChange={(v) => setNotificationType(v as NotificationType)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

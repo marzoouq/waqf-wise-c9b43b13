@@ -19,37 +19,37 @@ const fontCache: FontCache = {
 async function fetchFontAsBase64(url: string): Promise<string> {
   try {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const arrayBuffer = await response.arrayBuffer();
-    
+
     if (arrayBuffer.byteLength < 1000) {
       throw new Error('Font file too small, might be corrupted');
     }
-    
+
     const bytes = new Uint8Array(arrayBuffer);
-    
+
     // تحويل إلى Base64 باستخدام طريقة أكثر موثوقية
     let binary = '';
     const len = bytes.byteLength;
     for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-    
+
     const base64 = btoa(binary);
-    
+
     logger.info(`Font loaded: ${url}, size: ${len} bytes, base64 length: ${base64.length}`, {
-      context: 'font_load_success'
+      context: 'font_load_success',
     });
-    
+
     return base64;
   } catch (error) {
-    logger.error(`Failed to load font from ${url}`, { 
+    logger.error(`Failed to load font from ${url}`, {
       context: 'font_load_error',
-      metadata: { error: String(error) }
+      metadata: { error: String(error) },
     });
     throw error;
   }

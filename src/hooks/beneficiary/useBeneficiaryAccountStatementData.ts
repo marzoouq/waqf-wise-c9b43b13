@@ -1,9 +1,9 @@
 /**
  * Hook for BeneficiaryAccountStatement data fetching
  */
-import { useQuery } from "@tanstack/react-query";
-import { BeneficiaryService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { BeneficiaryService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BeneficiaryInfo {
   id: string;
@@ -27,8 +27,16 @@ export interface PaymentFilters {
   paymentMethod: string;
 }
 
-export function useBeneficiaryAccountStatementData(userId: string | undefined, filters: PaymentFilters) {
-  const { data: beneficiary, isLoading: beneficiaryLoading, error: beneficiaryError, refetch: refetchBeneficiary } = useQuery({
+export function useBeneficiaryAccountStatementData(
+  userId: string | undefined,
+  filters: PaymentFilters
+) {
+  const {
+    data: beneficiary,
+    isLoading: beneficiaryLoading,
+    error: beneficiaryError,
+    refetch: refetchBeneficiary,
+  } = useQuery({
     queryKey: QUERY_KEYS.MY_BENEFICIARY(userId),
     queryFn: async () => {
       if (!userId) return null;
@@ -37,8 +45,18 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
     enabled: !!userId,
   });
 
-  const { data: payments = [], isLoading: paymentsLoading, error: paymentsError, refetch: refetchPayments } = useQuery({
-    queryKey: QUERY_KEYS.BENEFICIARY_PAYMENTS(beneficiary?.id || '', filters.dateFrom, filters.dateTo, filters.paymentMethod),
+  const {
+    data: payments = [],
+    isLoading: paymentsLoading,
+    error: paymentsError,
+    refetch: refetchPayments,
+  } = useQuery({
+    queryKey: QUERY_KEYS.BENEFICIARY_PAYMENTS(
+      beneficiary?.id || '',
+      filters.dateFrom,
+      filters.dateTo,
+      filters.paymentMethod
+    ),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
       return BeneficiaryService.getBeneficiaryPayments(beneficiary.id, {
@@ -53,8 +71,12 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
   const calculateStats = (filteredPayments: BeneficiaryPayment[]) => ({
     totalPayments: filteredPayments.reduce((sum, p) => sum + Number(p.amount), 0),
     paymentsCount: filteredPayments.length,
-    avgPayment: filteredPayments.length > 0 ? filteredPayments.reduce((sum, p) => sum + Number(p.amount), 0) / filteredPayments.length : 0,
-    largestPayment: filteredPayments.length > 0 ? Math.max(...filteredPayments.map((p) => Number(p.amount))) : 0,
+    avgPayment:
+      filteredPayments.length > 0
+        ? filteredPayments.reduce((sum, p) => sum + Number(p.amount), 0) / filteredPayments.length
+        : 0,
+    largestPayment:
+      filteredPayments.length > 0 ? Math.max(...filteredPayments.map((p) => Number(p.amount))) : 0,
   });
 
   const refetch = () => {
@@ -62,12 +84,12 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
     refetchPayments();
   };
 
-  return { 
-    beneficiary, 
-    payments, 
-    isLoading: beneficiaryLoading || paymentsLoading, 
+  return {
+    beneficiary,
+    payments,
+    isLoading: beneficiaryLoading || paymentsLoading,
     error: beneficiaryError || paymentsError,
     refetch,
-    calculateStats 
+    calculateStats,
   };
 }

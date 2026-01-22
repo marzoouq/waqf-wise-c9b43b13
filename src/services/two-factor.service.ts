@@ -2,7 +2,7 @@
  * Two Factor Authentication Service - خدمة المصادقة الثنائية
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface TwoFactorStatus {
   enabled: boolean;
@@ -16,9 +16,9 @@ export class TwoFactorService {
    */
   static async getStatus(userId: string): Promise<TwoFactorStatus | null> {
     const { data, error } = await supabase
-      .from("two_factor_secrets")
-      .select("enabled, secret, backup_codes")
-      .eq("user_id", userId)
+      .from('two_factor_secrets')
+      .select('enabled, secret, backup_codes')
+      .eq('user_id', userId)
       .maybeSingle();
 
     if (error) throw error;
@@ -29,14 +29,12 @@ export class TwoFactorService {
    * تفعيل المصادقة الثنائية
    */
   static async enable(userId: string, secret: string, backupCodes: string[]): Promise<void> {
-    const { error } = await supabase
-      .from("two_factor_secrets")
-      .upsert({
-        user_id: userId,
-        secret: secret,
-        backup_codes: backupCodes,
-        enabled: true,
-      });
+    const { error } = await supabase.from('two_factor_secrets').upsert({
+      user_id: userId,
+      secret: secret,
+      backup_codes: backupCodes,
+      enabled: true,
+    });
 
     if (error) throw error;
   }
@@ -46,9 +44,9 @@ export class TwoFactorService {
    */
   static async disable(userId: string): Promise<void> {
     const { error } = await supabase
-      .from("two_factor_secrets")
+      .from('two_factor_secrets')
       .update({ enabled: false })
-      .eq("user_id", userId);
+      .eq('user_id', userId);
 
     if (error) throw error;
   }
@@ -59,7 +57,7 @@ export class TwoFactorService {
   static async verifyCode(userId: string, _code: string): Promise<boolean> {
     const status = await this.getStatus(userId);
     if (!status?.enabled || !status.secret) return false;
-    
+
     // التحقق من الرمز يتم عادةً باستخدام مكتبة OTP
     // هنا نعتمد على التحقق من جانب العميل
     return true;
@@ -77,11 +75,11 @@ export class TwoFactorService {
 
     // إزالة الرمز المستخدم
     const updatedCodes = status.backup_codes.filter((_, i) => i !== codeIndex);
-    
+
     const { error } = await supabase
-      .from("two_factor_secrets")
+      .from('two_factor_secrets')
       .update({ backup_codes: updatedCodes })
-      .eq("user_id", userId);
+      .eq('user_id', userId);
 
     if (error) throw error;
     return true;

@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { BookOpen, Building2 } from "lucide-react";
-import { memo } from "react";
+import { Button } from '@/components/ui/button';
+import { BookOpen, Building2 } from 'lucide-react';
+import { memo } from 'react';
 
 interface AccountingHeaderProps {
   onBankReconciliation: () => void;
@@ -22,9 +22,9 @@ export const AccountingHeader = memo(({ onBankReconciliation }: AccountingHeader
           </p>
         </div>
       </div>
-      <Button 
-        onClick={onBankReconciliation} 
-        variant="outline" 
+      <Button
+        onClick={onBankReconciliation}
+        variant="outline"
         size="sm"
         className="w-full sm:w-auto"
       >

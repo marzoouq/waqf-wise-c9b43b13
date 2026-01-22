@@ -17,7 +17,9 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات الأداء" onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات الأداء" onRetry={refetch} />
+    );
   }
 
   if (!stats || stats.length === 0) {
@@ -59,9 +61,7 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totals.assigned}</div>
-            <p className="text-xs text-muted-foreground">
-              إجمالي التذاكر المُعيّنة
-            </p>
+            <p className="text-xs text-muted-foreground">إجمالي التذاكر المُعيّنة</p>
           </CardContent>
         </Card>
 
@@ -72,9 +72,7 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totals.resolved}</div>
-            <p className="text-xs text-muted-foreground">
-              معدل الحل: {resolutionRate.toFixed(1)}%
-            </p>
+            <p className="text-xs text-muted-foreground">معدل الحل: {resolutionRate.toFixed(1)}%</p>
           </CardContent>
         </Card>
 
@@ -102,9 +100,7 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
             <div className="text-2xl font-bold">
               {avgSatisfaction > 0 ? avgSatisfaction.toFixed(1) : '0.0'}
             </div>
-            <p className="text-xs text-muted-foreground">
-              من 5 نجوم
-            </p>
+            <p className="text-xs text-muted-foreground">من 5 نجوم</p>
           </CardContent>
         </Card>
       </div>
@@ -122,9 +118,7 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
                 className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
               >
                 <div>
-                  <p className="font-medium">
-                    {new Date(day.date).toLocaleDateString('ar-SA')}
-                  </p>
+                  <p className="font-medium">{new Date(day.date).toLocaleDateString('ar-SA')}</p>
                   <p className="text-sm text-muted-foreground">
                     {day.total_assigned} مُعيّن | {day.total_resolved} محلول
                   </p>

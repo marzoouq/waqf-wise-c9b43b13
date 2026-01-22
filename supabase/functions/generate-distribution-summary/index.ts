@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 interface DistributionSettings {
@@ -36,10 +36,12 @@ serve(async (req) => {
             status: 'healthy',
             function: 'generate-distribution-summary',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة
@@ -56,7 +58,10 @@ serve(async (req) => {
 
     // 🔐 التحقق من صحة التوكن والصلاحيات
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[generate-distribution-summary] ❌ Invalid token:', authError);
@@ -64,20 +69,28 @@ serve(async (req) => {
     }
 
     // 🔐 التحقق من صلاحيات المستخدم (admin, nazer, accountant)
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant'].includes(r.role));
+    const hasAccess = roles?.some((r) => ['admin', 'nazer', 'accountant'].includes(r.role));
     if (!hasAccess) {
-      console.error('[generate-distribution-summary] ❌ Unauthorized role:', { userId: user.id, roles });
+      console.error('[generate-distribution-summary] ❌ Unauthorized role:', {
+        userId: user.id,
+        roles,
+      });
       return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
     }
 
-    console.log('[generate-distribution-summary] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
+    console.log('[generate-distribution-summary] ✅ Authorized:', {
+      userId: user.id,
+      roles: roles?.map((r) => r.role),
+    });
 
-    const { period_start, period_end, distribution_type = 'شهري', waqf_corpus_percentage = 0 } = await req.json();
+    const {
+      period_start,
+      period_end,
+      distribution_type = 'شهري',
+      waqf_corpus_percentage = 0,
+    } = await req.json();
 
     console.log(`📊 Starting distribution calculation for period ${period_start} to ${period_end}`);
 
@@ -132,8 +145,8 @@ serve(async (req) => {
           total_expenses: totalExpenses,
           net_revenues: netRevenues,
           distributable_amount: 0,
-          beneficiaries_count: 0
-        }
+          beneficiaries_count: 0,
+        },
       });
     }
 
@@ -143,29 +156,37 @@ serve(async (req) => {
     // 1️⃣ الصيانة والعمارة (أول ما يُخرج)
     const maintenanceAmount = remainingAmount * ((settings.maintenance_percentage || 0) / 100);
     remainingAmount -= maintenanceAmount;
-    console.log(`🔧 Maintenance (${settings.maintenance_percentage}%): ${maintenanceAmount} SAR | Remaining: ${remainingAmount}`);
+    console.log(
+      `🔧 Maintenance (${settings.maintenance_percentage}%): ${maintenanceAmount} SAR | Remaining: ${remainingAmount}`
+    );
 
     // 2️⃣ نسبة الناظر (من الباقي)
     const nazerShare = remainingAmount * ((settings.nazer_percentage || 0) / 100);
     remainingAmount -= nazerShare;
-    console.log(`👤 Nazer (${settings.nazer_percentage}%): ${nazerShare} SAR | Remaining: ${remainingAmount}`);
+    console.log(
+      `👤 Nazer (${settings.nazer_percentage}%): ${nazerShare} SAR | Remaining: ${remainingAmount}`
+    );
 
     // 3️⃣ صدقة الواقف (من الباقي)
     const waqifCharity = remainingAmount * ((settings.waqif_charity_percentage || 0) / 100);
     remainingAmount -= waqifCharity;
-    console.log(`💝 Waqif Charity (${settings.waqif_charity_percentage}%): ${waqifCharity} SAR | Remaining: ${remainingAmount}`);
+    console.log(
+      `💝 Waqif Charity (${settings.waqif_charity_percentage}%): ${waqifCharity} SAR | Remaining: ${remainingAmount}`
+    );
 
     // 4️⃣ الاحتياطي (اختياري، من الباقي)
-    const reserveAmount = settings.reserve_percentage 
+    const reserveAmount = settings.reserve_percentage
       ? remainingAmount * ((settings.reserve_percentage || 0) / 100)
       : 0;
     remainingAmount -= reserveAmount;
-    console.log(`🏦 Reserve (${settings.reserve_percentage || 0}%): ${reserveAmount} SAR | Remaining: ${remainingAmount}`);
+    console.log(
+      `🏦 Reserve (${settings.reserve_percentage || 0}%): ${reserveAmount} SAR | Remaining: ${remainingAmount}`
+    );
 
     const waqfCorpus = 0; // Not used in sequential calculation
 
     // Validation
-    const totalPercentages = 
+    const totalPercentages =
       (settings.maintenance_percentage || 0) +
       (settings.nazer_percentage || 0) +
       (settings.waqif_charity_percentage || 0) +
@@ -203,49 +224,57 @@ serve(async (req) => {
     console.log(`👥 Active Beneficiaries: ${beneficiaries.length}`);
 
     // 8. تصنيف المستفيدين
-    const wives = beneficiaries.filter(b => b.beneficiary_type === 'زوجة');
-    const sons = beneficiaries.filter(b => b.beneficiary_type === 'ولد');
-    const daughters = beneficiaries.filter(b => b.beneficiary_type === 'بنت');
-    const others = beneficiaries.filter(b => !['زوجة', 'ولد', 'بنت'].includes(b.beneficiary_type || ''));
+    const wives = beneficiaries.filter((b) => b.beneficiary_type === 'زوجة');
+    const sons = beneficiaries.filter((b) => b.beneficiary_type === 'ولد');
+    const daughters = beneficiaries.filter((b) => b.beneficiary_type === 'بنت');
+    const others = beneficiaries.filter(
+      (b) => !['زوجة', 'ولد', 'بنت'].includes(b.beneficiary_type || '')
+    );
 
-    console.log(`👰 Wives: ${wives.length}, 👦 Sons: ${sons.length}, 👧 Daughters: ${daughters.length}`);
+    console.log(
+      `👰 Wives: ${wives.length}, 👦 Sons: ${sons.length}, 👧 Daughters: ${daughters.length}`
+    );
 
     // 9. حساب التوزيع حسب القاعدة الشرعية
-    const distributionDetails: Array<{ beneficiary_id: string; beneficiary_type: string; allocated_amount: number }> = [];
+    const distributionDetails: Array<{
+      beneficiary_id: string;
+      beneficiary_type: string;
+      allocated_amount: number;
+    }> = [];
 
     if (settings.distribution_rule === 'شرعي') {
       // أ) حصة الزوجات (الثمن = 12.5%)
       const wivesTotal = distributableAmount * (settings.wives_share_ratio / 100);
       const wivesPerPerson = wives.length > 0 ? wivesTotal / wives.length : 0;
 
-      wives.forEach(wife => {
+      wives.forEach((wife) => {
         distributionDetails.push({
           beneficiary_id: wife.id,
           beneficiary_type: 'زوجة',
-          allocated_amount: wivesPerPerson
+          allocated_amount: wivesPerPerson,
         });
       });
 
       // ب) الباقي للأولاد والبنات (للذكر مثل حظ الأنثيين)
       const remainingAmount = distributableAmount - wivesTotal;
-      
+
       // حساب الأسهم: كل ابن = سهمان، كل بنت = سهم واحد
-      const totalShares = (sons.length * 2) + (daughters.length * 1);
+      const totalShares = sons.length * 2 + daughters.length * 1;
       const shareValue = totalShares > 0 ? remainingAmount / totalShares : 0;
 
-      sons.forEach(son => {
+      sons.forEach((son) => {
         distributionDetails.push({
           beneficiary_id: son.id,
           beneficiary_type: 'ولد',
-          allocated_amount: shareValue * 2
+          allocated_amount: shareValue * 2,
         });
       });
 
-      daughters.forEach(daughter => {
+      daughters.forEach((daughter) => {
         distributionDetails.push({
           beneficiary_id: daughter.id,
           beneficiary_type: 'بنت',
-          allocated_amount: shareValue * 1
+          allocated_amount: shareValue * 1,
         });
       });
 
@@ -255,11 +284,11 @@ serve(async (req) => {
     } else if (settings.distribution_rule === 'متساوي') {
       // التوزيع المتساوي
       const perPerson = distributableAmount / beneficiaries.length;
-      beneficiaries.forEach(b => {
+      beneficiaries.forEach((b) => {
         distributionDetails.push({
           beneficiary_id: b.id,
           beneficiary_type: b.beneficiary_type || 'أخرى',
-          allocated_amount: perPerson
+          allocated_amount: perPerson,
         });
       });
     }
@@ -268,7 +297,10 @@ serve(async (req) => {
     const { data: distribution, error: distError } = await supabase
       .from('distributions')
       .insert({
-        month: new Date(period_start).toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' }),
+        month: new Date(period_start).toLocaleDateString('ar-SA', {
+          month: 'long',
+          year: 'numeric',
+        }),
         distribution_date: new Date().toISOString().split('T')[0],
         distribution_type: distribution_type,
         period_start: period_start,
@@ -302,12 +334,12 @@ serve(async (req) => {
     console.log(`✅ Distribution created with ID: ${distribution.id}`);
 
     // 11. حفظ تفاصيل التوزيع
-    const detailsToInsert = distributionDetails.map(d => ({
+    const detailsToInsert = distributionDetails.map((d) => ({
       distribution_id: distribution.id,
       beneficiary_id: d.beneficiary_id,
       beneficiary_type: d.beneficiary_type,
       allocated_amount: d.allocated_amount,
-      payment_status: 'معلق'
+      payment_status: 'معلق',
     }));
 
     const { error: detailsError } = await supabase
@@ -351,13 +383,11 @@ serve(async (req) => {
         waqf_corpus: waqfCorpus,
         reserve_amount: reserveAmount,
         distributable_amount: distributableAmount,
-        beneficiaries_count: beneficiaries.length
-      }
+        beneficiaries_count: beneficiaries.length,
+      },
     });
   } catch (error) {
     console.error('❌ Error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error');
   }
 });

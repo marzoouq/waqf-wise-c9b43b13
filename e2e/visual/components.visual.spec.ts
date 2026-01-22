@@ -1,4 +1,9 @@
-import { test, expect, fullPageOptions, waitForPageStability } from '../fixtures/visual-test.fixture';
+import {
+  test,
+  expect,
+  fullPageOptions,
+  waitForPageStability,
+} from '../fixtures/visual-test.fixture';
 
 /**
  * Components Visual Regression Tests
@@ -6,13 +11,15 @@ import { test, expect, fullPageOptions, waitForPageStability } from '../fixtures
  */
 
 test.describe('Shared Components Visual Tests', () => {
-  
   test.describe('Buttons', () => {
     test('primary button on landing @visual', async ({ page }) => {
       await page.goto('/');
       await waitForPageStability(page);
-      
-      const primaryBtn = page.locator('button, a').filter({ hasText: /تسجيل|دخول|ابدأ/ }).first();
+
+      const primaryBtn = page
+        .locator('button, a')
+        .filter({ hasText: /تسجيل|دخول|ابدأ/ })
+        .first();
       if (await primaryBtn.isVisible()) {
         await expect(primaryBtn).toHaveScreenshot('component-btn-primary.png', {
           animations: 'disabled',
@@ -23,8 +30,11 @@ test.describe('Shared Components Visual Tests', () => {
     test('primary button hover @visual', async ({ page }) => {
       await page.goto('/');
       await waitForPageStability(page);
-      
-      const primaryBtn = page.locator('button, a').filter({ hasText: /تسجيل|دخول|ابدأ/ }).first();
+
+      const primaryBtn = page
+        .locator('button, a')
+        .filter({ hasText: /تسجيل|دخول|ابدأ/ })
+        .first();
       if (await primaryBtn.isVisible()) {
         await primaryBtn.hover();
         await expect(primaryBtn).toHaveScreenshot('component-btn-primary-hover.png', {
@@ -47,13 +57,13 @@ test.describe('Shared Components Visual Tests', () => {
         await expect(input).toHaveScreenshot('component-input-empty.png', {
           animations: 'disabled',
         });
-        
+
         // Filled state
         await input.fill('نص تجريبي');
         await expect(input).toHaveScreenshot('component-input-filled.png', {
           animations: 'disabled',
         });
-        
+
         // Focused state
         await input.focus();
         await expect(input).toHaveScreenshot('component-input-focused.png', {
@@ -76,7 +86,7 @@ test.describe('Shared Components Visual Tests', () => {
     test('tabs default state @visual', async ({ page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
-      
+
       const tabs = page.locator('[role="tablist"]').first();
       if (await tabs.isVisible()) {
         await expect(tabs).toHaveScreenshot('component-tabs-default.png', {
@@ -88,11 +98,11 @@ test.describe('Shared Components Visual Tests', () => {
     test('tabs active state @visual', async ({ page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
-      
+
       const tabs = page.locator('[role="tablist"]').first();
       const secondTab = page.locator('[role="tab"]').nth(1);
-      
-      if (await tabs.isVisible() && await secondTab.isVisible()) {
+
+      if ((await tabs.isVisible()) && (await secondTab.isVisible())) {
         await secondTab.click();
         await page.waitForTimeout(300);
         await expect(tabs).toHaveScreenshot('component-tabs-active-second.png', {
@@ -106,7 +116,7 @@ test.describe('Shared Components Visual Tests', () => {
     test('card component @visual', async ({ page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
-      
+
       const card = page.locator('[class*="card"], [class*="Card"]').first();
       if (await card.isVisible()) {
         await expect(card).toHaveScreenshot('component-card.png', {
@@ -120,17 +130,17 @@ test.describe('Shared Components Visual Tests', () => {
     test('button loading state @visual', async ({ page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
-      
+
       // ملء النموذج وإرساله لرؤية حالة التحميل
       const emailInput = page.locator('input[type="email"], input[name="email"]').first();
       const passwordInput = page.locator('input[type="password"]').first();
       const submitBtn = page.locator('button[type="submit"]').first();
-      
-      if (await emailInput.isVisible() && await passwordInput.isVisible()) {
+
+      if ((await emailInput.isVisible()) && (await passwordInput.isVisible())) {
         await emailInput.fill('test@test.com');
         await passwordInput.fill('password123');
         await submitBtn.click();
-        
+
         // محاولة التقاط حالة التحميل
         const loadingBtn = page.locator('button:has-text("جاري"), button:has([class*="animate"])');
         if (await loadingBtn.isVisible({ timeout: 1000 }).catch(() => false)) {

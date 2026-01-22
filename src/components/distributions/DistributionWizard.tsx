@@ -9,11 +9,11 @@ import { BeneficiarySelector } from './BeneficiarySelector';
 import { DeductionsConfig } from './DeductionsConfig';
 import { DistributionPreview } from './DistributionPreview';
 import { ApprovalSettings } from './ApprovalSettings';
-import type { 
-  DistributionWizardFormData, 
-  DeductionsValues, 
+import type {
+  DistributionWizardFormData,
+  DeductionsValues,
   ApprovalSettingsValues,
-  DistributionPattern 
+  DistributionPattern,
 } from '@/types/distributions';
 
 interface DistributionWizardProps {
@@ -129,8 +129,8 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
                     currentStep > step.id
                       ? 'bg-primary text-primary-foreground'
                       : currentStep === step.id
-                      ? 'bg-primary/20 text-primary border-2 border-primary'
-                      : 'bg-muted text-muted-foreground'
+                        ? 'bg-primary/20 text-primary border-2 border-primary'
+                        : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {currentStep > step.id ? <Check className="h-5 w-5" /> : step.id}
@@ -144,9 +144,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
               </div>
               {index < steps.length - 1 && (
                 <div
-                  className={`h-0.5 w-12 mx-2 ${
-                    currentStep > step.id ? 'bg-primary' : 'bg-muted'
-                  }`}
+                  className={`h-0.5 w-12 mx-2 ${currentStep > step.id ? 'bg-primary' : 'bg-muted'}`}
                 />
               )}
             </div>
@@ -158,10 +156,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
           {currentStep === 1 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">اختر نمط التوزيع</h3>
-              <DistributionPatternSelector
-                value={formData.pattern}
-                onChange={updatePattern}
-              />
+              <DistributionPatternSelector value={formData.pattern} onChange={updatePattern} />
             </div>
           )}
 
@@ -178,10 +173,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
           {currentStep === 3 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">نسب الاستقطاع</h3>
-              <DeductionsConfig
-                values={formData.deductions}
-                onChange={updateDeductions}
-              />
+              <DeductionsConfig values={formData.deductions} onChange={updateDeductions} />
             </div>
           )}
 
@@ -205,11 +197,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            disabled={currentStep === 1}
-          >
+          <Button variant="outline" onClick={handleBack} disabled={currentStep === 1}>
             <ArrowLeft className="h-4 w-4 ms-2" />
             السابق
           </Button>

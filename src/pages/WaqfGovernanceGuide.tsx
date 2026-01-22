@@ -3,24 +3,36 @@
  * اللائحة التنفيذية لوقف مرزوق علي الثبيتي
  */
 
-import { useState } from "react";
-import { ScrollText, Printer, Download, ChevronUp, Info, Calendar, Building2, Loader2 } from "lucide-react";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
-import { RegulationsContent } from "@/components/governance/RegulationsContent";
-import { RegulationsSearchBar } from "@/components/governance/RegulationsSearchBar";
-import { useRegulationsSearch } from "@/hooks/governance/useRegulationsSearch";
-import { generateGovernancePDF } from "@/lib/pdf/governance-pdf";
-import { toast } from "sonner";
+import { useState } from 'react';
+import {
+  ScrollText,
+  Printer,
+  Download,
+  ChevronUp,
+  Info,
+  Calendar,
+  Building2,
+  Loader2,
+} from 'lucide-react';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { CoreValuesSection } from '@/components/governance/CoreValuesSection';
+import { RegulationsContent } from '@/components/governance/RegulationsContent';
+import { RegulationsSearchBar } from '@/components/governance/RegulationsSearchBar';
+import { useRegulationsSearch } from '@/hooks/governance/useRegulationsSearch';
+import { generateGovernancePDF } from '@/lib/pdf/governance-pdf';
+import { toast } from 'sonner';
 
 const WaqfGovernanceGuide = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [_showScrollTop, _setShowScrollTop] = useState(false);
-  
+
   const {
     searchQuery,
     setSearchQuery,
@@ -70,15 +82,15 @@ const WaqfGovernanceGuide = () => {
             </div>
           }
         />
-        
+
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handlePrint} className="gap-2">
             <Printer className="h-4 w-4" />
             <span className="hidden sm:inline">طباعة</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="gap-2"
             onClick={handleDownloadPDF}
             disabled={isGeneratingPDF}
@@ -190,7 +202,7 @@ const WaqfGovernanceGuide = () => {
       <CoreValuesSection />
 
       {/* محتوى اللائحة مع دعم البحث */}
-      <RegulationsContent 
+      <RegulationsContent
         filteredParts={filteredParts}
         expandedParts={expandedParts}
         onExpandedChange={setExpandedParts}

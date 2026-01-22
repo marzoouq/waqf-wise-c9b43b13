@@ -1,11 +1,16 @@
 /**
  * UX Verification System - نظام التحقق من تكامل UX
  * يوفر أدوات للتحقق من أن جميع أنظمة UX تعمل بشكل صحيح
- * 
+ *
  * @version 1.0.0
  */
 
-import { checkUXSystemsHealth, detectDeviceCapabilities, collectUXMetrics, FEATURES } from './ux-integration';
+import {
+  checkUXSystemsHealth,
+  detectDeviceCapabilities,
+  collectUXMetrics,
+  FEATURES,
+} from './ux-integration';
 
 // ==================== Verification Types ====================
 
@@ -36,7 +41,7 @@ export interface VerificationReport {
  */
 export function verifyAccessibility(): VerificationResult[] {
   const results: VerificationResult[] = [];
-  
+
   // التحقق من وجود Skip Links
   const skipLinks = document.querySelector('[aria-label="روابط التخطي"]');
   results.push({
@@ -45,7 +50,7 @@ export function verifyAccessibility(): VerificationResult[] {
     status: skipLinks ? 'pass' : 'warn',
     message: skipLinks ? 'روابط التخطي موجودة' : 'روابط التخطي غير موجودة',
   });
-  
+
   // التحقق من Main Content
   const mainContent = document.querySelector('#main-content');
   results.push({
@@ -54,7 +59,7 @@ export function verifyAccessibility(): VerificationResult[] {
     status: mainContent ? 'pass' : 'warn',
     message: mainContent ? 'المحتوى الرئيسي معرّف' : 'المحتوى الرئيسي غير معرّف',
   });
-  
+
   // التحقق من اللغة
   const htmlLang = document.documentElement.lang;
   results.push({
@@ -63,7 +68,7 @@ export function verifyAccessibility(): VerificationResult[] {
     status: htmlLang ? 'pass' : 'warn',
     message: htmlLang ? `اللغة محددة: ${htmlLang}` : 'اللغة غير محددة',
   });
-  
+
   // التحقق من اتجاه الصفحة
   const htmlDir = document.documentElement.dir;
   results.push({
@@ -72,7 +77,7 @@ export function verifyAccessibility(): VerificationResult[] {
     status: htmlDir === 'rtl' ? 'pass' : 'warn',
     message: htmlDir === 'rtl' ? 'الاتجاه RTL' : 'الاتجاه غير محدد أو LTR',
   });
-  
+
   return results;
 }
 
@@ -81,7 +86,7 @@ export function verifyAccessibility(): VerificationResult[] {
  */
 export function verifyNetworkResilience(): VerificationResult[] {
   const results: VerificationResult[] = [];
-  
+
   // التحقق من حالة الاتصال
   results.push({
     category: 'network',
@@ -89,16 +94,19 @@ export function verifyNetworkResilience(): VerificationResult[] {
     status: navigator.onLine ? 'pass' : 'fail',
     message: navigator.onLine ? 'متصل بالإنترنت' : 'غير متصل بالإنترنت',
   });
-  
+
   // التحقق من Network Information API
-  const connection = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
+  const connection = (navigator as Navigator & { connection?: { effectiveType?: string } })
+    .connection;
   results.push({
     category: 'network',
     name: 'Network Info API',
     status: connection ? 'pass' : 'warn',
-    message: connection ? `نوع الاتصال: ${connection.effectiveType || 'unknown'}` : 'Network Information API غير مدعوم',
+    message: connection
+      ? `نوع الاتصال: ${connection.effectiveType || 'unknown'}`
+      : 'Network Information API غير مدعوم',
   });
-  
+
   // التحقق من Service Worker
   results.push({
     category: 'network',
@@ -106,7 +114,7 @@ export function verifyNetworkResilience(): VerificationResult[] {
     status: 'serviceWorker' in navigator ? 'pass' : 'warn',
     message: 'serviceWorker' in navigator ? 'Service Worker مدعوم' : 'Service Worker غير مدعوم',
   });
-  
+
   return results;
 }
 
@@ -116,11 +124,15 @@ export function verifyNetworkResilience(): VerificationResult[] {
 export function verifyPerformance(): VerificationResult[] {
   const results: VerificationResult[] = [];
   const metrics = collectUXMetrics();
-  
+
   // التحقق من FCP
   if (metrics.firstContentfulPaint) {
-    const fcpStatus = metrics.firstContentfulPaint < 1800 ? 'pass' : 
-                      metrics.firstContentfulPaint < 3000 ? 'warn' : 'fail';
+    const fcpStatus =
+      metrics.firstContentfulPaint < 1800
+        ? 'pass'
+        : metrics.firstContentfulPaint < 3000
+          ? 'warn'
+          : 'fail';
     results.push({
       category: 'performance',
       name: 'First Contentful Paint',
@@ -129,11 +141,15 @@ export function verifyPerformance(): VerificationResult[] {
       details: { value: metrics.firstContentfulPaint, threshold: 1800 },
     });
   }
-  
+
   // التحقق من TTI
   if (metrics.timeToInteractive) {
-    const ttiStatus = metrics.timeToInteractive < 3000 ? 'pass' :
-                      metrics.timeToInteractive < 5000 ? 'warn' : 'fail';
+    const ttiStatus =
+      metrics.timeToInteractive < 3000
+        ? 'pass'
+        : metrics.timeToInteractive < 5000
+          ? 'warn'
+          : 'fail';
     results.push({
       category: 'performance',
       name: 'Time to Interactive',
@@ -142,15 +158,16 @@ export function verifyPerformance(): VerificationResult[] {
       details: { value: metrics.timeToInteractive, threshold: 3000 },
     });
   }
-  
+
   // التحقق من Performance API
   results.push({
     category: 'performance',
     name: 'Performance API',
     status: typeof performance !== 'undefined' ? 'pass' : 'warn',
-    message: typeof performance !== 'undefined' ? 'Performance API متاح' : 'Performance API غير متاح',
+    message:
+      typeof performance !== 'undefined' ? 'Performance API متاح' : 'Performance API غير متاح',
   });
-  
+
   return results;
 }
 
@@ -159,7 +176,7 @@ export function verifyPerformance(): VerificationResult[] {
  */
 export function verifyFeatureSupport(): VerificationResult[] {
   const results: VerificationResult[] = [];
-  
+
   const criticalFeatures: (keyof typeof FEATURES)[] = [
     'intersectionObserver',
     'resizeObserver',
@@ -167,7 +184,7 @@ export function verifyFeatureSupport(): VerificationResult[] {
     'cssVariables',
     'cssFlexbox',
   ];
-  
+
   for (const feature of criticalFeatures) {
     results.push({
       category: 'features',
@@ -176,7 +193,7 @@ export function verifyFeatureSupport(): VerificationResult[] {
       message: FEATURES[feature] ? `${feature} مدعوم` : `${feature} غير مدعوم`,
     });
   }
-  
+
   return results;
 }
 
@@ -186,7 +203,7 @@ export function verifyFeatureSupport(): VerificationResult[] {
 export function verifyDeviceCapabilities(): VerificationResult[] {
   const results: VerificationResult[] = [];
   const capabilities = detectDeviceCapabilities();
-  
+
   results.push({
     category: 'device',
     name: 'Touch Support',
@@ -194,7 +211,7 @@ export function verifyDeviceCapabilities(): VerificationResult[] {
     message: capabilities.hasTouchScreen ? 'جهاز لمسي' : 'جهاز غير لمسي',
     details: { hasTouchScreen: capabilities.hasTouchScreen },
   });
-  
+
   results.push({
     category: 'device',
     name: 'High Resolution',
@@ -202,7 +219,7 @@ export function verifyDeviceCapabilities(): VerificationResult[] {
     message: capabilities.isHighResolution ? 'شاشة عالية الدقة' : 'شاشة عادية',
     details: { devicePixelRatio: window.devicePixelRatio },
   });
-  
+
   results.push({
     category: 'device',
     name: 'Motion Preference',
@@ -210,7 +227,7 @@ export function verifyDeviceCapabilities(): VerificationResult[] {
     message: capabilities.prefersReducedMotion ? 'يفضل تقليل الحركة' : 'الحركة مفعلة',
     details: { prefersReducedMotion: capabilities.prefersReducedMotion },
   });
-  
+
   return results;
 }
 
@@ -227,18 +244,17 @@ export function runFullVerification(): VerificationReport {
     ...verifyFeatureSupport(),
     ...verifyDeviceCapabilities(),
   ];
-  
+
   const summary = {
     total: allResults.length,
-    passed: allResults.filter(r => r.status === 'pass').length,
-    warnings: allResults.filter(r => r.status === 'warn').length,
-    failed: allResults.filter(r => r.status === 'fail').length,
+    passed: allResults.filter((r) => r.status === 'pass').length,
+    warnings: allResults.filter((r) => r.status === 'warn').length,
+    failed: allResults.filter((r) => r.status === 'fail').length,
   };
-  
-  const overallStatus: VerificationReport['overallStatus'] = 
-    summary.failed > 0 ? 'critical' :
-    summary.warnings > 2 ? 'degraded' : 'healthy';
-  
+
+  const overallStatus: VerificationReport['overallStatus'] =
+    summary.failed > 0 ? 'critical' : summary.warnings > 2 ? 'degraded' : 'healthy';
+
   return {
     timestamp: new Date().toISOString(),
     overallStatus,
@@ -252,20 +268,20 @@ export function runFullVerification(): VerificationReport {
  */
 export function logVerificationReport(): void {
   const report = runFullVerification();
-  
+
   console.group('🔍 UX Verification Report');
   console.log(`📅 Timestamp: ${report.timestamp}`);
   console.log(`📊 Overall Status: ${report.overallStatus}`);
   console.log(`✅ Passed: ${report.summary.passed}/${report.summary.total}`);
   console.log(`⚠️ Warnings: ${report.summary.warnings}`);
   console.log(`❌ Failed: ${report.summary.failed}`);
-  
+
   console.group('📋 Details');
-  const categories = [...new Set(report.results.map(r => r.category))];
-  
+  const categories = [...new Set(report.results.map((r) => r.category))];
+
   for (const category of categories) {
     console.group(`📁 ${category}`);
-    const categoryResults = report.results.filter(r => r.category === category);
+    const categoryResults = report.results.filter((r) => r.category === category);
     for (const result of categoryResults) {
       const icon = result.status === 'pass' ? '✅' : result.status === 'warn' ? '⚠️' : '❌';
       console.log(`${icon} ${result.name}: ${result.message}`);
@@ -273,7 +289,7 @@ export function logVerificationReport(): void {
     console.groupEnd();
   }
   console.groupEnd();
-  
+
   console.groupEnd();
 }
 
@@ -286,11 +302,7 @@ export const PHASES_SUMMARY = {
   phase1: {
     name: 'المرحلة الأولى - التحليل والتمحيص',
     status: 'completed',
-    deliverables: [
-      'تحديد المشكلة بدقة وفهم المتطلبات',
-      'فحص المتطلبات تقنياً',
-      'وثيقة عمل واضحة',
-    ],
+    deliverables: ['تحديد المشكلة بدقة وفهم المتطلبات', 'فحص المتطلبات تقنياً', 'وثيقة عمل واضحة'],
   },
   phase2: {
     name: 'المرحلة الثانية - الهيكلة والتصميم',

@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/ui/use-toast";
-import { Search, Save, X, UserPlus, AlertCircle } from "lucide-react";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/ui/use-toast';
+import { Search, Save, X, UserPlus, AlertCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -22,9 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useUserPermissionsOverride } from "@/hooks/permissions/useUserPermissionsOverride";
+} from '@/components/ui/table';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useUserPermissionsOverride } from '@/hooks/permissions/useUserPermissionsOverride';
 
 interface UserPermissionsOverrideProps {
   userId: string;
@@ -33,60 +33,142 @@ interface UserPermissionsOverrideProps {
 
 // قائمة الصلاحيات المتاحة في النظام
 const AVAILABLE_PERMISSIONS = [
-  { key: 'users.manage', name: 'إدارة المستخدمين', description: 'إنشاء وتعديل وحذف المستخدمين', category: 'المستخدمون' },
-  { key: 'settings.manage', name: 'إدارة الإعدادات', description: 'تعديل إعدادات النظام', category: 'الإعدادات' },
-  { key: 'reports.view', name: 'عرض التقارير', description: 'الوصول للتقارير المالية والإدارية', category: 'التقارير' },
-  { key: 'beneficiaries.manage', name: 'إدارة المستفيدين', description: 'إضافة وتعديل بيانات المستفيدين', category: 'المستفيدون' },
-  { key: 'beneficiaries.view', name: 'عرض المستفيدين', description: 'الاطلاع على بيانات المستفيدين', category: 'المستفيدون' },
-  { key: 'properties.manage', name: 'إدارة العقارات', description: 'إضافة وتعديل العقارات', category: 'العقارات' },
-  { key: 'funds.manage', name: 'إدارة الصناديق', description: 'إدارة صناديق الوقف', category: 'المالية' },
-  { key: 'accounting.manage', name: 'إدارة المحاسبة', description: 'الوصول الكامل للنظام المحاسبي', category: 'المالية' },
-  { key: 'journal_entries.create', name: 'إنشاء قيود محاسبية', description: 'تسجيل القيود المحاسبية', category: 'المالية' },
-  { key: 'bank_accounts.view', name: 'عرض الحسابات البنكية', description: 'الاطلاع على الحسابات البنكية', category: 'المالية' },
-  { key: 'payments.execute', name: 'تنفيذ المدفوعات', description: 'صرف المستحقات', category: 'المالية' },
-  { key: 'vouchers.create', name: 'إنشاء السندات', description: 'إنشاء سندات الصرف والقبض', category: 'المالية' },
-  { key: 'documents.manage', name: 'إدارة المستندات', description: 'رفع وتعديل المستندات', category: 'الأرشيف' },
-  { key: 'archive.manage', name: 'إدارة الأرشيف', description: 'إدارة نظام الأرشيف', category: 'الأرشيف' },
-  { key: 'documents.upload', name: 'رفع المستندات', description: 'رفع مستندات جديدة', category: 'الأرشيف' },
-  { key: 'profile.view', name: 'عرض الملف الشخصي', description: 'الاطلاع على الملف الشخصي', category: 'الملف الشخصي' },
-  { key: 'requests.submit', name: 'تقديم الطلبات', description: 'تقديم طلبات جديدة', category: 'الطلبات' },
+  {
+    key: 'users.manage',
+    name: 'إدارة المستخدمين',
+    description: 'إنشاء وتعديل وحذف المستخدمين',
+    category: 'المستخدمون',
+  },
+  {
+    key: 'settings.manage',
+    name: 'إدارة الإعدادات',
+    description: 'تعديل إعدادات النظام',
+    category: 'الإعدادات',
+  },
+  {
+    key: 'reports.view',
+    name: 'عرض التقارير',
+    description: 'الوصول للتقارير المالية والإدارية',
+    category: 'التقارير',
+  },
+  {
+    key: 'beneficiaries.manage',
+    name: 'إدارة المستفيدين',
+    description: 'إضافة وتعديل بيانات المستفيدين',
+    category: 'المستفيدون',
+  },
+  {
+    key: 'beneficiaries.view',
+    name: 'عرض المستفيدين',
+    description: 'الاطلاع على بيانات المستفيدين',
+    category: 'المستفيدون',
+  },
+  {
+    key: 'properties.manage',
+    name: 'إدارة العقارات',
+    description: 'إضافة وتعديل العقارات',
+    category: 'العقارات',
+  },
+  {
+    key: 'funds.manage',
+    name: 'إدارة الصناديق',
+    description: 'إدارة صناديق الوقف',
+    category: 'المالية',
+  },
+  {
+    key: 'accounting.manage',
+    name: 'إدارة المحاسبة',
+    description: 'الوصول الكامل للنظام المحاسبي',
+    category: 'المالية',
+  },
+  {
+    key: 'journal_entries.create',
+    name: 'إنشاء قيود محاسبية',
+    description: 'تسجيل القيود المحاسبية',
+    category: 'المالية',
+  },
+  {
+    key: 'bank_accounts.view',
+    name: 'عرض الحسابات البنكية',
+    description: 'الاطلاع على الحسابات البنكية',
+    category: 'المالية',
+  },
+  {
+    key: 'payments.execute',
+    name: 'تنفيذ المدفوعات',
+    description: 'صرف المستحقات',
+    category: 'المالية',
+  },
+  {
+    key: 'vouchers.create',
+    name: 'إنشاء السندات',
+    description: 'إنشاء سندات الصرف والقبض',
+    category: 'المالية',
+  },
+  {
+    key: 'documents.manage',
+    name: 'إدارة المستندات',
+    description: 'رفع وتعديل المستندات',
+    category: 'الأرشيف',
+  },
+  {
+    key: 'archive.manage',
+    name: 'إدارة الأرشيف',
+    description: 'إدارة نظام الأرشيف',
+    category: 'الأرشيف',
+  },
+  {
+    key: 'documents.upload',
+    name: 'رفع المستندات',
+    description: 'رفع مستندات جديدة',
+    category: 'الأرشيف',
+  },
+  {
+    key: 'profile.view',
+    name: 'عرض الملف الشخصي',
+    description: 'الاطلاع على الملف الشخصي',
+    category: 'الملف الشخصي',
+  },
+  {
+    key: 'requests.submit',
+    name: 'تقديم الطلبات',
+    description: 'تقديم طلبات جديدة',
+    category: 'الطلبات',
+  },
 ];
 
 export function UserPermissionsOverride({ userId, userName }: UserPermissionsOverrideProps) {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPermission, setSelectedPermission] = useState<typeof AVAILABLE_PERMISSIONS[0] | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPermission, setSelectedPermission] = useState<
+    (typeof AVAILABLE_PERMISSIONS)[0] | null
+  >(null);
   const [grantPermission, setGrantPermission] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { 
-    userOverrides, 
-    addOverride, 
-    removeOverride, 
-    isAdding, 
-    isRemoving 
-  } = useUserPermissionsOverride(userId);
+  const { userOverrides, addOverride, removeOverride, isAdding, isRemoving } =
+    useUserPermissionsOverride(userId);
 
   const handleAddOverride = async () => {
     if (!selectedPermission) return;
-    
+
     try {
       await addOverride({
         permissionKey: selectedPermission.key,
         granted: grantPermission,
       });
       toast({
-        title: "تم الحفظ",
-        description: "تم إضافة استثناء الصلاحية بنجاح",
+        title: 'تم الحفظ',
+        description: 'تم إضافة استثناء الصلاحية بنجاح',
       });
       setIsDialogOpen(false);
       setSelectedPermission(null);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "فشل إضافة استثناء الصلاحية";
+      const message = error instanceof Error ? error.message : 'فشل إضافة استثناء الصلاحية';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -95,23 +177,24 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
     try {
       await removeOverride(permissionKey);
       toast({
-        title: "تم الحذف",
-        description: "تم إزالة استثناء الصلاحية بنجاح",
+        title: 'تم الحذف',
+        description: 'تم إزالة استثناء الصلاحية بنجاح',
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "فشل إزالة استثناء الصلاحية";
+      const message = error instanceof Error ? error.message : 'فشل إزالة استثناء الصلاحية';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
-  const filteredPermissions = AVAILABLE_PERMISSIONS.filter(perm =>
-    perm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    perm.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    perm.key.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPermissions = AVAILABLE_PERMISSIONS.filter(
+    (perm) =>
+      perm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      perm.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      perm.key.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const hasOverrides = userOverrides.length > 0;
@@ -123,9 +206,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>استثناءات صلاحيات المستخدم</CardTitle>
-              <CardDescription>
-                إدارة صلاحيات خاصة لـ {userName}
-              </CardDescription>
+              <CardDescription>إدارة صلاحيات خاصة لـ {userName}</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -166,12 +247,14 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                         {filteredPermissions.map((perm) => (
                           <TableRow
                             key={perm.key}
-                            className={selectedPermission?.key === perm.key ? "bg-muted" : ""}
+                            className={selectedPermission?.key === perm.key ? 'bg-muted' : ''}
                           >
                             <TableCell>
                               <div>
                                 <p className="font-medium text-sm">{perm.name}</p>
-                                <p className="font-mono text-xs text-muted-foreground">{perm.key}</p>
+                                <p className="font-mono text-xs text-muted-foreground">
+                                  {perm.key}
+                                </p>
                               </div>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
@@ -180,10 +263,12 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                             <TableCell>
                               <Button
                                 size="sm"
-                                variant={selectedPermission?.key === perm.key ? "default" : "outline"}
+                                variant={
+                                  selectedPermission?.key === perm.key ? 'default' : 'outline'
+                                }
                                 onClick={() => setSelectedPermission(perm)}
                               >
-                                {selectedPermission?.key === perm.key ? "مختار" : "اختيار"}
+                                {selectedPermission?.key === perm.key ? 'مختار' : 'اختيار'}
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -196,15 +281,12 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                     <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-medium">
-                          {grantPermission ? "منح الصلاحية" : "منع الصلاحية"}
+                          {grantPermission ? 'منح الصلاحية' : 'منع الصلاحية'}
                         </span>
-                        <Switch
-                          checked={grantPermission}
-                          onCheckedChange={setGrantPermission}
-                        />
+                        <Switch checked={grantPermission} onCheckedChange={setGrantPermission} />
                       </div>
-                      <Badge variant={grantPermission ? "default" : "destructive"}>
-                        {grantPermission ? "سماح" : "رفض"}
+                      <Badge variant={grantPermission ? 'default' : 'destructive'}>
+                        {grantPermission ? 'سماح' : 'رفض'}
                       </Badge>
                     </div>
                   )}
@@ -235,7 +317,9 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
           ) : (
             <div className="space-y-2">
               {userOverrides.map((override) => {
-                const permInfo = AVAILABLE_PERMISSIONS.find(p => p.key === override.permission_key);
+                const permInfo = AVAILABLE_PERMISSIONS.find(
+                  (p) => p.key === override.permission_key
+                );
                 return (
                   <div
                     key={override.id}
@@ -246,17 +330,15 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                         <p className="text-sm font-medium">
                           {permInfo?.name || override.permission_key}
                         </p>
-                        <Badge variant={override.granted ? "default" : "destructive"}>
-                          {override.granted ? "سماح" : "رفض"}
+                        <Badge variant={override.granted ? 'default' : 'destructive'}>
+                          {override.granted ? 'سماح' : 'رفض'}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground font-mono">
                         {override.permission_key}
                       </p>
                       {permInfo?.description && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {permInfo.description}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">{permInfo.description}</p>
                       )}
                     </div>
                     <Button

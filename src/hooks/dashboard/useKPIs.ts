@@ -1,17 +1,17 @@
 /**
  * useKPIs Hook
  * Hook لجلب مؤشرات الأداء الرئيسية من kpi_definitions
- * 
+ *
  * @deprecated استخدم useUnifiedKPIs للـ Dashboard KPIs العامة
  * هذا الـ Hook مخصص فقط لـ KPIDashboard component
- * 
+ *
  * @version 2.9.3
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { DashboardService, RealtimeService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { DashboardService, RealtimeService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface KPI {
   id: string;
@@ -33,14 +33,21 @@ export interface KPI {
   current_value?: number;
   previous_value?: number;
   change_percentage?: number;
-  trend?: "up" | "down" | "stable";
-  status?: "success" | "warning" | "danger" | "neutral";
+  trend?: 'up' | 'down' | 'stable';
+  status?: 'success' | 'warning' | 'danger' | 'neutral';
 }
 
 export function useKPIs(category?: string) {
   const queryClient = useQueryClient();
 
-  const { data: kpis = [], isLoading, isRefetching, dataUpdatedAt, error, refetch } = useQuery({
+  const {
+    data: kpis = [],
+    isLoading,
+    isRefetching,
+    dataUpdatedAt,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.KPIS(category),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
@@ -50,7 +57,8 @@ export function useKPIs(category?: string) {
         data.map(async (kpi) => {
           const currentValue = await DashboardService.calculateKPIValue(kpi.kpi_code);
           const previousValue = currentValue * 0.95;
-          const changePercentage = previousValue > 0 ? ((currentValue - previousValue) / previousValue) * 100 : 0;
+          const changePercentage =
+            previousValue > 0 ? ((currentValue - previousValue) / previousValue) * 100 : 0;
           const trend = determineTrend(currentValue, kpi.target_value);
           const status = determineStatus(currentValue, kpi.target_value, null, null);
 
@@ -82,10 +90,14 @@ export function useKPIs(category?: string) {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToChanges(
       ['distributions', 'beneficiaries', 'payments', 'contracts'],
-      () => { queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KPIS(category) }); }
+      () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KPIS(category) });
+      }
     );
 
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [queryClient, category]);
 
   const handleRefresh = () => {
@@ -103,12 +115,15 @@ export function useKPIs(category?: string) {
   };
 }
 
-function determineTrend(currentValue?: number, targetValue?: number | null): "up" | "down" | "stable" {
-  if (!currentValue || !targetValue) return "stable";
+function determineTrend(
+  currentValue?: number,
+  targetValue?: number | null
+): 'up' | 'down' | 'stable' {
+  if (!currentValue || !targetValue) return 'stable';
   const percentage = (currentValue / targetValue) * 100;
-  if (percentage > 100) return "up";
-  if (percentage < 80) return "down";
-  return "stable";
+  if (percentage > 100) return 'up';
+  if (percentage < 80) return 'down';
+  return 'stable';
 }
 
 function determineStatus(
@@ -116,10 +131,16 @@ function determineStatus(
   targetValue?: number | null,
   warningThreshold?: number | null,
   dangerThreshold?: number | null
-): "success" | "warning" | "danger" | "neutral" {
-  if (targetValue === null || targetValue === undefined) return "neutral";
-  if (dangerThreshold !== null && dangerThreshold !== undefined && currentValue <= dangerThreshold) return "danger";
-  if (warningThreshold !== null && warningThreshold !== undefined && currentValue <= warningThreshold) return "warning";
-  if (currentValue >= targetValue) return "success";
-  return "neutral";
+): 'success' | 'warning' | 'danger' | 'neutral' {
+  if (targetValue === null || targetValue === undefined) return 'neutral';
+  if (dangerThreshold !== null && dangerThreshold !== undefined && currentValue <= dangerThreshold)
+    return 'danger';
+  if (
+    warningThreshold !== null &&
+    warningThreshold !== undefined &&
+    currentValue <= warningThreshold
+  )
+    return 'warning';
+  if (currentValue >= targetValue) return 'success';
+  return 'neutral';
 }

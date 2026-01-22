@@ -41,7 +41,7 @@ describe('ErrorTracker - Deduplication', () => {
   it('should not deduplicate errors outside window', () => {
     const DEDUP_WINDOW = 15 * 60 * 1000;
     const now = Date.now();
-    const oldTime = now - (20 * 60 * 1000); // 20 minutes ago
+    const oldTime = now - 20 * 60 * 1000; // 20 minutes ago
 
     const dedupMap = new Map<string, { count: number; lastSeen: number }>();
     dedupMap.set('error-key', { count: 1, lastSeen: oldTime });
@@ -53,16 +53,20 @@ describe('ErrorTracker - Deduplication', () => {
   it('should auto-resolve repeated errors after threshold', () => {
     const MAX_COUNT = 20;
     const dedupMap = new Map<string, { count: number; lastSeen: number; resolved: boolean }>();
-    
+
     // Simulate 20 identical errors
     for (let i = 1; i <= MAX_COUNT; i++) {
-      const entry = dedupMap.get('test-error') || { count: 0, lastSeen: Date.now(), resolved: false };
+      const entry = dedupMap.get('test-error') || {
+        count: 0,
+        lastSeen: Date.now(),
+        resolved: false,
+      };
       entry.count++;
-      
+
       if (entry.count >= MAX_COUNT) {
         entry.resolved = true;
       }
-      
+
       dedupMap.set('test-error', entry);
     }
 
@@ -126,7 +130,7 @@ describe('ErrorTracker - Error Filtering', () => {
   ];
 
   const shouldIgnore = (message: string): boolean => {
-    return IGNORE_PATTERNS.some(pattern => pattern.test(message));
+    return IGNORE_PATTERNS.some((pattern) => pattern.test(message));
   };
 
   it('should ignore auth errors', () => {
@@ -149,9 +153,9 @@ describe('ErrorTracker - Queue Management', () => {
   it('should add errors to queue', () => {
     const queue: any[] = [];
     const error = { type: 'test', message: 'Test error' };
-    
+
     queue.push(error);
-    
+
     expect(queue.length).toBe(1);
     expect(queue[0]).toEqual(error);
   });
@@ -165,7 +169,7 @@ describe('ErrorTracker - Queue Management', () => {
 
     const first = queue.shift();
     expect(first?.id).toBe(1);
-    
+
     const second = queue.shift();
     expect(second?.id).toBe(2);
   });
@@ -173,10 +177,10 @@ describe('ErrorTracker - Queue Management', () => {
   it('should save pending errors to localStorage', () => {
     const errors = [{ type: 'test', message: 'Test' }];
     const serialized = JSON.stringify(errors);
-    
+
     expect(serialized).toContain('test');
     expect(serialized).toContain('Test');
-    
+
     const deserialized = JSON.parse(serialized);
     expect(deserialized).toEqual(errors);
   });

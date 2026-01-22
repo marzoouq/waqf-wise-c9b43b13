@@ -3,9 +3,9 @@
  * @version 2.8.42
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { abortableFetch } from "@/lib/utils/abortable-fetch";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import { abortableFetch } from '@/lib/utils/abortable-fetch';
+import type { Database } from '@/integrations/supabase/types';
 
 type SecurityEventRow = Database['public']['Tables']['security_events_log']['Row'];
 type LoginAttemptRow = Database['public']['Tables']['login_attempts_log']['Row'];
@@ -17,11 +17,11 @@ export class SecurityService {
    */
   static async getSecurityEvents(limit = 50): Promise<SecurityEventRow[]> {
     const { data, error } = await supabase
-      .from("security_events_log")
-      .select("*")
-      .order("created_at", { ascending: false })
+      .from('security_events_log')
+      .select('*')
+      .order('created_at', { ascending: false })
       .limit(limit);
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -31,11 +31,11 @@ export class SecurityService {
    */
   static async getLoginAttempts(limit = 20): Promise<LoginAttemptRow[]> {
     const { data, error } = await supabase
-      .from("login_attempts_log")
-      .select("*")
-      .order("created_at", { ascending: false })
+      .from('login_attempts_log')
+      .select('*')
+      .order('created_at', { ascending: false })
       .limit(limit);
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -45,9 +45,9 @@ export class SecurityService {
    */
   static async getUserRole(userId: string): Promise<string | null> {
     const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
       .maybeSingle();
 
     if (error) return null;
@@ -59,10 +59,10 @@ export class SecurityService {
    */
   static async getRolePermissions(role: string): Promise<RolePermissionRow[]> {
     const { data, error } = await supabase
-      .from("role_permissions")
-      .select("*")
-      .eq("role", role as RolePermissionRow['role']);
-    
+      .from('role_permissions')
+      .select('*')
+      .eq('role', role as RolePermissionRow['role']);
+
     if (error) throw error;
     return data || [];
   }
@@ -70,17 +70,22 @@ export class SecurityService {
   /**
    * تحديث أو إضافة صلاحية لدور
    */
-  static async upsertRolePermission(role: string, permissionId: string, granted: boolean): Promise<void> {
-    const { error } = await supabase
-      .from("role_permissions")
-      .upsert({
+  static async upsertRolePermission(
+    role: string,
+    permissionId: string,
+    granted: boolean
+  ): Promise<void> {
+    const { error } = await supabase.from('role_permissions').upsert(
+      {
         role: role as RolePermissionRow['role'],
         permission_id: permissionId,
-        granted
-      }, {
-        onConflict: 'role,permission_id'
-      });
-    
+        granted,
+      },
+      {
+        onConflict: 'role,permission_id',
+      }
+    );
+
     if (error) throw error;
   }
 
@@ -89,10 +94,10 @@ export class SecurityService {
    */
   static async getUserPermissionOverrides(userId: string) {
     const { data, error } = await supabase
-      .from("user_permissions")
-      .select("*")
-      .eq("user_id", userId);
-    
+      .from('user_permissions')
+      .select('*')
+      .eq('user_id', userId);
+
     if (error) throw error;
     return data || [];
   }
@@ -100,35 +105,41 @@ export class SecurityService {
   /**
    * إضافة أو تحديث تجاوز صلاحية للمستخدم
    */
-  static async upsertUserPermissionOverride(userId: string, permissionKey: string, granted: boolean): Promise<void> {
-    const { error } = await supabase
-      .from("user_permissions")
-      .upsert({
-        user_id: userId,
-        permission_key: permissionKey,
-        granted,
-        granted_at: new Date().toISOString()
-      });
-    
+  static async upsertUserPermissionOverride(
+    userId: string,
+    permissionKey: string,
+    granted: boolean
+  ): Promise<void> {
+    const { error } = await supabase.from('user_permissions').upsert({
+      user_id: userId,
+      permission_key: permissionKey,
+      granted,
+      granted_at: new Date().toISOString(),
+    });
+
     if (error) throw error;
   }
 
   /**
    * حذف تجاوز صلاحية من المستخدم (Soft Delete)
    */
-  static async removeUserPermissionOverride(userId: string, permissionKey: string, reason: string = 'إلغاء الصلاحية'): Promise<void> {
+  static async removeUserPermissionOverride(
+    userId: string,
+    permissionKey: string,
+    reason: string = 'إلغاء الصلاحية'
+  ): Promise<void> {
     const { data: userData } = await supabase.auth.getUser();
-    
+
     const { error } = await supabase
-      .from("user_permissions")
+      .from('user_permissions')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: userData?.user?.id || null,
         deletion_reason: reason,
       })
-      .eq("user_id", userId)
-      .eq("permission_key", permissionKey);
-    
+      .eq('user_id', userId)
+      .eq('permission_key', permissionKey);
+
     if (error) throw error;
   }
 
@@ -139,13 +150,13 @@ export class SecurityService {
   static async saveLeakedPasswordCheck(userId: string, passwordHash: string, isLeaked: boolean) {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    
+
     await abortableFetch(`${supabaseUrl}/rest/v1/leaked_password_checks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`,
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
       },
       body: JSON.stringify({
         user_id: userId,

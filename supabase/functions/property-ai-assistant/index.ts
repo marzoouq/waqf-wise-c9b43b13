@@ -1,34 +1,34 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
   errorResponse,
   unauthorizedResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting & Role Configuration ============
 const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 const RATE_LIMIT = {
-  maxRequests: 20,    // 20 تحليل
-  windowMs: 60000     // في الدقيقة
+  maxRequests: 20, // 20 تحليل
+  windowMs: 60000, // في الدقيقة
 };
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
     return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
   }
-  
+
   if (userLimit.count >= RATE_LIMIT.maxRequests) {
     return { allowed: false, remaining: 0 };
   }
-  
+
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
 }
@@ -41,7 +41,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -57,7 +57,7 @@ serve(async (req) => {
         status: 'healthy',
         function: 'property-ai-assistant',
         timestamp: new Date().toISOString(),
-        version: '2.1.0'
+        version: '2.1.0',
       });
     }
 
@@ -69,14 +69,17 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.error('Auth error:', authError);
       return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
@@ -93,16 +96,19 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', user.id);
 
-    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
+    const hasPermission = userRoles?.some((r) => ALLOWED_ROLES.includes(r.role));
     if (!hasPermission) {
       console.error('❌ Unauthorized role for property AI:', { userId: user.id, roles: userRoles });
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'ليس لديك صلاحية لاستخدام المساعد الذكي للعقارات'
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'ليس لديك صلاحية لاستخدام المساعد الذكي للعقارات',
+        }),
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        }
+      );
     }
 
     // 🔐 SECURITY: Rate Limiting
@@ -112,33 +118,38 @@ serve(async (req) => {
       return rateLimitResponse('تم تجاوز الحد الأقصى للتحليل (20/دقيقة). يرجى الانتظار.');
     }
 
-    console.log('Authenticated user for property AI:', user.id, 'Rate limit remaining:', rateCheck.remaining);
+    console.log(
+      'Authenticated user for property AI:',
+      user.id,
+      'Rate limit remaining:',
+      rateCheck.remaining
+    );
 
     // ✅ استخدام bodyData المحفوظة
     const action = bodyData.action as string | undefined;
     const data = (bodyData.data || {}) as Record<string, unknown>;
-    
+
     // التحقق من وجود action
     if (!action) {
       return errorResponse('Action is required', 400);
     }
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    let systemPrompt = "";
-    let userPrompt = "";
+    let systemPrompt = '';
+    let userPrompt = '';
 
     switch (action) {
-      case "analyze_property":
+      case 'analyze_property':
         systemPrompt = `أنت مساعد ذكي متخصص في تحليل العقارات الاستثمارية. قم بتحليل البيانات المقدمة وقدم رؤى واقتراحات.`;
         userPrompt = `
           حلل هذا العقار:
@@ -156,7 +167,7 @@ serve(async (req) => {
         `;
         break;
 
-      case "suggest_maintenance":
+      case 'suggest_maintenance':
         systemPrompt = `أنت مساعد ذكي متخصص في إدارة صيانة العقارات. قم بتحليل سجل الصيانة واقترح خطة صيانة مثالية.`;
         userPrompt = `
           بناءً على سجل الصيانة التالي:
@@ -170,7 +181,7 @@ serve(async (req) => {
         `;
         break;
 
-      case "predict_revenue":
+      case 'predict_revenue':
         systemPrompt = `أنت مساعد ذكي متخصص في التوقعات المالية للعقارات. قم بتحليل البيانات التاريخية وتوقع الإيرادات المستقبلية.`;
         userPrompt = `
           بناءً على بيانات الإيرادات التاريخية:
@@ -184,7 +195,7 @@ serve(async (req) => {
         `;
         break;
 
-      case "optimize_contracts":
+      case 'optimize_contracts':
         systemPrompt = `أنت مساعد ذكي متخصص في إدارة عقود الإيجار. قم بتحليل العقود الحالية واقترح تحسينات.`;
         userPrompt = `
           حلل العقود التالية:
@@ -198,7 +209,7 @@ serve(async (req) => {
         `;
         break;
 
-      case "alert_insights":
+      case 'alert_insights':
         systemPrompt = `أنت مساعد ذكي متخصص في تحليل التنبيهات والمخاطر العقارية. قم بتحليل التنبيهات وتقديم رؤى استباقية.`;
         userPrompt = `
           حلل التنبيهات التالية:
@@ -213,21 +224,21 @@ serve(async (req) => {
         break;
 
       default:
-        throw new Error("Invalid action");
+        throw new Error('Invalid action');
     }
 
     // استدعاء Lovable AI
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: 'google/gemini-2.5-flash',
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
         temperature: 0.7,
         max_tokens: 2000,
@@ -241,22 +252,18 @@ serve(async (req) => {
       if (aiResponse.status === 402) {
         return errorResponse('يرجى إضافة رصيد إلى حساب Lovable AI', 402);
       }
-      
+
       const errorText = await aiResponse.text();
-      console.error("AI gateway error:", aiResponse.status, errorText);
-      throw new Error("AI gateway error");
+      console.error('AI gateway error:', aiResponse.status, errorText);
+      throw new Error('AI gateway error');
     }
 
     const aiResult = await aiResponse.json();
     const analysis = aiResult.choices[0].message.content;
 
     return jsonResponse({ success: true, analysis });
-    
   } catch (error) {
-    console.error("Error:", error);
-    return errorResponse(
-      error instanceof Error ? error.message : "Unknown error",
-      500
-    );
+    console.error('Error:', error);
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

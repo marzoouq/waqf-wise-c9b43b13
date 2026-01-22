@@ -4,9 +4,16 @@
  * @version 2.9.12
  */
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface UsersTableSkeletonProps {
   rows?: number;
@@ -26,13 +33,27 @@ export function UsersTableSkeleton({ rows = 5 }: UsersTableSkeletonProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-start"><Skeleton className="h-4 w-16" /></TableHead>
-                <TableHead className="text-start"><Skeleton className="h-4 w-28" /></TableHead>
-                <TableHead className="text-start hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableHead>
-                <TableHead className="text-start"><Skeleton className="h-4 w-16" /></TableHead>
-                <TableHead className="text-start hidden lg:table-cell"><Skeleton className="h-4 w-14" /></TableHead>
-                <TableHead className="text-start hidden lg:table-cell"><Skeleton className="h-4 w-24" /></TableHead>
-                <TableHead className="text-start"><Skeleton className="h-4 w-20" /></TableHead>
+                <TableHead className="text-start">
+                  <Skeleton className="h-4 w-16" />
+                </TableHead>
+                <TableHead className="text-start">
+                  <Skeleton className="h-4 w-28" />
+                </TableHead>
+                <TableHead className="text-start hidden md:table-cell">
+                  <Skeleton className="h-4 w-20" />
+                </TableHead>
+                <TableHead className="text-start">
+                  <Skeleton className="h-4 w-16" />
+                </TableHead>
+                <TableHead className="text-start hidden lg:table-cell">
+                  <Skeleton className="h-4 w-14" />
+                </TableHead>
+                <TableHead className="text-start hidden lg:table-cell">
+                  <Skeleton className="h-4 w-24" />
+                </TableHead>
+                <TableHead className="text-start">
+                  <Skeleton className="h-4 w-20" />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -1,12 +1,12 @@
 /**
  * UX Integration System - نظام التكامل الموحد
  * يجمع جميع أنظمة تحسين تجربة المستخدم
- * 
+ *
  * @version 1.0.0
  */
 
 // Re-export accessibility (excluding conflicts)
-export { 
+export {
   ARIA_LABELS,
   FOCUSABLE_ELEMENTS,
   getFocusableElements,
@@ -56,8 +56,8 @@ export {
 export * from './microcopy';
 
 // Re-export image optimization
-export { 
-  optimizeImageUrl, 
+export {
+  optimizeImageUrl,
   supportsWebP,
   supportsAVIF,
   getBestSupportedFormat,
@@ -71,11 +71,11 @@ export {
   optimizeLCP,
   observeLCP,
   optimizePageImages,
-  type ImageOptimizationOptions 
+  type ImageOptimizationOptions,
 } from './imageOptimization';
 
 // Re-export route prefetch
-export { 
+export {
   prefetchRoute,
   prefetchRoutes,
   prefetchCommonRoutes,
@@ -114,22 +114,22 @@ export interface UXConfig {
   enableSkipLinks: boolean;
   enableKeyboardShortcuts: boolean;
   enableAnnouncements: boolean;
-  
+
   // Mobile
   enableTouchOptimization: boolean;
   enableSwipeGestures: boolean;
   enablePullToRefresh: boolean;
-  
+
   // Motion
   respectReducedMotion: boolean;
   enableAnimations: boolean;
   animationDuration: number;
-  
+
   // Network
   enableOfflineSupport: boolean;
   enableOptimisticUpdates: boolean;
   retryAttempts: number;
-  
+
   // Performance
   enableLazyLoading: boolean;
   enableImageOptimization: boolean;
@@ -185,7 +185,7 @@ export interface UXPerformanceMetrics {
   timeToInteractive: number | null;
   firstContentfulPaint: number | null;
   largestContentfulPaint: number | null;
-  
+
   // Custom metrics
   networkLatency: number | null;
   renderTime: number | null;
@@ -204,22 +204,24 @@ export function collectUXMetrics(): UXPerformanceMetrics {
     renderTime: null,
     interactionDelay: null,
   };
-  
+
   if (typeof performance !== 'undefined') {
-    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const navigationEntry = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined;
     const paintEntries = performance.getEntriesByType('paint');
-    
+
     if (navigationEntry) {
       metrics.timeToInteractive = navigationEntry.domInteractive - navigationEntry.startTime;
       metrics.networkLatency = navigationEntry.responseEnd - navigationEntry.requestStart;
     }
-    
-    const fcpEntry = paintEntries.find(e => e.name === 'first-contentful-paint');
+
+    const fcpEntry = paintEntries.find((e) => e.name === 'first-contentful-paint');
     if (fcpEntry) {
       metrics.firstContentfulPaint = fcpEntry.startTime;
     }
   }
-  
+
   return metrics;
 }
 
@@ -230,21 +232,21 @@ export interface DeviceCapabilities {
   isHighResolution: boolean;
   supportsHDR: boolean;
   colorGamut: 'srgb' | 'p3' | 'rec2020';
-  
+
   // Input
   hasTouchScreen: boolean;
   hasPointer: boolean;
   hasKeyboard: boolean;
-  
+
   // Features
   supportsVibration: boolean;
   supportsNotifications: boolean;
   supportsWebGL: boolean;
-  
+
   // Network
   connectionType: string;
   saveData: boolean;
-  
+
   // Preferences
   prefersReducedMotion: boolean;
   prefersHighContrast: boolean;
@@ -271,23 +273,23 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
     prefersHighContrast: false,
     prefersDarkMode: false,
   };
-  
+
   if (typeof window === 'undefined') return capabilities;
-  
+
   // Display
   capabilities.isHighResolution = window.devicePixelRatio >= 2;
   capabilities.supportsHDR = window.matchMedia('(dynamic-range: high)').matches;
-  
+
   if (window.matchMedia('(color-gamut: rec2020)').matches) {
     capabilities.colorGamut = 'rec2020';
   } else if (window.matchMedia('(color-gamut: p3)').matches) {
     capabilities.colorGamut = 'p3';
   }
-  
+
   // Input
   capabilities.hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   capabilities.hasPointer = window.matchMedia('(pointer: fine)').matches;
-  
+
   // Features
   capabilities.supportsVibration = 'vibrate' in navigator;
   capabilities.supportsNotifications = 'Notification' in window;
@@ -299,19 +301,21 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
       return false;
     }
   })();
-  
+
   // Network
-  const connection = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
+  const connection = (
+    navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }
+  ).connection;
   if (connection) {
     capabilities.connectionType = connection.effectiveType || 'unknown';
     capabilities.saveData = connection.saveData || false;
   }
-  
+
   // Preferences
   capabilities.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   capabilities.prefersHighContrast = window.matchMedia('(prefers-contrast: more)').matches;
   capabilities.prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
+
   return capabilities;
 }
 
@@ -323,38 +327,38 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 export function applyAdaptiveUX(): void {
   const capabilities = detectDeviceCapabilities();
   const _config = getUXConfig();
-  
+
   // تعديل التكوين بناءً على القدرات
   if (capabilities.prefersReducedMotion) {
     configureUX({ enableAnimations: false });
   }
-  
+
   if (capabilities.saveData) {
-    configureUX({ 
+    configureUX({
       enableImageOptimization: true,
       enableRoutePrefetch: false,
     });
   }
-  
+
   if (!capabilities.hasTouchScreen) {
     configureUX({
       enableSwipeGestures: false,
       enablePullToRefresh: false,
     });
   }
-  
+
   // تطبيق CSS classes على body
   if (typeof document !== 'undefined') {
     const body = document.body;
-    
+
     if (capabilities.hasTouchScreen) {
       body.classList.add('touch-device');
     }
-    
+
     if (capabilities.prefersReducedMotion) {
       body.classList.add('reduced-motion');
     }
-    
+
     if (capabilities.prefersHighContrast) {
       body.classList.add('high-contrast');
     }
@@ -380,9 +384,9 @@ export function logUXError(error: Omit<UXError, 'timestamp'>): void {
     ...error,
     timestamp: Date.now(),
   };
-  
+
   errorLog.push(uxError);
-  
+
   // الاحتفاظ بآخر 50 خطأ فقط
   if (errorLog.length > 50) {
     errorLog.shift();

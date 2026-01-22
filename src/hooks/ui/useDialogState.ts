@@ -1,7 +1,7 @@
 /**
  * Dialog State Hook - خطاف حالة المحاور
  * @version 2.8.30
- * 
+ *
  * يوفر إدارة موحدة لحالة فتح/إغلاق المحاور
  * بدلاً من تكرار useState في كل مكان
  */
@@ -21,9 +21,7 @@ interface DialogState<T = undefined> {
  * @param initialOpen الحالة الأولية
  * @returns حالة المحاور مع دوال التحكم
  */
-export function useDialogState<T = undefined>(
-  initialOpen: boolean = false
-): DialogState<T> {
+export function useDialogState<T = undefined>(initialOpen: boolean = false): DialogState<T> {
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [data, setData] = useState<T | undefined>(undefined);
 
@@ -39,7 +37,7 @@ export function useDialogState<T = undefined>(
   }, []);
 
   const toggle = useCallback(() => {
-    setIsOpen(prev => !prev);
+    setIsOpen((prev) => !prev);
   }, []);
 
   return { isOpen, data, open, close, toggle };
@@ -52,9 +50,7 @@ interface MultiDialogState {
   [key: string]: boolean;
 }
 
-export function useMultiDialogState(
-  initialState: MultiDialogState = {}
-): {
+export function useMultiDialogState(initialState: MultiDialogState = {}): {
   dialogs: MultiDialogState;
   open: (key: string) => void;
   close: (key: string) => void;
@@ -65,25 +61,26 @@ export function useMultiDialogState(
   const [dialogs, setDialogs] = useState<MultiDialogState>(initialState);
 
   const open = useCallback((key: string) => {
-    setDialogs(prev => ({ ...prev, [key]: true }));
+    setDialogs((prev) => ({ ...prev, [key]: true }));
   }, []);
 
   const close = useCallback((key: string) => {
-    setDialogs(prev => ({ ...prev, [key]: false }));
+    setDialogs((prev) => ({ ...prev, [key]: false }));
   }, []);
 
   const toggle = useCallback((key: string) => {
-    setDialogs(prev => ({ ...prev, [key]: !prev[key] }));
+    setDialogs((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  const isOpen = useCallback((key: string) => {
-    return dialogs[key] || false;
-  }, [dialogs]);
+  const isOpen = useCallback(
+    (key: string) => {
+      return dialogs[key] || false;
+    },
+    [dialogs]
+  );
 
   const closeAll = useCallback(() => {
-    setDialogs(prev => 
-      Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: false }), {})
-    );
+    setDialogs((prev) => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: false }), {}));
   }, []);
 
   return { dialogs, open, close, toggle, isOpen, closeAll };
@@ -107,7 +104,7 @@ export function useConfirmDialog<T = undefined>(): ConfirmState<T> {
   const confirm = useCallback((newData?: T): Promise<boolean> => {
     setData(newData);
     setIsOpen(true);
-    return new Promise<boolean>(resolve => {
+    return new Promise<boolean>((resolve) => {
       setResolvePromise(() => resolve);
     });
   }, []);

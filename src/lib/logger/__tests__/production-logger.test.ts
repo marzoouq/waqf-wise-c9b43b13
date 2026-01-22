@@ -20,12 +20,12 @@ describe('ProductionLogger', () => {
       }));
 
       const { productionLogger } = await import('../production-logger');
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
-      
+
       productionLogger.info('Test info message', { data: 'test' });
-      
+
       // Queue should be empty - info never adds to queue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
@@ -42,12 +42,12 @@ describe('ProductionLogger', () => {
       }));
 
       const { productionLogger } = await import('../production-logger');
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
-      
+
       productionLogger.warn('Test warning', { data: 'test' });
-      
+
       // Queue should be empty - warn doesn't add to queue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
@@ -64,11 +64,11 @@ describe('ProductionLogger', () => {
       }));
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       const { productionLogger } = await import('../production-logger');
-      
+
       productionLogger.error('Test error', new Error('Test'));
-      
+
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -85,12 +85,12 @@ describe('ProductionLogger', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const { productionLogger } = await import('../production-logger');
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
-      
+
       productionLogger.error('Test error', new Error('Test'));
-      
+
       // In DEV, addToQueue checks IS_PROD and doesn't add
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
@@ -109,18 +109,18 @@ describe('ProductionLogger', () => {
       }));
 
       const { productionLogger } = await import('../production-logger');
-      
+
       // Manually add items to queue for testing
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [
         { level: 'error', message: 'Error 1', timestamp: new Date().toISOString(), data: {} },
         { level: 'warn', message: 'Warning 1', timestamp: new Date().toISOString(), data: {} },
       ];
-      
+
       // Call flush
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (productionLogger as any).flush();
-      
+
       // In DEV, flush clears queue and returns immediately
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
@@ -137,15 +137,15 @@ describe('ProductionLogger', () => {
       }));
 
       const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
-      
+
       const { productionLogger } = await import('../production-logger');
-      
+
       // Ensure flushInterval is null (it should be in DEV since constructor doesn't start it)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).flushInterval = null;
-      
+
       productionLogger.cleanup();
-      
+
       expect(clearIntervalSpy).not.toHaveBeenCalled();
       clearIntervalSpy.mockRestore();
     });
@@ -159,17 +159,17 @@ describe('ProductionLogger', () => {
       }));
 
       const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
-      
+
       const { productionLogger } = await import('../production-logger');
-      
+
       // Set a fake interval
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fakeInterval = setInterval(() => {}, 1000);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).flushInterval = fakeInterval;
-      
+
       productionLogger.cleanup();
-      
+
       expect(clearIntervalSpy).toHaveBeenCalledWith(fakeInterval);
       clearIntervalSpy.mockRestore();
     });

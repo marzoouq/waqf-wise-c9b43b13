@@ -1,15 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { DollarSign, PiggyBank, TrendingDown, Inbox } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useWaqfBudgets } from "@/hooks/distributions/useWaqfBudgets";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { DollarSign, PiggyBank, TrendingDown, Inbox } from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { useWaqfBudgets } from '@/hooks/distributions/useWaqfBudgets';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function BudgetsTab() {
   const { settings } = useVisibilitySettings();
-  const { budgetCategories, annualBudget, reserveTotals, isLoading, hasBudgets, hasReserves, error, refetch } = useWaqfBudgets();
+  const {
+    budgetCategories,
+    annualBudget,
+    reserveTotals,
+    isLoading,
+    hasBudgets,
+    hasReserves,
+    error,
+    refetch,
+  } = useWaqfBudgets();
 
   if (!settings?.show_budgets) {
     return (
@@ -42,8 +51,8 @@ export function BudgetsTab() {
 
   return (
     <div className="space-y-6">
-      {settings?.show_annual_budget && (
-        hasBudgets ? (
+      {settings?.show_annual_budget &&
+        (hasBudgets ? (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -57,30 +66,33 @@ export function BudgetsTab() {
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">إجمالي الميزانية</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     <MaskedValue
-                      value={annualBudget.total.toLocaleString("ar-SA")}
+                      value={annualBudget.total.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">المُنفق</p>
                   <p className="text-xl sm:text-2xl font-bold text-destructive">
                     <MaskedValue
-                      value={annualBudget.spent.toLocaleString("ar-SA")}
+                      value={annualBudget.spent.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">المتبقي</p>
                   <p className="text-xl sm:text-2xl font-bold text-success">
                     <MaskedValue
-                      value={annualBudget.remaining.toLocaleString("ar-SA")}
+                      value={annualBudget.remaining.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
               </div>
@@ -100,11 +112,10 @@ export function BudgetsTab() {
               <p className="text-muted-foreground">لا توجد ميزانيات مُسجلة حالياً</p>
             </CardContent>
           </Card>
-        )
-      )}
+        ))}
 
-      {settings?.show_budget_execution && (
-        budgetCategories.length > 0 ? (
+      {settings?.show_budget_execution &&
+        (budgetCategories.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -119,15 +130,17 @@ export function BudgetsTab() {
                     <span className="font-medium">{category.name}</span>
                     <span className="text-sm text-muted-foreground">
                       <MaskedValue
-                        value={category.spent.toLocaleString("ar-SA")}
+                        value={category.spent.toLocaleString('ar-SA')}
                         type="amount"
                         masked={settings?.mask_exact_amounts || false}
-                      /> / {" "}
+                      />{' '}
+                      /{' '}
                       <MaskedValue
-                        value={category.budget.toLocaleString("ar-SA")}
+                        value={category.budget.toLocaleString('ar-SA')}
                         type="amount"
                         masked={settings?.mask_exact_amounts || false}
-                      /> ريال
+                      />{' '}
+                      ريال
                     </span>
                   </div>
                   <Progress value={category.percentage} />
@@ -143,11 +156,10 @@ export function BudgetsTab() {
               <p className="text-muted-foreground">لا توجد فئات ميزانية مُسجلة</p>
             </CardContent>
           </Card>
-        )
-      )}
+        ))}
 
-      {settings?.show_reserve_funds && (
-        hasReserves ? (
+      {settings?.show_reserve_funds &&
+        (hasReserves ? (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -161,30 +173,33 @@ export function BudgetsTab() {
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">إجمالي الاحتياطي</p>
                   <p className="text-base sm:text-xl font-bold">
                     <MaskedValue
-                      value={reserveTotals.total.toLocaleString("ar-SA")}
+                      value={reserveTotals.total.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">مستثمر</p>
                   <p className="text-base sm:text-xl font-bold text-primary">
                     <MaskedValue
-                      value={reserveTotals.invested.toLocaleString("ar-SA")}
+                      value={reserveTotals.invested.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <p className="text-xs sm:text-sm text-muted-foreground mb-2">سائل</p>
                   <p className="text-base sm:text-xl font-bold text-success">
                     <MaskedValue
-                      value={reserveTotals.liquid.toLocaleString("ar-SA")}
+                      value={reserveTotals.liquid.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
               </div>
@@ -197,8 +212,7 @@ export function BudgetsTab() {
               <p className="text-muted-foreground">لا توجد صناديق احتياطي</p>
             </CardContent>
           </Card>
-        )
-      )}
+        ))}
 
       {settings?.show_investment_plans && (
         <Card>

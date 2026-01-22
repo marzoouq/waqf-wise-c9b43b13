@@ -1,7 +1,7 @@
 /**
  * Edge Function للتنظيف المجدول
  * يمكن استدعاؤها من Cron Job أو يدوياً
- * 
+ *
  * ⚠️ ملاحظة هامة - الامتثال الوقفي:
  * - لا يتم حذف سجلات التدقيق (audit_logs) نهائياً
  * - يتم نسخها للأرشيف مع وضع علامة archived_at فقط
@@ -9,12 +9,12 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-import { 
-  corsHeaders, 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
-  unauthorizedResponse 
+import {
+  corsHeaders,
+  handleCors,
+  jsonResponse,
+  errorResponse,
+  unauthorizedResponse,
 } from '../_shared/cors.ts';
 
 interface CleanupDetails {
@@ -47,17 +47,19 @@ Deno.serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'scheduled-cleanup',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // يمكن استدعاؤها بدون مصادقة للـ Cron Jobs
     // أو مع مصادقة للاستدعاء اليدوي
     const authHeader = req.headers.get('authorization');
     const isCronJob = req.headers.get('x-cron-job') === 'true';
-    
+
     if (!isCronJob && !authHeader) {
       console.log('Unauthorized access attempt - not a cron job and no auth header');
       return unauthorizedResponse('Unauthorized');
@@ -79,14 +81,14 @@ Deno.serve(async (req) => {
     }
 
     const result = data as CleanupResult;
-    
+
     console.log('Cleanup completed:', JSON.stringify(result));
 
     // 2. أرشفة سجلات التدقيق القديمة (أكثر من 7 أيام)
     // ⚠️ هام: لا نحذف سجلات التدقيق - فقط نضع علامة أنها مؤرشفة
     // هذا يتوافق مع متطلبات الامتثال الوقفي والشرعي
     const archiveCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    
+
     const { data: logsToArchive, error: selectError } = await supabase
       .from('audit_logs')
       .select('*')
@@ -97,27 +99,29 @@ Deno.serve(async (req) => {
     let archivedCount = 0;
     if (!selectError && logsToArchive && logsToArchive.length > 0) {
       const now = new Date().toISOString();
-      
+
       // 2.1 نسخ إلى جدول الأرشيف (نسخة احتياطية)
-      const { error: insertError } = await supabase
-        .from('audit_logs_archive')
-        .insert(logsToArchive.map(log => ({ 
-          ...log, 
-          archived_at: now 
-        })));
-      
+      const { error: insertError } = await supabase.from('audit_logs_archive').insert(
+        logsToArchive.map((log) => ({
+          ...log,
+          archived_at: now,
+        }))
+      );
+
       if (!insertError) {
         // 2.2 وضع علامة على السجلات الأصلية أنها مؤرشفة (بدون حذف!)
         // ✅ الامتثال الوقفي: نحتفظ بالسجلات الأصلية للأبد
-        const ids = logsToArchive.map(log => log.id);
+        const ids = logsToArchive.map((log) => log.id);
         const { error: updateError } = await supabase
           .from('audit_logs')
           .update({ archived_at: now })
           .in('id', ids);
-        
+
         if (!updateError) {
           archivedCount = logsToArchive.length;
-          console.log(`[Waqf Compliance] Archived ${archivedCount} audit logs (records preserved, not deleted)`);
+          console.log(
+            `[Waqf Compliance] Archived ${archivedCount} audit logs (records preserved, not deleted)`
+          );
         } else {
           console.error('Error marking logs as archived:', updateError);
         }
@@ -156,12 +160,8 @@ Deno.serve(async (req) => {
       details: result.details,
       message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف، ${archivedCount} سجل تدقيق مؤرشف (محفوظ)`,
     });
-
   } catch (error) {
     console.error('Cleanup error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

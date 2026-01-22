@@ -1,6 +1,7 @@
 # 📘 إرشادات المكونات - Component Guidelines
 
 ## 🎯 الهدف
+
 توحيد معايير تطوير المكونات لضمان الجودة والاتساق والقابلية للصيانة.
 
 ---
@@ -28,12 +29,14 @@ src/components/
 ## 📝 تسمية الملفات والمكونات
 
 ### القواعد:
+
 1. **PascalCase** لأسماء المكونات: `UserProfile.tsx`
 2. **camelCase** للـ hooks: `useUserProfile.ts`
 3. **kebab-case** للمجلدات: `user-profile/`
 4. أسماء وصفية وواضحة
 
 ### أمثلة:
+
 ```
 ✅ BeneficiaryCard.tsx
 ✅ useBeneficiaryProfile.ts
@@ -105,30 +108,33 @@ export const ComponentName: React.FC<Props> = ({
 ## 🎨 التصميم والـ Styling
 
 ### استخدام Design Tokens:
+
 ```tsx
 // ✅ صحيح - استخدام semantic tokens
-className="bg-background text-foreground border-border"
-className="text-primary hover:bg-primary/10"
+className = 'bg-background text-foreground border-border';
+className = 'text-primary hover:bg-primary/10';
 
 // ❌ خطأ - ألوان مباشرة
-className="bg-white text-black border-gray-200"
-className="text-blue-500 hover:bg-blue-100"
+className = 'bg-white text-black border-gray-200';
+className = 'text-blue-500 hover:bg-blue-100';
 ```
 
 ### التجاوب (Responsive):
+
 ```tsx
 // استخدام breakpoints من design-tokens
-className="p-4 md:p-6 lg:p-8"
-className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-className="text-sm md:text-base"
+className = 'p-4 md:p-6 lg:p-8';
+className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+className = 'text-sm md:text-base';
 ```
 
 ### RTL Support:
+
 ```tsx
 // استخدام logical properties
-className="ps-4 pe-2"     // padding-start, padding-end
-className="ms-auto"       // margin-start
-className="text-start"    // بدلاً من text-left
+className = 'ps-4 pe-2'; // padding-start, padding-end
+className = 'ms-auto'; // margin-start
+className = 'text-start'; // بدلاً من text-left
 ```
 
 ---
@@ -136,6 +142,7 @@ className="text-start"    // بدلاً من text-left
 ## ♿ الوصول (Accessibility)
 
 ### قواعد إلزامية:
+
 1. **aria-label** لجميع الأزرار بدون نص
 2. **role** attributes للعناصر غير الدلالية
 3. **tabIndex** للتنقل بلوحة المفاتيح
@@ -170,16 +177,18 @@ className="text-start"    // بدلاً من text-left
 ## 📱 Mobile UX
 
 ### Touch Targets:
+
 ```tsx
 // الحد الأدنى 44x44px
-className="min-h-[44px] min-w-[44px]"
-className="p-3" // للأزرار الأيقونية
+className = 'min-h-[44px] min-w-[44px]';
+className = 'p-3'; // للأزرار الأيقونية
 ```
 
 ### Safe Areas:
+
 ```tsx
 // للأجهزة ذات notch
-className="pb-safe" // padding-bottom: env(safe-area-inset-bottom)
+className = 'pb-safe'; // padding-bottom: env(safe-area-inset-bottom)
 ```
 
 ---
@@ -187,6 +196,7 @@ className="pb-safe" // padding-bottom: env(safe-area-inset-bottom)
 ## 📊 بطاقات الإحصائيات (Canonical Pattern)
 
 ### القاعدة الإلزامية:
+
 جميع بطاقات الإحصائيات يجب أن تستخدم النمط الموحد التالي:
 
 ```tsx
@@ -217,15 +227,15 @@ import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 ### الخصائص المتاحة:
 
-| الخاصية | النوع | الوصف |
-|---------|-------|-------|
-| `title` | string | عنوان البطاقة |
-| `value` | string \| number \| ReactNode | القيمة الرئيسية |
-| `icon` | LucideIcon | أيقونة البطاقة |
-| `variant` | 'default' \| 'success' \| 'warning' \| 'destructive' \| 'primary' \| 'danger' | نمط اللون |
-| `subtitle` | string | نص فرعي (اختياري) |
-| `size` | 'default' \| 'compact' | حجم البطاقة |
-| `onClick` | () => void | دالة النقر (اختياري) |
+| الخاصية    | النوع                                                                         | الوصف                |
+| ---------- | ----------------------------------------------------------------------------- | -------------------- |
+| `title`    | string                                                                        | عنوان البطاقة        |
+| `value`    | string \| number \| ReactNode                                                 | القيمة الرئيسية      |
+| `icon`     | LucideIcon                                                                    | أيقونة البطاقة       |
+| `variant`  | 'default' \| 'success' \| 'warning' \| 'destructive' \| 'primary' \| 'danger' | نمط اللون            |
+| `subtitle` | string                                                                        | نص فرعي (اختياري)    |
+| `size`     | 'default' \| 'compact'                                                        | حجم البطاقة          |
+| `onClick`  | () => void                                                                    | دالة النقر (اختياري) |
 
 ### أمثلة الـ Variants:
 
@@ -242,6 +252,7 @@ import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 ## ⚡ الأداء
 
 ### React.memo:
+
 ```tsx
 // للمكونات التي تُعاد رسمها كثيراً
 export const ExpensiveComponent = React.memo(({ data }) => {
@@ -250,12 +261,10 @@ export const ExpensiveComponent = React.memo(({ data }) => {
 ```
 
 ### useMemo / useCallback:
+
 ```tsx
 // للقيم المحسوبة
-const sortedData = useMemo(() => 
-  data.sort((a, b) => a.name.localeCompare(b.name)),
-  [data]
-);
+const sortedData = useMemo(() => data.sort((a, b) => a.name.localeCompare(b.name)), [data]);
 
 // للـ callbacks
 const handleClick = useCallback(() => {
@@ -264,6 +273,7 @@ const handleClick = useCallback(() => {
 ```
 
 ### Lazy Loading:
+
 ```tsx
 // للمكونات الثقيلة
 const HeavyChart = React.lazy(() => import('./HeavyChart'));
@@ -271,7 +281,7 @@ const HeavyChart = React.lazy(() => import('./HeavyChart'));
 // استخدام
 <Suspense fallback={<ChartSkeleton />}>
   <HeavyChart data={data} />
-</Suspense>
+</Suspense>;
 ```
 
 ---
@@ -279,6 +289,7 @@ const HeavyChart = React.lazy(() => import('./HeavyChart'));
 ## 🧪 الاختبار
 
 ### Unit Tests:
+
 ```tsx
 // ComponentName.test.tsx
 import { render, screen } from '@testing-library/react';
@@ -304,6 +315,7 @@ describe('ComponentName', () => {
 ## 📋 Checklist للمراجعة
 
 ### قبل الـ PR:
+
 - [ ] TypeScript بدون أخطاء
 - [ ] ESLint بدون تحذيرات
 - [ ] اختبارات مكتوبة وناجحة

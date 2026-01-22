@@ -1,11 +1,11 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
   forbiddenResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 interface ErrorLog {
@@ -35,10 +35,12 @@ Deno.serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'execute-auto-fix',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // 🔒 1. فحص المصادقة
     const authHeader = req.headers.get('Authorization');
@@ -51,8 +53,11 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return unauthorizedResponse('مصادقة غير صالحة');
     }
@@ -63,7 +68,7 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', user.id);
 
-    const userRoles = roleData?.map(r => r.role) || [];
+    const userRoles = roleData?.map((r) => r.role) || [];
     const hasAccess = userRoles.includes('admin') || userRoles.includes('nazer');
 
     if (!hasAccess) {
@@ -79,7 +84,7 @@ Deno.serve(async (req) => {
 
     // التحقق من المصدر (cron vs manual)
     const isCronJob = req.headers.get('x-cron-job') === 'true';
-    
+
     if (!isCronJob && recentFixes && recentFixes.length >= 1) {
       return rateLimitResponse('يرجى الانتظار دقيقة واحدة قبل المحاولة مرة أخرى');
     }
@@ -96,52 +101,58 @@ Deno.serve(async (req) => {
     let duplicateAlertsWindowHours = 1;
 
     if (settings && settings.length > 0) {
-      settings.forEach(setting => {
+      settings.forEach((setting) => {
         if (setting.setting_key === 'cron_old_errors_threshold_hours') {
           oldErrorsThresholdHours = Number(setting.setting_value);
         } else if (setting.setting_key === 'cron_duplicate_alerts_window_hours') {
           duplicateAlertsWindowHours = Number(setting.setting_value);
         }
       });
-      console.log(`✅ Using settings: old errors threshold=${oldErrorsThresholdHours}h, duplicate alerts window=${duplicateAlertsWindowHours}h`);
+      console.log(
+        `✅ Using settings: old errors threshold=${oldErrorsThresholdHours}h, duplicate alerts window=${duplicateAlertsWindowHours}h`
+      );
     }
 
     // 🔧 1. Auto-resolve old errors (حسب الإعداد من DB)
-    const thresholdTime = new Date(Date.now() - oldErrorsThresholdHours * 60 * 60 * 1000).toISOString();
+    const thresholdTime = new Date(
+      Date.now() - oldErrorsThresholdHours * 60 * 60 * 1000
+    ).toISOString();
     const { data: oldErrors } = await supabase
       .from('system_error_logs')
-      .update({ 
+      .update({
         status: 'auto_resolved',
         resolved_at: new Date().toISOString(),
-        resolved_by: null // UUID column - cannot use string
+        resolved_by: null, // UUID column - cannot use string
       })
       .eq('status', 'new')
       .lt('created_at', thresholdTime)
       .select('id');
-    
+
     if (oldErrors && oldErrors.length > 0) {
       console.log(`✅ Auto-resolved ${oldErrors.length} old errors`);
     }
 
     // 🔧 2. Clean duplicate alerts (حسب الإعداد من DB)
-    const alertsWindowTime = new Date(Date.now() - duplicateAlertsWindowHours * 60 * 60 * 1000).toISOString();
+    const alertsWindowTime = new Date(
+      Date.now() - duplicateAlertsWindowHours * 60 * 60 * 1000
+    ).toISOString();
     const { data: alerts } = await supabase
       .from('system_alerts')
       .select('alert_type, severity, id')
       .eq('status', 'active')
       .gte('created_at', alertsWindowTime);
-    
+
     if (alerts && alerts.length > 1) {
       // تجميع حسب النوع والشدة
       const alertGroups = new Map<string, string[]>();
-      alerts.forEach(alert => {
+      alerts.forEach((alert) => {
         const key = `${alert.alert_type}-${alert.severity}`;
         if (!alertGroups.has(key)) {
           alertGroups.set(key, []);
         }
         alertGroups.get(key)!.push(alert.id);
       });
-      
+
       // حل المكررات (نحتفظ بواحد فقط من كل مجموعة)
       let resolvedCount = 0;
       for (const [_, ids] of alertGroups) {
@@ -149,18 +160,18 @@ Deno.serve(async (req) => {
           // حل جميع التنبيهات ماعدا الأول
           const { error } = await supabase
             .from('system_alerts')
-            .update({ 
+            .update({
               status: 'resolved',
-              resolved_at: new Date().toISOString()
+              resolved_at: new Date().toISOString(),
             })
             .in('id', ids.slice(1));
-          
+
           if (!error) {
             resolvedCount += ids.length - 1;
           }
         }
       }
-      
+
       if (resolvedCount > 0) {
         console.log(`✅ Cleaned ${resolvedCount} duplicate alerts`);
       }
@@ -181,7 +192,7 @@ Deno.serve(async (req) => {
     }
 
     console.log(`📋 Found ${pendingFixes.length} pending fixes`);
-    
+
     let successCount = 0;
     let failedCount = 0;
 
@@ -202,15 +213,15 @@ Deno.serve(async (req) => {
           case 'retry':
             result = await executeRetryStrategy(supabase, errorLog);
             break;
-          
+
           case 'fallback':
             result = await executeFallbackStrategy(supabase, errorLog);
             break;
-          
+
           case 'restart':
             result = await executeRestartStrategy(supabase, errorLog);
             break;
-          
+
           default:
             result = 'Unknown strategy';
             status = 'failed';
@@ -228,7 +239,7 @@ Deno.serve(async (req) => {
 
         if (status === 'success') {
           successCount++;
-          
+
           // تحديث حالة الخطأ إلى محلول
           await supabase
             .from('system_error_logs')
@@ -243,11 +254,10 @@ Deno.serve(async (req) => {
         }
 
         console.log(`${status === 'success' ? '✅' : '❌'} Fix ${fix.id}: ${result}`);
-
       } catch (error) {
         console.error(`❌ Failed to execute fix ${fix.id}:`, error);
         failedCount++;
-        
+
         await supabase
           .from('auto_fix_attempts')
           .update({
@@ -267,7 +277,6 @@ Deno.serve(async (req) => {
       failed: failedCount,
       total: pendingFixes.length,
     });
-
   } catch (error) {
     console.error('Error in execute-auto-fix:', error);
     return errorResponse('حدث خطأ أثناء تنفيذ الإصلاحات التلقائية', 500);
@@ -282,11 +291,11 @@ async function executeRetryStrategy(supabase: SupabaseClient, errorLog: ErrorLog
   if (errorLog.error_type === 'network_error') {
     const errorAge = Date.now() - new Date(errorLog.created_at).getTime();
     const fiveMinutes = 5 * 60 * 1000;
-    
+
     if (errorAge > fiveMinutes) {
       return 'Network error resolved automatically (aged out)';
     }
-    
+
     // محاولة فحص الاتصال
     try {
       const { error } = await supabase.from('beneficiaries').select('id').limit(1);
@@ -298,26 +307,32 @@ async function executeRetryStrategy(supabase: SupabaseClient, errorLog: ErrorLog
       return 'Failed to verify network connectivity';
     }
   }
-  
+
   return 'Retry strategy applied';
 }
 
 /**
  * تنفيذ استراتيجية الاحتياطية
  */
-async function executeFallbackStrategy(_supabase: SupabaseClient, errorLog: ErrorLog): Promise<string> {
+async function executeFallbackStrategy(
+  _supabase: SupabaseClient,
+  errorLog: ErrorLog
+): Promise<string> {
   // للأخطاء المتعلقة بالأداء، نعتبرها محلولة إذا كانت قديمة
   if (errorLog.error_type === 'performance_issue' || errorLog.error_type === 'layout_shift') {
     return 'Performance issue marked as resolved (non-critical)';
   }
-  
+
   return 'Fallback strategy applied';
 }
 
 /**
  * تنفيذ استراتيجية إعادة التشغيل
  */
-async function executeRestartStrategy(supabase: SupabaseClient, errorLog: ErrorLog): Promise<string> {
+async function executeRestartStrategy(
+  supabase: SupabaseClient,
+  errorLog: ErrorLog
+): Promise<string> {
   // للأخطاء الحرجة، نسجلها فقط ونعلم المسؤولين
   if (errorLog.severity === 'critical') {
     // إنشاء إشعار للمسؤولين
@@ -325,7 +340,7 @@ async function executeRestartStrategy(supabase: SupabaseClient, errorLog: ErrorL
       .from('user_roles')
       .select('user_id')
       .eq('role', 'admin');
-    
+
     if (admins && admins.length > 0) {
       const typedAdmins = admins as Admin[];
       const notifications = typedAdmins.map((admin: Admin) => ({
@@ -337,11 +352,11 @@ async function executeRestartStrategy(supabase: SupabaseClient, errorLog: ErrorL
         action_url: `/system-error-logs?error_id=${errorLog.id}`,
         is_read: false,
       }));
-      
+
       await supabase.from('notifications').insert(notifications);
       return 'Critical error notifications sent to admins';
     }
   }
-  
+
   return 'Restart strategy executed';
 }

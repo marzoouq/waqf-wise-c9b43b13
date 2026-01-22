@@ -1,12 +1,12 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
   forbiddenResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // ✅ Rate Limiting للحماية من إساءة الاستخدام
@@ -17,16 +17,16 @@ const WINDOW_MS = 60 * 1000; // دقيقة واحدة
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(userId);
-  
+
   if (!record || now - record.lastAttempt > WINDOW_MS) {
     rateLimitMap.set(userId, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   if (record.count >= MAX_ATTEMPTS) {
     return false;
   }
-  
+
   record.count++;
   record.lastAttempt = now;
   return true;
@@ -44,7 +44,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -61,7 +61,7 @@ serve(async (req) => {
         function: 'secure-delete-file',
         testMode: !!bodyData.testMode,
         message: bodyData.testMode ? 'اختبار ناجح - لم يتم حذف ملفات فعلية' : undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -76,8 +76,11 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return unauthorizedResponse('فشل التحقق من الهوية');
     }
@@ -102,12 +105,9 @@ serve(async (req) => {
     console.log(`🗑️ طلب حذف ملف: ${fileId} من المستخدم: ${user.id}`);
 
     // التحقق من صلاحية المستخدم
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const userRoles = roles?.map(r => r.role) || [];
+    const userRoles = roles?.map((r) => r.role) || [];
     const isAdmin = userRoles.includes('admin') || userRoles.includes('nazer');
 
     if (!isAdmin && permanentDelete) {
@@ -175,7 +175,7 @@ serve(async (req) => {
           file_category: fileCategory,
           requested_by: user.id,
           reason: deletionReason || 'طلب حذف ملف',
-          status: 'pending'
+          status: 'pending',
         })
         .select()
         .maybeSingle();
@@ -184,16 +184,14 @@ serve(async (req) => {
         success: true,
         message: 'تم إنشاء طلب الحذف - في انتظار الموافقة',
         requestId: deletionRequest?.id,
-        requiresApproval: true
+        requiresApproval: true,
       });
     }
 
     // إذا كان حذف نهائي
     if (permanentDelete) {
       // حذف الملف من Storage
-      const { error: storageError } = await supabase.storage
-        .from(storageBucket)
-        .remove([filePath]);
+      const { error: storageError } = await supabase.storage.from(storageBucket).remove([filePath]);
 
       if (storageError) {
         console.warn(`⚠️ فشل حذف الملف من Storage: ${storageError.message}`);
@@ -210,7 +208,7 @@ serve(async (req) => {
         deletion_reason: deletionReason || 'حذف نهائي',
         retention_policy_id: retentionPolicy?.id,
         can_restore: false,
-        permanent_deletion_at: new Date().toISOString()
+        permanent_deletion_at: new Date().toISOString(),
       });
 
       // حذف السجل من الجدول الأصلي
@@ -226,7 +224,7 @@ serve(async (req) => {
       return jsonResponse({
         success: true,
         message: 'تم حذف الملف نهائياً',
-        permanentDelete: true
+        permanentDelete: true,
       });
     }
 
@@ -245,15 +243,14 @@ serve(async (req) => {
       retention_policy_id: retentionPolicy?.id,
       can_restore: true,
       restore_until: restoreUntil,
-      permanent_deletion_at: new Date(Date.now() + (restoreDays + 90) * 24 * 60 * 60 * 1000).toISOString()
+      permanent_deletion_at: new Date(
+        Date.now() + (restoreDays + 90) * 24 * 60 * 60 * 1000
+      ).toISOString(),
     });
 
     // تحديث حالة الملف
     if (encryptedFile) {
-      await supabase
-        .from('encrypted_files')
-        .update({ is_deleted: true })
-        .eq('id', fileId);
+      await supabase.from('encrypted_files').update({ is_deleted: true }).eq('id', fileId);
     }
 
     console.log(`✅ تم الحذف المؤقت للملف: ${fileId} (استرجاع حتى ${restoreUntil})`);
@@ -262,13 +259,10 @@ serve(async (req) => {
       success: true,
       message: `تم حذف الملف مؤقتاً - يمكن استرجاعه حتى ${restoreDays} يوم`,
       permanentDelete: false,
-      restoreUntil: restoreUntil
+      restoreUntil: restoreUntil,
     });
   } catch (error) {
     console.error('❌ خطأ في حذف الملف:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'خطأ غير معروف',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'خطأ غير معروف', 500);
   }
 });

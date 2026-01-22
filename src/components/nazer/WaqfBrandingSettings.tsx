@@ -3,28 +3,28 @@
  * @version 2.0.0 - إضافة شعار الوقف وخيارات الإظهار
  */
 
-import { useState, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Stamp, FileSignature, Upload, Loader2, Save, User, Image } from "lucide-react";
-import { useWaqfBranding } from "@/hooks/nazer/useWaqfBranding";
+import { useState, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Stamp, FileSignature, Upload, Loader2, Save, User, Image } from 'lucide-react';
+import { useWaqfBranding } from '@/hooks/nazer/useWaqfBranding';
 
 export const WaqfBrandingSettings = () => {
-  const { 
-    branding, 
-    isLoading, 
-    uploadStamp, 
-    uploadSignature, 
+  const {
+    branding,
+    isLoading,
+    uploadStamp,
+    uploadSignature,
     uploadLogo,
-    updateNazerName, 
+    updateNazerName,
     toggleShowLogo,
     toggleShowStamp,
-    isUpdating 
+    isUpdating,
   } = useWaqfBranding();
-  const [nazerName, setNazerName] = useState("");
+  const [nazerName, setNazerName] = useState('');
   const stampInputRef = useRef<HTMLInputElement>(null);
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +86,7 @@ export const WaqfBrandingSettings = () => {
           </Label>
           <div className="flex gap-2">
             <Input
-              placeholder={branding?.nazer_name || "ناظر الوقف"}
+              placeholder={branding?.nazer_name || 'ناظر الوقف'}
               value={nazerName}
               onChange={(e) => setNazerName(e.target.value)}
               className="flex-1"
@@ -96,11 +96,15 @@ export const WaqfBrandingSettings = () => {
               disabled={isUpdating || !nazerName.trim()}
               size="sm"
             >
-              {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {isUpdating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            الاسم الحالي: {branding?.nazer_name || "ناظر الوقف"}
+            الاسم الحالي: {branding?.nazer_name || 'ناظر الوقف'}
           </p>
         </div>
 
@@ -215,9 +219,7 @@ export const WaqfBrandingSettings = () => {
                 )}
                 رفع صورة الختم
               </Button>
-              <p className="text-xs text-muted-foreground">
-                PNG أو JPG بخلفية شفافة (مستحسن)
-              </p>
+              <p className="text-xs text-muted-foreground">PNG أو JPG بخلفية شفافة (مستحسن)</p>
             </div>
           </div>
         </div>
@@ -271,7 +273,7 @@ export const WaqfBrandingSettings = () => {
         {/* معلومات آخر تحديث */}
         {branding?.updated_at && (
           <p className="text-xs text-muted-foreground pt-4 border-t">
-            آخر تحديث: {new Date(branding.updated_at).toLocaleDateString("ar-SA")}
+            آخر تحديث: {new Date(branding.updated_at).toLocaleDateString('ar-SA')}
           </p>
         )}
       </CardContent>

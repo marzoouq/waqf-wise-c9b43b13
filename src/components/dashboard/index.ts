@@ -1,7 +1,7 @@
 /**
  * Dashboard Components Index
  * تم تحديثه بتاريخ 2025-12-03
- * 
+ *
  * الهيكل الموحد:
  * - UnifiedDashboardLayout: Layout موحد لجميع لوحات التحكم
  * - Skeletons: مكونات التحميل

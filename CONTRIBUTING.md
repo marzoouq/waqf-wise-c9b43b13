@@ -1,6 +1,7 @@
 # دليل المساهمة في المشروع
 
 ## 📋 جدول المحتويات
+
 - [البداية](#البداية)
 - [معايير الكود](#معايير-الكود)
 - [قواعد ESLint](#قواعد-eslint)
@@ -12,6 +13,7 @@
 ## 🚀 البداية
 
 ### المتطلبات الأساسية
+
 - Node.js 18+ أو Bun
 - Git
 - محرر نصوص (VSCode موصى به)
@@ -36,6 +38,7 @@ bun dev
 ## 📝 معايير الكود
 
 ### TypeScript
+
 - ✅ استخدم TypeScript Strict Mode
 - ✅ تجنب استخدام `any` (استخدم `unknown` إذا لزم الأمر)
 - ✅ أضف type annotations للدوال العامة
@@ -59,6 +62,7 @@ function processData(data: DataInput): string {
 ```
 
 ### تسمية الملفات والمكونات
+
 - المكونات: `PascalCase.tsx` (مثل: `BeneficiaryCard.tsx`)
 - الـ Hooks: `use*.ts` (مثل: `useBeneficiaries.ts`)
 - الأدوات: `camelCase.ts` (مثل: `formatCurrency.ts`)
@@ -89,6 +93,7 @@ export function ComponentName({ className, ...props }: ComponentNameProps) {
 ```
 
 ### Styling
+
 - ✅ استخدم Tailwind semantic tokens من `index.css`
 - ✅ استخدم `cn()` للجمع بين الـ classes
 - ❌ تجنب الألوان المباشرة (مثل `text-white`, `bg-blue-500`)
@@ -103,6 +108,7 @@ export function ComponentName({ className, ...props }: ComponentNameProps) {
 ```
 
 ### Logging
+
 - ❌ لا تستخدم `console.log` في الكود النهائي
 - ✅ استخدم `productionLogger` من `@/lib/logger/production-logger`
 
@@ -119,6 +125,7 @@ productionLogger.error('Error occurred', error, { context: 'payment' });
 ```
 
 ### معالجة الأخطاء
+
 استخدم نظام معالجة الأخطاء الموحد:
 
 ```typescript
@@ -139,31 +146,35 @@ try {
 
 ### القواعد الصارمة المفعّلة
 
-| القاعدة | المستوى | الوصف |
-|---------|---------|-------|
-| `@typescript-eslint/no-explicit-any` | `error` | ممنوع استخدام `any` نهائياً |
-| `@typescript-eslint/no-empty-function` | `error` | ممنوع الدوال الفارغة |
-| `no-console` | `error` | ممنوع `console.log` (مسموح `warn`, `error` فقط) |
-| `prefer-const` | `error` | استخدم `const` للمتغيرات الثابتة |
-| `no-var` | `error` | ممنوع استخدام `var` |
-| `eqeqeq` | `error` | استخدم `===` بدلاً من `==` |
-| `no-duplicate-imports` | `error` | ممنوع استيراد نفس الملف مرتين |
+| القاعدة                                | المستوى | الوصف                                           |
+| -------------------------------------- | ------- | ----------------------------------------------- |
+| `@typescript-eslint/no-explicit-any`   | `error` | ممنوع استخدام `any` نهائياً                     |
+| `@typescript-eslint/no-empty-function` | `error` | ممنوع الدوال الفارغة                            |
+| `no-console`                           | `error` | ممنوع `console.log` (مسموح `warn`, `error` فقط) |
+| `prefer-const`                         | `error` | استخدم `const` للمتغيرات الثابتة                |
+| `no-var`                               | `error` | ممنوع استخدام `var`                             |
+| `eqeqeq`                               | `error` | استخدم `===` بدلاً من `==`                      |
+| `no-duplicate-imports`                 | `error` | ممنوع استيراد نفس الملف مرتين                   |
 
 ### أمثلة على الأخطاء الشائعة
 
 ```typescript
 // ❌ أخطاء سيتم رفضها
-function doNothing() {}                    // no-empty-function
-console.log('debug');                      // no-console
-let x = 5;                                 // no-var / prefer-const
-if (value == null) {}                      // eqeqeq
-const data: any = {};                      // no-explicit-any
+function doNothing() {} // no-empty-function
+console.log('debug'); // no-console
+let x = 5; // no-var / prefer-const
+if (value == null) {
+} // eqeqeq
+const data: any = {}; // no-explicit-any
 
 // ✅ الطريقة الصحيحة
-function handleEvent(_e: Event) { /* intentionally empty */ }
+function handleEvent(_e: Event) {
+  /* intentionally empty */
+}
 productionLogger.debug('debug');
 const x = 5;
-if (value === null) {}
+if (value === null) {
+}
 const data: unknown = {};
 ```
 
@@ -194,12 +205,12 @@ npm run lint -- --fix
 
 ### سلوك الفحوصات
 
-| الفحص | يوقف الـ commit؟ | ملاحظات |
-|-------|-----------------|---------|
-| TypeScript | ✅ نعم | أي خطأ type يمنع الـ commit |
-| ESLint | ✅ نعم | أي خطأ أو تحذير يمنع الـ commit |
-| Prettier | ❌ لا | يتم الإصلاح التلقائي |
-| Unit Tests | ⚠️ تحذير | يستمر حتى لو فشلت |
+| الفحص      | يوقف الـ commit؟ | ملاحظات                         |
+| ---------- | ---------------- | ------------------------------- |
+| TypeScript | ✅ نعم           | أي خطأ type يمنع الـ commit     |
+| ESLint     | ✅ نعم           | أي خطأ أو تحذير يمنع الـ commit |
+| Prettier   | ❌ لا            | يتم الإصلاح التلقائي            |
+| Unit Tests | ⚠️ تحذير         | يستمر حتى لو فشلت               |
 
 ### تجاوز الفحوصات (للطوارئ فقط!)
 
@@ -223,6 +234,7 @@ npm run deploy:check
 ### Git Workflow
 
 1. أنشئ branch جديد للميزة:
+
 ```bash
 git checkout -b feature/feature-name
 ```
@@ -230,18 +242,21 @@ git checkout -b feature/feature-name
 2. اكتب كود نظيف ومنظم
 
 3. اختبر التغييرات:
+
 ```bash
 bun test
 bun lint
 ```
 
 4. Commit التغييرات:
+
 ```bash
 git add .
 git commit -m "feat: add new feature"
 ```
 
 ### Commit Message Convention
+
 نتبع [Conventional Commits](https://www.conventionalcommits.org/):
 
 - `feat:` ميزة جديدة
@@ -253,6 +268,7 @@ git commit -m "feat: add new feature"
 - `chore:` تحديثات صيانة
 
 أمثلة:
+
 ```
 feat: add beneficiary search functionality
 fix: resolve date formatting in reports
@@ -263,6 +279,7 @@ refactor: split Accounting component into smaller parts
 ## 🧪 الاختبارات
 
 ### تشغيل الاختبارات
+
 ```bash
 # جميع الاختبارات
 bun test
@@ -278,6 +295,7 @@ bun test:e2e
 ```
 
 ### كتابة الاختبارات
+
 ```typescript
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -311,9 +329,11 @@ describe('ComponentName', () => {
 
 ```markdown
 ## الوصف
+
 وصف مختصر للتغييرات
 
 ## نوع التغيير
+
 - [ ] ميزة جديدة
 - [ ] إصلاح bug
 - [ ] تحسين أداء
@@ -321,14 +341,17 @@ describe('ComponentName', () => {
 - [ ] تحديث توثيق
 
 ## الاختبارات
+
 - [ ] تم اختبار التغييرات يدوياً
 - [ ] تم إضافة/تحديث unit tests
 - [ ] تم إضافة/تحديث E2E tests
 
 ## Screenshots (إن وجدت)
+
 أضف screenshots للتغييرات البصرية
 
 ## ملاحظات إضافية
+
 أي ملاحظات إضافية للمراجعين
 ```
 

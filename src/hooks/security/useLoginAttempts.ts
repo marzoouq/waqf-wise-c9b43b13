@@ -3,10 +3,10 @@
  * جلب محاولات تسجيل الدخول
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { SecurityService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery } from '@tanstack/react-query';
+import { SecurityService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import type { Database } from '@/integrations/supabase/types';
 
 type LoginAttemptRow = Database['public']['Tables']['login_attempts_log']['Row'];
 
@@ -30,11 +30,12 @@ export function useLoginAttempts(limit = 20) {
 
   const stats: LoginAttemptStats = {
     total: loginAttempts.length,
-    successful: loginAttempts.filter(a => a.success).length,
-    failed: loginAttempts.filter(a => !a.success).length,
-    failedPercentage: loginAttempts.length > 0 
-      ? Math.round((loginAttempts.filter(a => !a.success).length / loginAttempts.length) * 100)
-      : 0,
+    successful: loginAttempts.filter((a) => a.success).length,
+    failed: loginAttempts.filter((a) => !a.success).length,
+    failedPercentage:
+      loginAttempts.length > 0
+        ? Math.round((loginAttempts.filter((a) => !a.success).length / loginAttempts.length) * 100)
+        : 0,
   };
 
   return {

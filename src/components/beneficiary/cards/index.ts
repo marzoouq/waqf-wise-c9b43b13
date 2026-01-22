@@ -10,10 +10,10 @@ export { PropertyStatsCards } from '../PropertyStatsCards';
 export { ReportsExplanationCard } from '../ReportsExplanationCard';
 
 // Mobile Card Base
-export { 
-  MobileCardBase, 
-  CardInfoRow, 
-  CardInfoGrid, 
+export {
+  MobileCardBase,
+  CardInfoRow,
+  CardInfoGrid,
   CardInfoItem,
   type MobileCardBaseProps,
   type CardInfoRowProps,

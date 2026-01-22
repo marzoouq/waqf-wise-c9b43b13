@@ -2,10 +2,10 @@
  * Financial Report Service - خدمة التقارير المالية
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { logger } from "@/lib/logger";
-import { productionLogger } from "@/lib/logger/production-logger";
-import type { PropertyRow, ContractRow } from "@/types/supabase-helpers";
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
+import { productionLogger } from '@/lib/logger/production-logger';
+import type { PropertyRow, ContractRow } from '@/types/supabase-helpers';
 
 export interface CashFlowData {
   month: string;
@@ -48,14 +48,14 @@ export class FinancialReportService {
 
       if (error) throw error;
 
-      const entries = (data || []).map(e => ({
+      const entries = (data || []).map((e) => ({
         entry_id: e.id,
         description: e.description || '',
         is_linked: !!e.reference_id,
       }));
 
-      const linked = entries.filter(e => e.is_linked).length;
-      const unlinked = entries.filter(e => !e.is_linked).length;
+      const linked = entries.filter((e) => e.is_linked).length;
+      const unlinked = entries.filter((e) => !e.is_linked).length;
 
       return { linked, unlinked, entries };
     } catch (error) {
@@ -88,8 +88,10 @@ export class FinancialReportService {
         { label: 'أكثر من 90 يوم', amount: 0, count: 0 },
       ];
 
-      (ledger || []).forEach(entry => {
-        const days = Math.floor((now.getTime() - new Date(entry.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
+      (ledger || []).forEach((entry) => {
+        const days = Math.floor(
+          (now.getTime() - new Date(entry.transaction_date).getTime()) / (1000 * 60 * 60 * 24)
+        );
         const amount = entry.debit_amount || 0;
 
         if (days <= 30) {
@@ -120,12 +122,16 @@ export class FinancialReportService {
    * جلب تقرير انحراف الميزانية
    */
   static async getBudgetVarianceReport(fiscalYearId?: string): Promise<{
-    accounts: { account_name: string; budgeted: number; actual: number; variance: number; variance_pct: number }[];
+    accounts: {
+      account_name: string;
+      budgeted: number;
+      actual: number;
+      variance: number;
+      variance_pct: number;
+    }[];
   }> {
     try {
-      let query = supabase
-        .from('budgets')
-        .select('*, accounts(name_ar)');
+      let query = supabase.from('budgets').select('*, accounts(name_ar)');
 
       if (fiscalYearId) {
         query = query.eq('fiscal_year_id', fiscalYearId);
@@ -135,7 +141,7 @@ export class FinancialReportService {
 
       if (error) throw error;
 
-      const accounts = (data || []).map(b => {
+      const accounts = (data || []).map((b) => {
         const budgeted = b.budgeted_amount || 0;
         const actual = b.actual_amount || 0;
         const variance = actual - budgeted;
@@ -180,7 +186,7 @@ export class FinancialReportService {
       if (error) throw error;
 
       const flow = data?.[0];
-      
+
       return {
         operating: flow?.operating_activities || 0,
         investing: flow?.investing_activities || 0,
@@ -201,25 +207,25 @@ export class FinancialReportService {
   static async getCashFlowData(): Promise<CashFlowData[]> {
     try {
       const { data, error } = await supabase
-        .from("unified_transactions_view")
-        .select("transaction_date, amount, transaction_type")
-        .gte("transaction_date", new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
+        .from('unified_transactions_view')
+        .select('transaction_date, amount, transaction_type')
+        .gte('transaction_date', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
 
       if (error) throw error;
 
       const monthlyData: Record<string, { income: number; expense: number }> = {};
 
       (data || []).forEach((transaction) => {
-        const month = new Date(transaction.transaction_date).toLocaleDateString("ar-SA", {
-          year: "numeric",
-          month: "short",
+        const month = new Date(transaction.transaction_date).toLocaleDateString('ar-SA', {
+          year: 'numeric',
+          month: 'short',
         });
 
         if (!monthlyData[month]) {
           monthlyData[month] = { income: 0, expense: 0 };
         }
 
-        if (transaction.transaction_type === "قبض") {
+        if (transaction.transaction_type === 'قبض') {
           monthlyData[month].income += transaction.amount;
         } else {
           monthlyData[month].expense += transaction.amount;
@@ -239,7 +245,7 @@ export class FinancialReportService {
         return dateA.getTime() - dateB.getTime();
       });
     } catch (error) {
-      productionLogger.error("Error fetching cash flow data", error);
+      productionLogger.error('Error fetching cash flow data', error);
       throw error;
     }
   }
@@ -250,8 +256,9 @@ export class FinancialReportService {
   static async getPropertiesReport(): Promise<PropertyWithContracts[]> {
     try {
       const { data, error } = await supabase
-        .from("properties")
-        .select(`
+        .from('properties')
+        .select(
+          `
           *,
           contracts (
             id,
@@ -260,13 +267,14 @@ export class FinancialReportService {
             monthly_rent,
             status
           )
-        `)
-        .order("created_at", { ascending: false });
+        `
+        )
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as PropertyWithContracts[];
     } catch (error) {
-      productionLogger.error("Error fetching properties report", error);
+      productionLogger.error('Error fetching properties report', error);
       throw error;
     }
   }
@@ -279,26 +287,28 @@ export class FinancialReportService {
       const operations: OperationRecord[] = [];
 
       const { data: payments } = await supabase
-        .from("payments")
-        .select("*, journal_entries:journal_entry_id(*)")
-        .not("journal_entry_id", "is", null);
-      
+        .from('payments')
+        .select('*, journal_entries:journal_entry_id(*)')
+        .not('journal_entry_id', 'is', null);
+
       if (payments) {
-        operations.push(...payments.map(p => ({
-          id: p.id,
-          type: "سند",
-          number: p.payment_number,
-          description: p.description || '',
-          amount: p.amount,
-          date: p.payment_date,
-          journal_entry_id: p.journal_entry_id,
-          journalEntry: p.journal_entry_id || undefined,
-        })));
+        operations.push(
+          ...payments.map((p) => ({
+            id: p.id,
+            type: 'سند',
+            number: p.payment_number,
+            description: p.description || '',
+            amount: p.amount,
+            date: p.payment_date,
+            journal_entry_id: p.journal_entry_id,
+            journalEntry: p.journal_entry_id || undefined,
+          }))
+        );
       }
 
       return operations;
     } catch (error) {
-      productionLogger.error("Error fetching linked operations", error);
+      productionLogger.error('Error fetching linked operations', error);
       throw error;
     }
   }

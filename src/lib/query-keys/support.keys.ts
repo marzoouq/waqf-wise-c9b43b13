@@ -9,12 +9,13 @@ export const SUPPORT_KEYS = {
   TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
   SUPPORT_STATS: ['support-stats'] as const,
   SUPPORT_ESCALATIONS: ['support-escalations'] as const,
-  
+
   // Agent
   AGENT_AVAILABILITY: (userId: string) => ['agent-availability', userId] as const,
-  AGENT_STATS: (userId: string, dateRange?: { from: string; to: string }) => ['agent-stats', userId, dateRange] as const,
+  AGENT_STATS: (userId: string, dateRange?: { from: string; to: string }) =>
+    ['agent-stats', userId, dateRange] as const,
   ASSIGNMENT_SETTINGS: ['assignment-settings'] as const,
-  
+
   // Ticket Ratings
   TICKET_RATING: (ticketId: string) => ['ticket-rating', ticketId] as const,
   TICKET_RATINGS: ['ticket-ratings'] as const,

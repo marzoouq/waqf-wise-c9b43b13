@@ -22,10 +22,10 @@ export function AgentAvailabilityCard() {
 
   const handleToggleAvailability = async () => {
     if (!user) return;
-    
+
     const newStatus = !isAvailable;
     setIsAvailable(newStatus);
-    
+
     await updateAvailability.mutateAsync({
       userId: user.id,
       isAvailable: newStatus,
@@ -36,9 +36,10 @@ export function AgentAvailabilityCard() {
     return null;
   }
 
-  const loadPercentage = availability.max_capacity > 0
-    ? (availability.current_load / availability.max_capacity) * 100
-    : 0;
+  const loadPercentage =
+    availability.max_capacity > 0
+      ? (availability.current_load / availability.max_capacity) * 100
+      : 0;
 
   return (
     <Card>
@@ -49,9 +50,7 @@ export function AgentAvailabilityCard() {
               <User className="h-5 w-5" />
               حالة التوافر
             </CardTitle>
-            <CardDescription>
-              إدارة توافرك لاستقبال التذاكر
-            </CardDescription>
+            <CardDescription>إدارة توافرك لاستقبال التذاكر</CardDescription>
           </div>
           <Badge variant={isAvailable ? 'default' : 'secondary'}>
             {isAvailable ? 'متاح' : 'غير متاح'}
@@ -84,9 +83,11 @@ export function AgentAvailabilityCard() {
           <div className="w-full bg-muted rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all ${
-                loadPercentage >= 80 ? 'bg-destructive' :
-                loadPercentage >= 60 ? 'bg-warning' :
-                'bg-primary'
+                loadPercentage >= 80
+                  ? 'bg-destructive'
+                  : loadPercentage >= 60
+                    ? 'bg-warning'
+                    : 'bg-primary'
               }`}
               style={{ width: `${Math.min(loadPercentage, 100)}%` }}
             />

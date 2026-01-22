@@ -1,20 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  AlertTriangle, 
-  Trash2, 
-  DollarSign, 
-  UserCog, 
-  Eye, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  AlertTriangle,
+  Trash2,
+  DollarSign,
+  UserCog,
+  Eye,
   Bell,
   CheckCircle,
-  XCircle
-} from "lucide-react";
-import { useAuditAlerts, type AuditAlert } from "@/hooks/system/useAuditAlerts";
-import { format } from "@/lib/date";
-import { cn } from "@/lib/utils";
+  XCircle,
+} from 'lucide-react';
+import { useAuditAlerts, type AuditAlert } from '@/hooks/system/useAuditAlerts';
+import { format } from '@/lib/date';
+import { cn } from '@/lib/utils';
 
 interface AuditAlertsCardProps {
   maxAlerts?: number;
@@ -22,7 +22,10 @@ interface AuditAlertsCardProps {
   className?: string;
 }
 
-const alertTypeConfig: Record<AuditAlert['type'], { icon: typeof AlertTriangle; label: string; color: string }> = {
+const alertTypeConfig: Record<
+  AuditAlert['type'],
+  { icon: typeof AlertTriangle; label: string; color: string }
+> = {
   mass_delete: { icon: Trash2, label: 'حذف جماعي', color: 'text-destructive' },
   financial_change: { icon: DollarSign, label: 'تغيير مالي', color: 'text-warning' },
   role_change: { icon: UserCog, label: 'تغيير أدوار', color: 'text-primary' },
@@ -43,8 +46,8 @@ export function AuditAlertsCard({ maxAlerts = 10, className }: AuditAlertsCardPr
 
   const displayedAlerts = alerts.slice(0, maxAlerts);
 
-  const criticalCount = alerts.filter(a => a.severity === 'critical').length;
-  const highCount = alerts.filter(a => a.severity === 'high').length;
+  const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
+  const highCount = alerts.filter((a) => a.severity === 'high').length;
 
   if (isLoading) {
     return (
@@ -121,21 +124,21 @@ export function AuditAlertsCard({ maxAlerts = 10, className }: AuditAlertsCardPr
                   <div
                     key={alert.id}
                     className={cn(
-                      "p-3 rounded-lg border transition-colors",
-                      alert.severity === 'critical' && "border-destructive/50 bg-destructive/5",
-                      alert.severity === 'high' && "border-warning/50 bg-warning/5",
-                      alert.severity === 'medium' && "border-info/50 bg-info/5",
-                      alert.severity === 'low' && "border-border bg-card"
+                      'p-3 rounded-lg border transition-colors',
+                      alert.severity === 'critical' && 'border-destructive/50 bg-destructive/5',
+                      alert.severity === 'high' && 'border-warning/50 bg-warning/5',
+                      alert.severity === 'medium' && 'border-info/50 bg-info/5',
+                      alert.severity === 'low' && 'border-border bg-card'
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={cn("mt-0.5", config.color)}>
+                      <div className={cn('mt-0.5', config.color)}>
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="font-medium text-sm">{alert.title}</span>
-                          <Badge className={cn("text-xs", severity.className)}>
+                          <Badge className={cn('text-xs', severity.className)}>
                             {severity.label}
                           </Badge>
                         </div>
@@ -146,9 +149,7 @@ export function AuditAlertsCard({ maxAlerts = 10, className }: AuditAlertsCardPr
                           {alert.userEmail && (
                             <span className="truncate max-w-[150px]">{alert.userEmail}</span>
                           )}
-                          <span>
-                            {format(alert.triggeredAt, "HH:mm dd/MM")}
-                          </span>
+                          <span>{format(alert.triggeredAt, 'HH:mm dd/MM')}</span>
                         </div>
                       </div>
                     </div>

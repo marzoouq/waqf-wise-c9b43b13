@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Download, TrendingUp, Users, Building2, DollarSign } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText, Download, TrendingUp, Users, Building2, DollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ReportLink {
   title: string;
@@ -16,28 +16,28 @@ export function IntegratedReportsWidget() {
 
   const reports: ReportLink[] = [
     {
-      title: "تقرير المستفيدين",
-      description: "قائمة شاملة بجميع المستفيدين وأرصدتهم",
+      title: 'تقرير المستفيدين',
+      description: 'قائمة شاملة بجميع المستفيدين وأرصدتهم',
       icon: Users,
-      path: "/beneficiaries",
+      path: '/beneficiaries',
     },
     {
-      title: "تقرير التوزيعات",
-      description: "سجل التوزيعات المالية والموافقات",
+      title: 'تقرير التوزيعات',
+      description: 'سجل التوزيعات المالية والموافقات',
       icon: DollarSign,
-      path: "/funds?tab=distributions",
+      path: '/funds?tab=distributions',
     },
     {
-      title: "التقارير المالية",
-      description: "الميزانية وقائمة الدخل والتدفقات النقدية",
+      title: 'التقارير المالية',
+      description: 'الميزانية وقائمة الدخل والتدفقات النقدية',
       icon: TrendingUp,
-      path: "/accounting?tab=trial-balance",
+      path: '/accounting?tab=trial-balance',
     },
     {
-      title: "تقرير العقارات",
-      description: "حالة العقارات والعقود والإيجارات",
+      title: 'تقرير العقارات',
+      description: 'حالة العقارات والعقود والإيجارات',
       icon: Building2,
-      path: "/properties",
+      path: '/properties',
     },
   ];
 
@@ -50,11 +50,9 @@ export function IntegratedReportsWidget() {
               <FileText className="h-5 w-5 text-primary" />
               التقارير المتكاملة
             </CardTitle>
-            <CardDescription>
-              الوصول السريع للتقارير الأساسية
-            </CardDescription>
+            <CardDescription>الوصول السريع للتقارير الأساسية</CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={() => navigate("/reports")}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/reports')}>
             <Download className="h-4 w-4 ms-2" />
             جميع التقارير
           </Button>

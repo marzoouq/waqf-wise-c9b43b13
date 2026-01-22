@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { FiscalYearService } from "@/services/fiscal-year.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { FiscalYearService } from '@/services/fiscal-year.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface FiscalYear {
   id: string;

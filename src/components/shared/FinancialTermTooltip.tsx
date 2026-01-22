@@ -1,23 +1,18 @@
 /**
  * Financial Term Tooltip - مكون التوضيح للمصطلحات المالية
- * 
+ *
  * يعرض للمستخدم معلومات توضيحية عن المصطلحات المالية:
  * - اسم المصطلح
  * - تعريفه
  * - مصدر البيانات
- * 
+ *
  * @version 1.0.0
  */
 
-import { ReactNode } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
-import { FINANCIAL_TERMS, type FinancialTermKey } from "@/lib/financial-terms";
+import { ReactNode } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+import { FINANCIAL_TERMS, type FinancialTermKey } from '@/lib/financial-terms';
 
 interface FinancialTermTooltipProps {
   /** مفتاح المصطلح من القاموس الموحد */
@@ -48,11 +43,7 @@ export function FinancialTermTooltip({
             {showIcon && <Info className="h-3 w-3 text-muted-foreground" />}
           </span>
         </TooltipTrigger>
-        <TooltipContent 
-          side="top" 
-          className="max-w-xs p-3 text-right"
-          dir="rtl"
-        >
+        <TooltipContent side="top" className="max-w-xs p-3 text-right" dir="rtl">
           <div className="space-y-2">
             <p className="font-bold text-foreground">{termData.ar}</p>
             <p className="text-sm text-muted-foreground">{termData.description}</p>

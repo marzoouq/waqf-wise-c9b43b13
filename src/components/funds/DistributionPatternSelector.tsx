@@ -86,9 +86,7 @@ export function DistributionPatternSelector({ value, onChange }: DistributionPat
                           </Badge>
                         )}
                       </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {pattern.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{pattern.description}</p>
                     </div>
                   </div>
                 </CardContent>

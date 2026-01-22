@@ -31,12 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TenantDialog } from '@/components/tenants/TenantDialog';
 import { QuickPaymentDialog } from '@/components/tenants/QuickPaymentDialog';
 import { useTenants } from '@/hooks/property/useTenants';
@@ -59,7 +54,10 @@ import {
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 import type { TenantInsert, TenantWithBalance } from '@/types/tenants';
 
-const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
+const statusLabels: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' }
+> = {
   active: { label: 'نشط', variant: 'default' },
   inactive: { label: 'غير نشط', variant: 'secondary' },
   blacklisted: { label: 'محظور', variant: 'destructive' },
@@ -67,9 +65,10 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 
 export default function Tenants() {
   const navigate = useNavigate();
-  const { tenants, isLoading, addTenant, updateTenant, deleteTenant, isAdding, isUpdating } = useTenants();
+  const { tenants, isLoading, addTenant, updateTenant, deleteTenant, isAdding, isUpdating } =
+    useTenants();
   useTenantsRealtime(); // تحديثات فورية
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<TenantWithBalance | null>(null);
@@ -134,25 +133,31 @@ export default function Tenants() {
             <Users className="h-6 w-6" />
             إدارة المستأجرين
           </h1>
-          <p className="text-muted-foreground">
-            قائمة المستأجرين وحساباتهم
-          </p>
+          <p className="text-muted-foreground">قائمة المستأجرين وحساباتهم</p>
         </div>
         <div className="flex gap-2">
           {tenants.length > 0 && (
             <ExportButton
-              data={tenants.map(t => ({
+              data={tenants.map((t) => ({
                 'رقم المستأجر': t.tenant_number || '-',
-                'الاسم': t.full_name,
+                الاسم: t.full_name,
                 'رقم الهوية': t.id_number,
-                'الجوال': t.phone || '-',
-                'البريد': t.email || '-',
-                'الحالة': statusLabels[t.status]?.label || t.status,
-                'الرصيد': formatCurrency(t.current_balance),
+                الجوال: t.phone || '-',
+                البريد: t.email || '-',
+                الحالة: statusLabels[t.status]?.label || t.status,
+                الرصيد: formatCurrency(t.current_balance),
               }))}
               filename="المستأجرين"
               title="تقرير المستأجرين"
-              headers={['رقم المستأجر', 'الاسم', 'رقم الهوية', 'الجوال', 'البريد', 'الحالة', 'الرصيد']}
+              headers={[
+                'رقم المستأجر',
+                'الاسم',
+                'رقم الهوية',
+                'الجوال',
+                'البريد',
+                'الحالة',
+                'الرصيد',
+              ]}
             />
           )}
           <Button
@@ -231,23 +236,23 @@ export default function Tenants() {
               ))}
             </div>
           ) : filteredTenants.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              لا يوجد مستأجرين
-            </div>
+            <div className="text-center py-8 text-muted-foreground">لا يوجد مستأجرين</div>
           ) : (
             <>
               {/* Mobile Card View */}
               <div className="block md:hidden space-y-3">
                 {filteredTenants.map((tenant) => (
-                  <Card 
-                    key={tenant.id} 
+                  <Card
+                    key={tenant.id}
                     className="p-3 cursor-pointer hover:bg-muted/50"
                     onClick={() => navigate(`/tenants/${tenant.id}`)}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="font-medium">{tenant.full_name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{tenant.tenant_number}</p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {tenant.tenant_number}
+                        </p>
                       </div>
                       <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
                         {statusLabels[tenant.status]?.label || tenant.status}
@@ -265,10 +270,15 @@ export default function Tenants() {
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t">
                       <span className="text-xs text-muted-foreground">الرصيد:</span>
-                      <span className={`font-medium ${
-                        tenant.current_balance > 0 ? 'text-destructive' :
-                        tenant.current_balance < 0 ? 'text-status-success' : ''
-                      }`}>
+                      <span
+                        className={`font-medium ${
+                          tenant.current_balance > 0
+                            ? 'text-destructive'
+                            : tenant.current_balance < 0
+                              ? 'text-status-success'
+                              : ''
+                        }`}
+                      >
                         {formatCurrency(tenant.current_balance)}
                       </span>
                     </div>
@@ -330,10 +340,16 @@ export default function Tenants() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم المستأجر</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                        رقم المستأجر
+                      </TableHead>
                       <TableHead className="text-xs sm:text-sm">الاسم</TableHead>
-                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم الهوية</TableHead>
-                      <TableHead className="text-xs sm:text-sm hidden xl:table-cell">التواصل</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                        رقم الهوية
+                      </TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden xl:table-cell">
+                        التواصل
+                      </TableHead>
                       <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
                       <TableHead className="text-end text-xs sm:text-sm">الرصيد</TableHead>
                       <TableHead className="w-12"></TableHead>
@@ -352,7 +368,9 @@ export default function Tenants() {
                         <TableCell className="font-medium text-xs sm:text-sm">
                           {tenant.full_name}
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{tenant.id_number}</TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
+                          {tenant.id_number}
+                        </TableCell>
                         <TableCell className="hidden xl:table-cell">
                           <div className="flex flex-col gap-1">
                             {tenant.phone && (
@@ -380,8 +398,8 @@ export default function Tenants() {
                               tenant.current_balance > 0
                                 ? 'text-destructive font-medium'
                                 : tenant.current_balance < 0
-                                ? 'text-status-success font-medium'
-                                : ''
+                                  ? 'text-status-success font-medium'
+                                  : ''
                             }
                           >
                             {formatCurrency(tenant.current_balance)}
@@ -430,7 +448,7 @@ export default function Tenants() {
                               </Tooltip>
                             </TooltipProvider>
                           )}
-                          
+
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                               <Button variant="ghost" size="icon">

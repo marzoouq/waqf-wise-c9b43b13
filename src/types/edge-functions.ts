@@ -1,6 +1,6 @@
 /**
  * Edge Functions Types - أنواع بيانات Edge Functions
- * 
+ *
  * أنواع محددة بدلاً من any لتحسين جودة الكود والأمان
  */
 

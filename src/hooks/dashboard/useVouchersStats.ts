@@ -3,9 +3,9 @@
  * Hook لإحصائيات سندات الدفع
  * @version 2.9.2
  */
-import { useQuery } from "@tanstack/react-query";
-import { PaymentService } from "@/services/payment.service";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { PaymentService } from '@/services/payment.service';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export interface VouchersStats {
   total: number;

@@ -35,7 +35,11 @@ export function useBudgetVarianceReport() {
     queryFn: () => FiscalYearService.getAll(),
   });
 
-  const { data: budgets, isLoading: loadingBudgets, error } = useQuery({
+  const {
+    data: budgets,
+    isLoading: loadingBudgets,
+    error,
+  } = useQuery({
     queryKey: QUERY_KEYS.BUDGETS_VARIANCE(selectedFiscalYear),
     queryFn: () => AccountingService.getBudgetsByFiscalYear(selectedFiscalYear),
     enabled: !!selectedFiscalYear,
@@ -43,16 +47,20 @@ export function useBudgetVarianceReport() {
 
   const typedBudgets = (budgets || []) as BudgetData[];
 
-  const summary: BudgetSummary | null = typedBudgets.reduce(
-    (acc, budget) => ({
-      totalBudgeted: acc.totalBudgeted + budget.budgeted_amount,
-      totalActual: acc.totalActual + (budget.actual_amount || 0),
-      totalVariance: acc.totalVariance + (budget.variance_amount || 0),
-    }),
-    { totalBudgeted: 0, totalActual: 0, totalVariance: 0 }
-  ) || null;
+  const summary: BudgetSummary | null =
+    typedBudgets.reduce(
+      (acc, budget) => ({
+        totalBudgeted: acc.totalBudgeted + budget.budgeted_amount,
+        totalActual: acc.totalActual + (budget.actual_amount || 0),
+        totalVariance: acc.totalVariance + (budget.variance_amount || 0),
+      }),
+      { totalBudgeted: 0, totalActual: 0, totalVariance: 0 }
+    ) || null;
 
-  const getVarianceStatus = (variance: number, budgeted: number): 'good' | 'warning' | 'critical' => {
+  const getVarianceStatus = (
+    variance: number,
+    budgeted: number
+  ): 'good' | 'warning' | 'critical' => {
     const percentage = (variance / budgeted) * 100;
     if (Math.abs(percentage) <= 5) return 'good';
     if (Math.abs(percentage) <= 15) return 'warning';

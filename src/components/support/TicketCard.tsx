@@ -43,8 +43,8 @@ export function TicketCard({
   return (
     <div
       className={cn(
-        "flex items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors",
-        isOverdue && "border border-destructive/50",
+        'flex items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors',
+        isOverdue && 'border border-destructive/50',
         className
       )}
       onClick={() => onClick?.(id)}
@@ -53,18 +53,14 @@ export function TicketCard({
         <div className="flex items-center gap-2 flex-wrap">
           <p className="font-medium truncate">{subject}</p>
           {showTicketNumber && ticketNumber && (
-            <Badge variant="outline" className="shrink-0">#{ticketNumber}</Badge>
+            <Badge variant="outline" className="shrink-0">
+              #{ticketNumber}
+            </Badge>
           )}
         </div>
-        {displayName && (
-          <p className="text-sm text-muted-foreground truncate">
-            {displayName}
-          </p>
-        )}
+        {displayName && <p className="text-sm text-muted-foreground truncate">{displayName}</p>}
         {!showTicketNumber && ticketNumber && (
-          <p className="text-sm text-muted-foreground">
-            #{ticketNumber}
-          </p>
+          <p className="text-sm text-muted-foreground">#{ticketNumber}</p>
         )}
       </div>
       <div className="text-left space-y-1 sm:space-y-2 shrink-0 me-2">
@@ -73,9 +69,7 @@ export function TicketCard({
         ) : (
           <Badge>{statusLabels[status] || status}</Badge>
         )}
-        <p className="text-xs text-muted-foreground">
-          {formatDate(createdAt, 'PP')}
-        </p>
+        <p className="text-xs text-muted-foreground">{formatDate(createdAt, 'PP')}</p>
       </div>
     </div>
   );

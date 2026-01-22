@@ -1,30 +1,33 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { NotificationItem } from "@/components/notifications/NotificationItem";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { Bell, Check } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNotifications } from '@/hooks/notifications/useNotifications';
+import { NotificationItem } from '@/components/notifications/NotificationItem';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Bell, Check } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Notifications = () => {
-  const { 
-    notifications, 
-    isLoading, 
+  const {
+    notifications,
+    isLoading,
     error,
     refetch,
-    unreadCount, 
-    markAsRead, 
+    unreadCount,
+    markAsRead,
     markAllAsRead,
-    isMarkingAllAsRead 
+    isMarkingAllAsRead,
   } = useNotifications();
 
-  const unreadNotifications = notifications.filter(n => !n.is_read);
-  const readNotifications = notifications.filter(n => n.is_read);
+  const unreadNotifications = notifications.filter((n) => !n.is_read);
+  const readNotifications = notifications.filter((n) => n.is_read);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الإشعارات..." />;
@@ -32,8 +35,8 @@ const Notifications = () => {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الإشعارات" 
+      <ErrorState
+        title="فشل تحميل الإشعارات"
         message="حدث خطأ أثناء تحميل الإشعارات"
         onRetry={() => refetch?.()}
         fullScreen
@@ -46,9 +49,8 @@ const Notifications = () => {
       <MobileOptimizedLayout>
         <MobileOptimizedHeader
           title="الإشعارات"
-          description={unreadCount > 0 
-            ? `لديك ${unreadCount} إشعار غير مقروء`
-            : "جميع الإشعارات مقروءة"
+          description={
+            unreadCount > 0 ? `لديك ${unreadCount} إشعار غير مقروء` : 'جميع الإشعارات مقروءة'
           }
           icon={<Bell className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
           actions={
@@ -73,13 +75,22 @@ const Notifications = () => {
             <Tabs defaultValue="all" className="w-full">
               <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0 pb-2">
                 <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 gap-1 h-auto min-w-full sm:min-w-0 mb-4">
-                  <TabsTrigger value="all" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <TabsTrigger
+                    value="all"
+                    className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                  >
                     الكل ({notifications.length})
                   </TabsTrigger>
-                  <TabsTrigger value="unread" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <TabsTrigger
+                    value="unread"
+                    className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                  >
                     غير مقروءة ({unreadCount})
                   </TabsTrigger>
-                  <TabsTrigger value="read" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">
+                  <TabsTrigger
+                    value="read"
+                    className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+                  >
                     مقروءة ({readNotifications.length})
                   </TabsTrigger>
                 </TabsList>

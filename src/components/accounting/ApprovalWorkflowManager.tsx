@@ -1,23 +1,28 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, User } from "lucide-react";
-import { useApprovalWorkflow, type ApprovalStatus } from "@/hooks/accounting";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, XCircle, Clock, User } from 'lucide-react';
+import { useApprovalWorkflow, type ApprovalStatus } from '@/hooks/accounting';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function ApprovalWorkflowManager() {
   const { pendingApprovals, isLoading, error, refetch } = useApprovalWorkflow();
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      pending: { label: "قيد المراجعة", variant: "secondary" as const, icon: Clock, className: "" },
-      approved: { label: "موافق عليه", variant: "default" as const, icon: CheckCircle, className: "bg-success/10 text-success" },
-      rejected: { label: "مرفوض", variant: "destructive" as const, icon: XCircle, className: "" },
+      pending: { label: 'قيد المراجعة', variant: 'secondary' as const, icon: Clock, className: '' },
+      approved: {
+        label: 'موافق عليه',
+        variant: 'default' as const,
+        icon: CheckCircle,
+        className: 'bg-success/10 text-success',
+      },
+      rejected: { label: 'مرفوض', variant: 'destructive' as const, icon: XCircle, className: '' },
     };
-    
+
     const config = variants[status as keyof typeof variants] || variants.pending;
     const Icon = config.icon;
-    
+
     return (
       <Badge variant={config.variant} className={`gap-1 ${config.className}`}>
         <Icon className="h-3 w-3" />
@@ -31,7 +36,13 @@ export function ApprovalWorkflowManager() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الموافقات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الموافقات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -58,7 +69,7 @@ export function ApprovalWorkflowManager() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold">
-                        {approval.entity_type === "journal_entry" 
+                        {approval.entity_type === 'journal_entry'
                           ? `قيد محاسبي - ${approval.entity_id}`
                           : approval.entity_type}
                       </h3>
@@ -66,13 +77,15 @@ export function ApprovalWorkflowManager() {
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                       <span className="text-muted-foreground">
-                        المستوى الحالي: <span className="font-semibold text-foreground">
+                        المستوى الحالي:{' '}
+                        <span className="font-semibold text-foreground">
                           {approval.current_level} من {approval.total_levels}
                         </span>
                       </span>
                       <span className="text-muted-foreground">
-                        تاريخ البدء: <span className="font-medium text-foreground">
-                          {new Date(approval.started_at).toLocaleDateString("ar-SA")}
+                        تاريخ البدء:{' '}
+                        <span className="font-medium text-foreground">
+                          {new Date(approval.started_at).toLocaleDateString('ar-SA')}
                         </span>
                       </span>
                     </div>
@@ -92,16 +105,16 @@ export function ApprovalWorkflowManager() {
                           key={`step-${step.level}-${step.approver_role}`}
                           className={`flex items-center gap-3 p-2 rounded ${
                             step.action
-                              ? "bg-muted/50"
+                              ? 'bg-muted/50'
                               : (approval.current_level || 0) === (step.level || 0)
-                              ? "bg-primary/10 border border-primary/20"
-                              : "bg-background"
+                                ? 'bg-primary/10 border border-primary/20'
+                                : 'bg-background'
                           }`}
                         >
                           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-background border-2 border-border">
-                            {step.action === "approved" ? (
+                            {step.action === 'approved' ? (
                               <CheckCircle className="h-5 w-5 text-success" />
-                            ) : step.action === "rejected" ? (
+                            ) : step.action === 'rejected' ? (
                               <XCircle className="h-5 w-5 text-destructive" />
                             ) : (
                               <span className="text-sm font-semibold">{step.level}</span>
@@ -116,7 +129,7 @@ export function ApprovalWorkflowManager() {
                           {step.actioned_at && (
                             <div className="text-left">
                               <p className="text-xs text-muted-foreground">
-                                {new Date(step.actioned_at).toLocaleDateString("ar-SA")}
+                                {new Date(step.actioned_at).toLocaleDateString('ar-SA')}
                               </p>
                               {step.notes && (
                                 <p className="text-xs text-muted-foreground">{step.notes}</p>

@@ -2,47 +2,53 @@
  * إدارة المستفيدين السريعة للناظر
  * عرض قائمة المستفيدين مع إجراءات سريعة
  */
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate } from "react-router-dom";
-import { useNazerBeneficiariesQuick } from "@/hooks/nazer/useNazerBeneficiariesQuick";
-import { 
-  Users, Search, Eye, Edit, UserPlus, 
-  ChevronLeft, Phone, Wallet
-} from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { matchesStatus } from "@/lib/constants";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
+import { useNazerBeneficiariesQuick } from '@/hooks/nazer/useNazerBeneficiariesQuick';
+import { Users, Search, Eye, Edit, UserPlus, ChevronLeft, Phone, Wallet } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { matchesStatus } from '@/lib/constants';
 
 export function NazerBeneficiaryManagement() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: beneficiaries = [], isLoading } = useNazerBeneficiariesQuick();
 
-  const filteredBeneficiaries = beneficiaries.filter(b => 
-    b.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.phone?.includes(searchQuery) ||
-    b.national_id?.includes(searchQuery)
+  const filteredBeneficiaries = beneficiaries.filter(
+    (b) =>
+      b.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.phone?.includes(searchQuery) ||
+      b.national_id?.includes(searchQuery)
   );
 
   const stats = {
     total: beneficiaries.length,
-    active: beneficiaries.filter(b => matchesStatus(b.status, 'active')).length,
-    inactive: beneficiaries.filter(b => !matchesStatus(b.status, 'active')).length,
+    active: beneficiaries.filter((b) => matchesStatus(b.status, 'active')).length,
+    inactive: beneficiaries.filter((b) => !matchesStatus(b.status, 'active')).length,
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "نشط":
-        return <Badge className="bg-status-success/10 text-status-success border-status-success/20">نشط</Badge>;
-      case "متوقف":
-        return <Badge className="bg-status-warning/10 text-status-warning border-status-warning/20">متوقف</Badge>;
+      case 'نشط':
+        return (
+          <Badge className="bg-status-success/10 text-status-success border-status-success/20">
+            نشط
+          </Badge>
+        );
+      case 'متوقف':
+        return (
+          <Badge className="bg-status-warning/10 text-status-warning border-status-warning/20">
+            متوقف
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -56,7 +62,12 @@ export function NazerBeneficiaryManagement() {
             <Users className="h-5 w-5 text-primary" />
             <CardTitle>إدارة المستفيدين</CardTitle>
           </div>
-          <Button onClick={() => navigate("/beneficiaries")} variant="ghost" size="sm" className="gap-1">
+          <Button
+            onClick={() => navigate('/beneficiaries')}
+            variant="ghost"
+            size="sm"
+            className="gap-1"
+          >
             عرض الكل
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -95,7 +106,7 @@ export function NazerBeneficiaryManagement() {
         <ScrollArea className="h-[300px]">
           {isLoading ? (
             <div className="space-y-2">
-              {[1, 2, 3, 4].map(i => (
+              {[1, 2, 3, 4].map((i) => (
                 <Skeleton key={i} className="h-16 w-full" />
               ))}
             </div>
@@ -107,14 +118,14 @@ export function NazerBeneficiaryManagement() {
           ) : (
             <div className="space-y-2">
               {filteredBeneficiaries.map((beneficiary) => (
-                <div 
+                <div
                   key={beneficiary.id}
                   className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                        {beneficiary.full_name?.charAt(0) || "؟"}
+                        {beneficiary.full_name?.charAt(0) || '؟'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -137,9 +148,9 @@ export function NazerBeneficiaryManagement() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-8 w-8"
                       onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
                       aria-label="عرض تفاصيل المستفيد"
@@ -147,9 +158,9 @@ export function NazerBeneficiaryManagement() {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-8 w-8"
                       onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
                       aria-label="تعديل بيانات المستفيد"
@@ -165,8 +176,8 @@ export function NazerBeneficiaryManagement() {
         </ScrollArea>
 
         {/* زر إضافة مستفيد */}
-        <Button 
-          onClick={() => navigate("/beneficiaries")} 
+        <Button
+          onClick={() => navigate('/beneficiaries')}
           className="w-full gap-2"
           variant="outline"
         >

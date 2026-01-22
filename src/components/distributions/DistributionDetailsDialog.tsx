@@ -1,11 +1,24 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { useDistributionDetails } from "@/hooks/distributions/useDistributionDetails";
-import { Distribution } from "@/hooks/distributions/useDistributions";
-import { DistributionVouchersTab } from "./DistributionVouchersTab";
-import { Loader2, Users, Receipt } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { useDistributionDetails } from '@/hooks/distributions/useDistributionDetails';
+import { Distribution } from '@/hooks/distributions/useDistributions';
+import { DistributionVouchersTab } from './DistributionVouchersTab';
+import { Loader2, Users, Receipt } from 'lucide-react';
 
 interface DistributionDetailsDialogProps {
   distribution: Distribution | null;
@@ -21,12 +34,12 @@ export function DistributionDetailsDialog({
   const { details, isLoading } = useDistributionDetails(distribution?.id);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      "معلق": "secondary",
-      "مدفوع": "default",
-      "ملغي": "destructive",
+    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
+      معلق: 'secondary',
+      مدفوع: 'default',
+      ملغي: 'destructive',
     };
-    return <Badge variant={variants[status] || "default"}>{status}</Badge>;
+    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
   };
 
   return (
@@ -45,19 +58,27 @@ export function DistributionDetailsDialog({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
               <div>
                 <p className="text-sm text-muted-foreground">إجمالي الإيرادات</p>
-                <p className="text-lg font-bold">{distribution.total_revenues?.toLocaleString()} ريال</p>
+                <p className="text-lg font-bold">
+                  {distribution.total_revenues?.toLocaleString()} ريال
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">إجمالي المصروفات</p>
-                <p className="text-lg font-bold text-destructive">{distribution.total_expenses?.toLocaleString()} ريال</p>
+                <p className="text-lg font-bold text-destructive">
+                  {distribution.total_expenses?.toLocaleString()} ريال
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">صافي الإيرادات</p>
-                <p className="text-lg font-bold text-primary">{distribution.net_revenues?.toLocaleString()} ريال</p>
+                <p className="text-lg font-bold text-primary">
+                  {distribution.net_revenues?.toLocaleString()} ريال
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">المبلغ القابل للتوزيع</p>
-                <p className="text-lg font-bold text-success">{distribution.distributable_amount?.toLocaleString()} ريال</p>
+                <p className="text-lg font-bold text-success">
+                  {distribution.distributable_amount?.toLocaleString()} ريال
+                </p>
               </div>
             </div>
 
@@ -65,15 +86,21 @@ export function DistributionDetailsDialog({
             <div className="grid grid-cols-3 gap-4">
               <div className="p-3 border rounded-lg">
                 <p className="text-sm text-muted-foreground">حصة الناظر</p>
-                <p className="text-lg font-semibold">{distribution.nazer_share?.toLocaleString()} ريال</p>
+                <p className="text-lg font-semibold">
+                  {distribution.nazer_share?.toLocaleString()} ريال
+                </p>
               </div>
               <div className="p-3 border rounded-lg">
                 <p className="text-sm text-muted-foreground">صدقة الواقف</p>
-                <p className="text-lg font-semibold">{distribution.waqif_charity?.toLocaleString()} ريال</p>
+                <p className="text-lg font-semibold">
+                  {distribution.waqif_charity?.toLocaleString()} ريال
+                </p>
               </div>
               <div className="p-3 border rounded-lg">
                 <p className="text-sm text-muted-foreground">رقبة الوقف</p>
-                <p className="text-lg font-semibold">{distribution.waqf_corpus?.toLocaleString()} ريال</p>
+                <p className="text-lg font-semibold">
+                  {distribution.waqf_corpus?.toLocaleString()} ريال
+                </p>
               </div>
             </div>
 
@@ -120,11 +147,11 @@ export function DistributionDetailsDialog({
                             <TableCell className="font-semibold text-success">
                               {detail.allocated_amount.toLocaleString()} ريال
                             </TableCell>
+                            <TableCell>{getStatusBadge(detail.payment_status)}</TableCell>
                             <TableCell>
-                              {getStatusBadge(detail.payment_status)}
-                            </TableCell>
-                            <TableCell>
-                              {detail.payment_date ? new Date(detail.payment_date).toLocaleDateString('ar-SA') : '-'}
+                              {detail.payment_date
+                                ? new Date(detail.payment_date).toLocaleDateString('ar-SA')
+                                : '-'}
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {detail.beneficiaries?.bank_name || '-'}

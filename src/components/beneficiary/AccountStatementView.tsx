@@ -1,12 +1,27 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Download, FileText, Calendar } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { toast } from "sonner";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicTableData } from "@/lib/pdf/arabic-pdf-utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Download, FileText, Calendar } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { toast } from 'sonner';
+import { productionLogger } from '@/lib/logger/production-logger';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  getDefaultTableStyles,
+  WAQF_COLORS,
+  processArabicText,
+  processArabicTableData,
+} from '@/lib/pdf/arabic-pdf-utils';
 
 interface PaymentRecord {
   id: string;
@@ -32,15 +47,12 @@ export function AccountStatementView({
 
   const handleExportPDF = async () => {
     try {
-      const [{ default: jsPDF }] = await Promise.all([
-        import('jspdf'),
-        import('jspdf-autotable')
-      ]);
+      const [{ default: jsPDF }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
 
       const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
       });
 
       // تحميل الخط العربي من الملف المحلي
@@ -55,29 +67,42 @@ export function AccountStatementView({
       doc.setFont(fontName, 'normal');
       doc.setFontSize(11);
       doc.setTextColor(0, 0, 0);
-      doc.text(processArabicText(`اسم المستفيد: ${beneficiaryName}`), pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`اسم المستفيد: ${beneficiaryName}`), pageWidth - 20, yPos, {
+        align: 'right',
+      });
       yPos += 7;
-      doc.text(processArabicText(`رقم المستفيد: ${beneficiaryId}`), pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`رقم المستفيد: ${beneficiaryId}`), pageWidth - 20, yPos, {
+        align: 'right',
+      });
       yPos += 7;
-      doc.text(processArabicText(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`), pageWidth - 20, yPos, { align: 'right' });
+      doc.text(
+        processArabicText(`إجمالي المدفوعات: ${totalAmount.toLocaleString()} ر.س`),
+        pageWidth - 20,
+        yPos,
+        { align: 'right' }
+      );
       yPos += 7;
-      doc.text(processArabicText(`عدد المدفوعات: ${payments.length}`), pageWidth - 20, yPos, { align: 'right' });
+      doc.text(processArabicText(`عدد المدفوعات: ${payments.length}`), pageWidth - 20, yPos, {
+        align: 'right',
+      });
       yPos += 10;
 
       // الجدول
-      const tableData = processArabicTableData(payments.map((payment) => [
-        format(new Date(payment.date), "dd/MM/yyyy", { locale: ar }),
-        payment.type,
-        payment.description,
-        `${payment.amount.toLocaleString()} ر.س`,
-        payment.status,
-      ]));
+      const tableData = processArabicTableData(
+        payments.map((payment) => [
+          format(new Date(payment.date), 'dd/MM/yyyy', { locale: ar }),
+          payment.type,
+          payment.description,
+          `${payment.amount.toLocaleString()} ر.س`,
+          payment.status,
+        ])
+      );
 
       const tableStyles = getDefaultTableStyles(fontName);
 
       (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         startY: yPos,
-        head: [processArabicTableData([["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]])[0]],
+        head: [processArabicTableData([['التاريخ', 'النوع', 'الوصف', 'المبلغ', 'الحالة']])[0]],
         body: tableData,
         ...tableStyles,
         headStyles: {
@@ -90,11 +115,11 @@ export function AccountStatementView({
         },
       });
 
-      doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
-      toast.success("تم تصدير كشف الحساب بنجاح");
+      doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+      toast.success('تم تصدير كشف الحساب بنجاح');
     } catch (error) {
-      toast.error("فشل تصدير كشف الحساب");
-      productionLogger.error("PDF export error", error);
+      toast.error('فشل تصدير كشف الحساب');
+      productionLogger.error('PDF export error', error);
     }
   };
 
@@ -174,7 +199,7 @@ export function AccountStatementView({
                   payments.map((payment) => (
                     <TableRow key={payment.id}>
                       <TableCell>
-                        {format(new Date(payment.date), "dd/MM/yyyy", { locale: ar })}
+                        {format(new Date(payment.date), 'dd/MM/yyyy', { locale: ar })}
                       </TableCell>
                       <TableCell>{payment.type}</TableCell>
                       <TableCell className="max-w-[200px] truncate">
@@ -186,11 +211,11 @@ export function AccountStatementView({
                       <TableCell>
                         <Badge
                           variant={
-                            payment.status === "مكتمل"
-                              ? "default"
-                              : payment.status === "معلق"
-                              ? "secondary"
-                              : "destructive"
+                            payment.status === 'مكتمل'
+                              ? 'default'
+                              : payment.status === 'معلق'
+                                ? 'secondary'
+                                : 'destructive'
                           }
                         >
                           {payment.status}
@@ -207,11 +232,11 @@ export function AccountStatementView({
         {/* ملاحظة قانونية */}
         <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg">
           <p>
-            * هذا الكشف صادر عن منصة إدارة الوقف الإلكترونية ويعتبر وثيقة رسمية
-            لسجل المدفوعات والمستحقات.
+            * هذا الكشف صادر عن منصة إدارة الوقف الإلكترونية ويعتبر وثيقة رسمية لسجل المدفوعات
+            والمستحقات.
           </p>
           <p className="mt-1">
-            تاريخ الإصدار: {format(new Date(), "dd MMMM yyyy - HH:mm", { locale: ar })}
+            تاريخ الإصدار: {format(new Date(), 'dd MMMM yyyy - HH:mm', { locale: ar })}
           </p>
         </div>
       </CardContent>

@@ -31,38 +31,38 @@ export function generateSecurePassword(): string {
   const lowercase = 'abcdefghjkmnpqrstuvwxyz'; // بدون i, l, o
   const numbers = '23456789'; // بدون 0, 1
   const symbols = '!@#$%^&*_+-=';
-  
+
   // استخدام Crypto API للعشوائية الآمنة
   const getSecureRandom = (max: number): number => {
     const array = new Uint32Array(1);
     crypto.getRandomValues(array);
     return array[0] % max;
   };
-  
+
   // ضمان وجود حرف من كل نوع (4 أحرف)
   let password = '';
   password += uppercase[getSecureRandom(uppercase.length)];
   password += lowercase[getSecureRandom(lowercase.length)];
   password += numbers[getSecureRandom(numbers.length)];
   password += symbols[getSecureRandom(symbols.length)];
-  
+
   // إضافة طابع زمني مشفر لضمان التفرد (6 أحرف)
   const timestamp = Date.now().toString(36).slice(-6);
   password += timestamp;
-  
+
   // إكمال باقي الـ 10 أحرف عشوائية
   const allChars = uppercase + lowercase + numbers + symbols;
   for (let i = 0; i < 10; i++) {
     password += allChars[getSecureRandom(allChars.length)];
   }
-  
+
   // خلط الأحرف باستخدام Fisher-Yates shuffle مع crypto
   const chars = password.split('');
   for (let i = chars.length - 1; i > 0; i--) {
     const j = getSecureRandom(i + 1);
     [chars[i], chars[j]] = [chars[j], chars[i]];
   }
-  
+
   return chars.join('');
 }
 

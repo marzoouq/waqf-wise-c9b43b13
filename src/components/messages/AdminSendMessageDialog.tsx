@@ -1,27 +1,24 @@
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Send, Users } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { MessageService } from "@/services/message.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { Send, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { MessageService } from '@/services/message.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface AdminSendMessageDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function AdminSendMessageDialog({
-  open,
-  onOpenChange,
-}: AdminSendMessageDialogProps) {
+export function AdminSendMessageDialog({ open, onOpenChange }: AdminSendMessageDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const { beneficiaries } = useBeneficiaries();
@@ -29,17 +26,17 @@ export function AdminSendMessageDialog({
   const [isBroadcast, setIsBroadcast] = useState(false);
   const [selectedBeneficiaries, setSelectedBeneficiaries] = useState<string[]>([]);
   const [message, setMessage] = useState({
-    subject: "",
-    body: "",
+    subject: '',
+    body: '',
   });
 
   // فلترة المستفيدين الذين لديهم صلاحية تسجيل الدخول
-  const beneficiariesWithAccounts = beneficiaries.filter(b => b.can_login);
+  const beneficiariesWithAccounts = beneficiaries.filter((b) => b.can_login);
 
   const handleToggleBeneficiary = (beneficiaryId: string) => {
-    setSelectedBeneficiaries(prev =>
+    setSelectedBeneficiaries((prev) =>
       prev.includes(beneficiaryId)
-        ? prev.filter(id => id !== beneficiaryId)
+        ? prev.filter((id) => id !== beneficiaryId)
         : [...prev, beneficiaryId]
     );
   };
@@ -48,29 +45,29 @@ export function AdminSendMessageDialog({
     if (selectedBeneficiaries.length === beneficiariesWithAccounts.length) {
       setSelectedBeneficiaries([]);
     } else {
-      setSelectedBeneficiaries(beneficiariesWithAccounts.map(b => b.id));
+      setSelectedBeneficiaries(beneficiariesWithAccounts.map((b) => b.id));
     }
   };
 
   const handleSendMessage = async () => {
     if (!message.subject || !message.body) {
       toast({
-        title: "خطأ",
-        description: "الرجاء ملء جميع الحقول",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'الرجاء ملء جميع الحقول',
+        variant: 'destructive',
       });
       return;
     }
 
     const recipientBeneficiaries = isBroadcast
       ? beneficiariesWithAccounts
-      : beneficiariesWithAccounts.filter(b => selectedBeneficiaries.includes(b.id));
+      : beneficiariesWithAccounts.filter((b) => selectedBeneficiaries.includes(b.id));
 
     if (recipientBeneficiaries.length === 0) {
       toast({
-        title: "خطأ",
-        description: "الرجاء اختيار مستفيد واحد على الأقل",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'الرجاء اختيار مستفيد واحد على الأقل',
+        variant: 'destructive',
       });
       return;
     }
@@ -79,20 +76,21 @@ export function AdminSendMessageDialog({
 
     try {
       // فلترة المستفيدين الذين لديهم user_id فقط
-      const recipientsWithAccounts = recipientBeneficiaries.filter(b => b.user_id);
-      
+      const recipientsWithAccounts = recipientBeneficiaries.filter((b) => b.user_id);
+
       if (recipientsWithAccounts.length === 0) {
         toast({
-          title: "تنبيه",
-          description: "المستفيدون المحددون لم يتم تفعيل حساباتهم بعد. يرجى تفعيل تسجيل الدخول لهم أولاً من صفحة المستفيدين.",
-          variant: "destructive",
+          title: 'تنبيه',
+          description:
+            'المستفيدون المحددون لم يتم تفعيل حساباتهم بعد. يرجى تفعيل تسجيل الدخول لهم أولاً من صفحة المستفيدين.',
+          variant: 'destructive',
         });
         setIsLoading(false);
         return;
       }
 
-      const messages = recipientsWithAccounts.map(b => ({
-        sender_id: user?.id || "",
+      const messages = recipientsWithAccounts.map((b) => ({
+        sender_id: user?.id || '',
         receiver_id: b.user_id!,
         subject: message.subject,
         body: message.body,
@@ -101,23 +99,24 @@ export function AdminSendMessageDialog({
       await MessageService.sendBulkMessages(messages);
 
       const skippedCount = recipientBeneficiaries.length - recipientsWithAccounts.length;
-      
+
       toast({
-        title: "تم الإرسال بنجاح",
-        description: skippedCount > 0 
-          ? `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد. تم تجاهل ${skippedCount} مستفيد لعدم تفعيل حساباتهم.`
-          : `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد`,
+        title: 'تم الإرسال بنجاح',
+        description:
+          skippedCount > 0
+            ? `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد. تم تجاهل ${skippedCount} مستفيد لعدم تفعيل حساباتهم.`
+            : `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد`,
       });
 
-      setMessage({ subject: "", body: "" });
+      setMessage({ subject: '', body: '' });
       setSelectedBeneficiaries([]);
       setIsBroadcast(false);
       onOpenChange(false);
     } catch {
       toast({
-        title: "خطأ في الإرسال",
-        description: "حدث خطأ أثناء إرسال الرسائل",
-        variant: "destructive",
+        title: 'خطأ في الإرسال',
+        description: 'حدث خطأ أثناء إرسال الرسائل',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -163,14 +162,10 @@ export function AdminSendMessageDialog({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">اختيار المستفيدين</label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSelectAll}
-              >
+              <Button variant="ghost" size="sm" onClick={handleSelectAll}>
                 {selectedBeneficiaries.length === beneficiariesWithAccounts.length
-                  ? "إلغاء الكل"
-                  : "اختيار الكل"}
+                  ? 'إلغاء الكل'
+                  : 'اختيار الكل'}
               </Button>
             </div>
             <ScrollArea className="h-[200px] border rounded-lg p-2">
@@ -185,10 +180,7 @@ export function AdminSendMessageDialog({
                       checked={selectedBeneficiaries.includes(beneficiary.id)}
                       onCheckedChange={() => handleToggleBeneficiary(beneficiary.id)}
                     />
-                    <label
-                      htmlFor={beneficiary.id}
-                      className="text-sm cursor-pointer flex-1"
-                    >
+                    <label htmlFor={beneficiary.id} className="text-sm cursor-pointer flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{beneficiary.full_name}</span>
                         {!beneficiary.user_id && (
@@ -235,13 +227,9 @@ export function AdminSendMessageDialog({
         </div>
 
         {/* زر الإرسال */}
-        <Button
-          onClick={handleSendMessage}
-          className="w-full"
-          disabled={isLoading}
-        >
+        <Button onClick={handleSendMessage} className="w-full" disabled={isLoading}>
           <Send className="h-4 w-4 ms-2" />
-          {isLoading ? "جاري الإرسال..." : "إرسال الرسالة"}
+          {isLoading ? 'جاري الإرسال...' : 'إرسال الرسالة'}
         </Button>
       </div>
     </ResponsiveDialog>

@@ -2,13 +2,13 @@
  * useDistributionApprovals Hook - موافقات التوزيعات
  * يستخدم FundService + RealtimeService
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useEffect } from "react";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { FundService, RealtimeService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { matchesStatus } from "@/lib/constants";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useEffect } from 'react';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { FundService, RealtimeService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface DistributionApproval {
   id: string;
@@ -28,14 +28,13 @@ export function useDistributionApprovals(distributionId?: string) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      'distribution_approvals',
-      () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
-      }
-    );
-    return () => { subscription.unsubscribe(); };
+    const subscription = RealtimeService.subscribeToTable('distribution_approvals', () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   const { data: approvals = [], isLoading } = useQuery({
@@ -45,30 +44,38 @@ export function useDistributionApprovals(distributionId?: string) {
   });
 
   const addApproval = useMutation({
-    mutationFn: (approval: Omit<DistributionApproval, "id" | "created_at" | "updated_at">) => 
+    mutationFn: (approval: Omit<DistributionApproval, 'id' | 'created_at' | 'updated_at'>) =>
       FundService.addDistributionApproval(approval),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
-      toast({ title: "تمت الموافقة بنجاح", description: "تم تسجيل الموافقة على التوزيع" });
+      toast({ title: 'تمت الموافقة بنجاح', description: 'تم تسجيل الموافقة على التوزيع' });
     },
-    onError: createMutationErrorHandler({ context: 'approve_distribution', toastTitle: 'خطأ في الموافقة' }),
+    onError: createMutationErrorHandler({
+      context: 'approve_distribution',
+      toastTitle: 'خطأ في الموافقة',
+    }),
   });
 
   const updateApproval = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<DistributionApproval> }) => 
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<DistributionApproval> }) =>
       FundService.updateDistributionApproval(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
-      toast({ title: "تم التحديث بنجاح", description: "تم تحديث حالة الموافقة" });
+      toast({ title: 'تم التحديث بنجاح', description: 'تم تحديث حالة الموافقة' });
     },
-    onError: createMutationErrorHandler({ context: 'update_distribution_approval', toastTitle: 'خطأ في التحديث' }),
+    onError: createMutationErrorHandler({
+      context: 'update_distribution_approval',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
-  const checkAllApproved = () => approvals.length === 3 && approvals.every(a => matchesStatus(a.status, 'موافق'));
-  const hasRejection = () => approvals.some(a => matchesStatus(a.status, 'مرفوض'));
-  const getCurrentLevel = () => approvals.filter(a => matchesStatus(a.status, 'موافق')).length + 1;
+  const checkAllApproved = () =>
+    approvals.length === 3 && approvals.every((a) => matchesStatus(a.status, 'موافق'));
+  const hasRejection = () => approvals.some((a) => matchesStatus(a.status, 'مرفوض'));
+  const getCurrentLevel = () =>
+    approvals.filter((a) => matchesStatus(a.status, 'موافق')).length + 1;
 
   return {
     approvals,

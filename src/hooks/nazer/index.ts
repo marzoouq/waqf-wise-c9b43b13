@@ -3,16 +3,13 @@
  * @version 2.8.44 - إضافة تصديرات مفقودة
  */
 
-export { 
-  useBeneficiaryActivitySessions, 
+export {
+  useBeneficiaryActivitySessions,
   getPageName,
-  type BeneficiarySession 
+  type BeneficiarySession,
 } from './useBeneficiaryActivitySessions';
 
-export { 
-  useDistributeRevenue,
-  type HeirShare 
-} from './useDistributeRevenue';
+export { useDistributeRevenue, type HeirShare } from './useDistributeRevenue';
 
 export { usePublishFiscalYear } from './usePublishFiscalYear';
 

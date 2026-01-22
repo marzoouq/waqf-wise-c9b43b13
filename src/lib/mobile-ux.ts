@@ -7,25 +7,25 @@
 export const TOUCH_CONSTANTS = {
   // Minimum touch target sizes (WCAG 2.5.5)
   targets: {
-    minimum: 44,      // الحد الأدنى المطلوب
-    comfortable: 48,  // الحجم المريح
-    large: 56,        // للأزرار الرئيسية
+    minimum: 44, // الحد الأدنى المطلوب
+    comfortable: 48, // الحجم المريح
+    large: 56, // للأزرار الرئيسية
   },
-  
+
   // Touch timing
   timing: {
-    tapDelay: 0,           // لا تأخير للنقرات
-    longPressDelay: 500,   // وقت الضغط الطويل
-    doubleTapDelay: 300,   // وقت بين النقرتين
+    tapDelay: 0, // لا تأخير للنقرات
+    longPressDelay: 500, // وقت الضغط الطويل
+    doubleTapDelay: 300, // وقت بين النقرتين
   },
-  
+
   // Swipe thresholds
   swipe: {
-    threshold: 50,         // المسافة الدنيا للسحب
-    velocity: 0.3,         // السرعة الدنيا
-    maxTime: 300,          // الوقت الأقصى للسحب
+    threshold: 50, // المسافة الدنيا للسحب
+    velocity: 0.3, // السرعة الدنيا
+    maxTime: 300, // الوقت الأقصى للسحب
   },
-  
+
   // Scroll behavior
   scroll: {
     momentum: true,
@@ -35,7 +35,14 @@ export const TOUCH_CONSTANTS = {
 } as const;
 
 // ==================== Haptic Feedback ====================
-export type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection';
+export type HapticType =
+  | 'light'
+  | 'medium'
+  | 'heavy'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'selection';
 
 /**
  * تشغيل Haptic Feedback إذا كان مدعوماً
@@ -43,7 +50,7 @@ export type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 
 export function hapticFeedback(type: HapticType = 'light'): void {
   // التحقق من دعم Vibration API
   if (!('vibrate' in navigator)) return;
-  
+
   const patterns: Record<HapticType, number | number[]> = {
     light: 10,
     medium: 20,
@@ -53,7 +60,7 @@ export function hapticFeedback(type: HapticType = 'light'): void {
     error: [30, 50, 30, 50, 30],
     selection: 5,
   };
-  
+
   try {
     navigator.vibrate(patterns[type]);
   } catch {
@@ -104,9 +111,9 @@ export function getSafeAreaInsets(): { top: number; bottom: number; left: number
   if (typeof window === 'undefined') {
     return { top: 0, bottom: 0, left: 0, right: 0 };
   }
-  
+
   const computedStyle = getComputedStyle(document.documentElement);
-  
+
   return {
     top: parseInt(computedStyle.getPropertyValue('--sat') || '0', 10),
     bottom: parseInt(computedStyle.getPropertyValue('--sab') || '0', 10),
@@ -120,7 +127,7 @@ export function getSafeAreaInsets(): { top: number; bottom: number; left: number
  */
 export function isEdgeToEdge(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   const insets = getSafeAreaInsets();
   return insets.top > 0 || insets.bottom > 0;
 }
@@ -161,23 +168,23 @@ export function createSwipeState(touch: Touch): SwipeState {
 export function updateSwipeState(state: SwipeState, touch: Touch): SwipeState {
   const now = Date.now();
   const timeDelta = now - state.timestamp;
-  
+
   const deltaX = touch.clientX - state.startX;
   const deltaY = touch.clientY - state.startY;
-  
+
   const absDeltaX = Math.abs(deltaX);
   const absDeltaY = Math.abs(deltaY);
-  
+
   let direction: SwipeState['direction'] = null;
   if (absDeltaX > absDeltaY) {
     direction = deltaX > 0 ? 'right' : 'left';
   } else if (absDeltaY > absDeltaX) {
     direction = deltaY > 0 ? 'down' : 'up';
   }
-  
+
   const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
   const velocity = timeDelta > 0 ? distance / timeDelta : 0;
-  
+
   return {
     ...state,
     currentX: touch.clientX,
@@ -193,14 +200,17 @@ export function updateSwipeState(state: SwipeState, touch: Touch): SwipeState {
 /**
  * التحقق من اكتمال السحب
  */
-export function isSwipeComplete(state: SwipeState, direction: 'horizontal' | 'vertical' = 'horizontal'): boolean {
+export function isSwipeComplete(
+  state: SwipeState,
+  direction: 'horizontal' | 'vertical' = 'horizontal'
+): boolean {
   const { deltaX, deltaY, velocity } = state;
   const { threshold, velocity: minVelocity } = TOUCH_CONSTANTS.swipe;
-  
+
   if (direction === 'horizontal') {
     return Math.abs(deltaX) >= threshold || velocity >= minVelocity;
   }
-  
+
   return Math.abs(deltaY) >= threshold || velocity >= minVelocity;
 }
 
@@ -243,17 +253,17 @@ export const MOBILE_UX_CLASSES = {
   touchTarget: 'min-h-[44px] min-w-[44px]',
   touchTargetComfortable: 'min-h-[48px] min-w-[48px]',
   touchTargetLarge: 'min-h-[56px] min-w-[56px]',
-  
+
   // Touch behavior
   touchManipulation: 'touch-manipulation',
   touchNone: 'touch-none',
   touchPanX: 'touch-pan-x',
   touchPanY: 'touch-pan-y',
-  
+
   // Selection prevention
   noSelect: 'select-none',
   noCallout: '[-webkit-touch-callout:none]',
-  
+
   // Safe areas
   safeAreaTop: 'pt-[env(safe-area-inset-top)]',
   safeAreaBottom: 'pb-[env(safe-area-inset-bottom)]',
@@ -261,17 +271,17 @@ export const MOBILE_UX_CLASSES = {
   safeAreaRight: 'pr-[env(safe-area-inset-right)]',
   safeAreaX: 'px-[env(safe-area-inset-left)] px-[env(safe-area-inset-right)]',
   safeAreaY: 'py-[env(safe-area-inset-top)] py-[env(safe-area-inset-bottom)]',
-  
+
   // Active states
   activeScale: 'active:scale-[0.97] transition-transform duration-100',
   activeOpacity: 'active:opacity-80 transition-opacity duration-100',
-  
+
   // Scroll behavior
   scrollSmooth: 'scroll-smooth',
   scrollSnap: 'snap-x snap-mandatory',
   scrollSnapItem: 'snap-center',
   overscrollContain: 'overscroll-contain',
-  
+
   // Momentum scrolling (iOS)
   momentumScroll: '[-webkit-overflow-scrolling:touch]',
 } as const;

@@ -3,15 +3,15 @@
  * حوار تعديل أدوار المستخدم
  */
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { ROLE_LABELS, ROLE_COLORS, SYSTEM_ROLES, type AppRole } from "@/types/roles";
-import type { UserProfile } from "@/hooks/users/useUsersManagement";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { ROLE_LABELS, ROLE_COLORS, SYSTEM_ROLES, type AppRole } from '@/types/roles';
+import type { UserProfile } from '@/hooks/users/useUsersManagement';
 
-const EDITABLE_ROLES: AppRole[] = SYSTEM_ROLES.filter(r => r !== 'waqf_heir') as AppRole[];
+const EDITABLE_ROLES: AppRole[] = SYSTEM_ROLES.filter((r) => r !== 'waqf_heir') as AppRole[];
 
 interface EditRolesDialogProps {
   open: boolean;
@@ -33,8 +33,8 @@ export function EditRolesDialog({
   isSaving,
 }: EditRolesDialogProps) {
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="تعديل الأدوار"
       description={`تحديد أدوار المستخدم: ${user?.full_name}`}
@@ -52,7 +52,9 @@ export function EditRolesDialog({
                 checked={selectedRoles.includes(role)}
                 onCheckedChange={() => onToggleRole(role)}
               />
-              <Label className="cursor-pointer">{ROLE_LABELS[role as keyof typeof ROLE_LABELS]}</Label>
+              <Label className="cursor-pointer">
+                {ROLE_LABELS[role as keyof typeof ROLE_LABELS]}
+              </Label>
             </div>
             <Badge variant="outline" className={ROLE_COLORS[role]}>
               {role}
@@ -69,7 +71,7 @@ export function EditRolesDialog({
           onClick={onSave}
           disabled={selectedRoles.length === 0 || !user?.user_id || isSaving}
         >
-          {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+          {isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
         </Button>
       </div>
     </ResponsiveDialog>

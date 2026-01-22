@@ -1,4 +1,9 @@
-import { test, expect, fullPageOptions, waitForPageStability } from '../fixtures/visual-test.fixture';
+import {
+  test,
+  expect,
+  fullPageOptions,
+  waitForPageStability,
+} from '../fixtures/visual-test.fixture';
 
 /**
  * Landing Page Visual Regression Tests
@@ -33,7 +38,10 @@ test.describe('Landing Page Visual Tests', () => {
 
   test('features section @visual', async ({ page }) => {
     // البحث عن قسم المميزات
-    const featuresSection = page.locator('section').filter({ hasText: /مميزات|خدمات|ميزات/ }).first();
+    const featuresSection = page
+      .locator('section')
+      .filter({ hasText: /مميزات|خدمات|ميزات/ })
+      .first();
     if (await featuresSection.isVisible()) {
       await featuresSection.scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
@@ -55,7 +63,10 @@ test.describe('Landing Page Visual Tests', () => {
   });
 
   test('CTA buttons @visual', async ({ page }) => {
-    const ctaButton = page.locator('a[href="/login"], button').filter({ hasText: /تسجيل|دخول|ابدأ/ }).first();
+    const ctaButton = page
+      .locator('a[href="/login"], button')
+      .filter({ hasText: /تسجيل|دخول|ابدأ/ })
+      .first();
     if (await ctaButton.isVisible()) {
       await expect(ctaButton).toHaveScreenshot('landing-cta-button.png', {
         animations: 'disabled',

@@ -34,17 +34,17 @@ export function useIntelligentSearch() {
   });
 
   const searchMutation = useMutation({
-    mutationFn: async ({ 
-      query, 
+    mutationFn: async ({
+      query,
       searchType = 'all',
-      limit = 20 
-    }: { 
-      query: string; 
+      limit = 20,
+    }: {
+      query: string;
       searchType?: SearchType;
       limit?: number;
     }): Promise<SearchResponse> => {
       const { data, error } = await supabase.functions.invoke('intelligent-search', {
-        body: { query, searchType, limit }
+        body: { query, searchType, limit },
       });
 
       if (error) throw error;
@@ -54,9 +54,9 @@ export function useIntelligentSearch() {
       // حفظ البحث في السجل المحلي
       const newSearches = [
         variables.query,
-        ...recentSearches.filter(s => s !== variables.query)
+        ...recentSearches.filter((s) => s !== variables.query),
       ].slice(0, 10);
-      
+
       setRecentSearches(newSearches);
       localStorage.setItem('recent_searches', JSON.stringify(newSearches));
     },

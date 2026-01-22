@@ -1,35 +1,41 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useCustomReports } from "@/hooks/reports/useCustomReports";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useCustomReports } from '@/hooks/reports/useCustomReports';
 
 export function ReportBuilder() {
   const { createTemplate } = useCustomReports();
-  const [reportName, setReportName] = useState("");
-  const [reportType, setReportType] = useState("custom");
+  const [reportName, setReportName] = useState('');
+  const [reportType, setReportType] = useState('custom');
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
 
   const availableColumns = [
-    { value: "full_name", label: "الاسم الكامل" },
-    { value: "national_id", label: "رقم الهوية" },
-    { value: "phone", label: "رقم الهاتف" },
-    { value: "category", label: "الفئة" },
-    { value: "status", label: "الحالة" },
-    { value: "total_received", label: "إجمالي المستحقات" },
-    { value: "created_at", label: "تاريخ التسجيل" },
+    { value: 'full_name', label: 'الاسم الكامل' },
+    { value: 'national_id', label: 'رقم الهوية' },
+    { value: 'phone', label: 'رقم الهاتف' },
+    { value: 'category', label: 'الفئة' },
+    { value: 'status', label: 'الحالة' },
+    { value: 'total_received', label: 'إجمالي المستحقات' },
+    { value: 'created_at', label: 'تاريخ التسجيل' },
   ];
 
   const reportTypes = [
-    { value: "beneficiaries", label: "المستفيدون" },
-    { value: "properties", label: "العقارات" },
-    { value: "distributions", label: "التوزيعات" },
-    { value: "loans", label: "القروض" },
-    { value: "accounting", label: "المحاسبة" },
-    { value: "custom", label: "مخصص" },
+    { value: 'beneficiaries', label: 'المستفيدون' },
+    { value: 'properties', label: 'العقارات' },
+    { value: 'distributions', label: 'التوزيعات' },
+    { value: 'loans', label: 'القروض' },
+    { value: 'accounting', label: 'المحاسبة' },
+    { value: 'custom', label: 'مخصص' },
   ];
 
   const handleSubmit = () => {
@@ -106,15 +112,16 @@ export function ReportBuilder() {
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => {
-            setReportName("");
-            setSelectedColumns([]);
-          }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setReportName('');
+              setSelectedColumns([]);
+            }}
+          >
             إعادة تعيين
           </Button>
-          <Button onClick={handleSubmit}>
-            إنشاء التقرير
-          </Button>
+          <Button onClick={handleSubmit}>إنشاء التقرير</Button>
         </div>
       </CardContent>
     </Card>

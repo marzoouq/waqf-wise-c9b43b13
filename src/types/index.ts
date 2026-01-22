@@ -1,7 +1,7 @@
 /**
  * ملف تصدير مركزي لجميع الأنواع
  * Central export file for all types
- * 
+ *
  * ملاحظة: بعض الأنواع تُعرّف في hooks لأنها مرتبطة بالـ query
  * - Property: من src/hooks/useProperties.ts
  * - Contract: من src/types/contracts.ts
@@ -47,11 +47,7 @@ export type {
   JournalApproval,
   JournalEntryWithLines,
 } from './approvals';
-export {
-  calculateProgress,
-  getNextPendingApproval,
-  areAllApprovalsCompleted,
-} from './approvals';
+export { calculateProgress, getNextPendingApproval, areAllApprovalsCompleted } from './approvals';
 export * from './beneficiary';
 export * from './loans';
 export * from './admin';
@@ -63,11 +59,11 @@ export * from './reports/index';
 
 export interface Payment {
   id: string;
-  payment_type: "receipt" | "payment";
+  payment_type: 'receipt' | 'payment';
   payment_number: string;
   payment_date: string;
   amount: number;
-  payment_method: "cash" | "bank_transfer" | "cheque" | "card";
+  payment_method: 'cash' | 'bank_transfer' | 'cheque' | 'card';
   payer_name: string;
   reference_number?: string;
   description: string;
@@ -89,7 +85,7 @@ export interface Invoice {
   subtotal: number;
   tax_amount: number;
   total_amount: number;
-  status: "draft" | "sent" | "paid" | "cancelled";
+  status: 'draft' | 'sent' | 'paid' | 'cancelled';
   notes?: string;
   journal_entry_id?: string;
   created_at: string;

@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle } from "lucide-react";
-import { JournalApproval } from "@/types/approvals";
-import { useApproveJournal } from "@/hooks/accounting";
+import { useState } from 'react';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { JournalApproval } from '@/types/approvals';
+import { useApproveJournal } from '@/hooks/accounting';
 
 interface ApproveJournalDialogProps {
   open: boolean;
@@ -14,18 +14,18 @@ interface ApproveJournalDialogProps {
 }
 
 export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJournalDialogProps) {
-  const [notes, setNotes] = useState("");
-  
+  const [notes, setNotes] = useState('');
+
   const { isSubmitting, handleApprove, handleReject } = useApproveJournal(() => {
     onOpenChange(false);
-    setNotes("");
+    setNotes('');
   });
 
   if (!approval) return null;
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="موافقة على القيد المحاسبي"
       description={`قيد رقم: ${approval.journal_entry?.entry_number || 'غير محدد'}`}
@@ -59,11 +59,7 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isSubmitting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             إلغاء
           </Button>
           <Button
@@ -74,12 +70,9 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
             <XCircle className="h-4 w-4 me-2" />
             رفض
           </Button>
-          <Button
-            onClick={() => handleApprove(approval, notes)}
-            disabled={isSubmitting}
-          >
+          <Button onClick={() => handleApprove(approval, notes)} disabled={isSubmitting}>
             <CheckCircle className="h-4 w-4 me-2" />
-            {isSubmitting ? "جاري المعالجة..." : "موافقة"}
+            {isSubmitting ? 'جاري المعالجة...' : 'موافقة'}
           </Button>
         </DialogFooter>
       </div>

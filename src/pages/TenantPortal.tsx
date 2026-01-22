@@ -4,36 +4,53 @@
  * @version 1.3.0
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Building2, Phone, Wrench, Bell, LogOut, Plus, Star, Clock, CheckCircle2, FileText, AlertCircle } from "lucide-react";
-import { useTenantAuth, useTenantProfile, useTenantMaintenanceRequests, useTenantNotifications } from "@/hooks/tenant-portal/useTenantPortal";
-import { CreateMaintenanceRequestDialog } from "@/components/tenant-portal/CreateMaintenanceRequestDialog";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Building2,
+  Phone,
+  Wrench,
+  Bell,
+  LogOut,
+  Plus,
+  Star,
+  Clock,
+  CheckCircle2,
+  FileText,
+  AlertCircle,
+} from 'lucide-react';
+import {
+  useTenantAuth,
+  useTenantProfile,
+  useTenantMaintenanceRequests,
+  useTenantNotifications,
+} from '@/hooks/tenant-portal/useTenantPortal';
+import { CreateMaintenanceRequestDialog } from '@/components/tenant-portal/CreateMaintenanceRequestDialog';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
 
 // مكون تسجيل الدخول
 function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> }) {
-  const [phone, setPhone] = useState("");
-  const [contractNumber, setContractNumber] = useState("");
-  const [step, setStep] = useState<"phone" | "contract">("phone");
+  const [phone, setPhone] = useState('');
+  const [contractNumber, setContractNumber] = useState('');
+  const [step, setStep] = useState<'phone' | 'contract'>('phone');
   const { sendOtp, isSendingOtp, verifyOtp, isVerifyingOtp, tenantName } = authHook;
 
   const handleSendOtp = () => {
     sendOtp(phone, {
       onSuccess: (data) => {
         if (data?.success) {
-          setStep("contract");
+          setStep('contract');
         }
-      }
+      },
     });
   };
 
@@ -52,7 +69,7 @@ function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> 
           <CardDescription>تسجيل الدخول لإدارة طلبات الصيانة</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {step === "phone" ? (
+          {step === 'phone' ? (
             <>
               <div className="space-y-2">
                 <Label htmlFor="phone">رقم الهاتف</Label>
@@ -69,8 +86,12 @@ function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> 
                   />
                 </div>
               </div>
-              <Button onClick={handleSendOtp} disabled={!phone || phone.length < 9 || isSendingOtp} className="w-full">
-                {isSendingOtp ? "جاري التحقق..." : "متابعة"}
+              <Button
+                onClick={handleSendOtp}
+                disabled={!phone || phone.length < 9 || isSendingOtp}
+                className="w-full"
+              >
+                {isSendingOtp ? 'جاري التحقق...' : 'متابعة'}
               </Button>
             </>
           ) : (
@@ -96,10 +117,14 @@ function TenantLogin({ authHook }: { authHook: ReturnType<typeof useTenantAuth> 
                   رقم العقد موجود في عقد الإيجار الخاص بك
                 </p>
               </div>
-              <Button onClick={handleVerifyContract} disabled={!contractNumber || isVerifyingOtp} className="w-full">
-                {isVerifyingOtp ? "جاري التحقق..." : "تسجيل الدخول"}
+              <Button
+                onClick={handleVerifyContract}
+                disabled={!contractNumber || isVerifyingOtp}
+                className="w-full"
+              >
+                {isVerifyingOtp ? 'جاري التحقق...' : 'تسجيل الدخول'}
               </Button>
-              <Button variant="ghost" onClick={() => setStep("phone")} className="w-full">
+              <Button variant="ghost" onClick={() => setStep('phone')} className="w-full">
                 تغيير رقم الهاتف
               </Button>
             </>
@@ -118,7 +143,12 @@ interface TenantDashboardProps {
   notificationsHook: ReturnType<typeof useTenantNotifications>;
 }
 
-function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsHook }: TenantDashboardProps) {
+function TenantDashboard({
+  authHook,
+  profileQuery,
+  requestsQuery,
+  notificationsHook,
+}: TenantDashboardProps) {
   const { tenant, logout } = authHook;
   const { data: profileData } = profileQuery;
   const { data: requestsData, isLoading: loadingRequests } = requestsQuery;
@@ -130,22 +160,26 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
   const contracts = profileData?.contracts || [];
 
   // الحالات المعلقة: جديد، معلق، قيد المراجعة
-  const pendingCount = requests.filter((r) => ["جديد", "معلق", "قيد المراجعة"].includes(r.status)).length;
+  const pendingCount = requests.filter((r) =>
+    ['جديد', 'معلق', 'قيد المراجعة'].includes(r.status)
+  ).length;
   // الحالات قيد التنفيذ: معتمد، قيد التنفيذ
-  const inProgressCount = requests.filter((r) => ["معتمد", "قيد التنفيذ"].includes(r.status)).length;
-  const completedCount = requests.filter((r) => r.status === "مكتمل").length;
+  const inProgressCount = requests.filter((r) =>
+    ['معتمد', 'قيد التنفيذ'].includes(r.status)
+  ).length;
+  const completedCount = requests.filter((r) => r.status === 'مكتمل').length;
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      "جديد": "bg-yellow-100 text-yellow-800",
-      "معلق": "bg-yellow-100 text-yellow-800",
-      "قيد المراجعة": "bg-orange-100 text-orange-800",
-      "معتمد": "bg-blue-100 text-blue-800",
-      "قيد التنفيذ": "bg-blue-100 text-blue-800",
-      "مكتمل": "bg-green-100 text-green-800",
-      "ملغي": "bg-red-100 text-red-800",
+      جديد: 'bg-yellow-100 text-yellow-800',
+      معلق: 'bg-yellow-100 text-yellow-800',
+      'قيد المراجعة': 'bg-orange-100 text-orange-800',
+      معتمد: 'bg-blue-100 text-blue-800',
+      'قيد التنفيذ': 'bg-blue-100 text-blue-800',
+      مكتمل: 'bg-green-100 text-green-800',
+      ملغي: 'bg-red-100 text-red-800',
     };
-    return <Badge className={styles[status] || "bg-gray-100 text-gray-800"}>{status}</Badge>;
+    return <Badge className={styles[status] || 'bg-gray-100 text-gray-800'}>{status}</Badge>;
   };
 
   return (
@@ -176,15 +210,13 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
                 </div>
                 <ScrollArea className="h-[300px]">
                   {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-muted-foreground">
-                      لا توجد إشعارات
-                    </div>
+                    <div className="p-4 text-center text-muted-foreground">لا توجد إشعارات</div>
                   ) : (
                     <div className="divide-y">
                       {notifications.slice(0, 10).map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-3 cursor-pointer hover:bg-muted/50 transition-colors ${!notification.is_read ? "bg-primary/5" : ""}`}
+                          className={`p-3 cursor-pointer hover:bg-muted/50 transition-colors ${!notification.is_read ? 'bg-primary/5' : ''}`}
                           onClick={() => {
                             if (!notification.is_read) {
                               markAsRead(notification.id);
@@ -192,16 +224,22 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
                           }}
                         >
                           <div className="flex items-start gap-2">
-                            <AlertCircle className={`h-4 w-4 mt-0.5 ${!notification.is_read ? "text-primary" : "text-muted-foreground"}`} />
+                            <AlertCircle
+                              className={`h-4 w-4 mt-0.5 ${!notification.is_read ? 'text-primary' : 'text-muted-foreground'}`}
+                            />
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium ${!notification.is_read ? "text-foreground" : "text-muted-foreground"}`}>
+                              <p
+                                className={`text-sm font-medium ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}
+                              >
                                 {notification.title}
                               </p>
                               <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                                 {notification.message}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
-                                {format(new Date(notification.created_at), "dd MMM yyyy HH:mm", { locale: ar })}
+                                {format(new Date(notification.created_at), 'dd MMM yyyy HH:mm', {
+                                  locale: ar,
+                                })}
                               </p>
                             </div>
                             {!notification.is_read && (
@@ -227,18 +265,15 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
         {/* Welcome */}
         <Card>
           <CardContent className="py-4">
-            <p className="text-lg">مرحباً، <strong>{tenant?.fullName}</strong></p>
+            <p className="text-lg">
+              مرحباً، <strong>{tenant?.fullName}</strong>
+            </p>
           </CardContent>
         </Card>
 
         {/* Stats */}
         <UnifiedStatsGrid columns={3}>
-          <UnifiedKPICard
-            title="معلق"
-            value={pendingCount}
-            icon={Clock}
-            variant="warning"
-          />
+          <UnifiedKPICard title="معلق" value={pendingCount} icon={Clock} variant="warning" />
           <UnifiedKPICard
             title="قيد التنفيذ"
             value={inProgressCount}
@@ -299,9 +334,11 @@ function TenantDashboard({ authHook, profileQuery, requestsQuery, notificationsH
                   )}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{request.category}</span>
-                    <span>{format(new Date(request.created_at), "dd MMM yyyy", { locale: ar })}</span>
+                    <span>
+                      {format(new Date(request.created_at), 'dd MMM yyyy', { locale: ar })}
+                    </span>
                   </div>
-                  {request.status === "مكتمل" && !request.rating && (
+                  {request.status === 'مكتمل' && !request.rating && (
                     <Button variant="outline" size="sm" className="w-full mt-2">
                       <Star className="h-4 w-4 ms-2" />
                       قيّم الخدمة
@@ -331,7 +368,7 @@ export default function TenantPortal() {
   }
 
   return (
-    <TenantDashboard 
+    <TenantDashboard
       authHook={authHook}
       profileQuery={profileQuery}
       requestsQuery={requestsQuery}

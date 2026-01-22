@@ -3,12 +3,12 @@
  * @version 2.8.67
  */
 
-import { InvoiceService, PaymentService, SettingsService, StorageService } from "@/services";
-import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
-import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
-import { useToast } from "@/hooks/ui/use-toast";
-import type { RentalPayment } from "@/hooks/property/useRentalPayments";
-import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
+import { InvoiceService, PaymentService, SettingsService, StorageService } from '@/services';
+import { generateInvoicePDF } from '@/lib/generateInvoicePDF';
+import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
+import { useToast } from '@/hooks/ui/use-toast';
+import type { RentalPayment } from '@/hooks/property/useRentalPayments';
+import type { OrganizationSettings } from '@/hooks/governance/useOrganizationSettings';
 
 export function usePaymentDocuments() {
   const { toast } = useToast();
@@ -16,9 +16,9 @@ export function usePaymentDocuments() {
   const viewInvoice = async (payment: RentalPayment) => {
     if (!payment.invoice_id) {
       toast({
-        title: "تنبيه",
-        description: "لم يتم إصدار فاتورة لهذه الدفعة بعد",
-        variant: "destructive"
+        title: 'تنبيه',
+        description: 'لم يتم إصدار فاتورة لهذه الدفعة بعد',
+        variant: 'destructive',
       });
       return;
     }
@@ -28,9 +28,9 @@ export function usePaymentDocuments() {
 
       if (!invoiceData) {
         toast({
-          title: "خطأ",
-          description: "فشل تحميل بيانات الفاتورة",
-          variant: "destructive"
+          title: 'خطأ',
+          description: 'فشل تحميل بيانات الفاتورة',
+          variant: 'destructive',
         });
         return;
       }
@@ -45,26 +45,30 @@ export function usePaymentDocuments() {
           'documents',
           `invoices/${new Date(invoiceData.invoice_date).getFullYear()}/${new Date(invoiceData.invoice_date).getMonth() + 1}/Invoice-${invoiceData.invoice_number}.pdf`
         );
-        
+
         window.open(publicUrl, '_blank');
       } else {
         // fallback: توليد PDF فوري
         const orgSettings = await SettingsService.getOrganizationSettings();
 
         if (orgSettings) {
-          await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
-          
+          await generateInvoicePDF(
+            invoiceData,
+            invoiceData.invoice_lines || [],
+            orgSettings as OrganizationSettings | null
+          );
+
           toast({
-            title: "تم التوليد",
-            description: "تم توليد الفاتورة وتحميلها",
+            title: 'تم التوليد',
+            description: 'تم توليد الفاتورة وتحميلها',
           });
         }
       }
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء عرض الفاتورة",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء عرض الفاتورة',
+        variant: 'destructive',
       });
     }
   };
@@ -72,9 +76,9 @@ export function usePaymentDocuments() {
   const viewReceipt = async (payment: RentalPayment) => {
     if (!payment.receipt_id) {
       toast({
-        title: "تنبيه",
-        description: "لم يتم إصدار سند قبض لهذه الدفعة بعد",
-        variant: "destructive"
+        title: 'تنبيه',
+        description: 'لم يتم إصدار سند قبض لهذه الدفعة بعد',
+        variant: 'destructive',
       });
       return;
     }
@@ -84,9 +88,9 @@ export function usePaymentDocuments() {
 
       if (!receiptData) {
         toast({
-          title: "خطأ",
-          description: "فشل تحميل بيانات سند القبض",
-          variant: "destructive"
+          title: 'خطأ',
+          description: 'فشل تحميل بيانات سند القبض',
+          variant: 'destructive',
         });
         return;
       }
@@ -101,7 +105,7 @@ export function usePaymentDocuments() {
           'documents',
           `receipts/${new Date(receiptData.payment_date).getFullYear()}/${new Date(receiptData.payment_date).getMonth() + 1}/Receipt-${receiptData.payment_number}.pdf`
         );
-        
+
         window.open(publicUrl, '_blank');
       } else {
         // fallback: توليد PDF فوري
@@ -109,18 +113,18 @@ export function usePaymentDocuments() {
 
         if (orgSettings) {
           await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);
-          
+
           toast({
-            title: "تم التوليد",
-            description: "تم توليد سند القبض وتحميله",
+            title: 'تم التوليد',
+            description: 'تم توليد سند القبض وتحميله',
           });
         }
       }
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء عرض سند القبض",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء عرض سند القبض',
+        variant: 'destructive',
       });
     }
   };

@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CreditCard, Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useTenants } from "@/hooks/property/useTenants";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, CreditCard, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { useTenants } from '@/hooks/property/useTenants';
+import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
 
 interface UpcomingPayment {
   id: string;
@@ -21,7 +21,13 @@ export const UpcomingPaymentsCard = () => {
   const navigate = useNavigate();
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل بيانات الدفعات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل بيانات الدفعات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (isLoading) {
@@ -34,9 +40,7 @@ export const UpcomingPaymentsCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            جاري التحميل...
-          </div>
+          <div className="text-center py-6 text-muted-foreground">جاري التحميل...</div>
         </CardContent>
       </Card>
     );
@@ -52,9 +56,7 @@ export const UpcomingPaymentsCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            لا توجد بيانات
-          </div>
+          <div className="text-center py-6 text-muted-foreground">لا توجد بيانات</div>
         </CardContent>
       </Card>
     );
@@ -70,11 +72,11 @@ export const UpcomingPaymentsCard = () => {
     })
     .map((tenant) => {
       const balance = tenant.current_balance;
-      
+
       // نفترض أن الدفعة مستحقة بناءً على الرصيد
       // إذا كان هناك رصيد فهو مستحق الآن
       const daysRemaining = balance > 0 ? 0 : 30;
-      
+
       return {
         id: tenant.id,
         tenantName: tenant.full_name || 'غير معروف',
@@ -90,27 +92,27 @@ export const UpcomingPaymentsCard = () => {
     })
     .slice(0, 6); // أول 6 دفعات
 
-  const overdueCount = upcomingPayments.filter(p => p.isOverdue).length;
+  const overdueCount = upcomingPayments.filter((p) => p.isOverdue).length;
 
   const getSeverityBadge = (payment: UpcomingPayment) => {
     if (payment.amount > 10000) {
-      return { 
-        variant: "destructive" as const, 
-        label: "مبلغ كبير",
-        color: "bg-destructive/10 text-destructive border-destructive/20" 
+      return {
+        variant: 'destructive' as const,
+        label: 'مبلغ كبير',
+        color: 'bg-destructive/10 text-destructive border-destructive/20',
       };
     }
     if (payment.amount > 5000) {
-      return { 
-        variant: "secondary" as const, 
-        label: "مستحق",
-        color: "bg-warning/10 text-warning border-warning/20" 
+      return {
+        variant: 'secondary' as const,
+        label: 'مستحق',
+        color: 'bg-warning/10 text-warning border-warning/20',
       };
     }
-    return { 
-      variant: "outline" as const, 
-      label: "مستحق",
-      color: "bg-info/10 text-info border-info/20" 
+    return {
+      variant: 'outline' as const,
+      label: 'مستحق',
+      color: 'bg-info/10 text-info border-info/20',
     };
   };
 
@@ -136,9 +138,7 @@ export const UpcomingPaymentsCard = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-success/10 mb-3">
               <CreditCard className="h-6 w-6 text-success" />
             </div>
-            <p className="text-sm text-muted-foreground">
-              لا توجد دفعات مستحقة حالياً
-            </p>
+            <p className="text-sm text-muted-foreground">لا توجد دفعات مستحقة حالياً</p>
           </div>
         </CardContent>
       </Card>
@@ -146,7 +146,7 @@ export const UpcomingPaymentsCard = () => {
   }
 
   return (
-    <Card className={overdueCount > 0 ? "border-warning" : ""}>
+    <Card className={overdueCount > 0 ? 'border-warning' : ''}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-base">
           <div className="flex items-center gap-2">
@@ -154,7 +154,10 @@ export const UpcomingPaymentsCard = () => {
             الدفعات المستحقة
           </div>
           {overdueCount > 0 && (
-            <Badge variant="secondary" className="gap-1 bg-warning/10 text-warning border-warning/20">
+            <Badge
+              variant="secondary"
+              className="gap-1 bg-warning/10 text-warning border-warning/20"
+            >
               <AlertTriangle className="h-3 w-3" />
               {overdueCount} مستحق
             </Badge>
@@ -167,19 +170,14 @@ export const UpcomingPaymentsCard = () => {
             const severity = getSeverityBadge(payment);
 
             return (
-              <div 
-                key={payment.id} 
+              <div
+                key={payment.id}
                 className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm truncate">
-                      {payment.tenantName}
-                    </span>
-                    <Badge 
-                      variant={severity.variant}
-                      className={`text-xs ${severity.color}`}
-                    >
+                    <span className="font-medium text-sm truncate">{payment.tenantName}</span>
+                    <Badge variant={severity.variant} className={`text-xs ${severity.color}`}>
                       {severity.label}
                     </Badge>
                   </div>
@@ -189,7 +187,7 @@ export const UpcomingPaymentsCard = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {payment.tenantPhone && (
                     <WhatsAppButton
@@ -214,11 +212,7 @@ export const UpcomingPaymentsCard = () => {
             );
           })}
 
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => navigate('/tenants')}
-          >
+          <Button variant="outline" className="w-full" onClick={() => navigate('/tenants')}>
             عرض جميع المستأجرين
           </Button>
         </div>

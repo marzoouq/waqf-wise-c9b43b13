@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserCheck, Shield, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { useUserStats } from "@/hooks/admin/useUserStats";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, UserCheck, Shield, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { useUserStats } from '@/hooks/admin/useUserStats';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function UserManagementSection() {
   const navigate = useNavigate();
@@ -32,7 +32,13 @@ export function UserManagementSection() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل إحصائيات المستخدمين" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل إحصائيات المستخدمين"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!stats) return null;
@@ -44,11 +50,7 @@ export function UserManagementSection() {
           <Users className="h-5 w-5" />
           إدارة المستخدمين
         </CardTitle>
-        <Button 
-          size="sm" 
-          variant="outline"
-          onClick={() => navigate('/users')}
-        >
+        <Button size="sm" variant="outline" onClick={() => navigate('/users')}>
           عرض الكل
         </Button>
       </CardHeader>
@@ -81,9 +83,7 @@ export function UserManagementSection() {
               className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
             >
               <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                  {user.email.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
+                <AvatarFallback>{user.email.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user.email}</p>

@@ -26,7 +26,7 @@ export interface AdminKPIsResponse {
  */
 export function parseAdminKPIsResponse(data: unknown): AdminKPIsResponse {
   const raw = data as Record<string, unknown>;
-  
+
   return {
     totalBeneficiaries: Number(raw?.totalBeneficiaries || 0),
     activeBeneficiaries: Number(raw?.activeBeneficiaries || 0),

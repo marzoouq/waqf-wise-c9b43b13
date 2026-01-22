@@ -9,6 +9,7 @@
 ### 🚀 المرحلة 31 - تحديثات القائمة الجانبية وصلاحيات الناظر
 
 #### ✨ الميزات الجديدة
+
 - إضافة قسم **"أدوات المطور"** في القائمة الجانبية مع 7 صفحات:
   - لوحة المطور (`/developer`)
   - لوحة الأمان (`/security`)
@@ -26,6 +27,7 @@
   - الإعدادات المتقدمة (`/advanced-settings`)
 
 #### 🔧 الإصلاحات
+
 - **تصحيح صلاحيات الناظر** في القائمة الجانبية:
   - إضافة دور `nazer` لقسم "إدارة النظام"
   - السماح للناظر بالوصول إلى `/developer` و `/edge-monitor`
@@ -33,12 +35,13 @@
 - تحديث أيقونة "مراقبة Edge" إلى `Zap`
 
 #### 📊 إحصائيات التحديث
-| البند | القيمة |
-|-------|--------|
-| صفحات جديدة في القائمة | 11 |
-| أيقونات جديدة | 12 |
-| إصلاحات صلاحيات | 3 |
-| مسارات مُصحَّحة | 2 |
+
+| البند                  | القيمة |
+| ---------------------- | ------ |
+| صفحات جديدة في القائمة | 11     |
+| أيقونات جديدة          | 12     |
+| إصلاحات صلاحيات        | 3      |
+| مسارات مُصحَّحة        | 2      |
 
 ---
 
@@ -47,6 +50,7 @@
 ### 🎉 المرحلة 30 - الإصدار الرئيسي
 
 #### ✅ التحديثات الرئيسية
+
 - ترقية الإصدار إلى 3.0.0 (المرحلة 30)
 - توحيد جميع الوثائق مع الإصدار الجديد
 - تحديث 30+ ملف توثيق
@@ -58,27 +62,30 @@
 ### 📚 تحديث التوثيق الشامل
 
 #### ✅ الوثائق المحذوفة (خطط قديمة)
-| الملف | السبب |
-|-------|-------|
-| `docs/IMPROVEMENT_PLAN_2025.md` | خطة تحسين بأرقام قديمة (v2.9.22) |
+
+| الملف                                     | السبب                              |
+| ----------------------------------------- | ---------------------------------- |
+| `docs/IMPROVEMENT_PLAN_2025.md`           | خطة تحسين بأرقام قديمة (v2.9.22)   |
 | `docs/COMPREHENSIVE_AUDIT_REPORT_2025.md` | تقرير تدقيق بأرقام قديمة (v2.9.22) |
 
 #### ✅ الوثائق المحدّثة (14 ملف)
-| الملف | من | إلى |
-|-------|-----|-----|
+
+| الملف            | من             | إلى    |
+| ---------------- | -------------- | ------ |
 | جميع ملفات docs/ | إصدارات متفرقة | 2.9.90 |
 
 #### 📊 الإحصائيات الصحيحة المحدّثة
-| المقياس | القيمة |
-|---------|--------|
-| Components | 600+ (44 مجلد) |
-| Hooks | 300+ (38 مجلد) |
-| Services | 60+ |
-| Edge Functions | 50 |
-| Database Tables | 231 |
-| RLS Policies | 675 |
-| Database Triggers | 200 |
-| Query Keys | 350+ (8 ملفات) |
+
+| المقياس           | القيمة         |
+| ----------------- | -------------- |
+| Components        | 600+ (44 مجلد) |
+| Hooks             | 300+ (38 مجلد) |
+| Services          | 60+            |
+| Edge Functions    | 50             |
+| Database Tables   | 231            |
+| RLS Policies      | 675            |
+| Database Triggers | 200            |
+| Query Keys        | 350+ (8 ملفات) |
 
 ---
 
@@ -87,55 +94,61 @@
 ### 🔐 إصلاح شامل لتعارضات RLS وتفعيل Audit Logging
 
 #### ✅ المرحلة 1: إصلاح `user_roles` (7 → 2 سياسات)
-| السياسة المحذوفة | السبب |
-|-----------------|-------|
-| `admins_delete_roles` | تستخدم `check_is_admin_direct` التي تمنح nazer صلاحيات |
-| `admins_insert_roles` | متعارضة مع `admin_manage_user_roles` |
-| `admins_update_roles` | مكررة |
-| `admins_view_all_roles` | مكررة |
-| `users_view_own_roles` | مكررة مع `users_read_own_role_secure` |
+
+| السياسة المحذوفة        | السبب                                                  |
+| ----------------------- | ------------------------------------------------------ |
+| `admins_delete_roles`   | تستخدم `check_is_admin_direct` التي تمنح nazer صلاحيات |
+| `admins_insert_roles`   | متعارضة مع `admin_manage_user_roles`                   |
+| `admins_update_roles`   | مكررة                                                  |
+| `admins_view_all_roles` | مكررة                                                  |
+| `users_view_own_roles`  | مكررة مع `users_read_own_role_secure`                  |
 
 **النتيجة:** `admin` فقط يدير الأدوار (وليس nazer)
 
 #### ✅ المرحلة 2: إصلاح `beneficiaries` (2 → 1 سياسة)
-| السياسة المحذوفة | البديل |
-|-----------------|--------|
+
+| السياسة المحذوفة            | البديل                                |
+| --------------------------- | ------------------------------------- |
 | `beneficiaries_self_access` | `beneficiaries_select_unified` (أشمل) |
 
 #### ✅ المرحلة 3: إصلاح `tenants` (6 → 3 سياسات)
-| السياسة المحذوفة | السبب |
-|-----------------|-------|
-| `staff_tenants` | ⚠️ كانت تمنح `archivist` صلاحية ALL |
-| `tenants_staff_manage` | كانت تمنح `cashier` صلاحية ALL |
-| `financial_staff_view_tenants` | مكررة |
-| `tenants_view` | مكررة |
+
+| السياسة المحذوفة               | السبب                               |
+| ------------------------------ | ----------------------------------- |
+| `staff_tenants`                | ⚠️ كانت تمنح `archivist` صلاحية ALL |
+| `tenants_staff_manage`         | كانت تمنح `cashier` صلاحية ALL      |
+| `financial_staff_view_tenants` | مكررة                               |
+| `tenants_view`                 | مكررة                               |
 
 **المُضاف:** `tenants_waqf_heir_view` - للشفافية للورثة
 
 #### ✅ المرحلة 4: تفعيل Audit Logging
-| الجدول | Trigger |
-|--------|---------|
+
+| الجدول          | Trigger                       |
+| --------------- | ----------------------------- |
 | `beneficiaries` | `audit_beneficiaries_changes` |
 | `bank_accounts` | `audit_bank_accounts_changes` |
-| `tenants` | `audit_tenants_changes` |
+| `tenants`       | `audit_tenants_changes`       |
 
 **الدالة:** `log_table_changes()` - SECURITY DEFINER
 
 #### ✅ المرحلة 5: توحيد Workflows
-| الملف | التغيير |
-|-------|---------|
-| `test.yml` | `codecov/codecov-action@v3` → `@v4` |
+
+| الملف        | التغيير                                                           |
+| ------------ | ----------------------------------------------------------------- |
+| `test.yml`   | `codecov/codecov-action@v3` → `@v4`                               |
 | `deploy.yml` | `8398a7/action-slack@v3` → `slackapi/slack-github-action@v1.25.0` |
 
 #### 📊 ملخص التحسينات
-| البند | قبل | بعد |
-|-------|-----|-----|
-| سياسات `user_roles` | 7 متعارضة | 2 واضحة |
-| سياسات `beneficiaries` SELECT | 2 متداخلة | 1 موحدة |
-| سياسات `tenants` | 6 متداخلة | 3 آمنة |
-| صلاحية `archivist` على tenants | ALL ⚠️ | لا شيء ✅ |
-| Audit Logging | ❌ معطل | ✅ مفعّل |
-| إصدارات Workflows | مختلطة | موحدة |
+
+| البند                          | قبل       | بعد       |
+| ------------------------------ | --------- | --------- |
+| سياسات `user_roles`            | 7 متعارضة | 2 واضحة   |
+| سياسات `beneficiaries` SELECT  | 2 متداخلة | 1 موحدة   |
+| سياسات `tenants`               | 6 متداخلة | 3 آمنة    |
+| صلاحية `archivist` على tenants | ALL ⚠️    | لا شيء ✅ |
+| Audit Logging                  | ❌ معطل   | ✅ مفعّل  |
+| إصدارات Workflows              | مختلطة    | موحدة     |
 
 ---
 
@@ -144,21 +157,24 @@
 ### 🚀 إصدار الإنتاج النهائي
 
 #### ✅ التحقق من جاهزية الإنتاج
-| الفحص | النتيجة |
-|-------|---------|
-| سياسات RLS | 651+ سياسة نشطة |
-| Edge Functions | 42 دالة محمية بـ JWT |
-| أخطاء Console | 0 أخطاء نشطة |
-| إصدارات موحدة | VERSION, version.ts, vite.config.ts = 2.9.25 |
-| console.log | محمية بـ DEV mode في جميع الخدمات |
-| localhost | لا يوجد URLs ثابتة |
+
+| الفحص          | النتيجة                                      |
+| -------------- | -------------------------------------------- |
+| سياسات RLS     | 651+ سياسة نشطة                              |
+| Edge Functions | 42 دالة محمية بـ JWT                         |
+| أخطاء Console  | 0 أخطاء نشطة                                 |
+| إصدارات موحدة  | VERSION, version.ts, vite.config.ts = 2.9.25 |
+| console.log    | محمية بـ DEV mode في جميع الخدمات            |
+| localhost      | لا يوجد URLs ثابتة                           |
 
 #### ✅ تنظيف قاعدة البيانات
+
 - حذف الأخطاء المؤقتة القديمة من `system_error_logs`
 - حذف التنبيهات القديمة من `system_alerts`
 - تنظيف `system_health_checks` القديمة
 
 #### ✅ تنظيف الملفات
+
 - حذف مجلد `docs/archive/` بالكامل (4 ملفات قديمة)
 
 ---
@@ -168,13 +184,15 @@
 ### 🔧 تحسينات ما قبل الإنتاج
 
 #### ✅ توحيد الإصدارات
-| الملف | الإصدار |
-|-------|---------|
-| `VERSION` | 2.9.25 |
-| `src/lib/version.ts` | 2.9.25 |
-| `vite.config.ts` | 2.9.25 |
+
+| الملف                | الإصدار |
+| -------------------- | ------- |
+| `VERSION`            | 2.9.25  |
+| `src/lib/version.ts` | 2.9.25  |
+| `vite.config.ts`     | 2.9.25  |
 
 #### ✅ تحسينات الأمان
+
 - فحص شامل لسياسات RLS
 - التحقق من حماية Edge Functions
 - مراجعة صلاحيات المستخدمين
@@ -211,20 +229,20 @@
 
 ```typescript
 // قبل (مسار قديم)
-import { useBeneficiaries } from "@/hooks/useBeneficiaries";
+import { useBeneficiaries } from '@/hooks/useBeneficiaries';
 
 // بعد (مسار مباشر)
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
 ```
 
 #### ✅ useAuth الآن من AuthContext مباشرة
 
 ```typescript
 // قبل
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from '@/hooks/useAuth';
 
 // بعد
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from '@/contexts/AuthContext';
 ```
 
 #### 📁 الهيكل النهائي لمجلد Hooks
@@ -246,12 +264,12 @@ src/hooks/
 
 #### 📊 إحصائيات التنظيف
 
-| المقياس | القيمة |
-|---------|--------|
-| ملفات re-export محذوفة | 125+ |
-| استيرادات محدثة | 220+ |
-| أخطاء بناء | 0 |
-| مجلدات فرعية | 36 |
+| المقياس                | القيمة |
+| ---------------------- | ------ |
+| ملفات re-export محذوفة | 125+   |
+| استيرادات محدثة        | 220+   |
+| أخطاء بناء             | 0      |
+| مجلدات فرعية           | 36     |
 
 ---
 
@@ -260,60 +278,65 @@ src/hooks/
 ### 🎨 تحسينات شاملة للمنصة
 
 #### ✅ إصلاح ألوان Overlay (المرحلة 2)
-| الملف | التغيير |
-|-------|---------|
-| `dialog.tsx` | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
-| `drawer.tsx` | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
+
+| الملف              | التغيير                                             |
+| ------------------ | --------------------------------------------------- |
+| `dialog.tsx`       | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
+| `drawer.tsx`       | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
 | `alert-dialog.tsx` | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
-| `sheet.tsx` | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
+| `sheet.tsx`        | `bg-black/80` → `bg-background/80 backdrop-blur-sm` |
 
 #### ✅ Dialog Contexts جديدة (المرحلة 3)
-| الملف | الوصف |
-|-------|-------|
-| `src/contexts/PaymentsDialogsContext.tsx` | إدارة حوارات صفحة المدفوعات |
-| `src/contexts/TenantsDialogsContext.tsx` | إدارة حوارات صفحة المستأجرين |
-| `src/contexts/ArchiveDialogsContext.tsx` | إدارة حوارات صفحة الأرشيف |
+
+| الملف                                     | الوصف                        |
+| ----------------------------------------- | ---------------------------- |
+| `src/contexts/PaymentsDialogsContext.tsx` | إدارة حوارات صفحة المدفوعات  |
+| `src/contexts/TenantsDialogsContext.tsx`  | إدارة حوارات صفحة المستأجرين |
+| `src/contexts/ArchiveDialogsContext.tsx`  | إدارة حوارات صفحة الأرشيف    |
 
 #### ✅ RTL Margins (المرحلة 1)
-| الملف | عدد الإصلاحات |
-|--------|---------------|
-| `Tenants.tsx` | 4 |
-| `Archive.tsx` | 4 |
-| `CashFlowStatement.tsx` | 2 |
-| `RequestSubmissionDialog.tsx` | 1 |
-| `BatchPaymentProcessor.tsx` | 4 |
-| `ApprovalWorkflowDialog.tsx` | 2 |
-| `FundsPerformanceReport.tsx` | 2 |
-| `PushNotificationsSetup.tsx` | 1 |
-| `BeneficiaryMobileCard.tsx` | 7 |
-| `IntegratedReportsWidget.tsx` | 1 |
-| `ZATCAQRCode.tsx` | 3 |
-| `ViewInvoiceDialog.tsx` | 4 |
-| `InvoiceStatusActions.tsx` | 3 |
-| `AddInvoiceDialog.tsx` | 1 |
-| `InvoiceManager.tsx` | 1 |
-| `FinancialReports.tsx` | 1 |
-| `ViewJournalEntryDialog.tsx` | 3 |
-| `TrialBalanceReport.tsx` | 3 |
-| `ApprovalDialog.tsx` | 2 |
-| `AddJournalEntryDialog.tsx` | 1 |
-| `GeneralLedgerReport.tsx` | 3 |
-| `InvoiceManagement.tsx` | 4 |
-| `BudgetManagement.tsx` | 1 |
-| `ApprovalWorkflowManager.tsx` | 2 |
+
+| الملف                         | عدد الإصلاحات |
+| ----------------------------- | ------------- |
+| `Tenants.tsx`                 | 4             |
+| `Archive.tsx`                 | 4             |
+| `CashFlowStatement.tsx`       | 2             |
+| `RequestSubmissionDialog.tsx` | 1             |
+| `BatchPaymentProcessor.tsx`   | 4             |
+| `ApprovalWorkflowDialog.tsx`  | 2             |
+| `FundsPerformanceReport.tsx`  | 2             |
+| `PushNotificationsSetup.tsx`  | 1             |
+| `BeneficiaryMobileCard.tsx`   | 7             |
+| `IntegratedReportsWidget.tsx` | 1             |
+| `ZATCAQRCode.tsx`             | 3             |
+| `ViewInvoiceDialog.tsx`       | 4             |
+| `InvoiceStatusActions.tsx`    | 3             |
+| `AddInvoiceDialog.tsx`        | 1             |
+| `InvoiceManager.tsx`          | 1             |
+| `FinancialReports.tsx`        | 1             |
+| `ViewJournalEntryDialog.tsx`  | 3             |
+| `TrialBalanceReport.tsx`      | 3             |
+| `ApprovalDialog.tsx`          | 2             |
+| `AddJournalEntryDialog.tsx`   | 1             |
+| `GeneralLedgerReport.tsx`     | 3             |
+| `InvoiceManagement.tsx`       | 4             |
+| `BudgetManagement.tsx`        | 1             |
+| `ApprovalWorkflowManager.tsx` | 2             |
 
 #### ✅ تحديث الوثائق (المرحلة 4)
+
 - توحيد الإصدار إلى 2.9.15 عبر جميع الملفات
 - تحديث `src/lib/version.ts` بالإحصائيات الجديدة
 - إضافة RTL و Theming status في ARCHITECTURE_STATUS
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| Dialog Contexts | 2 | 5 (+3) |
-| CSS Variables للألوان | 80% | 100% |
-| RTL Margins | 0% | ~15% (60+ إصلاح) |
-| Theming متسق | جزئي | كامل |
+
+| المقياس               | قبل  | بعد              |
+| --------------------- | ---- | ---------------- |
+| Dialog Contexts       | 2    | 5 (+3)           |
+| CSS Variables للألوان | 80%  | 100%             |
+| RTL Margins           | 0%   | ~15% (60+ إصلاح) |
+| Theming متسق          | جزئي | كامل             |
 
 ---
 
@@ -322,38 +345,42 @@ src/hooks/
 ### 🚀 تحسينات شاملة للأداء والهيكلة
 
 #### ✅ ملفات جديدة
-| الملف | الوصف |
-|-------|-------|
-| `src/components/users/UsersTableWithContext.tsx` | جدول المستخدمين بدون Props (0 بدلاً من 9) |
-| `src/components/users/UsersTableRowWithContext.tsx` | صف المستخدم مع Context |
-| `src/components/users/LazyDialogs.tsx` | تحميل كسول للحوارات |
-| `src/components/users/RoleAuditDialog.tsx` | حوار سجل تغييرات الأدوار |
-| `src/components/users/AddRoleDialog.tsx` | حوار إضافة دور |
-| `src/contexts/RolesContext.tsx` | سياق إدارة الأدوار |
+
+| الملف                                               | الوصف                                     |
+| --------------------------------------------------- | ----------------------------------------- |
+| `src/components/users/UsersTableWithContext.tsx`    | جدول المستخدمين بدون Props (0 بدلاً من 9) |
+| `src/components/users/UsersTableRowWithContext.tsx` | صف المستخدم مع Context                    |
+| `src/components/users/LazyDialogs.tsx`              | تحميل كسول للحوارات                       |
+| `src/components/users/RoleAuditDialog.tsx`          | حوار سجل تغييرات الأدوار                  |
+| `src/components/users/AddRoleDialog.tsx`            | حوار إضافة دور                            |
+| `src/contexts/RolesContext.tsx`                     | سياق إدارة الأدوار                        |
 
 #### ✅ تحسينات الأداء
-| التحسين | الأثر |
-|---------|-------|
-| Lazy Loading للـ Dialogs | تحسين 15% في سرعة التحميل الأولي |
-| UsersTableWithContext | 0 props بدلاً من 9 (إزالة Props Drilling) |
-| RolesProvider | اتساق هيكلي مع UsersProvider |
-| استخراج Dialogs | تقليل حجم RolesManagement بنسبة 40% |
+
+| التحسين                  | الأثر                                     |
+| ------------------------ | ----------------------------------------- |
+| Lazy Loading للـ Dialogs | تحسين 15% في سرعة التحميل الأولي          |
+| UsersTableWithContext    | 0 props بدلاً من 9 (إزالة Props Drilling) |
+| RolesProvider            | اتساق هيكلي مع UsersProvider              |
+| استخراج Dialogs          | تقليل حجم RolesManagement بنسبة 40%       |
 
 #### ✅ ملفات محذوفة (تم استبدالها)
-| الملف | البديل |
-|-------|--------|
-| `UsersTable.tsx` | `UsersTableWithContext.tsx` |
-| `UsersTableRow.tsx` | `UsersTableRowWithContext.tsx` |
+
+| الملف                | البديل                             |
+| -------------------- | ---------------------------------- |
+| `UsersTable.tsx`     | `UsersTableWithContext.tsx`        |
+| `UsersTableRow.tsx`  | `UsersTableRowWithContext.tsx`     |
 | `useEntityFilter.ts` | `useUsersFilter.ts` (موجود مسبقاً) |
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| Props في UsersTable | 9 | 0 |
-| Props في UsersTableRow | 8 | 1 |
-| حجم RolesManagement.tsx | 271 سطر | ~190 سطر |
-| تحميل Dialogs | Eager | Lazy |
-| Context للأدوار | لا يوجد | RolesContext |
+
+| المقياس                 | قبل     | بعد          |
+| ----------------------- | ------- | ------------ |
+| Props في UsersTable     | 9       | 0            |
+| Props في UsersTableRow  | 8       | 1            |
+| حجم RolesManagement.tsx | 271 سطر | ~190 سطر     |
+| تحميل Dialogs           | Eager   | Lazy         |
+| Context للأدوار         | لا يوجد | RolesContext |
 
 ---
 
@@ -362,21 +389,24 @@ src/hooks/
 ### 🏗️ تحسينات شاملة للمستخدمين والحوكمة
 
 #### ✅ ملفات جديدة
-| الملف | الوصف |
-|-------|-------|
-| `src/hooks/users/useUsersFilter.ts` | Hook موحد للفلترة - يدعم UserProfile و UserWithRoles |
-| `src/hooks/users/useUsersPaginated.ts` | Server-side Pagination للمستخدمين |
-| `src/utils/export-users.ts` | Utility منفصل لتصدير المستخدمين (CSV/JSON) |
+
+| الملف                                  | الوصف                                                |
+| -------------------------------------- | ---------------------------------------------------- |
+| `src/hooks/users/useUsersFilter.ts`    | Hook موحد للفلترة - يدعم UserProfile و UserWithRoles |
+| `src/hooks/users/useUsersPaginated.ts` | Server-side Pagination للمستخدمين                    |
+| `src/utils/export-users.ts`            | Utility منفصل لتصدير المستخدمين (CSV/JSON)           |
 
 #### ✅ تحسينات رئيسية
-| المكون | التحسين |
-|--------|---------|
-| `UsersContext.tsx` | تفعيل السياق مع الفلترة المدمجة |
-| `Users.tsx` | استخدام UsersProvider بدلاً من props drilling |
-| `useUsersManagement.ts` | استبدال console.error بـ productionLogger |
-| `pagination.types.ts` | إضافة PaginatedResult interface |
+
+| المكون                  | التحسين                                       |
+| ----------------------- | --------------------------------------------- |
+| `UsersContext.tsx`      | تفعيل السياق مع الفلترة المدمجة               |
+| `Users.tsx`             | استخدام UsersProvider بدلاً من props drilling |
+| `useUsersManagement.ts` | استبدال console.error بـ productionLogger     |
+| `pagination.types.ts`   | إضافة PaginatedResult interface               |
 
 #### 📊 نتائج التحسين
+
 - تقليل props من 9 إلى 0 عبر Context
 - فلترة موحدة قابلة لإعادة الاستخدام
 - تصدير CSV/JSON منفصل ومنظم
@@ -389,11 +419,12 @@ src/hooks/
 ### 📄 إضافة Server-side Pagination للعقود والحوكمة
 
 #### ✅ مكونات جديدة
-| الملف | الوصف |
-|-------|-------|
-| `src/lib/pagination.types.ts` | أنواع Pagination الموحدة |
-| `src/hooks/property/useContractsPaginated.ts` | Pagination للعقود |
-| `src/hooks/governance/useGovernanceDecisionsPaginated.ts` | Pagination للحوكمة |
+
+| الملف                                                     | الوصف                    |
+| --------------------------------------------------------- | ------------------------ |
+| `src/lib/pagination.types.ts`                             | أنواع Pagination الموحدة |
+| `src/hooks/property/useContractsPaginated.ts`             | Pagination للعقود        |
+| `src/hooks/governance/useGovernanceDecisionsPaginated.ts` | Pagination للحوكمة       |
 
 ---
 
@@ -402,18 +433,21 @@ src/hooks/
 ### 📄 إضافة نظام Pagination لسجل التدقيق
 
 #### ✅ مكونات جديدة
-| الملف | الوصف |
-|-------|-------|
-| `src/hooks/ui/usePagination.ts` | Hook للتصفح مع دعم Client & Server pagination |
-| `src/components/ui/pagination-controls.tsx` | مكون التنقل بين الصفحات |
+
+| الملف                                       | الوصف                                         |
+| ------------------------------------------- | --------------------------------------------- |
+| `src/hooks/ui/usePagination.ts`             | Hook للتصفح مع دعم Client & Server pagination |
+| `src/components/ui/pagination-controls.tsx` | مكون التنقل بين الصفحات                       |
 
 #### ✅ تحديثات
-| الصفحة | التحسين |
-|--------|---------|
-| `AuditLogs.tsx` | إضافة Pagination كامل (469 سجل → 15 سجل/صفحة) |
-| `audit.service.ts` | رفع الحد من 100 إلى 1000 سجل |
+
+| الصفحة             | التحسين                                       |
+| ------------------ | --------------------------------------------- |
+| `AuditLogs.tsx`    | إضافة Pagination كامل (469 سجل → 15 سجل/صفحة) |
+| `audit.service.ts` | رفع الحد من 100 إلى 1000 سجل                  |
 
 #### 📊 الميزات
+
 - عرض 15 سجل افتراضياً بدلاً من 469
 - خيارات: 10, 15, 25, 50, 100 سجل/صفحة
 - تنقل سهل بين الصفحات مع أزرار RTL
@@ -426,39 +460,44 @@ src/hooks/
 ### 🏗️ تقسيم auth.service.ts وتحسينات الأداء
 
 #### ✅ تقسيم الخدمات
-| الخدمة الجديدة | المسؤولية | الأسطر |
-|---------------|-----------|--------|
-| `permissions.service.ts` | إدارة الصلاحيات | ~120 |
-| `two-factor.service.ts` | المصادقة الثنائية | ~85 |
-| `auth.service.ts` | المصادقة الأساسية | ~380 (من 481) |
+
+| الخدمة الجديدة           | المسؤولية         | الأسطر        |
+| ------------------------ | ----------------- | ------------- |
+| `permissions.service.ts` | إدارة الصلاحيات   | ~120          |
+| `two-factor.service.ts`  | المصادقة الثنائية | ~85           |
+| `auth.service.ts`        | المصادقة الأساسية | ~380 (من 481) |
 
 #### ✅ إنشاء useFilteredData Hook
-| الدالة | الوصف |
-|--------|-------|
+
+| الدالة                 | الوصف                    |
+| ---------------------- | ------------------------ |
 | `useFilteredData<T>()` | Hook موحد للتصفية والبحث |
-| `useSearchFilter<T>()` | Hook مبسط للبحث فقط |
-| `useRoleFilter<T>()` | Hook للفلترة حسب الدور |
+| `useSearchFilter<T>()` | Hook مبسط للبحث فقط      |
+| `useRoleFilter<T>()`   | Hook للفلترة حسب الدور   |
 
 #### ✅ تحسين التخزين المؤقت
-| البيانات | staleTime | gcTime |
-|----------|-----------|--------|
-| `allPermissions` | 10 دقائق | 30 دقيقة |
-| `rolePermissions` | 5 دقائق | افتراضي |
+
+| البيانات          | staleTime | gcTime   |
+| ----------------- | --------- | -------- |
+| `allPermissions`  | 10 دقائق  | 30 دقيقة |
+| `rolePermissions` | 5 دقائق   | افتراضي  |
 
 #### 📁 الملفات الجديدة
-| الملف | الوصف |
-|-------|-------|
+
+| الملف                                 | الوصف                   |
+| ------------------------------------- | ----------------------- |
 | `src/services/permissions.service.ts` | خدمة الصلاحيات المنفصلة |
-| `src/services/two-factor.service.ts` | خدمة المصادقة الثنائية |
-| `src/hooks/ui/useFilteredData.ts` | Hook التصفية الموحد |
+| `src/services/two-factor.service.ts`  | خدمة المصادقة الثنائية  |
+| `src/hooks/ui/useFilteredData.ts`     | Hook التصفية الموحد     |
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| حجم `auth.service.ts` | 481 سطر | 380 سطر |
-| خدمات جديدة | 0 | 2 |
-| Hooks تصفية موحدة | 0 | 1 (3 دوال) |
-| staleTime للصلاحيات | 2 دقيقة | 10 دقائق |
+
+| المقياس               | قبل     | بعد        |
+| --------------------- | ------- | ---------- |
+| حجم `auth.service.ts` | 481 سطر | 380 سطر    |
+| خدمات جديدة           | 0       | 2          |
+| Hooks تصفية موحدة     | 0       | 1 (3 دوال) |
+| staleTime للصلاحيات   | 2 دقيقة | 10 دقائق   |
 
 ---
 
@@ -467,52 +506,58 @@ src/hooks/
 ### 🔐 تحسين نظام إدارة المستخدمين والأدوار (User Management & Roles Enhancement)
 
 #### ✅ المرحلة 1: إصلاحات حرجة
-| المشكلة | الحل | الموقع |
-|---------|------|--------|
-| View `user_profile_with_roles` يربط `p.id` بدلاً من `p.user_id` | تصحيح الربط ليستخدم `p.user_id` | Database View |
-| `UserService.getUsersWithRoles()` لا يعمل | تحديث ليستخدم View المصحح | `user.service.ts` |
-| صلاحيات الناظر والمدير غير مفعلة | تفعيل 50+ صلاحية في `role_permissions` | Database |
+
+| المشكلة                                                         | الحل                                   | الموقع            |
+| --------------------------------------------------------------- | -------------------------------------- | ----------------- |
+| View `user_profile_with_roles` يربط `p.id` بدلاً من `p.user_id` | تصحيح الربط ليستخدم `p.user_id`        | Database View     |
+| `UserService.getUsersWithRoles()` لا يعمل                       | تحديث ليستخدم View المصحح              | `user.service.ts` |
+| صلاحيات الناظر والمدير غير مفعلة                                | تفعيل 50+ صلاحية في `role_permissions` | Database          |
 
 #### ✅ المرحلة 2: تقليل Props Drilling
-| التحسين | الوصف |
-|---------|-------|
-| إنشاء `UsersContext` | Context لتوفير بيانات المستخدمين |
-| إنشاء `UsersTableRow` | مكون منفصل لصف المستخدم |
-| تحديث `UsersTable` | استخدام المكونات الجديدة |
+
+| التحسين               | الوصف                            |
+| --------------------- | -------------------------------- |
+| إنشاء `UsersContext`  | Context لتوفير بيانات المستخدمين |
+| إنشاء `UsersTableRow` | مكون منفصل لصف المستخدم          |
+| تحديث `UsersTable`    | استخدام المكونات الجديدة         |
 
 #### ✅ المرحلة 3: Realtime Updates
-| التحسين | الوصف |
-|---------|-------|
-| إنشاء `useUsersRealtime` | اشتراك Realtime لـ 3 جداول |
-| استماع لـ `profiles` | تحديث فوري لبيانات المستخدمين |
-| استماع لـ `user_roles` | تحديث فوري للأدوار |
-| استماع لـ `role_permissions` | تحديث فوري للصلاحيات |
+
+| التحسين                      | الوصف                         |
+| ---------------------------- | ----------------------------- |
+| إنشاء `useUsersRealtime`     | اشتراك Realtime لـ 3 جداول    |
+| استماع لـ `profiles`         | تحديث فوري لبيانات المستخدمين |
+| استماع لـ `user_roles`       | تحديث فوري للأدوار            |
+| استماع لـ `role_permissions` | تحديث فوري للصلاحيات          |
 
 #### ✅ المرحلة 4: تصدير وتكامل
-| التحسين | الوصف |
-|---------|-------|
-| تحديث `hooks/users/index.ts` | تصدير `useUsersRealtime` |
+
+| التحسين                             | الوصف                                       |
+| ----------------------------------- | ------------------------------------------- |
+| تحديث `hooks/users/index.ts`        | تصدير `useUsersRealtime`                    |
 | إصلاح responsive في `UsersTableRow` | `last_login_at` الآن `hidden lg:table-cell` |
 
 #### 📁 الملفات المعدلة/الجديدة
-| الملف | التغيير |
-|-------|---------|
-| ✨ `src/contexts/UsersContext.tsx` | **جديد** - Context للمستخدمين |
-| ✨ `src/components/users/UsersTableRow.tsx` | **جديد** - صف المستخدم |
-| ✨ `src/hooks/users/useUsersRealtime.ts` | **جديد** - Realtime hook |
-| `src/services/user.service.ts` | تحديث `getUsersWithRoles()` |
-| `src/components/users/UsersTable.tsx` | استخدام `UsersTableRow` |
-| `src/hooks/users/index.ts` | تصدير الـ hooks الجديدة |
-| `src/pages/Users.tsx` | تفعيل Realtime |
-| `src/pages/RolesManagement.tsx` | تفعيل Realtime |
+
+| الملف                                       | التغيير                       |
+| ------------------------------------------- | ----------------------------- |
+| ✨ `src/contexts/UsersContext.tsx`          | **جديد** - Context للمستخدمين |
+| ✨ `src/components/users/UsersTableRow.tsx` | **جديد** - صف المستخدم        |
+| ✨ `src/hooks/users/useUsersRealtime.ts`    | **جديد** - Realtime hook      |
+| `src/services/user.service.ts`              | تحديث `getUsersWithRoles()`   |
+| `src/components/users/UsersTable.tsx`       | استخدام `UsersTableRow`       |
+| `src/hooks/users/index.ts`                  | تصدير الـ hooks الجديدة       |
+| `src/pages/Users.tsx`                       | تفعيل Realtime                |
+| `src/pages/RolesManagement.tsx`             | تفعيل Realtime                |
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| Props في UsersTable | 9 | 9 (مع UsersTableRow) |
-| صلاحيات nazer/admin مفعلة | 0 | 50+ |
-| Realtime على جداول المستخدمين | 0 | 3 |
-| Hooks مصدرة من users/index | 4 | 5 |
+
+| المقياس                       | قبل | بعد                  |
+| ----------------------------- | --- | -------------------- |
+| Props في UsersTable           | 9   | 9 (مع UsersTableRow) |
+| صلاحيات nazer/admin مفعلة     | 0   | 50+                  |
+| Realtime على جداول المستخدمين | 0   | 3                    |
+| Hooks مصدرة من users/index    | 4   | 5                    |
 
 ---
 
@@ -521,52 +566,58 @@ src/hooks/
 ### 🔧 تدقيق وإصلاح لوحة تحكم المدير (Admin Dashboard Audit & Fixes)
 
 #### ✅ المرحلة 1: إصلاحات حرجة
-| المشكلة | الحل | الموقع |
-|---------|------|--------|
-| `AdminKPIs` يستخدم `useAdminKPIs` بدلاً من `useUnifiedKPIs` | استبدال بـ `useUnifiedKPIs` | `AdminKPIs.tsx` |
-| `UsersActivityChart` مكرر في tabs "users" و "performance" | إزالة من tab "performance" | `AdminDashboard.tsx` |
-| `AuditLogsPreview` مكرر في tabs "security" و "system" | إزالة من tab "system" | `AdminDashboard.tsx` |
+
+| المشكلة                                                     | الحل                        | الموقع               |
+| ----------------------------------------------------------- | --------------------------- | -------------------- |
+| `AdminKPIs` يستخدم `useAdminKPIs` بدلاً من `useUnifiedKPIs` | استبدال بـ `useUnifiedKPIs` | `AdminKPIs.tsx`      |
+| `UsersActivityChart` مكرر في tabs "users" و "performance"   | إزالة من tab "performance"  | `AdminDashboard.tsx` |
+| `AuditLogsPreview` مكرر في tabs "security" و "system"       | إزالة من tab "system"       | `AdminDashboard.tsx` |
 
 #### ✅ المرحلة 2: توحيد لوحة المحاسب
-| المشكلة | الحل |
-|---------|------|
-| `useAccountantKPIs` hook مستقل | حذف واستخدام `useUnifiedKPIs` |
-| `AccountingStats` يستخدم hook قديم | تحديث لـ `useUnifiedKPIs` |
+
+| المشكلة                                        | الحل                                      |
+| ---------------------------------------------- | ----------------------------------------- |
+| `useAccountantKPIs` hook مستقل                 | حذف واستخدام `useUnifiedKPIs`             |
+| `AccountingStats` يستخدم hook قديم             | تحديث لـ `useUnifiedKPIs`                 |
 | بيانات المحاسبة غير موجودة في `kpi.service.ts` | إضافة حقول المحاسبة للـ `UnifiedKPIsData` |
 
 #### ✅ المرحلة 3: إصلاحات متوسطة
-| المشكلة | الحل |
-|---------|------|
-| `responseTime` و `cpu` قيم ثابتة (0) | جلب من `system_health_checks` |
-| `useSettingsCategories` hook في مجلد settings | نقل إلى `src/hooks/settings/` |
-| ثوابت مكررة | إضافة `DASHBOARD_METRICS` و `CHART_CONSTANTS` |
+
+| المشكلة                                       | الحل                                          |
+| --------------------------------------------- | --------------------------------------------- |
+| `responseTime` و `cpu` قيم ثابتة (0)          | جلب من `system_health_checks`                 |
+| `useSettingsCategories` hook في مجلد settings | نقل إلى `src/hooks/settings/`                 |
+| ثوابت مكررة                                   | إضافة `DASHBOARD_METRICS` و `CHART_CONSTANTS` |
 
 #### ✅ المرحلة 4: تحسينات اختيارية
-| التحسين | الوصف |
-|---------|-------|
-| توحيد معالجة الأخطاء | استخدام `ErrorState` component |
-| تحسين Skeleton loading | توحيد الأنماط عبر المكونات |
+
+| التحسين                | الوصف                          |
+| ---------------------- | ------------------------------ |
+| توحيد معالجة الأخطاء   | استخدام `ErrorState` component |
+| تحسين Skeleton loading | توحيد الأنماط عبر المكونات     |
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| Hooks مكررة لـ KPIs | 3 (Admin, Nazer, Accountant) | 1 (useUnifiedKPIs) |
-| مكونات مكررة | 2 (UsersActivity, AuditLogs) | 0 |
-| Hook Settings في component | 1 | 0 (منقول لـ hooks/) |
-| بيانات أداء ثابتة | 2 (cpu, responseTime) | 0 (جلب ديناميكي) |
+
+| المقياس                    | قبل                          | بعد                 |
+| -------------------------- | ---------------------------- | ------------------- |
+| Hooks مكررة لـ KPIs        | 3 (Admin, Nazer, Accountant) | 1 (useUnifiedKPIs)  |
+| مكونات مكررة               | 2 (UsersActivity, AuditLogs) | 0                   |
+| Hook Settings في component | 1                            | 0 (منقول لـ hooks/) |
+| بيانات أداء ثابتة          | 2 (cpu, responseTime)        | 0 (جلب ديناميكي)    |
 
 #### 📁 الملفات المعدلة/المحذوفة
-| الملف | التغيير |
-|-------|---------|
-| `src/pages/AdminDashboard.tsx` | إزالة التكرارات |
-| `src/components/dashboard/admin/AdminKPIs.tsx` | استخدام `useUnifiedKPIs` |
-| `src/pages/AccountantDashboard.tsx` | استخدام `useUnifiedKPIs` |
-| `src/components/dashboard/AccountingStats.tsx` | استخدام `useUnifiedKPIs` |
-| `src/services/dashboard/kpi.service.ts` | إضافة حقول المحاسبة |
-| `src/hooks/settings/useSettingsCategories.ts` | نقل من components |
-| `src/hooks/system/useSystemPerformanceMetrics.ts` | جلب بيانات فعلية |
-| ❌ `src/hooks/accounting/useAccountantKPIs.ts` | **محذوف** |
-| ❌ `src/components/dashboard/admin/settings/useSettingsCategories.ts` | **محذوف** |
+
+| الملف                                                                 | التغيير                  |
+| --------------------------------------------------------------------- | ------------------------ |
+| `src/pages/AdminDashboard.tsx`                                        | إزالة التكرارات          |
+| `src/components/dashboard/admin/AdminKPIs.tsx`                        | استخدام `useUnifiedKPIs` |
+| `src/pages/AccountantDashboard.tsx`                                   | استخدام `useUnifiedKPIs` |
+| `src/components/dashboard/AccountingStats.tsx`                        | استخدام `useUnifiedKPIs` |
+| `src/services/dashboard/kpi.service.ts`                               | إضافة حقول المحاسبة      |
+| `src/hooks/settings/useSettingsCategories.ts`                         | نقل من components        |
+| `src/hooks/system/useSystemPerformanceMetrics.ts`                     | جلب بيانات فعلية         |
+| ❌ `src/hooks/accounting/useAccountantKPIs.ts`                        | **محذوف**                |
+| ❌ `src/components/dashboard/admin/settings/useSettingsCategories.ts` | **محذوف**                |
 
 ---
 
@@ -575,30 +626,34 @@ src/hooks/
 ### 🏗️ إعادة تنظيم بوابة المستفيد (BeneficiaryPortal Restructure)
 
 #### ✅ المرحلة 1: إصلاحات حرجة (Critical)
-| المشكلة | الحل | الموقع |
-|---------|------|--------|
-| `handleRetry` يستخدم `window.location.reload()` | استبدال بـ `queryClient.invalidateQueries()` + `refetch()` | `BeneficiaryPortal.tsx` |
-| `get_beneficiary_statistics` RPC تقرأ من payments فقط | تعديل لتستعلم من `heir_distributions` | Database RPC |
-| `beneficiaries.total_received = 0` للجميع | إنشاء Trigger لتحديث من `heir_distributions` | Database Trigger |
-| `BeneficiaryStatementsTab` رسالة ثابتة | عرض بيانات ديناميكية من التوزيعات | `BeneficiaryStatementsTab.tsx` |
-| `useGovernanceData` بيانات hardcoded | استعلام فعلي من `governance_meetings` و `governance_decisions` | `useGovernanceData.ts` |
+
+| المشكلة                                               | الحل                                                           | الموقع                         |
+| ----------------------------------------------------- | -------------------------------------------------------------- | ------------------------------ |
+| `handleRetry` يستخدم `window.location.reload()`       | استبدال بـ `queryClient.invalidateQueries()` + `refetch()`     | `BeneficiaryPortal.tsx`        |
+| `get_beneficiary_statistics` RPC تقرأ من payments فقط | تعديل لتستعلم من `heir_distributions`                          | Database RPC                   |
+| `beneficiaries.total_received = 0` للجميع             | إنشاء Trigger لتحديث من `heir_distributions`                   | Database Trigger               |
+| `BeneficiaryStatementsTab` رسالة ثابتة                | عرض بيانات ديناميكية من التوزيعات                              | `BeneficiaryStatementsTab.tsx` |
+| `useGovernanceData` بيانات hardcoded                  | استعلام فعلي من `governance_meetings` و `governance_decisions` | `useGovernanceData.ts`         |
 
 #### ✅ المرحلة 2: إصلاحات متوسطة (Medium)
-| المشكلة | الحل |
-|---------|------|
-| `QuickActionsGrid` يستخدم `/support` | تصحيح إلى `/beneficiary-support` |
-| `TabRenderer` يستخدم `any` | استبدال بـ `Partial<VisibilitySettings>` |
-| `onChangePassword` callback فارغ | ربط بـ `navigate('/settings')` |
+
+| المشكلة                              | الحل                                     |
+| ------------------------------------ | ---------------------------------------- |
+| `QuickActionsGrid` يستخدم `/support` | تصحيح إلى `/beneficiary-support`         |
+| `TabRenderer` يستخدم `any`           | استبدال بـ `Partial<VisibilitySettings>` |
+| `onChangePassword` callback فارغ     | ربط بـ `navigate('/settings')`           |
 
 #### ✅ المرحلة 3: تحسينات اختيارية (Optional)
-| التحسين | الوصف |
-|---------|-------|
+
+| التحسين                            | الوصف                                |
+| ---------------------------------- | ------------------------------------ |
 | توحيد `HeirDistribution` interface | مكان واحد في `types/distribution.ts` |
-| إنشاء `MobileCardBase` | مكون أساسي موحد لبطاقات الجوال |
-| إضافة `TabErrorBoundary` | عزل الأخطاء لكل تبويب |
-| **إعادة تنظيم ملفات التبويبات** | نقل 16 ملف `*Tab.tsx` إلى `tabs/` |
+| إنشاء `MobileCardBase`             | مكون أساسي موحد لبطاقات الجوال       |
+| إضافة `TabErrorBoundary`           | عزل الأخطاء لكل تبويب                |
+| **إعادة تنظيم ملفات التبويبات**    | نقل 16 ملف `*Tab.tsx` إلى `tabs/`    |
 
 #### 📁 هيكل التبويبات الجديد
+
 ```
 src/components/beneficiary/
 ├── tabs/                          ← 16 ملف تبويب منظم
@@ -629,12 +684,13 @@ src/components/beneficiary/
 ```
 
 #### 📊 إحصائيات التحسين
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| ملفات Tab في الجذر | 16 | 0 |
-| ملفات Tab في tabs/ | 0 | 16 |
-| Error Boundaries | 0 | 1 (TabErrorBoundary) |
-| MobileCardBase | لا يوجد | موجود |
+
+| المقياس            | قبل     | بعد                  |
+| ------------------ | ------- | -------------------- |
+| ملفات Tab في الجذر | 16      | 0                    |
+| ملفات Tab في tabs/ | 0       | 16                   |
+| Error Boundaries   | 0       | 1 (TabErrorBoundary) |
+| MobileCardBase     | لا يوجد | موجود                |
 
 ---
 
@@ -643,21 +699,24 @@ src/components/beneficiary/
 ### 🔧 إصلاحات معمارية وتحسينات الأداء
 
 #### ✅ إصلاح N+1 Query في TenantService
-| المشكلة | الحل |
-|---------|------|
+
+| المشكلة                                | الحل                                                 |
+| -------------------------------------- | ---------------------------------------------------- |
 | `getTenantsAging()` كان يستعلم N+1 مرة | استعلام واحد لجميع سجلات الدفتر ثم معالجة في الذاكرة |
-| أداء بطيء مع زيادة المستأجرين | تقليل الاستعلامات من N+1 إلى 2 فقط |
+| أداء بطيء مع زيادة المستأجرين          | تقليل الاستعلامات من N+1 إلى 2 فقط                   |
 
 #### ✅ إزالة MainLayout المكرر
+
 - **`TenantDetails.tsx`**: إزالة 3 تكرارات لـ `<MainLayout>` (السطور 44, 55, 67)
 - **السبب**: MainLayout موجود في App.tsx للـ protected routes
 
 #### ✅ توحيد QUERY_KEYS في useTenantLedger
-| قبل | بعد |
-|-----|-----|
+
+| قبل                           | بعد                                  |
+| ----------------------------- | ------------------------------------ |
 | `['tenant-ledger', tenantId]` | `QUERY_KEYS.TENANT_LEDGER(tenantId)` |
-| `['tenants-aging']` | `QUERY_KEYS.TENANTS_AGING` |
-| `['tenants']` | `QUERY_KEYS.TENANTS` |
+| `['tenants-aging']`           | `QUERY_KEYS.TENANTS_AGING`           |
+| `['tenants']`                 | `QUERY_KEYS.TENANTS`                 |
 
 ---
 
@@ -666,19 +725,22 @@ src/components/beneficiary/
 ### 📊 المرحلة 4: الرسوم البيانية التحليلية للوحة الناظر
 
 #### ✅ مكونات جديدة
-| الملف | الوصف |
-|-------|-------|
-| `src/components/nazer/NazerAnalyticsSection.tsx` | قسم الرسوم البيانية التحليلية |
-| `src/components/nazer/RevenueExpenseChart.tsx` | رسم الإيرادات والمصروفات الشهرية |
-| `src/components/nazer/BudgetComparisonChart.tsx` | رسم مقارنة الميزانية بالفعلي |
+
+| الملف                                            | الوصف                            |
+| ------------------------------------------------ | -------------------------------- |
+| `src/components/nazer/NazerAnalyticsSection.tsx` | قسم الرسوم البيانية التحليلية    |
+| `src/components/nazer/RevenueExpenseChart.tsx`   | رسم الإيرادات والمصروفات الشهرية |
+| `src/components/nazer/BudgetComparisonChart.tsx` | رسم مقارنة الميزانية بالفعلي     |
 
 #### ✅ الرسوم البيانية المضافة
+
 - **الإيرادات والمصروفات**: رسم منطقي (Area Chart) للتدفق الشهري
 - **مقارنة الميزانية**: رسم أعمدة أفقي للمقارنة بين المخطط والفعلي
 - **توزيع الإيرادات**: رسم دائري لتوزيع الإيرادات حسب المصدر
 - **أداء العقارات**: رسم أعمدة لأداء أعلى 6 عقارات
 
 #### 📋 تحسينات UI
+
 - تبويبات داخل البطاقة للتنقل بين الرسوم
 - تصميم متجاوب للجوال
 - ألوان من نظام التصميم (semantic tokens)
@@ -691,15 +753,18 @@ src/components/beneficiary/
 ### 🔧 تحسينات لوحات التحكم - المرحلة 1 + 2 + 3
 
 #### ✅ المرحلة 1: إصلاحات حرجة
+
 - **AccountantDashboard**: إضافة `useAccountantDashboardRealtime` للتحديثات المباشرة
 - **CashierDashboard**: تفعيل `useCashierDashboardRealtime` (كان موجوداً لكن غير مفعّل)
 - **NazerDashboard**: إزالة `PendingApprovalsSection` المكرر من تبويب المستفيدين
 
 #### ✅ المرحلة 2: تحسين التكامل
+
 - **PreviewAsBeneficiaryButton**: زر "معاينة كـ مستفيد" - ميزة Impersonation معتمدة في المنصات الكبيرة
 - **LastSyncIndicator**: مؤشر آخر تحديث مع تمييز التحديثات الحديثة
 
 #### ✅ المرحلة 3: تحسين قسم التحكم (60+ إعداد)
+
 - **بحث وفلترة**: شريط بحث للإعدادات + فلتر حسب الفئة
 - **أزرار جماعية**: تفعيل الكل / إلغاء الكل / إعادة للافتراضي
 - **أزرار لكل فئة**: تفعيل/إلغاء كل إعدادات فئة معينة
@@ -708,20 +773,22 @@ src/components/beneficiary/
 - **عداد**: عرض عدد الإعدادات المفعّلة من الإجمالي
 
 #### ✅ ملفات جديدة
-| الملف | الوصف |
-|-------|-------|
+
+| الملف                                                   | الوصف                                |
+| ------------------------------------------------------- | ------------------------------------ |
 | `src/hooks/dashboard/useAccountantDashboardRealtime.ts` | hook موحد للتحديثات المباشرة للمحاسب |
-| `src/components/nazer/PreviewAsBeneficiaryButton.tsx` | زر معاينة كـ مستفيد |
-| `src/components/nazer/LastSyncIndicator.tsx` | مؤشر آخر تحديث |
+| `src/components/nazer/PreviewAsBeneficiaryButton.tsx`   | زر معاينة كـ مستفيد                  |
+| `src/components/nazer/LastSyncIndicator.tsx`            | مؤشر آخر تحديث                       |
 
 #### 📋 الملفات المعدلة
-| الملف | التغيير |
-|-------|---------|
-| `src/pages/AccountantDashboard.tsx` | إضافة Realtime |
-| `src/pages/CashierDashboard.tsx` | تفعيل Realtime |
-| `src/pages/NazerDashboard.tsx` | إضافة زر المعاينة + مؤشر التحديث + إزالة التكرار |
-| `src/hooks/dashboard/index.ts` | تصدير hook المحاسب الجديد |
-| `src/components/nazer/BeneficiaryControlSection.tsx` | إعادة هيكلة كاملة مع بحث وفلترة وأزرار جماعية |
+
+| الملف                                                | التغيير                                          |
+| ---------------------------------------------------- | ------------------------------------------------ |
+| `src/pages/AccountantDashboard.tsx`                  | إضافة Realtime                                   |
+| `src/pages/CashierDashboard.tsx`                     | تفعيل Realtime                                   |
+| `src/pages/NazerDashboard.tsx`                       | إضافة زر المعاينة + مؤشر التحديث + إزالة التكرار |
+| `src/hooks/dashboard/index.ts`                       | تصدير hook المحاسب الجديد                        |
+| `src/components/nazer/BeneficiaryControlSection.tsx` | إعادة هيكلة كاملة مع بحث وفلترة وأزرار جماعية    |
 
 ---
 
@@ -730,11 +797,13 @@ src/components/beneficiary/
 ### 🔧 إصلاح مشاكل التمرير وأخطاء 404
 
 #### ✅ أخطاء 404 تم إصلاحها
+
 - **QuickActionsGrid.tsx**: تصحيح المسارات من `/beneficiary-portal` إلى `/beneficiary-dashboard`
   - مسار الإفصاح السنوي
   - مسار كشف الحساب
 
 #### ✅ إصلاح التصلب في التمرير
+
 - **BeneficiaryPortal.tsx**: إعادة هيكلة الحاوية الرئيسية
   - `h-screen + overflow-hidden` على الحاوية الخارجية
   - `overflow-y-auto + overscroll-contain + touch-pan-y` على main
@@ -750,13 +819,14 @@ src/components/beneficiary/
   - إضافة `overflow-x: hidden` على body
 
 #### 📋 الملفات المعدلة
-| الملف | التغيير |
-|-------|---------|
-| `src/components/beneficiary/sections/QuickActionsGrid.tsx` | تصحيح المسارات |
-| `src/pages/BeneficiaryPortal.tsx` | إعادة هيكلة التمرير |
-| `src/components/distributions/ViewDisclosureDialog.tsx` | إصلاح تمرير الحوار |
-| `src/components/ui/scroll-area.tsx` | تحسين touch scrolling |
-| `src/index.css` | تحسينات CSS للجوال |
+
+| الملف                                                      | التغيير               |
+| ---------------------------------------------------------- | --------------------- |
+| `src/components/beneficiary/sections/QuickActionsGrid.tsx` | تصحيح المسارات        |
+| `src/pages/BeneficiaryPortal.tsx`                          | إعادة هيكلة التمرير   |
+| `src/components/distributions/ViewDisclosureDialog.tsx`    | إصلاح تمرير الحوار    |
+| `src/components/ui/scroll-area.tsx`                        | تحسين touch scrolling |
+| `src/index.css`                                            | تحسينات CSS للجوال    |
 
 ---
 
@@ -765,6 +835,7 @@ src/components/beneficiary/
 ### 🧹 تنظيف الكود وإصلاح الأنواع
 
 #### ✅ ما تم إصلاحه
+
 - **إزالة 110 استخدام لـ `any` type** من 12 ملف خدمة و hook
 - **تنظيف 45 تنبيه قديم** من النظام
 - **إصلاح الأنواع في الخدمات:**
@@ -775,6 +846,7 @@ src/components/beneficiary/
   - `RealtimeService` - RealtimePostgresChangesPayload
 
 #### ✅ Hooks تم تحسينها
+
 - `usePermissions` - واجهة UserPermission
 - `useRequestApprovals` - إزالة any من فحص الحالة
 - `useRequestAttachments` - إزالة any من find
@@ -784,12 +856,13 @@ src/components/beneficiary/
 - `useErrorNotifications` - تبسيط callbacks
 
 #### 📊 إحصائيات الجودة
-| المقياس | قبل | بعد |
-|---------|-----|-----|
-| `any` types | 110 | ~5 (مقبولة) |
-| System Alerts | 45 | 0 |
-| System Errors | undefined | 0 |
-| Build Errors | 0 | 0 |
+
+| المقياس       | قبل       | بعد         |
+| ------------- | --------- | ----------- |
+| `any` types   | 110       | ~5 (مقبولة) |
+| System Alerts | 45        | 0           |
+| System Errors | undefined | 0           |
+| Build Errors  | 0         | 0           |
 
 ---
 
@@ -798,28 +871,33 @@ src/components/beneficiary/
 ### 🔧 إصلاح خطأ useContext و تحديث الخدمات
 
 #### ✅ ما تم إصلاحه
-- **خطأ `Cannot read properties of null (reading 'useContext')`:** 
+
+- **خطأ `Cannot read properties of null (reading 'useContext')`:**
   - السبب: `next-themes` يُحمّل قبل React في chunks
   - الحل: إنشاء chunk `react-core` يحتوي React + next-themes + sonner معاً
   - ملف: `vite.config.ts`
 
 #### ✅ خدمات جديدة تم إنشاؤها
+
 - `WaqfService` - إدارة ربط العقارات بأقلام الوقف
 - `DocumentService` - عرض الفواتير والسندات
 - `DiagnosticsService` - التشخيص المتقدم
 - `SearchService` - البحث المتقدم
 
 #### ✅ Hooks جديدة
+
 - `useWaqfProperties` - إدارة عقارات الوقف
 - `useDocumentViewer` - عرض المستندات
 
 #### ✅ Components تم تحويلها للهيكل الجديد
+
 - `PaymentsTab.tsx` → يستخدم `useDocumentViewer`
 - `LinkPropertyDialog.tsx` → يستخدم `useWaqfProperties`
 - `WaqfUnitDetailsDialog.tsx` → يستخدم `useWaqfProperties`
 - `MultiChannelNotifications.tsx` → يستخدم services
 
 #### ✅ Hooks تم تحويلها
+
 - `useLeakedPassword.ts` → يستخدم `SecurityService`
 - `useDeepDiagnostics.ts` → يستخدم `DiagnosticsService`
 - `useAdvancedSearch.ts` → يستخدم `SearchService`
@@ -832,15 +910,16 @@ src/components/beneficiary/
 
 #### 📊 حالة الهيكل المعماري
 
-| المكون | الحالة | التفاصيل |
-|--------|--------|----------|
-| **الخدمات** | ✅ مكتمل | 47 خدمة في `src/services/` |
-| **الـ Hooks** | ✅ مكتمل | 170+ hook في 25 مجلد |
-| **QUERY_KEYS** | ✅ مكتمل | موحد في `src/lib/query-keys.ts` |
-| **Realtime** | ✅ مكتمل | موحد للوحات التحكم |
+| المكون         | الحالة   | التفاصيل                           |
+| -------------- | -------- | ---------------------------------- |
+| **الخدمات**    | ✅ مكتمل | 47 خدمة في `src/services/`         |
+| **الـ Hooks**  | ✅ مكتمل | 170+ hook في 25 مجلد               |
+| **QUERY_KEYS** | ✅ مكتمل | موحد في `src/lib/query-keys.ts`    |
+| **Realtime**   | ✅ مكتمل | موحد للوحات التحكم                 |
 | **Components** | ✅ مكتمل | جميع المكونات تستخدم الهيكل الصحيح |
 
 #### ✅ ما تم إنجازه
+
 - جميع الـ Hooks تستخدم Services
 - جميع الـ Components تستخدم Hooks
 - QUERY_KEYS موحد ومحدث
@@ -851,6 +930,7 @@ src/components/beneficiary/
 ## [2.8.45] - 2025-12-09
 
 ### 🏗️ تحسينات الهيكل المعماري
+
 - نقل Realtime من 3 components إلى hooks
 - توحيد QUERY_KEYS موجود ومحدث
 - إزالة استيرادات supabase مباشرة من بعض Components
@@ -863,10 +943,12 @@ src/components/beneficiary/
 ### 🏗️ تحسين الهيكل المعماري (Architecture Improvements)
 
 #### ✨ الميزات الجديدة
+
 - **DashboardService:** طبقة خدمة جديدة للـ Dashboard
 - **ثوابت الحالة الجديدة:** `PROPERTY_STATUS`, `CONTRACT_STATUS`, `LOAN_STATUS`, `REQUEST_STATUS`
 
 #### 🔧 التحسينات
+
 - **useNazerSystemOverview:** يستخدم الآن `DashboardService.getSystemOverview()`
 - **useUnifiedKPIs:** يستخدم الآن `DashboardService.getUnifiedKPIs()`
 
@@ -883,6 +965,7 @@ src/components/beneficiary/
 ### 🏢 نظام إدارة المستأجرين الشامل
 
 #### ✨ الميزات الجديدة
+
 - **جدول المستأجرين `tenants`**
 - **سجل حساب المستأجر `tenant_ledger`**
 - **حساب ذمم المستأجرين (1.2.1)**

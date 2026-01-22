@@ -1,7 +1,13 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Download, X, FileText, Image as ImageIcon } from "lucide-react";
-import { useDocumentPreview } from "@/hooks/archive/useDocumentPreview";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Download, X, FileText, Image as ImageIcon } from 'lucide-react';
+import { useDocumentPreview } from '@/hooks/archive/useDocumentPreview';
 
 interface DocumentPreviewDialogProps {
   open: boolean;
@@ -91,24 +97,13 @@ export function DocumentPreviewDialog({
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold">
-              معاينة المستند
-            </DialogTitle>
+            <DialogTitle className="text-xl font-bold">معاينة المستند</DialogTitle>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownload}
-                disabled={loading}
-              >
+              <Button variant="outline" size="sm" onClick={handleDownload} disabled={loading}>
                 <Download className="ms-2 h-4 w-4" />
                 تحميل
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>

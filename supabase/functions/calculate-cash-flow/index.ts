@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
@@ -47,10 +47,12 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'calculate-cash-flow',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة
@@ -67,7 +69,10 @@ serve(async (req) => {
 
     // 🔐 التحقق من صحة التوكن
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[calculate-cash-flow] ❌ Invalid token:', authError);
@@ -75,12 +80,9 @@ serve(async (req) => {
     }
 
     // 🔐 التحقق من الصلاحيات
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant'].includes(r.role));
+    const hasAccess = roles?.some((r) => ['admin', 'nazer', 'accountant'].includes(r.role));
     if (!hasAccess) {
       console.error('[calculate-cash-flow] ❌ Unauthorized:', { userId: user.id });
       return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
@@ -131,7 +133,7 @@ serve(async (req) => {
     }
 
     // إنشاء خريطة الحسابات
-    const accountMap = new Map(accounts.map(a => [a.id, a]));
+    const accountMap = new Map(accounts.map((a) => [a.id, a]));
 
     // جلب القيود المرحّلة في الفترة المحددة
     const { data: journalEntries } = await supabase
@@ -157,11 +159,11 @@ serve(async (req) => {
           net_cash_flow: 0,
           opening_cash: 0,
           closing_cash: 0,
-        }
+        },
       });
     }
 
-    const entryIds = journalEntries.map(e => e.id);
+    const entryIds = journalEntries.map((e) => e.id);
 
     // جلب سطور القيود
     const { data: journalLines } = await supabase
@@ -188,24 +190,24 @@ serve(async (req) => {
       const netAmount = (line.debit_amount || 0) - (line.credit_amount || 0);
 
       // تصنيف حسب كود الحساب
-      if (ACCOUNT_CLASSIFICATIONS.cash.some(c => code.startsWith(c))) {
+      if (ACCOUNT_CLASSIFICATIONS.cash.some((c) => code.startsWith(c))) {
         // حركات النقدية
         if (netAmount > 0) {
           cashInflow += netAmount;
         } else {
           cashOutflow += Math.abs(netAmount);
         }
-      } else if (ACCOUNT_CLASSIFICATIONS.operating.some(c => code.startsWith(c))) {
+      } else if (ACCOUNT_CLASSIFICATIONS.operating.some((c) => code.startsWith(c))) {
         // أنشطة تشغيلية
         if (account.account_type === 'revenue') {
           operatingActivities += (line.credit_amount || 0) - (line.debit_amount || 0);
         } else if (account.account_type === 'expense') {
           operatingActivities -= (line.debit_amount || 0) - (line.credit_amount || 0);
         }
-      } else if (ACCOUNT_CLASSIFICATIONS.investing.some(c => code.startsWith(c))) {
+      } else if (ACCOUNT_CLASSIFICATIONS.investing.some((c) => code.startsWith(c))) {
         // أنشطة استثمارية
         investingActivities -= netAmount; // سالب = شراء أصول
-      } else if (ACCOUNT_CLASSIFICATIONS.financing.some(c => code.startsWith(c))) {
+      } else if (ACCOUNT_CLASSIFICATIONS.financing.some((c) => code.startsWith(c))) {
         // أنشطة تمويلية
         financingActivities += netAmount;
       }
@@ -294,9 +296,8 @@ serve(async (req) => {
         net: result.net_cash_flow,
         entries_processed: journalEntries.length,
         lines_processed: journalLines.length,
-      }
+      },
     });
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('[calculate-cash-flow] ❌ Error:', error);

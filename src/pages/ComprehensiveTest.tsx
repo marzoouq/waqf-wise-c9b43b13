@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TestTube, Play, ShieldCheck } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { TestTube, Play, ShieldCheck } from 'lucide-react';
 
 export default function ComprehensiveTest() {
   return (
@@ -19,7 +22,8 @@ export default function ComprehensiveTest() {
           <CardHeader>
             <CardTitle>قيد الإعداد</CardTitle>
             <CardDescription>
-              تم إنشاء المسار لتجنب 404. يمكنك حالياً استخدام أدوات المراقبة والأمان من الروابط أدناه.
+              تم إنشاء المسار لتجنب 404. يمكنك حالياً استخدام أدوات المراقبة والأمان من الروابط
+              أدناه.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-2">

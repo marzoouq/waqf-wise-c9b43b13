@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
-import { ArchiveService } from "@/services";
-import { toast } from "sonner";
-import { logger } from "@/lib/logger";
+import { useState, useCallback } from 'react';
+import { ArchiveService } from '@/services';
+import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UseDocumentPreviewOptions {
   document: {
@@ -18,7 +18,7 @@ export function useDocumentPreview({ document }: UseDocumentPreviewOptions) {
 
     try {
       setLoading(true);
-      
+
       const fileName = document.file_path.split('/').pop() || document.name;
       const data = await ArchiveService.downloadFile('beneficiary-documents', fileName);
 

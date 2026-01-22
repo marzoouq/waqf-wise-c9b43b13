@@ -1,30 +1,40 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useMaintenanceProviders } from "@/hooks/property/useMaintenanceProviders";
-import { Plus, Star, Phone, Mail } from "lucide-react";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useMaintenanceProviders } from '@/hooks/property/useMaintenanceProviders';
+import { Plus, Star, Phone, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface MaintenanceProvidersDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenanceProvidersDialogProps) {
+export function MaintenanceProvidersDialog({
+  open,
+  onOpenChange,
+}: MaintenanceProvidersDialogProps) {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [formData, setFormData] = useState({
-    provider_name: "",
-    contact_person: "",
-    phone: "",
-    email: "",
-    address: "",
+    provider_name: '',
+    contact_person: '',
+    phone: '',
+    email: '',
+    address: '',
     specialization: [] as string[],
-    notes: ""
+    notes: '',
   });
 
   // استخدام hook موحد بدلاً من useQuery/useMutation مباشرة
@@ -32,7 +42,7 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
 
   const handleSubmit = () => {
     if (!formData.provider_name || !formData.phone) {
-      toast.error("يرجى إدخال الاسم ورقم الهاتف");
+      toast.error('يرجى إدخال الاسم ورقم الهاتف');
       return;
     }
     addProvider({
@@ -50,17 +60,17 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
     });
     setIsAddingNew(false);
     setFormData({
-      provider_name: "",
-      contact_person: "",
-      phone: "",
-      email: "",
-      address: "",
+      provider_name: '',
+      contact_person: '',
+      phone: '',
+      email: '',
+      address: '',
       specialization: [],
-      notes: ""
+      notes: '',
     });
   };
 
-  const specializations = ["سباكة", "كهرباء", "تكييف", "نجارة", "دهان", "تنظيف", "أخرى"];
+  const specializations = ['سباكة', 'كهرباء', 'تكييف', 'نجارة', 'دهان', 'تنظيف', 'أخرى'];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -126,18 +136,18 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
                 {specializations.map((spec) => (
                   <Badge
                     key={spec}
-                    variant={formData.specialization.includes(spec) ? "default" : "outline"}
+                    variant={formData.specialization.includes(spec) ? 'default' : 'outline'}
                     className="cursor-pointer"
                     onClick={() => {
                       if (formData.specialization.includes(spec)) {
                         setFormData({
                           ...formData,
-                          specialization: formData.specialization.filter(s => s !== spec)
+                          specialization: formData.specialization.filter((s) => s !== spec),
                         });
                       } else {
                         setFormData({
                           ...formData,
-                          specialization: [...formData.specialization, spec]
+                          specialization: [...formData.specialization, spec],
                         });
                       }
                     }}
@@ -160,9 +170,7 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
               <Button variant="outline" onClick={() => setIsAddingNew(false)}>
                 إلغاء
               </Button>
-              <Button onClick={handleSubmit}>
-                حفظ
-              </Button>
+              <Button onClick={handleSubmit}>حفظ</Button>
             </div>
           </div>
         )}
@@ -181,7 +189,9 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">جاري التحميل...</TableCell>
+                  <TableCell colSpan={5} className="text-center">
+                    جاري التحميل...
+                  </TableCell>
                 </TableRow>
               ) : providers.length === 0 ? (
                 <TableRow>
@@ -196,7 +206,9 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
                       <div>
                         <div className="font-medium">{provider.provider_name}</div>
                         {provider.contact_person && (
-                          <div className="text-sm text-muted-foreground">{provider.contact_person}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {provider.contact_person}
+                          </div>
                         )}
                       </div>
                     </TableCell>

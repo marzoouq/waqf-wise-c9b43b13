@@ -1,15 +1,15 @@
-import { useState, useCallback } from "react";
-import { type Property } from "@/hooks/property/useProperties";
-import { type Contract } from "@/hooks/property/useContracts";
-import { type RentalPayment } from "@/hooks/property/useRentalPayments";
-import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
+import { useState, useCallback } from 'react';
+import { type Property } from '@/hooks/property/useProperties';
+import { type Contract } from '@/hooks/property/useContracts';
+import { type RentalPayment } from '@/hooks/property/useRentalPayments';
+import { type MaintenanceRequest } from '@/hooks/property/useMaintenanceRequests';
 
 export const usePropertiesDialogs = () => {
   const [propertyDialogOpen, setPropertyDialogOpen] = useState(false);
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = useState(false);
-  
+
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null);

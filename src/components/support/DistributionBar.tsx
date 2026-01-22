@@ -25,18 +25,16 @@ export function DistributionBar({
   const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
 
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div className={cn('flex items-center justify-between', className)}>
       <span className="text-sm font-medium">{label}</span>
       <div className="flex items-center gap-2">
         <div className="w-24 sm:w-32 bg-muted rounded-full h-2">
           <div
-            className={cn("h-2 rounded-full transition-all", colorMap[color])}
+            className={cn('h-2 rounded-full transition-all', colorMap[color])}
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <span className="text-sm text-muted-foreground w-8 text-left">
-          {count}
-        </span>
+        <span className="text-sm text-muted-foreground w-8 text-left">{count}</span>
       </div>
     </div>
   );
@@ -54,13 +52,9 @@ export function DistributionList({
   emptyMessage = 'لا توجد بيانات',
 }: DistributionListProps) {
   const entries = Object.entries(data);
-  
+
   if (entries.length === 0) {
-    return (
-      <p className="text-center text-muted-foreground py-8">
-        {emptyMessage}
-      </p>
-    );
+    return <p className="text-center text-muted-foreground py-8">{emptyMessage}</p>;
   }
 
   const maxCount = Math.max(...entries.map(([, v]) => Number(v)));

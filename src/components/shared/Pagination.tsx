@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface PaginationProps {
   currentPage: number;
@@ -42,9 +42,7 @@ export function Pagination({
       <div className="flex items-center gap-2">
         {showItemsPerPage && onItemsPerPageChange && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
-              عدد العناصر:
-            </span>
+            <span className="text-sm text-muted-foreground whitespace-nowrap">عدد العناصر:</span>
             <Select
               value={itemsPerPage.toString()}
               onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
@@ -81,7 +79,7 @@ export function Pagination({
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-          
+
           <div className="flex items-center gap-1 px-2">
             <span className="text-sm font-medium">{currentPage}</span>
             <span className="text-sm text-muted-foreground">من</span>

@@ -1,10 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 5 تشغيلات/ساعة لكل مستخدم ============
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -14,16 +10,16 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -31,7 +27,7 @@ function checkRateLimit(userId: string): boolean {
 /**
  * Unified Daily Notifications System
  * نظام الإشعارات اليومية الموحد
- * 
+ *
  * يشمل جميع أنواع الإشعارات والمهام الدورية:
  * - إشعارات الفواتير المتأخرة
  * - إشعارات الأقساط المتأخرة
@@ -57,10 +53,12 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'daily-notifications',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة - يدعم طريقتين:
@@ -87,7 +85,10 @@ serve(async (req) => {
     // طريقة 2: التحقق من JWT token
     else if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser(token);
 
       if (!authError && user) {
         // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
@@ -96,17 +97,17 @@ serve(async (req) => {
           .select('role')
           .eq('user_id', user.id);
 
-        const hasAccess = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+        const hasAccess = roles?.some((r) => ['admin', 'nazer'].includes(r.role));
         if (hasAccess) {
           isAuthorized = true;
           authMethod = 'jwt';
-          
+
           // ✅ Rate Limiting للمستخدمين (ليس للمهام المجدولة)
           if (!checkRateLimit(user.id)) {
             console.warn(`[daily-notifications] Rate limit exceeded for user: ${user.id}`);
             return errorResponse('تجاوزت الحد المسموح (5 تشغيلات/ساعة). يرجى الانتظار.', 429);
           }
-          
+
           console.log('[daily-notifications] ✅ Authorized via JWT:', { userId: user.id });
         }
       }
@@ -129,14 +130,14 @@ serve(async (req) => {
       overdueInstallments: false,
       reports: false,
       cleanup: false,
-      deletedNotifications: 0
+      deletedNotifications: 0,
     };
 
     // 1. إرسال إشعارات الفواتير المتأخرة
     console.log('📧 إرسال إشعارات الفواتير المتأخرة...');
     try {
       const { error: invoicesError } = await supabase.rpc('notify_overdue_invoices');
-      
+
       if (invoicesError) {
         console.error('❌ خطأ في إرسال إشعارات الفواتير:', invoicesError);
       } else {
@@ -151,7 +152,7 @@ serve(async (req) => {
     console.log('💰 إرسال إشعارات الأقساط المتأخرة...');
     try {
       const { error: installmentsError } = await supabase.rpc('notify_overdue_loan_installments');
-      
+
       if (installmentsError) {
         console.error('❌ خطأ في إرسال إشعارات الأقساط:', installmentsError);
       } else {
@@ -166,7 +167,7 @@ serve(async (req) => {
     console.log('📄 إرسال إشعارات العقود القريبة من الانتهاء...');
     try {
       const { error: contractsError } = await supabase.rpc('notify_contract_expiring');
-      
+
       if (contractsError) {
         console.error('❌ خطأ في إرسال إشعارات العقود:', contractsError);
       } else {
@@ -181,7 +182,7 @@ serve(async (req) => {
     console.log('🏠 إرسال إشعارات دفعات الإيجار...');
     try {
       const { error: rentalsError } = await supabase.rpc('notify_rental_payment_due');
-      
+
       if (rentalsError) {
         console.error('❌ خطأ في إرسال إشعارات الإيجارات:', rentalsError);
       } else {
@@ -196,7 +197,7 @@ serve(async (req) => {
     console.log('🔄 تحديث حالة الأقساط المتأخرة...');
     try {
       const { error: updateError } = await supabase.rpc('update_overdue_installments');
-      
+
       if (updateError) {
         console.error('❌ خطأ في تحديث الأقساط:', updateError);
       } else {
@@ -211,7 +212,7 @@ serve(async (req) => {
     console.log('📝 تحديث حالة الطلبات المتأخرة...');
     try {
       const { error: requestsError } = await supabase.rpc('check_overdue_requests');
-      
+
       if (requestsError) {
         console.error('❌ خطأ في تحديث الطلبات:', requestsError);
       } else {
@@ -226,7 +227,7 @@ serve(async (req) => {
     console.log('📊 تحديث التقارير المالية...');
     try {
       const { error: viewsError } = await supabase.rpc('refresh_financial_views');
-      
+
       if (viewsError) {
         console.error('❌ خطأ في تحديث التقارير:', viewsError);
       } else {
@@ -240,8 +241,10 @@ serve(async (req) => {
     // 8. تنظيف الإشعارات القديمة
     console.log('🧹 تنظيف الإشعارات القديمة...');
     try {
-      const { data: deletedCount, error: cleanupError } = await supabase.rpc('archive_old_notifications');
-      
+      const { data: deletedCount, error: cleanupError } = await supabase.rpc(
+        'archive_old_notifications'
+      );
+
       if (cleanupError) {
         console.error('❌ خطأ في التنظيف:', cleanupError);
       } else {
@@ -256,20 +259,27 @@ serve(async (req) => {
     console.log('🎉 اكتمل تشغيل نظام الإشعارات اليومية الموحد');
 
     // ✅ تسجيل في audit_logs للتدقيق الجنائي
-    const successful = Object.values(results).filter(v => v === true).length;
-    const failed = Object.values(results).filter(v => v === false).length - 1;
-    
+    const successful = Object.values(results).filter((v) => v === true).length;
+    const failed = Object.values(results).filter((v) => v === false).length - 1;
+
     try {
       await supabase.from('audit_logs').insert({
         action_type: 'daily_notifications',
         table_name: 'notifications',
-        user_id: authMethod === 'jwt' ? (await supabase.auth.getUser(req.headers.get('Authorization')?.replace('Bearer ', '') || '')).data.user?.id : null,
+        user_id:
+          authMethod === 'jwt'
+            ? (
+                await supabase.auth.getUser(
+                  req.headers.get('Authorization')?.replace('Bearer ', '') || ''
+                )
+              ).data.user?.id
+            : null,
         user_email: authMethod === 'cron_secret' ? 'cron_job@system' : null,
         description: `تشغيل الإشعارات اليومية: ${successful} ناجح, ${failed} فاشل`,
         severity: failed > 0 ? 'warning' : 'info',
         ip_address: req.headers.get('x-forwarded-for') || 'system',
         user_agent: req.headers.get('user-agent') || 'cron_job',
-        metadata: { results, authMethod }
+        metadata: { results, authMethod },
       });
     } catch (auditError) {
       console.warn('[daily-notifications] Failed to log audit:', auditError);
@@ -282,15 +292,11 @@ serve(async (req) => {
       summary: {
         successful,
         failed,
-        total: 8
-      }
+        total: 8,
+      },
     });
-
   } catch (error) {
     console.error('💥 خطأ عام في نظام الإشعارات:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'خطأ غير معروف',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'خطأ غير معروف', 500);
   }
 });

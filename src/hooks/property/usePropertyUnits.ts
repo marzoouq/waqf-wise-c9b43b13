@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { PropertyService } from "@/services/property.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { PropertyService } from '@/services/property.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import type { Database } from '@/integrations/supabase/types';
 
 type DbPropertyUnitInsert = Database['public']['Tables']['property_units']['Insert'];
 type DbPropertyUnitUpdate = Database['public']['Tables']['property_units']['Update'];
@@ -11,7 +11,12 @@ export function usePropertyUnits(propertyId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: units = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: units = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId || ''),
     queryFn: () => PropertyService.getUnits(propertyId),
   });
@@ -22,22 +27,22 @@ export function usePropertyUnits(propertyId?: string) {
       queryClient.invalidateQueries({ queryKey: ['property-units'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة الوحدة بنجاح",
+        title: 'تمت الإضافة بنجاح',
+        description: 'تم إضافة الوحدة بنجاح',
       });
     },
   });
 
   const updateUnit = useMutation({
-    mutationFn: ({ id, ...updates }: DbPropertyUnitUpdate & { id: string }) => 
+    mutationFn: ({ id, ...updates }: DbPropertyUnitUpdate & { id: string }) =>
       PropertyService.updateUnit(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['property-units'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث الوحدة بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث الوحدة بنجاح',
       });
     },
   });
@@ -48,8 +53,8 @@ export function usePropertyUnits(propertyId?: string) {
       queryClient.invalidateQueries({ queryKey: ['property-units'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف الوحدة بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف الوحدة بنجاح',
       });
     },
   });

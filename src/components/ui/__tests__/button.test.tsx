@@ -51,7 +51,11 @@ describe('Button Component', () => {
   });
 
   it('can be disabled by both isLoading and disabled', () => {
-    const { getByRole } = render(<Button isLoading disabled>معطل ويحمل</Button>);
+    const { getByRole } = render(
+      <Button isLoading disabled>
+        معطل ويحمل
+      </Button>
+    );
     expect(getByRole('button')).toBeDisabled();
   });
 });

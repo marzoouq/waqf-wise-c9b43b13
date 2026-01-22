@@ -1,14 +1,14 @@
-import { useState, useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState, useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -16,74 +16,74 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Filter, 
-  Download, 
-  Shield, 
-  AlertCircle, 
-  Info, 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import {
+  Filter,
+  Download,
+  Shield,
+  AlertCircle,
+  Info,
   AlertTriangle,
   Search,
   Eye,
   RefreshCw,
   ChevronDown,
-  ChevronUp
-} from "lucide-react";
-import { 
-  useAuditLogsEnhanced, 
+  ChevronUp,
+} from 'lucide-react';
+import {
+  useAuditLogsEnhanced,
   useAuditLogTables,
   useAuditLogUsers,
   type EnhancedAuditLog,
-  type EnhancedAuditFilters
-} from "@/hooks/system/useAuditLogsEnhanced";
-import { format } from "@/lib/date";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { PaginationControls } from "@/components/ui/pagination-controls";
-import { usePagination } from "@/hooks/ui/usePagination";
-import { AuditLogDetailsDialog } from "./AuditLogDetailsDialog";
-import { AuditStatsCards } from "./AuditStatsCards";
-import { AuditAlertsCard } from "./AuditAlertsCard";
-import { AuditDashboardCharts } from "./AuditDashboardCharts";
-import { AuditCategoryFilter, CATEGORY_TABLES } from "./AuditCategoryFilter";
-import { cn } from "@/lib/utils";
+  type EnhancedAuditFilters,
+} from '@/hooks/system/useAuditLogsEnhanced';
+import { format } from '@/lib/date';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { usePagination } from '@/hooks/ui/usePagination';
+import { AuditLogDetailsDialog } from './AuditLogDetailsDialog';
+import { AuditStatsCards } from './AuditStatsCards';
+import { AuditAlertsCard } from './AuditAlertsCard';
+import { AuditDashboardCharts } from './AuditDashboardCharts';
+import { AuditCategoryFilter, CATEGORY_TABLES } from './AuditCategoryFilter';
+import { cn } from '@/lib/utils';
 
 const severityConfig: Record<string, { label: string; icon: typeof Info; color: string }> = {
-  info: { label: "معلومة", icon: Info, color: "bg-info/10 text-info" },
-  warning: { label: "تحذير", icon: AlertTriangle, color: "bg-warning/10 text-warning" },
-  error: { label: "خطأ", icon: AlertCircle, color: "bg-destructive/10 text-destructive" },
-  critical: { label: "حرج", icon: Shield, color: "bg-destructive text-destructive-foreground" },
+  info: { label: 'معلومة', icon: Info, color: 'bg-info/10 text-info' },
+  warning: { label: 'تحذير', icon: AlertTriangle, color: 'bg-warning/10 text-warning' },
+  error: { label: 'خطأ', icon: AlertCircle, color: 'bg-destructive/10 text-destructive' },
+  critical: { label: 'حرج', icon: Shield, color: 'bg-destructive text-destructive-foreground' },
 };
 
 const actionTypeLabels: Record<string, string> = {
-  INSERT: "إضافة",
-  UPDATE: "تحديث",
-  DELETE: "حذف",
-  VIEW_ACCESS: "عرض",
-  LOGIN: "تسجيل دخول",
-  LOGOUT: "تسجيل خروج",
+  INSERT: 'إضافة',
+  UPDATE: 'تحديث',
+  DELETE: 'حذف',
+  VIEW_ACCESS: 'عرض',
+  LOGIN: 'تسجيل دخول',
+  LOGOUT: 'تسجيل خروج',
 };
 
 const tableNameLabels: Record<string, string> = {
-  beneficiaries: "المستفيدون",
-  families: "العائلات",
-  properties: "العقارات",
-  property_units: "الوحدات",
-  funds: "الصناديق",
-  journal_entries: "القيود",
-  journal_entry_lines: "سطور القيود",
-  payment_vouchers: "سندات الصرف",
-  distributions: "التوزيعات",
-  loans: "القروض",
-  contracts: "العقود",
-  tenants: "المستأجرين",
-  user_roles: "الأدوار",
-  governance_decisions: "قرارات الحوكمة",
-  bank_accounts: "الحسابات البنكية",
-  bank_transfers: "التحويلات",
+  beneficiaries: 'المستفيدون',
+  families: 'العائلات',
+  properties: 'العقارات',
+  property_units: 'الوحدات',
+  funds: 'الصناديق',
+  journal_entries: 'القيود',
+  journal_entry_lines: 'سطور القيود',
+  payment_vouchers: 'سندات الصرف',
+  distributions: 'التوزيعات',
+  loans: 'القروض',
+  contracts: 'العقود',
+  tenants: 'المستأجرين',
+  user_roles: 'الأدوار',
+  governance_decisions: 'قرارات الحوكمة',
+  bank_accounts: 'الحسابات البنكية',
+  bank_transfers: 'التحويلات',
 };
 
 export function AuditLogsTable() {
@@ -100,7 +100,7 @@ export function AuditLogsTable() {
   const filteredLogs = useMemo(() => {
     if (!selectedCategory) return logs;
     const categoryTables = CATEGORY_TABLES[selectedCategory] || [];
-    return logs.filter(log => categoryTables.includes(log.table_name || ""));
+    return logs.filter((log) => categoryTables.includes(log.table_name || ''));
   }, [logs, selectedCategory]);
 
   const {
@@ -132,22 +132,30 @@ export function AuditLogsTable() {
   const exportLogs = () => {
     if (!filteredLogs || filteredLogs.length === 0) return;
 
-    const csvHeaders = ["التاريخ", "المستخدم", "الدور", "نوع العملية", "الجدول", "الوصف", "الخطورة"];
-    const csvData = filteredLogs.map(log => [
-      format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss"),
-      log.user_email || "-",
-      log.user_role || "-",
+    const csvHeaders = [
+      'التاريخ',
+      'المستخدم',
+      'الدور',
+      'نوع العملية',
+      'الجدول',
+      'الوصف',
+      'الخطورة',
+    ];
+    const csvData = filteredLogs.map((log) => [
+      format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
+      log.user_email || '-',
+      log.user_role || '-',
       actionTypeLabels[log.action_type] || log.action_type,
-      tableNameLabels[log.table_name || ""] || log.table_name || "-",
-      log.description || "-",
-      severityConfig[log.severity]?.label || log.severity
+      tableNameLabels[log.table_name || ''] || log.table_name || '-',
+      log.description || '-',
+      severityConfig[log.severity]?.label || log.severity,
     ]);
 
-    const csv = [csvHeaders, ...csvData].map(row => row.join(",")).join("\n");
-    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const csv = [csvHeaders, ...csvData].map((row) => row.join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `audit_logs_${format(new Date(), "yyyy-MM-dd_HH-mm")}.csv`;
+    link.download = `audit_logs_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.csv`;
     link.click();
   };
 
@@ -156,7 +164,7 @@ export function AuditLogsTable() {
     setSelectedCategory(null);
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v) || selectedCategory;
+  const hasActiveFilters = Object.values(filters).some((v) => v) || selectedCategory;
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجلات التدقيق..." />;
@@ -164,8 +172,8 @@ export function AuditLogsTable() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل السجلات" 
+      <ErrorState
+        title="فشل تحميل السجلات"
         message="حدث خطأ أثناء تحميل سجلات التدقيق"
         onRetry={() => refetch()}
       />
@@ -181,9 +189,9 @@ export function AuditLogsTable() {
       <AuditStatsCards dateRange={dateRange} />
 
       {/* فلاتر الفئات */}
-      <AuditCategoryFilter 
-        selectedCategory={selectedCategory} 
-        onCategoryChange={setSelectedCategory} 
+      <AuditCategoryFilter
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
       />
 
       {/* التنبيهات + الفلاتر */}
@@ -195,7 +203,7 @@ export function AuditLogsTable() {
 
         {/* الفلاتر */}
         <Card className="lg:col-span-2 p-4">
-          <div 
+          <div
             className="flex items-center justify-between cursor-pointer mb-4"
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -203,7 +211,9 @@ export function AuditLogsTable() {
               <Filter className="h-5 w-5 text-muted-foreground" />
               <h2 className="font-semibold">الفلاتر</h2>
               {hasActiveFilters && (
-                <Badge variant="secondary" className="text-xs">نشط</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  نشط
+                </Badge>
               )}
             </div>
             {showFilters ? (
@@ -221,7 +231,7 @@ export function AuditLogsTable() {
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="بحث في الوصف..."
-                    value={filters.search || ""}
+                    value={filters.search || ''}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                     className="pe-10"
                   />
@@ -229,9 +239,9 @@ export function AuditLogsTable() {
 
                 {/* الجدول */}
                 <Select
-                  value={filters.tableName || "all"}
+                  value={filters.tableName || 'all'}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, tableName: value === "all" ? undefined : value })
+                    setFilters({ ...filters, tableName: value === 'all' ? undefined : value })
                   }
                 >
                   <SelectTrigger>
@@ -249,9 +259,9 @@ export function AuditLogsTable() {
 
                 {/* نوع العملية */}
                 <Select
-                  value={filters.actionType || "all"}
+                  value={filters.actionType || 'all'}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, actionType: value === "all" ? undefined : value })
+                    setFilters({ ...filters, actionType: value === 'all' ? undefined : value })
                   }
                 >
                   <SelectTrigger>
@@ -267,9 +277,9 @@ export function AuditLogsTable() {
 
                 {/* الخطورة */}
                 <Select
-                  value={filters.severity || "all"}
+                  value={filters.severity || 'all'}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, severity: value === "all" ? undefined : value })
+                    setFilters({ ...filters, severity: value === 'all' ? undefined : value })
                   }
                 >
                   <SelectTrigger>
@@ -287,7 +297,7 @@ export function AuditLogsTable() {
                 {/* من تاريخ */}
                 <Input
                   type="date"
-                  value={filters.startDate || ""}
+                  value={filters.startDate || ''}
                   onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
                   placeholder="من تاريخ"
                 />
@@ -295,7 +305,7 @@ export function AuditLogsTable() {
                 {/* إلى تاريخ */}
                 <Input
                   type="date"
-                  value={filters.endDate || ""}
+                  value={filters.endDate || ''}
                   onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
                   placeholder="إلى تاريخ"
                 />
@@ -306,7 +316,7 @@ export function AuditLogsTable() {
                   مسح الفلاتر
                 </Button>
                 <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-                  <RefreshCw className={cn("h-4 w-4 ms-2", isFetching && "animate-spin")} />
+                  <RefreshCw className={cn('h-4 w-4 ms-2', isFetching && 'animate-spin')} />
                   تحديث
                 </Button>
                 <Button variant="outline" onClick={exportLogs} disabled={logs.length === 0}>
@@ -346,36 +356,36 @@ export function AuditLogsTable() {
                   {paginatedData.map((log) => {
                     const config = severityConfig[log.severity] || severityConfig.info;
                     const SeverityIcon = config.icon;
-                    
+
                     return (
-                      <TableRow 
-                        key={log.id} 
+                      <TableRow
+                        key={log.id}
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => setSelectedLog(log)}
                       >
                         <TableCell className="font-mono text-xs whitespace-nowrap">
-                          {format(new Date(log.created_at), "MM/dd HH:mm:ss")}
+                          {format(new Date(log.created_at), 'MM/dd HH:mm:ss')}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="text-sm truncate max-w-[150px]">
-                              {log.user_email || "غير معروف"}
+                              {log.user_email || 'غير معروف'}
                             </span>
                             {log.user_role && (
-                              <span className="text-xs text-muted-foreground">
-                                {log.user_role}
-                              </span>
+                              <span className="text-xs text-muted-foreground">{log.user_role}</span>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge 
-                            variant="outline" 
+                          <Badge
+                            variant="outline"
                             className={cn(
-                              "text-xs",
-                              log.action_type === 'DELETE' && "border-destructive/50 text-destructive",
-                              log.action_type === 'INSERT' && "border-status-success/50 text-status-success",
-                              log.action_type === 'UPDATE' && "border-info/50 text-info"
+                              'text-xs',
+                              log.action_type === 'DELETE' &&
+                                'border-destructive/50 text-destructive',
+                              log.action_type === 'INSERT' &&
+                                'border-status-success/50 text-status-success',
+                              log.action_type === 'UPDATE' && 'border-info/50 text-info'
                             )}
                           >
                             {actionTypeLabels[log.action_type] || log.action_type}
@@ -383,14 +393,14 @@ export function AuditLogsTable() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
                           <Badge variant="secondary" className="text-xs">
-                            {tableNameLabels[log.table_name || ""] || log.table_name || "-"}
+                            {tableNameLabels[log.table_name || ''] || log.table_name || '-'}
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell max-w-xs truncate text-xs">
                           {log.description}
                         </TableCell>
                         <TableCell>
-                          <Badge className={cn(config.color, "text-xs gap-1")}>
+                          <Badge className={cn(config.color, 'text-xs gap-1')}>
                             <SeverityIcon className="h-3 w-3" />
                             {config.label}
                           </Badge>

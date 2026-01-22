@@ -24,7 +24,7 @@ test.describe('Login Page UI', () => {
   test('should display login page correctly', async ({ page }) => {
     // Check for main elements
     await expect(page.locator('h1, [class*="title"]').first()).toBeVisible();
-    
+
     // Check for tabs (staff/beneficiary)
     const tabs = page.locator('[role="tablist"]');
     await expect(tabs).toBeVisible();
@@ -47,13 +47,15 @@ test.describe('Login Page UI', () => {
   test('should switch between staff and beneficiary tabs', async ({ page }) => {
     // Find beneficiary tab
     const beneficiaryTab = page.locator('text=المستفيدون').first();
-    
+
     if (await beneficiaryTab.isVisible()) {
       await beneficiaryTab.click();
       await page.waitForTimeout(300);
 
       // Should show national ID input instead of email
-      const nationalIdInput = page.locator('input[id*="national"], input[placeholder*="هوية"]').first();
+      const nationalIdInput = page
+        .locator('input[id*="national"], input[placeholder*="هوية"]')
+        .first();
       await expect(nationalIdInput).toBeVisible();
     }
   });
@@ -62,7 +64,7 @@ test.describe('Login Page UI', () => {
 test.describe('Staff Login Flow', () => {
   test('should show error for empty form submission', async ({ page }) => {
     await page.goto('/login');
-    
+
     const submitButton = page.locator('button[type="submit"]').first();
     await submitButton.click();
 
@@ -142,7 +144,7 @@ test.describe('Staff Login Flow', () => {
 test.describe('Beneficiary Login Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login');
-    
+
     // Switch to beneficiary tab
     const beneficiaryTab = page.locator('text=المستفيدون').first();
     if (await beneficiaryTab.isVisible()) {
@@ -152,23 +154,27 @@ test.describe('Beneficiary Login Flow', () => {
   });
 
   test('should show national ID input in beneficiary tab', async ({ page }) => {
-    const nationalIdInput = page.locator('input[id*="national"], input[placeholder*="هوية"]').first();
-    
+    const nationalIdInput = page
+      .locator('input[id*="national"], input[placeholder*="هوية"]')
+      .first();
+
     // May or may not be visible depending on tab implementation
     const isVisible = await nationalIdInput.isVisible().catch(() => false);
-    
+
     if (isVisible) {
       await expect(nationalIdInput).toBeVisible();
     }
   });
 
   test('should validate national ID format (10 digits)', async ({ page }) => {
-    const nationalIdInput = page.locator('input[id*="national"], input[placeholder*="هوية"]').first();
-    
+    const nationalIdInput = page
+      .locator('input[id*="national"], input[placeholder*="هوية"]')
+      .first();
+
     if (await nationalIdInput.isVisible()) {
       // Enter short ID
       await nationalIdInput.fill('123');
-      
+
       const submitButton = page.locator('button[type="submit"]').first();
       await submitButton.click();
 
@@ -180,12 +186,14 @@ test.describe('Beneficiary Login Flow', () => {
   });
 
   test('should accept valid national ID format', async ({ page }) => {
-    const nationalIdInput = page.locator('input[id*="national"], input[placeholder*="هوية"]').first();
-    
+    const nationalIdInput = page
+      .locator('input[id*="national"], input[placeholder*="هوية"]')
+      .first();
+
     if (await nationalIdInput.isVisible()) {
       // Enter valid 10-digit ID
       await nationalIdInput.fill('1234567890');
-      
+
       const value = await nationalIdInput.inputValue();
       expect(value.length).toBe(10);
     }
@@ -197,10 +205,10 @@ test.describe('OAuth Login Options', () => {
     await page.goto('/login');
 
     const googleButton = page.locator('button:has-text("Google"), [class*="google"]').first();
-    
+
     // Google login may or may not be implemented
     const isVisible = await googleButton.isVisible().catch(() => false);
-    
+
     if (isVisible) {
       await expect(googleButton).toBeEnabled();
     }
@@ -210,7 +218,7 @@ test.describe('OAuth Login Options', () => {
     await page.goto('/login');
 
     const googleButton = page.locator('button:has-text("Google")').first();
-    
+
     if (await googleButton.isVisible()) {
       // Clicking should either open popup or redirect
       const [popup] = await Promise.all([
@@ -233,11 +241,11 @@ test.describe('Session Management', () => {
 
     // Should redirect to login
     await page.waitForURL(/\/(login|unauthorized|auth)/, { timeout: 5000 }).catch(() => {});
-    
+
     // Either redirected or shows unauthorized state
     const isOnLogin = page.url().includes('/login') || page.url().includes('/auth');
     const isOnDashboard = page.url().includes('/dashboard');
-    
+
     // If still on dashboard, there should be an auth prompt
     if (isOnDashboard) {
       const authPrompt = page.locator('text=تسجيل الدخول, text=غير مصرح');
@@ -294,11 +302,15 @@ test.describe('Logout Flow', () => {
       await page.waitForURL(/\/(dashboard|redirect|home)/, { timeout: 10000 });
 
       // Look for logout button
-      const logoutButton = page.locator('button:has-text("خروج"), button:has-text("تسجيل الخروج"), [aria-label*="logout"]').first();
+      const logoutButton = page
+        .locator('button:has-text("خروج"), button:has-text("تسجيل الخروج"), [aria-label*="logout"]')
+        .first();
 
       // May be in a dropdown menu
-      const userMenu = page.locator('[aria-label*="user"], [aria-label*="menu"], button:has([class*="avatar"])').first();
-      
+      const userMenu = page
+        .locator('[aria-label*="user"], [aria-label*="menu"], button:has([class*="avatar"])')
+        .first();
+
       if (await userMenu.isVisible()) {
         await userMenu.click();
         await page.waitForTimeout(300);
@@ -319,7 +331,9 @@ test.describe('Password Visibility Toggle', () => {
     await page.goto('/login');
 
     const passwordInput = page.locator('input[type="password"]').first();
-    const toggleButton = page.locator('button:near(input[type="password"]), [class*="eye"]').first();
+    const toggleButton = page
+      .locator('button:near(input[type="password"]), [class*="eye"]')
+      .first();
 
     // Check initial state
     await expect(passwordInput).toHaveAttribute('type', 'password');
@@ -327,7 +341,7 @@ test.describe('Password Visibility Toggle', () => {
     // If toggle exists, click it
     if (await toggleButton.isVisible()) {
       await toggleButton.click();
-      
+
       // Password should now be visible
       const inputType = await passwordInput.getAttribute('type');
       expect(['text', 'password']).toContain(inputType);

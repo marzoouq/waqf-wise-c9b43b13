@@ -2,9 +2,9 @@
  * Hook لإدارة مستندات الإفصاح السنوي
  * @version 2.8.65
  */
-import { useQuery } from "@tanstack/react-query";
-import { DisclosureService } from "@/services/disclosure.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { DisclosureService } from '@/services/disclosure.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DisclosureDocument {
   id: string;
@@ -20,13 +20,13 @@ export interface DisclosureDocument {
 }
 
 const DOCUMENT_TYPE_LABELS: Record<string, string> = {
-  'فاتورة_خدمات': 'فواتير خدمات',
-  'صيانة': 'صيانة',
-  'زكاة_ضرائب': 'زكاة وضرائب',
-  'تقرير_مالي': 'تقارير مالية',
-  'خدمات_محاسبية': 'خدمات محاسبية',
-  'مصاريف_عامة': 'مصاريف عامة',
-  'اقفال_سنوي': 'إقفال سنوي',
+  فاتورة_خدمات: 'فواتير خدمات',
+  صيانة: 'صيانة',
+  زكاة_ضرائب: 'زكاة وضرائب',
+  تقرير_مالي: 'تقارير مالية',
+  خدمات_محاسبية: 'خدمات محاسبية',
+  مصاريف_عامة: 'مصاريف عامة',
+  اقفال_سنوي: 'إقفال سنوي',
 };
 
 export function useDisclosureDocuments(disclosureId?: string) {
@@ -37,14 +37,17 @@ export function useDisclosureDocuments(disclosureId?: string) {
   });
 
   // تجميع المستندات حسب النوع
-  const groupedDocuments = documents.reduce((acc, doc) => {
-    const type = doc.document_type;
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push(doc as unknown as DisclosureDocument);
-    return acc;
-  }, {} as Record<string, DisclosureDocument[]>);
+  const groupedDocuments = documents.reduce(
+    (acc, doc) => {
+      const type = doc.document_type;
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(doc as unknown as DisclosureDocument);
+      return acc;
+    },
+    {} as Record<string, DisclosureDocument[]>
+  );
 
   return {
     documents: documents as unknown as DisclosureDocument[],

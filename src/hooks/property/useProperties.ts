@@ -1,12 +1,12 @@
-import { useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PropertyService, RealtimeService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/contexts/AuthContext";
-import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { PropertyService, RealtimeService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useActivities } from '@/hooks/ui/useActivities';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface Property {
   id: string;
@@ -40,7 +40,12 @@ export function useProperties() {
   const { addActivity } = useActivities();
   const { user } = useAuth();
 
-  const { data: properties = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: properties = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.PROPERTIES,
     queryFn: () => PropertyService.getAll(),
     staleTime: 10 * 60 * 1000,
@@ -56,22 +61,22 @@ export function useProperties() {
   }, [queryClient]);
 
   const addProperty = useMutation({
-    mutationFn: async (property: Omit<Property, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (property: Omit<Property, 'id' | 'created_at' | 'updated_at'>) => {
       return PropertyService.create(property);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
-      
+
       addActivity({
         action: `تم إضافة عقار جديد: ${data.name}`,
         user_name: user?.email || 'النظام',
       }).catch((error) => {
         logger.error(error, { context: 'property_activity', severity: 'low' });
       });
-      
+
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة العقار الجديد بنجاح",
+        title: 'تمت الإضافة بنجاح',
+        description: 'تم إضافة العقار الجديد بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -87,8 +92,8 @@ export function useProperties() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث بيانات العقار بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث بيانات العقار بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -104,8 +109,8 @@ export function useProperties() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف العقار بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف العقار بنجاح',
       });
     },
     onError: createMutationErrorHandler({

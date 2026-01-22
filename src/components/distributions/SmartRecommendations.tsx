@@ -43,9 +43,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
               <p className="font-semibold text-success">
                 التوصية الرئيسية: {getPatternName(analysis.balancedOption.pattern)}
               </p>
-              <p className="text-sm text-success/80 mt-1">
-                {analysis.balancedOption.reason}
-              </p>
+              <p className="text-sm text-success/80 mt-1">{analysis.balancedOption.reason}</p>
             </div>
             {onSelectScenario && (
               <Button
@@ -74,9 +72,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
               <Badge variant="outline" className="mb-2">
                 {getPatternName(analysis.mostEquitable.pattern)}
               </Badge>
-              <p className="text-sm text-muted-foreground">
-                {analysis.mostEquitable.reason}
-              </p>
+              <p className="text-sm text-muted-foreground">{analysis.mostEquitable.reason}</p>
               {onSelectScenario && (
                 <Button
                   onClick={() => onSelectScenario(analysis.mostEquitable.pattern)}
@@ -102,9 +98,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
               <Badge variant="outline" className="mb-2">
                 {getPatternName(analysis.mostEfficient.pattern)}
               </Badge>
-              <p className="text-sm text-muted-foreground">
-                {analysis.mostEfficient.reason}
-              </p>
+              <p className="text-sm text-muted-foreground">{analysis.mostEfficient.reason}</p>
               {onSelectScenario && (
                 <Button
                   onClick={() => onSelectScenario(analysis.mostEfficient.pattern)}
@@ -141,12 +135,13 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
 // دوال مساعدة للتحليل
 function analyzeMostEquitable(scenarios: SimulationResult[]) {
   // حساب الانحراف المعياري لكل سيناريو
-  const deviations = scenarios.map(scenario => {
-    const amounts = scenario.results.map(r => r.allocated_amount);
+  const deviations = scenarios.map((scenario) => {
+    const amounts = scenario.results.map((r) => r.allocated_amount);
     const mean = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-    const variance = amounts.reduce((sum, amount) => sum + Math.pow(amount - mean, 2), 0) / amounts.length;
+    const variance =
+      amounts.reduce((sum, amount) => sum + Math.pow(amount - mean, 2), 0) / amounts.length;
     const stdDev = Math.sqrt(variance);
-    
+
     return {
       pattern: scenario.pattern,
       stdDev,
@@ -154,7 +149,7 @@ function analyzeMostEquitable(scenarios: SimulationResult[]) {
     };
   });
 
-  const mostEquitable = deviations.reduce((min, curr) => 
+  const mostEquitable = deviations.reduce((min, curr) =>
     curr.coefficient < min.coefficient ? curr : min
   );
 
@@ -166,7 +161,7 @@ function analyzeMostEquitable(scenarios: SimulationResult[]) {
 
 function analyzeMostEfficient(scenarios: SimulationResult[]) {
   // التوزيع حسب الحاجة هو الأكثر كفاءة عادةً
-  const needBased = scenarios.find(s => s.pattern === 'need_based');
+  const needBased = scenarios.find((s) => s.pattern === 'need_based');
   if (needBased) {
     return {
       pattern: 'need_based',
@@ -183,7 +178,7 @@ function analyzeMostEfficient(scenarios: SimulationResult[]) {
 
 function analyzeBalancedOption(scenarios: SimulationResult[]) {
   // المختلط هو الأفضل إذا كان موجوداً
-  const hybrid = scenarios.find(s => s.pattern === 'hybrid');
+  const hybrid = scenarios.find((s) => s.pattern === 'hybrid');
   if (hybrid) {
     return {
       pattern: 'hybrid',
@@ -192,7 +187,7 @@ function analyzeBalancedOption(scenarios: SimulationResult[]) {
   }
 
   // الشرعي هو الخيار الآمن
-  const shariah = scenarios.find(s => s.pattern === 'shariah');
+  const shariah = scenarios.find((s) => s.pattern === 'shariah');
   if (shariah) {
     return {
       pattern: 'shariah',
@@ -211,8 +206,8 @@ function generateWarnings(scenarios: SimulationResult[]): string[] {
   const warnings: string[] = [];
 
   // تحقق من وجود فروقات كبيرة
-  scenarios.forEach(scenario => {
-    const amounts = scenario.results.map(r => r.allocated_amount);
+  scenarios.forEach((scenario) => {
+    const amounts = scenario.results.map((r) => r.allocated_amount);
     const max = Math.max(...amounts);
     const min = Math.min(...amounts);
     const ratio = max / min;
@@ -225,7 +220,7 @@ function generateWarnings(scenarios: SimulationResult[]): string[] {
   });
 
   // تحقق من عدم توافق المبلغ الكامل
-  scenarios.forEach(scenario => {
+  scenarios.forEach((scenario) => {
     const diff = Math.abs(
       scenario.summary.distributable_amount - scenario.summary.total_distributed
     );

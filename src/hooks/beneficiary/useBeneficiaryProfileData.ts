@@ -3,10 +3,10 @@
  * @version 2.9.2
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { BeneficiaryService, RequestService, MessageService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import type { HeirDistribution } from "@/types/distributions";
+import { useQuery } from '@tanstack/react-query';
+import { BeneficiaryService, RequestService, MessageService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import type { HeirDistribution } from '@/types/distributions';
 
 // ==================== Family Tree Hook ====================
 export function useFamilyTree(beneficiaryId: string, enabled: boolean = true) {
@@ -43,7 +43,7 @@ export function useRequestDetails(requestId: string, isOpen: boolean) {
     queryKey: QUERY_KEYS.REQUEST_DETAILS(requestId),
     queryFn: async () => {
       const data = await RequestService.getById(requestId);
-      if (!data) throw new Error("Request not found");
+      if (!data) throw new Error('Request not found');
       return data as unknown as RequestWithDetails;
     },
     enabled: isOpen && !!requestId,
@@ -86,4 +86,4 @@ export function useWaqfDistributionsSummary(beneficiaryId: string) {
 }
 
 export type { RequestWithDetails };
-export type { HeirDistribution } from "@/types/distributions";
+export type { HeirDistribution } from '@/types/distributions';

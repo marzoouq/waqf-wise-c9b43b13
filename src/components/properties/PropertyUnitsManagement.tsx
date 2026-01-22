@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Plus,
   Search,
@@ -33,17 +33,17 @@ import {
   CheckCircle2,
   XCircle,
   Edit,
-  Trash2
-} from "lucide-react";
-import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
-import { PropertyUnitDialog } from "./PropertyUnitDialog";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { EnhancedEmptyState } from "@/components/shared";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { useToast } from "@/hooks/ui/use-toast";
-import type { Database } from "@/integrations/supabase/types";
-import { getUnitTypeLabel } from "@/lib/constants";
+  Trash2,
+} from 'lucide-react';
+import { usePropertyUnits } from '@/hooks/property/usePropertyUnits';
+import { PropertyUnitDialog } from './PropertyUnitDialog';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { EnhancedEmptyState } from '@/components/shared';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { useToast } from '@/hooks/ui/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+import { getUnitTypeLabel } from '@/lib/constants';
 
 type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
@@ -52,12 +52,12 @@ interface PropertyUnitsManagementProps {
 }
 
 export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManagementProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<DbPropertyUnit | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<DbPropertyUnit | null>(null);
-  
+
   const { units, isLoading, deleteUnit, error, refetch } = usePropertyUnits(propertyId);
   const { toast } = useToast();
 
@@ -76,9 +76,10 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
     );
   }
 
-  const filteredUnits = (units || []).filter(unit =>
-    unit.unit_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    unit.unit_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUnits = (units || []).filter(
+    (unit) =>
+      unit.unit_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      unit.unit_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleEdit = (unit: DbPropertyUnit) => {
@@ -98,18 +99,18 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
 
   const handleDeleteConfirm = async () => {
     if (!unitToDelete) return;
-    
+
     try {
       await deleteUnit(unitToDelete.id);
       toast({
-        title: "تم الحذف",
+        title: 'تم الحذف',
         description: `تم حذف الوحدة ${unitToDelete.unit_number} بنجاح`,
       });
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حذف الوحدة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء حذف الوحدة',
+        variant: 'destructive',
       });
     } finally {
       setDeleteDialogOpen(false);
@@ -119,9 +120,9 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      'متاح': 'bg-success/10 text-success border-success/30',
-      'مشغول': 'bg-info/10 text-info border-info/30',
-      'صيانة': 'bg-warning/10 text-warning border-warning/30',
+      متاح: 'bg-success/10 text-success border-success/30',
+      مشغول: 'bg-info/10 text-info border-info/30',
+      صيانة: 'bg-warning/10 text-warning border-warning/30',
       'غير متاح': 'bg-muted text-muted-foreground border-border',
     };
     return (
@@ -133,9 +134,17 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
 
   const getOccupancyBadge = (status: string | null) => {
     if (status === 'مشغول') {
-      return <Badge variant="outline" className="bg-info/10 text-info">مشغول</Badge>;
+      return (
+        <Badge variant="outline" className="bg-info/10 text-info">
+          مشغول
+        </Badge>
+      );
     }
-    return <Badge variant="outline" className="bg-success/10 text-success">شاغر</Badge>;
+    return (
+      <Badge variant="outline" className="bg-success/10 text-success">
+        شاغر
+      </Badge>
+    );
   };
 
   if (isLoading) {
@@ -143,12 +152,18 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الوحدات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الوحدات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
-  const occupiedCount = units.filter(u => u.occupancy_status === 'مشغول').length;
-  const availableCount = units.filter(u => u.status === 'متاح').length;
-  const maintenanceCount = units.filter(u => u.status === 'صيانة').length;
+  const occupiedCount = units.filter((u) => u.occupancy_status === 'مشغول').length;
+  const availableCount = units.filter((u) => u.status === 'متاح').length;
+  const maintenanceCount = units.filter((u) => u.status === 'صيانة').length;
 
   return (
     <>
@@ -217,8 +232,8 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
               title="لا توجد وحدات"
               description="ابدأ بإضافة الوحدات للعقار"
               action={{
-                label: "إضافة وحدة جديدة",
-                onClick: () => setDialogOpen(true)
+                label: 'إضافة وحدة جديدة',
+                onClick: () => setDialogOpen(true),
               }}
             />
           ) : (
@@ -229,31 +244,47 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                     <TableHead className="text-xs sm:text-sm">رقم الوحدة</TableHead>
                     <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الاسم</TableHead>
                     <TableHead className="text-xs sm:text-sm">النوع</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الطابق</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">المساحة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                      الطابق
+                    </TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                      المساحة
+                    </TableHead>
                     <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الغرف</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الإيجار</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                      الإيجار
+                    </TableHead>
                     <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الإشغال</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                      الإشغال
+                    </TableHead>
                     <TableHead className="text-center text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUnits.map((unit) => (
                     <TableRow key={unit.id}>
-                      <TableCell className="font-medium text-xs sm:text-sm">{unit.unit_number}</TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{unit.unit_name || '-'}</TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">
+                        {unit.unit_number}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                        {unit.unit_name || '-'}
+                      </TableCell>
                       <TableCell className="text-xs sm:text-sm">
                         <Badge variant="outline">{getUnitTypeLabel(unit.unit_type)}</Badge>
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">{unit.floor_number || '-'}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                        {unit.floor_number || '-'}
+                      </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         {unit.area ? (
                           <span className="flex items-center gap-1">
                             <Maximize2 className="h-3 w-3" />
                             {unit.area} م²
                           </span>
-                        ) : '-'}
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         <div className="flex items-center gap-2">
@@ -278,24 +309,28 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                           <span className="font-medium">
                             {unit.monthly_rent.toLocaleString()} ر.س
                           </span>
-                        ) : '-'}
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm">{getStatusBadge(unit.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        {getStatusBadge(unit.status)}
+                      </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         {getOccupancyBadge(unit.occupancy_status)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(unit)}
                             title="تعديل"
                           >
                             <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteClick(unit)}
                             title="حذف"
@@ -327,8 +362,8 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف الوحدة "{unitToDelete?.unit_number}"؟ 
-              لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من حذف الوحدة "{unitToDelete?.unit_number}"؟ لا يمكن التراجع عن هذا
+              الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

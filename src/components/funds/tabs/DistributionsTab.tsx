@@ -1,24 +1,24 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Eye, CheckSquare, Calculator, Plus, Trash2, History } from "lucide-react";
-import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
-import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkflowDialog";
-import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
-import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
-import { DistributionTimelineTab } from "@/components/distributions/DistributionTimelineTab";
-import { useDistributions, Distribution } from "@/hooks/distributions/useDistributions";
-import { useUserRole } from "@/hooks/auth/useUserRole";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { format, arLocale as ar } from "@/lib/date";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Eye, CheckSquare, Calculator, Plus, Trash2, History } from 'lucide-react';
+import { DistributionDetailsDialog } from '@/components/distributions/DistributionDetailsDialog';
+import { ApprovalWorkflowDialog } from '@/components/distributions/ApprovalWorkflowDialog';
+import { DistributionSimulator } from '@/components/distributions/DistributionSimulator';
+import { CreateDistributionDialog } from '@/components/distributions/CreateDistributionDialog';
+import { DistributionTimelineTab } from '@/components/distributions/DistributionTimelineTab';
+import { useDistributions, Distribution } from '@/hooks/distributions/useDistributions';
+import { useUserRole } from '@/hooks/auth/useUserRole';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { UnifiedDataTable } from '@/components/unified/UnifiedDataTable';
+import { format, arLocale as ar } from '@/lib/date';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +28,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 export function DistributionsTab() {
   const { distributions, isLoading, deleteDistribution } = useDistributions();
@@ -46,7 +46,7 @@ export function DistributionsTab() {
   // المدير يمكنه حذف أي توزيع، غيره فقط المسودات
   const canDeleteDistribution = (distribution: Distribution) => {
     if (isAdmin) return true;
-    return distribution.status !== "معتمد";
+    return distribution.status !== 'معتمد';
   };
 
   const handleDeleteClick = (distribution: Distribution) => {
@@ -66,36 +66,36 @@ export function DistributionsTab() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      "مسودة": "secondary",
-      "معتمد": "default",
-      "مرفوض": "destructive",
-      "معلق": "secondary",
+    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
+      مسودة: 'secondary',
+      معتمد: 'default',
+      مرفوض: 'destructive',
+      معلق: 'secondary',
     };
-    return <Badge variant={variants[status] || "default"}>{status}</Badge>;
+    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
   };
 
   // Define columns for UnifiedDataTable
   const columns = [
     {
-      key: "month",
-      label: "الشهر",
-      render: (value: string) => <span className="font-medium">{value}</span>
+      key: 'month',
+      label: 'الشهر',
+      render: (value: string) => <span className="font-medium">{value}</span>,
     },
     {
-      key: "total_amount",
-      label: "إجمالي المبلغ",
-      render: (value: number) => `${value?.toLocaleString() || 0} ر.س`
+      key: 'total_amount',
+      label: 'إجمالي المبلغ',
+      render: (value: number) => `${value?.toLocaleString() || 0} ر.س`,
     },
     {
-      key: "beneficiaries_count",
-      label: "عدد المستفيدين",
+      key: 'beneficiaries_count',
+      label: 'عدد المستفيدين',
     },
     {
-      key: "status",
-      label: "الحالة",
-      render: (_: unknown, row: Distribution) => getStatusBadge(row.status)
-    }
+      key: 'status',
+      label: 'الحالة',
+      render: (_: unknown, row: Distribution) => getStatusBadge(row.status),
+    },
   ];
 
   // Actions for each row
@@ -157,17 +157,24 @@ export function DistributionsTab() {
       <div className="flex flex-wrap gap-3 justify-end">
         {distributions.length > 0 && (
           <ExportButton
-            data={distributions.map(d => ({
-              'الشهر': d.month,
+            data={distributions.map((d) => ({
+              الشهر: d.month,
               'إجمالي المبلغ': d.total_amount?.toLocaleString() || '0',
               'عدد المستفيدين': d.beneficiaries_count,
               'حصة الناظر': d.nazer_share?.toLocaleString() || '0',
               'تاريخ التوزيع': format(new Date(d.distribution_date), 'yyyy/MM/dd', { locale: ar }),
-              'الحالة': d.status,
+              الحالة: d.status,
             }))}
             filename="التوزيعات"
             title="تقرير التوزيعات"
-            headers={['الشهر', 'إجمالي المبلغ', 'عدد المستفيدين', 'حصة الناظر', 'تاريخ التوزيع', 'الحالة']}
+            headers={[
+              'الشهر',
+              'إجمالي المبلغ',
+              'عدد المستفيدين',
+              'حصة الناظر',
+              'تاريخ التوزيع',
+              'الحالة',
+            ]}
             variant="outline"
             size="sm"
           />
@@ -205,23 +212,15 @@ export function DistributionsTab() {
         distribution={selectedDistribution}
       />
 
-      <DistributionSimulator
-        open={simulatorOpen}
-        onOpenChange={setSimulatorOpen}
-      />
+      <DistributionSimulator open={simulatorOpen} onOpenChange={setSimulatorOpen} />
 
-      <CreateDistributionDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      <CreateDistributionDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <Dialog open={timelineOpen} onOpenChange={setTimelineOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>سجل التوزيع: {timelineDistribution?.month}</DialogTitle>
-            <DialogDescription>
-              تاريخ الموافقات والتغييرات للتوزيع
-            </DialogDescription>
+            <DialogDescription>تاريخ الموافقات والتغييرات للتوزيع</DialogDescription>
           </DialogHeader>
           <DistributionTimelineTab distribution={timelineDistribution} />
         </DialogContent>
@@ -232,15 +231,22 @@ export function DistributionsTab() {
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف التوزيع لشهر <span className="font-bold">{distributionToDelete?.month}</span> بمبلغ{" "}
-              <span className="font-bold">{distributionToDelete?.total_amount?.toLocaleString()} ر.س</span>؟
+              هل أنت متأكد من حذف التوزيع لشهر{' '}
+              <span className="font-bold">{distributionToDelete?.month}</span> بمبلغ{' '}
+              <span className="font-bold">
+                {distributionToDelete?.total_amount?.toLocaleString()} ر.س
+              </span>
+              ؟
               <br />
               <span className="text-destructive">هذا الإجراء لا يمكن التراجع عنه.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               حذف
             </AlertDialogAction>
           </AlertDialogFooter>

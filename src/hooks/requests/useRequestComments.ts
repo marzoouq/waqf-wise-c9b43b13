@@ -2,12 +2,12 @@
  * useRequestComments Hook - تعليقات الطلبات
  * يستخدم RequestService
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { RequestService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { TOAST_MESSAGES, QUERY_STALE_TIME } from '@/lib/constants';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { RequestService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface RequestComment {
   id: string;
@@ -36,9 +36,12 @@ export function useRequestComments(requestId?: string) {
       RequestService.addComment(data.request_id, data.comment, data.is_internal),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
-      toast({ title: "تم بنجاح", description: "تم إضافة التعليق بنجاح" });
+      toast({ title: 'تم بنجاح', description: 'تم إضافة التعليق بنجاح' });
     },
-    onError: createMutationErrorHandler({ context: 'add_request_comment', toastTitle: TOAST_MESSAGES.ERROR.ADD }),
+    onError: createMutationErrorHandler({
+      context: 'add_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD,
+    }),
   });
 
   const updateComment = useMutation({
@@ -46,18 +49,24 @@ export function useRequestComments(requestId?: string) {
       RequestService.updateComment(id, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
-      toast({ title: "تم بنجاح", description: "تم تحديث التعليق بنجاح" });
+      toast({ title: 'تم بنجاح', description: 'تم تحديث التعليق بنجاح' });
     },
-    onError: createMutationErrorHandler({ context: 'update_request_comment', toastTitle: TOAST_MESSAGES.ERROR.UPDATE }),
+    onError: createMutationErrorHandler({
+      context: 'update_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE,
+    }),
   });
 
   const deleteComment = useMutation({
     mutationFn: (id: string) => RequestService.deleteComment(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
-      toast({ title: "تم بنجاح", description: "تم حذف التعليق بنجاح" });
+      toast({ title: 'تم بنجاح', description: 'تم حذف التعليق بنجاح' });
     },
-    onError: createMutationErrorHandler({ context: 'delete_request_comment', toastTitle: TOAST_MESSAGES.ERROR.DELETE }),
+    onError: createMutationErrorHandler({
+      context: 'delete_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.DELETE,
+    }),
   });
 
   return {
