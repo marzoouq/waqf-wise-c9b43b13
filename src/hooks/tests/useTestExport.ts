@@ -144,7 +144,8 @@ export function useTestExport() {
       toastSuccess('تم تصدير التقرير بنجاح');
     } catch (error: unknown) {
       console.error('Export PDF error:', error);
-      toastError('فشل التصدير: ' + error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toastError('فشل التصدير: ' + message);
     }
   }, []);
 

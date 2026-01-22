@@ -47,11 +47,6 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     
     onOpenChange(false);
   };
-        is_matched: false,
-      });
-    }
-    setStep("match");
-  };
 
   return (
     <ResponsiveDialog 
