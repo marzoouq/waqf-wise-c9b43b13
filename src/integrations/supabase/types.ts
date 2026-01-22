@@ -17234,6 +17234,11 @@ export type Database = {
         Args: { p_voucher_id: string }
         Returns: undefined
       }
+      recalculate_account_balance: {
+        Args: { p_account_id: string }
+        Returns: number
+      }
+      recalculate_all_account_balances: { Args: never; Returns: undefined }
       refresh_financial_views: { Args: never; Returns: undefined }
       refresh_table_statistics: { Args: never; Returns: undefined }
       refresh_user_profile_cache: {

@@ -78,15 +78,15 @@ export const KPIService = {
       requestsRes,
       documentsRes,
     ] = await Promise.all([
-      supabase.from("beneficiaries").select("id, status", { count: "exact" }),
-      supabase.from("properties").select("id, status", { count: "exact" }),
-      supabase.from("contracts").select("id, status", { count: "exact" }),
-      supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }),
-      supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع"),
-      // إضافة: سندات القبض المدفوعة
-      supabase.from("payment_vouchers").select("id, amount, voucher_type, status").eq("status", "paid").eq("voucher_type", "receipt"),
-      supabase.from("beneficiary_requests").select("id, status", { count: "exact" }),
-      supabase.from("documents").select("id", { count: "exact" }),
+      supabase.from("beneficiaries").select("id, status", { count: "exact" }).is("deleted_at", null),
+      supabase.from("properties").select("id, status", { count: "exact" }).is("deleted_at", null),
+      supabase.from("contracts").select("id, status", { count: "exact" }).is("deleted_at", null),
+      supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }).is("deleted_at", null),
+      supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع").is("deleted_at", null),
+      // إضافة: سندات القبض المدفوعة (مع فلتر الحذف)
+      supabase.from("payment_vouchers").select("id, amount, voucher_type, status").eq("status", "paid").eq("voucher_type", "receipt").is("deleted_at", null),
+      supabase.from("beneficiary_requests").select("id, status", { count: "exact" }).is("deleted_at", null),
+      supabase.from("documents").select("id", { count: "exact" }).is("deleted_at", null),
     ]);
 
     const beneficiaries = beneficiariesRes.data || [];
@@ -154,19 +154,19 @@ export const KPIService = {
       vouchersResult,
       waqfUnitsResult
     ] = await Promise.all([
-      supabase.from('beneficiaries').select('id, status'),
-      supabase.from('families').select('id'),
-      supabase.from('properties').select('id, status'),
-      supabase.from('contracts').select('id, status, monthly_rent, payment_frequency'),
-      supabase.from('funds').select('id, is_active'),
-      supabase.from('beneficiary_requests').select('id, status, is_overdue'),
-      supabase.from('loans').select('id, status'),
-      supabase.from('rental_payments').select('id, amount_paid, status'),
-      supabase.from('journal_entries').select('id, status, entry_date'),
-      // سندات الصرف والقبض المدفوعة
-      supabase.from('payment_vouchers').select('id, amount, voucher_type, status').eq('status', 'paid'),
+      supabase.from('beneficiaries').select('id, status').is('deleted_at', null),
+      supabase.from('families').select('id').is('deleted_at', null),
+      supabase.from('properties').select('id, status').is('deleted_at', null),
+      supabase.from('contracts').select('id, status, monthly_rent, payment_frequency').is('deleted_at', null),
+      supabase.from('funds').select('id, is_active').is('deleted_at', null),
+      supabase.from('beneficiary_requests').select('id, status, is_overdue').is('deleted_at', null),
+      supabase.from('loans').select('id, status').is('deleted_at', null),
+      supabase.from('rental_payments').select('id, amount_paid, status').is('deleted_at', null),
+      supabase.from('journal_entries').select('id, status, entry_date').is('deleted_at', null),
+      // سندات الصرف والقبض المدفوعة (مع فلتر الحذف)
+      supabase.from('payment_vouchers').select('id, amount, voucher_type, status').eq('status', 'paid').is('deleted_at', null),
       // أرصدة أقلام الوقف
-      supabase.from('waqf_units').select('id, current_balance, total_income, total_expenses')
+      supabase.from('waqf_units').select('id, current_balance, total_income, total_expenses').is('deleted_at', null)
     ]);
 
     const beneficiaries = beneficiariesResult.data || [];
