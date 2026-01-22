@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * Dashboard Navigation E2E Tests
@@ -11,7 +11,7 @@ const TEST_USER = {
 };
 
 // Dashboard routes by role
-const ROLE_DASHBOARDS = {
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',
@@ -60,7 +60,7 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(page: any) {
+  async function loginAsTestUser(page: Page) {
     await page.goto('/login');
     
     const emailInput = page.locator('input[type="email"]').first();

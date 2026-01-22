@@ -106,7 +106,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, beneficiaryId, nationalId, newPassword } = body;
+    const { action, beneficiaryId, nationalId: _nationalId, newPassword } = body;
 
     console.log('✅ Admin manage password request:', { 
       action, 
@@ -144,7 +144,7 @@ serve(async (req) => {
       }
 
       // تحديث كلمة المرور مباشرة باستخدام Admin API
-      const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      const { data: _updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
         beneficiary.user_id,
         { password: newPassword }
       );

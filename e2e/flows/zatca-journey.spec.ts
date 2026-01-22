@@ -60,7 +60,7 @@ test.describe('رحلة الزكاة ZATCA', () => {
     await waitForPageLoad(page);
     
     // البحث عن مؤشرات التحقق
-    const validationIndicators = page.locator('.validation, .zatca-status, [data-zatca]');
+    const _validationIndicators = page.locator('.validation, .zatca-status, [data-zatca]');
     
     const content = await page.content();
     const hasZatcaContent = content.includes('ZATCA') || 
@@ -109,7 +109,7 @@ test.describe('رحلة الزكاة ZATCA', () => {
     await waitForPageLoad(page);
     
     // البحث عن مؤشر حالة ZATCA
-    const statusIndicator = page.locator('.zatca-status, [data-zatca-status], .invoice-status');
+    const _statusIndicator = page.locator('.zatca-status, [data-zatca-status], .invoice-status');
     
     const content = await page.content();
     expect(content.length).toBeGreaterThan(100);
@@ -141,7 +141,7 @@ test.describe('اختبار QR Code ZATCA', () => {
     await waitForPageLoad(page);
     
     // البحث عن عنصر QR Code
-    const qrCode = page.locator('img[alt*="QR"], .qr-code, [data-qr], canvas.qr');
+    const _qrCode = page.locator('img[alt*="QR"], .qr-code, [data-qr], canvas.qr');
     
     const content = await page.content();
     const hasQRContent = content.includes('QR') || content.includes('qrcode');
@@ -152,7 +152,7 @@ test.describe('اختبار QR Code ZATCA', () => {
 
 // اختبار Edge Function zatca-submit
 test.describe('اختبار Edge Function ZATCA', () => {
-  test('التحقق من وجود وظيفة zatca-submit', async ({ page, request }) => {
+  test('التحقق من وجود وظيفة zatca-submit', async ({ request }) => {
     // محاولة استدعاء الوظيفة في وضع الاختبار
     const response = await request.post(`${process.env.SUPABASE_URL || ''}/functions/v1/zatca-submit`, {
       headers: {

@@ -10,7 +10,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { 
-  corsHeaders, 
+  corsHeaders as _corsHeaders, 
   handleCors, 
   jsonResponse, 
   errorResponse, 

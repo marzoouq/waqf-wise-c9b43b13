@@ -1,4 +1,4 @@
-import { test, expect, fullPageOptions, waitForPageStability } from '../fixtures/visual-test.fixture';
+import { test, expect, fullPageOptions as _fullPageOptions, waitForPageStability } from '../fixtures/visual-test.fixture';
 
 /**
  * Components Visual Regression Tests
