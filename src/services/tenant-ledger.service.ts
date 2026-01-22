@@ -57,7 +57,7 @@ export const TenantLedgerService = {
       .maybeSingle();
 
     if (error) throw error;
-    if (!entry) throw new Error("فشل في إنشاء قيد دفتر المستأجر");
+    if (!entry) throw new Error(`فشل في إنشاء قيد دفتر المستأجر للمستأجر ${data.tenantId} - إيصال رقم ${receiptNumber}`);
 
     return {
       entry: entry as TenantLedgerEntry,
