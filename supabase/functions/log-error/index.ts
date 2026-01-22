@@ -375,7 +375,7 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
+async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, _alert: SystemAlert) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];

@@ -10,8 +10,8 @@ const TEST_USER = {
   password: process.env.TEST_USER_PASSWORD || 'Test123!',
 };
 
-// Dashboard routes by role
-const ROLE_DASHBOARDS = {
+// Dashboard routes by role (متاح للتوسع المستقبلي)
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',
