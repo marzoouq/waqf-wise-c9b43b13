@@ -177,8 +177,9 @@ serve(async (req) => {
     let operatingActivities = 0;
     let investingActivities = 0;
     let financingActivities = 0;
-    let cashInflow = 0;
-    let cashOutflow = 0;
+    // ملاحظة: هذه المتغيرات متاحة للتوسع المستقبلي (إضافة تفاصيل التدفق)
+    let _cashInflow = 0;
+    let _cashOutflow = 0;
 
     for (const line of journalLines) {
       const account = accountMap.get(line.account_id);
@@ -191,9 +192,9 @@ serve(async (req) => {
       if (ACCOUNT_CLASSIFICATIONS.cash.some(c => code.startsWith(c))) {
         // حركات النقدية
         if (netAmount > 0) {
-          cashInflow += netAmount;
+          _cashInflow += netAmount;
         } else {
-          cashOutflow += Math.abs(netAmount);
+          _cashOutflow += Math.abs(netAmount);
         }
       } else if (ACCOUNT_CLASSIFICATIONS.operating.some(c => code.startsWith(c))) {
         // أنشطة تشغيلية

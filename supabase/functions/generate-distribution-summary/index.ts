@@ -2,7 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
-interface DistributionSettings {
+// Interfaces للتوثيق والتوسع المستقبلي
+interface _DistributionSettings {
   maintenance_percentage: number;
   nazer_percentage: number;
   waqif_charity_percentage: number;
@@ -13,7 +14,7 @@ interface DistributionSettings {
   distribution_rule: string;
 }
 
-interface Beneficiary {
+interface _Beneficiary {
   id: string;
   full_name: string;
   beneficiary_type: string;
@@ -206,7 +207,8 @@ serve(async (req) => {
     const wives = beneficiaries.filter(b => b.beneficiary_type === 'زوجة');
     const sons = beneficiaries.filter(b => b.beneficiary_type === 'ولد');
     const daughters = beneficiaries.filter(b => b.beneficiary_type === 'بنت');
-    const others = beneficiaries.filter(b => !['زوجة', 'ولد', 'بنت'].includes(b.beneficiary_type || ''));
+    // ملاحظة: الآخرين متاحون للتوسع المستقبلي
+    const _others = beneficiaries.filter(b => !['زوجة', 'ولد', 'بنت'].includes(b.beneficiary_type || ''));
 
     console.log(`👰 Wives: ${wives.length}, 👦 Sons: ${sons.length}, 👧 Daughters: ${daughters.length}`);
 
