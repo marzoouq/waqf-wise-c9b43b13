@@ -2,7 +2,7 @@
  * Hook لتصدير نتائج الاختبارات كـ PDF/Excel
  */
 
-import { useCallback } from 'react';
+import { useCallback as _useCallback } from 'react';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 
 export interface TestResult {

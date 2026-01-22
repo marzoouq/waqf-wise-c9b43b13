@@ -15,7 +15,6 @@ export function useDistributions() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { addActivity } = useActivities();
-  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {
