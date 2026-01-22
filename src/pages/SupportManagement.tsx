@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,7 +22,7 @@ import { EmptySupportState } from '@/components/support/EmptySupportState';
 import { TicketCard } from '@/components/support/TicketCard';
 import { DistributionList } from '@/components/support/DistributionBar';
 import { SupportStatsCards } from '@/components/support/SupportStatsCards';
-import { AlertCircle, Settings, Star } from 'lucide-react';
+import { AlertCircle, Settings, Star, Headphones } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import type { SupportFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
@@ -64,13 +65,25 @@ export default function SupportManagement() {
 
   return (
     <PageErrorBoundary pageName="إدارة الدعم الفني">
+      <MobileOptimizedLayout>
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <MobileOptimizedHeader
+            title="إدارة الدعم الفني"
+            description="إدارة تذاكر الدعم الفني ومتابعة أداء فريق الدعم"
+            icon={
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary-hover shadow-xl shadow-primary/40 ring-2 ring-primary/20">
+                <Headphones className="h-7 w-7 text-primary-foreground" />
+              </div>
+            }
+          />
+          <Button variant="outline" onClick={() => setSettingsOpen(true)}>
+            <Settings className="h-4 w-4 ms-2" />
+            <span className="hidden sm:inline">إعدادات التعيين</span>
+          </Button>
+        </div>
+        
         <div className="space-y-4 sm:space-y-6">
-          <div className="flex items-center justify-end">
-            <Button variant="outline" onClick={() => setSettingsOpen(true)}>
-              <Settings className="h-4 w-4 ms-2" />
-              <span className="hidden sm:inline">إعدادات التعيين</span>
-            </Button>
-          </div>
           
           <AgentAvailabilityCard />
 
@@ -345,6 +358,7 @@ export default function SupportManagement() {
             onOpenChange={setSettingsOpen}
           />
         </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
