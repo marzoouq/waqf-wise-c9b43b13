@@ -58,7 +58,10 @@ export function MobileCardBase({
   // دعم لوحة المفاتيح للتفاعل مع البطاقة
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-      e.preventDefault();
+      // منع السلوك الافتراضي فقط لمفتاح المسافة لتجنب التأثير على التمرير
+      if (e.key === ' ') {
+        e.preventDefault();
+      }
       onClick();
     }
   };
