@@ -130,7 +130,7 @@ export default function SecurityDashboard() {
 
       doc.save("security-report.pdf");
       toast({ title: "تم التنزيل", description: "تم تنزيل تقرير الأمان بنجاح" });
-    } catch (error) {
+    } catch (_error) {
       toast({ 
         title: "خطأ", 
         description: "حدث خطأ أثناء إنشاء التقرير",

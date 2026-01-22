@@ -9,7 +9,7 @@ export interface BankIntegration {
   supports_transfers: boolean;
   supports_balance_inquiry: boolean;
   supports_statement: boolean;
-  configuration: Record<string, any>;
+  configuration: Record<string, unknown>;
   last_sync_at?: string;
   created_at: string;
   updated_at: string;
@@ -21,7 +21,7 @@ export interface PaymentGateway {
   gateway_type: string;
   is_active: boolean;
   merchant_id?: string;
-  configuration: Record<string, any>;
+  configuration: Record<string, unknown>;
   supported_methods: string[];
   success_rate?: number;
   total_transactions: number;
@@ -39,7 +39,7 @@ export interface GatewayTransaction {
   currency: string;
   payment_method: string;
   status: string;
-  gateway_response?: Record<string, any>;
+  gateway_response?: Record<string, unknown>;
   processed_at?: string;
   created_at: string;
 }
@@ -53,7 +53,7 @@ export interface GovernmentIntegration {
   requires_authentication: boolean;
   last_sync_at?: string;
   sync_frequency: string;
-  configuration: Record<string, any>;
+  configuration: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }

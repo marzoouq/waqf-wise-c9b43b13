@@ -80,7 +80,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch (_error) {
         toast({
           title: "خطأ في قراءة الملف",
           description: "تأكد من صحة تنسيق ملف Excel",
@@ -117,7 +117,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
       setPreviewData([]);
       setValidationErrors([]);
       onSuccess();
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "خطأ في الاستيراد",
         description: error instanceof Error ? error.message : "حدث خطأ غير متوقع",

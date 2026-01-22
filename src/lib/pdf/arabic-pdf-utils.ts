@@ -141,8 +141,10 @@ export const loadArabicFontToPDF = async (doc: jsPDF): Promise<string> => {
 
     // مهم: لا نفعّل setR2L(true) لأنه يعكس ترتيب الأحرف/الأرقام
     // نعتمد على processArabicText(reshape) + محاذاة يمين/توسيط عبر align
-    if (typeof (doc as any).setR2L === "function") {
-      (doc as any).setR2L(false);
+    type JsPdfWithR2L = { setR2L?: (value: boolean) => void };
+    const docWithR2L: JsPdfWithR2L = doc as unknown as JsPdfWithR2L;
+    if (typeof docWithR2L.setR2L === "function") {
+      docWithR2L.setR2L(false);
     }
 
     return "Amiri";

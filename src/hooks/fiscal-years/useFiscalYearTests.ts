@@ -30,7 +30,7 @@ export function useFiscalYearTests() {
         status: "success",
         message: `تم العثور على ${fiscalYears.length} سنة مالية`
       });
-    } catch (error) {
+    } catch (_error) {
       testResults.push({
         test: "جدول السنوات المالية",
         status: "error",
@@ -57,7 +57,7 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مالية للاختبار"
         });
       }
-    } catch (error) {
+    } catch (_error) {
       testResults.push({
         test: "دالة حساب ملخص السنة",
         status: "error",
@@ -84,7 +84,7 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مفتوحة للاختبار"
         });
       }
-    } catch (error) {
+    } catch (_error) {
       testResults.push({
         test: "Edge Function: auto-close-fiscal-year",
         status: "error",
@@ -109,7 +109,7 @@ export function useFiscalYearTests() {
           message: "لا توجد سنة نشطة"
         });
       }
-    } catch (error) {
+    } catch (_error) {
       testResults.push({
         test: "السنة المالية النشطة",
         status: "error",
@@ -136,7 +136,7 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مغلقة للاختبار"
         });
       }
-    } catch (error) {
+    } catch (_error) {
       testResults.push({
         test: "بيانات الإقفال",
         status: "error",

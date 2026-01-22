@@ -32,7 +32,7 @@ export function AccountStatementView({
 
   const handleExportPDF = async () => {
     try {
-      const [{ default: jsPDF }, autoTable] = await Promise.all([
+      const [{ default: jsPDF }] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
       ]);

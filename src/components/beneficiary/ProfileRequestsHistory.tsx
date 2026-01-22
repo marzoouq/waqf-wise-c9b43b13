@@ -1,7 +1,7 @@
 import { useBeneficiaryProfileRequests } from '@/hooks/beneficiary/useBeneficiaryProfileRequests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';

@@ -2,7 +2,7 @@ import { useFinancialReports } from "@/hooks/accounting/useFinancialReports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Printer, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Printer, CheckCircle, XCircle, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 
 export function EnhancedBalanceSheet() {

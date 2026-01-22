@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { Plus, FolderTree, ChevronLeft, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { Account, AccountType, AccountNature } from '@/types/accounting';
+import { AccountType, AccountNature } from '@/types/accounting';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { getAccountTypeLabel } from '@/lib/constants';

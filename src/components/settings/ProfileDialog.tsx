@@ -42,7 +42,7 @@ interface ProfileDialogProps {
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
-  const { profile, isLoading, upsertProfile } = useProfile();
+  const { profile, upsertProfile } = useProfile();
   const { roles } = useUserRole();
 
   const form = useForm<ProfileFormValues>({
@@ -76,7 +76,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
         position: values.position,
       });
       onOpenChange(false);
-    } catch (error) {
+    } catch (_error) {
       // Error is handled by the mutation's onError callback
     }
   };

@@ -10,7 +10,6 @@ import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { TrialBalanceRow } from "@/types/supabase-helpers";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();

@@ -20,7 +20,7 @@ const folderSchema = z.object({
     .string()
     .min(3, { message: "اسم المجلد يجب أن يكون 3 أحرف على الأقل" })
     .max(50, { message: "اسم المجلد يجب ألا يتجاوز 50 حرف" })
-    .regex(/^[\u0600-\u06FF\s\-]+$/, {
+    .regex(/^[\u0600-\u06FF\s-]+$/, {
       message: "اسم المجلد يجب أن يحتوي على أحرف عربية فقط",
     }),
   description: z.string().optional(),

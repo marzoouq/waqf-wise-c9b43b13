@@ -1,7 +1,7 @@
 import { useContracts } from "@/hooks/property/useContracts";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText, EyeOff } from "lucide-react";
+import { EyeOff } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";

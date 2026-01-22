@@ -92,8 +92,10 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   });
 
   const updateSettings = useMutation({
-    mutationFn: (updates: Partial<VisibilitySettings>) => 
-      GovernanceService.updateVisibilitySettings(settings?.id!, updates),
+    mutationFn: (updates: Partial<VisibilitySettings>) => {
+      if (!settings?.id) throw new Error('Settings ID is required');
+      return GovernanceService.updateVisibilitySettings(settings.id, updates);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole) });
       toast({

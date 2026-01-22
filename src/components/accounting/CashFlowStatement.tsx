@@ -11,8 +11,7 @@ import { formatCurrency, formatNumber } from "@/lib/utils";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
 
 export function CashFlowStatement() {
-  const { cashFlows, isLoading, isCalculating, latestFlow, handleCalculate } = useCashFlowCalculation();
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const { isLoading, isCalculating, latestFlow, handleCalculate } = useCashFlowCalculation();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قائمة التدفقات النقدية..." />;
@@ -135,7 +134,7 @@ export function CashFlowStatement() {
       toast.success("تم تصدير قائمة التدفقات النقدية بنجاح", {
         description: `تم حفظ الملف: ${filename}`,
       });
-    } catch (error) {
+    } catch (_error) {
       toast.error("حدث خطأ أثناء تصدير PDF", {
         description: "الرجاء المحاولة مرة أخرى",
       });

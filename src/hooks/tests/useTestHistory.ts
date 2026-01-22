@@ -2,7 +2,7 @@
  * Hook لإدارة سجل الاختبارات التاريخية
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';

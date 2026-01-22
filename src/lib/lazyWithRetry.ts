@@ -72,7 +72,7 @@ function forceReload(): void {
  * @param options - Retry options
  * @returns Lazy component with retry logic
  */
-export function lazyWithRetry<T extends ComponentType<any>>(
+export function lazyWithRetry<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
   options: LazyRetryOptions = {}
 ): React.LazyExoticComponent<T> {
@@ -152,7 +152,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 /**
  * Lazy load a named export with automatic retry mechanism
  */
-export function lazyWithRetryNamed<T extends ComponentType<any>>(
+export function lazyWithRetryNamed<T extends ComponentType<unknown>>(
   importFn: () => Promise<Record<string, T>>,
   exportName: string,
   options: LazyRetryOptions = {}
@@ -167,7 +167,7 @@ export function lazyWithRetryNamed<T extends ComponentType<any>>(
  * Create a lazy component with retry for a specific page
  * Convenience wrapper with sensible defaults
  */
-export function lazyPage<T extends ComponentType<any>>(
+export function lazyPage<T extends ComponentType<unknown>>(
   importFn: () => Promise<{ default: T }>
 ): React.LazyExoticComponent<T> {
   return lazyWithRetry(importFn, {

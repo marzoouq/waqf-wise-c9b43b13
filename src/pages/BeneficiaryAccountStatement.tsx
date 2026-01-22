@@ -43,7 +43,7 @@ export default function BeneficiaryAccountStatement() {
 
   // تصدير PDF مع الخط العربي
   const exportToPDF = async () => {
-    const [jsPDFModule, autoTableModule] = await Promise.all([
+    const [jsPDFModule] = await Promise.all([
       import('jspdf'),
       import('jspdf-autotable')
     ]);

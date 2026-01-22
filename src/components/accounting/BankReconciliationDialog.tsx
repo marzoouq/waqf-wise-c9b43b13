@@ -8,8 +8,8 @@ import { useBankAccounts } from "@/hooks/payments/useBankAccounts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Upload } from "lucide-react";
-import { BankStatementRow, BankAccountRow } from "@/types/supabase-helpers";
+import { CheckCircle, XCircle } from "lucide-react";
+import { BankAccountRow } from "@/types/supabase-helpers";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BankReconciliationDialogProps {
@@ -18,11 +18,10 @@ interface BankReconciliationDialogProps {
 }
 
 export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliationDialogProps) {
-  const { statements, transactions, createStatement, addTransaction, matchTransaction, reconcileStatement } = useBankReconciliation();
+  const { statements, createStatement } = useBankReconciliation();
   const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
   
   const [step, setStep] = useState<"select" | "import" | "match">("select");
-  const [selectedStatement, setSelectedStatement] = useState<{ id: string; bank_account_id: string } | null>(null);
   
   const [newStatement, setNewStatement] = useState({
     bank_account_id: "",
@@ -47,21 +46,6 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     });
     
     onOpenChange(false);
-  };
-
-  const handleImportTransactions = async (csvData: Array<{ date: string; description: string; reference: string; amount: string; type: string }>) => {
-    for (const row of csvData) {
-      await addTransaction({
-        statement_id: selectedStatement.id,
-        transaction_date: row.date,
-        description: row.description,
-        reference_number: row.reference,
-        amount: parseFloat(row.amount),
-        transaction_type: row.type,
-        is_matched: false,
-      });
-    }
-    setStep("match");
   };
 
   return (

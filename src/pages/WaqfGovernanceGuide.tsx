@@ -50,7 +50,7 @@ const WaqfGovernanceGuide = () => {
       toast.info('جاري إنشاء ملف PDF...');
       await generateGovernancePDF();
       toast.success('تم تحميل اللائحة التنفيذية بنجاح');
-    } catch (error) {
+    } catch (_error) {
       toast.error('فشل إنشاء ملف PDF');
     } finally {
       setIsGeneratingPDF(false);

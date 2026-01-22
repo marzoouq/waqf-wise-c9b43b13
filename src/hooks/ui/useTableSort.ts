@@ -7,7 +7,7 @@ interface UseSortableTableProps<T> {
   defaultDirection?: SortDirection;
 }
 
-export function useTableSort<T extends Record<string, any>>({
+export function useTableSort<T extends Record<string, unknown>>({
   data,
   defaultSortKey,
   defaultDirection = 'asc',

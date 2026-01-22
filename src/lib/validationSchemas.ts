@@ -4,7 +4,7 @@ import { VALIDATION } from "./constants";
 
 // Common validation rules
 export const commonValidation = {
-  requiredString: (message: string) => 
+  requiredString: (_message: string) => 
     z.string().min(1, { message }),
   
   optionalString: () => 
@@ -33,7 +33,7 @@ export const commonValidation = {
       .min(VALIDATION.MIN_PERCENTAGE, { message: "النسبة لا يمكن أن تكون سالبة" })
       .max(VALIDATION.MAX_PERCENTAGE, { message: "النسبة لا يمكن أن تتجاوز 100%" }),
   
-  date: (message: string) =>
+  date: (_message: string) =>
     z.date({ required_error: message }),
   
   dateString: (message: string = "التاريخ غير صحيح") =>
@@ -51,7 +51,7 @@ export const commonValidation = {
         { message }
       ),
   
-  positiveInteger: (message: string) =>
+  positiveInteger: (_message: string) =>
     z.number().int().positive({ message }),
 };
 

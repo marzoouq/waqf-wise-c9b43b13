@@ -72,7 +72,7 @@ export function DocumentUploadDialog({
       setDescription("");
       onOpenChange(false);
       onUploadComplete?.();
-    } catch (error) {
+    } catch (_error) {
       // Error handled in hook
     } finally {
       setUploading(false);
