@@ -34,26 +34,26 @@ export const test = base.extend<AuthFixtures>({
     await client.auth.signOut();
   },
 
-  loginAs: async ({ page }, use) => {
-    const loginAs = async (role: UserRole): Promise<boolean> => {
+  loginAs: async ({ _page }, use) => {
+    const loginAs = async (_role: UserRole): Promise<boolean> => {
       return false;
     };
     await use(loginAs);
   },
 
-  loginWithCredentials: async ({ page }, use) => {
-    const loginWithCredentials = async (email: string, password: string): Promise<boolean> => {
+  loginWithCredentials: async ({ _page }, use) => {
+    const loginWithCredentials = async (_email: string, _password: string): Promise<boolean> => {
       return false;
     };
     await use(loginWithCredentials);
   },
 
-  logout: async ({ page }, use) => {
+  logout: async ({ _page }, use) => {
     const logout = async (): Promise<void> => {};
     await use(logout);
   },
 
-  isLoggedIn: async ({ page }, use) => {
+  isLoggedIn: async ({ _page }, use) => {
     const isLoggedIn = async (): Promise<boolean> => {
       return false;
     };
@@ -63,7 +63,7 @@ export const test = base.extend<AuthFixtures>({
 
 export { expect };
 
-export async function createAuthenticatedClient(role: UserRole): Promise<SupabaseClient | null> {
+export async function createAuthenticatedClient(_role: UserRole): Promise<SupabaseClient | null> {
   return null;
 }
 
@@ -71,6 +71,6 @@ export function isSupabaseConfigured(): boolean {
   return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 }
 
-export async function waitForAuth(page: any, timeout = 10000): Promise<boolean> {
+export async function waitForAuth(_page: any, _timeout = 10000): Promise<boolean> {
   return false;
 }

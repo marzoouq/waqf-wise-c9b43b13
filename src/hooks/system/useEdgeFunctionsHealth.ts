@@ -61,7 +61,7 @@ export function useEdgeFunctionsHealth() {
       }
 
       return result;
-    } catch (error: any) {
+    } catch {
       toastError(`خطأ في فحص ${functionName}`);
       return null;
     }

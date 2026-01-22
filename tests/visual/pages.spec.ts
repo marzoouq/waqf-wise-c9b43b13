@@ -54,7 +54,7 @@ test.describe('Visual Regression - Main Pages @visual', () => {
 });
 
 test.describe('Visual Regression - Dashboards @visual @dashboard', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ _page }) => {
     // تسجيل الدخول قبل الوصول للوحات التحكم
     // يمكن استخدام mock auth أو تخطي هذا في البيئة المحلية
   });

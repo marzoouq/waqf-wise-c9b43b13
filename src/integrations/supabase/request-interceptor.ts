@@ -27,8 +27,8 @@ export function initializeSupabaseInterceptor(): void {
   isInitialized = true;
 
   // مراقبة أخطاء المصادقة
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
+  supabase.auth.onAuthStateChange((_event, _session) => {
+    if (_event === 'SIGNED_OUT') {
       connectionMonitor.logEvent({
         type: 'api',
         status: 'error',
@@ -37,7 +37,7 @@ export function initializeSupabaseInterceptor(): void {
       });
     }
     
-    if (event === 'TOKEN_REFRESHED') {
+    if (_event === 'TOKEN_REFRESHED') {
       connectionMonitor.logEvent({
         type: 'api',
         status: 'reconnected',
@@ -50,7 +50,7 @@ export function initializeSupabaseInterceptor(): void {
   const originalFetch = window.fetch;
   
   window.fetch = async function(...args) {
-    const [input, init] = args;
+    const [input] = args;
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     const startTime = Date.now();
 
