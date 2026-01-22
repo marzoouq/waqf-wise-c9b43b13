@@ -2,6 +2,7 @@
  * Test Setup - Vitest Configuration
  */
 import '@testing-library/jest-dom';
+import React from 'react';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
 
