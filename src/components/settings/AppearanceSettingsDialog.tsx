@@ -81,10 +81,12 @@ export function AppearanceSettingsDialog({
   const [font, setFont] = useState(() => localStorage.getItem("app-font") || "cairo");
 
   useEffect(() => {
-    // تطبيق الإعدادات عند فتح الحوار
+    // تطبيق الإعدادات عند فتح الحوار (run once on mount)
     applyTheme(theme);
     applyAccentColor(accentColor);
     applyFont(font);
+    // These apply the initial saved values - we only want this to run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleThemeChange = (value: string) => {

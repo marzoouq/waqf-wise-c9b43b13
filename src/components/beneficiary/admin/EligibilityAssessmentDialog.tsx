@@ -68,6 +68,8 @@ export function EligibilityAssessmentDialog({
         // معالجة الخطأ تتم في الـ hook
       });
     }
+    // runAssessment is stable from the hook, but we intentionally only trigger when dialog opens or beneficiary changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, beneficiary?.id]);
 
   const getStatusColor = (status: string) => {
