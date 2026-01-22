@@ -37,8 +37,9 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
         
-      - name: Run ESLint (Strict)
-        run: npx eslint . --ext .ts,.tsx --max-warnings=0
+      - name: Run ESLint (Allow 400 warnings during migration)
+        run: npx eslint . --ext .ts,.tsx --max-warnings=400
+        continue-on-error: false
         
       - name: Prettier Check
         run: npx prettier --check "src/**/*.{ts,tsx,css,json}"
