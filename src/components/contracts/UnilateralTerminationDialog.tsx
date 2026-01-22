@@ -2,7 +2,6 @@
  * حوار فسخ العقد من طرف واحد
  */
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -42,9 +41,7 @@ import {
   FileWarning,
   Scale
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useContractRequests } from '@/hooks/contracts/useContractRequests';
 import { type Contract } from '@/hooks/property/useContracts';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -71,8 +68,7 @@ export function UnilateralTerminationDialog({
   onOpenChange,
   contract,
 }: UnilateralTerminationDialogProps) {
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createTerminationRequest } = useContractRequests(contract?.id);
 
   const form = useForm<TerminationFormValues>({
     resolver: zodResolver(terminationSchema),
@@ -85,33 +81,25 @@ export function UnilateralTerminationDialog({
     },
   });
 
-  const onSubmit = async (data: TerminationFormValues) => {
+  const onSubmit = (data: TerminationFormValues) => {
     if (!contract) return;
 
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.from('contract_termination_requests').insert({
-        contract_id: contract.id,
-        requested_by: data.requested_by,
-        termination_type: data.termination_type,
-        requested_date: data.requested_date,
-        reason: data.reason,
-        legal_basis: data.legal_basis || null,
-        status: 'معلق',
-      });
+    // تحويل القيم العربية إلى القيم الإنجليزية المتوقعة من الـ hook
+    const requestedBy = data.requested_by === 'المؤجر' ? 'landlord' : 'tenant';
+    const terminationType = data.termination_type === 'فسخ بالتراضي' ? 'mutual' : 'unilateral';
 
-      if (error) throw error;
-
-      toast.success('تم تقديم طلب الفسخ بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['contract-termination-requests'] });
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      console.error('Error submitting termination request:', error);
-      toast.error('حدث خطأ أثناء تقديم الطلب');
-    } finally {
-      setIsSubmitting(false);
-    }
+    createTerminationRequest.mutate({
+      contract_id: contract.id,
+      requested_by: requestedBy,
+      termination_type: terminationType,
+      requested_date: data.requested_date,
+      reason: data.reason + (data.legal_basis ? ` | الأساس النظامي: ${data.legal_basis}` : ''),
+    }, {
+      onSuccess: () => {
+        onOpenChange(false);
+        form.reset();
+      }
+    });
   };
 
   if (!contract) return null;
@@ -274,9 +262,9 @@ export function UnilateralTerminationDialog({
               <Button 
                 type="submit" 
                 variant="destructive"
-                disabled={isSubmitting}
+                disabled={createTerminationRequest.isPending}
               >
-                {isSubmitting ? (
+                {createTerminationRequest.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                     جاري التقديم...

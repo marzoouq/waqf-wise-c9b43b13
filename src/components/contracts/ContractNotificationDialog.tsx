@@ -3,7 +3,6 @@
  * يدعم أنواع متعددة من الإشعارات مع قوالب جاهزة
  */
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -43,9 +42,7 @@ import {
   Phone,
   Send,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useContractNotifications, type NotificationType, type DeliveryMethod } from '@/hooks/contracts/useContractNotifications';
 import { type Contract } from '@/hooks/property/useContracts';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -120,8 +117,7 @@ export function ContractNotificationDialog({
   onOpenChange,
   contract,
 }: ContractNotificationDialogProps) {
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createNotification } = useContractNotifications(contract?.id);
 
   const form = useForm<NotificationFormValues>({
     resolver: zodResolver(notificationSchema),
@@ -149,40 +145,26 @@ export function ContractNotificationDialog({
     }
   };
 
-  const onSubmit = async (data: NotificationFormValues) => {
+  const onSubmit = (data: NotificationFormValues) => {
     if (!contract) return;
 
-    setIsSubmitting(true);
-    try {
-      const deliveryMethods: string[] = [];
-      if (data.delivery_email) deliveryMethods.push('email');
-      if (data.delivery_sms) deliveryMethods.push('sms');
-      if (data.delivery_whatsapp) deliveryMethods.push('whatsapp');
+    const deliveryMethods: DeliveryMethod[] = [];
+    if (data.delivery_email) deliveryMethods.push('email');
+    if (data.delivery_sms) deliveryMethods.push('sms');
+    if (data.delivery_whatsapp) deliveryMethods.push('whatsapp');
 
-      const { error } = await supabase.from('contract_notifications').insert({
-        contract_id: contract.id,
-        notification_type: data.notification_type,
-        title: data.title,
-        content: data.content,
-        delivery_method: deliveryMethods,
-        status: 'مسودة',
-        recipient_name: contract.tenant_name,
-        recipient_email: contract.tenant_email,
-        recipient_phone: contract.tenant_phone,
-      });
-
-      if (error) throw error;
-
-      toast.success('تم حفظ الإشعار بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['contract-notifications'] });
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      console.error('Error saving notification:', error);
-      toast.error('حدث خطأ أثناء حفظ الإشعار');
-    } finally {
-      setIsSubmitting(false);
-    }
+    createNotification.mutate({
+      contract_id: contract.id,
+      notification_type: data.notification_type as NotificationType,
+      title: data.title,
+      content: data.content,
+      delivery_method: deliveryMethods,
+    }, {
+      onSuccess: () => {
+        onOpenChange(false);
+        form.reset();
+      }
+    });
   };
 
   if (!contract) return null;
@@ -360,8 +342,8 @@ export function ContractNotificationDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" disabled={createNotification.isPending}>
+                {createNotification.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                     جاري الحفظ...

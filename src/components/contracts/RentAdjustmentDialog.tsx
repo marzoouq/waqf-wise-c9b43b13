@@ -2,7 +2,7 @@
  * حوار طلب تعديل قيمة الإيجار (رفع أو خفض)
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -34,9 +34,7 @@ import {
   Calendar,
   ArrowRight
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useContractRequests } from '@/hooks/contracts/useContractRequests';
 import { type Contract } from '@/hooks/property/useContracts';
 import { formatCurrency } from '@/lib/utils';
 
@@ -61,8 +59,7 @@ export function RentAdjustmentDialog({
   contract,
   adjustmentType,
 }: RentAdjustmentDialogProps) {
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createRentAdjustmentRequest } = useContractRequests(contract?.id);
 
   const isIncrease = adjustmentType === 'increase';
   const currentRent = contract?.monthly_rent || 0;
@@ -90,35 +87,23 @@ export function RentAdjustmentDialog({
     }
   }, [open, contract, isIncrease, currentRent, form]);
 
-  const onSubmit = async (data: AdjustmentFormValues) => {
+  const onSubmit = (data: AdjustmentFormValues) => {
     if (!contract) return;
 
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.from('rent_adjustment_requests').insert({
-        contract_id: contract.id,
-        requested_by: 'المؤجر',
-        adjustment_type: isIncrease ? 'زيادة' : 'تخفيض',
-        current_rent: currentRent,
-        requested_rent: parseFloat(data.requested_rent),
-        adjustment_percentage: parseFloat(percentage),
-        reason: data.reason,
-        effective_date: data.effective_date,
-        status: 'معلق',
-      });
-
-      if (error) throw error;
-
-      toast.success(`تم تقديم طلب ${isIncrease ? 'رفع' : 'خفض'} الإيجار بنجاح`);
-      queryClient.invalidateQueries({ queryKey: ['rent-adjustment-requests'] });
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      console.error('Error submitting adjustment request:', error);
-      toast.error('حدث خطأ أثناء تقديم الطلب');
-    } finally {
-      setIsSubmitting(false);
-    }
+    createRentAdjustmentRequest.mutate({
+      contract_id: contract.id,
+      requested_by: 'landlord',
+      adjustment_type: isIncrease ? 'increase' : 'decrease',
+      current_rent: currentRent,
+      requested_rent: parseFloat(data.requested_rent),
+      reason: data.reason,
+      effective_date: data.effective_date,
+    }, {
+      onSuccess: () => {
+        onOpenChange(false);
+        form.reset();
+      }
+    });
   };
 
   if (!contract) return null;
@@ -247,10 +232,10 @@ export function RentAdjustmentDialog({
               </Button>
               <Button 
                 type="submit" 
-                disabled={isSubmitting}
+                disabled={createRentAdjustmentRequest.isPending}
                 className={isIncrease ? 'bg-success hover:bg-success/90' : ''}
               >
-                {isSubmitting ? (
+                {createRentAdjustmentRequest.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                     جاري التقديم...

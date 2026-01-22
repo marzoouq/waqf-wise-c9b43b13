@@ -142,6 +142,8 @@ export function NazerBeneficiaryManagement() {
                       size="icon" 
                       className="h-8 w-8"
                       onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
+                      aria-label="عرض تفاصيل المستفيد"
+                      title="عرض المستفيد"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -150,6 +152,7 @@ export function NazerBeneficiaryManagement() {
                       size="icon" 
                       className="h-8 w-8"
                       onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
+                      aria-label="تعديل بيانات المستفيد"
                       title="تعديل المستفيد"
                     >
                       <Edit className="h-4 w-4" />
