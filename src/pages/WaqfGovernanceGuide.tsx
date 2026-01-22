@@ -19,6 +19,7 @@ import { toast } from "sonner";
 
 const WaqfGovernanceGuide = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   
   const {
     searchQuery,

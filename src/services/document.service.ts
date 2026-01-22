@@ -4,6 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import type { InvoiceLine } from "@/types/invoice-line";
 
 // إعادة تصدير للتوافق
 export type { InvoiceLine } from "@/types/invoice-line";

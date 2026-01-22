@@ -147,7 +147,9 @@ export function UploadDocumentDialog({
                         onChange(e.target.files);
                         handleFileChange(e.target.files);
                       }}
-                      {...field}
+                      name={field.name}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
                       className="cursor-pointer"
                     />
                     {selectedFile && (
