@@ -20,6 +20,26 @@ interface TestCategory {
   label: string;
 }
 
+// Type extension for jsPDF with autoTable plugin
+interface JsPDFWithAutoTable {
+  autoTable: (options: {
+    head?: string[][];
+    body?: string[][];
+    startY?: number;
+    styles?: Record<string, unknown>;
+    headStyles?: Record<string, unknown>;
+    alternateRowStyles?: Record<string, unknown>;
+    columnStyles?: Record<string, unknown>;
+  }) => void;
+  internal: {
+    getNumberOfPages: () => number;
+    pageSize: {
+      getWidth: () => number;
+      getHeight: () => number;
+    };
+  };
+}
+
 export function useTestExport() {
   // تصدير PDF مفصل
   const exportToPDF = useCallback(async (
@@ -81,7 +101,7 @@ export function useTestExport() {
         r.testName
       ]);
 
-      (doc as any).autoTable({
+      (doc as unknown as JsPDFWithAutoTable).autoTable({
         head: [['الزمن', 'الرسالة', 'الحالة', 'الفئة', 'الاختبار']],
         body: tableData,
         startY: 85,
@@ -128,7 +148,7 @@ export function useTestExport() {
       }
 
       // التذييل
-      const pageCount = (doc as any).internal.getNumberOfPages();
+      const pageCount = (doc as unknown as JsPDFWithAutoTable).internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
