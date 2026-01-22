@@ -57,6 +57,7 @@ export class JournalEntryService {
               accounts (code, name_ar, account_type)
             )
           `)
+          .is('deleted_at', null)  // فلتر الحذف الناعم
           .order('entry_date', { ascending: false });
 
         if (error) throw error;
@@ -80,7 +81,8 @@ export class JournalEntryService {
       return await withRetry(async () => {
         let query = supabase
           .from('journal_entries')
-          .select('*');
+          .select('*')
+          .is('deleted_at', null);  // فلتر الحذف الناعم
 
         if (filters?.status && filters.status !== 'all') {
           query = query.eq('status', filters.status as JournalEntryRow['status']);

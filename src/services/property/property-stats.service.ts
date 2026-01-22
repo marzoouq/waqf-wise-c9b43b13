@@ -109,10 +109,10 @@ export class PropertyStatsService {
         maintenanceResult,
         fiscalYearResult,
       ] = await Promise.all([
-        supabase.from("properties").select("*"),
-        supabase.from("property_units").select("*"),
-        supabase.from("contracts").select("*").eq("status", "نشط"),
-        supabase.from("maintenance_requests").select("*").in("status", [...MAINTENANCE_OPEN_STATUSES]),
+        supabase.from("properties").select("*").is("deleted_at", null),
+        supabase.from("property_units").select("*").is("deleted_at", null),
+        supabase.from("contracts").select("*").eq("status", "نشط").is("deleted_at", null),
+        supabase.from("maintenance_requests").select("*").in("status", [...MAINTENANCE_OPEN_STATUSES]).is("deleted_at", null),
         supabase.from("fiscal_years").select("*").eq("is_active", true).maybeSingle(),
       ]);
 
@@ -128,11 +128,13 @@ export class PropertyStatsService {
       const fiscalYear = fiscalYearResult.data;
 
       // جلب المدفوعات الفعلية من سندات القبض (مصدر الحقيقة الموحد)
+      // جلب المدفوعات الفعلية مع فلتر الحذف
       let paymentsQuery = supabase
         .from(COLLECTION_SOURCE.TABLE)
         .select("amount")
         .eq("voucher_type", COLLECTION_SOURCE.TYPE)
-        .eq("status", COLLECTION_SOURCE.STATUS);
+        .eq("status", COLLECTION_SOURCE.STATUS)
+        .is("deleted_at", null);
 
       if (fiscalYear) {
         paymentsQuery = paymentsQuery

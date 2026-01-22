@@ -98,35 +98,39 @@ export const FinancialCardsService = {
     progress: number;
   }> {
     const [paymentsResult, vouchersResult, contractsResult, revenueEntriesResult] = await Promise.all([
-      // دفعات الإيجار المدفوعة
+      // دفعات الإيجار المدفوعة (مع فلتر الحذف)
       supabase
         .from("rental_payments")
         .select("amount_due, amount_paid, tax_amount")
         .eq("status", "مدفوع")
+        .is("deleted_at", null)
         .gte("payment_date", fiscalYear.start_date)
         .lte("payment_date", fiscalYear.end_date),
-      // سندات القبض المدفوعة
+      // سندات القبض المدفوعة (مع فلتر الحذف)
       supabase
         .from("payment_vouchers")
         .select("amount")
         .eq("voucher_type", "receipt")
         .eq("status", "paid")
+        .is("deleted_at", null)
         .gte("created_at", fiscalYear.start_date)
         .lte("created_at", fiscalYear.end_date),
-      // العقود النشطة
+      // العقود النشطة (مع فلتر الحذف)
       supabase
         .from("contracts")
         .select("monthly_rent, payment_frequency")
-        .eq("status", "نشط"),
-      // القيود المحاسبية على حسابات الإيرادات
+        .eq("status", "نشط")
+        .is("deleted_at", null),
+      // القيود المحاسبية على حسابات الإيرادات (مع فلتر الحذف)
       supabase
         .from("journal_entry_lines")
         .select(`
           credit_amount,
-          journal_entries!inner(entry_date),
+          journal_entries!inner(entry_date, deleted_at),
           accounts!inner(account_type)
         `)
         .eq("accounts.account_type", "revenue")
+        .is("journal_entries.deleted_at", null)
         .gte("journal_entries.entry_date", fiscalYear.start_date)
         .lte("journal_entries.entry_date", fiscalYear.end_date),
     ]);
