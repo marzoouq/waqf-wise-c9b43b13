@@ -4,7 +4,6 @@
 
 import { useCallback } from 'react';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
-import type { jsPDF } from 'jspdf';
 
 export interface TestResult {
   testId: string;
@@ -20,17 +19,6 @@ interface TestCategory {
   id: string;
   label: string;
 }
-
-/**
- * Alias for jsPDF with autoTable plugin
- *
- * The jspdf-autotable plugin is loaded via side-effect import, and its
- * TypeScript module augmentation is defined globally in
- * src/types/jspdf-autotable.d.ts. That augmentation already extends jsPDF
- * with the autoTable method and related options, so we simply alias here
- * to avoid duplicating those types.
- */
-type JsPDFWithAutoTable = jsPDF;
 
 export function useTestExport() {
   // تصدير PDF مفصل
@@ -93,7 +81,7 @@ export function useTestExport() {
         r.testName
       ]);
 
-      (doc as JsPDFWithAutoTable).autoTable({
+      doc.autoTable({
         head: [['الزمن', 'الرسالة', 'الحالة', 'الفئة', 'الاختبار']],
         body: tableData,
         startY: 85,
