@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { 
   handleCors, 
@@ -69,7 +70,7 @@ Deno.serve(async (req) => {
     }
 
     // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
-    const { credentialId, userId, challenge } = bodyData;
+    const { credentialId, userId, _challenge } = bodyData;
     
     // ✅ التحقق من وجود المعاملات
     if (!credentialId || !userId) {

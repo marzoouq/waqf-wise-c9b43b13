@@ -54,13 +54,13 @@ test.describe('Visual Regression - Main Pages @visual', () => {
 });
 
 test.describe('Visual Regression - Dashboards @visual @dashboard', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ _page }) => {
     // تسجيل الدخول قبل الوصول للوحات التحكم
     // يمكن استخدام mock auth أو تخطي هذا في البيئة المحلية
   });
 
   for (const dashboard of dashboards) {
-    test(`${dashboard.name} should match snapshot`, async ({ page }) => {
+    test(`${dashboard.name} should match snapshot`, async ({ _page }) => {
       await page.goto(dashboard.path);
       await page.waitForLoadState('networkidle');
       
@@ -73,7 +73,7 @@ test.describe('Visual Regression - Dashboards @visual @dashboard', () => {
 });
 
 test.describe('Visual Regression - Components @visual', () => {
-  test('buttons should match snapshot', async ({ page }) => {
+  test('buttons should match snapshot', async ({ _page }) => {
     await page.goto('/');
     
     // التقاط صورة للأزرار
@@ -83,7 +83,7 @@ test.describe('Visual Regression - Components @visual', () => {
     }
   });
 
-  test('cards should match snapshot', async ({ page }) => {
+  test('cards should match snapshot', async ({ _page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     
@@ -93,7 +93,7 @@ test.describe('Visual Regression - Components @visual', () => {
     }
   });
 
-  test('tables should match snapshot', async ({ page }) => {
+  test('tables should match snapshot', async ({ _page }) => {
     await page.goto('/beneficiaries');
     await page.waitForLoadState('networkidle');
     
@@ -105,7 +105,7 @@ test.describe('Visual Regression - Components @visual', () => {
 });
 
 test.describe('Visual Regression - Empty States @visual', () => {
-  test('empty state should match snapshot', async ({ page }) => {
+  test('empty state should match snapshot', async ({ _page }) => {
     await page.goto('/beneficiaries?filter=nonexistent');
     await page.waitForLoadState('networkidle');
     
@@ -117,7 +117,7 @@ test.describe('Visual Regression - Empty States @visual', () => {
 });
 
 test.describe('Visual Regression - Loading States @visual', () => {
-  test('skeleton loading should match snapshot', async ({ page }) => {
+  test('skeleton loading should match snapshot', async ({ _page }) => {
     // اعتراض الطلبات لإبقاء حالة التحميل
     await page.route('**/api/**', async (route) => {
       await new Promise(resolve => setTimeout(resolve, 5000));

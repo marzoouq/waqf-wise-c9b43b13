@@ -2,11 +2,11 @@
  * useAuditAlerts Hook - تنبيهات التدقيق الذكية
  * @version 1.0.0
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, _useMutation, _useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { toast } from "sonner";
-import { useEffect, useCallback } from "react";
+import { useEffect, _useCallback } from "react";
 
 export interface AuditAlert {
   id: string;
@@ -39,8 +39,8 @@ interface AuditAlertRule {
   isActive: boolean;
 }
 
-// القواعد الافتراضية للتنبيهات
-const DEFAULT_ALERT_RULES: AuditAlertRule[] = [
+// القواعس الافتراضية للتنبيهات
+const _DEFAULT_ALERT_RULES: AuditAlertRule[] = [
   {
     id: 'rule_mass_delete',
     name: 'حذف جماعي',

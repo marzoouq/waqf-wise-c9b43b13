@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-explicit-any
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -433,7 +434,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
           fixed: false
         }));
       }
-    } catch (e) {
+    } catch {
       console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
     }
 
@@ -466,7 +467,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
             fixed: false
           }));
         }
-      } catch (e) {
+      } catch {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
       }
     }
@@ -715,7 +716,7 @@ async function savePendingFixes(supabase: any, auditId: string, findings: AuditF
 
 function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): string {
   const total = findings.length;
-  const issues = total - summary.success;
+  const _issues = total - summary.success;
   
   let analysis = `## ملخص الفحص الذكي\n\n`;
   analysis += `تم فحص النظام والعثور على ${total} نتيجة:\n`;

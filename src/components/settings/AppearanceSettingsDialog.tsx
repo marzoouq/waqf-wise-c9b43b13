@@ -85,7 +85,7 @@ export function AppearanceSettingsDialog({
     applyTheme(theme);
     applyAccentColor(accentColor);
     applyFont(font);
-  }, []);
+  }, [theme, accentColor, font]);
 
   const handleThemeChange = (value: string) => {
     setTheme(value);

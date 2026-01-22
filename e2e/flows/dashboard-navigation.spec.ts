@@ -11,7 +11,7 @@ const TEST_USER = {
 };
 
 // Dashboard routes by role
-const ROLE_DASHBOARDS = {
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',
@@ -60,11 +60,11 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(page: any) {
-    await page.goto('/login');
+  async function loginAsTestUser(_page: any) {
+    await _page.goto('/login');
     
-    const emailInput = page.locator('input[type="email"]').first();
-    const passwordInput = page.locator('input[type="password"]').first();
+    const emailInput = _page.locator('input[type="email"]').first();
+    const passwordInput = _page.locator('input[type="password"]').first();
 
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);

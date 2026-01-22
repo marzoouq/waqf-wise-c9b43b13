@@ -4,7 +4,7 @@
  * @version 2.8.91
  */
 
-import { test, expect, devices } from '@playwright/test';
+import { test, expect, _devices } from '@playwright/test';
 
 // الأجهزة للاختبار
 const testDevices = [

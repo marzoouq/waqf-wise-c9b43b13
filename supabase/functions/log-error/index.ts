@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-explicit-any
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { 
@@ -375,7 +376,7 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
+async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, _alert: SystemAlert) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
