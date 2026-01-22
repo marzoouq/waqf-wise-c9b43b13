@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Briefcase, DollarSign, ArrowUpCircle, Receipt } from 'lucide-react';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import {
   useCashierShift,
   usePOSTransactions,
@@ -105,7 +106,8 @@ export default function PointOfSale() {
   }
 
   return (
-    <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
+    <PageErrorBoundary pageName="مركز التحصيل والصرف">
+      <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -199,6 +201,7 @@ export default function PointOfSale() {
         onConfirm={handlePayment}
         isLoading={isPaying}
       />
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

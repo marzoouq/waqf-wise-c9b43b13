@@ -5,7 +5,7 @@
  */
 
 import { useState } from "react";
-import { DocumentService } from "@/services/document.service";
+import { DocumentService, type InvoiceLine } from "@/services/document.service";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { useToast } from "@/hooks/ui/use-toast";

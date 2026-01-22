@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DistributionService, RealtimeService, EdgeFunctionService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useActivities } from "@/hooks/ui/useActivities";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";

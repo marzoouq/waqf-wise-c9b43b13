@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Building2, Users, Plus, UserPlus, Trash2 } from "lucide-react";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -152,8 +153,9 @@ const GovernanceBoards = () => {
   };
 
   return (
-    <MobileOptimizedLayout>
-      <motion.div 
+    <PageErrorBoundary pageName="مجالس الحوكمة">
+      <MobileOptimizedLayout>
+        <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -552,7 +554,8 @@ const GovernanceBoards = () => {
           </DialogContent>
         </Dialog>
       </motion.div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

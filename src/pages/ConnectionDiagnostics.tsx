@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { 
   Wifi, 
   WifiOff, 
@@ -177,39 +179,28 @@ export default function ConnectionDiagnostics() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6" dir="rtl">
-      {/* الرأس */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Activity className="h-6 w-6" />
-              تشخيص الاتصال
-            </h1>
-            <p className="text-muted-foreground">
-              فحص شامل لحالة الاتصال وأسباب الانقطاع
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {isOnline ? (
-            <Badge className="bg-green-500">
-              <Wifi className="h-4 w-4 ms-1" />
-              متصل
-            </Badge>
-          ) : (
-            <Badge variant="destructive">
-              <WifiOff className="h-4 w-4 ms-1" />
-              غير متصل
-            </Badge>
-          )}
-        </div>
-      </div>
+    <PageErrorBoundary pageName="تشخيص الاتصال">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="تشخيص الاتصال"
+          description="فحص شامل لحالة الاتصال وأسباب الانقطاع"
+          icon={<Activity className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <div className="flex items-center gap-2">
+              {isOnline ? (
+                <Badge variant="default" className="gap-1">
+                  <Wifi className="h-4 w-4" />
+                  <span className="hidden sm:inline">متصل</span>
+                </Badge>
+              ) : (
+                <Badge variant="destructive" className="gap-1">
+                  <WifiOff className="h-4 w-4" />
+                  <span className="hidden sm:inline">غير متصل</span>
+                </Badge>
+              )}
+            </div>
+          }
+        />
 
       <Tabs defaultValue="diagnostics" className="space-y-4">
         <TabsList>
@@ -385,6 +376,7 @@ export default function ConnectionDiagnostics() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

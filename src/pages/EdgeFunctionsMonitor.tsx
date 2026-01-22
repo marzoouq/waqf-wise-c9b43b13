@@ -205,7 +205,7 @@ export default function EdgeFunctionsMonitor() {
       </div>
 
       {/* فلتر الفئات */}
-      <Tabs value={activeCategory} onValueChange={setActiveCategory}>
+      <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as typeof activeCategory)}>
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="all">الكل ({functions.length})</TabsTrigger>
           {Object.entries(functionsByCategory || {}).map(([cat, funcs]) => {
@@ -226,7 +226,7 @@ export default function EdgeFunctionsMonitor() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  onClick={() => activeCategory !== 'all' ? checkCategory(activeCategory) : undefined}
+                  onClick={() => checkCategory(activeCategory)}
                   disabled={isChecking}
                 >
                   <RefreshCw className={`h-4 w-4 ms-1 ${isChecking ? 'animate-spin' : ''}`} />

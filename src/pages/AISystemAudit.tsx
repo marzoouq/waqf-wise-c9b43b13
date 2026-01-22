@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useAISystemAudit } from '@/hooks/ai/useAISystemAudit';
 import { 
   Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, 
@@ -45,17 +46,19 @@ export default function AISystemAudit() {
 
   return (
     <PageErrorBoundary pageName="الفحص الذكي للنظام">
-    <div className="container mx-auto p-6 space-y-6" dir="rtl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">الفحص الذكي للنظام</h1>
-          <p className="text-muted-foreground mt-1">فحص شامل بالذكاء الاصطناعي مع إصلاح تلقائي</p>
-        </div>
-        <Button onClick={handleRunAudit} disabled={isAuditing} size="lg">
-          {isAuditing ? <RefreshCw className="ms-2 h-5 w-5 animate-spin" /> : <Play className="ms-2 h-5 w-5" />}
-          {isAuditing ? 'جاري الفحص...' : 'بدء فحص جديد'}
-        </Button>
-      </div>
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الفحص الذكي للنظام"
+          description="فحص شامل بالذكاء الاصطناعي مع إصلاح تلقائي"
+          icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <Button onClick={handleRunAudit} disabled={isAuditing} size="sm">
+              {isAuditing ? <RefreshCw className="ms-2 h-4 w-4 animate-spin" /> : <Play className="ms-2 h-4 w-4" />}
+              {isAuditing ? 'جاري الفحص...' : 'بدء فحص جديد'}
+            </Button>
+          }
+        />
+        <div className="space-y-6">
 
       {/* شريط التقدم */}
       {isAuditing && (
@@ -263,7 +266,8 @@ export default function AISystemAudit() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+        </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
