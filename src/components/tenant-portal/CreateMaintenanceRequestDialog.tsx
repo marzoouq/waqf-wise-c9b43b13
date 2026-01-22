@@ -85,10 +85,10 @@ const MAINTENANCE_CATEGORIES = [
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: "منخفضة", label: "منخفضة", color: "bg-green-100 text-green-800" },
-  { value: "متوسطة", label: "متوسطة", color: "bg-yellow-100 text-yellow-800" },
-  { value: "عالية", label: "عالية", color: "bg-orange-100 text-orange-800" },
-  { value: "طارئة", label: "طارئة", color: "bg-red-100 text-red-800" },
+  { value: "منخفضة", label: "منخفضة", color: "bg-success/10 text-success" },
+  { value: "متوسطة", label: "متوسطة", color: "bg-warning/10 text-warning" },
+  { value: "عالية", label: "عالية", color: "bg-warning/20 text-warning" },
+  { value: "طارئة", label: "طارئة", color: "bg-destructive/10 text-destructive" },
 ];
 
 const LOCATION_OPTIONS = [
@@ -391,11 +391,11 @@ export function CreateMaintenanceRequestDialog({
               </div>
 
               {/* Urgent Toggle */}
-              <Card className={isUrgent ? "border-red-300 bg-red-50" : ""}>
+              <Card className={isUrgent ? "border-destructive/30 bg-destructive/5" : ""}>
                 <CardContent className="py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <AlertTriangle className={`h-5 w-5 ${isUrgent ? "text-red-600" : "text-muted-foreground"}`} />
+                      <AlertTriangle className={`h-5 w-5 ${isUrgent ? "text-destructive" : "text-muted-foreground"}`} />
                       <div>
                         <p className="font-medium">حالة طارئة</p>
                         <p className="text-sm text-muted-foreground">
