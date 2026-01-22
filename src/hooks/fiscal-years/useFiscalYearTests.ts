@@ -30,11 +30,11 @@ export function useFiscalYearTests() {
         status: "success",
         message: `تم العثور على ${fiscalYears.length} سنة مالية`
       });
-    } catch (_error) {
+    } catch (err) {
       testResults.push({
         test: "جدول السنوات المالية",
         status: "error",
-        message: error instanceof Error ? error.message : "فشل الاتصال بالجدول"
+        message: err instanceof Error ? err.message : "فشل الاتصال بالجدول"
       });
     }
 
@@ -57,11 +57,11 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مالية للاختبار"
         });
       }
-    } catch (_error) {
+    } catch (err) {
       testResults.push({
         test: "دالة حساب ملخص السنة",
         status: "error",
-        message: error instanceof Error ? error.message : "فشل تنفيذ الدالة"
+        message: err instanceof Error ? err.message : "فشل تنفيذ الدالة"
       });
     }
 
@@ -84,11 +84,11 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مفتوحة للاختبار"
         });
       }
-    } catch (_error) {
+    } catch (err) {
       testResults.push({
         test: "Edge Function: auto-close-fiscal-year",
         status: "error",
-        message: error instanceof Error ? error.message : "فشل استدعاء Edge Function"
+        message: err instanceof Error ? err.message : "فشل استدعاء Edge Function"
       });
     }
 
@@ -109,11 +109,11 @@ export function useFiscalYearTests() {
           message: "لا توجد سنة نشطة"
         });
       }
-    } catch (_error) {
+    } catch (err) {
       testResults.push({
         test: "السنة المالية النشطة",
         status: "error",
-        message: error instanceof Error ? error.message : "فشل جلب السنة النشطة"
+        message: err instanceof Error ? err.message : "فشل جلب السنة النشطة"
       });
     }
 

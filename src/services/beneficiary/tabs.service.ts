@@ -35,7 +35,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب توزيعات المستفيد
    */
-  static async getDistributions(_beneficiaryId: string): Promise<Database['public']['Tables']['heir_distributions']['Row'][]> {
+  static async getDistributions(beneficiaryId: string): Promise<Database['public']['Tables']['heir_distributions']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('heir_distributions')
@@ -225,7 +225,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب طلبات المستفيد
    */
-  static async getRequests(_beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_requests']['Row'][]> {
+  static async getRequests(beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_requests']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('beneficiary_requests')
@@ -274,7 +274,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب شجرة العائلة
    */
-  static async getFamilyTree(_beneficiaryId: string): Promise<{
+  static async getFamilyTree(beneficiaryId: string): Promise<{
     beneficiary: Beneficiary;
     familyMembers: Beneficiary[];
     family: Database['public']['Tables']['families']['Row'] | null;
@@ -352,7 +352,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب إحصائيات تكامل المستفيد
    */
-  static async getIntegrationStats(_beneficiaryId: string) {
+  static async getIntegrationStats(beneficiaryId: string) {
     try {
       const [paymentsRes, documentsRes, requestsRes, activeRequestsRes, beneficiaryRes] = await Promise.all([
         supabase.from("payments").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
@@ -379,7 +379,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب ملخص توزيعات الوقف للمستفيد
    */
-  static async getWaqfDistributionsSummary(_beneficiaryId: string) {
+  static async getWaqfDistributionsSummary(beneficiaryId: string) {
     try {
       const { data, error } = await supabase
         .from("heir_distributions")
@@ -465,7 +465,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب كشوفات المستفيد (المدفوعات) - بيانات بسيطة للتبويبات
    */
-  static async getStatementsSimple(_beneficiaryId: string) {
+  static async getStatementsSimple(beneficiaryId: string) {
     const { data, error } = await supabase
       .from("payments")
       .select("*")
@@ -539,7 +539,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب طلبات المستفيد
    */
-  static async getRequestsWithTypes(_beneficiaryId: string) {
+  static async getRequestsWithTypes(beneficiaryId: string) {
     const { data, error } = await supabase
       .from("beneficiary_requests")
       .select(`
@@ -559,7 +559,7 @@ export class BeneficiaryTabsService {
   /**
    * جلب مقارنة سنوية للمستفيد
    */
-  static async getYearlyComparison(_beneficiaryId: string) {
+  static async getYearlyComparison(beneficiaryId: string) {
     const currentYear = new Date().getFullYear();
     const years = [currentYear - 1, currentYear];
 
@@ -715,7 +715,7 @@ export class BeneficiaryTabsService {
   /**
    * تقييم أهلية المستفيد باستخدام RPC
    */
-  static async assessEligibilityRPC(_beneficiaryId: string): Promise<{
+  static async assessEligibilityRPC(beneficiaryId: string): Promise<{
     score: number;
     status: string;
     max_score: number;

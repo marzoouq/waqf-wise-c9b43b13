@@ -163,6 +163,17 @@ export function SwipeActions({
     }
   }, [swipeState, disabled, isAnimating, hasLeftAction, hasRightAction, maxSwipeLeft, maxSwipeRight, threshold, activeAction]);
   
+  const resetSwipe = useCallback(() => {
+    setIsAnimating(true);
+    setTranslateX(0);
+    setActiveAction(null);
+    setSwipeState(null);
+    
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 200);
+  }, []);
+  
   const handleTouchEnd = useCallback(() => {
     if (!swipeState || disabled) return;
     
@@ -196,17 +207,6 @@ export function SwipeActions({
     
     onSwipeEnd?.();
   }, [swipeState, disabled, translateX, threshold, leftAction, rightAction, onSwipeEnd, resetSwipe]);
-  
-  const resetSwipe = useCallback(() => {
-    setIsAnimating(true);
-    setTranslateX(0);
-    setActiveAction(null);
-    setSwipeState(null);
-    
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 200);
-  }, []);
   
   // إغلاق عند النقر على الإجراء
   const handleActionClick = useCallback((action: SwipeAction) => {

@@ -104,13 +104,13 @@ export class ContractService {
     if (error) {
       // تحسين رسائل الخطأ للمستخدم
       if (error.code === '23503') {
-        const customError = new Error('بيانات المستأجر أو العقار غير صالحة. يرجى التحقق من البيانات.');
-        (customError as Record<string, unknown>).code = '23503';
+        const customError = new Error('بيانات المستأجر أو العقار غير صالحة. يرجى التحقق من البيانات.') as Error & { code?: string };
+        customError.code = '23503';
         throw customError;
       }
       if (error.message?.includes('occupied_units_check')) {
-        const customError = new Error('يوجد تعارض في عدد الوحدات المشغولة');
-        (customError as Record<string, unknown>).code = 'occupied_units_check';
+        const customError = new Error('يوجد تعارض في عدد الوحدات المشغولة') as Error & { code?: string };
+        customError.code = 'occupied_units_check';
         throw customError;
       }
       throw error;

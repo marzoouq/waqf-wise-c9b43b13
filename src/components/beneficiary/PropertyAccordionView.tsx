@@ -101,7 +101,7 @@ interface PropertyUnitsSectionProps {
   occupiedUnits: number;
 }
 
-function PropertyUnitsSection({ propertyId, propertyName, _totalUnits, _occupiedUnits }: PropertyUnitsSectionProps) {
+function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSectionProps) {
   const { units, isLoading } = usePropertyUnits(propertyId);
   
   if (isLoading) {

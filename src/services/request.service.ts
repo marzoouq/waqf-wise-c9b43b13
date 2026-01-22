@@ -55,7 +55,7 @@ export class RequestService {
   /**
    * جلب طلب بالمعرف
    */
-  static async getById(_requestId: string) {
+  static async getById(requestId: string) {
     const { data, error } = await supabase
       .from('beneficiary_requests')
       .select(`
@@ -288,7 +288,7 @@ export class RequestService {
   /**
    * الحصول على workflow الطلب
    */
-  static async getWorkflow(_requestId: string) {
+  static async getWorkflow(requestId: string) {
     const { data, error } = await supabase
       .from('request_workflows')
       .select('id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at')
@@ -300,7 +300,7 @@ export class RequestService {
   }
 
   // ==================== المرفقات ====================
-  static async getAttachments(_requestId: string) {
+  static async getAttachments(requestId: string) {
     const { data, error } = await supabase
       .from("request_attachments")
       .select("*")
@@ -379,7 +379,7 @@ export class RequestService {
   }
 
   // ==================== التعليقات ====================
-  static async getComments(_requestId: string) {
+  static async getComments(requestId: string) {
     // جلب التعليقات
     const { data: comments, error } = await supabase
       .from("request_comments")

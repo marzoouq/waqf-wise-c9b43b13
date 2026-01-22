@@ -7,7 +7,7 @@ interface UseSortableTableProps<T> {
   defaultDirection?: SortDirection;
 }
 
-export function useTableSort<T extends Record<string, unknown>>({
+export function useTableSort<T>({
   data,
   defaultSortKey,
   defaultDirection = 'asc',
@@ -20,14 +20,14 @@ export function useTableSort<T extends Record<string, unknown>>({
     direction: defaultDirection,
   });
 
-  const sortedData = useMemo(() => {
+  const sortedData = useMemo((): T[] => {
     if (!sortConfig.key || !sortConfig.direction) {
       return data;
     }
 
     return [...data].sort((a, b) => {
-      const aValue = a[sortConfig.key!];
-      const bValue = b[sortConfig.key!];
+      const aValue = (a as Record<string, unknown>)[sortConfig.key!];
+      const bValue = (b as Record<string, unknown>)[sortConfig.key!];
 
       if (aValue === null || aValue === undefined) return 1;
       if (bValue === null || bValue === undefined) return -1;

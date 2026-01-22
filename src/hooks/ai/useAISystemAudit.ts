@@ -3,9 +3,10 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  AISystemAuditService
+  AISystemAuditService,
+  AUDIT_CATEGORIES
 } from '@/services/ai-system-audit.service';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 

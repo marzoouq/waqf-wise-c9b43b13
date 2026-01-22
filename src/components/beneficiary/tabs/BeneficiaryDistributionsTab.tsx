@@ -13,6 +13,7 @@ import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings"
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 import { useYearlyComparison } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
@@ -33,6 +34,7 @@ const HEIR_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
   const masked = settings?.mask_exact_amounts || false;
+  const isMobile = useIsMobile();
   
   const {
     distributions,

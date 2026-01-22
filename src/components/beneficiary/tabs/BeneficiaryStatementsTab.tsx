@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Download, FileText, Wallet, ArrowDownToLine, ArrowUpFromLine, Scale } from "lucide-react";
+import { Download, FileText, Wallet, ArrowDownToLine, ArrowUpFromLine, Scale, TrendingUp, TrendingDown } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
 import { formatCurrency } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -39,6 +40,7 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
   const { isLoading: paymentsLoading } = useBeneficiaryStatements(beneficiaryId);
   const { distributions, isLoading: distributionsLoading } = useBeneficiaryDistributions(beneficiaryId);
   const { exportJournalEntries } = useBeneficiaryExport();
+  const isMobile = useIsMobile();
 
   const isLoading = paymentsLoading || distributionsLoading;
   const masked = settings?.mask_exact_amounts || false;

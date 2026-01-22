@@ -168,7 +168,6 @@ const Requests = memo(() => {
             searchQuery={searchQuery}
             statusFilter={statusFilter}
             setSelectedRequest={setSelectedRequest}
-            setApprovalDialogOpen={setApprovalDialogOpen}
             setCommentsDialogOpen={setCommentsDialogOpen}
             handleDeleteClick={handleDeleteClick}
             handleViewDetails={handleViewDetails}

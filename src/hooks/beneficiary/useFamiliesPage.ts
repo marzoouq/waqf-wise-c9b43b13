@@ -45,13 +45,13 @@ export function useFamiliesPage() {
     });
   }, [families, searchQuery, advancedFilters]);
 
-  const { sortedData, sortConfig, handleSort } = useTableSort({
+  const { sortedData, sortConfig, handleSort } = useTableSort<Family>({
     data: filteredFamilies,
     defaultSortKey: 'family_name',
     defaultDirection: 'asc',
   });
 
-  const bulkSelection = useBulkSelection(sortedData);
+  const bulkSelection = useBulkSelection<Family>(sortedData);
 
   const paginatedFamilies = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;

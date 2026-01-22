@@ -34,7 +34,7 @@ export function filterItems<T extends Record<string, unknown>>(
       const itemDate = item.created_at || item.date || item.payment_date || item.entry_date;
       
       if (itemDate) {
-        const date = new Date(itemDate);
+        const date = new Date(String(itemDate));
         
         if (filters.dateFrom) {
           matchesDateFrom = date >= new Date(filters.dateFrom);
