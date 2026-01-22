@@ -1,249 +1,206 @@
 
+# خطة إزالة مبلغ 1,300 ريال + إعادة احتساب الأرصدة
 
-# خطة التحسين الفعلية للصفحات (4 صفحات فقط)
-
-## الملخص التنفيذي
-
-بعد الفحص الفعلي الشامل للـ 18 صفحة المصنفة "B - يحتاج تحسين"، تبين أن:
-
-- **14 صفحة** ✅ منظمة بالفعل وتتبع الهيكل الموحد
-- **4 صفحات** فقط تحتاج تحسين فعلي
+## الهدف
+إزالة المبلغ الوهمي (1,300 ريال) من جميع التقارير واللوحات، مع إعادة احتساب الأرصدة من القيود الفعلية المرحَّلة.
 
 ---
 
-## الصفحات التي تحتاج تحسين
+## المرحلة 1: تنظيف قاعدة البيانات
 
-### 1. SupportManagement.tsx
-**المشكلة:** لا تستخدم `MobileOptimizedLayout`
-
-**التعديل المطلوب:**
-```text
-السطر 65-67 (الحالي):
-  return (
-    <PageErrorBoundary pageName="إدارة الدعم الفني">
-        <div className="space-y-4 sm:space-y-6">
-
-التعديل:
-  return (
-    <PageErrorBoundary pageName="إدارة الدعم الفني">
-      <MobileOptimizedLayout>
-        <div className="space-y-4 sm:space-y-6">
+### 1.1 حذف سطور القيد المرتبطة
+```sql
+UPDATE journal_entry_lines
+SET deleted_at = NOW(), 
+    deleted_by = NULL, 
+    deletion_reason = 'حذف سطور قيد وهمي مرتبط بسند V-1768526034377'
+WHERE journal_entry_id = 'e2925c24-903e-4f78-8129-3f0a065869ad'
+  AND deleted_at IS NULL;
 ```
 
-```text
-السطر 347-349 (الحالي):
-        </div>
-    </PageErrorBoundary>
-  );
+### 1.2 إعادة احتساب رصيد حساب النقدية والبنوك
+```sql
+WITH valid_lines AS (
+  SELECT 
+    jel.account_id,
+    SUM(jel.debit_amount) as total_debit,
+    SUM(jel.credit_amount) as total_credit
+  FROM journal_entry_lines jel
+  INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
+  WHERE je.deleted_at IS NULL 
+    AND jel.deleted_at IS NULL
+    AND je.status = 'posted'
+  GROUP BY jel.account_id
+)
+UPDATE accounts a
+SET current_balance = CASE 
+  WHEN a.account_nature = 'debit' THEN COALESCE(vl.total_debit, 0) - COALESCE(vl.total_credit, 0)
+  ELSE COALESCE(vl.total_credit, 0) - COALESCE(vl.total_debit, 0)
+END
+FROM valid_lines vl
+WHERE a.id = vl.account_id;
 
-التعديل:
-        </div>
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
-  );
+-- تصفير الحسابات التي ليس لها قيود
+UPDATE accounts
+SET current_balance = 0
+WHERE id NOT IN (
+  SELECT DISTINCT jel.account_id 
+  FROM journal_entry_lines jel
+  INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
+  WHERE je.deleted_at IS NULL AND jel.deleted_at IS NULL AND je.status = 'posted'
+);
 ```
 
-**الاستيراد المطلوب:**
+---
+
+## المرحلة 2: إصلاح الخدمات (طبقة الكود)
+
+### 2.1 تحديث `JournalEntryService.getJournalEntriesWithLines`
+- إضافة `.is('deleted_at', null)` لجدول `journal_entries`
+- التحقق من أن سطور القيود تُستثنى المحذوفة
+
+### 2.2 تحديث `JournalEntryService.updateAccountBalances`
+- إضافة فلتر لاستثناء القيود المحذوفة عند إعادة الحساب
+
+### 2.3 تحديث `FinancialCardsService.getRevenueProgress`
+- إضافة `.is('deleted_at', null)` لجدول `payment_vouchers`
+
+---
+
+## المرحلة 3: إنشاء دالة إعادة احتساب الأرصدة
+
+### 3.1 دالة `recalculate_all_account_balances()`
+```sql
+CREATE OR REPLACE FUNCTION recalculate_all_account_balances()
+RETURNS void AS $$
+BEGIN
+  -- إعادة حساب كل الأرصدة من القيود المرحَّلة الفعلية
+  UPDATE accounts a
+  SET current_balance = COALESCE((
+    SELECT CASE 
+      WHEN a.account_nature = 'debit' THEN SUM(jel.debit_amount) - SUM(jel.credit_amount)
+      ELSE SUM(jel.credit_amount) - SUM(jel.debit_amount)
+    END
+    FROM journal_entry_lines jel
+    INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
+    WHERE jel.account_id = a.id
+      AND je.deleted_at IS NULL
+      AND jel.deleted_at IS NULL
+      AND je.status = 'posted'
+  ), 0);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### 3.2 Trigger للحذف التلقائي لإعادة الرصيد
+```sql
+CREATE OR REPLACE FUNCTION on_journal_entry_soft_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL THEN
+    -- إعادة حساب أرصدة الحسابات المتأثرة
+    UPDATE accounts a
+    SET current_balance = COALESCE((
+      SELECT CASE 
+        WHEN a.account_nature = 'debit' THEN SUM(jel.debit_amount) - SUM(jel.credit_amount)
+        ELSE SUM(jel.credit_amount) - SUM(jel.debit_amount)
+      END
+      FROM journal_entry_lines jel
+      INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
+      WHERE jel.account_id = a.id
+        AND je.deleted_at IS NULL
+        AND jel.deleted_at IS NULL
+        AND je.status = 'posted'
+    ), 0)
+    WHERE a.id IN (
+      SELECT account_id FROM journal_entry_lines WHERE journal_entry_id = OLD.id
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_journal_entry_soft_delete
+AFTER UPDATE ON journal_entries
+FOR EACH ROW
+WHEN (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL)
+EXECUTE FUNCTION on_journal_entry_soft_delete();
+```
+
+---
+
+## المرحلة 4: تحديث الاستعلامات في الخدمات
+
+### الملفات المتأثرة:
+
+| الملف | التغيير |
+|-------|---------|
+| `src/services/dashboard/kpi.service.ts` | إضافة `.is('deleted_at', null)` للسندات والقيود |
+| `src/services/property/property-stats.service.ts` | إضافة `.is('deleted_at', null)` للسندات |
+| `src/services/accounting/journal-entry.service.ts` | إضافة الفلاتر للقيود والسطور |
+| `src/services/dashboard/financial-cards.service.ts` | إضافة الفلتر للسندات |
+
+### مثال التغيير:
 ```typescript
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+// قبل
+.from("payment_vouchers")
+.select("amount")
+.eq("voucher_type", "receipt")
+.eq("status", "paid")
+
+// بعد
+.from("payment_vouchers")
+.select("amount")
+.eq("voucher_type", "receipt")
+.eq("status", "paid")
+.is("deleted_at", null)  // ← إضافة
 ```
 
 ---
 
-### 2. AISystemAudit.tsx
-**المشكلة:** لا تستخدم `MobileOptimizedLayout` (تستخدم `<div className="container mx-auto p-6">` بدلاً منها)
+## المرحلة 5: التحقق والاختبار
 
-**التعديل المطلوب:**
-```text
-السطر 47-48 (الحالي):
-    <PageErrorBoundary pageName="الفحص الذكي للنظام">
-    <div className="container mx-auto p-6 space-y-6" dir="rtl">
+### 5.1 استعلامات التحقق
+```sql
+-- التحقق من رصيد النقدية
+SELECT code, name_ar, current_balance FROM accounts WHERE code = '1.1.1';
+-- يجب أن يكون: 0
 
-التعديل:
-    <PageErrorBoundary pageName="الفحص الذكي للنظام">
-      <MobileOptimizedLayout>
-        <MobileOptimizedHeader
-          title="الفحص الذكي للنظام"
-          description="فحص شامل بالذكاء الاصطناعي مع إصلاح تلقائي"
-          icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-          actions={
-            <Button onClick={handleRunAudit} disabled={isAuditing} size="sm">
-              {isAuditing ? <RefreshCw className="ms-2 h-4 w-4 animate-spin" /> : <Play className="ms-2 h-4 w-4" />}
-              {isAuditing ? 'جاري الفحص...' : 'بدء فحص جديد'}
-            </Button>
-          }
-        />
-        <div className="space-y-6">
+-- التحقق من عدم وجود سندات نشطة بـ 1300
+SELECT COUNT(*) FROM payment_vouchers WHERE amount = 1300 AND deleted_at IS NULL;
+-- يجب أن يكون: 0
+
+-- التحقق من عدم وجود قيود نشطة مرتبطة
+SELECT COUNT(*) FROM journal_entries 
+WHERE reference_id = 'd9f7a74b-5dec-470f-beb3-700063f8b798' AND deleted_at IS NULL;
+-- يجب أن يكون: 0
 ```
 
-```text
-السطر 266-268 (الحالي):
-    </div>
-    </PageErrorBoundary>
-  );
-
-التعديل:
-        </div>
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
-  );
-```
-
-**الاستيراد المطلوب:**
-```typescript
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-```
-
-**حذف Header القديم (السطور 49-58):**
-```typescript
-// حذف هذا الجزء:
-<div className="flex items-center justify-between">
-  <div>
-    <h1 className="text-3xl font-bold">الفحص الذكي للنظام</h1>
-    <p className="text-muted-foreground mt-1">فحص شامل بالذكاء الاصطناعي مع إصلاح تلقائي</p>
-  </div>
-  <Button onClick={handleRunAudit} disabled={isAuditing} size="lg">
-    ...
-  </Button>
-</div>
-```
+### 5.2 اختبار اللوحات
+- لوحة الناظر: إجمالي الأصول = 0
+- لوحة المشرف: التحصيل = 0
+- بطاقة الرصيد البنكي: 0 ر.س
 
 ---
 
-### 3. BeneficiaryAccountStatement.tsx
-**المشكلة:** لا تستخدم `PageErrorBoundary` ولا `MobileOptimizedLayout`
+## ملخص التنفيذ
 
-**التعديل المطلوب:**
-```text
-السطر 122-123 (الحالي):
-  return (
-    <div className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-5 ...">
-
-التعديل:
-  return (
-    <PageErrorBoundary pageName="كشف حساب المستفيد">
-      <MobileOptimizedLayout>
-        <MobileOptimizedHeader
-          title="كشف الحساب التفصيلي"
-          description="عرض تفصيلي لجميع المعاملات المالية"
-          icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-          actions={
-            <Button onClick={exportToPDF} variant="outline" size="sm">
-              <Download className="h-4 w-4 ms-2" />
-              <span className="hidden sm:inline">تصدير PDF</span>
-              <span className="sm:hidden">تصدير</span>
-            </Button>
-          }
-        />
-        <div className="space-y-4 sm:space-y-6">
-```
-
-```text
-السطر 375-377 (الحالي):
-    </div>
-  );
-}
-
-التعديل:
-        </div>
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
-  );
-}
-```
-
-**الاستيراد المطلوب:**
-```typescript
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-```
-
-**حذف Header القديم (السطور 124-140):**
-```typescript
-// حذف الـ div الذي يحتوي على Header القديم
-```
+| المرحلة | الإجراء | الأولوية |
+|---------|---------|----------|
+| 1 | تنظيف قاعدة البيانات (soft delete للسطور + إعادة احتساب) | 🔴 عاجل |
+| 2 | إضافة فلاتر `deleted_at` للخدمات | 🔴 عاجل |
+| 3 | إنشاء دالة وtrigger للحذف المستقبلي | 🟠 مهم |
+| 4 | تحديث الاستعلامات | 🟠 مهم |
+| 5 | التحقق والاختبار | 🟢 تأكيد |
 
 ---
 
-### 4. PointOfSale.tsx
-**المشكلة:** لا تستخدم `PageErrorBoundary` ولا `MobileOptimizedLayout` (صفحة POS خاصة لكن تحتاج الحماية)
+## النتيجة المتوقعة
 
-**التعديل المطلوب:**
-```text
-إضافة PageErrorBoundary حول المحتوى الرئيسي
-```
+بعد التنفيذ:
+- **إجمالي الأصول**: 0 ر.س
+- **التحصيل الفعلي**: 0 ر.س
+- **الرصيد البنكي**: 0 ر.س
+- **الميزانية المتاحة**: 0 ر.س
 
-**الاستيراد المطلوب:**
-```typescript
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-```
-
-**ملاحظة:** صفحة POS لها تصميم خاص (واجهة نقطة بيع) ولا تحتاج `MobileOptimizedLayout` بشكل كامل، لكنها تحتاج `PageErrorBoundary` للحماية من الأخطاء.
-
----
-
-## ملخص التعديلات
-
-| الصفحة | التعديل | الوقت المقدر |
-|--------|---------|-------------|
-| `SupportManagement.tsx` | إضافة `MobileOptimizedLayout` | 3 دقائق |
-| `AISystemAudit.tsx` | استبدال container بـ `MobileOptimizedLayout` + `MobileOptimizedHeader` | 5 دقائق |
-| `BeneficiaryAccountStatement.tsx` | إضافة `PageErrorBoundary` + `MobileOptimizedLayout` + `MobileOptimizedHeader` | 7 دقائق |
-| `PointOfSale.tsx` | إضافة `PageErrorBoundary` | 2 دقائق |
-| **الإجمالي** | | **~17 دقيقة** |
-
----
-
-## تحديث الوثائق
-
-بعد التحسين، سيتم تحديث:
-
-1. **`docs/PAGES_ORGANIZATION_STATUS.md`:**
-   - نقل الصفحات الأربعة من "B - يحتاج تحسين" إلى "A - منظم"
-   - تحديث النسب: A = 55 (65%) | B = 14 (16%) | C = 16 (19%)
-
-2. **`docs/AUDIT_ACTION_ITEMS.md`:**
-   - تحديث حالة المهام المنجزة
-
----
-
-## النتيجة النهائية المتوقعة
-
-```text
-قبل التحسين:
-منظم بالكامل:    ████████████████████████████████████████████████░░  60% (51/85)
-يحتاج تحسين:     ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  21% (18/85)
-
-بعد التحسين:
-منظم بالكامل:    ████████████████████████████████████████████████████  65% (55/85)
-يحتاج تحسين:     ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  16% (14/85)
-```
-
----
-
-## الملاحظات الفنية
-
-### الهيكل الموحد المستخدم:
-```typescript
-<PageErrorBoundary pageName="اسم الصفحة">
-  <MobileOptimizedLayout>
-    <MobileOptimizedHeader 
-      title="..."
-      description="..."
-      icon={<Icon />}
-      actions={<Button>...</Button>}
-    />
-    <UnifiedStatsGrid>...</UnifiedStatsGrid>  // إذا كانت هناك إحصائيات
-    <FiltersSection />  // إذا كانت هناك فلاتر
-    <ContentSection />  // المحتوى الرئيسي
-    <DialogsSection />  // الـ Dialogs
-  </MobileOptimizedLayout>
-</PageErrorBoundary>
-```
-
-### الفوائد:
-1. **حماية من الأخطاء:** `PageErrorBoundary` يمنع انهيار الصفحة بالكامل
-2. **تجاوب مع الجوال:** `MobileOptimizedLayout` يوفر تصميم متجاوب
-3. **تناسق بصري:** `MobileOptimizedHeader` يوفر header موحد
-4. **تجربة مستخدم محسنة:** تحميل أسرع وأداء أفضل
-
+مع ضمان أن أي حذف مستقبلي سيُعيد الأرصدة تلقائياً.
