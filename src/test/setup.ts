@@ -4,6 +4,7 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
+import React from 'react';
 
 // Make vi globally available
 globalThis.vi = vi;

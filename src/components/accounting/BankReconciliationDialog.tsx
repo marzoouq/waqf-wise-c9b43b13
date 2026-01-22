@@ -21,8 +21,6 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
   const { statements, createStatement } = useBankReconciliation();
   const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
   
-  const [step, _setStep] = useState<"select" | "import" | "match">("select");
-  
   const [newStatement, setNewStatement] = useState({
     bank_account_id: "",
     statement_date: "",
@@ -55,10 +53,8 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
       title="التسوية البنكية"
       size="xl"
     >
-
-        {step === "select" && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">إنشاء كشف حساب جديد</h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">إنشاء كشف حساب جديد</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -157,7 +153,6 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
               </Table>
             </div>
           </div>
-        )}
     </ResponsiveDialog>
   );
 }
