@@ -8,7 +8,6 @@
 
 import React, { lazy, ComponentType } from 'react';
 import { 
-  isChunkLoadError, 
   getChunkErrorInfo, 
   logChunkError 
 } from '@/lib/errors/chunk-error-handler';

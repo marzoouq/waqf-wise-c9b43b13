@@ -4,7 +4,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import type { RentalPaymentInsert, RentalPaymentUpdate } from "@/types/payments";
+import type { RentalPaymentInsert } from "@/types/payments";
 import type { Database } from "@/integrations/supabase/types";
 
 // Types from database

@@ -2,7 +2,6 @@
  * Edge Functions Health Service - خدمة مراقبة صحة Edge Functions
  */
 
-import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger';
 
 export type CheckType = 'ping' | 'json-required' | 'formdata';

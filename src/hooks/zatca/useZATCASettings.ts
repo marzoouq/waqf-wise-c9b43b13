@@ -45,7 +45,7 @@ export function useZATCASettings() {
         description: "تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح",
       });
       return true;
-    } catch (_error) {
+    } catch {
       toast.error("خطأ في الحفظ", {
         description: "تعذر حفظ الإعدادات. الرجاء المحاولة مرة أخرى.",
       });

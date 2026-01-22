@@ -166,7 +166,7 @@ export class PaymentService {
   /**
    * جلب إحصائيات المدفوعات
    */
-  static async getStats(fiscalYearId?: string): Promise<{
+  static async getStats(_fiscalYearId?: string): Promise<{
     totalReceipts: number;
     totalPayments: number;
     pendingApprovals: number;

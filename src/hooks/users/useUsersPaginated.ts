@@ -9,7 +9,7 @@ import { useState } from "react";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { AuthService } from "@/services/auth.service";
 import type { UserProfile } from "@/types/auth";
-import type { PaginationParams, PaginatedResult } from "@/lib/pagination.types";
+import type { PaginatedResult } from "@/lib/pagination.types";
 
 interface UseUsersPaginatedOptions {
   initialPage?: number;

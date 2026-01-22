@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTenantsRealtime } from '@/hooks/property/useTenantsRealtime';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -55,10 +55,9 @@ import {
   Phone,
   Mail,
   Banknote,
-  MessageCircle,
 } from 'lucide-react';
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton';
-import type { Tenant, TenantInsert, TenantWithBalance } from '@/types/tenants';
+import type { TenantInsert, TenantWithBalance } from '@/types/tenants';
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
   active: { label: 'نشط', variant: 'default' },

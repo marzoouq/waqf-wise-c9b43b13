@@ -21,7 +21,7 @@ import { FiscalYearTestPanel } from "@/components/fiscal-years/FiscalYearTestPan
 import { AddFiscalYearDialog } from "@/components/fiscal-years/AddFiscalYearDialog";
 
 export default function FiscalYearsManagement() {
-  const { fiscalYears, isLoading: loadingYears } = useFiscalYears();
+  const { fiscalYears } = useFiscalYears();
   const { closings, isLoading: _loadingClosings } = useFiscalYearClosings();
   const [selectedYearId, setSelectedYearId] = useState<string | null>(null);
   const [manualClosingOpen, setManualClosingOpen] = useState(false);

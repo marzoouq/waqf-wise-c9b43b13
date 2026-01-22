@@ -207,7 +207,6 @@ vi.mock('sonner', () => {
 
 // Mock Auth context so components using `useAuth()` work in tests
 vi.mock('@/contexts/AuthContext', async () => {
-  const React = await import('react');
   return {
     AuthProvider: ({ children }: { children: React.ReactNode }) => children,
     useAuth: () => ({

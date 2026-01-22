@@ -261,7 +261,7 @@ export class AISystemAuditService {
     actionUrl?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data, error } = await supabase.functions.invoke('send-slack-alert', {
+      const { error } = await supabase.functions.invoke('send-slack-alert', {
         body: { title, message, severity, fields, actionUrl }
       });
 

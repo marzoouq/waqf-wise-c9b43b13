@@ -52,18 +52,6 @@ export default function GovernanceDecisions() {
     matchesStatus(d.decision_status, 'rejected', 'cancelled')
   );
 
-  // تحديد القرارات المعروضة حسب التبويب النشط
-  const getDisplayedDecisions = () => {
-    switch (activeTab) {
-      case "active": return activeDecisions;
-      case "completed": return completedDecisions;
-      case "rejected": return rejectedDecisions;
-      default: return activeDecisions;
-    }
-  };
-
-  const displayedDecisions = getDisplayedDecisions();
-
   return (
     <PageErrorBoundary pageName="القرارات والتصويت">
       <MobileOptimizedLayout>

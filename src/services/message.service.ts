@@ -31,28 +31,6 @@ export interface Recipient {
   roleKey: string;
 }
 
-type RoleType = "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir";
-
-const ROLE_TRANSLATIONS: Record<string, string> = {
-  'admin': 'مشرف',
-  'nazer': 'ناظر',
-  'accountant': 'محاسب',
-  'cashier': 'صراف',
-  'beneficiary': 'مستفيد',
-  'archivist': 'أرشيفي',
-  'waqf_heir': 'وارث'
-};
-
-const ROLE_ORDER: Record<string, number> = {
-  'nazer': 1,
-  'admin': 2,
-  'accountant': 3,
-  'cashier': 4,
-  'archivist': 5,
-  'beneficiary': 6,
-  'waqf_heir': 7
-};
-
 export class MessageService {
   /**
    * جلب الرسائل الواردة باستخدام دالة SECURITY DEFINER

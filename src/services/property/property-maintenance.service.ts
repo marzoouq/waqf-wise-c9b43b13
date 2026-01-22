@@ -5,7 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
-import type { Database, Json } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
 
 export class PropertyMaintenanceService {
   /**

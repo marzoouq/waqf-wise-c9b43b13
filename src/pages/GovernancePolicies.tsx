@@ -50,10 +50,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGovernancePolicies, usePoliciesStats, useCreatePolicy, useDeletePolicy, useAvailableCategories } from "@/hooks/governance/useGovernancePolicies";
 import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 import type { Database } from "@/integrations/supabase/types";
 
 type PolicyInsert = Database['public']['Tables']['governance_policies']['Insert'];

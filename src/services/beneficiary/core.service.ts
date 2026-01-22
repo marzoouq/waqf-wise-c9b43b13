@@ -76,7 +76,7 @@ export class BeneficiaryCoreService {
    * جلب مستفيد واحد بالـ ID
    * 🔐 SECURITY: RLS يتحقق من صلاحية الوصول على مستوى قاعدة البيانات
    */
-  static async getById(id: string, options?: { skipAuthCheck?: boolean }): Promise<Beneficiary | null> {
+  static async getById(id: string, _options?: { skipAuthCheck?: boolean }): Promise<Beneficiary | null> {
     try {
       // التحقق من صحة UUID
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -219,7 +219,7 @@ export class BeneficiaryCoreService {
    */
   static async getStats(): Promise<BeneficiaryStats> {
     try {
-      const { data, error } = await withRetry(async () => {
+      const { data } = await withRetry(async () => {
         const result = await supabase
           .from('beneficiaries')
           .select('status, total_received, pending_amount');

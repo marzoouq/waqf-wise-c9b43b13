@@ -1,7 +1,5 @@
 import { useSystemErrorLogsData } from "@/hooks/system/useSystemErrorLogsData";
-import { Database } from "@/integrations/supabase/types";
 
-type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
@@ -26,7 +24,6 @@ export default function SystemErrorLogs() {
     activeAlerts,
     stats,
     isLoading,
-    selectedError,
     setSelectedError,
     resolutionNotes,
     setResolutionNotes,

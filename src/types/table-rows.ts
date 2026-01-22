@@ -2,7 +2,6 @@
  * أنواع صفوف الجداول للاستخدام في UnifiedDataTable
  */
 
-import type { Database } from "@/integrations/supabase/types";
 import type { EmergencyAid } from "./loans";
 import type { Loan } from "@/hooks/payments/useLoans";
 

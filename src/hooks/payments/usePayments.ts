@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PaymentService, RealtimeService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
 import { createMutationErrorHandler } from "@/lib/errors";

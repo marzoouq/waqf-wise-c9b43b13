@@ -30,7 +30,7 @@ export default function BeneficiaryPortal() {
   const { settings } = useVisibilitySettings();
 
   // استخدام Hook المخصص لجلب البيانات (يتضمن التحقق من وضع المعاينة)
-  const { beneficiary, statistics, isLoading, isPreviewMode, error, refetch } = useBeneficiaryPortalData();
+  const { beneficiary, isLoading, isPreviewMode, error, refetch } = useBeneficiaryPortalData();
 
   // تفعيل Realtime للتحديثات الفورية
   useBeneficiaryDashboardRealtime({

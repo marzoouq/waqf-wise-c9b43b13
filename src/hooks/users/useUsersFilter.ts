@@ -8,7 +8,6 @@
  */
 
 import { useState, useMemo } from "react";
-import type { UserProfile } from "@/types/auth";
 import type { AppRole } from "@/types/roles";
 
 // أدوار المشرفين والموظفين

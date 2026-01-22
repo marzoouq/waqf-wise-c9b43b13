@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
 import { useCashierStats, useCashierDashboardRealtime, useCashierDashboardRefresh } from "@/hooks/dashboard";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";

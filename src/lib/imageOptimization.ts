@@ -13,7 +13,6 @@
  */
 
 import { productionLogger } from '@/lib/logger/production-logger';
-import { shouldDeferHeavyOperations } from '@/lib/network-utils';
 
 export interface ImageOptimizationOptions {
   width?: number;

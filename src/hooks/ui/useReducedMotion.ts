@@ -9,7 +9,7 @@ import {
   onReducedMotionChange,
   prefersHighContrast as checkHighContrast,
 } from '@/lib/accessibility';
-import { DURATIONS, TRANSITIONS } from '@/lib/motion-system';
+import { DURATIONS } from '@/lib/motion-system';
 
 // ==================== Reduced Motion Hook ====================
 

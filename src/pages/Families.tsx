@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Plus, Users, MoreVertical, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { Plus, Users, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
 import { matchesStatus } from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';

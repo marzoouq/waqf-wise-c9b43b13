@@ -50,8 +50,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGovernanceBoards, useBoardsStats, useCreateBoard, useDeleteBoard, useBoardMembers, useAddBoardMember, useRemoveBoardMember } from "@/hooks/governance/useGovernanceBoards";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 import type { Database } from "@/integrations/supabase/types";
 
 type BoardInsert = Database['public']['Tables']['governance_boards']['Insert'];

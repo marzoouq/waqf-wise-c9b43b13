@@ -21,8 +21,8 @@ const Funds = () => {
   const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { distributions, isLoading: distributionsLoading, addDistributionAsync } = useDistributions();
-  const { waqfUnits, isLoading: waqfUnitsLoading } = useWaqfUnits();
+  const { distributions, addDistributionAsync } = useDistributions();
+  const { waqfUnits } = useWaqfUnits();
   const { createAutoEntry } = useJournalEntries();
 
   const handleDistribute = async (data: Record<string, unknown>) => {
