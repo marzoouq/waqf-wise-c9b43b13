@@ -21,7 +21,6 @@ import {
   RefreshCw,
   Clock,
   Activity,
-  ArrowLeft,
   Server,
   Database,
   Zap
@@ -31,7 +30,7 @@ import { ConnectionStatusPanel } from '@/components/monitoring/ConnectionStatusP
 import { DiagnosticsService, type DiagnosticResult } from '@/services/diagnostics.service';
 import { formatDistanceToNow } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
+
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
