@@ -3,7 +3,7 @@
  * اللائحة التنفيذية لوقف مرزوق علي الثبيتي
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollText, Printer, Download, ChevronUp, Info, Calendar, Building2, Loader2 } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,19 @@ const WaqfGovernanceGuide = () => {
     expandedParts,
     setExpandedParts,
   } = useRegulationsSearch();
+
+  // تتبع التمرير لإظهار زر العودة للأعلى
+  useEffect(() => {
+    const container = document.querySelector('[data-scroll-container]');
+    if (!container) return;
+
+    const handleScroll = () => {
+      setShowScrollTop(container.scrollTop > 300);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollToTop = () => {
     const container = document.querySelector('[data-scroll-container]');
