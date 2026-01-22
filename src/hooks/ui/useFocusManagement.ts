@@ -48,6 +48,9 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>({
 
     // حصر التركيز
     const cleanup = trapFocus(containerRef.current);
+    
+    // حفظ مرجع focusRestore للتنظيف
+    const currentFocusRestore = focusRestore.current;
 
     // التركيز على أول عنصر
     if (autoFocus) {
@@ -59,7 +62,7 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>({
       cleanup();
       // استعادة التركيز
       if (restoreFocus) {
-        focusRestore.current.restore();
+        currentFocusRestore.restore();
       }
     };
   }, [enabled, autoFocus, restoreFocus]);

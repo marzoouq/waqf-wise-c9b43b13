@@ -116,12 +116,13 @@ Deno.serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح. يرجى الانتظار ساعة قبل المحاولة مرة أخرى.', 429);
     }
 
-    // ✅ استخدام bodyData المحفوظة
-    const totalAmount = bodyData.totalAmount as number | undefined;
-    const fiscalYearId = bodyData.fiscalYearId as string | undefined;
-    const distributionDate = bodyData.distributionDate as string | undefined;
-    const notes = bodyData.notes as string | undefined;
-    const notifyHeirs = bodyData.notifyHeirs as boolean | undefined;
+    // ✅ استخدام bodyData المحفوظة مع التحقق من النوع
+    const requestData: Partial<DistributionRequest> = bodyData as Partial<DistributionRequest>;
+    const totalAmount = requestData.totalAmount;
+    const fiscalYearId = requestData.fiscalYearId;
+    const distributionDate = requestData.distributionDate;
+    const notes = requestData.notes;
+    const notifyHeirs = requestData.notifyHeirs;
 
     // التحقق من البيانات المطلوبة
     if (!totalAmount || typeof totalAmount !== 'number' || totalAmount <= 0) {

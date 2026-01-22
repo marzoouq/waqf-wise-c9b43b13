@@ -44,12 +44,13 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // ✅ استخدام body المحفوظة
-    const invoiceId = (body.invoiceId as string) || '';
-    const customerEmail = (body.customerEmail as string) || '';
-    const customerName = (body.customerName as string) || 'العميل الكريم';
-    const invoiceNumber = (body.invoiceNumber as string) || 'غير محدد';
-    const totalAmount = typeof body.totalAmount === 'number' ? body.totalAmount : 0;
+    // ✅ استخدام body المحفوظة مع التحقق من النوع
+    const requestData: Partial<SendInvoiceEmailRequest> = body as Partial<SendInvoiceEmailRequest>;
+    const invoiceId = requestData.invoiceId || '';
+    const customerEmail = requestData.customerEmail || '';
+    const customerName = requestData.customerName || 'العميل الكريم';
+    const invoiceNumber = requestData.invoiceNumber || 'غير محدد';
+    const totalAmount = typeof requestData.totalAmount === 'number' ? requestData.totalAmount : 0;
 
     // التحقق من البيانات المطلوبة
     if (!invoiceId || !customerEmail) {

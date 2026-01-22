@@ -90,9 +90,10 @@ serve(async (req) => {
       return forbiddenResponse('ليس لديك صلاحية إرسال الفواتير لهيئة الزكاة والضريبة');
     }
 
-    // ============ استخدام bodyData المحفوظة ============
-    const invoice_id = bodyData.invoice_id as string | undefined;
-    const submission_type = (bodyData.submission_type as 'reporting' | 'clearance') || 'reporting';
+    // ============ استخدام bodyData المحفوظة مع التحقق من النوع ============
+    const requestData: Partial<ZATCASubmitRequest> = bodyData as Partial<ZATCASubmitRequest>;
+    const invoice_id = requestData.invoice_id;
+    const submission_type = requestData.submission_type || 'reporting';
 
     if (!invoice_id) {
       return errorResponse('معرف الفاتورة مطلوب', 400);
