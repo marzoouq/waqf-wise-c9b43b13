@@ -3,7 +3,6 @@
  * نموذج موثق لتسجيل حالة الوحدة عند الاستلام أو التسليم
  */
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -45,9 +44,7 @@ import {
   CreditCard,
   Save
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
+import { useUnitHandovers } from '@/hooks/contracts/useUnitHandovers';
 import { type Contract } from '@/hooks/property/useContracts';
 
 const handoverSchema = z.object({
@@ -80,8 +77,7 @@ export function UnitHandoverDialog({
   onOpenChange,
   contract,
 }: UnitHandoverDialogProps) {
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addHandover } = useUnitHandovers(contract?.id);
 
   const form = useForm<HandoverFormValues>({
     resolver: zodResolver(handoverSchema),
@@ -103,41 +99,31 @@ export function UnitHandoverDialog({
     },
   });
 
-  const onSubmit = async (data: HandoverFormValues) => {
+  const onSubmit = (data: HandoverFormValues) => {
     if (!contract) return;
 
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.from('unit_handovers').insert({
-        contract_id: contract.id,
-        handover_type: data.handover_type,
-        handover_date: data.handover_date,
-        electricity_meter_reading: data.electricity_meter_reading ? parseFloat(data.electricity_meter_reading) : null,
-        water_meter_reading: data.water_meter_reading ? parseFloat(data.water_meter_reading) : null,
-        gas_meter_reading: data.gas_meter_reading ? parseFloat(data.gas_meter_reading) : null,
-        keys_count: data.keys_count ? parseInt(data.keys_count) : 0,
-        parking_cards_count: data.parking_cards_count ? parseInt(data.parking_cards_count) : 0,
-        access_cards_count: data.access_cards_count ? parseInt(data.access_cards_count) : 0,
-        remote_controls_count: data.remote_controls_count ? parseInt(data.remote_controls_count) : 0,
-        general_condition: data.general_condition,
-        cleanliness: data.cleanliness,
-        condition_notes: data.condition_notes,
-        witness_name: data.witness_name,
-        notes: data.notes,
-      });
-
-      if (error) throw error;
-
-      toast.success(`تم تسجيل نموذج ${data.handover_type} الوحدة بنجاح`);
-      queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      console.error('Error saving handover:', error);
-      toast.error('حدث خطأ أثناء حفظ النموذج');
-    } finally {
-      setIsSubmitting(false);
-    }
+    addHandover.mutate({
+      contract_id: contract.id,
+      handover_type: data.handover_type,
+      handover_date: data.handover_date,
+      electricity_meter_reading: data.electricity_meter_reading ? parseFloat(data.electricity_meter_reading) : null,
+      water_meter_reading: data.water_meter_reading ? parseFloat(data.water_meter_reading) : null,
+      gas_meter_reading: data.gas_meter_reading ? parseFloat(data.gas_meter_reading) : null,
+      keys_count: data.keys_count ? parseInt(data.keys_count) : 0,
+      parking_cards_count: data.parking_cards_count ? parseInt(data.parking_cards_count) : 0,
+      access_cards_count: data.access_cards_count ? parseInt(data.access_cards_count) : 0,
+      remote_controls_count: data.remote_controls_count ? parseInt(data.remote_controls_count) : 0,
+      general_condition: data.general_condition,
+      cleanliness: data.cleanliness,
+      condition_notes: data.condition_notes,
+      witness_name: data.witness_name,
+      notes: data.notes,
+    }, {
+      onSuccess: () => {
+        onOpenChange(false);
+        form.reset();
+      }
+    });
   };
 
   if (!contract) return null;
@@ -449,8 +435,8 @@ export function UnitHandoverDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" disabled={addHandover.isPending}>
+                {addHandover.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                     جاري الحفظ...
