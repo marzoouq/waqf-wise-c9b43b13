@@ -20,7 +20,15 @@ interface TestCategory {
   label: string;
 }
 
-// Type extension for jsPDF with autoTable plugin
+/**
+ * Type extension for jsPDF with autoTable plugin
+ * 
+ * The jsPDF library with autoTable plugin doesn't have complete TypeScript definitions
+ * for all its methods. This interface provides type safety for the autoTable method
+ * and internal properties used in this hook.
+ * 
+ * Used to avoid `any` type violations while maintaining type safety.
+ */
 interface JsPDFWithAutoTable {
   autoTable: (options: {
     head?: string[][];
