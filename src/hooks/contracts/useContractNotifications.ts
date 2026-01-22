@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { matchesStatus } from '@/lib/constants';
+import { PROPERTIES_KEYS } from '@/lib/query-keys';
 
 export interface ContractNotification {
   id: string;
@@ -44,7 +45,9 @@ export function useContractNotifications(contractId?: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['contract-notifications', contractId],
+    queryKey: contractId 
+      ? PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS_BY_CONTRACT(contractId)
+      : PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS,
     queryFn: async () => {
       let query = supabase
         .from('contract_notifications')
@@ -83,7 +86,7 @@ export function useContractNotifications(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract-notifications'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS });
       toast.success('تم إنشاء الإشعار بنجاح');
     },
     onError: (error) => {
@@ -110,7 +113,7 @@ export function useContractNotifications(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract-notifications'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS });
       toast.success('تم إرسال الإشعار بنجاح');
     },
     onError: (error) => {
@@ -145,7 +148,7 @@ export function useContractNotifications(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract-notifications'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS });
     },
     onError: (error) => {
       console.error('Error updating notification status:', error);
@@ -164,7 +167,7 @@ export function useContractNotifications(contractId?: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contract-notifications'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS });
       toast.success('تم حذف الإشعار');
     },
     onError: (error) => {
