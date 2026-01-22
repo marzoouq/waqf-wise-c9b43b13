@@ -34,7 +34,7 @@ export function DashboardDialogs({
 
   const handleSaveBeneficiary = async (data: Record<string, unknown>) => {
     try {
-      const { error } = await supabase.from("beneficiaries").insert(data);
+      const { error } = await supabase.from("beneficiaries").insert(data as never);
       if (error) throw error;
       
       toast({
@@ -43,11 +43,11 @@ export function DashboardDialogs({
       });
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       setBeneficiaryDialogOpen(false);
-    } catch (error) {
-      console.error("Error saving beneficiary:", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "خطأ غير معروف";
       toast({
         title: "خطأ",
-        description: "حدث خطأ أثناء إضافة المستفيد",
+        description: `حدث خطأ أثناء إضافة المستفيد: ${errorMessage}`,
         variant: "destructive",
       });
     }

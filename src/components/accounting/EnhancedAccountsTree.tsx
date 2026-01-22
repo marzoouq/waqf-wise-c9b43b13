@@ -164,7 +164,7 @@ function AccountNode({ account, level, onEdit, onAddChild, onDelete }: AccountNo
 }
 
 export function EnhancedAccountsTree() {
-  const { accountTree, isLoading, deleteAccount, refetch } = useAccounts();
+  const { accountTree, accounts, isLoading, error, deleteAccount, refetch } = useAccounts();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<AccountRow | null>(null);

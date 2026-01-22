@@ -4,8 +4,8 @@ import { VALIDATION } from "./constants";
 
 // Common validation rules
 export const commonValidation = {
-  requiredString: (_message: string) => 
-    z.string().min(1, { message }),
+  requiredString: (msg: string) => 
+    z.string().min(1, { message: msg }),
   
   optionalString: () => 
     z.string().optional(),
@@ -33,8 +33,8 @@ export const commonValidation = {
       .min(VALIDATION.MIN_PERCENTAGE, { message: "النسبة لا يمكن أن تكون سالبة" })
       .max(VALIDATION.MAX_PERCENTAGE, { message: "النسبة لا يمكن أن تتجاوز 100%" }),
   
-  date: (_message: string) =>
-    z.date({ required_error: message }),
+  date: (msg: string) =>
+    z.date({ required_error: msg }),
   
   dateString: (message: string = "التاريخ غير صحيح") =>
     z.string()
@@ -51,8 +51,8 @@ export const commonValidation = {
         { message }
       ),
   
-  positiveInteger: (_message: string) =>
-    z.number().int().positive({ message }),
+  positiveInteger: (msg: string) =>
+    z.number().int().positive({ message: msg }),
 };
 
 // Beneficiary Schema

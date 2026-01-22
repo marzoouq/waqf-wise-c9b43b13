@@ -117,10 +117,10 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
       setPreviewData([]);
       setValidationErrors([]);
       onSuccess();
-    } catch (_error) {
+    } catch (err) {
       toast({
         title: "خطأ في الاستيراد",
-        description: error instanceof Error ? error.message : "حدث خطأ غير متوقع",
+        description: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
         variant: "destructive",
       });
     } finally {

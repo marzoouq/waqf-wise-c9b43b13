@@ -252,7 +252,7 @@ export const COLUMN_RULES = {
  */
 export function isValidColumn(table: keyof typeof TABLE_COLUMNS, column: string): boolean {
   const columns = TABLE_COLUMNS[table];
-  return columns ? columns.includes(column as unknown as string) : true;
+  return columns ? (columns as readonly string[]).includes(column) : true;
 }
 
 /**
