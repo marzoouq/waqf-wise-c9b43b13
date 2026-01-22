@@ -2,7 +2,6 @@
  * Hook لإدارة سجل الاختبارات التاريخية
  */
 
-import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
@@ -122,7 +121,7 @@ export function useTestHistory() {
       queryClient.invalidateQueries({ queryKey: ['test-runs-history'] });
       toastSuccess('تم حفظ نتيجة الاختبار');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error saving test run:', error);
       toastError('فشل حفظ النتيجة: ' + error.message);
     }
@@ -142,7 +141,7 @@ export function useTestHistory() {
       queryClient.invalidateQueries({ queryKey: ['test-runs-history'] });
       toastSuccess('تم حذف السجل');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toastError('فشل الحذف: ' + error.message);
     }
   });

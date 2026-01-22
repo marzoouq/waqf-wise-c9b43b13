@@ -48,7 +48,7 @@ export interface UseUXIntegrationReturn {
  * خطاف التكامل الموحد لأنظمة UX
  */
 export function useUXIntegration(): UseUXIntegrationReturn {
-  const [systemStatus, setSystemStatus] = useState<UXSystemStatus>(() => checkUXSystemsHealth());
+  const [systemStatus] = useState<UXSystemStatus>(() => checkUXSystemsHealth());
   const [config, setConfig] = useState<UXConfig>(() => getUXConfig());
   const [capabilities, setCapabilities] = useState<DeviceCapabilities>(() => detectDeviceCapabilities());
   const [metrics, setMetrics] = useState<UXPerformanceMetrics>(() => collectUXMetrics());

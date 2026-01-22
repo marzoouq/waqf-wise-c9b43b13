@@ -9,7 +9,6 @@ import { DocumentService } from "@/services/document.service";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { useToast } from "@/hooks/ui/use-toast";
-import type { InvoiceLine } from "@/types/invoice-line";
 
 // تحويل بيانات الفاتورة من الخدمة إلى صيغة PDF
 function toInvoicePDFFormat(invoice: Awaited<ReturnType<typeof DocumentService.getInvoiceWithLines>>['invoice']) {
@@ -106,7 +105,7 @@ export function useDocumentViewer() {
           description: "تم توليد الفاتورة وتحميلها",
         });
       }
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض الفاتورة",
@@ -161,7 +160,7 @@ export function useDocumentViewer() {
           description: "تم توليد سند القبض وتحميله",
         });
       }
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض سند القبض",

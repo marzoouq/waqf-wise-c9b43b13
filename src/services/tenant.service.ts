@@ -5,7 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { matchesStatus, TENANT_ACTIVE_STATUSES } from "@/lib/constants";
+import { matchesStatus } from "@/lib/constants";
 import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 type Tenant = Database['public']['Tables']['tenants']['Row'];

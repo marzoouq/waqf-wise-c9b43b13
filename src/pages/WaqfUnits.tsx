@@ -24,7 +24,7 @@ import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { AdvancedFiltersDialog, FilterConfig, FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { useTableSort } from "@/hooks/ui/useTableSort";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
-import { format, arLocale as ar } from "@/lib/date";
+import { format } from "@/lib/date";
 import { toast } from "sonner";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
@@ -68,7 +68,6 @@ export default function WaqfUnits() {
   });
 
   const {
-    selectedIds,
     selectedCount,
     isSelected,
     isAllSelected,
@@ -90,7 +89,6 @@ export default function WaqfUnits() {
   ];
 
   const handleBulkExport = () => {
-    const selectedUnits = waqfUnits.filter(u => selectedIds.includes(u.id));
     toast.success(`جاري تصدير ${selectedCount} قلم وقف...`);
   };
 
@@ -101,7 +99,7 @@ export default function WaqfUnits() {
       await deleteWaqfUnit(unitToDelete.id);
       setDeleteDialogOpen(false);
       setUnitToDelete(null);
-    } catch (_error) {
+    } catch {
       // الخطأ يُعالج في الـ Hook
     } finally {
       setIsDeleting(false);

@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NotificationSettings as NotificationSettingsType } from "@/types/notifications";
 import { MultiChannelNotifications } from "@/components/notifications/MultiChannelNotifications";
 import { Settings, Radio } from "lucide-react";
 import { useNotificationSettingsData } from "@/hooks/notifications/useNotificationSettingsData";

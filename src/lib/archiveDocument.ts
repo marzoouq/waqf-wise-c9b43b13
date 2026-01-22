@@ -14,13 +14,13 @@ export async function archiveDocument(params: {
   description?: string;
 }): Promise<{ success: boolean; documentId?: string; error?: string }> {
   try {
-    const { fileBlob, fileName, fileType, referenceId, referenceType, description } = params;
+    const { fileBlob, fileName, fileType, referenceId, description } = params;
 
     // 1. رفع الملف إلى Supabase Storage مع مسار منظم
     // ✅ إصلاح: استخدام اسم الـ bucket الصحيح 'archive-documents'
     const storagePath = `${fileType}/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${fileName}`;
     
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('archive-documents')
       .upload(storagePath, fileBlob, {
         contentType: 'application/pdf',

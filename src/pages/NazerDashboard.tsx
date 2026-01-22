@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell, Wrench } from "lucide-react";
+import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

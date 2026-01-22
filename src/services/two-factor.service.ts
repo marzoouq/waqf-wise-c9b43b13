@@ -56,7 +56,7 @@ export class TwoFactorService {
   /**
    * التحقق من رمز المصادقة الثنائية
    */
-  static async verifyCode(userId: string, code: string): Promise<boolean> {
+  static async verifyCode(userId: string, _code: string): Promise<boolean> {
     const status = await this.getStatus(userId);
     if (!status?.enabled || !status.secret) return false;
     

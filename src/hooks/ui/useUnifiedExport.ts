@@ -63,7 +63,7 @@ export interface FinancialStatementConfig {
 // ==================== Main Hook ====================
 
 export function useUnifiedExport() {
-  const { toast: shadcnToast } = useToast();
+  const { toast: _shadcnToast } = useToast();
 
   /**
    * تصدير إلى PDF مع دعم الخطوط العربية

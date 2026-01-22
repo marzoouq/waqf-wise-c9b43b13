@@ -9,7 +9,6 @@ import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSet
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
 import { processArabicText, processArabicHeaders, processArabicTableData } from "./pdf/arabic-pdf-utils";
-import type { InvoiceLine } from "@/types/invoice-line";
 
 // Dynamic import type - jsPDF instance type
 type JsPDFInstance = InstanceType<typeof import('jspdf').default>;

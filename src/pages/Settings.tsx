@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { APP_VERSION } from "@/lib/version";
 import { useNavigate } from "react-router-dom";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye, BookOpen, Fingerprint } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";

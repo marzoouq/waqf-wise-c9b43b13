@@ -3,13 +3,6 @@ import { ArchiveService } from "@/services";
 import { QUERY_STALE_TIME } from "@/lib/constants";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
-interface ArchiveStats {
-  totalDocuments: number;
-  totalFolders: number;
-  totalSize: string;
-  thisMonthAdditions: number;
-}
-
 export function useArchiveStats() {
   const { data: stats, isLoading, error, refetch } = useQuery({
     queryKey: [...QUERY_KEYS.DOCUMENTS, "stats"],

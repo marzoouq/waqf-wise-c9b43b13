@@ -80,7 +80,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
             variant: "destructive",
           });
         }
-      } catch (_error) {
+      } catch {
         toast({
           title: "خطأ في قراءة الملف",
           description: "تأكد من صحة تنسيق ملف Excel",

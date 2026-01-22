@@ -19,7 +19,7 @@ export const usePrint = () => {
         title: "جاري الطباعة",
         description: "يتم تجهيز المستند للطباعة...",
       });
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ في الطباعة",
         description: "حدث خطأ أثناء محاولة الطباعة",
@@ -147,7 +147,7 @@ export const usePrint = () => {
         title: "جاري الطباعة",
         description: "يتم تجهيز المستند للطباعة...",
       });
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ في الطباعة",
         description: "حدث خطأ أثناء محاولة الطباعة",

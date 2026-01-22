@@ -32,7 +32,7 @@ export const AnnualDisclosureCard = () => {
       // السنة السابقة
       const previousYear = publishedDisclosures[index + 1] || null;
       await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
-    } catch (_error) {
+    } catch {
       // Error already handled in generateDisclosurePDF
     }
   };

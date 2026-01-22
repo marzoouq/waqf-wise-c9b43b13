@@ -13,7 +13,7 @@ import { queryInvalidationManager } from '@/lib/query-invalidation-manager';
 
 export function useRealtimeNotifications() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const { toast } = useToast();
 
   // استخدام refs لتجنب إعادة إنشاء الاشتراكات

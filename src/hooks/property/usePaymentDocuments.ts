@@ -60,7 +60,7 @@ export function usePaymentDocuments() {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض الفاتورة",
@@ -116,7 +116,7 @@ export function usePaymentDocuments() {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض سند القبض",

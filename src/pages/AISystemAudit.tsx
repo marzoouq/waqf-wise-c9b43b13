@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
-import { useAISystemAudit, AUDIT_CATEGORIES } from '@/hooks/ai/useAISystemAudit';
+import { useAISystemAudit } from '@/hooks/ai/useAISystemAudit';
 import { 
   Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, 
   Info, Shield, Undo2,

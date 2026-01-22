@@ -21,7 +21,6 @@ export function DocumentUploadDialog({
   open,
   onOpenChange,
   beneficiaryId,
-  requestId,
   onUploadComplete,
 }: DocumentUploadDialogProps) {
   const { toast } = useToast();
@@ -72,7 +71,7 @@ export function DocumentUploadDialog({
       setDescription("");
       onOpenChange(false);
       onUploadComplete?.();
-    } catch (_error) {
+    } catch {
       // Error handled in hook
     } finally {
       setUploading(false);

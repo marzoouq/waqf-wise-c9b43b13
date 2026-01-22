@@ -59,7 +59,9 @@ if (typeof globalWithObservers.IntersectionObserver === 'undefined') {
 
 // Force navigator language to en-US to avoid Arabic-digit formatting in tests
 if (typeof navigator !== 'undefined') {
-  try { Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true }); } catch {}
+  try { Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true }); } catch {
+    // Silently ignore errors when navigator.language cannot be configured
+  }
 }
 
 // Force Intl.NumberFormat to default to en-US when no locale provided
@@ -205,7 +207,6 @@ vi.mock('sonner', () => {
 
 // Mock Auth context so components using `useAuth()` work in tests
 vi.mock('@/contexts/AuthContext', async () => {
-  const React = await import('react');
   return {
     AuthProvider: ({ children }: { children: React.ReactNode }) => children,
     useAuth: () => ({

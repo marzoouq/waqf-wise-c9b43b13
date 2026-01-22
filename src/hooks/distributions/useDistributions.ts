@@ -1,9 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DistributionService, RealtimeService, EdgeFunctionService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";
@@ -15,9 +13,7 @@ export type { Distribution };
 export function useDistributions() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { createAutoEntry } = useJournalEntries();
   const { addActivity } = useActivities();
-  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {

@@ -10,12 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Settings,
-  User,
   Mail,
   Phone,
   Lock,
   Bell,
-  Shield,
   Moon,
   Sun,
   LogOut,
@@ -55,7 +53,7 @@ export function BeneficiarySettingsDropdown({
         description: "نراك قريباً",
       });
       navigate("/login");
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تسجيل الخروج",

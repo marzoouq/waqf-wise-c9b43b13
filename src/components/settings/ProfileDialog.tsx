@@ -76,7 +76,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
         position: values.position,
       });
       onOpenChange(false);
-    } catch (_error) {
+    } catch {
       // Error is handled by the mutation's onError callback
     }
   };

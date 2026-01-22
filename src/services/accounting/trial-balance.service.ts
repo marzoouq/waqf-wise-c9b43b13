@@ -61,7 +61,7 @@ export class TrialBalanceService {
    */
   static async getFinancialSummary(): Promise<FinancialSummary> {
     try {
-      const { data: accounts, error } = await withRetry(async () => {
+      const { data: accounts } = await withRetry(async () => {
         const result = await supabase
           .from('accounts')
           .select('account_type, current_balance')

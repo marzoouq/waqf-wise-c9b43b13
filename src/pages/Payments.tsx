@@ -24,7 +24,7 @@ const Payments = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   
@@ -55,8 +55,6 @@ const Payments = () => {
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return filteredPayments.slice(startIndex, endIndex);
   }, [filteredPayments, currentPage]);
-
-  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
 
   // حساب الإحصائيات
   const receipts = payments.filter((p) => p.payment_type === "receipt");

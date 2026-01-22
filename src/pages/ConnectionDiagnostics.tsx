@@ -43,7 +43,7 @@ interface DiagnosticTest {
 }
 
 export default function ConnectionDiagnostics() {
-  const { events, stats, isOnline } = useConnectionMonitor();
+  const { stats, isOnline } = useConnectionMonitor();
   const [tests, setTests] = useState<DiagnosticTest[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);

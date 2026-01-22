@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
-type MaintenanceProvider = Database['public']['Tables']['maintenance_providers']['Row'];
 type MaintenanceProviderInsert = Database['public']['Tables']['maintenance_providers']['Insert'];
 type MaintenanceProviderUpdate = Database['public']['Tables']['maintenance_providers']['Update'];
 

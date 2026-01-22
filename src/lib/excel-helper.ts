@@ -254,7 +254,7 @@ export async function exportToExcelWithIdentity(config: ExcelExportWithIdentityC
   }
   
   // تعيين الأعمدة
-  worksheet.columns = columns.map((col, index) => ({
+  worksheet.columns = columns.map((col, _index) => ({
     ...col,
     key: col.key,
     width: col.width

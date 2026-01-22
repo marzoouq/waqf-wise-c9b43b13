@@ -648,7 +648,7 @@ export class BeneficiaryTabsService {
   /**
    * حذف مرفق المستفيد
    */
-  static async deleteAttachment(attachmentId: string, filePath: string): Promise<void> {
+  static async deleteAttachment(attachmentId: string, _filePath: string): Promise<void> {
     // لا نحذف الملف من Storage، نقوم فقط بـ soft delete للسجل
     const { data: { user } } = await supabase.auth.getUser();
     

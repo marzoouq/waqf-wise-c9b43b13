@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
-import { productionLogger } from "@/lib/logger/production-logger";
 import type { Json } from "@/integrations/supabase/types";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

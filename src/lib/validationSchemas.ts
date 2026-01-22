@@ -23,7 +23,7 @@ export const commonValidation = {
   email: () =>
     z.string().email({ message: "البريد الإلكتروني غير صحيح" }).optional(),
   
-  amount: (message: string = "المبلغ مطلوب") =>
+  amount: (_message: string = "المبلغ مطلوب") =>
     z.number()
       .min(VALIDATION.MIN_AMOUNT, { message: "المبلغ يجب أن يكون أكبر من صفر" })
       .max(VALIDATION.MAX_AMOUNT, { message: "المبلغ كبير جداً" }),

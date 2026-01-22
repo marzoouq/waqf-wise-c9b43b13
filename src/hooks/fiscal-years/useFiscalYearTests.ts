@@ -136,7 +136,7 @@ export function useFiscalYearTests() {
           message: "لا توجد سنوات مغلقة للاختبار"
         });
       }
-    } catch (_error) {
+    } catch {
       testResults.push({
         test: "بيانات الإقفال",
         status: "error",

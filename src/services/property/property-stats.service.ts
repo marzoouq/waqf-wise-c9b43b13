@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database } from '@/integrations/supabase/types';
 import { MAINTENANCE_OPEN_STATUSES, COLLECTION_SOURCE, matchesStatus } from '@/lib/constants';
-import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 
 type PropertyRow = Database['public']['Tables']['properties']['Row'];
 

@@ -74,7 +74,7 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
         search_criteria: {},
         is_favorite: false,
       });
-    } catch (_error) {
+    } catch {
       // Error handled by mutation
     }
   };
@@ -98,7 +98,7 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
         await deleteSearch(searchToDelete.id);
         setDeleteDialogOpen(false);
         setSearchToDelete(null);
-      } catch (_error) {
+      } catch {
         // Error handled by mutation
       }
     }

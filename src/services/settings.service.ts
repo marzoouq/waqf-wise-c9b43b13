@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database, Json } from "@/integrations/supabase/types";
 
 type LandingSettingRow = Database['public']['Tables']['landing_page_settings']['Row'];
-type SavedFilterRow = Database['public']['Tables']['saved_filters']['Row'];
 
 export interface ZATCASetting {
   key: string;

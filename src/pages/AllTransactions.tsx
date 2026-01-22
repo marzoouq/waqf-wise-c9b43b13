@@ -12,7 +12,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
-import { useUnifiedTransactions, UnifiedTransaction } from "@/hooks/transactions/useUnifiedTransactions";
+import { useUnifiedTransactions } from "@/hooks/transactions/useUnifiedTransactions";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 

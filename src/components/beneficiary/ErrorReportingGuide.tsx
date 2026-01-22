@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Shield, Zap, Bell, TrendingUp, Activity, Eye, Lightbulb } from "lucide-react";
+import { Zap, Bell, TrendingUp, Activity, Eye, Lightbulb } from "lucide-react";
 
 export function ErrorReportingGuide() {
   return (

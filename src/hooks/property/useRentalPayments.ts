@@ -36,9 +36,9 @@ const RELATED_QUERY_KEYS = [
 
 export const useRentalPayments = (
   contractId?: string, 
-  showAllPayments: boolean = false, 
-  daysThreshold: number = 90,
-  showNextOnly: boolean = true
+  _showAllPayments: boolean = false, 
+  _daysThreshold: number = 90,
+  _showNextOnly: boolean = true
 ) => {
   const queryClient = useQueryClient();
   const { archiveInvoiceAndReceipt } = useRentalPaymentArchiving();

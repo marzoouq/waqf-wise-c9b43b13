@@ -22,16 +22,12 @@ export {
 } from './property/index';
 
 // استيراد الخدمات للاستخدام في الـ Facade
-import { PropertyCoreService, type PropertyFilters } from './property/property-core.service';
+import { PropertyCoreService } from './property/property-core.service';
 import { PropertyUnitsService } from './property/property-units.service';
-import { PropertyStatsService, type PropertyStats, type PropertiesFullStats } from './property/property-stats.service';
+import { PropertyStatsService } from './property/property-stats.service';
 import { PropertyMaintenanceService } from './property/property-maintenance.service';
 import { PropertyAlertsService } from './property/property-alerts.service';
 import { PropertyContractsService } from './property/property-contracts.service';
-import type { Database, Json } from '@/integrations/supabase/types';
-
-type PropertyRow = Database['public']['Tables']['properties']['Row'];
-type PropertyInsert = Database['public']['Tables']['properties']['Insert'];
 
 /**
  * PropertyService - Facade للتوافق العكسي

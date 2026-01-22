@@ -5,7 +5,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { SupportService } from '@/services';
-import { QUERY_KEYS } from '@/lib/query-keys';
 import type { SupportStatistics } from '@/types/support';
 
 export function useSupportStats() {

@@ -19,7 +19,7 @@ import {
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
-type JsPDF = import('jspdf').jsPDF;
+type _JsPDF = import('jspdf').jsPDF;
 
 // ترجمة أسماء المصروفات
 const expenseNameTranslations: Record<string, string> = {

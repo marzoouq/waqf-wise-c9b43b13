@@ -5,7 +5,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { TenantService } from '@/services';
-import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface TenantContract {
   id: string;

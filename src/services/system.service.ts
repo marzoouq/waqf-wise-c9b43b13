@@ -498,7 +498,7 @@ export class SystemService {
    * اختبار تسجيل الإصلاح التلقائي
    */
   static async testAutoFixLogging(): Promise<void> {
-    const { data: errorLog, error: errorLogError } = await supabase
+    await supabase
       .from('system_error_logs')
       .insert({
         error_type: 'test_error',

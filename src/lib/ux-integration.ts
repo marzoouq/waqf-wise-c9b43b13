@@ -322,7 +322,7 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
  */
 export function applyAdaptiveUX(): void {
   const capabilities = detectDeviceCapabilities();
-  const config = getUXConfig();
+  const _config = getUXConfig();
   
   // تعديل التكوين بناءً على القدرات
   if (capabilities.prefersReducedMotion) {

@@ -46,7 +46,7 @@ export default function CustomReports() {
       }
       
       toast({ title: "تم التنزيل", description: `تم تنزيل التقرير بصيغة ${format.toUpperCase()}` });
-    } catch (_error) {
+    } catch {
       toast({ 
         title: "خطأ في التنزيل", 
         description: "حدث خطأ أثناء تحميل التقرير",

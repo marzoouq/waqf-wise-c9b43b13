@@ -18,7 +18,6 @@ import { generateGovernancePDF } from "@/lib/pdf/governance-pdf";
 import { toast } from "sonner";
 
 const WaqfGovernanceGuide = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
   const {
@@ -50,7 +49,7 @@ const WaqfGovernanceGuide = () => {
       toast.info('جاري إنشاء ملف PDF...');
       await generateGovernancePDF();
       toast.success('تم تحميل اللائحة التنفيذية بنجاح');
-    } catch (_error) {
+    } catch {
       toast.error('فشل إنشاء ملف PDF');
     } finally {
       setIsGeneratingPDF(false);

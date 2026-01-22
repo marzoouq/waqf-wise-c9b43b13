@@ -23,7 +23,7 @@ interface Props {
 }
 
 export function SmartBankReconciliation({ statementId }: Props) {
-  const { autoMatch, manualMatch, matches, isLoading } = useBankMatching();
+  const { autoMatch, manualMatch, matches } = useBankMatching();
   const [isMatching, setIsMatching] = useState(false);
   const [suggestions, setSuggestions] = useState<MatchSuggestion[]>([]);
 

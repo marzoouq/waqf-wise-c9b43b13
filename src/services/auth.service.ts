@@ -14,7 +14,6 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
 
 export interface BeneficiaryEmailResult {
   email: string;
@@ -25,8 +24,6 @@ import { type AppRole } from "@/types/roles";
 
 // ملاحظة: PermissionsService و TwoFactorService يتم تصديرهم مباشرة من services/index.ts
 // لا نعيد التصدير هنا لتجنب التكرار
-
-type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
 
 // Re-export for backward compatibility
 export type { UserProfile, LoginResult } from "@/types/auth";

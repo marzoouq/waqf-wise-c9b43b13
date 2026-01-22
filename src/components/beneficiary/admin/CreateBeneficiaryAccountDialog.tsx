@@ -40,7 +40,7 @@ export function CreateBeneficiaryAccountDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [createdAccount, setCreatedAccount] = useState<{ email: string; password: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { checkPasswordQuick, isChecking } = useLeakedPassword();
+  const { checkPasswordQuick } = useLeakedPassword();
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),

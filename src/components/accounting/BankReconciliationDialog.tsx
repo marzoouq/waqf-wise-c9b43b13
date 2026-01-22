@@ -21,7 +21,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
   const { statements, createStatement } = useBankReconciliation();
   const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
   
-  const [step, setStep] = useState<"select" | "import" | "match">("select");
+  const [step, _setStep] = useState<"select" | "import" | "match">("select");
   
   const [newStatement, setNewStatement] = useState({
     bank_account_id: "",

@@ -50,7 +50,7 @@ const Beneficiaries = () => {
     setAdvancedCriteria,
   } = useBeneficiariesPageState();
 
-  const { beneficiaries, totalCount, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
+  const { beneficiaries, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
   const { searches } = useSavedSearches();
   
   const { filteredBeneficiaries, stats } = useBeneficiariesFilters(

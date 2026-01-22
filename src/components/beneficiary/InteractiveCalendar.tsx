@@ -7,7 +7,7 @@ interface InteractiveCalendarProps {
   beneficiaryId: string;
 }
 
-export function InteractiveCalendar({ beneficiaryId }: InteractiveCalendarProps) {
+export function InteractiveCalendar({ beneficiaryId: _beneficiaryId }: InteractiveCalendarProps) {
   // التاريخ والوقت ثابتين عند تحميل المكون - لا نحتاج تحديث كل ثانية
   const currentDate = useMemo(() => new Date(), []);
 

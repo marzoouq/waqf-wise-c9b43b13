@@ -24,7 +24,7 @@ const QUERY_KEYS = {
  * جلب جميع مجالس الحوكمة مع عدد الأعضاء
  */
 export function useGovernanceBoards() {
-  const { toast } = useToast();
+  const _toast = useToast();
 
   return useQuery({
     queryKey: QUERY_KEYS.GOVERNANCE_BOARDS,
@@ -191,7 +191,7 @@ export function useRemoveBoardMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ memberId, boardId }: { memberId: string; boardId: string }) =>
+    mutationFn: ({ memberId }: { memberId: string; boardId: string }) =>
       GovernanceBoardsService.removeMember(memberId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BOARD_MEMBERS(variables.boardId) });

@@ -4,7 +4,7 @@ import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";
-import type { InvoiceWithLines, InvoiceLineInsert } from "@/types/invoices";
+import type { InvoiceWithLines } from "@/types/invoices";
 import { InvoiceService } from "@/services/invoice.service";
 import { RealtimeService } from "@/services/realtime.service";
 import { QUERY_KEYS } from "@/lib/query-keys";

@@ -5,7 +5,6 @@
  */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { ApprovalService, RealtimeService } from "@/services";
@@ -28,7 +27,6 @@ export interface RequestApproval {
 export function useRequestApprovals(requestId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {

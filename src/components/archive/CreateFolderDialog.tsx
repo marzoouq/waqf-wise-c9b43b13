@@ -39,7 +39,7 @@ export function CreateFolderDialog({
   onOpenChange,
   onCreate,
 }: CreateFolderDialogProps) {
-  const { toast } = useToast();
+  const _toast = useToast();
 
   const form = useForm<FolderFormValues>({
     resolver: zodResolver(folderSchema),
@@ -54,7 +54,7 @@ export function CreateFolderDialog({
       await onCreate(data);
       form.reset();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error is handled by the mutation's onError callback
     }
   };
