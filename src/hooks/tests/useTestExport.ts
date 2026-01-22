@@ -27,7 +27,8 @@ interface TestCategory {
  * Extends the base jsPDF type to include the autoTable method from jspdf-autotable plugin.
  * This follows the established pattern in the codebase (see beneficiary-statement-pdf.ts).
  */
-type JsPDFWithAutoTable = jsPDF & {
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
   autoTable: (options: {
     head?: string[][];
     body?: string[][];
