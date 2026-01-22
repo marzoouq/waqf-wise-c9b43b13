@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { FileText, Download, Filter, Search, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -120,24 +122,21 @@ export default function BeneficiaryAccountStatement() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6 w-full max-w-full overflow-x-hidden">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
-            <FileText className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
-            كشف الحساب التفصيلي
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            عرض تفصيلي لجميع المعاملات المالية
-          </p>
-        </div>
-        <Button onClick={exportToPDF} variant="outline" size="sm" className="w-full sm:w-auto">
-          <Download className="h-4 w-4 ms-2" />
-          <span className="hidden sm:inline">تصدير PDF</span>
-          <span className="sm:hidden">تصدير</span>
-        </Button>
-      </div>
+    <PageErrorBoundary pageName="كشف حساب المستفيد">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="كشف الحساب التفصيلي"
+          description="عرض تفصيلي لجميع المعاملات المالية"
+          icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <Button onClick={exportToPDF} variant="outline" size="sm">
+              <Download className="h-4 w-4 ms-2" />
+              <span className="hidden sm:inline">تصدير PDF</span>
+              <span className="sm:hidden">تصدير</span>
+            </Button>
+          }
+        />
+        <div className="space-y-4 sm:space-y-6">
 
       {/* بيانات المستفيد */}
       <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background">
@@ -372,6 +371,8 @@ export default function BeneficiaryAccountStatement() {
           )}
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

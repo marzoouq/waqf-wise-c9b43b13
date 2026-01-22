@@ -23,6 +23,7 @@ import { DistributionList } from '@/components/support/DistributionBar';
 import { SupportStatsCards } from '@/components/support/SupportStatsCards';
 import { AlertCircle, Settings, Star } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
 import type { SupportFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
 import { cleanFilters } from '@/lib/utils/cleanFilters';
@@ -64,6 +65,7 @@ export default function SupportManagement() {
 
   return (
     <PageErrorBoundary pageName="إدارة الدعم الفني">
+      <MobileOptimizedLayout>
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-end">
             <Button variant="outline" onClick={() => setSettingsOpen(true)}>
@@ -345,6 +347,7 @@ export default function SupportManagement() {
             onOpenChange={setSettingsOpen}
           />
         </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
