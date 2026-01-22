@@ -4,6 +4,7 @@
 
 import { useCallback } from 'react';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
+import type { jsPDF } from 'jspdf';
 
 export interface TestResult {
   testId: string;
@@ -23,13 +24,10 @@ interface TestCategory {
 /**
  * Type extension for jsPDF with autoTable plugin
  * 
- * The jsPDF library with autoTable plugin doesn't have complete TypeScript definitions
- * for all its methods. This interface provides type safety for the autoTable method
- * and internal properties used in this hook.
- * 
- * Used to avoid `any` type violations while maintaining type safety.
+ * Extends the base jsPDF type to include the autoTable method from jspdf-autotable plugin.
+ * This follows the established pattern in the codebase (see beneficiary-statement-pdf.ts).
  */
-interface JsPDFWithAutoTable {
+type JsPDFWithAutoTable = jsPDF & {
   autoTable: (options: {
     head?: string[][];
     body?: string[][];
@@ -39,13 +37,6 @@ interface JsPDFWithAutoTable {
     alternateRowStyles?: Record<string, unknown>;
     columnStyles?: Record<string, unknown>;
   }) => void;
-  internal: {
-    getNumberOfPages: () => number;
-    pageSize: {
-      getWidth: () => number;
-      getHeight: () => number;
-    };
-  };
 }
 
 export function useTestExport() {
@@ -109,7 +100,7 @@ export function useTestExport() {
         r.testName
       ]);
 
-      (doc as unknown as JsPDFWithAutoTable).autoTable({
+      (doc as JsPDFWithAutoTable).autoTable({
         head: [['الزمن', 'الرسالة', 'الحالة', 'الفئة', 'الاختبار']],
         body: tableData,
         startY: 85,
@@ -156,7 +147,7 @@ export function useTestExport() {
       }
 
       // التذييل
-      const pageCount = (doc as unknown as JsPDFWithAutoTable).internal.getNumberOfPages();
+      const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
