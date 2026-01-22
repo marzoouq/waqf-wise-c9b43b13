@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, DollarSign } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { CheckCircle, XCircle, Clock, DollarSign, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";

@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, Eye, FileText } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, FileText, LucideIcon } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
 import { BadgeVariant, JournalEntryWithLines } from "@/types";
-import { LucideIcon } from "lucide-react";
 import { useJournalApprovals } from "@/hooks/approvals";
 import { useDialogState } from "@/hooks/ui/useDialogState";
 import { ErrorState } from "@/components/shared/ErrorState";

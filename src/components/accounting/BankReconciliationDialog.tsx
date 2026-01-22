@@ -9,15 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Upload } from "lucide-react";
-import { BankStatementRow } from "@/types/supabase-helpers";
+import { BankStatementRow, BankAccountRow } from "@/types/supabase-helpers";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BankReconciliationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-import { BankAccountRow } from "@/types/supabase-helpers";
 
 export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliationDialogProps) {
   const { statements, transactions, createStatement, addTransaction, matchTransaction, reconcileStatement } = useBankReconciliation();

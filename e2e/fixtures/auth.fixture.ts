@@ -28,7 +28,7 @@ interface AuthFixtures {
  * Extended test with authentication fixtures
  */
 export const test = base.extend<AuthFixtures>({
-  supabase: async ({}, use) => {
+  supabase: async (_unusedWorkerInfo, use) => {
     const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     await use(client);
     await client.auth.signOut();

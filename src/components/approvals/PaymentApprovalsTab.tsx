@@ -1,10 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, Receipt, CreditCard } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Receipt, CreditCard, type LucideIcon } from "lucide-react";
 import { matchesStatus } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import type { LucideIcon } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";

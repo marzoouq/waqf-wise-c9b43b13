@@ -49,14 +49,11 @@ export const useRequests = (beneficiaryId?: string) => {
     return () => unsubscribe();
   }, [queryClient]);
 
-  // Get single request
-  const getRequest = (requestId: string) => {
-    return useQuery({
-      queryKey: QUERY_KEYS.REQUEST(requestId),
-      queryFn: () => RequestService.getById(requestId),
-      enabled: !!requestId,
-    });
-  };
+  // Note: For fetching single request, use useQuery directly in component:
+  // const { data: request } = useQuery({
+  //   queryKey: QUERY_KEYS.REQUEST(requestId),
+  //   queryFn: () => RequestService.getById(requestId),
+  // });
 
   // Create request
   const createRequest = useMutation({
@@ -175,7 +172,6 @@ export const useRequests = (beneficiaryId?: string) => {
     isLoading,
     error,
     refetch,
-    getRequest,
     createRequest,
     updateRequest,
     deleteRequest,
