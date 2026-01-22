@@ -14,7 +14,6 @@ type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
 export function usePayments() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { createAutoEntry } = useJournalEntries();
 
   // Real-time subscription using RealtimeService
   useEffect(() => {

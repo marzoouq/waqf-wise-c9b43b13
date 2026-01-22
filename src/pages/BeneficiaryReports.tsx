@@ -25,7 +25,7 @@ export default function BeneficiaryReports() {
   const { toast } = useToast();
   const {
     beneficiary,
-    distributions,
+    
     yearlyStats,
     monthlyData,
     requestsStatusData,

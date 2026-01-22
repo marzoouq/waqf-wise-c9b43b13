@@ -9,7 +9,7 @@ import { QUERY_KEYS } from "@/lib/query-keys";
 export type { Activity };
 
 export function useActivities() {
-  const { toast } = useToast();
+  const _toast = useToast() = useToast();
   const queryClient = useQueryClient();
 
   const { data: activities = [], isLoading } = useQuery({

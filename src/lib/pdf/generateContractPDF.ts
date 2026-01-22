@@ -42,7 +42,7 @@ export async function generateContractPDF(contract: ContractData): Promise<jsPDF
 
   const fontName = await loadArabicFontToPDF(pdf);
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  const _pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 20;
 
   // ترويسة الوقف

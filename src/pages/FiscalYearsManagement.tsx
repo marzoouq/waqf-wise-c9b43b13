@@ -22,7 +22,7 @@ import { AddFiscalYearDialog } from "@/components/fiscal-years/AddFiscalYearDial
 
 export default function FiscalYearsManagement() {
   const { fiscalYears, isLoading: loadingYears } = useFiscalYears();
-  const { closings, isLoading: loadingClosings } = useFiscalYearClosings();
+  const { closings, isLoading: _loadingClosings } = useFiscalYearClosings();
   const [selectedYearId, setSelectedYearId] = useState<string | null>(null);
   const [manualClosingOpen, setManualClosingOpen] = useState(false);
   const [autoClosingOpen, setAutoClosingOpen] = useState(false);

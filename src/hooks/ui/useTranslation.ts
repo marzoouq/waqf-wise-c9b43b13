@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TranslationService, type Translation } from '@/services/translation.service';
+import { TranslationService, type _Translation } from '@/services/translation.service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type Language = 'ar' | 'en' | 'fr';

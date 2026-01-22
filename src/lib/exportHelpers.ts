@@ -5,7 +5,7 @@
  * @version 2.9.75 - إصلاح تنسيق الأرقام
  */
 
-import { logger } from "./logger";
+import { logger as _logger } from "./logger";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData, formatCurrencyForPDF } from "./pdf/arabic-pdf-utils";
 
 export const exportToPDF = async (

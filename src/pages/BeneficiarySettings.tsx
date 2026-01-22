@@ -29,7 +29,7 @@ const BeneficiarySettings = () => {
         title: "تم تسجيل الخروج",
         description: "تم تسجيل خروجك بنجاح",
       });
-    } catch (_error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء تسجيل الخروج",
