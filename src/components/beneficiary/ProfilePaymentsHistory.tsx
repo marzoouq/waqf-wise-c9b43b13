@@ -1,6 +1,5 @@
 import { useBeneficiaryProfilePayments } from '@/hooks/beneficiary/useBeneficiaryProfilePayments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { DollarSign, TrendingUp, Calendar } from 'lucide-react';

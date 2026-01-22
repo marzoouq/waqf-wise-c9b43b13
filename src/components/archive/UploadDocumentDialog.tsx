@@ -135,7 +135,7 @@ export function UploadDocumentDialog({
           <FormField
             control={form.control}
             name="file"
-            render={({ field: { onChange, value, ...field } }) => (
+            render={({ field: { onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>الملف *</FormLabel>
                 <FormControl>

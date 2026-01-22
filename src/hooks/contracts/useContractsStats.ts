@@ -3,6 +3,10 @@ import { type Contract } from "@/hooks/property/useContracts";
 import { differenceInDays } from "date-fns";
 import { matchesStatus } from "@/lib/constants";
 
+interface ContractWithAutoRenew extends Contract {
+  auto_renew_enabled?: boolean;
+}
+
 interface ContractsStats {
   total: number;
   active: number;
@@ -48,7 +52,7 @@ export function useContractsStats(contracts: Contract[] | undefined): ContractsS
           }
           
           // العقود المتجددة تلقائياً
-          if ((contract as any).auto_renew_enabled) {
+          if ((contract as ContractWithAutoRenew).auto_renew_enabled) {
             acc.autoRenewing++;
           }
         }

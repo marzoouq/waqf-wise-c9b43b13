@@ -16,7 +16,6 @@ interface BeneficiaryCertificateProps {
 
 export function BeneficiaryCertificate({
   beneficiaryName,
-  beneficiaryId,
   nationalId,
   category,
   registrationDate,

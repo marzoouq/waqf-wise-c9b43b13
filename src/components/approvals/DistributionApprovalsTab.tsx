@@ -13,7 +13,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 
 export function DistributionApprovalsTab() {
   const flowDialog = useDialogState<DistributionForApproval>();
-  const { canApproveLevel, userRole } = useApprovalPermissions();
+  const { userRole } = useApprovalPermissions();
 
   const { data: distributions, isLoading, error, refetch } = useDistributionApprovals();
 

@@ -1,7 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack:react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryAttachment {
@@ -25,7 +24,6 @@ export interface BeneficiaryAttachment {
 export function useBeneficiaryAttachments(beneficiaryId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   const { data: attachments = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || ''),

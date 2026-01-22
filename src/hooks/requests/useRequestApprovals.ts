@@ -28,7 +28,6 @@ export interface RequestApproval {
 export function useRequestApprovals(requestId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {

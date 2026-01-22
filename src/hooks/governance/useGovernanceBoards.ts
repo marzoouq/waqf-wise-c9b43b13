@@ -24,7 +24,7 @@ const QUERY_KEYS = {
  * جلب جميع مجالس الحوكمة مع عدد الأعضاء
  */
 export function useGovernanceBoards() {
-  const { toast } = useToast();
+  const _toast = useToast();
 
   return useQuery({
     queryKey: QUERY_KEYS.GOVERNANCE_BOARDS,

@@ -10,7 +10,7 @@ export type { AppRole } from "@/types/roles";
  * يستخدم البيانات المخزنة مسبقاً في AuthContext لتجنب الجلب المزدوج
  */
 export function useUserRole() {
-  const { user, roles: authRoles, rolesLoading, hasRole: authHasRole } = useAuth();
+  const { roles: authRoles, rolesLoading, hasRole: authHasRole } = useAuth();
   
   // تحويل الأدوار إلى AppRole type
   const roles = useMemo(() => authRoles as AppRole[], [authRoles]);

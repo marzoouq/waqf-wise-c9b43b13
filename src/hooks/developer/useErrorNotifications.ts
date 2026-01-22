@@ -2,10 +2,9 @@
  * useErrorNotifications Hook - إشعارات الأخطاء
  * يستخدم RealtimeService و MonitoringService
  */
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { SystemErrorLog } from "@/types/system-error";
 import { RealtimeService, MonitoringService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

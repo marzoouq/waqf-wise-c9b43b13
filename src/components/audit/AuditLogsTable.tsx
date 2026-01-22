@@ -94,7 +94,7 @@ export function AuditLogsTable() {
 
   const { data: logs = [], isLoading, error, refetch, isFetching } = useAuditLogsEnhanced(filters);
   const { data: availableTables = [] } = useAuditLogTables();
-  const { data: availableUsers = [] } = useAuditLogUsers();
+  const { data: _availableUsers = [] } = useAuditLogUsers();
 
   // فلترة السجلات حسب الفئة - يجب أن تكون قبل usePagination
   const filteredLogs = useMemo(() => {

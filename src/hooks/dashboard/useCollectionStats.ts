@@ -64,7 +64,7 @@ export function useCollectionStats() {
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
       // جلب السنة المالية النشطة
-      const { data: fiscalYear } = await supabase
+      const { data: _fiscalYear } = await supabase
         .from('fiscal_years')
         .select('id, start_date, end_date')
         .eq('is_active', true)

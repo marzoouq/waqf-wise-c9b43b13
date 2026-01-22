@@ -9,7 +9,6 @@ import { DocumentService } from "@/services/document.service";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { useToast } from "@/hooks/ui/use-toast";
-import type { InvoiceLine } from "@/types/invoice-line";
 
 // تحويل بيانات الفاتورة من الخدمة إلى صيغة PDF
 function toInvoicePDFFormat(invoice: Awaited<ReturnType<typeof DocumentService.getInvoiceWithLines>>['invoice']) {

@@ -182,7 +182,7 @@ export function EnhancedAccountsTree() {
         await deleteAccount(accountToDelete.id);
         setDeleteDialogOpen(false);
         setAccountToDelete(null);
-      } catch (error) {
+      } catch {
         // Error handled by hook
       }
     }

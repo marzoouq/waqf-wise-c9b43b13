@@ -8,7 +8,6 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 import { 
   dbHealthService, 
-  type DatabaseHealthReport, 
   type HealthAlert 
 } from "@/services/monitoring/db-health.service";
 

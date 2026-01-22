@@ -5,7 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { dbPerformanceService, type DBPerformanceStats, type PerformanceAlert } from "@/services/monitoring/db-performance.service";
+import { dbPerformanceService, type PerformanceAlert } from "@/services/monitoring/db-performance.service";
 
 const REFRESH_INTERVAL = 60000; // 60 ثانية (كان 30)
 const QUERY_KEY = 'db-performance-monitoring';

@@ -150,12 +150,12 @@ function generateCSV(details: DistributionDetail[]): string {
   return headers + rows;
 }
 
-function generateExcelData(details: DistributionDetail[]): string {
+function _generateExcelData(details: DistributionDetail[]): string {
   // نفس CSV لكن سيتم تحويله لـ Excel في المستقبل
   return generateCSV(details);
 }
 
-function generateISO20022(details: DistributionDetail[]): string {
+function _generateISO20022(details: DistributionDetail[]): string {
   // XML format for ISO20022
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">\n';
@@ -173,7 +173,7 @@ function generateISO20022(details: DistributionDetail[]): string {
   return xml;
 }
 
-function generateSWIFT(details: DistributionDetail[]): string {
+function _generateSWIFT(details: DistributionDetail[]): string {
   // SWIFT MT940 format
   let swift = ":20:Transfer File\n";
   swift += `:25:Waqf Account\n`;
@@ -185,7 +185,7 @@ function generateSWIFT(details: DistributionDetail[]): string {
 }
 
 // صيغة SEPA (Single Euro Payments Area)
-function generateSEPA(details: DistributionDetail[]): string {
+function _generateSEPA(details: DistributionDetail[]): string {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02">\n';
   xml += '  <CstmrDrctDbtInitn>\n';
@@ -222,7 +222,7 @@ function generateSEPA(details: DistributionDetail[]): string {
 }
 
 // صيغة ACH (Automated Clearing House) - أمريكي
-function generateACH(details: DistributionDetail[]): string {
+function _generateACH(details: DistributionDetail[]): string {
   let ach = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '').substring(2);
@@ -255,7 +255,7 @@ function generateACH(details: DistributionDetail[]): string {
 }
 
 // صيغة BACS (Bankers' Automated Clearing Services) - بريطاني
-function generateBACS(details: DistributionDetail[]): string {
+function _generateBACS(details: DistributionDetail[]): string {
   let bacs = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
@@ -284,7 +284,7 @@ function generateBACS(details: DistributionDetail[]): string {
 }
 
 // صيغة البنك الأهلي السعودي (NCB)
-function generateNCB(details: DistributionDetail[]): string {
+function _generateNCB(details: DistributionDetail[]): string {
   let ncb = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
@@ -319,7 +319,7 @@ function generateNCB(details: DistributionDetail[]): string {
 }
 
 // صيغة بنك الراجحي
-function generateAlRajhi(details: DistributionDetail[]): string {
+function _generateAlRajhi(details: DistributionDetail[]): string {
   let rajhi = '';
   const today = new Date();
   const batchId = `WAQF${Date.now()}`;

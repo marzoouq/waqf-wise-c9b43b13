@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-react";
@@ -134,7 +134,7 @@ export function CashFlowStatement() {
       toast.success("تم تصدير قائمة التدفقات النقدية بنجاح", {
         description: `تم حفظ الملف: ${filename}`,
       });
-    } catch (_error) {
+    } catch {
       toast.error("حدث خطأ أثناء تصدير PDF", {
         description: "الرجاء المحاولة مرة أخرى",
       });

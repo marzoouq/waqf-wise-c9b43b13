@@ -8,7 +8,6 @@ import { createMutationErrorHandler } from "@/lib/errors";
 import type { Database } from "@/integrations/supabase/types";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
-type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
 type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
 

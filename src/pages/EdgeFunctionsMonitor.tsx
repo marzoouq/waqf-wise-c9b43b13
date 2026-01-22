@@ -54,7 +54,7 @@ export default function EdgeFunctionsMonitor() {
     isChecking, checkProgress, checkAllFunctions, checkCategory, checkSingleFunction
   } = useEdgeFunctionsHealth();
 
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<EdgeFunctionInfo['category'] | 'all'>('all');
   const [checkTypeFilter, setCheckTypeFilter] = useState<CheckType | 'all'>('all');
   const [selectedFunction, setSelectedFunction] = useState<EdgeFunctionInfo | null>(null);
 
@@ -226,7 +226,7 @@ export default function EdgeFunctionsMonitor() {
                 <Button 
                   size="sm" 
                   variant="outline"
-                  onClick={() => checkCategory(activeCategory as any)}
+                  onClick={() => activeCategory !== 'all' ? checkCategory(activeCategory) : undefined}
                   disabled={isChecking}
                 >
                   <RefreshCw className={`h-4 w-4 ms-1 ${isChecking ? 'animate-spin' : ''}`} />
