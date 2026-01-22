@@ -28,17 +28,23 @@ if (typeof window.matchMedia !== 'function') {
 }
 
 // Minimal ResizeObserver mock
-if (typeof (globalThis as any).ResizeObserver === 'undefined') {
+type GenericCtor = new (...args: unknown[]) => unknown;
+const globalWithObservers = globalThis as unknown as {
+  ResizeObserver?: GenericCtor;
+  IntersectionObserver?: GenericCtor;
+};
+
+if (typeof globalWithObservers.ResizeObserver === 'undefined') {
   class MockResizeObserver {
     observe() { return; }
     unobserve() { return; }
     disconnect() { return; }
   }
-  (globalThis as any).ResizeObserver = MockResizeObserver;
+  globalWithObservers.ResizeObserver = MockResizeObserver as unknown as GenericCtor;
 }
 
 // Minimal IntersectionObserver mock
-if (typeof (globalThis as any).IntersectionObserver === 'undefined') {
+if (typeof globalWithObservers.IntersectionObserver === 'undefined') {
   class MockIntersectionObserver {
     readonly root: Element | null = null;
     readonly rootMargin: string = '';
@@ -48,7 +54,7 @@ if (typeof (globalThis as any).IntersectionObserver === 'undefined') {
     disconnect() { return; }
     takeRecords() { return []; }
   }
-  (globalThis as any).IntersectionObserver = MockIntersectionObserver;
+  globalWithObservers.IntersectionObserver = MockIntersectionObserver as unknown as GenericCtor;
 }
 
 // Force navigator language to en-US to avoid Arabic-digit formatting in tests

@@ -9,7 +9,6 @@ import {
   UserCog, 
   Eye, 
   Bell,
-  BellOff,
   CheckCircle,
   XCircle
 } from "lucide-react";
@@ -39,7 +38,7 @@ const severityConfig: Record<AuditAlert['severity'], { label: string; className:
   low: { label: 'منخفض', className: 'bg-muted text-muted-foreground' },
 };
 
-export function AuditAlertsCard({ maxAlerts = 10 = true, className }: AuditAlertsCardProps) {
+export function AuditAlertsCard({ maxAlerts = 10, className }: AuditAlertsCardProps) {
   const { data: alerts = [], isLoading, error, refetch } = useAuditAlerts();
 
   const displayedAlerts = alerts.slice(0, maxAlerts);

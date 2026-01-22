@@ -174,14 +174,14 @@ export function getChunkErrorInfo(error: unknown): ChunkErrorInfo {
 /**
  * تسجيل خطأ الـ Chunk للتشخيص
  */
-export function logChunkError(
+export async function logChunkError(
   error: unknown,
   context: {
     component?: string;
     attempt?: number;
     action?: 'initial' | 'retry' | 'reload';
   } = {}
-): void {
+): Promise<void> {
   const errorInfo = getChunkErrorInfo(error);
   const timestamp = new Date().toISOString();
   
