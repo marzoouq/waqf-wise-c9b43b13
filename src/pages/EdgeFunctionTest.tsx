@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { 
   Play, CheckCircle, XCircle, Clock, 
   Terminal, Copy, Zap, Database, Shield,
@@ -365,24 +367,18 @@ export default function EdgeFunctionTest() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6" dir="rtl">
-      {/* الهيدر */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Zap className="h-8 w-8 text-primary" />
-            اختبار Edge Functions الشامل
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            اختبر جميع وظائف الخادم ({TOTAL_FUNCTIONS} وظيفة) قبل النشر
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            {TOTAL_FUNCTIONS} وظيفة
-          </Badge>
-        </div>
-      </div>
+    <PageErrorBoundary pageName="اختبار Edge Functions">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="اختبار Edge Functions الشامل"
+          description={`اختبر جميع وظائف الخادم (${TOTAL_FUNCTIONS} وظيفة) قبل النشر`}
+          icon={<Zap className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <Badge variant="outline" className="text-sm px-3 py-1">
+              {TOTAL_FUNCTIONS} وظيفة
+            </Badge>
+          }
+        />
 
       {/* إحصائيات سريعة */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -872,6 +868,7 @@ export default function EdgeFunctionTest() {
           </ScrollArea>
         </CardContent>
       </Card>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
