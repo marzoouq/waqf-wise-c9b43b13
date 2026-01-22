@@ -17,8 +17,9 @@ import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostRepor
 import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
 import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedger";
 import { AgingReport } from "@/components/reports/AgingReport";
+import { AnnualDisclosuresReport } from "@/components/reports/AnnualDisclosuresReport";
 import { ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
-import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck, FileStack, Wrench } from "lucide-react";
+import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck, FileStack, Wrench, ScrollText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
@@ -76,11 +77,16 @@ const Reports = () => {
        <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-5 lg:grid-cols-10 gap-1">
+          <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 lg:grid-cols-11 gap-1">
               <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">لوحة التحكم</span>
                 <span className="sm:hidden">لوحة</span>
+              </TabsTrigger>
+              <TabsTrigger value="disclosures" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <ScrollText className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">الإفصاحات</span>
+                <span className="sm:hidden">إفصاح</span>
               </TabsTrigger>
               <TabsTrigger value="scheduled" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
                 <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -131,6 +137,10 @@ const Reports = () => {
 
           <TabsContent value="dashboard">
             <InteractiveDashboard />
+          </TabsContent>
+
+          <TabsContent value="disclosures">
+            <AnnualDisclosuresReport />
           </TabsContent>
 
           <TabsContent value="scheduled">
