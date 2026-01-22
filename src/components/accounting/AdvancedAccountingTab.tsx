@@ -1,8 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zap, GitBranch, Sparkles, TrendingUp, Settings, FileCheck } from "lucide-react";
-import { AutoJournalTemplatesManager } from "./AutoJournalTemplatesManager";
 import { AutoJournalTemplates } from "./AutoJournalTemplates";
-import { ApprovalWorkflowBuilder } from "./ApprovalWorkflowBuilder";
 import { ApprovalWorkflowManager } from "./ApprovalWorkflowManager";
 import { FinancialAnalyticsDashboard } from "./FinancialAnalyticsDashboard";
 import { BudgetManagement } from "./BudgetManagement";

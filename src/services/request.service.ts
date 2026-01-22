@@ -55,7 +55,7 @@ export class RequestService {
   /**
    * جلب طلب بالمعرف
    */
-  static async getById(requestId: string) {
+  static async getById(_requestId: string) {
     const { data, error } = await supabase
       .from('beneficiary_requests')
       .select(`
@@ -270,7 +270,7 @@ export class RequestService {
   /**
    * تصعيد طلب
    */
-  static async escalate(requestId: string): Promise<{ success: boolean }> {
+  static async escalate(_requestId: string): Promise<{ success: boolean }> {
     try {
       // يتم التصعيد تلقائياً عبر function
       const { error } = await supabase.rpc('escalate_overdue_requests');
@@ -288,7 +288,7 @@ export class RequestService {
   /**
    * الحصول على workflow الطلب
    */
-  static async getWorkflow(requestId: string) {
+  static async getWorkflow(_requestId: string) {
     const { data, error } = await supabase
       .from('request_workflows')
       .select('id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at')
@@ -300,7 +300,7 @@ export class RequestService {
   }
 
   // ==================== المرفقات ====================
-  static async getAttachments(requestId: string) {
+  static async getAttachments(_requestId: string) {
     const { data, error } = await supabase
       .from("request_attachments")
       .select("*")
@@ -379,7 +379,7 @@ export class RequestService {
   }
 
   // ==================== التعليقات ====================
-  static async getComments(requestId: string) {
+  static async getComments(_requestId: string) {
     // جلب التعليقات
     const { data: comments, error } = await supabase
       .from("request_comments")
@@ -446,7 +446,7 @@ export class RequestService {
     return data;
   }
 
-  static async deleteComment(id: string) {
+  static async deleteComment(_id: string) {
     // ملاحظة: جدول request_comments محمي بـ trigger - الحذف سيفشل تلقائياً
     console.warn('Comment deletion prevented by database trigger - record preserved for audit');
   }

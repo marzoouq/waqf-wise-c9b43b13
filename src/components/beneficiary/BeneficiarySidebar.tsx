@@ -64,7 +64,7 @@ export function BeneficiarySidebar({
         description: "نراك قريباً",
       });
       navigate("/login");
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "خطأ",
         description: "فشل تسجيل الخروج",

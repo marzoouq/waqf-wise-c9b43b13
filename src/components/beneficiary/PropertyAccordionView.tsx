@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useProperties } from "@/hooks/property/useProperties";
 import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import {
@@ -102,7 +101,7 @@ interface PropertyUnitsSectionProps {
   occupiedUnits: number;
 }
 
-function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUnits }: PropertyUnitsSectionProps) {
+function PropertyUnitsSection({ propertyId, propertyName, _totalUnits, _occupiedUnits }: PropertyUnitsSectionProps) {
   const { units, isLoading } = usePropertyUnits(propertyId);
   
   if (isLoading) {

@@ -12,7 +12,7 @@ import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS } from "
 
 export function CashFlowStatement() {
   const { cashFlows, isLoading, isCalculating, latestFlow, handleCalculate } = useCashFlowCalculation();
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [_selectedPeriod, _setSelectedPeriod] = useState<string | null>(null);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قائمة التدفقات النقدية..." />;

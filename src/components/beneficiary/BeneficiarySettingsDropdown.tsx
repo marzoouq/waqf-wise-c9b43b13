@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
   Settings,
   User,
@@ -56,7 +55,7 @@ export function BeneficiarySettingsDropdown({
         description: "نراك قريباً",
       });
       navigate("/login");
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "خطأ",
         description: "فشل تسجيل الخروج",

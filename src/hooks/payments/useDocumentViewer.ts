@@ -106,7 +106,7 @@ export function useDocumentViewer() {
           description: "تم توليد الفاتورة وتحميلها",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض الفاتورة",
@@ -161,7 +161,7 @@ export function useDocumentViewer() {
           description: "تم توليد سند القبض وتحميله",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء عرض سند القبض",

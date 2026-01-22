@@ -16,7 +16,7 @@ type MemberInsert = Database['public']['Tables']['governance_board_members']['In
 const QUERY_KEYS = {
   GOVERNANCE_BOARDS: ['governance', 'boards'] as const,
   GOVERNANCE_BOARD: (id: string) => ['governance', 'boards', id] as const,
-  BOARD_MEMBERS: (boardId: string) => ['governance', 'boards', boardId, 'members'] as const,
+  BOARD_MEMBERS: (_boardId: string) => ['governance', 'boards', boardId, 'members'] as const,
   BOARDS_STATS: ['governance', 'boards', 'stats'] as const,
 };
 
@@ -49,7 +49,7 @@ export function useGovernanceBoard(id: string) {
 /**
  * جلب أعضاء مجلس محدد
  */
-export function useBoardMembers(boardId: string) {
+export function useBoardMembers(_boardId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.BOARD_MEMBERS(boardId),
     queryFn: () => GovernanceBoardsService.getBoardMembers(boardId),

@@ -35,7 +35,7 @@ export function useZATCASubmit() {
         });
         return false;
       }
-    } catch (error) {
+    } catch (_error) {
       setZatcaStatus('error');
       toast.error("خطأ في الاتصال", {
         description: "تعذر الاتصال بخدمة هيئة الزكاة والضريبة",

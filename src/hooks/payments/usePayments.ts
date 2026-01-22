@@ -3,7 +3,6 @@ import { PaymentService, RealtimeService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
-import { logger } from "@/lib/logger";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { Database } from "@/integrations/supabase/types";

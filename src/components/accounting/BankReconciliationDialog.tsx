@@ -8,8 +8,8 @@ import { useBankAccounts } from "@/hooks/payments/useBankAccounts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Upload } from "lucide-react";
-import { BankStatementRow, BankAccountRow } from "@/types/supabase-helpers";
+import { CheckCircle, XCircle } from "lucide-react";
+import { BankAccountRow } from "@/types/supabase-helpers";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BankReconciliationDialogProps {

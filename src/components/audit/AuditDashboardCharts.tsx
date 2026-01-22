@@ -27,7 +27,7 @@ export function AuditDashboardCharts() {
   const { data: categoryData, isLoading: categoryLoading } = useCategoryData();
   const { data: hourlyData, isLoading: hourlyLoading } = useHourlyActivityData();
 
-  const COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#6B7280'];
+  const _COLORS = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#6B7280'];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">

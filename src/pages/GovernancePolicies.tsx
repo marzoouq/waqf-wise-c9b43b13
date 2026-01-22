@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ScrollText, FileText, Plus, Trash2, Edit, CheckCircle, Clock, XCircle } from "lucide-react";
+import { ScrollText, FileText, Plus, Trash2, CheckCircle, Clock, XCircle } from "lucide-react";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";

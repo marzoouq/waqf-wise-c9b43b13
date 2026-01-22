@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, FileText, Upload, LogIn, Send, CheckCircle } from "lucide-react";
+import { Activity, Upload, LogIn, Send, CheckCircle } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 
 import { Skeleton } from "@/components/ui/skeleton";

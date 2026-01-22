@@ -61,7 +61,7 @@ export function generateMT940File(
   lines.push(':60F:C' + formatDate(date) + 'SAR0,00');
 
   // Transactions
-  records.forEach((record, index) => {
+  records.forEach((record) => {
     lines.push(':61:' + formatDate(date) + 'C' + record.amount.toFixed(2).replace('.', ',') + 'NTRF');
     lines.push(':86:' + record.reference + ' ' + record.beneficiary_name);
   });
@@ -112,7 +112,7 @@ export function generateISO20022XML(
   xml += '        </Id>\n';
   xml += '      </DbtrAcct>\n';
 
-  records.forEach((record, index) => {
+  records.forEach((record) => {
     xml += '      <CdtTrfTxInf>\n';
     xml += '        <PmtId>\n';
     xml += `          <EndToEndId>${record.reference}</EndToEndId>\n`;

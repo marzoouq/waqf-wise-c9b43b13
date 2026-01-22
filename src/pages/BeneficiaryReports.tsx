@@ -40,7 +40,7 @@ export default function BeneficiaryReports() {
 
   // تصدير التقرير السنوي PDF
   const exportAnnualReport = async () => {
-    const [jsPDFModule, autoTableModule] = await Promise.all([
+    const [jsPDFModule] = await Promise.all([
       import('jspdf'),
       import('jspdf-autotable')
     ]);
