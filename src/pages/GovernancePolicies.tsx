@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ScrollText, FileText, Plus, Trash2, CheckCircle, Clock, XCircle } from "lucide-react";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -145,8 +146,9 @@ const GovernancePolicies = () => {
   };
 
   return (
-    <MobileOptimizedLayout>
-      <motion.div 
+    <PageErrorBoundary pageName="سياسات الحوكمة">
+      <MobileOptimizedLayout>
+        <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -456,7 +458,8 @@ const GovernancePolicies = () => {
           </Card>
         )}
       </motion.div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 
