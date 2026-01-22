@@ -50,6 +50,8 @@ export function EligibilityAssessmentDialog({
         max_score: 100,
       });
     }
+    // beneficiary object changes reference but we only care about the id
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, beneficiary?.id, latestAssessment]);
 
   // تشغيل التقييم عند الفتح

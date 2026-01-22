@@ -22,7 +22,9 @@ export function PropertyStatsCards() {
   const { data, isLoading: dataLoading, error, refetch } = usePropertyStats();
 
   const isLoading = dataLoading || publishStatusLoading;
-  const properties = data?.properties || [];
+  
+  // Memoize properties array to prevent recreating on each render
+  const properties = useMemo(() => data?.properties || [], [data?.properties]);
   const payments = data?.payments || [];
 
   // عرض أول 5 عقارات فقط مرتبة حسب الإشغال

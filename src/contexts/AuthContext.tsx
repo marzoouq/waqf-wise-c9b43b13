@@ -263,6 +263,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
+    // isInitialized is intentionally excluded - we only check its value at callback time
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchUserData, cleanupInvalidSession]);
 
   const signIn = async (email: string, password: string) => {
