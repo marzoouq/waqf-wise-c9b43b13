@@ -4,7 +4,7 @@
 
 import { useCallback } from 'react';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
-import type { jsPDF } from 'jspdf';
+import type jsPDF from 'jspdf';
 
 export interface TestResult {
   testId: string;
@@ -23,9 +23,9 @@ interface TestCategory {
 
 /**
  * Type extension for jsPDF with autoTable plugin
- * 
- * Extends the base jsPDF type to include the autoTable method from jspdf-autotable plugin.
- * This follows the established pattern in the codebase (see beneficiary-statement-pdf.ts).
+ *
+ * Extends the base jsPDF type to include the autoTable method from jspdf-autotable plugin
+ * using an intersection type. This follows the same pattern used in SecurityDashboard.tsx.
  */
 type JsPDFWithAutoTable = jsPDF & {
   autoTable: (options: {
