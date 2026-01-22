@@ -19,7 +19,6 @@ interface UpcomingPayment {
 export const UpcomingPaymentsCard = () => {
   const { tenants, isLoading, error, refetch } = useTenants();
   const navigate = useNavigate();
-  const today = new Date();
 
   if (error) {
     return <ErrorState title="خطأ في تحميل بيانات الدفعات" message={(error as Error).message} onRetry={refetch} />;

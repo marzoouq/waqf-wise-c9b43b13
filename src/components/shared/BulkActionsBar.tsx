@@ -1,4 +1,4 @@
-import { CheckSquare, X, Trash2, Download, Send } from "lucide-react";
+import { CheckSquare, X, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

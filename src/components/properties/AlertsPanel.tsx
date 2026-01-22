@@ -9,7 +9,7 @@ import { AIAssistantDialog } from "./AIAssistantDialog";
 import { useSystemAlerts } from "@/hooks/property/useSystemAlerts";
 import { PropertyService } from "@/services/property.service";
 import { toast } from "sonner";
-import type { SystemAlert, SeverityConfig } from "@/types/alerts";
+import type { SeverityConfig } from "@/types/alerts";
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);

@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAgentStats } from '@/hooks/support/useAgentAvailability';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { TrendingUp, Clock, CheckCircle, Star, User } from 'lucide-react';
+import { Clock, CheckCircle, Star, User } from 'lucide-react';
 
 interface AgentPerformanceReportProps {
   userId?: string;

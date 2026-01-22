@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Building, Calendar, FileText, CreditCard, AlertTriangle, Receipt } from 'lucide-react';
+import { Building, Calendar, FileText, CreditCard, AlertTriangle, Receipt, ChevronDown } from 'lucide-react';
 import { useTenantContracts } from '@/hooks/tenants/useTenantContracts';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EarlyTerminationDialog } from '@/components/contracts/EarlyTerminationDialog';
@@ -15,7 +15,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
 
 interface TenantContractsProps {
   tenantId: string;

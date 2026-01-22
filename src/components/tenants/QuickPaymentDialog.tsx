@@ -52,8 +52,6 @@ export function QuickPaymentDialog({
   const [paymentMethod, setPaymentMethod] = useState('نقدي');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [receiptGenerated, setReceiptGenerated] = useState(false);
-  const [lastReceiptNumber, setLastReceiptNumber] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!tenant || !amount || parseFloat(amount) <= 0) {
@@ -95,8 +93,6 @@ export function QuickPaymentDialog({
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
         
-        setReceiptGenerated(true);
-        setLastReceiptNumber(receiptNumber);
       } catch (pdfError) {
         console.error('Error generating receipt PDF:', pdfError);
         // لا نوقف العملية إذا فشل توليد PDF
@@ -134,8 +130,6 @@ export function QuickPaymentDialog({
     setAmount('');
     setPaymentMethod('نقدي');
     setNotes('');
-    setReceiptGenerated(false);
-    setLastReceiptNumber(null);
   };
 
   const handlePayFullBalance = () => {

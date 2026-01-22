@@ -12,7 +12,7 @@ interface BeneficiarySelectorProps {
 
 export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const { beneficiaries, loading, filterBeneficiaries } = useBeneficiarySelector();
+  const { loading, filterBeneficiaries } = useBeneficiarySelector();
 
   const filteredBeneficiaries = filterBeneficiaries(searchTerm);
 

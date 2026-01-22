@@ -10,7 +10,6 @@ import {
   FileText, 
   TrendingUp, 
   Users, 
-  DollarSign, 
   Eye,
   FileCheck,
   Download,
@@ -72,7 +71,7 @@ export function AnnualDisclosureTab() {
       // البحث عن السنة السابقة
       const previousYear = disclosures?.find(d => d.year === disclosure.year - 1) || null;
       await generateDisclosurePDF(disclosure, beneficiaries, previousYear);
-    } catch (error) {
+    } catch {
       // Error already handled in generateDisclosurePDF
     }
   };

@@ -1,14 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lucide-react";
+import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw, type LucideIcon } from "lucide-react";
 import { useAIInsights } from "@/hooks/ai/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import type { LucideIcon } from "lucide-react";
 
 const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,

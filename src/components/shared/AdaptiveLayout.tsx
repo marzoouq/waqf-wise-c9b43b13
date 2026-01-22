@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * AdaptiveLayout - نظام تخطيط متكيف
  * يوفر مكونات ذكية تتكيف مع حجم الشاشة ونوع الجهاز
@@ -37,10 +38,11 @@ export function useDeviceType(): DeviceType {
   const isMobile = useIsMobile();
   
   return useMemo(() => {
-    if (typeof window === 'undefined') return 'desktop';
-    
+    if (typeof window === 'undefined') {
+      return isMobile ? 'mobile' : 'desktop';
+    }
+
     const width = window.innerWidth;
-    
     if (width < 768) return 'mobile';
     if (width < 1024) return 'tablet';
     return 'desktop';

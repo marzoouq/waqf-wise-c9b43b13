@@ -5,7 +5,6 @@ import { useUsersActivityMetrics } from "@/hooks/system/useUsersActivityMetrics"
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { CHART_CONSTANTS } from "@/lib/constants";
 
 export function UsersActivityChart() {
   const { data, isLoading, isError, refetch, isFetching } = useUsersActivityMetrics();

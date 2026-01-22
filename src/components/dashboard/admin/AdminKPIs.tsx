@@ -10,20 +10,23 @@ export const AdminKPIs = memo(() => {
   const { data, isLoading, isError, refresh } = useUnifiedKPIs();
   
   // تحويل البيانات الموحدة لصيغة KPIs المشرف
-  const kpis = data ? {
-    totalBeneficiaries: data.totalBeneficiaries,
-    activeBeneficiaries: data.activeBeneficiaries,
-    totalFamilies: data.totalFamilies,
-    totalProperties: data.totalProperties,
-    occupiedProperties: data.occupiedProperties,
-    totalFunds: data.totalFunds,
-    activeFunds: data.activeFunds,
-    pendingRequests: data.pendingRequests,
-    overdueRequests: data.overdueRequests,
-    totalRevenue: data.totalRevenue,
-    totalExpenses: data.totalExpenses,
-    netIncome: data.netIncome,
-  } : undefined;
+  const kpis = useMemo(() => {
+    if (!data) return undefined;
+    return {
+      totalBeneficiaries: data.totalBeneficiaries,
+      activeBeneficiaries: data.activeBeneficiaries,
+      totalFamilies: data.totalFamilies,
+      totalProperties: data.totalProperties,
+      occupiedProperties: data.occupiedProperties,
+      totalFunds: data.totalFunds,
+      activeFunds: data.activeFunds,
+      pendingRequests: data.pendingRequests,
+      overdueRequests: data.overdueRequests,
+      totalRevenue: data.totalRevenue,
+      totalExpenses: data.totalExpenses,
+      netIncome: data.netIncome,
+    };
+  }, [data]);
 
   const stats = useMemo(() => {
     if (!kpis) return [];

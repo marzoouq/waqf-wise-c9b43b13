@@ -212,7 +212,7 @@ Deno.serve(async (req) => {
       });
     }
     
-    let errorReport = parseResult.data;
+    const errorReport = parseResult.data;
 
     // 🚦 6. Rate Limiting الذكي - منع الحلقات اللانهائية
     if (userId) {

@@ -9,6 +9,12 @@ import { describe, it, expect, beforeAll } from 'vitest';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Check if environment is configured
+const HAS_ENV = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+// Skip suite if env not configured
+const maybeDescribe = HAS_ENV ? describe : describe.skip;
+
 // Helper to call edge functions
 async function invokeFunction(
   functionName: string, 
@@ -32,7 +38,7 @@ async function invokeFunction(
   return response;
 }
 
-describe('Edge Functions - Public Endpoints', () => {
+maybeDescribe('Edge Functions - Public Endpoints', () => {
   beforeAll(() => {
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       throw new Error('Missing Supabase configuration');

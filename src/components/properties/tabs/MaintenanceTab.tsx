@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Edit, Trash2 } from "lucide-react";
-import { useMaintenanceRequests } from "@/hooks/property/useMaintenanceRequests";
+import { useMaintenanceRequests, type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { useMaintenanceSchedules } from "@/hooks/property/useMaintenanceSchedules";
 import { useTableSort } from "@/hooks/ui/useTableSort";
 import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format, arLocale as ar } from "@/lib/date";
-import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
@@ -118,7 +117,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   }, [requests, searchQuery, advancedFilters]);
 
   // Sorting
-  const { sortedData, sortConfig, handleSort } = useTableSort({
+  const { sortedData } = useTableSort({
     data: filteredRequests,
     defaultSortKey: 'requested_date',
     defaultDirection: 'desc',
@@ -171,7 +170,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   };
 
   // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, advancedFilters]);
 

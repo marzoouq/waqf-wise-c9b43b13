@@ -8,9 +8,8 @@ import { EmptyPaymentsState } from "../EmptyPaymentsState";
 import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/contexts/AuthContext";
-import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
+import { useFiscalYearPublishInfo, useFiscalYearsList } from "@/hooks/fiscal-years";
 import { FiscalYearNotPublishedBanner } from "../FiscalYearNotPublishedBanner";
-import { useFiscalYearsList } from "@/hooks/fiscal-years";
 
 export function FinancialTransparencyTab() {
   const { user } = useAuth();

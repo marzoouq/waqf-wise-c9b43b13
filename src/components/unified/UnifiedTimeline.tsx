@@ -10,7 +10,7 @@ export interface TimelineEvent {
   date: Date | string;
   icon?: LucideIcon;
   color?: "primary" | "success" | "warning" | "danger" | "info";
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface UnifiedTimelineProps {

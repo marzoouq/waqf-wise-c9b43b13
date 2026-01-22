@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -30,7 +29,6 @@ import { useCustomReports } from '@/hooks/reports/useCustomReports';
 import { Calendar, Clock, Mail, Play, Trash2, Plus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
-type ScheduledReport = Database['public']['Tables']['scheduled_report_jobs']['Row'];
 type ReportTemplate = Database['public']['Tables']['custom_report_templates']['Row'];
 import { LoadingState } from '@/components/shared/LoadingState';
 import { format } from 'date-fns';

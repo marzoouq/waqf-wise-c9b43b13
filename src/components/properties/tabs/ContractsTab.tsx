@@ -64,7 +64,6 @@ interface Props {
 export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
-  const [printContract, setPrintContract] = useState<Contract | null>(null);
   const [activeTabFilter, setActiveTabFilter] = useState("all");
   
   // حالات الحوارات الجديدة
@@ -118,11 +117,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
   };
 
   const handlePrintContract = (contract: Contract) => {
-    setPrintContract(contract);
-    setTimeout(() => {
-      printWithData(contract, (data) => <ContractPrintTemplate contract={data} />);
-      setPrintContract(null);
-    }, 100);
+    printWithData(contract, (data) => <ContractPrintTemplate contract={data} />);
   };
 
   // البحث والفلترة المحلية
@@ -147,7 +142,10 @@ export const ContractsTab = ({ onEdit }: Props) => {
         });
         break;
       case "autoRenew":
-        result = result.filter(c => (c as any).auto_renew_enabled && matchesStatus(c.status, 'active'));
+        result = result.filter((c) => {
+          const autoRenewEnabled = (c as { auto_renew_enabled?: boolean }).auto_renew_enabled;
+          return Boolean(autoRenewEnabled) && matchesStatus(c.status, 'active');
+        });
         break;
       case "expired":
         result = result.filter(c => c.status === "منتهي" || c.status === "expired");

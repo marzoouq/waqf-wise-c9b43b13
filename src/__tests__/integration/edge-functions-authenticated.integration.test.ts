@@ -12,8 +12,11 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const TEST_USER_EMAIL = import.meta.env.VITE_TEST_USER_EMAIL;
 const TEST_USER_PASSWORD = import.meta.env.VITE_TEST_USER_PASSWORD;
 
-// Supabase client
-const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+// Env gating: skip suite entirely if env not provided
+const HAS_ENV = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+// Supabase client (only created when env is available at runtime)
+const supabase = HAS_ENV ? createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!) : (null as any);
 
 let authToken: string | null = null;
 
@@ -44,11 +47,11 @@ async function invokeAuthenticatedFunction(
   return response;
 }
 
-describe('Edge Functions - Authenticated Endpoints', () => {
+const maybeDescribe = HAS_ENV ? describe : describe.skip;
+
+maybeDescribe('Edge Functions - Authenticated Endpoints', () => {
   beforeAll(async () => {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error('Missing Supabase configuration');
-    }
+    if (!HAS_ENV) return;
 
     // Skip if no test credentials
     if (!TEST_USER_EMAIL || !TEST_USER_PASSWORD) {
@@ -57,7 +60,7 @@ describe('Edge Functions - Authenticated Endpoints', () => {
     }
 
     // Sign in
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase!.auth.signInWithPassword({
       email: TEST_USER_EMAIL,
       password: TEST_USER_PASSWORD,
     });
@@ -73,7 +76,7 @@ describe('Edge Functions - Authenticated Endpoints', () => {
 
   afterAll(async () => {
     if (authToken) {
-      await supabase.auth.signOut();
+      await supabase!.auth.signOut();
       authToken = null;
     }
   });

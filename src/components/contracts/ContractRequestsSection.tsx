@@ -26,11 +26,7 @@ import {
   Clock,
   MessageSquare,
 } from 'lucide-react';
-import {
-  useContractRequests,
-  type TerminationRequest,
-  type RentAdjustmentRequest,
-} from '@/hooks/contracts/useContractRequests';
+import { useContractRequests } from '@/hooks/contracts/useContractRequests';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ContractRequestsSectionProps {

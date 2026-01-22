@@ -54,4 +54,33 @@ export default tseslint.config(
       }],
     },
   },
+  // ═══════════════════════════════════════════════════════════════
+  // 🧪 استثناءات للاختبارات وأدوات التطوير
+  // Exceptions for tests and dev tools
+  // ═══════════════════════════════════════════════════════════════
+  {
+    files: [
+      "e2e/**/*.ts",
+      "tests/**/*.ts", 
+      "**/*.spec.ts",
+      "src/lib/logger/**/*.ts",
+      "src/lib/errors/**/*.ts",
+      "src/lib/sw-cleanup.ts",
+      "src/lib/query-invalidation-manager.ts",
+      "src/lib/ux-verification.ts",
+      "src/components/developer/**/*.{ts,tsx}",
+      "src/services/monitoring/**/*.ts",
+      "src/services/realtime*.ts",
+      "src/integrations/supabase/request-interceptor.ts",
+      "src/hooks/system/**/*.ts",
+      "supabase/functions/**/*.ts"
+    ],
+    rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
 );

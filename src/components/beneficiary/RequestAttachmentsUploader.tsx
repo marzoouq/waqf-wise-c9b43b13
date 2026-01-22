@@ -22,8 +22,7 @@ import {
   File,
   Image,
   FileSpreadsheet,
-  Loader2,
-  CheckCircle
+  Loader2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatBytes } from "@/lib/utils";
@@ -104,7 +103,7 @@ export function RequestAttachmentsUploader({
       setSelectedFile(null);
       setDescription("");
       toast.success("تم رفع المرفق بنجاح");
-    } catch (error) {
+    } catch {
       toast.error("حدث خطأ أثناء رفع المرفق");
     }
   };

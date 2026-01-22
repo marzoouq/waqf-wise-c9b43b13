@@ -58,7 +58,7 @@ export function PaymentsTable({
     {
       key: "payment_type",
       label: "النوع",
-      render: (value: string, row: Payment) => (
+      render: (value: string) => (
         <Badge variant={value === "receipt" ? "default" : "secondary"}>
           <div className="flex items-center gap-1">
             {getPaymentTypeIcon(value)}

@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -15,15 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Calculator,
-  Play,
-  CheckCircle2,
-  AlertCircle,
-  PieChart,
-  TrendingUp,
-  Users
-} from "lucide-react";
+import { Calculator, Play } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { matchesStatus } from "@/lib/constants";

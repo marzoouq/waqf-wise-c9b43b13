@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SecurityEvent } from "@/types/security";
+import { LoginAttempt, SecurityEvent } from "@/types/security";
 import { Shield, AlertTriangle, CheckCircle, XCircle, Download, Users, Activity } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
@@ -18,6 +17,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+
+type JsPDFWithAutoTable = jsPDF & { lastAutoTable?: { finalY: number } };
 
 type TabValue = "events" | "sessions" | "attempts";
 
@@ -103,7 +104,8 @@ export default function SecurityDashboard() {
           headStyles: { fillColor: [66, 139, 202] },
         });
 
-        startY = (doc as any).lastAutoTable.finalY + 10;
+        const finalY = (doc as JsPDFWithAutoTable).lastAutoTable?.finalY ?? startY;
+        startY = finalY + 10;
       }
 
       // Login Attempts Table
@@ -214,7 +216,7 @@ export default function SecurityDashboard() {
     },
   ];
 
-  const attemptsColumns: Column<any>[] = [
+  const attemptsColumns: Column<LoginAttempt>[] = [
     {
       key: "user_email",
       label: "البريد الإلكتروني",

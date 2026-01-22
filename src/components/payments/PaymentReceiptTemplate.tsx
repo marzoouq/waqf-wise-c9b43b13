@@ -21,11 +21,6 @@ interface PaymentReceiptTemplateProps {
 
 export const PaymentReceiptTemplate = ({ payment }: PaymentReceiptTemplateProps) => {
   const amountInWords = (amount: number): string => {
-    // تحويل الرقم إلى كلمات (مبسط)
-    const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
-    const tens = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
-    const hundreds = ['', 'مائة', 'مئتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة'];
-    
     // تبسيط: إرجاع الرقم مع "ريال سعودي"
     return `${amount.toLocaleString('ar-SA')} ريال سعودي`;
   };

@@ -13,8 +13,7 @@ import {
   TrendingUp, AlertTriangle, Clock,
   Database, Shield, CheckCircle, Activity
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { useNazerSystemOverview } from "@/hooks/dashboard/useNazerSystemOverview";
 import { ErrorState } from "@/components/shared/ErrorState";
 

@@ -2,6 +2,7 @@
  * ملخص فئات المستندات
  * يعرض ملخص مالي سريع لكل فئة من المستندات
  */
+import { type ElementType } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -12,8 +13,7 @@ import {
   Calculator, 
   Wallet,
   FileCheck,
-  TrendingDown,
-  TrendingUp
+  TrendingDown
 } from "lucide-react";
 
 interface CategorySummary {
@@ -27,7 +27,7 @@ interface DocumentCategorySummaryProps {
   categories: CategorySummary[];
 }
 
-const TYPE_ICONS: Record<string, React.ElementType> = {
+const TYPE_ICONS: Record<string, ElementType> = {
   'فاتورة_خدمات': Zap,
   'صيانة': Wrench,
   'زكاة_ضرائب': Receipt,

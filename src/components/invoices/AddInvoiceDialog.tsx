@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,7 +7,6 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
@@ -90,6 +89,14 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
 
   const { data: accounts } = useRevenueAccounts();
   const { data: nextInvoiceNumber } = useNextInvoiceNumber();
+
+  useEffect(() => {
+    if (isEdit && invoiceToEdit) {
+      form.reset({
+        ...invoiceToEdit,
+      });
+    }
+  }, [form, invoiceToEdit, isEdit]);
 
   const addLine = () => {
     if (!newLine.account_id || !newLine.description || !newLine.quantity || !newLine.unit_price) {

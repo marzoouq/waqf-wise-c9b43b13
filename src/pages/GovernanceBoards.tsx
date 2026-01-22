@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Building2, Users, Plus, UserPlus, Trash2, Edit, Eye } from "lucide-react";
+import { Building2, Users, Plus, UserPlus, Trash2 } from "lucide-react";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -42,7 +42,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,

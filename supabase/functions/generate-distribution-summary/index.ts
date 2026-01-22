@@ -211,7 +211,7 @@ serve(async (req) => {
     console.log(`👰 Wives: ${wives.length}, 👦 Sons: ${sons.length}, 👧 Daughters: ${daughters.length}`);
 
     // 9. حساب التوزيع حسب القاعدة الشرعية
-    let distributionDetails: Array<{ beneficiary_id: string; beneficiary_type: string; allocated_amount: number }> = [];
+    const distributionDetails: Array<{ beneficiary_id: string; beneficiary_type: string; allocated_amount: number }> = [];
 
     if (settings.distribution_rule === 'شرعي') {
       // أ) حصة الزوجات (الثمن = 12.5%)

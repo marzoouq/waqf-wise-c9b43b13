@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingState } from "@/components/shared/LoadingState";
 import {
   Loader2,
   Globe,
@@ -54,6 +55,16 @@ export function PublishFiscalYearDialog({
 
   const unpublishedYears = fiscalYears.filter((fy) => !fy.is_published);
   const publishedYears = fiscalYears.filter((fy) => fy.is_published);
+
+  if (isLoading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-lg">
+          <LoadingState message="جاري تحميل السنوات المالية..." />
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

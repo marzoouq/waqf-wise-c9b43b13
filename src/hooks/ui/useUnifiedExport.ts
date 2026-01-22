@@ -84,7 +84,7 @@ export function useUnifiedExport() {
       const fontName = await loadArabicFontToPDF(doc);
 
       // إضافة ترويسة الوقف
-      let yPos = addWaqfHeader(doc, fontName, config.title);
+      const yPos = addWaqfHeader(doc, fontName, config.title);
 
       // معالجة البيانات للعربية
       const processedHeaders = processArabicHeaders(config.headers);

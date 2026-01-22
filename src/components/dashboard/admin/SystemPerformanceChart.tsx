@@ -5,7 +5,6 @@ import { useSystemPerformanceMetrics } from "@/hooks/system/useSystemPerformance
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { CHART_CONSTANTS } from "@/lib/constants";
 
 // استخراج الأنماط خارج المكون لتحسين الأداء
 const TOOLTIP_STYLE = {

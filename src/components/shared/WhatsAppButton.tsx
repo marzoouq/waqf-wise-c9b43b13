@@ -116,20 +116,6 @@ export function WhatsAppButton({
     openWhatsApp(phone, message);
   };
 
-  // إذا كان هناك مبلغ ودفعة قادمة، نرسل تذكير مباشر
-  const handleQuickMessage = () => {
-    if (daysRemaining < 0) {
-      // متأخر
-      handleOverdueMessage();
-    } else if (daysRemaining > 0) {
-      // تذكير
-      handleReminderMessage();
-    } else {
-      // رسالة عامة
-      handleCustomMessage();
-    }
-  };
-
   if (variant === "button") {
     return (
       <DropdownMenu>

@@ -18,7 +18,6 @@ import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { useDistributions } from "@/hooks/distributions/useDistributions";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
-import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
 import { matchesStatus } from "@/lib/constants";
 
 const distributionSchema = z.object({
@@ -125,7 +124,7 @@ export const CreateDistributionDialog = ({
 
       form.reset();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ في إنشاء التوزيع",
         description: "حدث خطأ أثناء إنشاء التوزيع، يرجى المحاولة مرة أخرى",

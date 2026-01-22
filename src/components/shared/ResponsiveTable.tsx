@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import {
   Table,
   TableBody,
@@ -11,7 +10,7 @@ import { Card } from '@/components/ui/card';
 import { useMediaQuery } from '@/hooks/ui/use-media-query';
 import { cn } from '@/lib/utils';
 import { ScrollableTableWrapper } from './ScrollableTableWrapper';
-import { TableRow as TableRowType, TableColumn, ResponsiveTableProps } from '@/types/table';
+import { TableRow as TableRowType, ResponsiveTableProps } from '@/types/table';
 
 /**
  * جدول محسّن للجوال مع دعم Generic Types

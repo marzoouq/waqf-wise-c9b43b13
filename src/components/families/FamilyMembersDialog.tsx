@@ -26,7 +26,7 @@ interface FamilyMember {
   is_head_of_family: boolean;
 }
 
-export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }: FamilyMembersDialogProps) {
+export function FamilyMembersDialog({ open, onOpenChange, familyName }: FamilyMembersDialogProps) {
   const { data: members = [], isLoading } = useFamilyMembersDialog(familyName, open);
 
   const getRelationshipBadge = (relationship: string) => {

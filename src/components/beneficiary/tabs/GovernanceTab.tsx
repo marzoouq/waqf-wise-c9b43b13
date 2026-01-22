@@ -6,14 +6,11 @@ import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings"
 import { useGovernanceData } from "@/hooks/governance/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useNavigate } from "react-router-dom";
-import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
 
 export function GovernanceTab() {
   const { settings } = useVisibilitySettings();
   const { meetings, decisions, auditReports, isLoading, hasMeetings, hasDecisions, hasAuditReports } = useGovernanceData();
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   if (!settings?.show_governance) {

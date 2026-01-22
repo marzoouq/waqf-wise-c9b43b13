@@ -81,7 +81,14 @@ export function HealthKPICards({ summary, alertsCount, isLoading }: HealthKPICar
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="space-y-3">
+      {alertsCount > 0 && (
+        <div className="flex items-center gap-2 text-sm text-warning">
+          <AlertTriangle className="h-4 w-4" />
+          <span>تنبيهات حرجة: {alertsCount}</span>
+        </div>
+      )}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {kpis.map((kpi, index) => {
         const Icon = kpi.icon;
         return (
@@ -103,6 +110,7 @@ export function HealthKPICards({ summary, alertsCount, isLoading }: HealthKPICar
           </Card>
         );
       })}
+      </div>
     </div>
   );
 }

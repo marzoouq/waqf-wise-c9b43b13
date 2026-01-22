@@ -106,6 +106,7 @@ export function InternalMessagesDialog({
                 <Card 
                   key={message.id} 
                   className={!message.is_read ? 'border-primary' : ''}
+                  onClick={() => handleReadMessage(message.id, message.is_read)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">

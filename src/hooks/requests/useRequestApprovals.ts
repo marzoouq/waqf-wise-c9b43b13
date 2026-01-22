@@ -8,8 +8,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
-import { ApprovalService } from "@/services";
-import { RealtimeService } from "@/services";
+import { ApprovalService, RealtimeService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { matchesStatus } from "@/lib/constants";
 

@@ -8,8 +8,7 @@ import { ReactNode } from 'react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
-import type { LucideIcon } from 'lucide-react';
-import { FileText } from 'lucide-react';
+import { type LucideIcon, FileText } from 'lucide-react';
 
 export interface UseDataStateOptions<T> {
   /** حالة التحميل */

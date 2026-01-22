@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, AlertCircle, XCircle, Circle } from 'lucide-react';
+import { CheckCircle2, Clock, XCircle, Circle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
@@ -11,11 +11,10 @@ interface TimelineEvent {
   status: 'completed' | 'in_progress' | 'pending' | 'failed';
   timestamp?: string;
   user?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface DistributionTimelineProps {
-  distributionId: string;
   events: TimelineEvent[];
 }
 
@@ -46,7 +45,7 @@ const statusConfig = {
   },
 };
 
-export function DistributionTimeline({ distributionId, events }: DistributionTimelineProps) {
+export function DistributionTimeline({ events }: DistributionTimelineProps) {
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-6">مسار التوزيع</h3>
@@ -57,7 +56,7 @@ export function DistributionTimeline({ distributionId, events }: DistributionTim
 
         {/* Events */}
         <div className="space-y-6">
-          {events.map((event, index) => {
+          {events.map((event, _index) => {
             const config = statusConfig[event.status];
             const Icon = config.icon;
 

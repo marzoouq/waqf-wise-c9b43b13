@@ -16,8 +16,16 @@ interface AnnualShareCardProps {
   beneficiaryId: string;
 }
 
+type DistributionRow = {
+  share_amount: number | null;
+  fiscal_years?: {
+    name?: string | null;
+    start_date?: string | null;
+  } | null;
+};
+
 export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
-const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['beneficiary-annual-share', beneficiaryId],
     queryFn: async () => {
       const currentYear = new Date().getFullYear(); // 2026
@@ -36,20 +44,20 @@ const { data, isLoading } = useQuery({
       const yearTotals: Record<string, number> = {};
 
       if (distributions) {
-        distributions.forEach((d: any) => {
+        distributions.forEach((distribution: DistributionRow) => {
           // استخدام start_date بدلاً من الاعتماد على اسم السنة المالية
-          const startDate = d.fiscal_years?.start_date;
+          const startDate = distribution.fiscal_years?.start_date;
           if (startDate) {
             const startYear = new Date(startDate).getFullYear();
             const fiscalYearKey = `${startYear}-${startYear + 1}`;
-            yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (d.share_amount || 0);
+            yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
           } else {
             // fallback: محاولة استخراج السنة من الاسم
-            const fiscalYearName = d.fiscal_years?.name || '';
+            const fiscalYearName = distribution.fiscal_years?.name || '';
             const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
             if (match) {
               const fiscalYearKey = `${match[1]}-${match[2]}`;
-              yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (d.share_amount || 0);
+              yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
             }
           }
         });

@@ -82,7 +82,7 @@ export const AdminTasks = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2 sm:space-y-3">
-          {tasks.map((task, index) => (
+          {tasks.map((task) => (
             <div
               key={task.id}
               className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"

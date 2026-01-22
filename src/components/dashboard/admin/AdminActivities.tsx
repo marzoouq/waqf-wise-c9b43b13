@@ -63,7 +63,7 @@ export const AdminActivities = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2 sm:space-y-3 md:space-y-4">
-          {activities.map((activity, index) => (
+          {activities.map((activity) => (
             <div
               key={activity.id}
               className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors"

@@ -108,10 +108,10 @@ interface ResponsiveFormDialogProps extends ResponsiveDialogProps {
 }
 
 export function ResponsiveFormDialog({
-  onSubmit,
-  submitLabel = 'حفظ',
-  cancelLabel = 'إلغاء',
-  isLoading,
+  onSubmit: _onSubmit,
+  submitLabel: _submitLabel = 'حفظ',
+  cancelLabel: _cancelLabel = 'إلغاء',
+  isLoading: _isLoading,
   children,
   ...props
 }: ResponsiveFormDialogProps) {

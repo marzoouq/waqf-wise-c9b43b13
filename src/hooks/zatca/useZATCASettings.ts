@@ -3,11 +3,10 @@
  * @version 2.8.65
  */
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { SettingsService } from "@/services/settings.service";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
-import React from "react";
 
 interface ZATCASettingsState {
   enabled: boolean;

@@ -23,7 +23,7 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
       });
       toast.success("تم إصدار الفاتورة");
       onStatusChanged?.();
-    } catch (error) {
+    } catch {
       toast.error("فشل في إصدار الفاتورة");
     }
   };
@@ -36,7 +36,7 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
       });
       toast.success("تم تسجيل الدفع");
       onStatusChanged?.();
-    } catch (error) {
+    } catch {
       toast.error("فشل في تسجيل الدفع");
     }
   };
@@ -49,7 +49,7 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
       });
       toast.warning("تم إلغاء الفاتورة");
       onStatusChanged?.();
-    } catch (error) {
+    } catch {
       toast.error("فشل في إلغاء الفاتورة");
     }
   };

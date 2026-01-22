@@ -4,8 +4,7 @@
  */
 
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle, XCircle, FileText, Clock } from "lucide-react";
-import { LucideIcon } from "lucide-react";
+import { AlertCircle, CheckCircle, XCircle, FileText, Clock, type LucideIcon } from "lucide-react";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 

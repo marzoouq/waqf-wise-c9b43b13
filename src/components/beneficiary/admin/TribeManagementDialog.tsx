@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Database } from "@/integrations/supabase/types";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Plus, Pencil, Trash2, Shield } from "lucide-react";
+import { Users, Plus, Pencil, Trash2 } from "lucide-react";
 import { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from "@/hooks/beneficiary/useTribes";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";

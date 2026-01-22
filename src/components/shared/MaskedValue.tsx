@@ -35,13 +35,15 @@ export function MaskedValue({ value, type, masked, showToggle = false }: MaskedV
         return value;
 
       case "amount":
-        // تقريب المبلغ لأقرب 1000
-        const amount = parseFloat(value.replace(/[^\d.]/g, ""));
-        if (!isNaN(amount)) {
-          const rounded = Math.round(amount / 1000) * 1000;
-          return `~${rounded.toLocaleString("ar-SA")} ريال`;
+        {
+          // تقريب المبلغ لأقرب 1000
+          const amount = parseFloat(value.replace(/[^\d.]/g, ""));
+          if (!isNaN(amount)) {
+            const rounded = Math.round(amount / 1000) * 1000;
+            return `~${rounded.toLocaleString("ar-SA")} ريال`;
+          }
+          return value;
         }
-        return value;
 
       case "national_id":
         // عرض أول رقمين وآخر رقمين

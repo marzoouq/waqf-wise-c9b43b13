@@ -31,15 +31,10 @@ import type { Database } from '@/integrations/supabase/types';
 // استيراد الخدمات للاستخدام في AccountingService
 import { AccountService } from './accounting/account.service';
 import { JournalEntryService } from './accounting/journal-entry.service';
-import { TrialBalanceService, type FinancialSummary } from './accounting/trial-balance.service';
-import { BudgetService, type FinancialKPIInsert, type FinancialForecastInsert } from './accounting/budget.service';
+import { TrialBalanceService } from './accounting/trial-balance.service';
+import { BudgetService } from './accounting/budget.service';
 import { BankReconciliationService } from './accounting/bank-reconciliation.service';
 import { AutoJournalService as AutoJournalServiceImport } from './accounting/auto-journal.service';
-
-type JournalEntryRow = Database['public']['Tables']['journal_entries']['Row'];
-type JournalEntryInsert = Database['public']['Tables']['journal_entries']['Insert'];
-type JournalEntryLineRow = Database['public']['Tables']['journal_entry_lines']['Row'];
-type AccountRow = Database['public']['Tables']['accounts']['Row'];
 
 /**
  * AccountingService - Facade للتوافق العكسي
@@ -237,11 +232,17 @@ export class AccountingService {
    */
   static async getCashFlows(fiscalYearId?: string) {
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('cash_flows')
         .select('*')
         .order('period_start', { ascending: false })
         .limit(10);
+
+      if (fiscalYearId) {
+        query.eq('fiscal_year_id', fiscalYearId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data || [];

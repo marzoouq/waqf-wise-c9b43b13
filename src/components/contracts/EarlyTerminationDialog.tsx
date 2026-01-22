@@ -26,9 +26,7 @@ import {
   Loader2, 
   AlertTriangle,
   Calendar,
-  Banknote,
-  Edit2,
-  RefreshCw
+  Edit2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';

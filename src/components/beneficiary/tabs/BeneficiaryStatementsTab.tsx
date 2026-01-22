@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Download, FileText, TrendingUp, TrendingDown, Wallet, ArrowDownToLine, ArrowUpFromLine, Scale } from "lucide-react";
+import { Download, FileText, Wallet, ArrowDownToLine, ArrowUpFromLine, Scale } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
@@ -16,7 +16,6 @@ import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryD
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
 import { formatCurrency } from "@/lib/utils";
 
@@ -37,9 +36,8 @@ interface Transaction {
 
 export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatementsTabProps) {
   const { settings } = useVisibilitySettings();
-  const isMobile = useIsMobile();
-  const { data: payments = [], isLoading: paymentsLoading } = useBeneficiaryStatements(beneficiaryId);
-  const { distributions, totalDistributed, isLoading: distributionsLoading } = useBeneficiaryDistributions(beneficiaryId);
+  const { isLoading: paymentsLoading } = useBeneficiaryStatements(beneficiaryId);
+  const { distributions, isLoading: distributionsLoading } = useBeneficiaryDistributions(beneficiaryId);
   const { exportJournalEntries } = useBeneficiaryExport();
 
   const isLoading = paymentsLoading || distributionsLoading;

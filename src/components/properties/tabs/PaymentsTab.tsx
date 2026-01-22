@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
 import { useRentalPayments, type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { useDocumentViewer } from "@/hooks/payments/useDocumentViewer";
@@ -132,7 +132,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   }, [payments, searchQuery, advancedFilters]);
 
   // Sorting
-  const { sortedData, sortConfig, handleSort } = useTableSort({
+  const { sortedData } = useTableSort({
     data: filteredPayments,
     defaultSortKey: 'due_date',
     defaultDirection: 'desc',
@@ -184,7 +184,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   };
 
   // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, advancedFilters]);
 

@@ -163,7 +163,7 @@ serve(async (req) => {
       .eq('is_active', true)
       .maybeSingle();
 
-    let requiresApproval = retentionPolicy?.requires_approval ?? true;
+    const requiresApproval = retentionPolicy?.requires_approval ?? true;
 
     // إذا كان الحذف يتطلب موافقة وليس المستخدم مدير
     if (requiresApproval && !isAdmin && !permanentDelete) {

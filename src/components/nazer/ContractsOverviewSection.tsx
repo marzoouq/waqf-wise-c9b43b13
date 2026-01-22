@@ -3,7 +3,7 @@
  * يعرض ملخص شامل لحالة العقود
  */
 import { memo } from "react";
-import { FileText, CheckCircle, Clock, AlertTriangle, RefreshCw, XCircle, DollarSign, TrendingUp } from "lucide-react";
+import { FileText, CheckCircle, Clock, AlertTriangle, RefreshCw, XCircle, DollarSign, TrendingUp, ArrowLeft } from "lucide-react";
 import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
 import { useContractsStats } from "@/hooks/contracts/useContractsStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { type Contract } from "@/hooks/property/useContracts";
 
 export const ContractsOverviewSection = memo(function ContractsOverviewSection() {

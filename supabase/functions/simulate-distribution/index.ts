@@ -235,7 +235,7 @@ Deno.serve(async (req) => {
     const sortedPriorities = Array.from(priorityGroups.keys()).sort((a, b) => b - a);
 
     // توزيع متساوٍ ضمن كل أولوية
-    let remainingAmount = distributable_amount;
+    const remainingAmount = distributable_amount;
     const totalBeneficiaries = beneficiaries.length;
     const baseAmount = distributable_amount / totalBeneficiaries;
 
@@ -246,7 +246,7 @@ Deno.serve(async (req) => {
     });
 
     beneficiaries.forEach((beneficiary: BeneficiaryWithPriority) => {
-      let allocatedAmount = baseAmount;
+      const allocatedAmount = baseAmount;
 
       // خصم القرض إن وجد
       const loanDeduction = loanDeductions.get(beneficiary.id) || 0;

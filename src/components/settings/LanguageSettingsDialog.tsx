@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { Globe } from "lucide-react";
 
 interface LanguageSettingsDialogProps {
   open: boolean;

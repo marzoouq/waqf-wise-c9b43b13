@@ -14,7 +14,6 @@ interface RequestsMobileViewProps {
   searchQuery: string;
   statusFilter: string;
   setSelectedRequest: (request: FullRequest) => void;
-  setApprovalDialogOpen: (open: boolean) => void;
   setCommentsDialogOpen: (open: boolean) => void;
   handleDeleteClick: (request: FullRequest) => void;
   handleViewDetails: (request: FullRequest) => void;
@@ -30,7 +29,6 @@ export const RequestsMobileView = memo(({
   searchQuery, 
   statusFilter,
   setSelectedRequest,
-  setApprovalDialogOpen,
   setCommentsDialogOpen,
   handleDeleteClick,
   handleViewDetails,

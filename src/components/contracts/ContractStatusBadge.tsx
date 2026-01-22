@@ -8,7 +8,7 @@ interface ContractStatusBadgeProps {
   status: string;
 }
 
-export const ContractStatusBadge = ({ startDate, endDate, status }: ContractStatusBadgeProps) => {
+export const ContractStatusBadge = ({ startDate: _startDate, endDate, status }: ContractStatusBadgeProps) => {
   const today = new Date();
   const end = new Date(endDate);
   const daysRemaining = differenceInDays(end, today);

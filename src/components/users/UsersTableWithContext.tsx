@@ -10,7 +10,6 @@ import { Shield } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { UsersTableRowWithContext } from "./UsersTableRowWithContext";
 import { useUsersContext } from "@/contexts/UsersContext";
-import { useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
 
 /**
  * UsersTableWithContext - نسخة محسنة تستخدم Context مباشرة

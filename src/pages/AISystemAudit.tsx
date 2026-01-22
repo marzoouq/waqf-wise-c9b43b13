@@ -9,7 +9,7 @@ import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useAISystemAudit, AUDIT_CATEGORIES } from '@/hooks/ai/useAISystemAudit';
 import { 
   Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, 
-  Info, Shield, Database, Gauge, LayoutDashboard, Undo2,
+  Info, Shield, Undo2,
   Clock, FileText, Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';

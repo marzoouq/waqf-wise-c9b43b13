@@ -27,7 +27,7 @@ export function SelfHealingToolsPanel() {
   const [isHealthMonitorRunning, setIsHealthMonitorRunning] = useState(true);
 
   // 📊 إحصائيات ديناميكية حقيقية من قاعدة البيانات
-  const { stats, isLoading: statsLoading, refetch: refetchStats } = useSelfHealingStats();
+  const { stats, isLoading: statsLoading } = useSelfHealingStats();
 
   // حالة الأدوات
   const toolsStatus = {
@@ -92,7 +92,7 @@ export function SelfHealingToolsPanel() {
         title: "✅ اكتمل التنظيف الشامل",
         description: "تم مسح جميع البيانات المؤقتة والمعلقة"
       });
-    } catch (error) {
+    } catch {
       toast({ 
         title: "❌ فشل التنظيف الشامل",
         variant: "destructive"

@@ -93,7 +93,7 @@ export function CreateDecisionDialog({
       
       onOpenChange(false);
       form.reset();
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء إنشاء القرار",

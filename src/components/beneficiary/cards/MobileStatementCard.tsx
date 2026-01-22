@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign, FileText, CreditCard } from "lucide-react";
 import { formatDate } from "@/lib/date";
-import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface MobileStatementCardProps {
   payment: {
@@ -18,6 +17,8 @@ interface MobileStatementCardProps {
 }
 
 export function MobileStatementCard({ payment, masked = false }: MobileStatementCardProps) {
+  const formattedAmount = payment.amount.toLocaleString("ar-SA");
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4 space-y-3">
@@ -55,7 +56,9 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
               <DollarSign className="h-3 w-3" />
               المبلغ
             </div>
-            <p className="text-sm font-bold">—</p>
+            <p className="text-sm font-bold">
+              {masked ? `${formattedAmount} ر.س` : formattedAmount + " ر.س"}
+            </p>
           </div>
         </div>
 

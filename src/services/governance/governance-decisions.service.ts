@@ -6,8 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database } from '@/integrations/supabase/types';
-import type { PaginatedResponse, PaginationParams } from '@/lib/pagination.types';
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '@/lib/pagination.types';
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, type PaginatedResponse, type PaginationParams } from '@/lib/pagination.types';
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 type GovernanceDecisionInsert = Database['public']['Tables']['governance_decisions']['Insert'];

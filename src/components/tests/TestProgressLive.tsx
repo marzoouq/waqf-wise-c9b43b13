@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Loader2, CheckCircle, XCircle, Clock, 
+  Loader2, CheckCircle, XCircle, 
   Zap, Timer, TestTube
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -141,7 +141,7 @@ export function TestProgressLive({
         {recentResults.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground">آخر النتائج:</h4>
-            <ScrollArea className="h-24" ref={scrollRef as any}>
+            <ScrollArea className="h-24" ref={scrollRef}>
               <div className="space-y-1">
                 {recentResults.slice(-6).map((result, index) => (
                   <div

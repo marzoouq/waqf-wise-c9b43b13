@@ -28,7 +28,7 @@ export function ManualClosingDialog({
   fiscalYear,
 }: ManualClosingDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

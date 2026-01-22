@@ -1,12 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   AlertTriangle, 
   Calendar, 
   DollarSign, 
   FileWarning,
-  Home,
   Clock,
   AlertCircle
 } from "lucide-react";

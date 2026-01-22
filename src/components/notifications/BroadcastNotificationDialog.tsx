@@ -117,7 +117,7 @@ export function BroadcastNotificationDialog({
       } else {
         toast.error(result.error || 'فشل في إرسال الإشعار');
       }
-    } catch (error) {
+    } catch {
       toast.error('حدث خطأ أثناء إرسال الإشعار');
     } finally {
       setIsLoading(false);
@@ -133,21 +133,6 @@ export function BroadcastNotificationDialog({
     setPriority('medium');
     setActionUrl('');
     onOpenChange(false);
-  };
-
-  const getTargetLabel = () => {
-    switch (targetType) {
-      case 'all':
-        return 'جميع المستخدمين';
-      case 'beneficiaries':
-        return 'المستفيدين';
-      case 'staff':
-        return 'الموظفين';
-      case 'role':
-        return ROLES.find(r => r.value === selectedRole)?.label || 'دور محدد';
-      default:
-        return '';
-    }
   };
 
   return (

@@ -6,7 +6,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis } from "recharts";
-import { PieChart as PieChartIcon, BarChart3 } from "lucide-react";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 
 interface DisclosureChartsProps {

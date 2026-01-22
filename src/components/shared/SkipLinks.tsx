@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { A11Y_CLASSES, ARIA_LABELS } from '@/lib/accessibility';
+import { ARIA_LABELS } from '@/lib/accessibility';
 
 interface SkipLink {
   id: string;
@@ -178,8 +178,11 @@ export function FocusTrap({ children, active = true, className }: FocusTrapProps
   React.useEffect(() => {
     if (!active || !containerRef.current) return;
 
+    const container = containerRef.current;
+    const startEl = startRef.current;
+    const endEl = endRef.current;
+
     const handleFocus = (e: FocusEvent) => {
-      const container = containerRef.current;
       if (!container) return;
 
       const focusableElements = container.querySelectorAll<HTMLElement>(
@@ -189,19 +192,19 @@ export function FocusTrap({ children, active = true, className }: FocusTrapProps
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
 
-      if (e.target === startRef.current) {
+      if (e.target === startEl) {
         lastElement?.focus();
-      } else if (e.target === endRef.current) {
+      } else if (e.target === endEl) {
         firstElement?.focus();
       }
     };
 
-    startRef.current?.addEventListener('focus', handleFocus);
-    endRef.current?.addEventListener('focus', handleFocus);
+    startEl?.addEventListener('focus', handleFocus);
+    endEl?.addEventListener('focus', handleFocus);
 
     return () => {
-      startRef.current?.removeEventListener('focus', handleFocus);
-      endRef.current?.removeEventListener('focus', handleFocus);
+      startEl?.removeEventListener('focus', handleFocus);
+      endEl?.removeEventListener('focus', handleFocus);
     };
   }, [active]);
 

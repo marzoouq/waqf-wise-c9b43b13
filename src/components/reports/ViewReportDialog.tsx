@@ -2,7 +2,7 @@
  * Dialog لعرض التقرير المخصص
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, FileSpreadsheet, FileText } from "lucide-react";
+import { Loader2, FileSpreadsheet, FileText } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -41,16 +41,7 @@ export function ViewReportDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open && template) {
-      loadReport();
-    } else {
-      setResult(null);
-      setError(null);
-    }
-  }, [open, template]);
-
-  const loadReport = async () => {
+  const loadReport = useCallback(async () => {
     if (!template) return;
 
     setIsLoading(true);
@@ -58,13 +49,21 @@ export function ViewReportDialog({
     try {
       const data = await executeReport(template);
       setResult(data);
-    } catch (err) {
+    } catch {
       setError("حدث خطأ أثناء تحميل التقرير");
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [executeReport, template]);
+
+  useEffect(() => {
+    if (open && template) {
+      loadReport();
+    } else {
+      setResult(null);
+      setError(null);
+    }
+  }, [loadReport, open, template]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

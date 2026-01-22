@@ -5,11 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/ui/use-toast";
-import { Key, Mail, User, Info, RefreshCw } from "lucide-react";
+import { Info, Key, Mail, User } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
 import { nationalIdToEmail, generateSecurePassword } from "@/lib/beneficiaryAuth";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
 import { useLeakedPassword } from "@/hooks/auth/useLeakedPassword";
 

@@ -28,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [_session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,8 +142,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initializeAuth = async () => {
       if (import.meta.env.DEV) {
-        console.log('🔐 [AuthContext] بدء التهيئة...');
-        console.log('🔐 [AuthContext] المسار:', window.location.pathname);
+        productionLogger.debug('🔐 [AuthContext] بدء التهيئة...');
+        productionLogger.debug('🔐 [AuthContext] المسار:', window.location.pathname);
       }
       
       try {
@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
         if (import.meta.env.DEV) {
-          console.log('🔐 [AuthContext] نتيجة getSession:', { hasSession: !!currentSession });
+          productionLogger.debug('🔐 [AuthContext] نتيجة getSession:', { hasSession: !!currentSession });
         }
         
         if (!isMounted) return;
@@ -183,14 +183,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         
         if (import.meta.env.DEV) {
-          console.log('🔐 [AuthContext] انتهاء التهيئة');
+          productionLogger.debug('🔐 [AuthContext] انتهاء التهيئة');
         }
         setIsInitialized(true);
       } catch (err) {
         if (!isMounted) return;
         productionLogger.error('Unexpected error getting session', err);
         if (import.meta.env.DEV) {
-          console.log('🔐 [AuthContext] خطأ:', err);
+          productionLogger.debug('🔐 [AuthContext] خطأ:', err);
         }
         await cleanupInvalidSession();
         setIsLoading(false);

@@ -120,7 +120,7 @@ export const CreateRequestDialog = memo(({
       } else {
         toast.error(result.message);
       }
-    } catch (error) {
+    } catch {
       toast.error('حدث خطأ أثناء إنشاء الطلب');
     } finally {
       setIsSubmitting(false);

@@ -51,7 +51,7 @@ export function WaqfUnitsTab({ waqfUnits, isLoading }: WaqfUnitsTabProps) {
     try {
       await deleteWaqfUnit(deletingUnit.id);
       setDeletingUnit(null);
-    } catch (error) {
+    } catch {
       // Error handled by hook
     } finally {
       setIsDeleting(false);

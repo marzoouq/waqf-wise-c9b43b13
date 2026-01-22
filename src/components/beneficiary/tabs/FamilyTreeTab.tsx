@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Users, User } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { matchesStatus } from "@/lib/constants";
 
 interface FamilyTreeTabProps {
@@ -13,7 +12,6 @@ interface FamilyTreeTabProps {
 
 export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
   const { settings } = useVisibilitySettings();
-  const isMobile = useIsMobile();
 
   const { data: familyMembers, isLoading } = useFamilyTree(
     beneficiaryId,

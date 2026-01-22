@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
 import { useProperties, type Property } from "@/hooks/property/useProperties";
 import { usePropertiesStats } from "@/hooks/property/usePropertiesStats";
@@ -106,7 +106,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   }, [properties, searchQuery, advancedFilters]);
 
   // Sorting
-  const { sortedData, sortConfig, handleSort } = useTableSort({
+  const { sortedData } = useTableSort({
     data: filteredProperties,
     defaultSortKey: 'name',
     defaultDirection: 'asc',
@@ -159,7 +159,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   };
 
   // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, advancedFilters]);
 

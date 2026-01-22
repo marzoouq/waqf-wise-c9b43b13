@@ -6,8 +6,6 @@ import {
   FileSpreadsheet,
   Building2,
   Receipt,
-  ClipboardList,
-  FileCheck,
   Download,
   User,
   Info,
@@ -32,7 +30,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPaymentsPDF = async () => {
     try {
-      const [jsPDFModule, autoTableModule] = await Promise.all([
+      const [jsPDFModule] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
       ]);
@@ -123,7 +121,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           ? "تم تصدير تقرير المدفوعات بنجاح"
           : "تم إنشاء التقرير - لا توجد مدفوعات حالياً",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير التقرير",
@@ -146,7 +144,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         return;
       }
 
-      const [jsPDFModule, autoTableModule] = await Promise.all([
+      const [jsPDFModule] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
       ]);
@@ -198,7 +196,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         title: "تم التصدير",
         description: "تم تصدير الإفصاح السنوي بنجاح",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير الإفصاح السنوي",
@@ -247,7 +245,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         title: "تم التصدير",
         description: "تم تصدير تقرير العقارات إلى Excel بنجاح",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير التقرير",
@@ -258,7 +256,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportAccountStatement = async () => {
     try {
-      const [jsPDFModule, autoTableModule] = await Promise.all([
+      const [jsPDFModule] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
       ]);
@@ -359,7 +357,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           ? "تم تصدير كشف الحساب بنجاح"
           : "تم إنشاء الكشف - لا توجد معاملات حالياً",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير التقرير",
@@ -529,7 +527,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         title: "تم التصدير",
         description: "تم تصدير تقرير البيانات الشخصية بنجاح",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير التقرير",
@@ -551,7 +549,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         return;
       }
 
-      const [jsPDFModule, autoTableModule] = await Promise.all([
+      const [jsPDFModule] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
       ]);
@@ -620,7 +618,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         title: "تم التصدير",
         description: "تم تصدير تقرير العقارات بنجاح",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير التقرير",

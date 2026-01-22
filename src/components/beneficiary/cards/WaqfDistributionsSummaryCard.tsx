@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wallet, TrendingUp, Calendar, ChevronLeft, CheckCircle2, Clock, Loader2, Archive, CircleDot } from "lucide-react";
+import { Wallet, Calendar, ChevronLeft, Loader2, Archive, CircleDot } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { HeirDistribution } from "@/types/distributions";

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMaintenanceProviders } from "@/hooks/property/useMaintenanceProviders";
-import { Plus, Star, Phone, Mail, MapPin } from "lucide-react";
+import { Plus, Star, Phone, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 interface MaintenanceProvidersDialogProps {

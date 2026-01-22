@@ -6,9 +6,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileWarning, User, Calendar, ArrowLeft, Building } from 'lucide-react';
+import { FileWarning, ArrowLeft, Building } from 'lucide-react';
 import { useCollectionStats } from '@/hooks/dashboard/useCollectionStats';
-import { formatCurrency } from '@/lib/formatters';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';

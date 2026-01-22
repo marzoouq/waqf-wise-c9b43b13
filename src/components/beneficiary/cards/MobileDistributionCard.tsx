@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Calendar, DollarSign } from "lucide-react";
 import { formatDate } from "@/lib/date";
+import { formatCurrency } from "@/lib/utils";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface MobileDistributionCardProps {
@@ -16,6 +17,8 @@ interface MobileDistributionCardProps {
 }
 
 export function MobileDistributionCard({ distribution, masked = false }: MobileDistributionCardProps) {
+  const formattedAmount = formatCurrency(distribution.amount);
+
   const getStatusBadge = (status: string) => {
     const config: Record<string, { icon: typeof CheckCircle2; variant: "default" | "secondary" | "outline" }> = {
       "مدفوع": { icon: CheckCircle2, variant: "outline" },
@@ -61,7 +64,13 @@ export function MobileDistributionCard({ distribution, masked = false }: MobileD
               <DollarSign className="h-3 w-3" />
               المبلغ
             </div>
-            <p className="text-sm font-bold">—</p>
+            <p className="text-sm font-bold">
+              {masked ? (
+                <MaskedValue value={formattedAmount} type="amount" masked />
+              ) : (
+                formattedAmount
+              )}
+            </p>
           </div>
         </div>
       </CardContent>

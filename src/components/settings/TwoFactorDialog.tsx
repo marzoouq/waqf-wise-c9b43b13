@@ -8,7 +8,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Key, Copy, Check } from "lucide-react";
+import { Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { TwoFactorService } from "@/services/two-factor.service";
 import { useProfile } from "@/hooks/auth/useProfile";

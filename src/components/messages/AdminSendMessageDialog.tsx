@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Send, Mail, Users } from "lucide-react";
+import { Send, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { MessageService } from "@/services/message.service";
@@ -113,7 +113,7 @@ export function AdminSendMessageDialog({
       setSelectedBeneficiaries([]);
       setIsBroadcast(false);
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ في الإرسال",
         description: "حدث خطأ أثناء إرسال الرسائل",

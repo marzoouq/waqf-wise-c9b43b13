@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, DollarSign, PiggyBank, TrendingDown, Inbox } from "lucide-react";
+import { DollarSign, PiggyBank, TrendingDown, Inbox } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useWaqfBudgets } from "@/hooks/distributions/useWaqfBudgets";

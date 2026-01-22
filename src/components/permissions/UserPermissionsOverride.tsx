@@ -56,13 +56,11 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPermission, setSelectedPermission] = useState<typeof AVAILABLE_PERMISSIONS[0] | null>(null);
-  const [overrideNotes, setOverrideNotes] = useState("");
   const [grantPermission, setGrantPermission] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { 
     userOverrides, 
-    isLoading, 
     addOverride, 
     removeOverride, 
     isAdding, 
@@ -83,7 +81,6 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
       });
       setIsDialogOpen(false);
       setSelectedPermission(null);
-      setOverrideNotes("");
     } catch (error) {
       const message = error instanceof Error ? error.message : "فشل إضافة استثناء الصلاحية";
       toast({

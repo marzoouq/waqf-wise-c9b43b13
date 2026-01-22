@@ -209,7 +209,6 @@ const AppSidebar = () => {
   const [showMore, setShowMore] = useState(false);
   const { 
     hasRole,
-    roles,
     isLoading: roleLoading 
   } = useUserRole();
 
@@ -223,7 +222,7 @@ const AppSidebar = () => {
       item.roles.includes('all') || 
       item.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
     );
-  }, [roles, roleLoading, hasRole]);
+  }, [roleLoading, hasRole]);
 
   // تصفية القوائم الموسعة حسب صلاحيات المستخدم
   const filteredMoreGroups = useMemo(() => {
@@ -233,7 +232,7 @@ const AppSidebar = () => {
       group.roles.includes('all') || 
       group.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
     );
-  }, [roles, roleLoading, hasRole]);
+  }, [roleLoading, hasRole]);
 
   return (
     <Sidebar collapsible="icon" side="right" aria-label="القائمة الرئيسية">

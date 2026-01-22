@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, TrendingUp, Wrench, DollarSign, AlertTriangle } from "lucide-react";
+import { Brain, DollarSign, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface PropertyData {

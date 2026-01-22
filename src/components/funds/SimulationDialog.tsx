@@ -120,6 +120,9 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
       description="محاكاة توزيع متقدمة باستخدام 5 أنماط مختلفة"
       size="xl"
     >
+      <div className="text-sm text-muted-foreground mb-2">
+        عدد المستفيدين النشطين: {activeBeneficiariesCount}
+      </div>
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'single' | 'comparison')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="single">محاكاة واحدة</TabsTrigger>

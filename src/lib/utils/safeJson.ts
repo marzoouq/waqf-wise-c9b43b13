@@ -29,7 +29,7 @@ export function safeJsonParse<T>(
     if (key) {
       try {
         localStorage.removeItem(key);
-        console.info(`[safeJsonParse] Removed corrupted data for key: ${key}`);
+        console.warn(`[safeJsonParse] Removed corrupted data for key: ${key}`);
       } catch {
         // تجاهل خطأ الحذف
       }
@@ -47,7 +47,7 @@ export function safeJsonParse<T>(
     if (key) {
       try {
         localStorage.removeItem(key);
-        console.info(`[safeJsonParse] Removed corrupted data for key: ${key}`);
+        console.warn(`[safeJsonParse] Removed corrupted data for key: ${key}`);
       } catch {
         // تجاهل خطأ الحذف
       }

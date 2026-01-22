@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Receipt, Eye, Download, Printer, FileText } from 'lucide-react';
+import { Receipt, Eye, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { generateReceiptPDF } from '@/lib/generateReceiptPDF';

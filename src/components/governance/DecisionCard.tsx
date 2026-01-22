@@ -8,8 +8,7 @@ import {
   ThumbsUp, 
   ThumbsDown, 
   Minus,
-  ChevronLeft,
-  Clock
+  ChevronLeft
 } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useNavigate } from "react-router-dom";

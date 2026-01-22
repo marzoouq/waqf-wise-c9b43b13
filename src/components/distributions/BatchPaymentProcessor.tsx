@@ -24,7 +24,6 @@ interface BatchStatus {
 }
 
 export function BatchPaymentProcessor({
-  distributionId,
   totalBeneficiaries,
   batchSize = 50,
   onComplete,

@@ -124,14 +124,15 @@ serve(async (req) => {
     // جمع البيانات المطلوبة
     let data;
     switch (reportType) {
-      case 'beneficiaries':
+      case 'beneficiaries': {
         const { data: benData } = await supabase
           .from('beneficiary_statistics')
           .select('*')
           .limit(100);
         data = benData;
         break;
-      case 'financial':
+      }
+      case 'financial': {
         const { data: finData } = await supabase
           .from('journal_entries')
           .select('*, journal_entry_lines(*)')
@@ -139,20 +140,23 @@ serve(async (req) => {
           .limit(50);
         data = finData;
         break;
-      case 'properties':
+      }
+      case 'properties': {
         const { data: propData } = await supabase
           .from('contracts')
           .select('*, properties(*), rental_payments(*)')
           .limit(50);
         data = propData;
         break;
-      case 'loans':
+      }
+      case 'loans': {
         const { data: loanData } = await supabase
           .from('loans')
           .select('*, loan_installments(*), beneficiaries(full_name)')
           .limit(50);
         data = loanData;
         break;
+      }
       default:
         data = [];
     }

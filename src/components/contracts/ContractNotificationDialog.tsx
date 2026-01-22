@@ -33,10 +33,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { 
   Loader2, 
   Bell, 
@@ -44,7 +42,6 @@ import {
   MessageSquare,
   Phone,
   Send,
-  FileText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -137,8 +134,6 @@ export function ContractNotificationDialog({
       delivery_whatsapp: false,
     },
   });
-
-  const selectedType = form.watch('notification_type');
 
   // تطبيق القالب عند تغيير النوع
   const applyTemplate = (type: string) => {

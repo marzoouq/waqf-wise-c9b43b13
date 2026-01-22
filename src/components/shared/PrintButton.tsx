@@ -12,7 +12,7 @@ interface PrintButtonProps {
 }
 
 export const PrintButton = ({
-  data,
+  data: _data,
   title,
   onPrint,
   variant = "outline",

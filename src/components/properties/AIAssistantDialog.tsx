@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { productionLogger } from "@/lib/logger/production-logger";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,7 +40,7 @@ interface AIAssistantDialogProps {
 }
 
 export function AIAssistantDialog({ open, onOpenChange, propertyData, actionType }: AIAssistantDialogProps) {
-  const { isAnalyzing, analysis, analyze, reset } = usePropertyAI();
+  const { isAnalyzing, analysis, analyze } = usePropertyAI();
 
   const actionTitles = {
     analyze_property: "تحليل العقار بالذكاء الاصطناعي",

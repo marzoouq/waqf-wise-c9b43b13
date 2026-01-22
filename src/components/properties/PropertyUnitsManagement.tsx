@@ -105,7 +105,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
         title: "تم الحذف",
         description: `تم حذف الوحدة ${unitToDelete.unit_number} بنجاح`,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء حذف الوحدة",

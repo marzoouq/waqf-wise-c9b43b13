@@ -50,6 +50,16 @@ export function MessageCenter() {
   
   const { data: availableUsers = [] } = useAvailableUsers();
 
+    if (isLoading) {
+      return (
+        <Card>
+          <CardContent className="p-6 text-center text-muted-foreground">
+            جاري تحميل الرسائل...
+          </CardContent>
+        </Card>
+      );
+    }
+
   // تقسيم الرسائل إلى واردة وصادرة
   const inboxMessages = messages.filter(m => m.receiver_id === user?.id);
   const sentMessages = messages.filter(m => m.sender_id === user?.id);

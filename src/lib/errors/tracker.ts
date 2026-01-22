@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { logger } from '@/lib/logger';
 import { safeJsonParse } from '@/lib/utils/safeJson';
 import { ErrorReport } from './types';
 import { 
@@ -60,14 +61,14 @@ class ErrorTracker {
     this.testingMode = enabled;
     if (!enabled && this.testingModeBuffer.length > 0) {
       // إرسال الأخطاء المجمعة عند إنهاء وضع الاختبار
-      console.log(`[ErrorTracker] Flushing ${this.testingModeBuffer.length} buffered errors`);
+      logger.info(`[ErrorTracker] Flushing ${this.testingModeBuffer.length} buffered errors`);
       this.testingModeBuffer.forEach(report => {
         this.errorQueue.push(report);
       });
       this.testingModeBuffer = [];
       this.processQueue();
     }
-    console.log(`[ErrorTracker] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
+    logger.info(`[ErrorTracker] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
   }
 
   isInTestingMode(): boolean {
@@ -105,18 +106,14 @@ class ErrorTracker {
           }
         });
 
-        if (import.meta.env.DEV) {
-          console.log('Loaded Error Tracker settings from DB', {
-            dedupWindow: `${this.config.deduplicationWindow / 60000}min`,
-            maxSameError: this.config.maxSameErrorCount,
-            maxConsecutive: this.config.maxConsecutiveErrors,
-          });
-        }
+        logger.debug('Loaded Error Tracker settings from DB', {
+          dedupWindow: `${this.config.deduplicationWindow / 60000}min`,
+          maxSameError: this.config.maxSameErrorCount,
+          maxConsecutive: this.config.maxConsecutiveErrors,
+        });
       }
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.warn('Failed to load settings from DB, using defaults', error);
-      }
+      productionLogger.warn('Failed to load settings from DB, using defaults', error);
     }
   }
 
@@ -149,9 +146,7 @@ class ErrorTracker {
         } else {
           localStorage.removeItem(this.config.localStorageKey);
         }
-        if (import.meta.env.DEV) {
-          console.log(`Cleaned ${errors.length - cleanedErrors.length} old auth errors`);
-        }
+        logger.info(`Cleaned ${errors.length - cleanedErrors.length} old auth errors`);
       }
     } catch (error) {
       productionLogger.error('Failed to cleanup old errors', error);
@@ -176,9 +171,7 @@ class ErrorTracker {
       
       if (filteredErrors.length > 0) {
         this.errorQueue.push(...filteredErrors);
-        if (import.meta.env.DEV) {
-          console.log(`Loaded ${filteredErrors.length} pending errors`);
-        }
+        logger.info(`Loaded ${filteredErrors.length} pending errors`);
       } else {
         localStorage.removeItem(this.config.localStorageKey);
       }

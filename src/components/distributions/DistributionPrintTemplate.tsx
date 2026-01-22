@@ -1,4 +1,3 @@
-import { format, arLocale as ar } from "@/lib/date";
 import { PrintHeader } from "@/components/shared/PrintHeader";
 import { PrintFooter } from "@/components/shared/PrintFooter";
 import type { Distribution } from "@/types/distributions";

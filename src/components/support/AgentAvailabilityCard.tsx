@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -40,8 +39,6 @@ export function AgentAvailabilityCard() {
   const loadPercentage = availability.max_capacity > 0
     ? (availability.current_load / availability.max_capacity) * 100
     : 0;
-
-  const loadColor = loadPercentage >= 80 ? 'destructive' : loadPercentage >= 60 ? 'warning' : 'default';
 
   return (
     <Card>

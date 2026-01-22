@@ -195,7 +195,7 @@ export function SwipeActions({
     }
     
     onSwipeEnd?.();
-  }, [swipeState, disabled, translateX, threshold, leftAction, rightAction, onSwipeEnd]);
+  }, [swipeState, disabled, translateX, threshold, leftAction, rightAction, onSwipeEnd, resetSwipe]);
   
   const resetSwipe = useCallback(() => {
     setIsAnimating(true);
@@ -209,7 +209,7 @@ export function SwipeActions({
   }, []);
   
   // إغلاق عند النقر على الإجراء
-  const handleActionClick = useCallback((action: SwipeAction, side: 'left' | 'right') => {
+  const handleActionClick = useCallback((action: SwipeAction) => {
     hapticFeedback('success');
     action.onAction();
     resetSwipe();
@@ -237,7 +237,7 @@ export function SwipeActions({
             activeAction === 'left' ? 'opacity-100' : 'opacity-90'
           )}
           style={{ width: ACTION_WIDTH }}
-          onClick={() => handleActionClick(leftAction, 'left')}
+          onClick={() => handleActionClick(leftAction)}
         >
           <div className="flex flex-col items-center gap-1">
             <span className="text-lg">{leftAction.icon}</span>
@@ -256,7 +256,7 @@ export function SwipeActions({
             activeAction === 'right' ? 'opacity-100' : 'opacity-90'
           )}
           style={{ width: ACTION_WIDTH }}
-          onClick={() => handleActionClick(rightAction, 'right')}
+          onClick={() => handleActionClick(rightAction)}
         >
           <div className="flex flex-col items-center gap-1">
             <span className="text-lg">{rightAction.icon}</span>

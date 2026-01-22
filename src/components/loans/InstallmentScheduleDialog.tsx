@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLoanInstallments } from "@/hooks/payments/useLoanInstallments";
 import { formatDate } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { Calendar, DollarSign, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { DollarSign, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 
 interface InstallmentScheduleDialogProps {
   open: boolean;

@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import { connectionMonitor } from '@/services/monitoring/connection-monitor.service';
 
 let isInitialized = false;
@@ -14,7 +15,7 @@ let testingMode = false;
  */
 export function setInterceptorTestingMode(enabled: boolean): void {
   testingMode = enabled;
-  console.log(`[RequestInterceptor] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
+  logger.info(`[RequestInterceptor] Testing mode: ${enabled ? 'enabled' : 'disabled'}`);
 }
 
 export function isInterceptorInTestingMode(): boolean {
@@ -111,7 +112,7 @@ export function initializeSupabaseInterceptor(): void {
     }
   };
 
-  console.log('[ConnectionMonitor] Supabase interceptor initialized');
+  logger.info('[ConnectionMonitor] Supabase interceptor initialized');
 }
 
 // تصدير دالة لتسجيل أخطاء Edge Functions

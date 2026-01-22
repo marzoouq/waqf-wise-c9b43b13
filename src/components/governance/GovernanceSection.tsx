@@ -4,9 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Vote, 
   Clock, 
-  CheckCircle2, 
-  XCircle,
-  TrendingUp,
   Users,
   ChevronLeft
 } from "lucide-react";
@@ -19,7 +16,7 @@ type GovernanceDecision = Database['public']['Tables']['governance_decisions']['
 
 export function GovernanceSection() {
   const navigate = useNavigate();
-  const { decisions, isLoading } = useGovernanceDecisions();
+  const { decisions = [] } = useGovernanceDecisions();
 
   // حساب إحصائيات سريعة
   const activeDecisions = decisions.filter(d => 

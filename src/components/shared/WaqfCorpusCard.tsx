@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, RefreshCw, Wifi, ChevronLeft, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useWaqfCorpus, type FiscalYearCorpus } from "@/hooks/dashboard/useFinancialCards";
+import { useWaqfCorpus } from "@/hooks/dashboard/useFinancialCards";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 interface WaqfCorpusCardProps {

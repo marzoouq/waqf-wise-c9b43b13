@@ -4,9 +4,8 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS, matchesStatus, TENANT_ACTIVE_STATUSES } from "@/lib/constants";
+import { PROPERTY_STATUS, matchesStatus } from "@/lib/constants";
 import { productionLogger } from '@/lib/logger/production-logger';
-import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -150,7 +149,6 @@ export const KPIService = {
       requestsResult,
       loansResult,
       paymentsResult,
-      journalEntriesResult,
       journalEntriesStatusResult,
       // إضافة: سندات الصرف والقبض + أقلام الوقف
       vouchersResult,
@@ -164,7 +162,6 @@ export const KPIService = {
       supabase.from('beneficiary_requests').select('id, status, is_overdue'),
       supabase.from('loans').select('id, status'),
       supabase.from('rental_payments').select('id, amount_paid, status'),
-      supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount'),
       supabase.from('journal_entries').select('id, status, entry_date'),
       // سندات الصرف والقبض المدفوعة
       supabase.from('payment_vouchers').select('id, amount, voucher_type, status').eq('status', 'paid'),
@@ -235,7 +232,6 @@ export const KPIService = {
     // أرصدة أقلام الوقف الفعلية
     const waqfUnits = waqfUnitsResult.data || [];
     const totalWaqfBalance = waqfUnits.reduce((sum, w) => sum + (w.current_balance || 0), 0);
-    const totalWaqfIncome = waqfUnits.reduce((sum, w) => sum + (w.total_income || 0), 0);
     const totalWaqfExpenses = waqfUnits.reduce((sum, w) => sum + (w.total_expenses || 0), 0);
 
     // حساب المصروفات الفعلية من حسابات المصروفات + سندات الصرف

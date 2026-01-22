@@ -12,8 +12,6 @@ import {
   FileText, 
   LayoutGrid, 
   List,
-  Download,
-  ExternalLink
 } from "lucide-react";
 import { useSmartDisclosureDocuments } from "@/hooks/reports/useSmartDisclosureDocuments";
 import { DocumentContentViewer, ExtractedContent } from "./DocumentContentViewer";
@@ -25,7 +23,7 @@ interface SmartDisclosureDocumentsProps {
 }
 
 export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocumentsProps) {
-  const { documents, categorySummary, isLoading, error, refetch, getTypeLabel } = useSmartDisclosureDocuments(disclosureId);
+  const { documents, categorySummary, isLoading, error, refetch } = useSmartDisclosureDocuments(disclosureId);
   const [viewMode, setViewMode] = useState<'summary' | 'details'>('summary');
 
   if (isLoading) {

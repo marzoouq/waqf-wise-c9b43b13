@@ -26,7 +26,7 @@ import {
   CheckCircle2,
   Percent
 } from "lucide-react";
-import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
 import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
 import { toast } from "sonner";
@@ -136,7 +136,7 @@ export function DisclosureDetailsTab() {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
       toast.success("تم تحميل ملف PDF بنجاح");
-    } catch (error) {
+    } catch {
       toast.error("فشل تحميل ملف PDF");
     } finally {
       setIsExporting(false);
@@ -203,13 +203,11 @@ export function DisclosureDetailsTab() {
   // Calculate key figures
   const totalRevenues = disclosure.total_revenues || 0;
   const totalExpenses = disclosure.total_expenses || 0;
-  const vatAmount = disclosure.vat_amount || 0;
   const nazerShare = disclosure.nazer_share || 0;
   const charityShare = disclosure.charity_share || 0;
   const corpusShare = disclosure.corpus_share || 0;
   const distributedAmount = distributions?.total || 0;
   const netAfterExpenses = totalRevenues - totalExpenses;
-  const totalDeductions = vatAmount + nazerShare + charityShare;
 
   return (
     <div className="space-y-6 print:space-y-4">

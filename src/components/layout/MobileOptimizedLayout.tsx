@@ -30,8 +30,6 @@ export const MobileOptimizedLayout = memo(function MobileOptimizedLayout({
   useSafeArea = true,
   maxWidth = '2xl',
 }: MobileOptimizedLayoutProps) {
-  const deviceType = useDeviceType();
-  
   return (
     <div className={cn(
       "min-h-screen bg-background w-full max-w-full overflow-x-hidden",

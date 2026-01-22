@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-interface UseAccountingFiltersProps<T> {
+interface UseAccountingFiltersProps<T extends Record<string, unknown>> {
   data: T[];
   searchFields: (keyof T)[];
   dateField?: keyof T;
@@ -8,7 +8,7 @@ interface UseAccountingFiltersProps<T> {
   statusOptions?: { value: string; label: string }[];
 }
 
-export function useAccountingFilters<T extends Record<string, any>>({
+export function useAccountingFilters<T extends Record<string, unknown>>({
   data,
   searchFields,
   dateField,
@@ -73,5 +73,6 @@ export function useAccountingFilters<T extends Record<string, any>>({
       dateTo,
       setDateTo,
     },
+    statusOptions,
   };
 }

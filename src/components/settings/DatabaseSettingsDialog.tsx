@@ -4,7 +4,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
-import { Database, Download, Upload, AlertCircle, Clock, CheckCircle2, XCircle, ShieldAlert } from "lucide-react";
+import { Download, Upload, AlertCircle, Clock, CheckCircle2, XCircle, ShieldAlert } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBackup } from "@/hooks/system/useBackup";
 import { LoadingState } from "@/components/shared/LoadingState";

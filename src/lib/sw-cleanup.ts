@@ -31,13 +31,15 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
     for (const registration of registrations) {
       await registration.unregister();
       if (import.meta.env.DEV) {
-        console.log('🗑️ تم إلغاء تسجيل Service Worker:', registration.scope);
+        const { logger } = await import('@/lib/logger');
+        logger.info('🗑️ تم إلغاء تسجيل Service Worker', { scope: registration.scope });
       }
     }
     
     return true;
   } catch (error) {
-    console.error('❌ خطأ في إلغاء تسجيل Service Workers:', error);
+    const { productionLogger } = await import('@/lib/logger/production-logger');
+    productionLogger.error('❌ خطأ في إلغاء تسجيل Service Workers:', error);
     return false;
   }
 }
@@ -60,7 +62,8 @@ export async function clearAllWorkboxCaches(): Promise<number> {
       if (shouldDelete) {
         await caches.delete(cacheName);
         if (import.meta.env.DEV) {
-          console.log('🗑️ تم حذف cache:', cacheName);
+          const { logger } = await import('@/lib/logger');
+          logger.info('🗑️ تم حذف cache', { cacheName });
         }
         deletedCount++;
       }
@@ -68,7 +71,8 @@ export async function clearAllWorkboxCaches(): Promise<number> {
     
     return deletedCount;
   } catch (error) {
-    console.error('❌ خطأ في حذف caches:', error);
+    const { productionLogger } = await import('@/lib/logger/production-logger');
+    productionLogger.error('❌ خطأ في حذف caches:', error);
     return 0;
   }
 }
@@ -101,14 +105,16 @@ export async function cleanupOldServiceWorkers(): Promise<void> {
     
     if (!response.ok) {
       if (import.meta.env.DEV) {
-        console.log('⚠️ ملف sw.js غير متاح (HTTP', response.status, ')');
+        const { logger } = await import('@/lib/logger');
+        logger.warn('⚠️ ملف sw.js غير متاح', { status: response.status });
       }
       await fullServiceWorkerCleanup();
     }
   } catch {
     // خطأ في الشبكة أو الملف غير موجود - تنظيف كامل
     if (import.meta.env.DEV) {
-      console.log('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف الشامل...');
+      const { logger } = await import('@/lib/logger');
+      logger.warn('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف الشامل...');
     }
     await fullServiceWorkerCleanup();
   }
@@ -128,7 +134,8 @@ export async function handleSWRegistrationError(error: Error): Promise<boolean> 
   
   if (isNotFoundError) {
     if (import.meta.env.DEV) {
-      console.log('🔧 خطأ في SW، جارِ التنظيف الشامل...');
+      const { logger } = await import('@/lib/logger');
+      logger.info('🔧 خطأ في SW، جارِ التنظيف الشامل...');
     }
     const result = await fullServiceWorkerCleanup();
     return result.swUnregistered || result.cachesDeleted > 0;

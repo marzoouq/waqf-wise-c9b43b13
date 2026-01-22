@@ -31,15 +31,12 @@ export function ApprovalFlowDialog({
   distributionAmount,
 }: ApprovalFlowDialogProps) {
   const { user } = useAuth();
-  const { approvals, isLoading, addApproval, updateApproval, getCurrentLevel } = 
+  const { approvals, addApproval, getCurrentLevel } = 
     useDistributionApprovals(distributionId);
   const [notes, setNotes] = useState("");
 
   const handleApprove = async () => {
     const currentLevel = getCurrentLevel();
-    
-    // التحقق من أن المستخدم له صلاحية الموافقة على هذا المستوى
-    const levelInfo = APPROVAL_LEVELS.find(l => l.level === currentLevel);
     
     await addApproval({
       distribution_id: distributionId,

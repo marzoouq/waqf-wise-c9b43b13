@@ -11,7 +11,7 @@ import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyle
 
 export function AccountingLinkReport() {
   const [activeTab, setActiveTab] = useState("linked");
-  const { linkedOperations, unlinkedOperations, isLoadingLinked, isLoadingUnlinked } = useAccountingLinkReport();
+  const { linkedOperations, unlinkedOperations } = useAccountingLinkReport();
 
   const exportToPDF = async () => {
     const [jsPDFModule, autoTableModule] = await Promise.all([

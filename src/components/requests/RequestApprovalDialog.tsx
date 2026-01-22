@@ -9,6 +9,7 @@ import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
 import { useRequestApprovals } from "@/hooks/requests/useRequestApprovals";
 import { useAuth } from "@/contexts/AuthContext";
 import { format, arLocale as ar } from "@/lib/date";
+import { APPROVAL_LEVELS } from '@/lib/request-constants';
 
 interface RequestApprovalDialogProps {
   open: boolean;
@@ -18,8 +19,6 @@ interface RequestApprovalDialogProps {
   requestDescription: string;
 }
 
-import { APPROVAL_LEVELS } from '@/lib/request-constants';
-
 export function RequestApprovalDialog({
   open,
   onOpenChange,
@@ -28,7 +27,7 @@ export function RequestApprovalDialog({
   requestDescription,
 }: RequestApprovalDialogProps) {
   const { user } = useAuth();
-  const { approvals, isLoading, addApproval, getCurrentLevel } = 
+  const { approvals, addApproval, getCurrentLevel } = 
     useRequestApprovals(requestId);
   const [notes, setNotes] = useState("");
 

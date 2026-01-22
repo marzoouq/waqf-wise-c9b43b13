@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNewAuditLogsCount, useCriticalAuditLogsCount } from "@/hooks/system/useNewAuditLogsCount";
-import { ReactNode } from "react";
 
 export interface QuickAction {
   label: string;

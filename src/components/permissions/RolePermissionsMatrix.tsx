@@ -23,7 +23,6 @@ interface RolePermissionsMatrixProps {
 
 export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatrixProps) {
   const {
-    rolePermissions,
     isLoading,
     error,
     refetch,

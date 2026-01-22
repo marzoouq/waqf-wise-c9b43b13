@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
@@ -32,12 +31,12 @@ export function MultiChannelNotifications() {
     unsubscribe: unsubscribePush
   } = usePushNotifications();
 
-  const getPushStatus = (): 'active' | 'pending' | 'disabled' | 'denied' => {
+  const getPushStatus = useCallback((): 'active' | 'pending' | 'disabled' | 'denied' => {
     if (!isPushSupported) return 'disabled';
     if (pushPermission === 'denied') return 'denied';
     if (isPushSubscribed) return 'active';
     return 'pending';
-  };
+  }, [isPushSupported, pushPermission, isPushSubscribed]);
 
   const [channels, setChannels] = useState<NotificationChannel[]>([
     {
@@ -96,7 +95,7 @@ export function MultiChannelNotifications() {
           : c
       )
     );
-  }, [isPushSupported, pushPermission, isPushSubscribed]);
+  }, [getPushStatus, isPushSupported, isPushSubscribed, pushPermission]);
 
   const toggleChannel = async (channelId: string) => {
     const channel = channels.find(c => c.id === channelId);

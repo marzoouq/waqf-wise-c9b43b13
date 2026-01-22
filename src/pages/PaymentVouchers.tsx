@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherDialog";
-import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign, Link2, Link2Off, Loader2, Edit, Trash2 } from "lucide-react";
+import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign, Link2, Link2Off, Loader2 } from "lucide-react";
 import { formatRelative, format, arLocale as ar } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
@@ -14,7 +14,6 @@ import { usePaymentVouchersData } from "@/hooks/payments/usePaymentVouchersData"
 import { useToast } from "@/hooks/ui/use-toast";
 import { VoucherLinkingService } from "@/services/voucher-linking.service";
 import { ExportButton } from "@/components/shared/ExportButton";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 export default function PaymentVouchers() {
   const [searchTerm, setSearchTerm] = useState("");

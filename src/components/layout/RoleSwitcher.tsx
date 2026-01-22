@@ -36,11 +36,6 @@ export const RoleSwitcher = memo(function RoleSwitcher() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // إذا كان لدى المستخدم دور واحد فقط، لا نعرض المبدل
-  if (roles.length <= 1) {
-    return null;
-  }
-
   const currentRole = useMemo(() => {
     const path = location.pathname;
     for (const [role, route] of Object.entries(roleRoutes)) {
@@ -57,6 +52,11 @@ export const RoleSwitcher = memo(function RoleSwitcher() {
       navigate(route);
     }
   }, [location.pathname, navigate]);
+
+  // إذا كان لدى المستخدم دور واحد فقط، لا نعرض المبدل
+  if (roles.length <= 1) {
+    return null;
+  }
 
   const CurrentIcon = roleIcons[currentRole] || User;
 

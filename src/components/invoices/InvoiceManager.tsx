@@ -24,7 +24,7 @@ export function InvoiceManager() {
     return <Badge variant={info.variant}>{info.label}</Badge>;
   };
 
-  const getZatcaStatusBadge = (status: string | null, isCompliant: boolean) => {
+  const getZatcaStatusBadge = (status: string | null) => {
     if (!status) return <Badge variant="secondary">غير مرسل</Badge>;
     
     if (status === 'accepted') {
@@ -104,7 +104,7 @@ export function InvoiceManager() {
                     <TableCell>{formatCurrency(invoice.total_amount)}</TableCell>
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                     <TableCell>
-                      {getZatcaStatusBadge(invoice.zatca_status, invoice.is_zatca_compliant || false)}
+                      {getZatcaStatusBadge(invoice.zatca_status)}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">

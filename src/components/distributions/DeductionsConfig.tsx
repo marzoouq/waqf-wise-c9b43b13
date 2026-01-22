@@ -18,11 +18,11 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
   const remaining = 100 - total;
 
   const deductions = [
-    { key: 'nazer', label: 'نصيب الناظر', color: 'bg-info' },
-    { key: 'reserve', label: 'الاحتياطي', color: 'bg-success' },
-    { key: 'development', label: 'التطوير', color: 'bg-primary' },
-    { key: 'maintenance', label: 'الصيانة', color: 'bg-warning' },
-    { key: 'investment', label: 'الاستثمار', color: 'bg-accent' },
+    { key: 'nazer', label: 'نصيب الناظر' },
+    { key: 'reserve', label: 'الاحتياطي' },
+    { key: 'development', label: 'التطوير' },
+    { key: 'maintenance', label: 'الصيانة' },
+    { key: 'investment', label: 'الاستثمار' },
   ];
 
   return (
@@ -40,7 +40,7 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
       </Card>
 
       <div className="space-y-4">
-        {deductions.map(({ key, label, color }) => (
+        {deductions.map(({ key, label }) => (
           <div key={key} className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor={key}>{label}</Label>

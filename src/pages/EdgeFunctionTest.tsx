@@ -10,10 +10,10 @@ import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
 import { 
-  Play, RefreshCw, CheckCircle, XCircle, Clock, 
-  Terminal, Copy, AlertTriangle, Zap, Database, Shield,
-  Brain, Bell, FileText, Settings, Users, Building,
-  CreditCard, Lock, Server, Activity, ChevronDown,
+  Play, CheckCircle, XCircle, Clock, 
+  Terminal, Copy, Zap, Database, Shield,
+  Brain, Bell, FileText, Settings, Users,
+  CreditCard, Server, Activity,
   PlayCircle, StopCircle, BarChart3, Loader2, LucideIcon
 } from 'lucide-react';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
@@ -166,7 +166,7 @@ interface TestResult {
   success: boolean;
   statusCode?: number;
   responseTime: number;
-  response?: any;
+  response?: unknown;
   error?: string;
   timestamp: Date;
 }
@@ -196,7 +196,7 @@ export default function EdgeFunctionTest() {
     setTestLogs(prev => [...prev, `[${timestamp}] ${message}`]);
   }, []);
 
-  const testSingleFunction = async (funcName: string, body: any): Promise<TestResult> => {
+  const testSingleFunction = async (funcName: string, body: Record<string, unknown>): Promise<TestResult> => {
     const startTime = performance.now();
     
     try {
@@ -220,12 +220,13 @@ export default function EdgeFunctionTest() {
         response: data,
         timestamp: new Date()
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       return {
         functionName: funcName,
         success: false,
         responseTime: Math.round(performance.now() - startTime),
-        error: err.message,
+        error: errorMessage,
         timestamp: new Date()
       };
     }
@@ -242,7 +243,7 @@ export default function EdgeFunctionTest() {
     setTestLogs([]);
     addLog(`بدء اختبار: ${selectedFunction}`);
 
-    let body = {};
+    let body: Record<string, unknown> = {};
     try {
       body = JSON.parse(requestBody);
       addLog('تم تحليل Request Body بنجاح');

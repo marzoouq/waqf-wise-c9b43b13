@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Stamp, FileSignature, Upload, Loader2, Save, User, Image, Eye, EyeOff } from "lucide-react";
+import { Stamp, FileSignature, Upload, Loader2, Save, User, Image } from "lucide-react";
 import { useWaqfBranding } from "@/hooks/nazer/useWaqfBranding";
 
 export const WaqfBrandingSettings = () => {

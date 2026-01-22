@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/ui/use-toast";
 import { type Property } from "@/hooks/property/useProperties";
 import { UnifiedFormField, FormGrid } from "@/components/unified/UnifiedFormField";
 
@@ -47,8 +46,6 @@ export function PropertyDialog({
   property,
   onSave,
 }: PropertyDialogProps) {
-  const { toast } = useToast();
-
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
@@ -88,7 +85,7 @@ export function PropertyDialog({
         apartment_count: 0,
       });
     }
-  }, [property, form.reset]);
+  }, [property, form]);
 
   const handleSubmit = (data: PropertyFormValues) => {
     onSave(data);

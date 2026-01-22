@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
+import { Form, FormLabel, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useContracts, Contract } from "@/hooks/property/useContracts";
 import { useProperties } from "@/hooks/property/useProperties";
@@ -100,16 +100,6 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     return totalAmount / durationInMonths;
   }, [startDate, durationValue, durationUnit, totalAmount]);
 
-  // حساب تاريخ النهاية
-  const endDate = useMemo(() => {
-    if (!startDate || !durationValue) return null;
-    const durationInMonths = durationUnit === 'سنوات' ? durationValue * 12 : durationValue;
-    const start = new Date(startDate);
-    const end = new Date(start);
-    end.setMonth(start.getMonth() + durationInMonths);
-    return end.toISOString().split('T')[0];
-  }, [startDate, durationValue, durationUnit]);
-
   // إرسال النموذج
   const onSubmit = async (data: ContractFormValues) => {
     // التحقق من اختيار الوحدات عند الإضافة الجديدة
@@ -181,26 +171,27 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       }
       onOpenChange(false);
       form.reset(getDefaultValues());
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving contract:', error);
+      const supabaseError = error as { code?: string; message?: string };
       
       // رسائل خطأ واضحة للمستخدم
-      if (error?.code === '23503' || error?.message?.includes('23503')) {
+      if (supabaseError?.code === '23503' || supabaseError?.message?.includes('23503')) {
         toast({
           title: "خطأ في البيانات",
           description: "يرجى التأكد من صحة بيانات المستأجر والوحدات المختارة",
           variant: "destructive",
         });
-      } else if (error?.code === 'occupied_units_check' || error?.message?.includes('occupied_units_check')) {
+      } else if (supabaseError?.code === 'occupied_units_check' || supabaseError?.message?.includes('occupied_units_check')) {
         toast({
           title: "خطأ في العقار",
           description: "يوجد تعارض في عدد الوحدات المشغولة",
           variant: "destructive",
         });
-      } else if (error?.message) {
+      } else if (supabaseError?.message) {
         toast({
           title: "خطأ",
-          description: error.message,
+          description: supabaseError.message,
           variant: "destructive",
         });
       }

@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Clock, AlertCircle, RefreshCw, Download } from 'lucide-react';
-import { useTransferStatusTracker, type TransferStatus } from '@/hooks/distributions/useTransferStatusTracker';
+import { useTransferStatusTracker } from '@/hooks/distributions/useTransferStatusTracker';
 
 interface TransferStatusTrackerProps {
   transferFileId: string;

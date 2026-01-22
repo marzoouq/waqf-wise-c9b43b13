@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
@@ -62,9 +62,12 @@ export function PaymentDialog({
   onSave,
 }: PaymentDialogProps) {
   const { contracts, isLoading: contractsLoading } = useContracts();
-  
+
   // تصفية العقود النشطة فقط
-  const activeContracts = contracts?.filter(c => matchesStatus(c.status, 'active')) || [];
+  const activeContracts = useMemo(
+    () => contracts?.filter((c) => matchesStatus(c.status, 'active')) || [],
+    [contracts]
+  );
 
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),

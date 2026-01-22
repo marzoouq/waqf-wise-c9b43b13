@@ -3,10 +3,8 @@
  */
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Keyboard, Command } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import { Keyboard, Command } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +13,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { framerVariants } from '@/lib/motion-system';
 
 interface ShortcutItem {
   key: string;

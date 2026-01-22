@@ -70,7 +70,6 @@ export function InputOTPSlot({
   const { value, onChange, maxLength, disabled } = React.useContext(InputOTPContext);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const char = value[index] || "";
-  const isFocused = React.useRef(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newChar = e.target.value.slice(-1);

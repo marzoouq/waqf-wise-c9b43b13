@@ -16,7 +16,6 @@ import {
   Monitor, 
   Smartphone, 
   Tablet, 
-  Chrome,
   Globe,
   MapPin,
   Clock,
@@ -56,28 +55,6 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
   
   const [sessionToEnd, setSessionToEnd] = useState<string | null>(null);
   const [showEndAllDialog, setShowEndAllDialog] = useState(false);
-
-  const getDeviceIcon = (userAgent?: string) => {
-    if (!userAgent) return Globe;
-    const ua = userAgent.toLowerCase();
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
-      return Smartphone;
-    }
-    if (ua.includes('tablet') || ua.includes('ipad')) {
-      return Tablet;
-    }
-    return Monitor;
-  };
-
-  const getBrowserName = (userAgent?: string) => {
-    if (!userAgent) return "متصفح غير معروف";
-    const ua = userAgent.toLowerCase();
-    if (ua.includes('chrome')) return 'Chrome';
-    if (ua.includes('firefox')) return 'Firefox';
-    if (ua.includes('safari')) return 'Safari';
-    if (ua.includes('edge')) return 'Edge';
-    return 'متصفح آخر';
-  };
 
   const handleEndSession = async (sessionId: string) => {
     try {

@@ -32,7 +32,7 @@ export function DashboardDialogs({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSaveBeneficiary = async (data: any) => {
+  const handleSaveBeneficiary = async (data: Record<string, unknown>) => {
     try {
       const { error } = await supabase.from("beneficiaries").insert(data);
       if (error) throw error;
@@ -53,7 +53,7 @@ export function DashboardDialogs({
     }
   };
 
-  const handleSaveProperty = async (data: any) => {
+  const handleSaveProperty = async (data: Parameters<typeof PropertyService.create>[0]) => {
     try {
       await PropertyService.create(data);
       toast({
@@ -72,7 +72,7 @@ export function DashboardDialogs({
     }
   };
 
-  const handleDistribute = async (data: any) => {
+  const handleDistribute = async (data: { totalAmount: number; beneficiaries: number; notes?: string; month: string }) => {
     try {
       await DistributionService.create({
         distribution_date: new Date().toISOString(),

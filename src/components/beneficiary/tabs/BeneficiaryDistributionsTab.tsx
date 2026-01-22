@@ -7,11 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Wallet, Calendar, Archive, CircleDot, TrendingUp, Users, Percent, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Wallet, Calendar, Archive, CircleDot, Users, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 import { useYearlyComparison } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 
@@ -33,7 +32,6 @@ const HEIR_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
-  const isMobile = useIsMobile();
   const masked = settings?.mask_exact_amounts || false;
   
   const {
@@ -62,15 +60,6 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   const getHeirConfig = (type: string) => {
     return HEIR_TYPE_CONFIG[type] || { label: type, color: "bg-muted text-muted-foreground border-border" };
   };
-
-  // تجميع التوزيعات حسب نوع الوريث
-  const distributionsByType = distributions.reduce((acc, dist) => {
-    const type = dist.heir_type || 'غير محدد';
-    if (!acc[type]) acc[type] = { count: 0, total: 0 };
-    acc[type].count++;
-    acc[type].total += dist.share_amount || 0;
-    return acc;
-  }, {} as Record<string, { count: number; total: number }>);
 
   return (
     <div className="space-y-6">

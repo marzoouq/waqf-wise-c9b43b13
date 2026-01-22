@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, memo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building, FileText, DollarSign, Wrench } from "lucide-react";
@@ -12,7 +12,6 @@ import { type Property } from "@/hooks/property/useProperties";
 import { type Contract } from "@/hooks/property/useContracts";
 import { type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
-import { memo } from "react";
 
 interface PropertiesTabsProps {
   activeTab: string;

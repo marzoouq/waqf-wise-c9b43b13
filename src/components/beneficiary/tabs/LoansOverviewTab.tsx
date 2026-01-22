@@ -61,10 +61,6 @@ export function LoansOverviewTab() {
     requestTypes.find(t => t.name_ar === 'قرض')?.id || null
   , [requestTypes]);
   
-  const emergencyTypeId = useMemo(() => 
-    requestTypes.find(t => t.name_ar === 'فزعة طارئة')?.id || null
-  , [requestTypes]);
-
   const handleEmergencySubmit = async (data: { amount: number; emergency_reason: string; description: string }) => {
     if (!beneficiaryId) {
       toast({ title: "خطأ", description: "لم يتم العثور على معرف المستفيد", variant: "destructive" });
@@ -86,7 +82,7 @@ export function LoansOverviewTab() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_EMERGENCY_AID(beneficiaryId) });
       setShowEmergencyDialog(false);
-    } catch (error) {
+    } catch {
       toast({ title: "خطأ", description: "فشل في تقديم طلب الفزعة", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
@@ -119,7 +115,7 @@ export function LoansOverviewTab() {
       toast({ title: "تم بنجاح", description: "تم تقديم طلب القرض وسيتم مراجعته" });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       setShowLoanDialog(false);
-    } catch (error) {
+    } catch {
       toast({ title: "خطأ", description: "فشل في تقديم طلب القرض", variant: "destructive" });
     } finally {
       setIsSubmitting(false);

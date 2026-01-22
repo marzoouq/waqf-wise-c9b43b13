@@ -126,7 +126,7 @@ export function UnifiedFileUpload({
           title: "تم الرفع بنجاح",
           description: `تم رفع ${fileArray.length} ملف`,
         });
-      } catch (error) {
+      } catch {
         toast({
           title: "خطأ في الرفع",
           description: "حدث خطأ أثناء رفع الملفات",

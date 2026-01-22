@@ -24,7 +24,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +31,6 @@ import {
   Loader2, 
   TrendingUp,
   TrendingDown,
-  Calculator,
   Calendar,
   ArrowRight
 } from 'lucide-react';

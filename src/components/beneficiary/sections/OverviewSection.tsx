@@ -4,7 +4,6 @@
  */
 
 import { Suspense, lazy } from "react";
-import { useNavigate } from "react-router-dom";
 import type { Beneficiary } from "@/types/beneficiary";
 import {
   AnnualDisclosureCard,
@@ -28,8 +27,6 @@ interface OverviewSectionProps {
 }
 
 export function OverviewSection({ beneficiary }: OverviewSectionProps) {
-  const navigate = useNavigate();
-
   return (
     <div className="space-y-4 sm:space-y-6 md:space-y-8">
       {/* ==================== القسم الأول: الترحيب الذكي ==================== */}

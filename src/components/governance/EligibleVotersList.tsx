@@ -2,7 +2,7 @@ import { useEligibleVoters } from "@/hooks/governance/useGovernanceData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CheckCircle2, XCircle, Clock, Users } from "lucide-react";
+import { CheckCircle2, Clock, Users } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Json } from "@/integrations/supabase/types";
 

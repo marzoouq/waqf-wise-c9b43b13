@@ -73,7 +73,7 @@ export class ReportTemplateService {
       let reportData: ReportData[] = [];
       
       switch (template.report_type) {
-        case "distributions":
+        case "distributions": {
           const { data: distributions } = await supabase
             .from("distributions")
             .select("*")
@@ -81,8 +81,9 @@ export class ReportTemplateService {
             .limit(100);
           reportData = distributions || [];
           break;
+        }
 
-        case "beneficiaries":
+        case "beneficiaries": {
           const { data: beneficiaries } = await supabase
             .from("beneficiaries")
             .select("*")
@@ -90,8 +91,9 @@ export class ReportTemplateService {
             .order("full_name");
           reportData = beneficiaries || [];
           break;
+        }
 
-        case "financial":
+        case "financial": {
           const { data: entries } = await supabase
             .from("journal_entries")
             .select("*")
@@ -99,6 +101,7 @@ export class ReportTemplateService {
             .limit(100);
           reportData = entries || [];
           break;
+        }
 
         default:
           throw new Error(`نوع تقرير غير مدعوم: ${template.report_type}`);

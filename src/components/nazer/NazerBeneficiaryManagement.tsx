@@ -14,8 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useNazerBeneficiariesQuick } from "@/hooks/nazer/useNazerBeneficiariesQuick";
 import { 
   Users, Search, Eye, Edit, UserPlus, 
-  ChevronLeft, Phone, Mail, Wallet,
-  UserCheck, UserX
+  ChevronLeft, Phone, Wallet
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { matchesStatus } from "@/lib/constants";

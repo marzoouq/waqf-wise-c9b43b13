@@ -37,7 +37,10 @@ class QueryInvalidationManager {
    */
   invalidate(queryKey: readonly unknown[]): void {
     if (!this.queryClient) {
-      console.warn('[QueryInvalidationManager] QueryClient not set. Call setQueryClient() first.');
+      // استخدام warn من اللوجر بدلاً من console
+      import('@/lib/logger').then(({ logger }) =>
+        logger.warn('[QueryInvalidationManager] QueryClient not set. Call setQueryClient() first.')
+      );
       return;
     }
 
@@ -77,7 +80,9 @@ class QueryInvalidationManager {
     const count = this.pendingInvalidations.size;
 
     if (import.meta.env.DEV && count > 0) {
-      console.log(`[QueryInvalidationManager] Flushing ${count} invalidations`);
+      import('@/lib/logger').then(({ logger }) =>
+        logger.debug(`[QueryInvalidationManager] Flushing ${count} invalidations`)
+      );
     }
 
     // تنفيذ الإبطالات
@@ -86,7 +91,9 @@ class QueryInvalidationManager {
         const queryKey = JSON.parse(keyStr);
         this.queryClient!.invalidateQueries({ queryKey });
       } catch (error) {
-        console.error('[QueryInvalidationManager] Failed to invalidate:', error);
+        import('@/lib/logger/production-logger').then(({ productionLogger }) =>
+          productionLogger.error('[QueryInvalidationManager] Failed to invalidate:', error)
+        );
       }
     });
 
@@ -134,7 +141,9 @@ class QueryInvalidationManager {
     this.queryClient.clear();
     
     if (import.meta.env.DEV) {
-      console.log('[QueryInvalidationManager] ✅ All cache cleared');
+      import('@/lib/logger').then(({ logger }) =>
+        logger.info('[QueryInvalidationManager] ✅ All cache cleared')
+      );
     }
   }
 

@@ -66,7 +66,7 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
       toast.success("تم نسخ البيانات إلى الحافظة");
       
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error("فشل في النسخ إلى الحافظة");
     }
   };

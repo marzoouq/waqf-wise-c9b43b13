@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Plus, Edit, Trash2, User, UserPlus } from 'lucide-react';
+import { Users, Trash2, User, UserPlus } from 'lucide-react';
 import { useFamilyMembers } from '@/hooks/beneficiary/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useDeleteConfirmation } from '@/hooks/shared';
@@ -53,7 +52,7 @@ interface MemberFormData {
  * يعرض أفراد العائلة بشكل هرمي
  */
 export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
-  const { members, isLoading, addMember, updateMember, removeMember, error, refetch } = useFamilyMembers(familyId);
+  const { members, isLoading, addMember, removeMember, error, refetch } = useFamilyMembers(familyId);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [formData, setFormData] = useState<MemberFormData>({
     beneficiary_id: '',
@@ -107,7 +106,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
         priority_level: 1,
         notes: '',
       });
-    } catch (error) {
+    } catch {
       // Error handled by hook
     }
   };

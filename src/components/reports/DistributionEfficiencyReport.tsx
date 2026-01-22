@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Clock, TrendingUp, TrendingDown, Download, Award, AlertTriangle } from 'lucide-react';
+import { Clock, TrendingUp, Download, Award, AlertTriangle } from 'lucide-react';
 import type { DistributionReportData, MonthlyEfficiencyData } from '@/types/reports/index';
 
 interface DistributionEfficiencyReportProps {

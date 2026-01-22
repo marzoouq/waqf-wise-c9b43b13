@@ -12,17 +12,37 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 
 **NEVER** call Supabase directly from components or pages. All data access flows through this layered architecture.
 
+### Technology Stack
+- **Frontend:** React 18.3 + TypeScript 5.5+ + Vite + Tailwind CSS + shadcn/ui
+- **Backend:** Supabase (PostgreSQL 15 + Edge Functions + Row Level Security + Realtime)
+- **State:** React Query (TanStack Query) + AuthContext
+- **Testing:** Vitest (11,000+ tests in src/__tests__/) + Playwright (E2E in e2e/)
+
 ## Directory Structure
 
 ```
 src/
 ├── components/     # UI components only - NO business logic (600+ in 44 folders)
-├── hooks/          # 300+ hooks in 38 feature folders (see src/hooks/README.md)
-├── services/       # 60+ services for ALL data operations (see src/services/README.md)
+├── hooks/          # 170+ hooks in 36 feature folders (see src/hooks/README.md)
+├── services/       # 42 services for ALL data operations (see src/services/README.md)
+│   ├── beneficiary/    # Facade pattern: core, documents, analytics, tabs
+│   ├── accounting/     # Facade pattern: core, reports, reconciliation
+│   ├── property/       # Facade pattern: core, contracts, units, maintenance
+│   └── ...             # Other services (single-file or facade)
 ├── types/          # TypeScript types - NEVER use `any`
-├── lib/            # Utilities: QUERY_KEYS, errors, query-invalidation
+├── lib/            # Utilities organized by concern:
+│   ├── query-keys/         # 9 files: accounting, beneficiary, dashboard, etc.
+│   ├── query-invalidation.ts  # Batched cache invalidation helpers
+│   ├── errors/             # Error handling utilities
+│   ├── pdf/                # PDF generators
+│   ├── banking/            # Banking integrations
+│   └── utils/              # General utilities
 ├── pages/          # Route pages - use hooks for data
-└── routes/         # Route definitions in 7 files (see src/routes/README.md)
+├── routes/         # Route definitions in 7 files (see src/routes/README.md)
+├── infrastructure/ # react-query config (QUERY_CONFIG, CACHE_TIMES)
+└── contexts/       # AuthContext (single source of truth for auth)
+supabase/
+└── functions/      # 55+ Edge Functions (secured with service_role)
 ```
 
 ## Critical Rules
@@ -47,38 +67,59 @@ const { data } = await supabase.from('users').select('*').eq('id', id).maybeSing
 
 ### 3. Query Keys & Config (ALWAYS use centralized)
 ```typescript
-import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
+import { QUERY_KEYS, QUERY_CONFIG, CACHE_TIMES } from '@/infrastructure/react-query';
 
-// 400+ keys organized by domain in 8 files
+// 400+ keys organized by domain in 9 files:
+// accounting.keys.ts, beneficiary.keys.ts, dashboard.keys.ts, payments.keys.ts,
+// properties.keys.ts, support.keys.ts, system.keys.ts, users.keys.ts
 useQuery({
   queryKey: QUERY_KEYS.BENEFICIARIES, 
   queryFn: () => BeneficiaryService.getAll(),
-  ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus
+  ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus: false
 });
 
-// Available configs:
-// QUERY_CONFIG.DEFAULT   - 2min stale, refetchOnWindowFocus
-// QUERY_CONFIG.REPORTS   - 2min stale, 5min refetchInterval
-// QUERY_CONFIG.REALTIME  - 30s stale
-// QUERY_CONFIG.STATIC    - 30min stale
+// Available configs (src/infrastructure/react-query/queryConfig.ts):
+// QUERY_CONFIG.DEFAULT         - 2min stale, refetchOnWindowFocus: false
+// QUERY_CONFIG.DASHBOARD_KPIS  - 1min stale, 5min refetchInterval
+// QUERY_CONFIG.ADMIN_KPIS      - 1min stale, 5min refetchInterval
+// QUERY_CONFIG.REPORTS         - 2min stale, 5min refetchInterval
+// QUERY_CONFIG.REALTIME        - 30s stale, refetchOnWindowFocus: true
+// QUERY_CONFIG.STATIC          - 30min stale, no refetch
+// QUERY_CONFIG.APPROVALS       - 1min stale
+// QUERY_CONFIG.ALERTS          - 30s stale
 ```
+
+**NEVER** create QUERY_CONFIG or CACHE_TIMES in other files. Always import from `@/infrastructure/react-query`.
 
 ### 4. Service Pattern (Facade for Large Services)
 ```typescript
-// Simple service
+// Simple service (single file)
 import { BeneficiaryService } from '@/services';
 const { data } = useQuery({
   queryKey: QUERY_KEYS.BENEFICIARIES,
   queryFn: () => BeneficiaryService.getAll()
 });
 
-// Large services use facade pattern (beneficiary, accounting, report, dashboard)
+// Large services use facade pattern (beneficiary, accounting, property, distribution, report, dashboard)
 src/services/beneficiary/
 ├── index.ts              # Re-exports all (facade)
 ├── core.service.ts       # CRUD operations
 ├── documents.service.ts  # Document handling
 ├── analytics.service.ts  # Statistics
 └── tabs.service.ts       # Portal tabs data
+
+// Services are classes with static methods
+export class BeneficiaryService {
+  static async getAll(): Promise<Beneficiary[]> {
+    const { data, error } = await supabase
+      .from('beneficiaries')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+}
 ```
 
 ### 5. Cache Invalidation (BATCHED)
@@ -88,9 +129,15 @@ queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
 queryClient.invalidateQueries({ queryKey: ['accounts'] });
 queryClient.invalidateQueries({ queryKey: ['trial-balance'] });
 
-// ✅ CORRECT - batched invalidation
+// ✅ CORRECT - batched invalidation (uses predicate internally)
 import { invalidateAccountingQueries } from '@/lib/query-invalidation';
-invalidateAccountingQueries(queryClient); // Invalidates all related queries
+invalidateAccountingQueries(queryClient); // Invalidates all related queries in one call
+
+// Available batched invalidators:
+// invalidateQueryGroups(queryClient, ['accounting', 'beneficiaries', 'payments'])
+// invalidateAccountingQueries(queryClient)
+// invalidateBeneficiaryQueries(queryClient)
+// invalidatePropertyQueries(queryClient)
 ```
 
 ### 6. Realtime Subscriptions (Exception to service rule)
@@ -111,17 +158,31 @@ import { useNazerDashboardRealtime } from '@/hooks/nazer/useNazerDashboardRealti
 
 ### 7. Error Handling
 ```typescript
-import { handleError, showSuccess } from '@/lib/errors';
+import { handleError, showSuccess, createMutationErrorHandler } from '@/lib/errors';
 
-// In mutations
+// In mutations (simple)
 useMutation({
   mutationFn: () => BeneficiaryService.create(data),
   onSuccess: () => showSuccess('تم الإنشاء بنجاح'),
-  onError: (error: unknown) => {
-    handleError(error, { context: { operation: 'create', component: 'BeneficiaryForm' } });
-  }
+  onError: createMutationErrorHandler({ 
+    context: 'create-beneficiary',
+    severity: 'high'
+  })
 });
+
+// Custom error handling
+try {
+  await service.operation();
+} catch (error) {
+  handleError(error, { 
+    context: { operation: 'create', component: 'BeneficiaryForm' },
+    showToast: true,
+    severity: 'medium'
+  });
+}
 ```
+
+Available severities: `'low' | 'medium' | 'high' | 'critical'`
 
 ## Design System
 
@@ -184,6 +245,9 @@ const [beneficiaries, properties, payments] = await Promise.all([
 npx vitest run          # Run all tests (11,000+ tests)
 npx vitest              # Interactive watch mode
 npx vitest --ui         # UI mode
+npx vitest --coverage   # Coverage report
+npm run test            # Alias for vitest run
+npm run test:watch      # Alias for vitest watch
 ```
 
 ### Test Structure
@@ -196,6 +260,12 @@ src/__tests__/
 ├── integration/        # Integration tests
 └── utils/
     └── test-utils.tsx  # Render with all providers
+
+e2e/
+├── auth.spec.ts        # Authentication flows
+├── beneficiary-lifecycle.spec.ts
+├── navigation.spec.ts
+└── accessibility.spec.ts
 ```
 
 ### Test Utilities
@@ -214,12 +284,14 @@ const createWrapper = () => ({ children }) => (
 ## Files to Reference
 
 - `docs/ARCHITECTURE_RULES.md` - Strict coding rules
+- `docs/ARCHITECTURE_DECISIONS.md` - All ADRs (Architecture Decision Records)
 - `src/services/README.md` - Service layer documentation  
 - `src/hooks/README.md` - Hooks organization
 - `src/routes/README.md` - Routing structure
-- `src/lib/query-keys/` - All query keys (400+ in 8 files)
+- `src/lib/query-keys/` - All query keys (400+ in 9 files)
 - `src/lib/query-invalidation.ts` - Batched cache invalidation
 - `src/lib/errors/index.ts` - Error handling utilities
+- `src/infrastructure/react-query/` - Query config & cache times
 
 ---
 
@@ -260,4 +332,31 @@ If you need to break an existing ADR, you MUST:
 
 ---
 
-**آخر تحديث:** 2026-01-18 | **الإصدار:** 2.9.91
+## Development Workflow
+
+### Build & Run
+```bash
+npm run dev              # Start dev server (Vite)
+npm run build            # Production build
+npm run preview          # Preview production build
+npm run lint             # ESLint check
+```
+
+### Edge Functions (Supabase)
+```bash
+# In supabase/ directory
+supabase functions serve  # Local development
+supabase functions deploy <function-name>  # Deploy
+```
+
+**Important:** All Edge Functions use `SERVICE_ROLE_KEY` for secure database access (ADR-005).
+
+### Database Migrations
+```bash
+# NEVER use VACUUM in migrations (ADR-002)
+# Transactions don't allow VACUUM in Supabase migrations
+```
+
+---
+
+**آخر تحديث:** 2026-01-22 | **الإصدار:** 3.1.0

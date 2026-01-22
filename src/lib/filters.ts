@@ -3,7 +3,7 @@ import { FilterParams } from "@/types";
 /**
  * Generic filter function for lists
  */
-export function filterItems<T extends Record<string, any>>(
+export function filterItems<T extends Record<string, unknown>>(
   items: T[],
   filters: FilterParams,
   searchFields: (keyof T)[]
@@ -191,7 +191,7 @@ export function filterByDateRange<T extends { date: string }>(
 /**
  * Search by text
  */
-export function searchByText<T extends Record<string, any>>(
+export function searchByText<T extends Record<string, unknown>>(
   items: T[],
   query: string,
   fields: (keyof T)[]

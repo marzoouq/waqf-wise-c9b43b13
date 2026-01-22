@@ -1,13 +1,9 @@
 import { UseFormReturn, Controller } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { FormMessage } from "@/components/ui/form";
 import { getUnitTypeLabel } from "@/lib/constants";
 import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import type { ContractFormValues } from "../contractSchema";
-import type { Database } from "@/integrations/supabase/types";
-
-type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
 interface Props {
   form: UseFormReturn<ContractFormValues>;

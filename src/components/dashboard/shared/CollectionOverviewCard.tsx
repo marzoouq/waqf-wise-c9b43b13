@@ -6,7 +6,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, Wallet } from 'lucide-react';
+import { TrendingUp, AlertTriangle, CheckCircle, Clock, Wallet } from 'lucide-react';
 import { useCollectionStats } from '@/hooks/dashboard/useCollectionStats';
 import { formatCurrency } from '@/lib/formatters';
 
@@ -39,12 +39,6 @@ export function CollectionOverviewCard() {
     if (rate >= 80) return 'text-success';
     if (rate >= 50) return 'text-warning';
     return 'text-destructive';
-  };
-
-  const getProgressColor = (rate: number) => {
-    if (rate >= 80) return 'bg-success';
-    if (rate >= 50) return 'bg-warning';
-    return 'bg-destructive';
   };
 
   return (

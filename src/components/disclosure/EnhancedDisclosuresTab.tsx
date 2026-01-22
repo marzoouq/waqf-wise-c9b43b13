@@ -101,7 +101,7 @@ export function EnhancedDisclosuresTab() {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
       toast.success("تم تحميل ملف PDF بنجاح");
-    } catch (error) {
+    } catch {
       toast.error("فشل تحميل ملف PDF");
     } finally {
       setIsExporting(null);

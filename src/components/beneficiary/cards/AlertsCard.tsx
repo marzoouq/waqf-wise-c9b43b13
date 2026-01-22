@@ -6,15 +6,12 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { 
   Bell, 
   AlertTriangle, 
   CheckCircle, 
   Clock, 
-  FileText, 
-  ArrowLeft,
-  Sparkles
+  ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";

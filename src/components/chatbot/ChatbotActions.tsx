@@ -58,7 +58,7 @@ export function ChatbotActions({ conversations, onClearHistory, hasConversations
         title: "تم التصدير",
         description: "تم تصدير المحادثات بنجاح",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "خطأ",
         description: "فشل تصدير المحادثات",

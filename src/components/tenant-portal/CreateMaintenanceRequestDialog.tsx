@@ -175,7 +175,7 @@ export function CreateMaintenanceRequestDialog({
         newImages.push(base64);
       }
       setImages([...images, ...newImages]);
-    } catch (error) {
+    } catch {
       toast.error("فشل في رفع الصور");
     } finally {
       setUploading(false);

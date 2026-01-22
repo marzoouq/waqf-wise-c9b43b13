@@ -1,4 +1,4 @@
-import { ReactNode, useState, memo, useMemo, useEffect, lazy, Suspense } from "react";
+import { ReactNode, useState, memo, useMemo, useEffect } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
 import { GlobalMonitoring } from "@/components/developer/GlobalMonitoring";
@@ -195,7 +195,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
-  const { isBeneficiary, isWaqfHeir, primaryRole } = useUserRole();
+  const { primaryRole } = useUserRole();
   
   // ✅ تنظيف التنبيهات - يعمل فقط للصفحات المحمية
   useAlertCleanup();

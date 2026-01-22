@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface LightAuthState {
   isLoggedIn: boolean;
@@ -64,7 +65,7 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
   useEffect(() => {
     let isMounted = true;
     if (import.meta.env.DEV) {
-      console.log('🔑 [useLightAuth] بدء جلب الجلسة...');
+      productionLogger.debug('🔑 [useLightAuth] بدء جلب الجلسة...');
     }
 
     const checkSession = async () => {
@@ -75,16 +76,16 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
 
         if (session?.user) {
           if (import.meta.env.DEV) {
-            console.log('🔑 [useLightAuth] نتيجة:', { hasSession: true, userId: session.user.id });
+            productionLogger.debug('🔑 [useLightAuth] نتيجة:', { hasSession: true, userId: session.user.id });
           }
           // المستخدم مسجل دخوله - تحديد المسار من الـ cache
           const cachedRoles = getCachedRoles(session.user.id);
           if (import.meta.env.DEV) {
-            console.log('🔑 [useLightAuth] الأدوار المخزنة:', cachedRoles);
+            productionLogger.debug('🔑 [useLightAuth] الأدوار المخزنة:', cachedRoles);
           }
           const dashboard = cachedRoles ? getDashboardPath(cachedRoles) : '/dashboard';
           if (import.meta.env.DEV) {
-            console.log('🔑 [useLightAuth] المسار المحدد:', dashboard);
+            productionLogger.debug('🔑 [useLightAuth] المسار المحدد:', dashboard);
           }
           
           setState({
@@ -95,7 +96,7 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
           setRedirectPath(dashboard);
         } else {
           if (import.meta.env.DEV) {
-            console.log('🔑 [useLightAuth] نتيجة:', { hasSession: false });
+            productionLogger.debug('🔑 [useLightAuth] نتيجة:', { hasSession: false });
           }
           setState({
             isLoggedIn: false,
@@ -106,7 +107,7 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
         }
       } catch (error) {
         if (import.meta.env.DEV) {
-          console.log('🔑 [useLightAuth] خطأ:', error);
+          productionLogger.debug('🔑 [useLightAuth] خطأ:', error);
         }
         if (isMounted) {
           setState({

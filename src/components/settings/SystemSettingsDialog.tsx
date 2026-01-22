@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSystemSettings } from "@/hooks/system/useSystemSettings";
-import { Settings, DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
+import { DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useToast } from "@/hooks/ui/use-toast";
@@ -32,7 +32,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
       });
       setEditedSettings(initial);
     }
-  }, [settings]);
+  }, [settings, editedSettings]);
 
   const validateSettings = () => {
     const errors: string[] = [];

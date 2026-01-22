@@ -38,7 +38,7 @@ export function PushNotificationsSetup() {
         const registration = await navigator.serviceWorker.ready;
         
         // Generate VAPID keys or use existing ones
-        const subscription = await registration.pushManager.subscribe({
+        await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
             'YOUR_VAPID_PUBLIC_KEY' // يجب استبداله بالمفتاح الحقيقي
@@ -169,13 +169,4 @@ function urlBase64ToUint8Array(base64String: string) {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
 }

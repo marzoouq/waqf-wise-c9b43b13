@@ -27,7 +27,6 @@ import {
   Percent,
   BarChart3,
   Lightbulb,
-  Building2,
   Download,
   Printer,
   Loader2
@@ -160,7 +159,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], prevYear);
       toast.success("تم تحميل ملف PDF بنجاح");
-    } catch (error) {
+    } catch {
       toast.error("فشل تحميل ملف PDF");
     } finally {
       setIsExporting(false);

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Receipt, Eye, Download } from 'lucide-react';
+import { Receipt, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { generateReceiptPDF } from '@/lib/generateReceiptPDF';

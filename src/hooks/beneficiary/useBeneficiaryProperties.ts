@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { PropertyService } from "@/services";
-import { ContractService } from "@/services";
+import { PropertyService, ContractService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface ContractWithProperty {

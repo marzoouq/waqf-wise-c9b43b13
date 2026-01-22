@@ -136,7 +136,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       // جلب سطور القيود للفترة المحددة
       const journalLines = await AccountingService.getJournalEntriesWithLines();
       const filteredLines = (journalLines || []).flatMap(entry => 
-        (entry.journal_entry_lines || []).filter((line: JournalEntryLineRaw) => {
+        (entry.journal_entry_lines || []).filter((_line: JournalEntryLineRaw) => {
           const entryDate = entry.entry_date;
           return entry.status === 'posted' && 
                  entryDate >= periodStart && 

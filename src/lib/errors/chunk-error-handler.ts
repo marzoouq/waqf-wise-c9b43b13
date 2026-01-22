@@ -199,15 +199,18 @@ export function logChunkError(
     // Ignore storage errors
   }
   
-  // Console log in development
-  if (import.meta.env.DEV) {
-    console.group(`[ChunkError] ${errorInfo.type}`);
-    console.log('Message:', errorInfo.message);
-    console.log('User Message:', errorInfo.userMessage);
-    console.log('Context:', context);
-    console.log('Can Retry:', errorInfo.canRetry);
-    console.log('Should Reload:', errorInfo.shouldReload);
-    console.groupEnd();
+  // Debug logging عبر اللوجر في التطوير
+  try {
+    const { logger } = await import('@/lib/logger');
+    logger.debug(`[ChunkError] ${errorInfo.type}`, {
+      message: errorInfo.message,
+      userMessage: errorInfo.userMessage,
+      context,
+      canRetry: errorInfo.canRetry,
+      shouldReload: errorInfo.shouldReload,
+    });
+  } catch {
+    // ignore optional logger import failures
   }
 }
 

@@ -22,9 +22,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import type { FullRequest } from '@/types/request.types';
-import { getRequestTypeName, getBeneficiaryName } from '@/types/request.types';
-import { REQUEST_STATUS, STATUS_BADGE_STYLES, PRIORITY_BADGE_STYLES } from '@/lib/request-constants';
+import { getRequestTypeName, getBeneficiaryName, type FullRequest } from '@/types/request.types';
+import { STATUS_BADGE_STYLES, PRIORITY_BADGE_STYLES } from '@/lib/request-constants';
 import { RequestAttachments } from './RequestAttachments';
 
 interface RequestDetailsDialogProps {

@@ -8,15 +8,14 @@ import {
   Building2, 
   Users, 
   TrendingUp, 
-  DollarSign, 
   Home, 
   CreditCard,
   Wallet,
-  PieChart
+  PieChart,
+  AlertCircle
 } from "lucide-react";
 import { useUnifiedKPIs } from "@/hooks/dashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedSectionHeader } from "@/components/unified/UnifiedSectionHeader";
