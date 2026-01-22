@@ -3,12 +3,9 @@
  */
 
 import { useState, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
-  AISystemAuditService, 
-  SystemAudit, 
-  PendingFix,
-  AUDIT_CATEGORIES 
+  AISystemAuditService
 } from '@/services/ai-system-audit.service';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 
@@ -67,10 +64,11 @@ export function useAISystemAudit() {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearInterval(progressInterval);
-      toastError(error.message);
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toastError(message);
+      return { success: false, error: message };
     } finally {
       setIsAuditing(false);
       setTimeout(() => setAuditProgress(0), 1000);

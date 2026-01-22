@@ -142,7 +142,7 @@ export function useTestExport() {
 
       doc.save(`test-report-${new Date().toISOString().split('T')[0]}.pdf`);
       toastSuccess('تم تصدير التقرير بنجاح');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Export PDF error:', error);
       toastError('فشل التصدير: ' + error.message);
     }
@@ -266,9 +266,10 @@ export function useTestExport() {
       URL.revokeObjectURL(url);
 
       toastSuccess('تم تصدير Excel بنجاح');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Export Excel error:', error);
-      toastError('فشل التصدير: ' + error.message);
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      toastError('فشل التصدير: ' + message);
     }
   }, []);
 

@@ -133,7 +133,7 @@ export function getSafeSeverity(
 ): SystemAlertSeverity | SystemErrorLogSeverity {
   const allowedValues = DB_CONSTRAINTS[table].severity;
   
-  if (allowedValues.includes(requestedSeverity as any)) {
+  if (allowedValues.includes(requestedSeverity as unknown as SystemAlertSeverity)) {
     return requestedSeverity as SystemAlertSeverity | SystemErrorLogSeverity;
   }
   
@@ -252,7 +252,7 @@ export const COLUMN_RULES = {
  */
 export function isValidColumn(table: keyof typeof TABLE_COLUMNS, column: string): boolean {
   const columns = TABLE_COLUMNS[table];
-  return columns ? columns.includes(column as any) : true;
+  return columns ? columns.includes(column as unknown as string) : true;
 }
 
 /**
