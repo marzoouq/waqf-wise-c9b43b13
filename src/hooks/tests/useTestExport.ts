@@ -22,23 +22,15 @@ interface TestCategory {
 }
 
 /**
- * Type extension for jsPDF with autoTable plugin
- * 
- * Extends the base jsPDF type to include the autoTable method from jspdf-autotable plugin.
- * This follows the established pattern in the codebase (see beneficiary-statement-pdf.ts).
+ * Alias for jsPDF with autoTable plugin
+ *
+ * The jspdf-autotable plugin is loaded via side-effect import, and its
+ * TypeScript module augmentation is defined globally in
+ * src/types/jspdf-autotable.d.ts. That augmentation already extends jsPDF
+ * with the autoTable method and related options, so we simply alias here
+ * to avoid duplicating those types.
  */
-interface JsPDFWithAutoTable extends jsPDF {
-  lastAutoTable?: { finalY: number };
-  autoTable: (options: {
-    head?: string[][];
-    body?: string[][];
-    startY?: number;
-    styles?: Record<string, unknown>;
-    headStyles?: Record<string, unknown>;
-    alternateRowStyles?: Record<string, unknown>;
-    columnStyles?: Record<string, unknown>;
-  }) => void;
-}
+type JsPDFWithAutoTable = jsPDF;
 
 export function useTestExport() {
   // تصدير PDF مفصل
