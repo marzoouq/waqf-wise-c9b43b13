@@ -6,7 +6,7 @@ import { useQuery, _useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { toast } from "sonner";
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 
 export interface AuditAlert {
   id: string;

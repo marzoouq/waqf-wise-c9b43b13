@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   try {
     // ✅ Health Check Support / Test Mode - يجب فحصه أولاً قبل أي شيء
     let bodyText = '';
-    let parsedBody: any = null;
+    let parsedBody: { ping?: boolean; healthCheck?: boolean; testMode?: boolean } | null = null;
     
     try {
       bodyText = await req.clone().text();

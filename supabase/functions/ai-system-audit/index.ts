@@ -433,7 +433,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
           fixed: false
         }));
       }
-    } catch (_e) {
+    } catch {
       console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
     }
 
@@ -466,7 +466,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
             fixed: false
           }));
         }
-      } catch (_e) {
+      } catch {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
       }
     }

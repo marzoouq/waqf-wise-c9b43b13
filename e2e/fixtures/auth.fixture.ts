@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, Page } from '@playwright/test';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -71,6 +71,6 @@ export function isSupabaseConfigured(): boolean {
   return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 }
 
-export async function waitForAuth(page: any, _timeout = 10000): Promise<boolean> {
+export async function waitForAuth(page: Page, _timeout = 10000): Promise<boolean> {
   return false;
 }
