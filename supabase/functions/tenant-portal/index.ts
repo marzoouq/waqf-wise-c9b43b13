@@ -16,6 +16,56 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-tenant-session",
 };
 
+interface ContractWithProperty {
+  id: string;
+  contract_number: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  property_id: string;
+  properties?: {
+    id: string;
+    name: string;
+    location?: string;
+    type?: string;
+  };
+}
+
+interface MaintenanceRequest {
+  id: string;
+  request_number: string;
+  title: string;
+  description?: string;
+  category: string;
+  priority: string;
+  status: string;
+  location_in_unit?: string;
+  images?: string[];
+  preferred_date?: string;
+  preferred_time_slot?: string;
+  is_urgent?: boolean;
+  tenant_notes?: string;
+  admin_response?: string;
+  rating?: number;
+  rating_feedback?: string;
+  scheduled_date?: string;
+  completed_date?: string;
+  created_at: string;
+  updated_at: string;
+  property_id: string;
+  unit_id?: string;
+  properties?: {
+    id: string;
+    name: string;
+    address?: string;
+  };
+  property_units?: {
+    id: string;
+    unit_number?: string;
+    unit_name?: string;
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -91,7 +141,7 @@ serve(async (req) => {
 
       // جلب الوحدات المرتبطة بكل عقد
       const contracts = [];
-      for (const contract of (contractsRaw || [])) {
+      for (const contract of (contractsRaw || []) as ContractWithProperty[]) {
         // جلب الوحدات التي تنتمي لهذا العقد
         const { data: units } = await supabaseAdmin
           .from("property_units")
@@ -109,9 +159,9 @@ serve(async (req) => {
               end_date: contract.end_date,
               status: contract.status,
               property_id: contract.property_id,
-              property_name: (contract as any).properties?.name || "غير محدد",
-              property_location: (contract as any).properties?.location,
-              property_type: (contract as any).properties?.type,
+              property_name: contract.properties?.name || "غير محدد",
+              property_location: contract.properties?.location,
+              property_type: contract.properties?.type,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -128,9 +178,9 @@ serve(async (req) => {
             end_date: contract.end_date,
             status: contract.status,
             property_id: contract.property_id,
-            property_name: (contract as any).properties?.name || "غير محدد",
-            property_location: (contract as any).properties?.location,
-            property_type: (contract as any).properties?.type,
+            property_name: contract.properties?.name || "غير محدد",
+            property_location: contract.properties?.location,
+            property_type: contract.properties?.type,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,
@@ -171,7 +221,7 @@ serve(async (req) => {
         .order("created_at", { ascending: false });
 
       // إضافة اسم العقار والوحدة للطلبات
-      const enrichedRequests = (requests || []).map((r: any) => ({
+      const enrichedRequests = (requests || [] as MaintenanceRequest[]).map((r: MaintenanceRequest) => ({
         ...r,
         property_name: r.properties?.name || "غير محدد",
         unit_name: r.property_units?.unit_name || r.property_units?.unit_number || null,

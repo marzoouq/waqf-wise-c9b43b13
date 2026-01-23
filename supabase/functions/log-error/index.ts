@@ -525,13 +525,14 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
     const target = existingByType;
 
     if (target?.id) {
+      const targetMetadata = target.metadata && typeof target.metadata === 'object' ? target.metadata as Record<string, unknown> : {};
       await supabase
         .from('system_alerts')
         .update({
           occurrence_count: similarErrors.length,
           description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
           metadata: {
-            ...(typeof (target as any).metadata === 'object' && (target as any).metadata ? (target as any).metadata : {}),
+            ...targetMetadata,
             error_message: errorReport.error_message,
             last_seen_at: new Date().toISOString(),
             sample_error_log_id: errorLogId,

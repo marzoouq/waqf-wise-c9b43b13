@@ -71,12 +71,12 @@ serve(async (req) => {
               message: `HTTP ${response.status}: ${response.statusText}`
             });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           results.push({
             functionName: funcName,
-            status: error.message?.includes('timeout') ? 'timeout' : 'error',
+            status: error instanceof Error && error.message?.includes('timeout') ? 'timeout' : 'error',
             duration: Date.now() - funcStart,
-            message: error.message
+            message: error instanceof Error ? error.message : String(error)
           });
         }
       }
@@ -96,12 +96,12 @@ serve(async (req) => {
             duration: Date.now() - tableStart,
             message: error?.message
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           results.push({
             functionName: `db:${table}`,
             status: 'error',
             duration: Date.now() - tableStart,
-            message: error.message
+            message: error instanceof Error ? error.message : String(error)
           });
         }
       }
@@ -191,12 +191,12 @@ serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Scheduled tests error:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error instanceof Error ? error.message : String(error)
       }),
       {
         status: 500,

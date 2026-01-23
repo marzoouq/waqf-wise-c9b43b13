@@ -117,7 +117,7 @@ serve(async (req) => {
     };
 
     // بناء رسالة Slack
-    const blocks: any[] = [
+    const blocks: Record<string, unknown>[] = [
       {
         type: 'header',
         text: {
