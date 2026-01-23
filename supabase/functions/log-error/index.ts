@@ -32,6 +32,7 @@ interface SystemAlert {
   alert_type: string;
   severity: string;
   status?: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface User {
@@ -375,7 +376,7 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
+async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, _alert: SystemAlert) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
@@ -531,7 +532,7 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
           occurrence_count: similarErrors.length,
           description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
           metadata: {
-            ...(typeof (target as any).metadata === 'object' && (target as any).metadata ? (target as any).metadata : {}),
+            ...(typeof target.metadata === 'object' && target.metadata ? target.metadata : {}),
             error_message: errorReport.error_message,
             last_seen_at: new Date().toISOString(),
             sample_error_log_id: errorLogId,

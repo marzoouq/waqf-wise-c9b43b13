@@ -144,7 +144,7 @@ serve(async (req) => {
       }
 
       // تحديث كلمة المرور مباشرة باستخدام Admin API
-      const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+      const { data: _updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
         beneficiary.user_id,
         { password: newPassword }
       );

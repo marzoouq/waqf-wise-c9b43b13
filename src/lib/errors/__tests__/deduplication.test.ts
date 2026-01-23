@@ -168,7 +168,8 @@ describe('Error Deduplicator', () => {
       resolved: false,
     };
     
-    (deduplicator as any).dedupMap.set('old-error', oldEntry);
+    // Access private field for testing purposes
+    (deduplicator as { dedupMap: Map<string, DedupEntry> }).dedupMap.set('old-error', oldEntry);
     
     const resolved = deduplicator.autoResolveOldErrors();
     expect(resolved).toBe(1);
