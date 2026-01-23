@@ -39,7 +39,9 @@ export class DistributionVoucherService {
   /**
    * جلب سندات التوزيع
    */
-  static async getVouchers(distributionId: string): Promise<Database['public']['Tables']['payment_vouchers']['Row'][]> {
+  static async getVouchers(
+    distributionId: string
+  ): Promise<Database['public']['Tables']['payment_vouchers']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('payment_vouchers')
@@ -58,7 +60,9 @@ export class DistributionVoucherService {
   /**
    * إنشاء سند صرف
    */
-  static async createVoucher(voucher: Database['public']['Tables']['payment_vouchers']['Insert']): Promise<Database['public']['Tables']['payment_vouchers']['Row']> {
+  static async createVoucher(
+    voucher: Database['public']['Tables']['payment_vouchers']['Insert']
+  ): Promise<Database['public']['Tables']['payment_vouchers']['Row']> {
     try {
       const { data, error } = await supabase
         .from('payment_vouchers')
@@ -78,11 +82,15 @@ export class DistributionVoucherService {
   /**
    * جلب سندات التوزيع مع التفاصيل
    */
-  static async getDistributionVouchersWithDetails(distributionId: string): Promise<VoucherRecord[]> {
+  static async getDistributionVouchersWithDetails(
+    distributionId: string
+  ): Promise<VoucherRecord[]> {
     try {
       const { data, error } = await supabase
         .from('payment_vouchers_with_details')
-        .select('id, voucher_number, voucher_type, beneficiary_id, amount, status, created_at, description, payment_method, bank_account_id, reference_number, notes, approved_by, approved_at, paid_by, paid_at')
+        .select(
+          'id, voucher_number, voucher_type, beneficiary_id, amount, status, created_at, description, payment_method, bank_account_id, reference_number, notes, approved_by, approved_at, paid_by, paid_at'
+        )
         .eq('distribution_id', distributionId)
         .order('created_at', { ascending: false });
 
@@ -108,11 +116,11 @@ export class DistributionVoucherService {
 
       return {
         total: data.length,
-        draft: data.filter(v => v.status === 'draft').length,
-        approved: data.filter(v => v.status === 'approved').length,
-        paid: data.filter(v => v.status === 'paid').length,
+        draft: data.filter((v) => v.status === 'draft').length,
+        approved: data.filter((v) => v.status === 'approved').length,
+        paid: data.filter((v) => v.status === 'paid').length,
         totalAmount: data.reduce((sum, v) => sum + v.amount, 0),
-        paidAmount: data.filter(v => v.status === 'paid').reduce((sum, v) => sum + v.amount, 0),
+        paidAmount: data.filter((v) => v.status === 'paid').reduce((sum, v) => sum + v.amount, 0),
       };
     } catch (error) {
       productionLogger.error('Error fetching distribution voucher stats', error);
@@ -126,8 +134,9 @@ export class DistributionVoucherService {
   static async getPaymentVouchersList() {
     try {
       const { data, error } = await supabase
-        .from("payment_vouchers")
-        .select(`
+        .from('payment_vouchers')
+        .select(
+          `
           *,
           beneficiaries (
             full_name,
@@ -136,8 +145,9 @@ export class DistributionVoucherService {
           distributions (
             distribution_name: month
           )
-        `)
-        .order("created_at", { ascending: false })
+        `
+        )
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;

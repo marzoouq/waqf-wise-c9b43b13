@@ -71,11 +71,7 @@ export function ContractActionsMenu({
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 hover:bg-muted"
-        >
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
           <MoreVertical className="h-4 w-4" />
           <span className="sr-only">فتح القائمة</span>
         </Button>
@@ -99,7 +95,7 @@ export function ContractActionsMenu({
 
         {/* عرض عقد إيجار (إذا كان موجوداً) */}
         {hasEjarDocument && (
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => window.open(contract.ejar_document_url, '_blank')}
             className="text-success"
           >
@@ -130,7 +126,7 @@ export function ContractActionsMenu({
 
         {/* إلغاء التجديد التلقائي */}
         {onCancelAutoRenew && isActive && hasAutoRenew && (
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => handleAction(() => onCancelAutoRenew(contract))}
             className="text-warning"
           >
@@ -141,7 +137,7 @@ export function ContractActionsMenu({
 
         {/* فسخ العقد من طرف واحد */}
         {onUnilateralTermination && isActive && (
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => handleAction(() => onUnilateralTermination(contract))}
             className="text-warning"
           >
@@ -153,13 +149,13 @@ export function ContractActionsMenu({
         {/* طلب رفع قيمة الإيجار */}
         {onRentAdjustment && isActive && (
           <>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleAction(() => onRentAdjustment(contract, 'increase'))}
             >
               <TrendingUp className="h-4 w-4 ms-2" />
               طلب رفع قيمة الإيجار
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => handleAction(() => onRentAdjustment(contract, 'decrease'))}
             >
               <TrendingDown className="h-4 w-4 ms-2" />
@@ -180,7 +176,7 @@ export function ContractActionsMenu({
 
         {/* إنهاء العقد */}
         {onEarlyTermination && isActive && (
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => handleAction(() => onEarlyTermination(contract))}
             className="text-destructive"
           >
@@ -191,7 +187,7 @@ export function ContractActionsMenu({
 
         {/* حذف العقد */}
         {onDelete && (
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => handleAction(() => onDelete(contract))}
             className="text-destructive focus:text-destructive"
           >

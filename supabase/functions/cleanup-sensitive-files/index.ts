@@ -1,11 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
   forbiddenResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // ✅ Rate Limiting
@@ -16,16 +16,16 @@ const WINDOW_MS = 60 * 1000;
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(userId);
-  
+
   if (!record || now - record.lastAttempt > WINDOW_MS) {
     rateLimitMap.set(userId, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   if (record.count >= MAX_ATTEMPTS) {
     return false;
   }
-  
+
   record.count++;
   record.lastAttempt = now;
   return true;
@@ -52,10 +52,12 @@ Deno.serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'cleanup-sensitive-files',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     const supabase = createClient(
@@ -80,8 +82,11 @@ Deno.serve(async (req) => {
       }
 
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-      
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser(token);
+
       if (authError || !user) {
         return unauthorizedResponse('فشل التحقق من الهوية');
       }
@@ -92,8 +97,8 @@ Deno.serve(async (req) => {
         .select('role')
         .eq('user_id', user.id);
 
-      const userRoles = roles?.map(r => r.role) || [];
-      const hasPermission = userRoles.some(role => ['admin', 'nazer'].includes(role));
+      const userRoles = roles?.map((r) => r.role) || [];
+      const hasPermission = userRoles.some((role) => ['admin', 'nazer'].includes(role));
 
       if (!hasPermission) {
         console.warn(`⚠️ Unauthorized cleanup attempt: ${user.id}`);
@@ -103,7 +108,7 @@ Deno.serve(async (req) => {
           action_type: 'UNAUTHORIZED_ACCESS_ATTEMPT',
           table_name: 'storage',
           severity: 'warning',
-          description: 'محاولة غير مصرح بها لحذف ملفات حساسة'
+          description: 'محاولة غير مصرح بها لحذف ملفات حساسة',
         });
         return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
       }
@@ -125,9 +130,7 @@ Deno.serve(async (req) => {
 
     if (filePath) {
       // حذف ملف محدد
-      const { error } = await supabase.storage
-        .from(bucket)
-        .remove([filePath]);
+      const { error } = await supabase.storage.from(bucket).remove([filePath]);
 
       if (error) {
         console.error('Error deleting file:', error);
@@ -151,32 +154,28 @@ Deno.serve(async (req) => {
       // حذف الملفات القديمة
       const cutoffDate = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
 
-      const { data: files, error: listError } = await supabase.storage
-        .from(bucket)
-        .list();
+      const { data: files, error: listError } = await supabase.storage.from(bucket).list();
 
       if (listError) throw listError;
 
       if (!files || files.length === 0) {
         console.log('No files found in bucket');
-        return jsonResponse({ 
-          success: true, 
+        return jsonResponse({
+          success: true,
           deletedCount: 0,
-          message: 'No files to delete' 
+          message: 'No files to delete',
         });
       }
 
-      const oldFiles = files.filter(file => {
+      const oldFiles = files.filter((file) => {
         const fileDate = new Date(file.created_at);
         return fileDate < cutoffDate;
       });
 
       if (oldFiles.length > 0) {
-        const filePaths = oldFiles.map(f => f.name);
-        
-        const { error: deleteError } = await supabase.storage
-          .from(bucket)
-          .remove(filePaths);
+        const filePaths = oldFiles.map((f) => f.name);
+
+        const { error: deleteError } = await supabase.storage.from(bucket).remove(filePaths);
 
         if (deleteError) throw deleteError;
 
@@ -196,17 +195,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    return jsonResponse({ 
-      success: true, 
+    return jsonResponse({
+      success: true,
       deletedCount,
-      message: `تم حذف ${deletedCount} ملف بنجاح` 
+      message: `تم حذف ${deletedCount} ملف بنجاح`,
     });
-
   } catch (error) {
     console.error('Cleanup error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      400
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 400);
   }
 });

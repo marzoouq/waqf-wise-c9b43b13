@@ -1,22 +1,22 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTasks } from "@/hooks/ui/useTasks";
-import { CheckSquare, AlertCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTasks } from '@/hooks/ui/useTasks';
+import { CheckSquare, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const AdminTasks = () => {
   const { tasks, isLoading, error, refetch } = useTasks();
 
   const getPriorityBadgeClasses = (priority: string) => {
-    if (priority === "عالية") {
-      return "bg-destructive/15 text-destructive border border-destructive/30";
+    if (priority === 'عالية') {
+      return 'bg-destructive/15 text-destructive border border-destructive/30';
     }
-    if (priority === "متوسطة") {
-      return "bg-warning/15 text-warning border border-warning/30";
+    if (priority === 'متوسطة') {
+      return 'bg-warning/15 text-warning border border-warning/30';
     }
-    return "bg-muted text-muted-foreground border border-border";
+    return 'bg-muted text-muted-foreground border border-border';
   };
 
   if (isLoading) {
@@ -46,7 +46,13 @@ export const AdminTasks = () => {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل المهام" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل المهام"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!tasks || tasks.length === 0) {
@@ -87,7 +93,7 @@ export const AdminTasks = () => {
               key={task.id}
               className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"
             >
-              {task.priority === "عالية" ? (
+              {task.priority === 'عالية' ? (
                 <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-destructive flex-shrink-0" />
               ) : (
                 <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
@@ -96,7 +102,9 @@ export const AdminTasks = () => {
                 <p className="text-[10px] sm:text-xs md:text-sm font-medium text-foreground mb-0.5 sm:mb-1 line-clamp-2">
                   {task.task}
                 </p>
-                <Badge className={`${getPriorityBadgeClasses(task.priority)} text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0 sm:py-0.5`}>
+                <Badge
+                  className={`${getPriorityBadgeClasses(task.priority)} text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0 sm:py-0.5`}
+                >
                   {task.priority}
                 </Badge>
               </div>

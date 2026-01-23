@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -57,9 +63,7 @@ export function DocumentVersionsDialog({
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">
-                            الإصدار {version.version_number}
-                          </span>
+                          <span className="font-medium">الإصدار {version.version_number}</span>
                           {version.is_current && (
                             <Badge variant="default" className="gap-1">
                               <Check className="h-3 w-3" />
@@ -71,17 +75,13 @@ export function DocumentVersionsDialog({
                           {version.change_description || 'بدون وصف'}
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                          <span>
-                            {formatDate(version.created_at, 'PPpp')}
-                          </span>
+                          <span>{formatDate(version.created_at, 'PPpp')}</span>
                           <span>{formatFileSize(version.file_size)}</span>
-                          {version.created_by && (
-                            <span>بواسطة: {version.created_by}</span>
-                          )}
+                          {version.created_by && <span>بواسطة: {version.created_by}</span>}
                         </div>
                       </div>
                     </div>
-                    
+
                     {!version.is_current && (
                       <Button
                         variant="outline"

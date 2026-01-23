@@ -4,43 +4,43 @@
  * @version 1.0.0
  */
 
-import { Home, Users, Shield, FileText, MoreHorizontal } from "lucide-react";
-import type { NavigationItem } from "@/types/navigation";
+import { Home, Users, Shield, FileText, MoreHorizontal } from 'lucide-react';
+import type { NavigationItem } from '@/types/navigation';
 
 export const adminNavigationItems: readonly NavigationItem[] = [
   {
-    id: "home",
-    label: "الرئيسية",
+    id: 'home',
+    label: 'الرئيسية',
     icon: Home,
-    path: "/admin-dashboard",
-    matchPaths: ["/admin-dashboard"],
+    path: '/admin-dashboard',
+    matchPaths: ['/admin-dashboard'],
   },
   {
-    id: "users",
-    label: "المستخدمون",
+    id: 'users',
+    label: 'المستخدمون',
     icon: Users,
-    path: "/users",
-    matchPaths: ["/users", "/roles-management"],
+    path: '/users',
+    matchPaths: ['/users', '/roles-management'],
   },
   {
-    id: "security",
-    label: "الأمان",
+    id: 'security',
+    label: 'الأمان',
     icon: Shield,
-    path: "/security-dashboard",
-    matchPaths: ["/security-dashboard", "/audit-logs"],
+    path: '/security-dashboard',
+    matchPaths: ['/security-dashboard', '/audit-logs'],
   },
   {
-    id: "audit",
-    label: "التدقيق",
+    id: 'audit',
+    label: 'التدقيق',
     icon: FileText,
-    path: "/audit-logs",
-    matchPaths: ["/audit-logs", "/system-error-logs"],
+    path: '/audit-logs',
+    matchPaths: ['/audit-logs', '/system-error-logs'],
   },
   {
-    id: "more",
-    label: "المزيد",
+    id: 'more',
+    label: 'المزيد',
     icon: MoreHorizontal,
-    path: "/settings",
-    matchPaths: ["/settings"],
+    path: '/settings',
+    matchPaths: ['/settings'],
   },
 ] as const;

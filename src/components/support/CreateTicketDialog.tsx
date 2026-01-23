@@ -32,7 +32,15 @@ import { Loader2 } from 'lucide-react';
 const ticketSchema = z.object({
   subject: z.string().min(5, 'العنوان يجب أن يكون 5 أحرف على الأقل'),
   description: z.string().min(20, 'الوصف يجب أن يكون 20 حرف على الأقل'),
-  category: z.enum(['technical', 'financial', 'account', 'request', 'complaint', 'inquiry', 'other']),
+  category: z.enum([
+    'technical',
+    'financial',
+    'account',
+    'request',
+    'complaint',
+    'inquiry',
+    'other',
+  ]),
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
 });
 
@@ -179,11 +187,7 @@ export function CreateTicketDialog({ open, onOpenChange }: CreateTicketDialogPro
             />
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
               <Button type="submit" disabled={createTicket.isPending}>

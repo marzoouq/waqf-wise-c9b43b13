@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 /**
  * Media Query Hook - Flexible media query detection
@@ -8,24 +8,24 @@ import { useState, useEffect } from "react";
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === 'undefined') return false;
     return window.matchMedia(query).matches;
   });
 
   useEffect(() => {
     const media = window.matchMedia(query);
-    
+
     // Set initial value
     setMatches(media.matches);
 
     // Create listener
     const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
-    
+
     // Add listener
-    media.addEventListener("change", listener);
+    media.addEventListener('change', listener);
 
     // Cleanup
-    return () => media.removeEventListener("change", listener);
+    return () => media.removeEventListener('change', listener);
   }, [query]); // ✅ فقط query - بدون matches لمنع الحلقة اللانهائية
 
   return matches;

@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { MonitoringService, type SmartAlert } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { MonitoringService, type SmartAlert } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { SmartAlert };
 

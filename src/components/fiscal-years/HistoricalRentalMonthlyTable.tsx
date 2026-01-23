@@ -25,9 +25,9 @@ interface HistoricalRentalMonthlyTableProps {
   onMonthClick: (monthDate: string) => void;
 }
 
-export function HistoricalRentalMonthlyTable({ 
+export function HistoricalRentalMonthlyTable({
   monthlySummary,
-  onMonthClick
+  onMonthClick,
 }: HistoricalRentalMonthlyTableProps) {
   const formatMonthLabel = (dateStr: string) => {
     try {
@@ -49,7 +49,9 @@ export function HistoricalRentalMonthlyTable({
           >
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold text-sm">{formatMonthLabel(month.month_date)}</span>
-              <Badge variant="outline" className="text-xs">{month.total_units} وحدة</Badge>
+              <Badge variant="outline" className="text-xs">
+                {month.total_units} وحدة
+              </Badge>
             </div>
             <div className="flex items-center gap-2 text-xs mb-2">
               <span className="flex items-center gap-1 text-success">
@@ -110,19 +112,20 @@ export function HistoricalRentalMonthlyTable({
           </TableHeader>
           <TableBody>
             {monthlySummary.map((month) => (
-              <TableRow 
+              <TableRow
                 key={month.month_date}
                 className="cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => onMonthClick(month.month_date)}
               >
-                <TableCell className="font-medium">
-                  {formatMonthLabel(month.month_date)}
-                </TableCell>
+                <TableCell className="font-medium">{formatMonthLabel(month.month_date)}</TableCell>
                 <TableCell className="text-center">
                   <Badge variant="outline">{month.total_units}</Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="default" className="bg-success/20 text-success hover:bg-success/30">
+                  <Badge
+                    variant="default"
+                    className="bg-success/20 text-success hover:bg-success/30"
+                  >
                     {month.paid_count}
                   </Badge>
                 </TableCell>

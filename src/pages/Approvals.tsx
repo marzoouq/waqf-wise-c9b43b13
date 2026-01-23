@@ -1,19 +1,30 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { FileText, Users, DollarSign, Coins, Wallet, AlertTriangle, CheckSquare } from "lucide-react";
-import { ApprovalsOverview } from "@/components/approvals/ApprovalsOverview";
-import { JournalApprovalsTab } from "@/components/approvals/JournalApprovalsTab";
-import { DistributionApprovalsTab } from "@/components/approvals/DistributionApprovalsTab";
-import { RequestApprovalsTab } from "@/components/approvals/RequestApprovalsTab";
-import { LoanApprovalsTab } from "@/components/approvals/LoanApprovalsTab";
-import { PaymentApprovalsTab } from "@/components/approvals/PaymentApprovalsTab";
-import { EmergencyAidApprovalsTab } from "@/components/approvals/EmergencyAidApprovalsTab";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  FileText,
+  Users,
+  DollarSign,
+  Coins,
+  Wallet,
+  AlertTriangle,
+  CheckSquare,
+} from 'lucide-react';
+import { ApprovalsOverview } from '@/components/approvals/ApprovalsOverview';
+import { JournalApprovalsTab } from '@/components/approvals/JournalApprovalsTab';
+import { DistributionApprovalsTab } from '@/components/approvals/DistributionApprovalsTab';
+import { RequestApprovalsTab } from '@/components/approvals/RequestApprovalsTab';
+import { LoanApprovalsTab } from '@/components/approvals/LoanApprovalsTab';
+import { PaymentApprovalsTab } from '@/components/approvals/PaymentApprovalsTab';
+import { EmergencyAidApprovalsTab } from '@/components/approvals/EmergencyAidApprovalsTab';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const Approvals = () => {
-  const [activeTab, setActiveTab] = useState("journal");
+  const [activeTab, setActiveTab] = useState('journal');
 
   return (
     <PageErrorBoundary pageName="الموافقات">
@@ -31,43 +42,43 @@ const Approvals = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <ScrollArea className="w-full whitespace-nowrap">
             <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 mb-2 h-auto p-1.5 bg-muted/60 rounded-xl">
-              <TabsTrigger 
-                value="journal" 
+              <TabsTrigger
+                value="journal"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <FileText className="h-4 w-4" />
                 <span className="text-xs sm:text-sm font-medium">القيود</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="distributions" 
+              <TabsTrigger
+                value="distributions"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <DollarSign className="h-4 w-4" />
                 <span className="text-xs sm:text-sm font-medium">التوزيعات</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="payments" 
+              <TabsTrigger
+                value="payments"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <Wallet className="h-4 w-4" />
                 <span className="text-xs sm:text-sm font-medium">المدفوعات</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="loans" 
+              <TabsTrigger
+                value="loans"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <Coins className="h-4 w-4" />
                 <span className="text-xs sm:text-sm font-medium">القروض</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="emergency" 
+              <TabsTrigger
+                value="emergency"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <AlertTriangle className="h-4 w-4" />
                 <span className="text-xs sm:text-sm font-medium">الفزعات</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="requests" 
+              <TabsTrigger
+                value="requests"
                 className="flex items-center gap-1.5 px-3 py-2.5 sm:px-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 <Users className="h-4 w-4" />

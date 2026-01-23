@@ -59,9 +59,11 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
       />
       <UnifiedKPICard
         title="متوسط الدفعة"
-        value={stats?.paymentsCount 
-          ? `${Math.round((stats.totalPayments || 0) / stats.paymentsCount).toLocaleString('ar-SA')} ريال`
-          : '0 ريال'}
+        value={
+          stats?.paymentsCount
+            ? `${Math.round((stats.totalPayments || 0) / stats.paymentsCount).toLocaleString('ar-SA')} ريال`
+            : '0 ريال'
+        }
         subtitle="لكل دفعة"
         icon={TrendingUp}
         variant="warning"

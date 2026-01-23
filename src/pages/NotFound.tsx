@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { Link } from 'react-router-dom';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 
 const NotFound = () => {
   return (

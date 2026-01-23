@@ -1,12 +1,19 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { Users } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useFamilyMembersDialog } from "@/hooks/distributions/useDistributionTabsData";
-import { matchesStatus } from "@/lib/constants";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Users } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useFamilyMembersDialog } from '@/hooks/distributions/useDistributionTabsData';
+import { matchesStatus } from '@/lib/constants';
 
 interface FamilyMembersDialogProps {
   open: boolean;
@@ -30,13 +37,13 @@ export function FamilyMembersDialog({ open, onOpenChange, familyName }: FamilyMe
   const { data: members = [], isLoading } = useFamilyMembersDialog(familyName, open);
 
   const getRelationshipBadge = (relationship: string) => {
-    const variants: Record<string, "default" | "secondary" | "outline"> = {
-      "رب الأسرة": "default",
-      "زوجة": "secondary",
-      "ابن": "outline",
-      "ابنة": "outline",
+    const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
+      'رب الأسرة': 'default',
+      زوجة: 'secondary',
+      ابن: 'outline',
+      ابنة: 'outline',
     };
-    return variants[relationship] || "outline";
+    return variants[relationship] || 'outline';
   };
 
   return (
@@ -57,7 +64,8 @@ export function FamilyMembersDialog({ open, onOpenChange, familyName }: FamilyMe
         ) : (
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              إجمالي الأفراد: <span className="font-bold">{(members as FamilyMember[]).length}</span>
+              إجمالي الأفراد:{' '}
+              <span className="font-bold">{(members as FamilyMember[]).length}</span>
             </div>
 
             <div className="rounded-md border">
@@ -86,17 +94,19 @@ export function FamilyMembersDialog({ open, onOpenChange, familyName }: FamilyMe
                       <TableCell className="font-mono text-sm">{member.national_id}</TableCell>
                       <TableCell>
                         <Badge variant={getRelationshipBadge(member.relationship)}>
-                          {member.relationship || "-"}
+                          {member.relationship || '-'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{member.gender || "-"}</TableCell>
+                      <TableCell>{member.gender || '-'}</TableCell>
                       <TableCell>
                         {member.date_of_birth
-                          ? format(new Date(member.date_of_birth), "dd/MM/yyyy", { locale: ar })
-                          : "-"}
+                          ? format(new Date(member.date_of_birth), 'dd/MM/yyyy', { locale: ar })
+                          : '-'}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={matchesStatus(member.status, 'active') ? "default" : "secondary"}>
+                        <Badge
+                          variant={matchesStatus(member.status, 'active') ? 'default' : 'secondary'}
+                        >
                           {member.status}
                         </Badge>
                       </TableCell>

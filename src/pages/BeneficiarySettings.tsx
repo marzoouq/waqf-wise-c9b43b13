@@ -1,18 +1,22 @@
-import { useState } from "react";
-import { User, Bell, Shield, Palette, LogOut } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { ProfileDialog } from "@/components/settings/ProfileDialog";
-import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
-import { SecuritySettingsDialog } from "@/components/settings/SecuritySettingsDialog";
-import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
-import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
-import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
-import { BiometricSettings } from "@/components/settings/BiometricSettings";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/ui/use-toast";
-import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
+import { useState } from 'react';
+import { User, Bell, Shield, Palette, LogOut } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { ProfileDialog } from '@/components/settings/ProfileDialog';
+import { NotificationsSettingsDialog } from '@/components/settings/NotificationsSettingsDialog';
+import { SecuritySettingsDialog } from '@/components/settings/SecuritySettingsDialog';
+import { AppearanceSettingsDialog } from '@/components/settings/AppearanceSettingsDialog';
+import { PushNotificationsSettings } from '@/components/settings/PushNotificationsSettings';
+import { LeakedPasswordCheck } from '@/components/settings/LeakedPasswordCheck';
+import { BiometricSettings } from '@/components/settings/BiometricSettings';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/ui/use-toast';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+  MobileOptimizedGrid,
+} from '@/components/layout/MobileOptimizedLayout';
 
 const BeneficiarySettings = () => {
   const { signOut } = useAuth();
@@ -26,39 +30,39 @@ const BeneficiarySettings = () => {
     try {
       await signOut();
       toast({
-        title: "تم تسجيل الخروج",
-        description: "تم تسجيل خروجك بنجاح",
+        title: 'تم تسجيل الخروج',
+        description: 'تم تسجيل خروجك بنجاح',
       });
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تسجيل الخروج",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تسجيل الخروج',
+        variant: 'destructive',
       });
     }
   };
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
-      case "الملف الشخصي":
+      case 'الملف الشخصي':
         setProfileDialogOpen(true);
         break;
-      case "الإشعارات":
+      case 'الإشعارات':
         setNotificationsDialogOpen(true);
         break;
-      case "الأمان والخصوصية":
+      case 'الأمان والخصوصية':
         setSecurityDialogOpen(true);
         break;
-      case "المظهر":
+      case 'المظهر':
         setAppearanceDialogOpen(true);
         break;
-      case "تسجيل الخروج":
+      case 'تسجيل الخروج':
         handleLogout();
         break;
       default:
         toast({
           title: `إعدادات ${sectionTitle}`,
-          description: "هذه الميزة قيد التطوير",
+          description: 'هذه الميزة قيد التطوير',
         });
     }
   };
@@ -66,31 +70,31 @@ const BeneficiarySettings = () => {
   const settingsSections = [
     {
       id: 1,
-      title: "الملف الشخصي",
-      description: "إدارة معلومات الحساب والبيانات الشخصية",
+      title: 'الملف الشخصي',
+      description: 'إدارة معلومات الحساب والبيانات الشخصية',
       icon: User,
-      color: "bg-success/10 text-success",
+      color: 'bg-success/10 text-success',
     },
     {
       id: 2,
-      title: "الإشعارات",
-      description: "تخصيص إعدادات التنبيهات والإشعارات",
+      title: 'الإشعارات',
+      description: 'تخصيص إعدادات التنبيهات والإشعارات',
       icon: Bell,
-      color: "bg-warning/10 text-warning-foreground",
+      color: 'bg-warning/10 text-warning-foreground',
     },
     {
       id: 3,
-      title: "الأمان والخصوصية",
-      description: "إدارة كلمة المرور والمصادقة الثنائية",
+      title: 'الأمان والخصوصية',
+      description: 'إدارة كلمة المرور والمصادقة الثنائية',
       icon: Shield,
-      color: "bg-destructive/10 text-destructive",
+      color: 'bg-destructive/10 text-destructive',
     },
     {
       id: 4,
-      title: "المظهر",
-      description: "تخصيص الألوان والثيم",
+      title: 'المظهر',
+      description: 'تخصيص الألوان والثيم',
       icon: Palette,
-      color: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+      color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
     },
   ];
 
@@ -122,9 +126,7 @@ const BeneficiarySettings = () => {
                       <CardTitle className="text-lg group-hover:text-primary transition-colors">
                         {section.title}
                       </CardTitle>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {section.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-2">{section.description}</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -136,12 +138,7 @@ const BeneficiarySettings = () => {
         {/* Logout Button */}
         <Card className="shadow-soft">
           <CardContent className="pt-6">
-            <Button
-              onClick={handleLogout}
-              variant="destructive"
-              className="w-full"
-              size="lg"
-            >
+            <Button onClick={handleLogout} variant="destructive" className="w-full" size="lg">
               <LogOut className="ms-2 h-5 w-5" />
               تسجيل الخروج
             </Button>
@@ -159,18 +156,12 @@ const BeneficiarySettings = () => {
         </div>
 
         {/* Dialogs */}
-        <ProfileDialog
-          open={profileDialogOpen}
-          onOpenChange={setProfileDialogOpen}
-        />
+        <ProfileDialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen} />
         <NotificationsSettingsDialog
           open={notificationsDialogOpen}
           onOpenChange={setNotificationsDialogOpen}
         />
-        <SecuritySettingsDialog
-          open={securityDialogOpen}
-          onOpenChange={setSecurityDialogOpen}
-        />
+        <SecuritySettingsDialog open={securityDialogOpen} onOpenChange={setSecurityDialogOpen} />
         <AppearanceSettingsDialog
           open={appearanceDialogOpen}
           onOpenChange={setAppearanceDialogOpen}

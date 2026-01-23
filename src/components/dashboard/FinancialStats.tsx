@@ -1,12 +1,27 @@
-import { useState } from "react";
-import { TrendingUp, TrendingDown, Wallet, PiggyBank, Calculator, Calendar, Lock, Unlock } from "lucide-react";
-import { useFinancialData, useFiscalYearOptions } from "@/hooks/accounting/useFinancialData";
-import { formatCurrency } from "@/lib/utils";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  PiggyBank,
+  Calculator,
+  Calendar,
+  Lock,
+  Unlock,
+} from 'lucide-react';
+import { useFinancialData, useFiscalYearOptions } from '@/hooks/accounting/useFinancialData';
+import { formatCurrency } from '@/lib/utils';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { ErrorState } from '@/components/shared/ErrorState';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 const FinancialStats = () => {
   const [selectedFiscalYearId, setSelectedFiscalYearId] = useState<string | undefined>(undefined);
@@ -19,13 +34,7 @@ const FinancialStats = () => {
         <div className="h-10 bg-muted/50 rounded animate-pulse w-64" />
         <UnifiedStatsGrid columns={3}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <UnifiedKPICard
-              key={`skeleton-${i}`}
-              title=""
-              value="0"
-              icon={Wallet}
-              loading={true}
-            />
+            <UnifiedKPICard key={`skeleton-${i}`} title="" value="0" icon={Wallet} loading={true} />
           ))}
         </UnifiedStatsGrid>
       </div>
@@ -33,47 +42,53 @@ const FinancialStats = () => {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل البيانات المالية" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل البيانات المالية"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!data) return null;
 
   const stats = [
     {
-      title: "إجمالي الأصول",
+      title: 'إجمالي الأصول',
       value: formatCurrency(data.totalAssets),
       icon: Wallet,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "إجمالي الالتزامات",
+      title: 'إجمالي الالتزامات',
       value: formatCurrency(data.totalLiabilities),
       icon: Calculator,
-      variant: "warning" as const,
+      variant: 'warning' as const,
     },
     {
-      title: "حقوق الملكية",
+      title: 'حقوق الملكية',
       value: formatCurrency(data.totalEquity),
       icon: PiggyBank,
-      variant: "default" as const,
+      variant: 'default' as const,
     },
     {
-      title: "إيرادات الفترة",
+      title: 'إيرادات الفترة',
       value: formatCurrency(data.totalRevenue),
       icon: TrendingUp,
-      variant: "success" as const,
+      variant: 'success' as const,
     },
     {
-      title: "إجمالي المصروفات",
+      title: 'إجمالي المصروفات',
       value: formatCurrency(data.totalExpenses),
       icon: TrendingDown,
-      variant: "danger" as const,
+      variant: 'danger' as const,
     },
     {
-      title: "صافي الدخل",
+      title: 'صافي الدخل',
       value: formatCurrency(data.netIncome),
       icon: TrendingUp,
-      variant: data.netIncome >= 0 ? "success" as const : "danger" as const,
+      variant: data.netIncome >= 0 ? ('success' as const) : ('danger' as const),
     },
   ];
 
@@ -85,9 +100,9 @@ const FinancialStats = () => {
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">السنة المالية:</span>
         </div>
-        
+
         <Select
-          value={selectedFiscalYearId || data.fiscalYearId || ""}
+          value={selectedFiscalYearId || data.fiscalYearId || ''}
           onValueChange={(value) => setSelectedFiscalYearId(value || undefined)}
         >
           <SelectTrigger className="w-[220px]">
@@ -104,7 +119,9 @@ const FinancialStats = () => {
                   )}
                   <span>{fy.name}</span>
                   {fy.is_active && (
-                    <Badge variant="secondary" className="text-xs">نشطة</Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      نشطة
+                    </Badge>
                   )}
                 </div>
               </SelectItem>
@@ -114,7 +131,7 @@ const FinancialStats = () => {
 
         {/* شارة حالة السنة المالية */}
         {data.fiscalYearName && (
-          <Badge 
+          <Badge
             variant={data.fiscalYearStatus === 'closed' ? 'secondary' : 'default'}
             className="flex items-center gap-1"
           >

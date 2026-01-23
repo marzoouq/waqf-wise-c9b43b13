@@ -4,9 +4,9 @@
  * @version 2.9.43
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { TwoFactorService } from "@/services/two-factor.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { TwoFactorService } from '@/services/two-factor.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useTwoFactorAuth(userId: string | undefined) {
   const queryClient = useQueryClient();

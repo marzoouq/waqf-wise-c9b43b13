@@ -1,15 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { GovernanceService, AuthService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { productionLogger } from "@/lib/logger/production-logger";
-import type { VoteType } from "@/types/governance";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { GovernanceService, AuthService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
+import type { VoteType } from '@/types/governance';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useGovernanceVoting(decisionId: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: votes = [], isLoading, error: votesError } = useQuery({
+  const {
+    data: votes = [],
+    isLoading,
+    error: votesError,
+  } = useQuery({
     queryKey: QUERY_KEYS.GOVERNANCE_VOTES(decisionId),
     queryFn: async () => {
       try {
@@ -47,16 +51,16 @@ export function useGovernanceVoting(decisionId: string) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_VOTE(decisionId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_DECISIONS });
       toast({
-        title: "تم تسجيل صوتك بنجاح",
-        description: "شكراً لمشاركتك في التصويت",
+        title: 'تم تسجيل صوتك بنجاح',
+        description: 'شكراً لمشاركتك في التصويت',
       });
     },
     onError: (error: Error) => {
       productionLogger.error('Cast vote mutation error:', error);
       toast({
-        title: "خطأ في التصويت",
-        description: error.message || "حدث خطأ أثناء تسجيل صوتك، يرجى المحاولة مرة أخرى",
-        variant: "destructive",
+        title: 'خطأ في التصويت',
+        description: error.message || 'حدث خطأ أثناء تسجيل صوتك، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
       });
     },
   });

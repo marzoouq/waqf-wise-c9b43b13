@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Mail, Phone, MapPin, Send, MessageSquare, Clock, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { useContactForm, type ContactFormData } from "@/hooks/ui/useContactForm";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { LandingHeader } from '@/components/landing/LandingHeader';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Mail, Phone, MapPin, Send, MessageSquare, Clock, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useContactForm, type ContactFormData } from '@/hooks/ui/useContactForm';
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -16,14 +16,14 @@ export default function Contact() {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
   });
-  
+
   const { sendMessage, isSending } = useContactForm();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
       await sendMessage(formData);
       setIsSubmitted(true);
@@ -42,7 +42,9 @@ export default function Contact() {
             <MessageSquare className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-4">تواصل معنا</h1>
-          <p className="text-muted-foreground">نحن هنا لمساعدتك. تواصل معنا وسنرد عليك في أقرب وقت</p>
+          <p className="text-muted-foreground">
+            نحن هنا لمساعدتك. تواصل معنا وسنرد عليك في أقرب وقت
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -73,7 +75,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">الهاتف</p>
-                    <p className="font-medium text-foreground" dir="ltr">+966 50 000 0000</p>
+                    <p className="font-medium text-foreground" dir="ltr">
+                      +966 50 000 0000
+                    </p>
                   </div>
                 </a>
 
@@ -104,10 +108,7 @@ export default function Contact() {
               <p className="text-sm text-muted-foreground mb-4">
                 للمشاكل التقنية أو الاستفسارات العاجلة، يمكنك التواصل مع فريق الدعم الفني مباشرة.
               </p>
-              <a 
-                href="mailto:support@waqf.sa" 
-                className="text-primary font-medium hover:underline"
-              >
+              <a href="mailto:support@waqf.sa" className="text-primary font-medium hover:underline">
                 support@waqf.sa
               </a>
             </div>
@@ -135,64 +136,70 @@ export default function Contact() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">الاسم الكامل</Label>
-                      <Input 
-                        id="name" 
-                        placeholder="أدخل اسمك" 
-                        required 
+                      <Input
+                        id="name"
+                        placeholder="أدخل اسمك"
+                        required
                         value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">البريد الإلكتروني</Label>
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="example@email.com" 
-                        required 
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="example@email.com"
+                        required
                         value={formData.email}
-                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, email: e.target.value }))
+                        }
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="phone">رقم الهاتف (اختياري)</Label>
-                    <Input 
-                      id="phone" 
-                      type="tel" 
-                      placeholder="+966 5X XXX XXXX" 
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+966 5X XXX XXXX"
                       value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="subject">الموضوع</Label>
-                    <Input 
-                      id="subject" 
-                      placeholder="موضوع الرسالة" 
-                      required 
+                    <Input
+                      id="subject"
+                      placeholder="موضوع الرسالة"
+                      required
                       value={formData.subject}
-                      onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, subject: e.target.value }))
+                      }
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="message">الرسالة</Label>
-                    <Textarea 
-                      id="message" 
-                      placeholder="اكتب رسالتك هنا..." 
+                    <Textarea
+                      id="message"
+                      placeholder="اكتب رسالتك هنا..."
                       rows={5}
-                      required 
+                      required
                       value={formData.message}
-                      onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, message: e.target.value }))
+                      }
                     />
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isSending}>
                     {isSending ? (
-                      "جاري الإرسال..."
+                      'جاري الإرسال...'
                     ) : (
                       <>
                         <Send className="w-4 h-4 ms-2" />
@@ -207,10 +214,7 @@ export default function Contact() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
-            to="/" 
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <Link to="/" className="text-muted-foreground hover:text-foreground">
             ← العودة للصفحة الرئيسية
           </Link>
         </div>

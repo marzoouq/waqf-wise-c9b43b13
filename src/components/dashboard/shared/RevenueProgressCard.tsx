@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { TrendingUp, Target, Wallet } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useRevenueProgress } from "@/hooks/dashboard/useRevenueProgress";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { TrendingUp, Target, Wallet } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useRevenueProgress } from '@/hooks/dashboard/useRevenueProgress';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function RevenueProgressCard() {
   const { data, isLoading, error, refetch } = useRevenueProgress();
@@ -23,7 +23,13 @@ export function RevenueProgressCard() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل تقدم الإيرادات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل تقدم الإيرادات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!data) return null;
@@ -41,8 +47,7 @@ export function RevenueProgressCard() {
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">نسبة التحصيل</span>
             <span className={`font-bold ${data.progress > 100 ? 'text-primary' : 'text-success'}`}>
-              {data.progress.toFixed(1)}%
-              {data.progress > 100 && ' ✓'}
+              {data.progress.toFixed(1)}%{data.progress > 100 && ' ✓'}
             </span>
           </div>
           <Progress value={Math.min(data.progress, 100)} className="h-3" />
@@ -54,17 +59,23 @@ export function RevenueProgressCard() {
         <div className="grid grid-cols-3 gap-3 pt-2">
           <div className="text-center p-2 bg-success/10 rounded-lg">
             <Wallet className="h-4 w-4 mx-auto mb-1 text-success" />
-            <span className="text-sm font-bold block">{data.totalCollected.toLocaleString('ar-SA')}</span>
+            <span className="text-sm font-bold block">
+              {data.totalCollected.toLocaleString('ar-SA')}
+            </span>
             <span className="text-xs text-muted-foreground">المحصل</span>
           </div>
           <div className="text-center p-2 bg-primary/10 rounded-lg">
             <Target className="h-4 w-4 mx-auto mb-1 text-primary" />
-            <span className="text-sm font-bold block">{data.expectedRevenue.toLocaleString('ar-SA')}</span>
+            <span className="text-sm font-bold block">
+              {data.expectedRevenue.toLocaleString('ar-SA')}
+            </span>
             <span className="text-xs text-muted-foreground">المتوقع</span>
           </div>
           <div className="text-center p-2 bg-muted/50 rounded-lg">
             <TrendingUp className="h-4 w-4 mx-auto mb-1 text-muted-foreground" />
-            <span className="text-sm font-bold block">{data.netRevenue.toLocaleString('ar-SA')}</span>
+            <span className="text-sm font-bold block">
+              {data.netRevenue.toLocaleString('ar-SA')}
+            </span>
             <span className="text-xs text-muted-foreground">الصافي</span>
           </div>
         </div>

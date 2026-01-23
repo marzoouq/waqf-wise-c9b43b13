@@ -38,16 +38,16 @@ export async function safeRPC<T>(
   try {
     // استخدام type assertion واضح وآمن
     const { data, error } = await supabase.rpc(functionName as never, params as never);
-    
+
     if (error) {
       return { data: null, error };
     }
-    
+
     return { data: data as T, error: null };
   } catch (error) {
-    return { 
-      data: null, 
-      error: error instanceof Error ? error : new Error('Unknown error') 
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error('Unknown error'),
     };
   }
 }
@@ -74,7 +74,7 @@ export async function createAutoJournalEntry(params: {
     p_reference_id: params.referenceId,
     p_amount: params.amount,
     p_description: params.description,
-    p_transaction_date: params.transactionDate || new Date().toISOString().split('T')[0]
+    p_transaction_date: params.transactionDate || new Date().toISOString().split('T')[0],
   });
 }
 
@@ -91,7 +91,7 @@ export async function checkRateLimit(params: {
     p_email: params.email,
     p_ip_address: params.ipAddress,
     p_max_attempts: params.maxAttempts || 5,
-    p_time_window_minutes: params.timeWindowMinutes || 15
+    p_time_window_minutes: params.timeWindowMinutes || 15,
   });
 }
 
@@ -111,20 +111,24 @@ export async function calculatePreciseLoanSchedule(params: {
   termMonths: number;
   interestRate: number;
   startDate: string;
-}): Promise<SupabaseResult<Array<{
-  installment_number: number;
-  due_date: string;
-  principal_amount: number;
-  interest_amount: number;
-  total_amount: number;
-  remaining_balance: number;
-}>>> {
+}): Promise<
+  SupabaseResult<
+    Array<{
+      installment_number: number;
+      due_date: string;
+      principal_amount: number;
+      interest_amount: number;
+      total_amount: number;
+      remaining_balance: number;
+    }>
+  >
+> {
   return safeRPC('calculate_precise_loan_schedule', {
     p_loan_id: params.loanId,
     p_principal: params.principal,
     p_term_months: params.termMonths,
     p_interest_rate: params.interestRate,
-    p_start_date: params.startDate
+    p_start_date: params.startDate,
   });
 }
 
@@ -141,6 +145,6 @@ export async function logLoginAttempt(params: {
     p_email: params.email,
     p_ip_address: params.ipAddress,
     p_success: params.success,
-    p_user_agent: params.userAgent
+    p_user_agent: params.userAgent,
   });
 }

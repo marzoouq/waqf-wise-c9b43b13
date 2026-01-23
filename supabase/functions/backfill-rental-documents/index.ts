@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 interface ProcessedPayment {
@@ -30,7 +30,7 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'backfill-rental-documents',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
       } catch {
@@ -51,9 +51,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
 
     if (authError || !user) {
       return unauthorizedResponse('Unauthorized');
@@ -70,8 +71,8 @@ serve(async (req) => {
       return errorResponse('Error verifying permissions', 500);
     }
 
-    const userRoles = roleData?.map(r => r.role) || [];
-    const hasRequiredRole = userRoles.some(role => ['admin', 'accountant'].includes(role));
+    const userRoles = roleData?.map((r) => r.role) || [];
+    const hasRequiredRole = userRoles.some((role) => ['admin', 'accountant'].includes(role));
 
     if (!hasRequiredRole) {
       console.warn('Unauthorized backfill attempt by:', user.id, 'with roles:', userRoles);
@@ -83,7 +84,8 @@ serve(async (req) => {
     // 1️⃣ جلب الدفعات المدفوعة فقط بدون فواتير
     const { data: paidPayments, error: fetchError } = await supabaseClient
       .from('rental_payments')
-      .select(`
+      .select(
+        `
         *,
         contracts!inner (
           contract_number,
@@ -95,7 +97,8 @@ serve(async (req) => {
             name
           )
         )
-      `)
+      `
+      )
       .eq('status', 'مدفوع')
       .gt('amount_paid', 0)
       .is('invoice_id', null);
@@ -105,10 +108,10 @@ serve(async (req) => {
     console.log(`✅ تم العثور على ${paidPayments?.length || 0} دفعات مدفوعة`);
 
     if (!paidPayments || paidPayments.length === 0) {
-      return jsonResponse({ 
-        success: true, 
+      return jsonResponse({
+        success: true,
         message: 'لا توجد دفعات تحتاج معالجة',
-        processed: 0 
+        processed: 0,
       });
     }
 
@@ -135,7 +138,7 @@ serve(async (req) => {
             p_tenant_id: payment.contracts.tenant_id_number,
             p_tenant_email: payment.contracts.tenant_email || null,
             p_tenant_phone: payment.contracts.tenant_phone,
-            p_property_name: payment.contracts.properties.name
+            p_property_name: payment.contracts.properties.name,
           }
         );
 
@@ -162,11 +165,10 @@ serve(async (req) => {
           payment_number: payment.payment_number,
           invoice_id: rpcResult[0].invoice_id,
           receipt_id: rpcResult[0].receipt_id,
-          journal_entry_id: rpcResult[0].journal_entry_id
+          journal_entry_id: rpcResult[0].journal_entry_id,
         });
 
         successCount++;
-
       } catch (error) {
         console.error(`❌ خطأ عام في معالجة ${payment.payment_number}:`, error);
         const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
@@ -177,34 +179,32 @@ serve(async (req) => {
 
     // 3️⃣ حذف القيود الخاطئة (المرتبطة بدفعات معلقة)
     console.log('🧹 تنظيف القيود المحاسبية الخاطئة...');
-    
+
     const { data: wrongEntries } = await supabaseClient
       .from('journal_entries')
       .select('id')
       .eq('reference_type', 'rental_payment')
-      .in('reference_id', 
+      .in(
+        'reference_id',
         await supabaseClient
           .from('rental_payments')
           .select('id')
           .neq('status', 'مدفوع')
-          .then(({ data }) => data?.map(p => p.id) || [])
+          .then(({ data }) => data?.map((p) => p.id) || [])
       );
 
     if (wrongEntries && wrongEntries.length > 0) {
-      const wrongEntryIds = wrongEntries.map(e => e.id);
-      
+      const wrongEntryIds = wrongEntries.map((e) => e.id);
+
       // حذف السطور أولاً
       await supabaseClient
         .from('journal_entry_lines')
         .delete()
         .in('journal_entry_id', wrongEntryIds);
-      
+
       // ثم حذف القيود
-      await supabaseClient
-        .from('journal_entries')
-        .delete()
-        .in('id', wrongEntryIds);
-      
+      await supabaseClient.from('journal_entries').delete().in('id', wrongEntryIds);
+
       console.log(`✅ تم حذف ${wrongEntries.length} قيد خاطئ`);
     }
 
@@ -217,13 +217,12 @@ serve(async (req) => {
       cleaned_entries: wrongEntries?.length || 0,
       errors: errors.length > 0 ? errors : undefined,
       processed_payments: processedPayments,
-      message: `تمت معالجة ${successCount} من ${paidPayments.length} دفعة بنجاح${wrongEntries?.length ? ` وتنظيف ${wrongEntries.length} قيد خاطئ` : ''}`
+      message: `تمت معالجة ${successCount} من ${paidPayments.length} دفعة بنجاح${wrongEntries?.length ? ` وتنظيف ${wrongEntries.length} قيد خاطئ` : ''}`,
     };
 
     console.log('📊 النتيجة النهائية:', result);
 
     return jsonResponse(result);
-
   } catch (error) {
     console.error('❌ خطأ حرج في Edge Function:', error);
     return errorResponse(

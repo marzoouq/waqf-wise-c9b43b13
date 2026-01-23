@@ -11,7 +11,12 @@ interface ProfilePaymentsHistoryProps {
 }
 
 export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistoryProps) {
-  const { data: payments, isLoading, error, refetch } = useBeneficiaryProfilePayments(beneficiaryId);
+  const {
+    data: payments,
+    isLoading,
+    error,
+    refetch,
+  } = useBeneficiaryProfilePayments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجل المدفوعات..." />;
@@ -23,9 +28,10 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
 
   const totalPayments = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
   const currentYear = new Date().getFullYear();
-  const currentYearPayments = payments?.filter(p => 
-    new Date(p.payment_date).getFullYear() === currentYear
-  ).reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+  const currentYearPayments =
+    payments
+      ?.filter((p) => new Date(p.payment_date).getFullYear() === currentYear)
+      .reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
 
   return (
     <div className="space-y-6">
@@ -71,9 +77,7 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">عدد المدفوعات</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {payments?.length || 0}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{payments?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -103,9 +107,7 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
                       {payment.description || 'دفعة من الوقف'}
                     </h4>
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span>
-                        {format(new Date(payment.payment_date), 'PPP', { locale: ar })}
-                      </span>
+                      <span>{format(new Date(payment.payment_date), 'PPP', { locale: ar })}</span>
                       {payment.payment_method && (
                         <>
                           <span>•</span>
@@ -114,7 +116,7 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="text-left">
                     <div className="text-xl font-bold text-primary">
                       {payment.amount.toLocaleString('ar-SA')} ريال

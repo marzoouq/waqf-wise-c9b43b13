@@ -54,16 +54,14 @@ describe('MobilePropertyCard Component', () => {
     );
     expect(screen.getByText('تجاري')).toBeInTheDocument();
 
-    rerender(
-      <MobilePropertyCard property={{ ...mockProperty, type: 'زراعي' }} />
-    );
+    rerender(<MobilePropertyCard property={{ ...mockProperty, type: 'زراعي' }} />);
     expect(screen.getByText('زراعي')).toBeInTheDocument();
   });
 
   it('should render without property type', () => {
     const propertyWithoutType = { ...mockProperty, type: undefined };
     render(<MobilePropertyCard property={propertyWithoutType} />);
-    
+
     // Should still render the property name
     expect(screen.getByText('عقار الخالدية')).toBeInTheDocument();
   });
@@ -71,7 +69,7 @@ describe('MobilePropertyCard Component', () => {
   it('should render without status', () => {
     const propertyWithoutStatus = { ...mockProperty, status: undefined };
     render(<MobilePropertyCard property={propertyWithoutStatus} />);
-    
+
     // Should still render the property name and location
     expect(screen.getByText('عقار الخالدية')).toBeInTheDocument();
     expect(screen.getByText(/الرياض/)).toBeInTheDocument();
@@ -103,7 +101,7 @@ describe('MobilePropertyCard Component', () => {
     const { container } = render(
       <MobilePropertyCard property={{ ...mockProperty, type: 'زراعي' }} />
     );
-    // Badge should be present  
+    // Badge should be present
     expect(screen.getByText('زراعي')).toBeInTheDocument();
   });
 });

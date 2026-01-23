@@ -2,19 +2,19 @@
  * ملخص فئات المستندات
  * يعرض ملخص مالي سريع لكل فئة من المستندات
  */
-import { type ElementType } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Zap, 
-  Wrench, 
-  Receipt, 
-  FileText, 
-  Calculator, 
+import { type ElementType } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Zap,
+  Wrench,
+  Receipt,
+  FileText,
+  Calculator,
   Wallet,
   FileCheck,
-  TrendingDown
-} from "lucide-react";
+  TrendingDown,
+} from 'lucide-react';
 
 interface CategorySummary {
   type: string;
@@ -28,30 +28,30 @@ interface DocumentCategorySummaryProps {
 }
 
 const TYPE_ICONS: Record<string, ElementType> = {
-  'فاتورة_خدمات': Zap,
-  'صيانة': Wrench,
-  'زكاة_ضرائب': Receipt,
-  'تقرير_مالي': FileText,
-  'خدمات_محاسبية': Calculator,
-  'مصاريف_عامة': Wallet,
-  'اقفال_سنوي': FileCheck,
+  فاتورة_خدمات: Zap,
+  صيانة: Wrench,
+  زكاة_ضرائب: Receipt,
+  تقرير_مالي: FileText,
+  خدمات_محاسبية: Calculator,
+  مصاريف_عامة: Wallet,
+  اقفال_سنوي: FileCheck,
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  'فاتورة_خدمات': 'bg-info/10 text-info border-info/20',
-  'صيانة': 'bg-warning/10 text-warning border-warning/20',
-  'زكاة_ضرائب': 'bg-success/10 text-success border-success/20',
-  'تقرير_مالي': 'bg-primary/10 text-primary border-primary/20',
-  'خدمات_محاسبية': 'bg-accent/10 text-accent-foreground border-accent/20',
-  'مصاريف_عامة': 'bg-muted text-muted-foreground border-border',
-  'اقفال_سنوي': 'bg-success/10 text-success border-success/20',
+  فاتورة_خدمات: 'bg-info/10 text-info border-info/20',
+  صيانة: 'bg-warning/10 text-warning border-warning/20',
+  زكاة_ضرائب: 'bg-success/10 text-success border-success/20',
+  تقرير_مالي: 'bg-primary/10 text-primary border-primary/20',
+  خدمات_محاسبية: 'bg-accent/10 text-accent-foreground border-accent/20',
+  مصاريف_عامة: 'bg-muted text-muted-foreground border-border',
+  اقفال_سنوي: 'bg-success/10 text-success border-success/20',
 };
 
 export function DocumentCategorySummary({ categories }: DocumentCategorySummaryProps) {
   const totalExpenses = categories.reduce((sum, cat) => sum + Math.abs(cat.totalAmount), 0);
 
   const formatAmount = (amount: number) => {
-    return Math.abs(amount).toLocaleString("ar-SA", {
+    return Math.abs(amount).toLocaleString('ar-SA', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -73,8 +73,8 @@ export function DocumentCategorySummary({ categories }: DocumentCategorySummaryP
           const colorClass = TYPE_COLORS[category.type] || TYPE_COLORS['مصاريف_عامة'];
 
           return (
-            <Card 
-              key={category.type} 
+            <Card
+              key={category.type}
               className={`border ${colorClass} transition-all hover:shadow-md`}
             >
               <CardContent className="p-4">
@@ -85,9 +85,7 @@ export function DocumentCategorySummary({ categories }: DocumentCategorySummaryP
                     </div>
                     <div>
                       <p className="font-medium">{category.label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {category.count} مستند
-                      </p>
+                      <p className="text-xs text-muted-foreground">{category.count} مستند</p>
                     </div>
                   </div>
                   <div className="text-left">

@@ -3,10 +3,10 @@
  * مع التحقق من البيانات وتسجيل التغييرات
  */
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Dialog,
   DialogContent,
@@ -14,47 +14,52 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { Loader2, User, Phone, CreditCard, Users, Save } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import { Loader2, User, Phone, CreditCard, Users, Save } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
-type Beneficiary = Database["public"]["Tables"]["beneficiaries"]["Row"];
+type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
 
 // مخطط التحقق
 const profileSchema = z.object({
   // معلومات التواصل
-  phone: z.string().min(10, "رقم الهاتف يجب أن يكون 10 أرقام على الأقل").max(15),
-  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
+  phone: z.string().min(10, 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل').max(15),
+  email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
   city: z.string().max(100).optional(),
   address: z.string().max(500).optional(),
-  
+
   // المعلومات البنكية
   bank_name: z.string().max(100).optional(),
   bank_account_number: z.string().max(30).optional(),
-  iban: z.string().max(34).regex(/^[A-Z]{2}[0-9A-Z]+$/, "صيغة IBAN غير صحيحة").optional().or(z.literal("")),
-  
+  iban: z
+    .string()
+    .max(34)
+    .regex(/^[A-Z]{2}[0-9A-Z]+$/, 'صيغة IBAN غير صحيحة')
+    .optional()
+    .or(z.literal('')),
+
   // المعلومات العائلية
   marital_status: z.string().optional(),
   number_of_sons: z.coerce.number().min(0).max(50).optional(),
   number_of_daughters: z.coerce.number().min(0).max(50).optional(),
   number_of_wives: z.coerce.number().min(0).max(4).optional(),
   family_size: z.coerce.number().min(1).max(100).optional(),
-  
+
   // معلومات إضافية
   housing_type: z.string().optional(),
   employment_status: z.string().optional(),
@@ -71,26 +76,26 @@ interface EditProfileDialogProps {
 }
 
 const MARITAL_STATUS_OPTIONS = [
-  { value: "أعزب", label: "أعزب" },
-  { value: "متزوج", label: "متزوج" },
-  { value: "مطلق", label: "مطلق" },
-  { value: "أرمل", label: "أرمل" },
+  { value: 'أعزب', label: 'أعزب' },
+  { value: 'متزوج', label: 'متزوج' },
+  { value: 'مطلق', label: 'مطلق' },
+  { value: 'أرمل', label: 'أرمل' },
 ];
 
 const HOUSING_TYPE_OPTIONS = [
-  { value: "ملك", label: "ملك" },
-  { value: "إيجار", label: "إيجار" },
-  { value: "مع الأهل", label: "مع الأهل" },
-  { value: "أخرى", label: "أخرى" },
+  { value: 'ملك', label: 'ملك' },
+  { value: 'إيجار', label: 'إيجار' },
+  { value: 'مع الأهل', label: 'مع الأهل' },
+  { value: 'أخرى', label: 'أخرى' },
 ];
 
 const EMPLOYMENT_STATUS_OPTIONS = [
-  { value: "موظف", label: "موظف" },
-  { value: "متقاعد", label: "متقاعد" },
-  { value: "عاطل", label: "عاطل عن العمل" },
-  { value: "طالب", label: "طالب" },
-  { value: "ربة منزل", label: "ربة منزل" },
-  { value: "أعمال حرة", label: "أعمال حرة" },
+  { value: 'موظف', label: 'موظف' },
+  { value: 'متقاعد', label: 'متقاعد' },
+  { value: 'عاطل', label: 'عاطل عن العمل' },
+  { value: 'طالب', label: 'طالب' },
+  { value: 'ربة منزل', label: 'ربة منزل' },
+  { value: 'أعمال حرة', label: 'أعمال حرة' },
 ];
 
 export function EditProfileDialog({
@@ -100,26 +105,26 @@ export function EditProfileDialog({
   onSuccess,
 }: EditProfileDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("contact");
+  const [activeTab, setActiveTab] = useState('contact');
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      phone: beneficiary.phone || "",
-      email: beneficiary.email || "",
-      city: beneficiary.city || "",
-      address: beneficiary.address || "",
-      bank_name: beneficiary.bank_name || "",
-      bank_account_number: beneficiary.bank_account_number || "",
-      iban: beneficiary.iban || "",
-      marital_status: beneficiary.marital_status || "",
+      phone: beneficiary.phone || '',
+      email: beneficiary.email || '',
+      city: beneficiary.city || '',
+      address: beneficiary.address || '',
+      bank_name: beneficiary.bank_name || '',
+      bank_account_number: beneficiary.bank_account_number || '',
+      iban: beneficiary.iban || '',
+      marital_status: beneficiary.marital_status || '',
       number_of_sons: beneficiary.number_of_sons || 0,
       number_of_daughters: beneficiary.number_of_daughters || 0,
       number_of_wives: beneficiary.number_of_wives || 0,
       family_size: beneficiary.family_size || 1,
-      housing_type: beneficiary.housing_type || "",
-      employment_status: beneficiary.employment_status || "",
-      notes: beneficiary.notes || "",
+      housing_type: beneficiary.housing_type || '',
+      employment_status: beneficiary.employment_status || '',
+      notes: beneficiary.notes || '',
     },
   });
 
@@ -127,21 +132,21 @@ export function EditProfileDialog({
   useEffect(() => {
     if (beneficiary) {
       form.reset({
-        phone: beneficiary.phone || "",
-        email: beneficiary.email || "",
-        city: beneficiary.city || "",
-        address: beneficiary.address || "",
-        bank_name: beneficiary.bank_name || "",
-        bank_account_number: beneficiary.bank_account_number || "",
-        iban: beneficiary.iban || "",
-        marital_status: beneficiary.marital_status || "",
+        phone: beneficiary.phone || '',
+        email: beneficiary.email || '',
+        city: beneficiary.city || '',
+        address: beneficiary.address || '',
+        bank_name: beneficiary.bank_name || '',
+        bank_account_number: beneficiary.bank_account_number || '',
+        iban: beneficiary.iban || '',
+        marital_status: beneficiary.marital_status || '',
         number_of_sons: beneficiary.number_of_sons || 0,
         number_of_daughters: beneficiary.number_of_daughters || 0,
         number_of_wives: beneficiary.number_of_wives || 0,
         family_size: beneficiary.family_size || 1,
-        housing_type: beneficiary.housing_type || "",
-        employment_status: beneficiary.employment_status || "",
-        notes: beneficiary.notes || "",
+        housing_type: beneficiary.housing_type || '',
+        employment_status: beneficiary.employment_status || '',
+        notes: beneficiary.notes || '',
       });
     }
   }, [beneficiary, form]);
@@ -152,7 +157,7 @@ export function EditProfileDialog({
     try {
       // تحديث البيانات
       const { error } = await supabase
-        .from("beneficiaries")
+        .from('beneficiaries')
         .update({
           phone: data.phone,
           email: data.email || null,
@@ -171,16 +176,16 @@ export function EditProfileDialog({
           notes: data.notes || null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", beneficiary.id);
+        .eq('id', beneficiary.id);
 
       if (error) throw error;
 
-      toast.success("تم تحديث الملف الشخصي بنجاح");
+      toast.success('تم تحديث الملف الشخصي بنجاح');
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("فشل تحديث الملف الشخصي");
+      console.error('Error updating profile:', error);
+      toast.error('فشل تحديث الملف الشخصي');
     } finally {
       setIsSubmitting(false);
     }
@@ -224,13 +229,15 @@ export function EditProfileDialog({
                     <Label htmlFor="phone">رقم الهاتف *</Label>
                     <Input
                       id="phone"
-                      {...form.register("phone")}
+                      {...form.register('phone')}
                       placeholder="05xxxxxxxx"
                       dir="ltr"
                       className="text-left"
                     />
                     {form.formState.errors.phone && (
-                      <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.phone.message}
+                      </p>
                     )}
                   </div>
 
@@ -239,30 +246,28 @@ export function EditProfileDialog({
                     <Input
                       id="email"
                       type="email"
-                      {...form.register("email")}
+                      {...form.register('email')}
                       placeholder="example@email.com"
                       dir="ltr"
                       className="text-left"
                     />
                     {form.formState.errors.email && (
-                      <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.email.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="city">المدينة</Label>
-                    <Input
-                      id="city"
-                      {...form.register("city")}
-                      placeholder="الرياض"
-                    />
+                    <Input id="city" {...form.register('city')} placeholder="الرياض" />
                   </div>
 
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="address">العنوان التفصيلي</Label>
                     <Textarea
                       id="address"
-                      {...form.register("address")}
+                      {...form.register('address')}
                       placeholder="الحي، الشارع، رقم المبنى"
                       rows={2}
                     />
@@ -277,7 +282,7 @@ export function EditProfileDialog({
                     <Label htmlFor="bank_name">اسم البنك</Label>
                     <Input
                       id="bank_name"
-                      {...form.register("bank_name")}
+                      {...form.register('bank_name')}
                       placeholder="البنك الأهلي"
                     />
                   </div>
@@ -286,7 +291,7 @@ export function EditProfileDialog({
                     <Label htmlFor="bank_account_number">رقم الحساب</Label>
                     <Input
                       id="bank_account_number"
-                      {...form.register("bank_account_number")}
+                      {...form.register('bank_account_number')}
                       placeholder="xxxxxxxxxx"
                       dir="ltr"
                       className="text-left font-mono"
@@ -297,13 +302,15 @@ export function EditProfileDialog({
                     <Label htmlFor="iban">رقم الآيبان (IBAN)</Label>
                     <Input
                       id="iban"
-                      {...form.register("iban")}
+                      {...form.register('iban')}
                       placeholder="SA0000000000000000000000"
                       dir="ltr"
                       className="text-left font-mono"
                     />
                     {form.formState.errors.iban && (
-                      <p className="text-sm text-destructive">{form.formState.errors.iban.message}</p>
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.iban.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -315,8 +322,8 @@ export function EditProfileDialog({
                   <div className="space-y-2">
                     <Label htmlFor="marital_status">الحالة الاجتماعية</Label>
                     <Select
-                      value={form.watch("marital_status")}
-                      onValueChange={(value) => form.setValue("marital_status", value)}
+                      value={form.watch('marital_status')}
+                      onValueChange={(value) => form.setValue('marital_status', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الحالة" />
@@ -338,7 +345,7 @@ export function EditProfileDialog({
                       type="number"
                       min={1}
                       max={100}
-                      {...form.register("family_size")}
+                      {...form.register('family_size')}
                     />
                   </div>
 
@@ -349,7 +356,7 @@ export function EditProfileDialog({
                       type="number"
                       min={0}
                       max={50}
-                      {...form.register("number_of_sons")}
+                      {...form.register('number_of_sons')}
                     />
                   </div>
 
@@ -360,7 +367,7 @@ export function EditProfileDialog({
                       type="number"
                       min={0}
                       max={50}
-                      {...form.register("number_of_daughters")}
+                      {...form.register('number_of_daughters')}
                     />
                   </div>
 
@@ -371,15 +378,15 @@ export function EditProfileDialog({
                       type="number"
                       min={0}
                       max={4}
-                      {...form.register("number_of_wives")}
+                      {...form.register('number_of_wives')}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="housing_type">نوع السكن</Label>
                     <Select
-                      value={form.watch("housing_type")}
-                      onValueChange={(value) => form.setValue("housing_type", value)}
+                      value={form.watch('housing_type')}
+                      onValueChange={(value) => form.setValue('housing_type', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر نوع السكن" />
@@ -397,8 +404,8 @@ export function EditProfileDialog({
                   <div className="space-y-2">
                     <Label htmlFor="employment_status">الحالة الوظيفية</Label>
                     <Select
-                      value={form.watch("employment_status")}
-                      onValueChange={(value) => form.setValue("employment_status", value)}
+                      value={form.watch('employment_status')}
+                      onValueChange={(value) => form.setValue('employment_status', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر الحالة" />
@@ -417,7 +424,7 @@ export function EditProfileDialog({
                     <Label htmlFor="notes">ملاحظات إضافية</Label>
                     <Textarea
                       id="notes"
-                      {...form.register("notes")}
+                      {...form.register('notes')}
                       placeholder="أي معلومات إضافية تود إضافتها..."
                       rows={3}
                     />

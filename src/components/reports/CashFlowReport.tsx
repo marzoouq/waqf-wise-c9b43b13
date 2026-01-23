@@ -1,21 +1,30 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
-import { useCashFlowReport } from "@/hooks/reports/useCashFlowReport";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import { ReportRefreshIndicator } from './ReportRefreshIndicator';
+import { useCashFlowReport } from '@/hooks/reports/useCashFlowReport';
 
 export function CashFlowReport() {
-  const { 
-    data: cashFlowData = [], 
-    isLoading, 
+  const {
+    data: cashFlowData = [],
+    isLoading,
     error,
     refetch,
-    isRefetching, 
-    stats, 
-    lastUpdated, 
-    handleRefresh 
+    isRefetching,
+    stats,
+    lastUpdated,
+    handleRefresh,
   } = useCashFlowReport();
 
   if (isLoading) {
@@ -23,7 +32,13 @@ export function CashFlowReport() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل تقرير التدفق النقدي" onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في التحميل"
+        message="فشل تحميل تقرير التدفق النقدي"
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -37,10 +52,10 @@ export function CashFlowReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {stats.totalIncome.toLocaleString("ar-SA")} ريال
+              {stats.totalIncome.toLocaleString('ar-SA')} ريال
             </div>
             <p className="text-xs text-muted-foreground">
-              متوسط شهري: {stats.avgMonthlyIncome.toLocaleString("ar-SA")} ريال
+              متوسط شهري: {stats.avgMonthlyIncome.toLocaleString('ar-SA')} ريال
             </p>
           </CardContent>
         </Card>
@@ -52,7 +67,7 @@ export function CashFlowReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">
-              {stats.totalExpense.toLocaleString("ar-SA")} ريال
+              {stats.totalExpense.toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>
         </Card>
@@ -63,8 +78,10 @@ export function CashFlowReport() {
             <DollarSign className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${stats.netCashFlow >= 0 ? "text-success" : "text-destructive"}`}>
-              {stats.netCashFlow.toLocaleString("ar-SA")} ريال
+            <div
+              className={`text-2xl font-bold ${stats.netCashFlow >= 0 ? 'text-success' : 'text-destructive'}`}
+            >
+              {stats.netCashFlow.toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>
         </Card>
@@ -87,8 +104,8 @@ export function CashFlowReport() {
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip
-                formatter={(value: number) => `${value.toLocaleString("ar-SA")} ريال`}
-                labelStyle={{ textAlign: "right" }}
+                formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`}
+                labelStyle={{ textAlign: 'right' }}
               />
               <Legend />
               <Bar dataKey="income" name="الإيرادات" fill="hsl(var(--status-success))" />

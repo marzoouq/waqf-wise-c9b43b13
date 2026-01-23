@@ -16,14 +16,14 @@ export const useRenderTracking = (componentName: string, threshold = 16) => {
     renderCount.current += 1;
     const currentTime = Date.now();
     const renderTime = currentTime - lastRenderTime.current;
-    
+
     if (renderTime > threshold) {
       productionLogger.warn(
         `[Performance] ${componentName} rendered in ${renderTime}ms (threshold: ${threshold}ms)`,
         { renderCount: renderCount.current }
       );
     }
-    
+
     lastRenderTime.current = currentTime;
   });
 
@@ -60,7 +60,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);

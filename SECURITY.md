@@ -4,7 +4,7 @@
 
 نحن ندعم حالياً الإصدارات التالية بتحديثات الأمان:
 
-| الإصدار | الدعم |
+| الإصدار | الدعم              |
 | ------- | ------------------ |
 | 1.x.x   | :white_check_mark: |
 
@@ -33,27 +33,32 @@
 ## الممارسات الأمنية
 
 ### المصادقة والتفويض
+
 - ✅ نستخدم Supabase Auth مع JWT tokens
 - ✅ Row Level Security (RLS) على جميع الجداول
 - ✅ إدارة صلاحيات دقيقة
 
 ### حماية البيانات
+
 - ✅ تشفير البيانات في الراحة والحركة (TLS 1.3)
 - ✅ تخزين آمن للبيانات الحساسة
 - ✅ نسخ احتياطية منتظمة
 
 ### Input Validation
+
 - ✅ Zod schema validation على جميع المدخلات
 - ✅ Sanitization للمدخلات
 - ✅ حماية من SQL Injection (Supabase parameterized queries)
 - ✅ حماية من XSS (React automatic escaping)
 
 ### الرصد والتتبع
+
 - ✅ Error tracking مع Sentry (production)
 - ✅ Audit logs لجميع العمليات الحساسة
 - ✅ تنبيهات للأنشطة المشبوهة
 
 ### Dependency Management
+
 - ✅ مراجعة منتظمة للثغرات في الحزم
 - ✅ تحديثات تلقائية للحزم الأمنية
 - ✅ استخدام حزم موثوقة فقط
@@ -61,6 +66,7 @@
 ## سياسة كلمات المرور
 
 نطبق السياسات التالية لكلمات المرور:
+
 - الحد الأدنى: 8 أحرف
 - يجب أن تحتوي على: حروف كبيرة وصغيرة وأرقام
 - فحص كلمات المرور المسربة (Have I Been Pwned API)
@@ -69,6 +75,7 @@
 ## الامتثال
 
 نلتزم بالمعايير التالية:
+
 - OWASP Top 10
 - GDPR (للبيانات الشخصية)
 - ISO 27001 guidelines
@@ -79,6 +86,7 @@
 ### آخر تحديث: 23 ديسمبر 2025 (النسخة 2.9.25)
 
 #### التحديثات المنفذة:
+
 - ✅ **675 سياسة RLS** محسّنة ومحدثة
 - ✅ **50 Edge Function** مؤمنة
 - ✅ **202 جدول** مع حماية RLS كاملة
@@ -92,27 +100,30 @@
 
 ## التوثيق الأمني
 
-| الملف | الوصف |
-|-------|-------|
-| [RLS_POLICIES.md](./docs/security/RLS_POLICIES.md) | سياسات Row Level Security |
-| [TESTING_GUIDE.md](./docs/security/TESTING_GUIDE.md) | دليل اختبارات الأمان |
-| [INCIDENT_RESPONSE.md](./docs/security/INCIDENT_RESPONSE.md) | خطة الاستجابة للحوادث |
+| الملف                                                                                  | الوصف                     |
+| -------------------------------------------------------------------------------------- | ------------------------- |
+| [RLS_POLICIES.md](./docs/security/RLS_POLICIES.md)                                     | سياسات Row Level Security |
+| [TESTING_GUIDE.md](./docs/security/TESTING_GUIDE.md)                                   | دليل اختبارات الأمان      |
+| [INCIDENT_RESPONSE.md](./docs/security/INCIDENT_RESPONSE.md)                           | خطة الاستجابة للحوادث     |
 | [edge-functions-security-report.md](./docs/security/edge-functions-security-report.md) | تقرير أمان Edge Functions |
 
 ## لوحة المطور
 
 للوصول لمؤشرات الأمان المباشرة:
+
 ```
 /developer → لوحة المطور (للمسؤولين فقط)
 ```
 
 تشمل:
+
 - تغطية RLS (90%+)
 - صحة النظام
 - الأحداث الأمنية
 - حالة CI/CD
 
 سننشر تحديثات الأمان في:
+
 1. GitHub Security Advisories
 2. Release Notes
 3. إشعارات البريد الإلكتروني (للمستخدمين المسجلين)
@@ -121,6 +132,7 @@
 ## Contact
 
 لأي استفسارات أمنية:
+
 - Email: security@waqfmanagement.com
 - Website: https://waqfmanagement.com/security
 

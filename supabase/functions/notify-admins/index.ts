@@ -1,10 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 interface NotificationPayload {
@@ -30,10 +30,12 @@ Deno.serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'notify-admins',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
@@ -49,7 +51,10 @@ Deno.serve(async (req) => {
 
     // 🔐 SECURITY: Extract and verify JWT token
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
@@ -67,7 +72,9 @@ Deno.serve(async (req) => {
       return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
-    const isStaff = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role));
+    const isStaff = roles?.some((r) =>
+      ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role)
+    );
     if (!isStaff) {
       console.error('❌ User is not staff:', { userId: user.id, roles });
       return forbiddenResponse('ليس لديك صلاحية لإرسال الإشعارات');
@@ -92,21 +99,20 @@ Deno.serve(async (req) => {
     console.log(`✅ Found ${admins?.length || 0} admins to notify`);
 
     // إنشاء إشعار لكل مسؤول - مع التأكد من عدم وجود قيم null
-    const notifications = admins?.map((admin) => ({
-      user_id: admin.user_id,
-      title: payload.title || 'تنبيه',
-      message: payload.description || payload.title || 'إشعار من النظام',
-      type: 'system',
-      reference_type: 'system_alert',
-      reference_id: payload.alertId || null,
-      action_url: '/system/monitoring',
-      is_read: false,
-    })) || [];
+    const notifications =
+      admins?.map((admin) => ({
+        user_id: admin.user_id,
+        title: payload.title || 'تنبيه',
+        message: payload.description || payload.title || 'إشعار من النظام',
+        type: 'system',
+        reference_type: 'system_alert',
+        reference_id: payload.alertId || null,
+        action_url: '/system/monitoring',
+        is_read: false,
+      })) || [];
 
     if (notifications.length > 0) {
-      const { error: notifyError } = await supabase
-        .from('notifications')
-        .insert(notifications);
+      const { error: notifyError } = await supabase.from('notifications').insert(notifications);
 
       if (notifyError) {
         console.error('❌ Error creating notifications:', notifyError);
@@ -123,9 +129,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('❌ Error in notify-admins function:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'حدث خطأ غير متوقع', 500);
   }
 });

@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { FundService } from "@/services/fund.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { FundService } from '@/services/fund.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface BudgetCategory {
   name: string;
@@ -10,24 +10,35 @@ interface BudgetCategory {
 }
 
 export function useWaqfBudgets(fiscalYearId?: string) {
-  const { data: budgets, isLoading: budgetsLoading, error: budgetsError, refetch: refetchBudgets } = useQuery({
+  const {
+    data: budgets,
+    isLoading: budgetsLoading,
+    error: budgetsError,
+    refetch: refetchBudgets,
+  } = useQuery({
     queryKey: QUERY_KEYS.WAQF_BUDGETS(fiscalYearId),
     queryFn: () => FundService.getBudgets(fiscalYearId),
   });
 
-  const { data: reserves, isLoading: reservesLoading, error: reservesError, refetch: refetchReserves } = useQuery({
+  const {
+    data: reserves,
+    isLoading: reservesLoading,
+    error: reservesError,
+    refetch: refetchReserves,
+  } = useQuery({
     queryKey: QUERY_KEYS.WAQF_RESERVES,
     queryFn: () => FundService.getReserves(),
   });
 
-  const budgetCategories: BudgetCategory[] = budgets?.map(budget => ({
-    name: budget.accounts?.name_ar || "غير محدد",
-    budget: budget.budgeted_amount || 0,
-    spent: budget.actual_amount || 0,
-    percentage: budget.budgeted_amount 
-      ? Math.round((budget.actual_amount / budget.budgeted_amount) * 100)
-      : 0,
-  })) || [];
+  const budgetCategories: BudgetCategory[] =
+    budgets?.map((budget) => ({
+      name: budget.accounts?.name_ar || 'غير محدد',
+      budget: budget.budgeted_amount || 0,
+      spent: budget.actual_amount || 0,
+      percentage: budget.budgeted_amount
+        ? Math.round((budget.actual_amount / budget.budgeted_amount) * 100)
+        : 0,
+    })) || [];
 
   const annualBudget = {
     total: budgets?.reduce((sum, b) => sum + (b.budgeted_amount || 0), 0) || 0,
@@ -36,7 +47,7 @@ export function useWaqfBudgets(fiscalYearId?: string) {
     percentage: 0,
   };
   annualBudget.remaining = annualBudget.total - annualBudget.spent;
-  annualBudget.percentage = annualBudget.total 
+  annualBudget.percentage = annualBudget.total
     ? Math.round((annualBudget.spent / annualBudget.total) * 100)
     : 0;
 

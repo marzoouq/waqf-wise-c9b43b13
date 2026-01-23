@@ -27,11 +27,7 @@ export function ResponsiveTable<T extends TableRowType = TableRowType>({
   const isMobile = useMediaQuery('(max-width: 640px)');
 
   if (data.length === 0) {
-    return (
-      <div className="text-center py-10 text-muted-foreground">
-        {emptyMessage}
-      </div>
-    );
+    return <div className="text-center py-10 text-muted-foreground">{emptyMessage}</div>;
   }
 
   // عرض Cards على الجوال
@@ -54,17 +50,17 @@ export function ResponsiveTable<T extends TableRowType = TableRowType>({
               ) : (
                 <div className="space-y-1.5 sm:space-y-2">
                   {columns
-                    .filter(col => !col.mobileHidden)
+                    .filter((col) => !col.mobileHidden)
                     .map((col) => {
-                      const value = col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '');
+                      const value = col.render
+                        ? col.render(row[col.key], row)
+                        : String(row[col.key] ?? '');
                       return (
                         <div key={col.key} className="flex justify-between items-start gap-2">
                           <span className="text-xs sm:text-sm text-muted-foreground font-medium min-w-[80px] sm:min-w-[100px]">
                             {col.label}:
                           </span>
-                          <span className="text-xs sm:text-sm flex-1 text-left">
-                            {value}
-                          </span>
+                          <span className="text-xs sm:text-sm flex-1 text-left">{value}</span>
                         </div>
                       );
                     })}
@@ -85,7 +81,7 @@ export function ResponsiveTable<T extends TableRowType = TableRowType>({
           <TableHeader>
             <TableRow>
               {columns
-                .filter(col => !col.mobileHidden || !isMobile)
+                .filter((col) => !col.mobileHidden || !isMobile)
                 .map((col) => (
                   <TableHead key={col.key} className={col.className}>
                     {col.label}
@@ -103,9 +99,11 @@ export function ResponsiveTable<T extends TableRowType = TableRowType>({
                   onClick={() => onRowClick?.(row)}
                 >
                   {columns
-                    .filter(col => !col.mobileHidden || !isMobile)
+                    .filter((col) => !col.mobileHidden || !isMobile)
                     .map((col) => {
-                      const value = col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '');
+                      const value = col.render
+                        ? col.render(row[col.key], row)
+                        : String(row[col.key] ?? '');
                       return (
                         <TableCell key={col.key} className={col.className}>
                           {value}

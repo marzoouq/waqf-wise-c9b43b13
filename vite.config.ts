@@ -1,136 +1,135 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import { componentTagger } from 'lovable-tagger';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
-  
+
   return {
-  logLevel: 'warn',
-  
-  define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.9.70'),
-    'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
-    'process.env.NODE_ENV': JSON.stringify('production'),
-  },
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(), 
-    mode === "development" && componentTagger(),
-  ].filter(Boolean),
-  
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    logLevel: 'warn',
+
+    define: {
+      'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.9.70'),
+      'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
+      'process.env.NODE_ENV': JSON.stringify('production'),
     },
-  },
-  
-  // ✅ Pre-bundle React والمكتبات التي تعتمد عليها معاً
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      'recharts',
-      'framer-motion',
-      'sonner',
-      'next-themes',
-      '@tanstack/react-query',
-    ],
-    exclude: ['jspdf', 'exceljs', 'xlsx'], // تحمّل عند الحاجة فقط
-  },
-  
-  build: {
-    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
-    // ✅ ترقية إلى Terser للضغط الأقوى في الإنتاج
-    minify: isProduction ? 'terser' : 'esbuild',
-    terserOptions: isProduction ? {
-      compress: {
-        drop_console: true,  // ✅ إزالة console.log في الإنتاج
-        drop_debugger: true,
-        passes: 2,           // ✅ ضغط مضاعف
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-      },
-      mangle: {
-        safari10: true,
-      },
-      format: {
-        comments: false,
-      },
-    } : undefined,
-    chunkSizeWarningLimit: 1000,
-    cssCodeSplit: true,
-    sourcemap: false,
-    reportCompressedSize: false,
-    assetsInlineLimit: 4096,
-    // ✅ منع modulePreload للمكتبات الثقيلة (PDF, Excel, Supabase)
-    modulePreload: {
-      polyfill: false,
-      resolveDependencies: (filename: string, deps: string[]) => {
-        return deps.filter(dep => 
-          !dep.includes('pdf-lib') && 
-          !dep.includes('excel-lib') &&
-          !dep.includes('supabase')
-        );
+    server: {
+      host: '::',
+      port: 8080,
+    },
+    plugins: [react(), mode === 'development' && componentTagger()].filter(Boolean),
+
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
       },
     },
-    
-    rollupOptions: {
-      // ✅ تحسين Tree Shaking
-      treeshake: {
-        moduleSideEffects: (id) => {
-          // الملفات التي لها آثار جانبية (CSS, main entry)
-          if (id.endsWith('.css') || id.endsWith('.scss')) return true;
-          if (id.includes('main.tsx') || id.includes('index.css')) return true;
-          return false;
+
+    // ✅ Pre-bundle React والمكتبات التي تعتمد عليها معاً
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        'recharts',
+        'framer-motion',
+        'sonner',
+        'next-themes',
+        '@tanstack/react-query',
+      ],
+      exclude: ['jspdf', 'exceljs', 'xlsx'], // تحمّل عند الحاجة فقط
+    },
+
+    build: {
+      target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+      // ✅ ترقية إلى Terser للضغط الأقوى في الإنتاج
+      minify: isProduction ? 'terser' : 'esbuild',
+      terserOptions: isProduction
+        ? {
+            compress: {
+              drop_console: true, // ✅ إزالة console.log في الإنتاج
+              drop_debugger: true,
+              passes: 2, // ✅ ضغط مضاعف
+              pure_funcs: ['console.log', 'console.info', 'console.debug'],
+            },
+            mangle: {
+              safari10: true,
+            },
+            format: {
+              comments: false,
+            },
+          }
+        : undefined,
+      chunkSizeWarningLimit: 1000,
+      cssCodeSplit: true,
+      sourcemap: false,
+      reportCompressedSize: false,
+      assetsInlineLimit: 4096,
+      // ✅ منع modulePreload للمكتبات الثقيلة (PDF, Excel, Supabase)
+      modulePreload: {
+        polyfill: false,
+        resolveDependencies: (filename: string, deps: string[]) => {
+          return deps.filter(
+            (dep) =>
+              !dep.includes('pdf-lib') && !dep.includes('excel-lib') && !dep.includes('supabase')
+          );
         },
-        propertyReadSideEffects: false,
       },
-      output: {
-        // ✅ manualChunks آمن - فقط المكتبات المستقلة التي لا تعتمد على React
-        manualChunks: (id) => {
-          // ✅ Lucide Icons - فصل منفصل للأيقونات (439 استيراد)
-          if (id.includes('lucide-react')) {
-            return 'icon-vendor';
-          }
-          
-          // ✅ مكتبات PDF - مستقلة، آمنة للفصل
-          if (id.includes('jspdf') || id.includes('autotable')) {
-            return 'pdf-lib';
-          }
-          
-          // ✅ مكتبات Excel - مستقلة، آمنة للفصل
-          if (id.includes('exceljs') || id.includes('xlsx')) {
-            return 'excel-lib';
-          }
-          
-          // ✅ Supabase - مستقل، آمن للفصل
-          if (id.includes('@supabase')) {
-            return 'supabase-vendor';
-          }
-          
-          // ✅ date-fns - مستقل، آمن للفصل
-          if (id.includes('date-fns')) {
-            return 'date-vendor';
-          }
-          
-          // ❌ تمت إزالة: recharts, framer-motion, @radix-ui, react-vendor
-          // هذه المكتبات تعتمد على React وتُحمَّل معه تلقائياً
-          // لتجنب خطأ: Cannot read properties of undefined (reading 'useState')
+
+      rollupOptions: {
+        // ✅ تحسين Tree Shaking
+        treeshake: {
+          moduleSideEffects: (id) => {
+            // الملفات التي لها آثار جانبية (CSS, main entry)
+            if (id.endsWith('.css') || id.endsWith('.scss')) return true;
+            if (id.includes('main.tsx') || id.includes('index.css')) return true;
+            return false;
+          },
+          propertyReadSideEffects: false,
         },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-        // ✅ تعطيل التحميل المسبق للـ chunks الثقيلة
-        experimentalMinChunkSize: 10000,
+        output: {
+          // ✅ manualChunks آمن - فقط المكتبات المستقلة التي لا تعتمد على React
+          manualChunks: (id) => {
+            // ✅ Lucide Icons - فصل منفصل للأيقونات (439 استيراد)
+            if (id.includes('lucide-react')) {
+              return 'icon-vendor';
+            }
+
+            // ✅ مكتبات PDF - مستقلة، آمنة للفصل
+            if (id.includes('jspdf') || id.includes('autotable')) {
+              return 'pdf-lib';
+            }
+
+            // ✅ مكتبات Excel - مستقلة، آمنة للفصل
+            if (id.includes('exceljs') || id.includes('xlsx')) {
+              return 'excel-lib';
+            }
+
+            // ✅ Supabase - مستقل، آمن للفصل
+            if (id.includes('@supabase')) {
+              return 'supabase-vendor';
+            }
+
+            // ✅ date-fns - مستقل، آمن للفصل
+            if (id.includes('date-fns')) {
+              return 'date-vendor';
+            }
+
+            // ❌ تمت إزالة: recharts, framer-motion, @radix-ui, react-vendor
+            // هذه المكتبات تعتمد على React وتُحمَّل معه تلقائياً
+            // لتجنب خطأ: Cannot read properties of undefined (reading 'useState')
+          },
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
+          // ✅ تعطيل التحميل المسبق للـ chunks الثقيلة
+          experimentalMinChunkSize: 10000,
+        },
+        // ✅ تعطيل modulePreload للمكتبات الثقيلة (PDF, Excel)
+        // هذا يمنع تحميلها في الصفحة الرئيسية
       },
-      // ✅ تعطيل modulePreload للمكتبات الثقيلة (PDF, Excel)
-      // هذا يمنع تحميلها في الصفحة الرئيسية
-    }
-  }
-}});
+    },
+  };
+});

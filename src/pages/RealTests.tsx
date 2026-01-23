@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TestTube, UserCheck, ShieldCheck, Activity } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { TestTube, UserCheck, ShieldCheck, Activity } from 'lucide-react';
 
 export default function RealTests() {
   return (
@@ -18,9 +21,7 @@ export default function RealTests() {
         <Card>
           <CardHeader>
             <CardTitle>مسار جاهز</CardTitle>
-            <CardDescription>
-              تم إنشاء الصفحة لتفادي ظهور 404 عند فتحها من القائمة.
-            </CardDescription>
+            <CardDescription>تم إنشاء الصفحة لتفادي ظهور 404 عند فتحها من القائمة.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2 sm:grid-cols-3">
             <Button asChild variant="outline" className="gap-2">

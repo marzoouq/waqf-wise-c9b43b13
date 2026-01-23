@@ -60,7 +60,7 @@ interface UseDeleteConfirmationReturn<T> {
 
 /**
  * Hook موحد لتأكيد الحذف
- * 
+ *
  * @example
  * const {
  *   confirmDelete,
@@ -79,7 +79,7 @@ interface UseDeleteConfirmationReturn<T> {
  *   description: 'هل أنت متأكد من حذف هذا المستخدم؟',
  *   onSuccess: () => refetch(),
  * });
- * 
+ *
  * // في JSX
  * <Button onClick={() => confirmDelete(userId, userName)}>حذف</Button>
  * <DeleteConfirmDialog
@@ -150,11 +150,14 @@ export function useDeleteConfirmation<T = string>({
     }
   }, [state.itemId, onDelete, successMessage, errorMessage, onSuccess, onError]);
 
-  const onOpenChange = useCallback((open: boolean) => {
-    if (!open && !state.isLoading) {
-      cancelDelete();
-    }
-  }, [state.isLoading, cancelDelete]);
+  const onOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && !state.isLoading) {
+        cancelDelete();
+      }
+    },
+    [state.isLoading, cancelDelete]
+  );
 
   return {
     confirmDelete,

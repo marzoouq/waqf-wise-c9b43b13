@@ -3,9 +3,9 @@
  * @version 2.8.65
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { productionLogger } from "@/lib/logger/production-logger";
-import type { Family, FamilyMember } from "@/types";
+import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
+import type { Family, FamilyMember } from '@/types';
 
 export class FamilyService {
   /**
@@ -15,14 +15,16 @@ export class FamilyService {
     try {
       const { data, error } = await supabase
         .from('families')
-        .select(`
+        .select(
+          `
           *,
           head_of_family:beneficiaries!families_head_of_family_id_fkey(
             id,
             full_name,
             national_id
           )
-        `)
+        `
+        )
         .is('deleted_at', null)
         .order('family_name', { ascending: true });
 
@@ -41,14 +43,16 @@ export class FamilyService {
     try {
       const { data, error } = await supabase
         .from('families')
-        .select(`
+        .select(
+          `
           *,
           head_of_family:beneficiaries!families_head_of_family_id_fkey(
             id,
             full_name,
             national_id
           )
-        `)
+        `
+        )
         .eq('id', id)
         .maybeSingle();
 
@@ -63,13 +67,11 @@ export class FamilyService {
   /**
    * إضافة عائلة جديدة
    */
-  static async create(family: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>): Promise<Family> {
+  static async create(
+    family: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>
+  ): Promise<Family> {
     try {
-      const { data, error } = await supabase
-        .from('families')
-        .insert(family)
-        .select()
-        .maybeSingle();
+      const { data, error } = await supabase.from('families').insert(family).select().maybeSingle();
 
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء العائلة');
@@ -117,7 +119,9 @@ export class FamilyService {
    */
   static async delete(id: string, reason?: string): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('families')
         .update({
@@ -141,7 +145,8 @@ export class FamilyService {
     try {
       const { data, error } = await supabase
         .from('family_members')
-        .select(`
+        .select(
+          `
           *,
           beneficiary:beneficiaries(
             id,
@@ -151,7 +156,8 @@ export class FamilyService {
             email,
             status
           )
-        `)
+        `
+        )
         .eq('family_id', familyId)
         .order('priority_level', { ascending: true });
 
@@ -166,7 +172,11 @@ export class FamilyService {
   /**
    * إضافة فرد للعائلة
    */
-  static async addMember(member: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & { relationship_to_head: string }): Promise<FamilyMember> {
+  static async addMember(
+    member: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & {
+      relationship_to_head: string;
+    }
+  ): Promise<FamilyMember> {
     try {
       const { data, error } = await supabase
         .from('family_members')
@@ -209,7 +219,9 @@ export class FamilyService {
    */
   static async removeMember(id: string, reason?: string): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('family_members')
         .update({
@@ -261,7 +273,9 @@ export class FamilyService {
       // جلب بيانات المستفيد الحالي
       const { data: beneficiary, error: benError } = await supabase
         .from('beneficiaries')
-        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size')
+        .select(
+          'id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size'
+        )
         .eq('id', beneficiaryId)
         .maybeSingle();
 
@@ -280,13 +294,15 @@ export class FamilyService {
         date_of_birth: string | null;
         status: string;
       };
-      
+
       let familyMembers: FamilyMemberData[] = [];
-      
+
       if (beneficiary.family_name) {
         const { data: members, error: membersError } = await supabase
           .from('beneficiaries')
-          .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
+          .select(
+            'id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status'
+          )
           .eq('family_name', beneficiary.family_name)
           .neq('id', beneficiaryId)
           .order('is_head_of_family', { ascending: false });
@@ -299,7 +315,9 @@ export class FamilyService {
       // جلب الأبناء المباشرين
       const { data: children, error: childrenError } = await supabase
         .from('beneficiaries')
-        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
+        .select(
+          'id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status'
+        )
         .eq('parent_beneficiary_id', beneficiaryId);
 
       if (!childrenError && children) {
@@ -308,9 +326,9 @@ export class FamilyService {
 
       return {
         beneficiary,
-        familyMembers: familyMembers.filter((m, index, self) => 
-          index === self.findIndex(t => t.id === m.id)
-        )
+        familyMembers: familyMembers.filter(
+          (m, index, self) => index === self.findIndex((t) => t.id === m.id)
+        ),
       };
     } catch (error) {
       productionLogger.error('Error fetching beneficiary family tree', error);

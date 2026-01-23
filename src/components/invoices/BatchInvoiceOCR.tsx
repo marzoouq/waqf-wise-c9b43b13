@@ -20,7 +20,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
 
   const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    
+
     // التحقق من عدد الملفات
     if (selectedFiles.length > 10) {
       toast.error('يمكنك رفع 10 فواتير كحد أقصى في المرة الواحدة');
@@ -28,7 +28,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
     }
 
     // التحقق من نوع وحجم الملفات
-    const validFiles = selectedFiles.filter(file => {
+    const validFiles = selectedFiles.filter((file) => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!validTypes.includes(file.type)) {
         toast.error(`${file.name}: نوع ملف غير مدعوم`);
@@ -42,10 +42,12 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
     });
 
     setFiles(validFiles);
-    setResults(validFiles.map(file => ({
-      file,
-      status: 'pending',
-    })));
+    setResults(
+      validFiles.map((file) => ({
+        file,
+        status: 'pending',
+      }))
+    );
   };
 
   const processAllFiles = async () => {
@@ -59,7 +61,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
 
       try {
         const result = await extractInvoiceData(files[i]);
-        
+
         if (result.success) {
           newResults[i].status = 'success';
           newResults[i].data = result.data;
@@ -83,7 +85,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
   };
 
   const getProgress = () => {
-    const processed = results.filter(r => r.status === 'success' || r.status === 'error').length;
+    const processed = results.filter((r) => r.status === 'success' || r.status === 'error').length;
     return (processed / files.length) * 100;
   };
 
@@ -104,9 +106,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
     <Card>
       <CardHeader>
         <CardTitle>معالجة دفعة من الفواتير</CardTitle>
-        <CardDescription>
-          ارفع عدة صور فواتير (حتى 10) لمعالجتها دفعة واحدة
-        </CardDescription>
+        <CardDescription>ارفع عدة صور فواتير (حتى 10) لمعالجتها دفعة واحدة</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {files.length === 0 ? (
@@ -150,9 +150,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
                 >
                   {getStatusIcon(result.status)}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {result.file.name}
-                    </p>
+                    <p className="text-sm font-medium truncate">{result.file.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {(result.file.size / 1024).toFixed(1)} KB
                     </p>
@@ -201,13 +199,10 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
               )}
             </div>
 
-            {!isProcessing && results.some(r => r.status === 'success') && (
-              <Button
-                onClick={() => onComplete(results)}
-                variant="default"
-                className="w-full"
-              >
-                استخدام البيانات المستخرجة ({results.filter(r => r.status === 'success').length} فاتورة)
+            {!isProcessing && results.some((r) => r.status === 'success') && (
+              <Button onClick={() => onComplete(results)} variant="default" className="w-full">
+                استخدام البيانات المستخرجة ({results.filter((r) => r.status === 'success').length}{' '}
+                فاتورة)
               </Button>
             )}
           </div>

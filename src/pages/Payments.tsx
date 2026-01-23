@@ -1,19 +1,22 @@
-import { useState, useMemo, useCallback } from "react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { usePayments } from "@/hooks/payments/usePayments";
-import { usePaymentsWithContracts, PaymentWithContract } from "@/hooks/payments/usePaymentsWithContracts";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { PaymentDialog } from "@/components/payments/PaymentDialog";
-import { PaymentsHeader } from "@/components/payments/PaymentsHeader";
-import { PaymentsStats } from "@/components/payments/PaymentsStats";
-import { PaymentsFilters } from "@/components/payments/PaymentsFilters";
-import { PaymentsTable } from "@/components/payments/PaymentsTable";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { logger } from "@/lib/logger";
+import { useState, useMemo, useCallback } from 'react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { usePayments } from '@/hooks/payments/usePayments';
+import {
+  usePaymentsWithContracts,
+  PaymentWithContract,
+} from '@/hooks/payments/usePaymentsWithContracts';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
+import { PaymentDialog } from '@/components/payments/PaymentDialog';
+import { PaymentsHeader } from '@/components/payments/PaymentsHeader';
+import { PaymentsStats } from '@/components/payments/PaymentsStats';
+import { PaymentsFilters } from '@/components/payments/PaymentsFilters';
+import { PaymentsTable } from '@/components/payments/PaymentsTable';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { logger } from '@/lib/logger';
 import { Database } from '@/integrations/supabase/types';
-import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
-import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
+import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
+import { useOrganizationSettings } from '@/hooks/governance/useOrganizationSettings';
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -21,13 +24,13 @@ const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [currentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
-  
+
   const { settings: orgSettings } = useOrganizationSettings();
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
@@ -57,13 +60,12 @@ const Payments = () => {
   }, [filteredPayments, currentPage]);
 
   // حساب الإحصائيات
-  const receipts = payments.filter((p) => p.payment_type === "receipt");
-  const paymentsOut = payments.filter((p) => p.payment_type === "payment");
+  const receipts = payments.filter((p) => p.payment_type === 'receipt');
+  const paymentsOut = payments.filter((p) => p.payment_type === 'payment');
   const totalReceipts = receipts.length;
   const totalVouchers = paymentsOut.length;
   const totalReceiptsAmount = receipts.reduce((sum, p) => sum + Number(p.amount), 0);
   const totalVouchersAmount = paymentsOut.reduce((sum, p) => sum + Number(p.amount), 0);
-
 
   const handleAddPayment = useCallback(() => {
     setSelectedPayment(null);
@@ -78,16 +80,18 @@ const Payments = () => {
   const handleSavePayment = async (data: Record<string, unknown>) => {
     try {
       if (selectedPayment) {
-        await updatePayment({ id: selectedPayment.id, ...data } as Parameters<typeof updatePayment>[0]);
-        toast({ title: "تم تحديث السند بنجاح", variant: "default" });
+        await updatePayment({ id: selectedPayment.id, ...data } as Parameters<
+          typeof updatePayment
+        >[0]);
+        toast({ title: 'تم تحديث السند بنجاح', variant: 'default' });
       } else {
         await addPayment(data as Parameters<typeof addPayment>[0]);
-        toast({ title: "تم إضافة السند بنجاح", variant: "default" });
+        toast({ title: 'تم إضافة السند بنجاح', variant: 'default' });
       }
       setDialogOpen(false);
     } catch (error) {
       logger.error(error, { context: 'save_payment', severity: 'medium' });
-      toast({ title: "حدث خطأ", description: "فشل في حفظ السند", variant: "destructive" });
+      toast({ title: 'حدث خطأ', description: 'فشل في حفظ السند', variant: 'destructive' });
     }
   };
 
@@ -116,14 +120,14 @@ const Payments = () => {
         description: payment.description || '',
         reference_number: payment.reference_number || undefined,
       };
-      
+
       const doc = await generateReceiptPDF(receiptData, orgSettings || null);
       doc.save(`سند_قبض_${receiptData.payment_number}.pdf`);
-      
-      toast({ title: "تم تحميل السند بنجاح", variant: "default" });
+
+      toast({ title: 'تم تحميل السند بنجاح', variant: 'default' });
     } catch (error) {
       logger.error(error, { context: 'print_payment_receipt', severity: 'medium' });
-      toast({ title: "حدث خطأ", description: "فشل في إنشاء ملف PDF", variant: "destructive" });
+      toast({ title: 'حدث خطأ', description: 'فشل في إنشاء ملف PDF', variant: 'destructive' });
     }
   };
 
@@ -135,10 +139,7 @@ const Payments = () => {
           payments={filteredPayments as unknown as Payment[]}
         />
 
-        <PaymentsFilters
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+        <PaymentsFilters searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
         <PaymentsStats
           totalReceipts={totalReceipts}
@@ -168,10 +169,13 @@ const Payments = () => {
           onConfirm={handleDeleteConfirm}
           title="حذف السند"
           description="هل أنت متأكد من حذف هذا السند؟ سيتم حذف القيد المحاسبي المرتبط به."
-          itemName={paymentToDelete ? `${paymentToDelete.payment_number} - ${paymentToDelete.amount} ر.س` : ""}
+          itemName={
+            paymentToDelete
+              ? `${paymentToDelete.payment_number} - ${paymentToDelete.amount} ر.س`
+              : ''
+          }
           isLoading={false}
         />
-
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

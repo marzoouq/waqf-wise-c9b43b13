@@ -1,18 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  AlertTriangle, 
-  Calendar, 
-  DollarSign, 
-  FileWarning,
-  Clock,
-  AlertCircle
-} from "lucide-react";
-import { useSmartAlerts } from "@/hooks/notifications/useSmartAlerts";
-import { useNavigate } from "react-router-dom";
-import { format, arLocale as ar } from "@/lib/date";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, Calendar, DollarSign, FileWarning, Clock, AlertCircle } from 'lucide-react';
+import { useSmartAlerts } from '@/hooks/notifications/useSmartAlerts';
+import { useNavigate } from 'react-router-dom';
+import { format, arLocale as ar } from '@/lib/date';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function SmartAlertsSection() {
   const navigate = useNavigate();
@@ -20,20 +13,29 @@ export default function SmartAlertsSection() {
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'contract_expiring': return Calendar;
-      case 'rent_overdue': return DollarSign;
-      case 'loan_due': return FileWarning;
-      case 'request_overdue': return Clock;
-      default: return AlertTriangle;
+      case 'contract_expiring':
+        return Calendar;
+      case 'rent_overdue':
+        return DollarSign;
+      case 'loan_due':
+        return FileWarning;
+      case 'request_overdue':
+        return Clock;
+      default:
+        return AlertTriangle;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'bg-destructive-light text-destructive dark:bg-destructive/10 border-destructive/30';
-      case 'medium': return 'bg-warning-light text-warning dark:bg-warning/10 border-warning/30';
-      case 'low': return 'bg-info-light text-info dark:bg-info/10 border-info/30';
-      default: return 'bg-secondary text-secondary-foreground border-border';
+      case 'high':
+        return 'bg-destructive-light text-destructive dark:bg-destructive/10 border-destructive/30';
+      case 'medium':
+        return 'bg-warning-light text-warning dark:bg-warning/10 border-warning/30';
+      case 'low':
+        return 'bg-info-light text-info dark:bg-info/10 border-info/30';
+      default:
+        return 'bg-secondary text-secondary-foreground border-border';
     }
   };
 
@@ -42,7 +44,8 @@ export default function SmartAlertsSection() {
       <Alert variant="destructive" className="mb-6">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          حدث خطأ في جلب التنبيهات الذكية: {error instanceof Error ? error.message : 'خطأ غير معروف'}
+          حدث خطأ في جلب التنبيهات الذكية:{' '}
+          {error instanceof Error ? error.message : 'خطأ غير معروف'}
         </AlertDescription>
       </Alert>
     );
@@ -100,7 +103,9 @@ export default function SmartAlertsSection() {
             <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">التنبيهات الذكية</span>
             <span className="sm:hidden">التنبيهات</span>
-            <Badge variant="secondary" className="text-xs">{alerts.length}</Badge>
+            <Badge variant="secondary" className="text-xs">
+              {alerts.length}
+            </Badge>
           </CardTitle>
         </div>
       </CardHeader>
@@ -109,7 +114,7 @@ export default function SmartAlertsSection() {
           {alerts.map((alert) => {
             const Icon = getAlertIcon(alert.type);
             return (
-              <div 
+              <div
                 key={alert.id}
                 className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${getSeverityColor(alert.severity)} cursor-pointer hover:opacity-80 transition-opacity`}
                 onClick={() => navigate(alert.actionUrl)}
@@ -119,10 +124,14 @@ export default function SmartAlertsSection() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-xs sm:text-sm mb-1">{alert.title}</h4>
-                  <p className="text-[10px] sm:text-sm opacity-90 mb-1 sm:mb-2 line-clamp-2">{alert.description}</p>
+                  <p className="text-[10px] sm:text-sm opacity-90 mb-1 sm:mb-2 line-clamp-2">
+                    {alert.description}
+                  </p>
                   <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs opacity-75">
                     <Calendar className="h-3 w-3" />
-                    <span className="hidden sm:inline">{format(alert.date, 'dd MMMM yyyy', { locale: ar })}</span>
+                    <span className="hidden sm:inline">
+                      {format(alert.date, 'dd MMMM yyyy', { locale: ar })}
+                    </span>
                     <span className="sm:hidden">{format(alert.date, 'dd/MM', { locale: ar })}</span>
                   </div>
                 </div>

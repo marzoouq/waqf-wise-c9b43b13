@@ -7,13 +7,18 @@ import { QUERY_KEYS } from '@/lib/query-keys';
 export function useAIInsights() {
   const queryClient = useQueryClient();
 
-  const { data: insights, isLoading, error, refetch } = useQuery({
+  const {
+    data: insights,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.AI_INSIGHTS,
     queryFn: () => AIService.getInsights(),
   });
 
   const generateInsightsMutation = useMutation({
-    mutationFn: (reportType: 'beneficiaries' | 'properties' | 'financial' | 'loans') => 
+    mutationFn: (reportType: 'beneficiaries' | 'properties' | 'financial' | 'loans') =>
       AIService.generateInsights(reportType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_INSIGHTS });

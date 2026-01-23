@@ -69,12 +69,17 @@ export function useApprovalWorkflows() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: workflowsRaw, isLoading: isLoadingWorkflows, error: workflowsError, refetch: refetchWorkflows } = useQuery({
+  const {
+    data: workflowsRaw,
+    isLoading: isLoadingWorkflows,
+    error: workflowsError,
+    refetch: refetchWorkflows,
+  } = useQuery({
     queryKey: QUERY_KEYS.APPROVAL_WORKFLOWS,
     queryFn: () => ApprovalService.getAllWorkflows(),
   });
 
-  const workflows = (workflowsRaw || []).map(item => ({
+  const workflows = (workflowsRaw || []).map((item) => ({
     ...item,
     approval_levels: parseApprovalLevels(item.approval_levels),
     conditions: parseConditions(item.conditions),
@@ -114,10 +119,10 @@ export function useApprovalWorkflows() {
       entityId: string;
       workflowId?: string;
     }) => {
-      let workflow = workflows.find(w => w.id === workflowId);
-      
+      let workflow = workflows.find((w) => w.id === workflowId);
+
       if (!workflow) {
-        workflow = workflows.find(w => w.entity_type === entityType && w.is_active);
+        workflow = workflows.find((w) => w.entity_type === entityType && w.is_active);
       }
 
       if (!workflow) {
@@ -129,7 +134,7 @@ export function useApprovalWorkflows() {
         entityType,
         entityId,
         totalLevels: workflow.approval_levels.length,
-        approvalLevels: workflow.approval_levels.map(l => ({ level: l.level, role: l.role })),
+        approvalLevels: workflow.approval_levels.map((l) => ({ level: l.level, role: l.role })),
       });
     },
     onSuccess: () => {
@@ -157,9 +162,8 @@ export function useApprovalWorkflows() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVAL_STATUSES });
       toast({
         title: variables.action === 'approved' ? 'تمت الموافقة' : 'تم الرفض',
-        description: variables.action === 'approved' 
-          ? 'تمت الموافقة على الطلب بنجاح' 
-          : 'تم رفض الطلب',
+        description:
+          variables.action === 'approved' ? 'تمت الموافقة على الطلب بنجاح' : 'تم رفض الطلب',
       });
     },
   });

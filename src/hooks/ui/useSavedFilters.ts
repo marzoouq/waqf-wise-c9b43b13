@@ -19,7 +19,12 @@ export function useSavedFilters(filterType: string) {
   const { user } = useAuth();
 
   // جلب الفلاتر المحفوظة
-  const { data: filters = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: filters = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['saved-filters', filterType],
     queryFn: async () => {
       if (!user) return [];
@@ -30,7 +35,12 @@ export function useSavedFilters(filterType: string) {
 
   // حفظ فلتر جديد
   const saveFilter = useMutation({
-    mutationFn: async (filterData: { name: string; filter_type: string; filter_criteria: Json; is_favorite: boolean }) => {
+    mutationFn: async (filterData: {
+      name: string;
+      filter_type: string;
+      filter_criteria: Json;
+      is_favorite: boolean;
+    }) => {
       if (!user) throw new Error('User not authenticated');
       await SettingsService.saveFilter(user.id, filterData);
       toast.success('تم الحفظ', { description: 'تم حفظ الفلتر بنجاح' });

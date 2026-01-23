@@ -1,6 +1,19 @@
-export type TicketCategory = 'technical' | 'financial' | 'account' | 'request' | 'complaint' | 'inquiry' | 'other';
+export type TicketCategory =
+  | 'technical'
+  | 'financial'
+  | 'account'
+  | 'request'
+  | 'complaint'
+  | 'inquiry'
+  | 'other';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
-export type TicketStatus = 'open' | 'in_progress' | 'waiting_customer' | 'resolved' | 'closed' | 'cancelled';
+export type TicketStatus =
+  | 'open'
+  | 'in_progress'
+  | 'waiting_customer'
+  | 'resolved'
+  | 'closed'
+  | 'cancelled';
 export type TicketSource = 'portal' | 'email' | 'phone' | 'chatbot';
 export type ArticleStatus = 'draft' | 'published' | 'archived';
 
@@ -34,17 +47,17 @@ export interface SupportTicket {
   ticket_number: string;
   user_id: string | null;
   beneficiary_id: string | null;
-  
+
   subject: string;
   description: string;
   category: TicketCategory;
   priority: TicketPriority;
   status: TicketStatus;
-  
+
   assigned_to: string | null;
   assigned_at: string | null;
   assigned_by: string | null;
-  
+
   created_at: string;
   updated_at: string;
   first_response_at: string | null;
@@ -52,11 +65,11 @@ export interface SupportTicket {
   closed_at: string | null;
   sla_due_at: string | null;
   is_overdue: boolean;
-  
+
   source: TicketSource;
   tags: string[] | null;
   metadata: TicketMetadata | null;
-  
+
   response_count: number;
   reopened_count: number;
   last_activity_at: string;

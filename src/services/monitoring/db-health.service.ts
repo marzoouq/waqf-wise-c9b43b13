@@ -3,7 +3,7 @@
  * Comprehensive Database Health Monitoring Service
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface DuplicateIndex {
   table_name: string;
@@ -77,7 +77,7 @@ class DatabaseHealthService {
   async getHealthReport(): Promise<DatabaseHealthReport> {
     try {
       const { data, error } = await supabase.functions.invoke('db-health-check');
-      
+
       if (error) {
         console.error('[DatabaseHealthService] Edge function error:', error);
         throw error;
@@ -165,7 +165,9 @@ class DatabaseHealthService {
 
     // تحذير أخطاء الاستعلامات
     if (report.queryErrors.length > 0) {
-      const criticalErrors = report.queryErrors.filter(e => e.severity === 'critical' || e.severity === 'error');
+      const criticalErrors = report.queryErrors.filter(
+        (e) => e.severity === 'critical' || e.severity === 'error'
+      );
       if (criticalErrors.length > 0) {
         alerts.push({
           id: 'query-errors',
@@ -178,7 +180,7 @@ class DatabaseHealthService {
     }
 
     // تحذير جداول بنسبة صفوف ميتة عالية
-    const highDeadRowsTables = report.deadRowsInfo.filter(t => t.dead_pct > 50);
+    const highDeadRowsTables = report.deadRowsInfo.filter((t) => t.dead_pct > 50);
     if (highDeadRowsTables.length > 0) {
       alerts.push({
         id: 'tables-high-dead-rows',

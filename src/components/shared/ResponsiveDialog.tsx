@@ -63,8 +63,8 @@ export function ResponsiveDialog({
   const isDesktop = isDesktopRef.current;
 
   // ✅ استخدام useMemo للـ className لمنع إعادة الحساب في كل render
-  const dialogClassName = useMemo(() => 
-    cn(SIZE_CLASSES[size], 'max-h-[90vh] overflow-y-auto', className),
+  const dialogClassName = useMemo(
+    () => cn(SIZE_CLASSES[size], 'max-h-[90vh] overflow-y-auto', className),
     [size, className]
   );
 
@@ -117,9 +117,7 @@ export function ResponsiveFormDialog({
 }: ResponsiveFormDialogProps) {
   return (
     <ResponsiveDialog {...props}>
-      <div className="space-y-4">
-        {children}
-      </div>
+      <div className="space-y-4">{children}</div>
     </ResponsiveDialog>
   );
 }

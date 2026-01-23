@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useGlobalSearch } from '@/hooks/ui/useGlobalSearch';
@@ -21,7 +28,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     navigate(result.url);
     onOpenChange(false);
     setSearchQuery('');
-    
+
     // حفظ في السجل
     saveSearchHistory.mutate({
       query: searchQuery,
@@ -113,12 +120,17 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="font-medium truncate">{result.title}</p>
-                            <Badge variant="outline" className={`text-xs ${getTypeBadgeColor(result.type)}`}>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${getTypeBadgeColor(result.type)}`}
+                            >
                               {getTypeLabel(result.type)}
                             </Badge>
                           </div>
                           {result.subtitle && (
-                            <p className="text-sm text-muted-foreground truncate">{result.subtitle}</p>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {result.subtitle}
+                            </p>
                           )}
                         </div>
                       </CommandItem>

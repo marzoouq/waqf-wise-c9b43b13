@@ -1,9 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -21,10 +17,12 @@ Deno.serve(async (req) => {
             status: 'healthy',
             function: 'support-auto-escalate',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     const supabaseClient = createClient(
@@ -59,7 +57,7 @@ Deno.serve(async (req) => {
             p_type: 'error',
             p_reference_type: 'support_ticket',
             p_reference_id: ticket.id,
-            p_action_url: '/support-management'
+            p_action_url: '/support-management',
           });
         }
       }
@@ -67,15 +65,12 @@ Deno.serve(async (req) => {
 
     console.log(`Processed ${overdueTickets?.length || 0} overdue tickets`);
 
-    return jsonResponse({ 
-      success: true, 
-      processed: overdueTickets?.length || 0 
+    return jsonResponse({
+      success: true,
+      processed: overdueTickets?.length || 0,
     });
   } catch (error) {
     console.error('Error in auto-escalate:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

@@ -3,14 +3,14 @@
  * بطاقة الحصة السنوية للمستفيد
  */
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Wallet, TrendingUp, TrendingDown, Minus, CalendarDays, Sparkles } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { formatCurrency } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Wallet, TrendingUp, TrendingDown, Minus, CalendarDays, Sparkles } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { formatCurrency } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import { motion } from 'framer-motion';
 
 interface AnnualShareCardProps {
   beneficiaryId: string;
@@ -33,11 +33,13 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
       // جلب توزيعات المستفيد مع السنوات المالية
       const { data: distributions } = await supabase
         .from('heir_distributions')
-        .select(`
+        .select(
+          `
           share_amount,
           fiscal_year_id,
           fiscal_years:fiscal_year_id(name, start_date)
-        `)
+        `
+        )
         .eq('beneficiary_id', beneficiaryId);
 
       // تجميع التوزيعات حسب السنة المالية
@@ -50,14 +52,16 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
           if (startDate) {
             const startYear = new Date(startDate).getFullYear();
             const fiscalYearKey = `${startYear}-${startYear + 1}`;
-            yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
+            yearTotals[fiscalYearKey] =
+              (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
           } else {
             // fallback: محاولة استخراج السنة من الاسم
             const fiscalYearName = distribution.fiscal_years?.name || '';
             const match = fiscalYearName.match(/(\d{4})-(\d{4})/);
             if (match) {
               const fiscalYearKey = `${match[1]}-${match[2]}`;
-              yearTotals[fiscalYearKey] = (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
+              yearTotals[fiscalYearKey] =
+                (yearTotals[fiscalYearKey] || 0) + (distribution.share_amount || 0);
             }
           }
         });
@@ -82,10 +86,10 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
         lastYearTotal,
         changePercentage,
         currentFiscalYear,
-        lastFiscalYear
+        lastFiscalYear,
       };
     },
-    staleTime: 60000
+    staleTime: 60000,
   });
 
   if (isLoading) {
@@ -100,10 +104,10 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
   };
 
   const getTrendColor = () => {
-    if (!data) return "text-muted-foreground";
-    if (data.changePercentage > 0) return "text-success";
-    if (data.changePercentage < 0) return "text-destructive";
-    return "text-muted-foreground";
+    if (!data) return 'text-muted-foreground';
+    if (data.changePercentage > 0) return 'text-success';
+    if (data.changePercentage < 0) return 'text-destructive';
+    return 'text-muted-foreground';
   };
 
   const TrendIcon = getTrendIcon();
@@ -138,15 +142,14 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
 
             {/* القسم الأيمن - المقارنة */}
             <div className="flex flex-col items-end gap-2">
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={`${getTrendColor()} border-current/30 bg-current/5`}
               >
                 <TrendIcon className="h-3.5 w-3.5 me-1" />
-                {data?.changePercentage 
+                {data?.changePercentage
                   ? `${data.changePercentage > 0 ? '+' : ''}${data.changePercentage.toFixed(1)}%`
-                  : '0%'
-                }
+                  : '0%'}
               </Badge>
               <p className="text-xs text-muted-foreground">
                 مقارنة بـ {data?.lastFiscalYear}: {formatCurrency(data?.lastYearTotal || 0)}
@@ -158,14 +161,20 @@ export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
           <div className="mt-4 pt-4 border-t border-border/50">
             <div className="flex justify-between text-xs text-muted-foreground mb-2">
               <span>التقدم مقارنة بالعام الماضي</span>
-              <span>{Math.min(100, Math.max(0, (data?.currentYearTotal || 0) / (data?.lastYearTotal || 1) * 100)).toFixed(0)}%</span>
+              <span>
+                {Math.min(
+                  100,
+                  Math.max(0, ((data?.currentYearTotal || 0) / (data?.lastYearTotal || 1)) * 100)
+                ).toFixed(0)}
+                %
+              </span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full"
                 initial={{ width: 0 }}
-                animate={{ 
-                  width: `${Math.min(100, Math.max(0, (data?.currentYearTotal || 0) / (data?.lastYearTotal || 1) * 100))}%` 
+                animate={{
+                  width: `${Math.min(100, Math.max(0, ((data?.currentYearTotal || 0) / (data?.lastYearTotal || 1)) * 100))}%`,
                 }}
                 transition={{ duration: 1, delay: 0.5 }}
               />

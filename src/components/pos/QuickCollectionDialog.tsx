@@ -33,7 +33,13 @@ const PAYMENT_METHODS = [
   { value: 'شيك', label: 'شيك', icon: FileText },
 ];
 
-export function QuickCollectionDialog({ open, onOpenChange, rental, onConfirm, isLoading }: QuickCollectionDialogProps) {
+export function QuickCollectionDialog({
+  open,
+  onOpenChange,
+  rental,
+  onConfirm,
+  isLoading,
+}: QuickCollectionDialogProps) {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'نقدي' | 'شبكة' | 'تحويل' | 'شيك'>('نقدي');
   const [referenceNumber, setReferenceNumber] = useState('');
@@ -80,7 +86,9 @@ export function QuickCollectionDialog({ open, onOpenChange, rental, onConfirm, i
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="font-medium">المبلغ المستحق:</span>
-                <span className="font-bold text-primary">{rental.amount_due.toLocaleString('ar-SA')} ر.س</span>
+                <span className="font-bold text-primary">
+                  {rental.amount_due.toLocaleString('ar-SA')} ر.س
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -110,11 +118,7 @@ export function QuickCollectionDialog({ open, onOpenChange, rental, onConfirm, i
             >
               {PAYMENT_METHODS.map((method) => (
                 <div key={method.value}>
-                  <RadioGroupItem
-                    value={method.value}
-                    id={method.value}
-                    className="peer sr-only"
-                  />
+                  <RadioGroupItem value={method.value} id={method.value} className="peer sr-only" />
                   <Label
                     htmlFor={method.value}
                     className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:bg-muted/50 transition-colors"
@@ -131,7 +135,11 @@ export function QuickCollectionDialog({ open, onOpenChange, rental, onConfirm, i
           {needsReference && (
             <div className="space-y-2">
               <Label htmlFor="referenceNumber">
-                {paymentMethod === 'شبكة' ? 'رقم العملية' : paymentMethod === 'تحويل' ? 'رقم الحوالة' : 'رقم الشيك'}
+                {paymentMethod === 'شبكة'
+                  ? 'رقم العملية'
+                  : paymentMethod === 'تحويل'
+                    ? 'رقم الحوالة'
+                    : 'رقم الشيك'}
               </Label>
               <Input
                 id="referenceNumber"
@@ -147,10 +155,7 @@ export function QuickCollectionDialog({ open, onOpenChange, rental, onConfirm, i
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button 
-              type="submit" 
-              disabled={isLoading || (needsReference && !referenceNumber)}
-            >
+            <Button type="submit" disabled={isLoading || (needsReference && !referenceNumber)}>
               {isLoading ? 'جاري التحصيل...' : 'تأكيد التحصيل'}
             </Button>
           </DialogFooter>

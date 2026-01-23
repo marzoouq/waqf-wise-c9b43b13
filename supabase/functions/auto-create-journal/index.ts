@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
@@ -10,16 +10,16 @@ const RATE_WINDOW = 60 * 1000; // 1 minute
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -54,10 +54,12 @@ serve(async (req) => {
             status: 'healthy',
             function: 'auto-create-journal',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة
@@ -74,7 +76,10 @@ serve(async (req) => {
 
     // 🔐 التحقق من صحة التوكن والصلاحيات
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[auto-create-journal] ❌ Invalid token:', authError);
@@ -82,12 +87,9 @@ serve(async (req) => {
     }
 
     // 🔐 التحقق من صلاحيات المستخدم (admin, nazer, accountant)
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant'].includes(r.role));
+    const hasAccess = roles?.some((r) => ['admin', 'nazer', 'accountant'].includes(r.role));
     if (!hasAccess) {
       console.error('[auto-create-journal] ❌ Unauthorized role:', { userId: user.id, roles });
       return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
@@ -99,9 +101,13 @@ serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح (30 قيد/دقيقة). يرجى الانتظار.', 429);
     }
 
-    console.log('[auto-create-journal] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role) });
+    console.log('[auto-create-journal] ✅ Authorized:', {
+      userId: user.id,
+      roles: roles?.map((r) => r.role),
+    });
 
-    const { trigger_event, reference_id, reference_type, amount, metadata }: AutoJournalRequest = await req.json();
+    const { trigger_event, reference_id, reference_type, amount, metadata }: AutoJournalRequest =
+      await req.json();
 
     // جلب القالب المناسب
     const { data: template, error: templateError } = await supabase
@@ -113,12 +119,14 @@ serve(async (req) => {
 
     if (templateError || !template) {
       // في وضع الاختبار نعيد نتيجة تجريبية
-      console.log(`[auto-create-journal] No template found for: ${trigger_event}, returning test response`);
+      console.log(
+        `[auto-create-journal] No template found for: ${trigger_event}, returning test response`
+      );
       return jsonResponse({
         success: true,
         testMode: true,
         message: `لم يتم العثور على قالب للحدث: ${trigger_event}`,
-        trigger_event
+        trigger_event,
       });
     }
 
@@ -141,7 +149,9 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    const lastNumber = lastEntry?.entry_number ? parseInt(lastEntry.entry_number.split('-')[1], 10) : 0;
+    const lastNumber = lastEntry?.entry_number
+      ? parseInt(lastEntry.entry_number.split('-')[1], 10)
+      : 0;
     const newEntryNumber = `JE-${(lastNumber + 1).toString().padStart(6, '0')}`;
 
     // إنشاء القيد
@@ -164,9 +174,9 @@ serve(async (req) => {
 
     // إنشاء سطور القيد - المدين
     const debitLines = template.debit_accounts.map((acc: AccountTemplate, idx: number) => {
-      const accountAmount = acc.percentage 
-        ? (amount * acc.percentage / 100)
-        : (acc.fixed_amount || 0);
+      const accountAmount = acc.percentage
+        ? (amount * acc.percentage) / 100
+        : acc.fixed_amount || 0;
 
       return {
         journal_entry_id: journalEntry.id,
@@ -180,9 +190,9 @@ serve(async (req) => {
 
     // إنشاء سطور القيد - الدائن
     const creditLines = template.credit_accounts.map((acc: AccountTemplate, idx: number) => {
-      const accountAmount = acc.percentage 
-        ? (amount * acc.percentage / 100)
-        : (acc.fixed_amount || 0);
+      const accountAmount = acc.percentage
+        ? (amount * acc.percentage) / 100
+        : acc.fixed_amount || 0;
 
       return {
         journal_entry_id: journalEntry.id,
@@ -196,15 +206,19 @@ serve(async (req) => {
 
     // إدراج السطور
     const allLines = [...debitLines, ...creditLines];
-    const { error: linesError } = await supabase
-      .from('journal_entry_lines')
-      .insert(allLines);
+    const { error: linesError } = await supabase.from('journal_entry_lines').insert(allLines);
 
     if (linesError) throw linesError;
 
     // التحقق من التوازن
-    const totalDebit = debitLines.reduce((sum: number, line: { debit_amount: number }) => sum + line.debit_amount, 0);
-    const totalCredit = creditLines.reduce((sum: number, line: { credit_amount: number }) => sum + line.credit_amount, 0);
+    const totalDebit = debitLines.reduce(
+      (sum: number, line: { debit_amount: number }) => sum + line.debit_amount,
+      0
+    );
+    const totalCredit = creditLines.reduce(
+      (sum: number, line: { credit_amount: number }) => sum + line.credit_amount,
+      0
+    );
 
     if (Math.abs(totalDebit - totalCredit) > 0.01) {
       throw new Error(`القيد غير متوازن: مدين ${totalDebit} ≠ دائن ${totalCredit}`);
@@ -233,7 +247,6 @@ serve(async (req) => {
       journal_entry_id: journalEntry.id,
       entry_number: newEntryNumber,
     });
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('Error creating auto journal:', error);

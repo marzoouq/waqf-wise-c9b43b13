@@ -3,24 +3,16 @@
  * يعرض طلبات الصيانة المقدمة من المستأجرين عبر البوابة
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Wrench, 
-  AlertTriangle,
-  Phone,
-  MapPin,
-  Calendar,
-  User,
-  ExternalLink
-} from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { format, arLocale as ar } from "@/lib/date";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Wrench, AlertTriangle, Phone, MapPin, Calendar, User, ExternalLink } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { format, arLocale as ar } from '@/lib/date';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface MaintenanceRequest {
   id: string;
@@ -52,7 +44,8 @@ export function TenantMaintenanceRequestsSection() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('maintenance_requests')
-        .select(`
+        .select(
+          `
           id,
           request_number,
           title,
@@ -67,7 +60,8 @@ export function TenantMaintenanceRequestsSection() {
           contact_phone,
           properties(name),
           tenants(full_name, phone)
-        `)
+        `
+        )
         .in('status', ['جديد', 'معلق', 'قيد المراجعة', 'قيد التنفيذ'])
         .order('created_at', { ascending: false })
         .limit(10);
@@ -80,26 +74,37 @@ export function TenantMaintenanceRequestsSection() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'جديد': return 'bg-info text-info-foreground';
-      case 'معلق': return 'bg-warning text-warning-foreground';
-      case 'قيد المراجعة': return 'bg-secondary text-secondary-foreground';
-      case 'قيد التنفيذ': return 'bg-primary text-primary-foreground';
-      case 'مكتمل': return 'bg-success text-success-foreground';
-      default: return 'bg-muted text-muted-foreground';
+      case 'جديد':
+        return 'bg-info text-info-foreground';
+      case 'معلق':
+        return 'bg-warning text-warning-foreground';
+      case 'قيد المراجعة':
+        return 'bg-secondary text-secondary-foreground';
+      case 'قيد التنفيذ':
+        return 'bg-primary text-primary-foreground';
+      case 'مكتمل':
+        return 'bg-success text-success-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'عاجلة': return 'bg-destructive text-destructive-foreground';
-      case 'عالية': return 'bg-warning text-warning-foreground';
-      case 'عادية': return 'bg-secondary text-secondary-foreground';
-      case 'منخفضة': return 'bg-muted text-muted-foreground';
-      default: return 'bg-muted text-muted-foreground';
+      case 'عاجلة':
+        return 'bg-destructive text-destructive-foreground';
+      case 'عالية':
+        return 'bg-warning text-warning-foreground';
+      case 'عادية':
+        return 'bg-secondary text-secondary-foreground';
+      case 'منخفضة':
+        return 'bg-muted text-muted-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
-  const newRequestsCount = requests.filter(r => r.status === 'جديد').length;
+  const newRequestsCount = requests.filter((r) => r.status === 'جديد').length;
 
   if (isLoading) {
     return (
@@ -131,8 +136,8 @@ export function TenantMaintenanceRequestsSection() {
               </Badge>
             )}
           </CardTitle>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             onClick={() => navigate('/properties')}
             className="text-xs sm:text-sm gap-1"
@@ -152,7 +157,7 @@ export function TenantMaintenanceRequestsSection() {
           <ScrollArea className="h-[300px] sm:h-[400px]">
             <div className="space-y-3 pr-2">
               {requests.map((request) => (
-                <div 
+                <div
                   key={request.id}
                   className="p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
                   onClick={() => navigate(`/properties`)}
@@ -178,7 +183,7 @@ export function TenantMaintenanceRequestsSection() {
                       </div>
                     )}
                   </div>
-                  
+
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                     {request.description}
                   </p>
@@ -191,7 +196,7 @@ export function TenantMaintenanceRequestsSection() {
                         {request.unit_id && <span>- وحدة</span>}
                       </div>
                     )}
-                    
+
                     {request.tenants?.full_name && (
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
@@ -208,7 +213,9 @@ export function TenantMaintenanceRequestsSection() {
 
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{format(new Date(request.created_at), 'dd/MM/yyyy HH:mm', { locale: ar })}</span>
+                      <span>
+                        {format(new Date(request.created_at), 'dd/MM/yyyy HH:mm', { locale: ar })}
+                      </span>
                     </div>
                   </div>
                 </div>

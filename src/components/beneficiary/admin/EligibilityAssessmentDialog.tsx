@@ -37,9 +37,11 @@ export function EligibilityAssessmentDialog({
   beneficiary,
 }: EligibilityAssessmentDialogProps) {
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
-  
+
   // استخدام الـ hook بدلاً من useMutation مباشرة
-  const { runAssessment, isAssessing, latestAssessment } = useEligibilityAssessment(beneficiary?.id || '');
+  const { runAssessment, isAssessing, latestAssessment } = useEligibilityAssessment(
+    beneficiary?.id || ''
+  );
 
   // تحديث البيانات عند فتح المحاور
   useEffect(() => {
@@ -55,18 +57,20 @@ export function EligibilityAssessmentDialog({
   // تشغيل التقييم عند الفتح
   useEffect(() => {
     if (open && beneficiary) {
-      runAssessment().then((result) => {
-        if (result && typeof result === 'object') {
-          const resultData = result as Record<string, unknown>;
-          setAssessment({
-            score: (resultData.total_score as number) || 0,
-            status: (resultData.eligibility_status as string) || 'غير محدد',
-            max_score: 100,
-          });
-        }
-      }).catch(() => {
-        // معالجة الخطأ تتم في الـ hook
-      });
+      runAssessment()
+        .then((result) => {
+          if (result && typeof result === 'object') {
+            const resultData = result as Record<string, unknown>;
+            setAssessment({
+              score: (resultData.total_score as number) || 0,
+              status: (resultData.eligibility_status as string) || 'غير محدد',
+              max_score: 100,
+            });
+          }
+        })
+        .catch(() => {
+          // معالجة الخطأ تتم في الـ hook
+        });
     }
   }, [open, beneficiary?.id]);
 
@@ -90,9 +94,15 @@ export function EligibilityAssessmentDialog({
       {
         icon: TrendingUp,
         label: 'الدخل الشهري',
-        value: beneficiary.monthly_income ? `${beneficiary.monthly_income.toLocaleString()} ريال` : 'غير محدد',
-        score: beneficiary.monthly_income 
-          ? (beneficiary.monthly_income < 3000 ? 30 : beneficiary.monthly_income < 5000 ? 20 : 10)
+        value: beneficiary.monthly_income
+          ? `${beneficiary.monthly_income.toLocaleString()} ريال`
+          : 'غير محدد',
+        score: beneficiary.monthly_income
+          ? beneficiary.monthly_income < 3000
+            ? 30
+            : beneficiary.monthly_income < 5000
+              ? 20
+              : 10
           : 0,
         maxScore: 30,
       },
@@ -101,7 +111,11 @@ export function EligibilityAssessmentDialog({
         label: 'حجم الأسرة',
         value: beneficiary.family_size ? `${beneficiary.family_size} أفراد` : 'غير محدد',
         score: beneficiary.family_size
-          ? (beneficiary.family_size > 7 ? 20 : beneficiary.family_size > 5 ? 15 : 10)
+          ? beneficiary.family_size > 7
+            ? 20
+            : beneficiary.family_size > 5
+              ? 15
+              : 10
           : 0,
         maxScore: 20,
       },
@@ -112,8 +126,8 @@ export function EligibilityAssessmentDialog({
         score: ['عاطل', 'غير موظف'].includes(beneficiary.employment_status || '')
           ? 20
           : ['موظف بدوام جزئي', 'أعمال حرة'].includes(beneficiary.employment_status || '')
-          ? 10
-          : 0,
+            ? 10
+            : 0,
         maxScore: 20,
       },
       {
@@ -123,8 +137,8 @@ export function EligibilityAssessmentDialog({
         score: ['إيجار', 'مع العائلة'].includes(beneficiary.housing_type || '')
           ? 15
           : beneficiary.housing_type === 'ملك جزئي'
-          ? 8
-          : 0,
+            ? 8
+            : 0,
         maxScore: 15,
       },
       {
@@ -133,9 +147,9 @@ export function EligibilityAssessmentDialog({
         value: beneficiary.marital_status || 'غير محدد',
         score: ['أرمل', 'مطلق', 'أعزب مع إعالة'].includes(beneficiary.marital_status || '')
           ? 15
-          : (beneficiary.marital_status === 'متزوج' && (beneficiary.family_size || 0) > 4)
-          ? 10
-          : 0,
+          : beneficiary.marital_status === 'متزوج' && (beneficiary.family_size || 0) > 4
+            ? 10
+            : 0,
         maxScore: 15,
       },
     ];
@@ -151,9 +165,7 @@ export function EligibilityAssessmentDialog({
             <Target className="h-5 w-5" />
             تقييم الأهلية
           </DialogTitle>
-          <DialogDescription>
-            تقييم أهلية المستفيد: {beneficiary?.full_name}
-          </DialogDescription>
+          <DialogDescription>تقييم أهلية المستفيد: {beneficiary?.full_name}</DialogDescription>
         </DialogHeader>
 
         {isAssessing ? (
@@ -188,9 +200,7 @@ export function EligibilityAssessmentDialog({
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">تفصيل المعايير</CardTitle>
-                <CardDescription>
-                  تقييم كل معيار على حدة
-                </CardDescription>
+                <CardDescription>تقييم كل معيار على حدة</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {getCriteriaScore(beneficiary).map((criterion) => {
@@ -271,11 +281,7 @@ export function EligibilityAssessmentDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إغلاق
           </Button>
-          {assessment && (
-            <Button onClick={() => runAssessment()}>
-              إعادة التقييم
-            </Button>
-          )}
+          {assessment && <Button onClick={() => runAssessment()}>إعادة التقييم</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>

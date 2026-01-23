@@ -84,7 +84,7 @@ export function useBankMatching() {
     queryKey: ['bank_matching_rules'],
     queryFn: async () => {
       const data = await AccountingService.getBankMatchingRules();
-      return data.map(item => ({
+      return data.map((item) => ({
         ...item,
         conditions: parseConditions(item.conditions),
         account_mapping: parseAccountMapping(item.account_mapping),
@@ -114,7 +114,8 @@ export function useBankMatching() {
         for (const entry of (entries || []) as JournalEntryWithLines[]) {
           const entryAmount = Math.abs(
             entry.journal_entry_lines.reduce(
-              (sum: number, line: JournalEntryLine) => sum + (line.debit_amount - line.credit_amount),
+              (sum: number, line: JournalEntryLine) =>
+                sum + (line.debit_amount - line.credit_amount),
               0
             )
           );
@@ -146,16 +147,12 @@ export function useBankMatching() {
 
           const txDesc = (tx.description || '').toLowerCase();
           const entryDesc = (entry.description || '').toLowerCase();
-          
+
           if (txDesc && entryDesc) {
             const txWords = txDesc.split(' ');
-            const commonWords = txWords.filter((word: string) =>
-              entryDesc.includes(word)
-            );
-            const similarity = commonWords.length / Math.max(
-              txWords.length,
-              entryDesc.split(' ').length
-            );
+            const commonWords = txWords.filter((word: string) => entryDesc.includes(word));
+            const similarity =
+              commonWords.length / Math.max(txWords.length, entryDesc.split(' ').length);
 
             if (similarity > 0.7) {
               confidence += 0.3;
@@ -179,8 +176,8 @@ export function useBankMatching() {
 
       suggestions.sort((a, b) => b.confidence - a.confidence);
 
-      const autoMatches = suggestions.filter(s => s.confidence >= 0.9);
-      
+      const autoMatches = suggestions.filter((s) => s.confidence >= 0.9);
+
       for (const match of autoMatches) {
         await AccountingService.createBankMatch({
           bank_transaction_id: match.bankTransactionId,

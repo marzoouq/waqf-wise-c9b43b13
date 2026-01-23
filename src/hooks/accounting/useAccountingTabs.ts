@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 export const useAccountingTabs = () => {
-  const [activeTab, setActiveTab] = useState("accounts");
+  const [activeTab, setActiveTab] = useState('accounts');
   const [isLoadingTab, setIsLoadingTab] = useState(false);
 
   // Keyboard shortcuts for tabs
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
     if (e.altKey) {
       const tabMap: Record<string, string> = {
-        "1": "accounts",
-        "2": "entries",
-        "3": "budgets",
-        "4": "trial-balance",
-        "5": "ledger",
-        "6": "bank-accounts",
-        "7": "cash-flow",
+        '1': 'accounts',
+        '2': 'entries',
+        '3': 'budgets',
+        '4': 'trial-balance',
+        '5': 'ledger',
+        '6': 'bank-accounts',
+        '7': 'cash-flow',
       };
-      
+
       if (tabMap[e.key]) {
         e.preventDefault();
         setActiveTab(tabMap[e.key]);
@@ -25,8 +25,8 @@ export const useAccountingTabs = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [handleKeyPress]);
 
   // Simulate loading when switching tabs

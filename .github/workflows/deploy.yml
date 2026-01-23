@@ -28,41 +28,41 @@ jobs:
   pre-deploy-checks:
     name: 🔍 Pre-Deploy Validation
     runs-on: ubuntu-latest
-    
+
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: TypeScript Check
         run: npx tsc --noEmit
-        
+
       - name: ESLint Strict Check
         run: npx eslint . --ext .ts,.tsx --max-warnings=0
-        
+
       - name: Unit Tests
         run: npm run test:unit --if-present || echo "No unit tests configured"
-        
+
       - name: Build Check
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          
+
       - name: Security Audit
         run: npm audit --audit-level=critical || true
-        
+
       - name: Set deploy flag
         id: check
         run: echo "should_deploy=true" >> $GITHUB_OUTPUT
@@ -76,23 +76,23 @@ jobs:
     needs: pre-deploy-checks
     if: needs.pre-deploy-checks.outputs.should_deploy == 'true'
     timeout-minutes: 10
-    
+
     outputs:
       tests_passed: ${{ steps.tests.outputs.passed }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-        
+
       - name: Run critical integration tests
         id: tests
         run: |
@@ -104,7 +104,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          
+
       - name: Integration test summary
         if: always()
         run: |
@@ -123,29 +123,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pre-deploy-checks, integration-check]
     if: needs.pre-deploy-checks.outputs.should_deploy == 'true' && needs.integration-check.outputs.tests_passed == 'true' && vars.DEPLOY_TARGET == 'vercel'
-    
+
     outputs:
       deployment_url: ${{ steps.deploy.outputs.url }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
-        
+
       - name: Pull Vercel Environment
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        
+
       - name: Build Project
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-        
+
       - name: Deploy to Vercel
         id: deploy
         run: |
@@ -161,29 +161,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pre-deploy-checks, integration-check]
     if: needs.pre-deploy-checks.outputs.should_deploy == 'true' && needs.integration-check.outputs.tests_passed == 'true' && vars.DEPLOY_TARGET == 'netlify'
-    
+
     outputs:
       deployment_url: ${{ steps.deploy.outputs.url }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          
+
       - name: Deploy to Netlify
         id: deploy
         uses: nwtgck/actions-netlify@v2.0
@@ -191,7 +191,7 @@ jobs:
           publish-dir: './dist'
           production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
+          deploy-message: 'Deploy from GitHub Actions'
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
@@ -204,7 +204,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pre-deploy-checks, integration-check, deploy-vercel, deploy-netlify]
     if: always() && vars.SLACK_WEBHOOK_ENABLED == 'true'
-    
+
     steps:
       - name: Determine status
         id: status
@@ -222,7 +222,7 @@ jobs:
             echo "color=danger" >> $GITHUB_OUTPUT
             echo "emoji=❌" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.25.0
         with:
@@ -270,7 +270,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [pre-deploy-checks, integration-check, deploy-vercel, deploy-netlify]
     if: always() && vars.DISCORD_WEBHOOK_ENABLED == 'true'
-    
+
     steps:
       - name: Determine status
         id: status
@@ -285,13 +285,13 @@ jobs:
             echo "status=❌ Failed" >> $GITHUB_OUTPUT
             echo "color=15158332" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Send Discord notification
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           status: ${{ steps.status.outputs.status }}
-          title: "Deploy Notification"
+          title: 'Deploy Notification'
           description: |
             **Repository:** ${{ github.repository }}
             **Branch:** ${{ github.ref_name }}

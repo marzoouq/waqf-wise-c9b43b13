@@ -3,8 +3,8 @@
  * @version 2.8.52
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 type SupportTicketInsert = Database['public']['Tables']['support_tickets']['Insert'];
@@ -27,12 +27,14 @@ export class SupportService {
   static async getTickets(filters?: SupportFilters): Promise<SupportTicket[]> {
     let query = supabase
       .from('support_tickets')
-      .select(`
+      .select(
+        `
         *,
         user:user_id(id, email),
         beneficiary:beneficiary_id(id, full_name, national_id),
         assigned_user:assigned_to(id, email)
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (filters?.status && filters.status.length > 0) {
@@ -51,7 +53,9 @@ export class SupportService {
       query = query.eq('is_overdue', true);
     }
     if (filters?.search) {
-      query = query.or(`subject.ilike.%${filters.search}%,description.ilike.%${filters.search}%,ticket_number.ilike.%${filters.search}%`);
+      query = query.or(
+        `subject.ilike.%${filters.search}%,description.ilike.%${filters.search}%,ticket_number.ilike.%${filters.search}%`
+      );
     }
     if (filters?.date_from) {
       query = query.gte('created_at', filters.date_from);
@@ -71,13 +75,15 @@ export class SupportService {
   static async getById(ticketId: string): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
-      .select(`
+      .select(
+        `
         *,
         user:user_id(id, email),
         beneficiary:beneficiary_id(id, full_name, national_id),
         assigned_user:assigned_to(id, email),
         assigned_by_user:assigned_by(id, email)
-      `)
+      `
+      )
       .eq('id', ticketId)
       .maybeSingle();
 
@@ -103,7 +109,10 @@ export class SupportService {
   /**
    * تحديث تذكرة
    */
-  static async update(id: string, updates: Partial<SupportTicketInsert>): Promise<SupportTicket | null> {
+  static async update(
+    id: string,
+    updates: Partial<SupportTicketInsert>
+  ): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update(updates)
@@ -162,7 +171,11 @@ export class SupportService {
   /**
    * تعيين تذكرة لموظف
    */
-  static async assign(ticketId: string, userId: string, assignedBy: string): Promise<SupportTicket | null> {
+  static async assign(
+    ticketId: string,
+    userId: string,
+    assignedBy: string
+  ): Promise<SupportTicket | null> {
     const { data, error } = await supabase
       .from('support_tickets')
       .update({
@@ -185,7 +198,9 @@ export class SupportService {
   static async getTicketRating(ticketId: string) {
     const { data, error } = await supabase
       .from('support_ticket_ratings')
-      .select('id, ticket_id, rating, feedback, response_speed_rating, solution_quality_rating, staff_friendliness_rating, rated_by, created_at')
+      .select(
+        'id, ticket_id, rating, feedback, response_speed_rating, solution_quality_rating, staff_friendliness_rating, rated_by, created_at'
+      )
       .eq('ticket_id', ticketId)
       .maybeSingle();
 
@@ -204,7 +219,9 @@ export class SupportService {
     solutionQualityRating?: number;
     staffFriendlinessRating?: number;
   }) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { data, error } = await supabase
       .from('support_ticket_ratings')
@@ -248,29 +265,31 @@ export class SupportService {
       .from('support_tickets')
       .select('status, category, priority');
 
-    const ticketsByStatus = allTickets?.reduce((acc: Record<string, number>, ticket) => {
-      acc[ticket.status] = (acc[ticket.status] || 0) + 1;
-      return acc;
-    }, {}) || {};
+    const ticketsByStatus =
+      allTickets?.reduce((acc: Record<string, number>, ticket) => {
+        acc[ticket.status] = (acc[ticket.status] || 0) + 1;
+        return acc;
+      }, {}) || {};
 
-    const ticketsByCategory = allTickets?.reduce((acc: Record<string, number>, ticket) => {
-      acc[ticket.category] = (acc[ticket.category] || 0) + 1;
-      return acc;
-    }, {}) || {};
+    const ticketsByCategory =
+      allTickets?.reduce((acc: Record<string, number>, ticket) => {
+        acc[ticket.category] = (acc[ticket.category] || 0) + 1;
+        return acc;
+      }, {}) || {};
 
-    const ticketsByPriority = allTickets?.reduce((acc: Record<string, number>, ticket) => {
-      acc[ticket.priority] = (acc[ticket.priority] || 0) + 1;
-      return acc;
-    }, {}) || {};
+    const ticketsByPriority =
+      allTickets?.reduce((acc: Record<string, number>, ticket) => {
+        acc[ticket.priority] = (acc[ticket.priority] || 0) + 1;
+        return acc;
+      }, {}) || {};
 
     // معدل الرضا
-    const { data: ratings } = await supabase
-      .from('support_ticket_ratings')
-      .select('rating');
+    const { data: ratings } = await supabase.from('support_ticket_ratings').select('rating');
 
-    const avgSatisfaction = ratings && ratings.length > 0
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
-      : 0;
+    const avgSatisfaction =
+      ratings && ratings.length > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+        : 0;
 
     return {
       ticketsByStatus,
@@ -287,7 +306,9 @@ export class SupportService {
   static async getOverdueTickets() {
     const { data, error } = await supabase
       .from('support_tickets')
-      .select('id, ticket_number, subject, status, priority, category, is_overdue, sla_due_at, created_at')
+      .select(
+        'id, ticket_number, subject, status, priority, category, is_overdue, sla_due_at, created_at'
+      )
       .eq('is_overdue', true)
       .order('sla_due_at', { ascending: true });
 
@@ -301,11 +322,13 @@ export class SupportService {
   static async getRecentTickets(limit: number = 10) {
     const { data, error } = await supabase
       .from('support_tickets')
-      .select(`
+      .select(
+        `
         *,
         user:user_id(email),
         beneficiary:beneficiary_id(full_name)
-      `)
+      `
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -322,7 +345,9 @@ export class SupportService {
 
     const { data, error } = await supabase
       .from('support_statistics')
-      .select('id, date, total_tickets, new_tickets, resolved_tickets, closed_tickets, reopened_tickets, avg_first_response_minutes, avg_resolution_minutes, sla_compliance_rate, avg_rating, total_ratings, active_agents, total_responses, created_at')
+      .select(
+        'id, date, total_tickets, new_tickets, resolved_tickets, closed_tickets, reopened_tickets, avg_first_response_minutes, avg_resolution_minutes, sla_compliance_rate, avg_rating, total_ratings, active_agents, total_responses, created_at'
+      )
       .gte('date', startDate.toISOString().split('T')[0])
       .order('date', { ascending: true });
 
@@ -355,7 +380,9 @@ export class SupportService {
     maxCapacity?: number;
     skills?: string[];
   }) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('غير مصرح');
 
     interface AvailabilityUpdate {
@@ -366,7 +393,7 @@ export class SupportService {
     }
 
     const updates: AvailabilityUpdate = {
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
     if (params.isAvailable !== undefined) updates.is_available = params.isAvailable;
     if (params.maxCapacity !== undefined) updates.max_capacity = params.maxCapacity;
@@ -374,12 +401,15 @@ export class SupportService {
 
     const { data, error } = await supabase
       .from('support_agent_availability')
-      .upsert({
-        user_id: params.userId,
-        ...updates,
-      }, {
-        onConflict: 'user_id',
-      })
+      .upsert(
+        {
+          user_id: params.userId,
+          ...updates,
+        },
+        {
+          onConflict: 'user_id',
+        }
+      )
       .select()
       .maybeSingle();
 
@@ -396,16 +426,16 @@ export class SupportService {
   static async getAgentStats(userId?: string, dateRange?: { from: string; to: string }) {
     let query = supabase
       .from('support_agent_stats')
-      .select('id, user_id, date, total_assigned, total_resolved, total_closed, avg_response_minutes, avg_resolution_minutes, customer_satisfaction_avg, created_at');
+      .select(
+        'id, user_id, date, total_assigned, total_resolved, total_closed, avg_response_minutes, avg_resolution_minutes, customer_satisfaction_avg, created_at'
+      );
 
     if (userId) {
       query = query.eq('user_id', userId);
     }
 
     if (dateRange) {
-      query = query
-        .gte('date', dateRange.from)
-        .lte('date', dateRange.to);
+      query = query.gte('date', dateRange.from).lte('date', dateRange.to);
     }
 
     query = query.order('date', { ascending: false });
@@ -424,12 +454,14 @@ export class SupportService {
   static async getEscalations() {
     const { data, error } = await supabase
       .from('support_escalations')
-      .select(`
+      .select(
+        `
         *,
         ticket:support_tickets(ticket_number, subject, status),
         escalated_from_user:escalated_from(id),
         escalated_to_user:escalated_to(id)
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -484,7 +516,9 @@ export class SupportService {
     isInternal?: boolean;
     isSolution?: boolean;
   }) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('يجب تسجيل الدخول');
 
     const { data, error } = await supabase

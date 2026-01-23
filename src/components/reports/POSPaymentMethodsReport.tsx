@@ -1,26 +1,19 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import { usePOSTransactions } from "@/hooks/pos/usePOSTransactions";
-import { subDays, isWithinInterval } from "date-fns";
-import { FileDown, RefreshCw, CreditCard, Banknote, Building2 } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { exportToExcel } from "@/lib/excel-helper";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from "recharts";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import { usePOSTransactions } from '@/hooks/pos/usePOSTransactions';
+import { subDays, isWithinInterval } from 'date-fns';
+import { FileDown, RefreshCw, CreditCard, Banknote, Building2 } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
+import { exportToExcel } from '@/lib/excel-helper';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 const COLORS = {
-  نقدي: "hsl(var(--status-success))",
-  شبكة: "hsl(var(--primary))",
-  تحويل: "hsl(var(--status-info))",
-  شيك: "hsl(var(--status-warning))",
+  نقدي: 'hsl(var(--status-success))',
+  شبكة: 'hsl(var(--primary))',
+  تحويل: 'hsl(var(--status-info))',
+  شيك: 'hsl(var(--status-warning))',
 };
 
 export const POSPaymentMethodsReport = () => {
@@ -42,7 +35,7 @@ export const POSPaymentMethodsReport = () => {
 
   const paymentMethodStats = filteredTransactions.reduce(
     (acc, t) => {
-      const method = t.payment_method || "أخرى";
+      const method = t.payment_method || 'أخرى';
       if (!acc[method]) {
         acc[method] = { count: 0, amount: 0 };
       }
@@ -64,22 +57,22 @@ export const POSPaymentMethodsReport = () => {
 
   const handleExport = async () => {
     const data = Object.entries(paymentMethodStats).map(([method, stats]) => ({
-      "طريقة الدفع": method,
-      "عدد العمليات": stats.count,
-      "إجمالي المبلغ": stats.amount,
-      "النسبة %": ((stats.amount / totalAmount) * 100).toFixed(1),
+      'طريقة الدفع': method,
+      'عدد العمليات': stats.count,
+      'إجمالي المبلغ': stats.amount,
+      'النسبة %': ((stats.amount / totalAmount) * 100).toFixed(1),
     }));
 
-    await exportToExcel(data, "تحليل طرق الدفع", "payment-methods-report");
+    await exportToExcel(data, 'تحليل طرق الدفع', 'payment-methods-report');
   };
 
   const getMethodIcon = (method: string) => {
     switch (method) {
-      case "نقدي":
+      case 'نقدي':
         return <Banknote className="h-5 w-5" />;
-      case "شبكة":
+      case 'شبكة':
         return <CreditCard className="h-5 w-5" />;
-      case "تحويل":
+      case 'تحويل':
         return <Building2 className="h-5 w-5" />;
       default:
         return null;
@@ -105,9 +98,7 @@ export const POSPaymentMethodsReport = () => {
         {isLoading ? (
           <div className="text-center py-8">جاري التحميل...</div>
         ) : chartData.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            لا توجد عمليات في هذه الفترة
-          </div>
+          <div className="text-center py-8 text-muted-foreground">لا توجد عمليات في هذه الفترة</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
             {/* Pie Chart */}
@@ -119,9 +110,7 @@ export const POSPaymentMethodsReport = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={100}
                     fill="hsl(var(--primary))"
                     dataKey="value"
@@ -136,11 +125,7 @@ export const POSPaymentMethodsReport = () => {
                       />
                     ))}
                   </Pie>
-                  <Tooltip
-                    formatter={(value: number) =>
-                      `${value.toLocaleString("ar-SA")} ريال`
-                    }
-                  />
+                  <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -158,7 +143,7 @@ export const POSPaymentMethodsReport = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">إجمالي المبالغ</span>
                   <span className="text-2xl font-bold">
-                    {totalAmount.toLocaleString("ar-SA")} ريال
+                    {totalAmount.toLocaleString('ar-SA')} ريال
                   </span>
                 </div>
               </Card>
@@ -173,12 +158,9 @@ export const POSPaymentMethodsReport = () => {
                         <span className="font-medium">{method}</span>
                       </div>
                       <div className="text-left">
-                        <p className="font-bold">
-                          {stats.amount.toLocaleString("ar-SA")} ريال
-                        </p>
+                        <p className="font-bold">{stats.amount.toLocaleString('ar-SA')} ريال</p>
                         <p className="text-xs text-muted-foreground">
-                          {stats.count} عملية (
-                          {((stats.amount / totalAmount) * 100).toFixed(1)}%)
+                          {stats.count} عملية ({((stats.amount / totalAmount) * 100).toFixed(1)}%)
                         </p>
                       </div>
                     </div>

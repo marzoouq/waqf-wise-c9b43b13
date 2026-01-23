@@ -15,18 +15,20 @@ src/config/
 ### 🔐 permissions.ts
 
 #### الأدوار المتوفرة
+
 ```typescript
-type UserRole = 
-  | 'nazer'       // الناظر
-  | 'admin'       // مدير النظام
-  | 'accountant'  // المحاسب
-  | 'cashier'     // أمين الصندوق
-  | 'archivist'   // الأرشيفي
-  | 'employee'    // الموظف
-  | 'beneficiary' // المستفيد
+type UserRole =
+  | 'nazer' // الناظر
+  | 'admin' // مدير النظام
+  | 'accountant' // المحاسب
+  | 'cashier' // أمين الصندوق
+  | 'archivist' // الأرشيفي
+  | 'employee' // الموظف
+  | 'beneficiary'; // المستفيد
 ```
 
 #### خريطة الصلاحيات
+
 ```typescript
 ROLE_PERMISSIONS = {
   nazer: [
@@ -37,7 +39,7 @@ ROLE_PERMISSIONS = {
     'manage_users',
     // ... صلاحيات كاملة
   ],
-  
+
   admin: [
     'view_dashboard',
     'manage_users',
@@ -45,7 +47,7 @@ ROLE_PERMISSIONS = {
     'view_audit_logs',
     // ...
   ],
-  
+
   accountant: [
     'view_dashboard',
     'manage_journal_entries',
@@ -53,12 +55,13 @@ ROLE_PERMISSIONS = {
     'view_financial_reports',
     // ...
   ],
-  
+
   // ... باقي الأدوار
-}
+};
 ```
 
 #### الدوال المتوفرة
+
 ```typescript
 // فحص صلاحية محددة
 checkPermission(role: UserRole, permission: string): boolean
@@ -74,15 +77,13 @@ hasAllPermissions(role: UserRole, permissions: string[]): boolean
 ## 🔄 طريقة الاستخدام
 
 ### استيراد الإعدادات
+
 ```typescript
-import { 
-  ROLE_PERMISSIONS, 
-  checkPermission, 
-  getRolePermissions 
-} from '@/config';
+import { ROLE_PERMISSIONS, checkPermission, getRolePermissions } from '@/config';
 ```
 
 ### فحص الصلاحيات
+
 ```typescript
 // فحص صلاحية واحدة
 if (checkPermission(userRole, 'approve_distributions')) {
@@ -94,17 +95,18 @@ const permissions = getRolePermissions('accountant');
 ```
 
 ### في المكونات
+
 ```typescript
 import { useAuth } from '@/hooks';
 import { checkPermission } from '@/config';
 
 function ApprovalButton() {
   const { userRole } = useAuth();
-  
+
   if (!checkPermission(userRole, 'approve_distributions')) {
     return null;
   }
-  
+
   return <Button>موافقة</Button>;
 }
 ```

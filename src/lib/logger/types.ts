@@ -27,7 +27,11 @@ export interface ILogger {
   info(message: string, data?: unknown): void;
   warn(message: string, data?: unknown, options?: LogOptions): void;
   // دعم نمطين: (message, error, options) أو (error, options)
-  error(messageOrError: string | Error | unknown, errorOrOptions?: unknown | LogOptions, options?: LogOptions): void;
+  error(
+    messageOrError: string | Error | unknown,
+    errorOrOptions?: unknown | LogOptions,
+    options?: LogOptions
+  ): void;
   success?(message: string, data?: unknown): void;
   flush?(): void;
   cleanup?(): void;

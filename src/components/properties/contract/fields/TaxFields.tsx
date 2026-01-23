@@ -1,10 +1,10 @@
-import { UseFormReturn } from "react-hook-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Receipt, CheckCircle } from "lucide-react";
-import type { ContractFormValues } from "../contractSchema";
+import { UseFormReturn } from 'react-hook-form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Receipt, CheckCircle } from 'lucide-react';
+import type { ContractFormValues } from '../contractSchema';
 
 interface Props {
   form: UseFormReturn<ContractFormValues>;
@@ -15,12 +15,12 @@ export function TaxFields({ form, monthlyRent }: Props) {
   const isTaxExempt = form.watch('is_tax_exempt');
 
   const handleTaxChange = (value: string) => {
-    const isExempt = value === "exempt";
+    const isExempt = value === 'exempt';
     form.setValue('is_tax_exempt', isExempt);
     form.setValue('tax_percentage', isExempt ? 0 : 15);
   };
 
-  const currentValue = isTaxExempt ? "exempt" : "taxable";
+  const currentValue = isTaxExempt ? 'exempt' : 'taxable';
 
   return (
     <Card>
@@ -48,7 +48,7 @@ export function TaxFields({ form, monthlyRent }: Props) {
               </p>
             </Label>
           </div>
-          
+
           <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
             <RadioGroupItem value="taxable" id="tax-taxable" />
             <Label htmlFor="tax-taxable" className="flex-1 cursor-pointer">
@@ -56,9 +56,7 @@ export function TaxFields({ form, monthlyRent }: Props) {
                 <Receipt className="h-4 w-4 text-warning" />
                 <span className="font-medium">خاضع للضريبة (15%)</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                للعقارات التجارية والمحلات
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">للعقارات التجارية والمحلات</p>
             </Label>
           </div>
         </RadioGroup>

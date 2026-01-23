@@ -1,17 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Bell, CheckCircle2, AlertCircle, Info, ChevronLeft } from "lucide-react";
-import { useNotifications, Notification } from "@/hooks/notifications/useNotifications";
-import { useNavigate } from "react-router-dom";
-import { format, arLocale as ar } from "@/lib/date";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Bell, CheckCircle2, AlertCircle, Info, ChevronLeft } from 'lucide-react';
+import { useNotifications, Notification } from '@/hooks/notifications/useNotifications';
+import { useNavigate } from 'react-router-dom';
+import { format, arLocale as ar } from '@/lib/date';
 
 export function NotificationsCard() {
   const navigate = useNavigate();
   const { notifications, markAsRead } = useNotifications();
 
   const recentNotifications = notifications.slice(0, 5);
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -27,17 +27,17 @@ export function NotificationsCard() {
   };
 
   const getNotificationBg = (type: string, isRead: boolean) => {
-    if (isRead) return "bg-muted/50";
-    
+    if (isRead) return 'bg-muted/50';
+
     switch (type) {
       case 'success':
-        return "bg-success-light border-success/20";
+        return 'bg-success-light border-success/20';
       case 'error':
-        return "bg-destructive-light border-destructive/20";
+        return 'bg-destructive-light border-destructive/20';
       case 'warning':
-        return "bg-warning-light border-warning/20";
+        return 'bg-warning-light border-warning/20';
       default:
-        return "bg-info-light border-info/20";
+        return 'bg-info-light border-info/20';
     }
   };
 
@@ -63,11 +63,7 @@ export function NotificationsCard() {
               </Badge>
             )}
           </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => navigate("/notifications")}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/notifications')}>
             عرض الكل
             <ChevronLeft className="h-4 w-4 me-2" />
           </Button>
@@ -92,14 +88,18 @@ export function NotificationsCard() {
                     {getNotificationIcon(notification.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium ${notification.is_read ? 'text-muted-foreground' : 'text-foreground'}`}>
+                    <p
+                      className={`text-sm font-medium ${notification.is_read ? 'text-muted-foreground' : 'text-foreground'}`}
+                    >
                       {notification.title}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(notification.created_at), 'dd MMM yyyy - HH:mm', { locale: ar })}
+                      {format(new Date(notification.created_at), 'dd MMM yyyy - HH:mm', {
+                        locale: ar,
+                      })}
                     </p>
                   </div>
                   {!notification.is_read && (

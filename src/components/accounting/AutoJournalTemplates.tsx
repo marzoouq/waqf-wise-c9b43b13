@@ -1,30 +1,33 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { useAutoJournalTemplates, type AutoJournalTemplate } from "@/hooks/accounting/useAutoJournalTemplates";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { AutoJournalTemplateForm } from "./AutoJournalTemplateForm";
+} from '@/components/ui/dialog';
+import {
+  useAutoJournalTemplates,
+  type AutoJournalTemplate,
+} from '@/hooks/accounting/useAutoJournalTemplates';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { AutoJournalTemplateForm } from './AutoJournalTemplateForm';
 
 export function AutoJournalTemplates() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<AutoJournalTemplate | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { 
-    templates, 
-    isLoading, 
-    error, 
-    refetch, 
-    toggleActive, 
+  const {
+    templates,
+    isLoading,
+    error,
+    refetch,
+    toggleActive,
     deleteTemplate,
     createTemplate,
     updateTemplate,
@@ -76,9 +79,7 @@ export function AutoJournalTemplates() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>
-                {editingTemplate ? "تعديل القالب" : "قالب جديد"}
-              </DialogTitle>
+              <DialogTitle>{editingTemplate ? 'تعديل القالب' : 'قالب جديد'}</DialogTitle>
             </DialogHeader>
             <AutoJournalTemplateForm
               template={editingTemplate}
@@ -97,16 +98,18 @@ export function AutoJournalTemplates() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-lg font-semibold">{template.template_name}</h3>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    template.is_active 
-                      ? "bg-success/10 text-success" 
-                      : "bg-muted text-muted-foreground"
-                  }`}>
-                    {template.is_active ? "مفعّل" : "معطّل"}
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${
+                      template.is_active
+                        ? 'bg-success/10 text-success'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {template.is_active ? 'مفعّل' : 'معطّل'}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-2">
-                  {template.description || "لا يوجد وصف"}
+                  {template.description || 'لا يوجد وصف'}
                 </p>
                 <div className="flex gap-4 text-sm">
                   <span className="text-muted-foreground">
@@ -121,10 +124,12 @@ export function AutoJournalTemplates() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => toggleActive({
-                    id: template.id,
-                    is_active: !template.is_active
-                  })}
+                  onClick={() =>
+                    toggleActive({
+                      id: template.id,
+                      is_active: !template.is_active,
+                    })
+                  }
                 >
                   {template.is_active ? (
                     <ToggleRight className="h-4 w-4 text-success" />
@@ -132,18 +137,10 @@ export function AutoJournalTemplates() {
                     <ToggleLeft className="h-4 w-4" />
                   )}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleOpenDialog(template)}
-                >
+                <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(template)}>
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteTemplate(template.id)}
-                >
+                <Button variant="ghost" size="icon" onClick={() => deleteTemplate(template.id)}>
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>

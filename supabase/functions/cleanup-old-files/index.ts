@@ -1,18 +1,18 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 /**
  * Edge Function مجدولة لحذف الملفات القديمة تلقائياً
  * تعمل وفق سياسات الاحتفاظ المحددة
  * يُنصح بجدولتها للتشغيل يومياً عبر Cron Job
- * 
+ *
  * ⚠️ CRITICAL: يتطلب دور admin فقط
  */
 serve(async (req) => {
@@ -23,7 +23,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -40,7 +40,7 @@ serve(async (req) => {
         function: 'cleanup-old-files',
         testMode: !!bodyData.testMode,
         message: bodyData.testMode ? 'اختبار ناجح - لم يتم تنظيف ملفات فعلية' : undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
     // 1. التحقق من المصادقة والصلاحيات
@@ -54,9 +54,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''));
 
     if (authError || !user) {
       return unauthorizedResponse('Unauthorized');
@@ -79,7 +80,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-    
+
     const today = new Date().toISOString().split('T')[0];
     const { count: todayCount } = await supabaseAdmin
       .from('audit_logs')
@@ -87,18 +88,18 @@ serve(async (req) => {
       .eq('action_type', 'CLEANUP_FILES')
       .eq('user_id', user.id)
       .gte('created_at', `${today}T00:00:00.000Z`);
-    
+
     if ((todayCount ?? 0) >= 3) {
       console.warn(`[cleanup-old-files] Rate limit exceeded for user: ${user.id}`);
       return errorResponse('تجاوزت الحد المسموح (3 مرات/يوم). حاول غداً.', 429);
     }
-    
+
     // تسجيل محاولة التنظيف
     await supabaseAdmin.from('audit_logs').insert({
       user_id: user.id,
       action_type: 'CLEANUP_FILES',
       description: 'بدء عملية تنظيف الملفات القديمة',
-      severity: 'info'
+      severity: 'info',
     });
 
     // 3. استخدام Service Role للعمليات
@@ -125,9 +126,7 @@ serve(async (req) => {
       for (const file of expiredFiles) {
         try {
           // حذف من Storage
-          await supabase.storage
-            .from('encrypted-files')
-            .remove([file.encrypted_file_path]);
+          await supabase.storage.from('encrypted-files').remove([file.encrypted_file_path]);
 
           // تسجيل في Audit
           await supabase.from('deleted_files_audit').insert({
@@ -138,7 +137,7 @@ serve(async (req) => {
             file_category: file.metadata?.category || 'expired',
             deletion_reason: 'انتهاء صلاحية الملف تلقائياً',
             can_restore: false,
-            permanent_deletion_at: new Date().toISOString()
+            permanent_deletion_at: new Date().toISOString(),
           });
 
           // حذف السجلات
@@ -166,16 +165,14 @@ serve(async (req) => {
       for (const file of permanentDeleteFiles) {
         try {
           // حذف من Storage
-          await supabase.storage
-            .from('encrypted-files')
-            .remove([file.file_path]);
+          await supabase.storage.from('encrypted-files').remove([file.file_path]);
 
           // تحديث السجل
           await supabase
             .from('deleted_files_audit')
             .update({
               can_restore: false,
-              permanent_deletion_at: new Date().toISOString()
+              permanent_deletion_at: new Date().toISOString(),
             })
             .eq('id', file.id);
 
@@ -222,13 +219,11 @@ serve(async (req) => {
                     file_category: policy.file_category,
                     reason: `تطبيق سياسة احتفاظ: ${policy.policy_name}`,
                     priority: 'normal',
-                    status: 'pending'
+                    status: 'pending',
                   });
                 } else {
                   // حذف مباشر
-                  await supabase.storage
-                    .from('encrypted-files')
-                    .remove([file.encrypted_file_path]);
+                  await supabase.storage.from('encrypted-files').remove([file.encrypted_file_path]);
 
                   await supabase.from('deleted_files_audit').insert({
                     original_file_id: file.id,
@@ -239,7 +234,7 @@ serve(async (req) => {
                     deletion_reason: `سياسة احتفاظ: ${policy.policy_name}`,
                     retention_policy_id: policy.id,
                     can_restore: false,
-                    permanent_deletion_at: new Date().toISOString()
+                    permanent_deletion_at: new Date().toISOString(),
                   });
 
                   await supabase.from('encrypted_files').delete().eq('id', file.id);
@@ -259,7 +254,7 @@ serve(async (req) => {
     // 4. تنظيف سجلات الوصول القديمة (أكثر من 180 يوم)
     const accessLogCutoff = new Date();
     accessLogCutoff.setDate(accessLogCutoff.getDate() - 180);
-    
+
     const { error: logCleanupError } = await supabase
       .from('sensitive_data_access_log')
       .delete()
@@ -282,14 +277,11 @@ serve(async (req) => {
       message: 'تمت عملية التنظيف بنجاح',
       stats: {
         filesDeleted: totalDeleted,
-        sizeFreedMB: parseFloat(sizeMB)
-      }
+        sizeFreedMB: parseFloat(sizeMB),
+      },
     });
   } catch (error) {
     console.error('❌ خطأ في عملية التنظيف:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'خطأ غير معروف',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'خطأ غير معروف', 500);
   }
 });

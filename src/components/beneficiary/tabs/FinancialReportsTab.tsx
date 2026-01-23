@@ -1,45 +1,45 @@
 /**
  * Financial Reports Tab for Beneficiaries
  * @version 3.0.0
- * 
+ *
  * تبويب التقارير المالية للمستفيد
  * - عرض التقارير المتاحة من قاعدة البيانات
  * - توليد PDF للتقارير
  * - عرض ملخصات مالية
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  FileText, 
-  Download, 
-  Eye, 
-  TrendingUp, 
-  TrendingDown, 
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  FileText,
+  Download,
+  Eye,
+  TrendingUp,
+  TrendingDown,
   DollarSign,
   PieChart,
   BarChart3,
   Calendar,
   Loader2,
   CheckCircle,
-  AlertCircle
-} from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useBeneficiaryId } from "@/hooks/beneficiary/useBeneficiaryId";
-import { toast } from "sonner";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { QUERY_KEYS } from "@/lib/query-keys";
+  AlertCircle,
+} from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useBeneficiaryId } from '@/hooks/beneficiary/useBeneficiaryId';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 // أنواع التقارير
 const REPORT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -48,7 +48,7 @@ const REPORT_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
   beneficiaries: DollarSign,
   properties: BarChart3,
   approvals: CheckCircle,
-  default: FileText
+  default: FileText,
 };
 
 interface ReportTemplate {
@@ -86,11 +86,11 @@ export function FinancialReportsTab() {
         .select('id, template_name, report_type, description, is_public')
         .eq('is_public', true)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data as ReportTemplate[];
     },
-    enabled: !!settings?.show_financial_reports
+    enabled: !!settings?.show_financial_reports,
   });
 
   // جلب الإفصاح السنوي المنشور
@@ -104,11 +104,11 @@ export function FinancialReportsTab() {
         .order('year', { ascending: false })
         .limit(1)
         .maybeSingle();
-      
+
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     },
-    enabled: !!settings?.show_financial_reports
+    enabled: !!settings?.show_financial_reports,
   });
 
   // جلب ملخص مالي للمستفيد مع تفاصيل التوزيعات الشهرية
@@ -136,10 +136,10 @@ export function FinancialReportsTab() {
         totalReceived: beneficiary?.total_received || 0,
         pendingAmount: beneficiary?.pending_amount || 0,
         lastDistributionDate: distributions?.[0]?.distribution_date || null,
-        distributionsCount: count || 0
+        distributionsCount: count || 0,
       } as FinancialSummary;
     },
-    enabled: !!beneficiaryId && !!settings?.show_financial_reports
+    enabled: !!beneficiaryId && !!settings?.show_financial_reports,
   });
 
   // جلب تفاصيل التوزيعات الشهرية (آخر 12 شهر)
@@ -161,7 +161,7 @@ export function FinancialReportsTab() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!beneficiaryId && quickReportType === 'monthly'
+    enabled: !!beneficiaryId && quickReportType === 'monthly',
   });
 
   // جلب ملخص السنة الحالية
@@ -185,7 +185,7 @@ export function FinancialReportsTab() {
 
       const total = data?.reduce((sum, d) => sum + (d.share_amount || 0), 0) || 0;
       const byType: Record<string, number> = {};
-      data?.forEach(d => {
+      data?.forEach((d) => {
         const type = d.heir_type || 'أخرى';
         byType[type] = (byType[type] || 0) + (d.share_amount || 0);
       });
@@ -194,16 +194,16 @@ export function FinancialReportsTab() {
         year: currentYear,
         totalAmount: total,
         distributionsCount: data?.length || 0,
-        byType
+        byType,
       };
     },
-    enabled: !!beneficiaryId && quickReportType === 'annual'
+    enabled: !!beneficiaryId && quickReportType === 'annual',
   });
 
   // توليد PDF للإفصاح السنوي
   const handleDownloadDisclosurePDF = async () => {
     if (!disclosure) {
-      toast.error("لا يوجد إفصاح سنوي منشور");
+      toast.error('لا يوجد إفصاح سنوي منشور');
       return;
     }
 
@@ -212,10 +212,10 @@ export function FinancialReportsTab() {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       // لا توجد سنة سابقة متوفرة هنا، نمرر null
       await generateDisclosurePDF(disclosure, beneficiaries || [], null);
-      toast.success("تم تحميل ملف PDF بنجاح");
+      toast.success('تم تحميل ملف PDF بنجاح');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast.error("حدث خطأ أثناء توليد التقرير");
+      toast.error('حدث خطأ أثناء توليد التقرير');
     } finally {
       setIsGenerating(null);
     }
@@ -270,9 +270,10 @@ export function FinancialReportsTab() {
                 <div>
                   <p className="text-sm text-muted-foreground">إجمالي المستلم</p>
                   <p className="text-2xl font-bold text-primary">
-                    {settings?.mask_exact_amounts 
-                      ? '***' 
-                      : financialSummary.totalReceived.toLocaleString('ar-SA')} ر.س
+                    {settings?.mask_exact_amounts
+                      ? '***'
+                      : financialSummary.totalReceived.toLocaleString('ar-SA')}{' '}
+                    ر.س
                   </p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-primary/20" />
@@ -286,9 +287,10 @@ export function FinancialReportsTab() {
                 <div>
                   <p className="text-sm text-muted-foreground">المبالغ المعلقة</p>
                   <p className="text-2xl font-bold text-amber-600">
-                    {settings?.mask_exact_amounts 
-                      ? '***' 
-                      : financialSummary.pendingAmount.toLocaleString('ar-SA')} ر.س
+                    {settings?.mask_exact_amounts
+                      ? '***'
+                      : financialSummary.pendingAmount.toLocaleString('ar-SA')}{' '}
+                    ر.س
                   </p>
                 </div>
                 <DollarSign className="h-8 w-8 text-amber-600/20" />
@@ -304,7 +306,10 @@ export function FinancialReportsTab() {
                   <p className="text-2xl font-bold">{financialSummary.distributionsCount}</p>
                   {financialSummary.lastDistributionDate && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      آخر توزيع: {format(new Date(financialSummary.lastDistributionDate), 'dd MMM yyyy', { locale: ar })}
+                      آخر توزيع:{' '}
+                      {format(new Date(financialSummary.lastDistributionDate), 'dd MMM yyyy', {
+                        locale: ar,
+                      })}
                     </p>
                   )}
                 </div>
@@ -334,33 +339,45 @@ export function FinancialReportsTab() {
               <div className="text-center p-3 bg-background rounded-lg">
                 <p className="text-xs text-muted-foreground">إجمالي الإيرادات</p>
                 <p className="font-semibold text-green-600">
-                  {settings?.mask_exact_amounts ? '***' : disclosure.total_revenues?.toLocaleString('ar-SA')} ر.س
+                  {settings?.mask_exact_amounts
+                    ? '***'
+                    : disclosure.total_revenues?.toLocaleString('ar-SA')}{' '}
+                  ر.س
                 </p>
               </div>
               <div className="text-center p-3 bg-background rounded-lg">
                 <p className="text-xs text-muted-foreground">إجمالي المصروفات</p>
                 <p className="font-semibold text-red-600">
-                  {settings?.mask_exact_amounts ? '***' : disclosure.total_expenses?.toLocaleString('ar-SA')} ر.س
+                  {settings?.mask_exact_amounts
+                    ? '***'
+                    : disclosure.total_expenses?.toLocaleString('ar-SA')}{' '}
+                  ر.س
                 </p>
               </div>
               <div className="text-center p-3 bg-background rounded-lg">
                 <p className="text-xs text-muted-foreground">صافي الدخل</p>
                 <p className="font-semibold text-primary">
-                  {settings?.mask_exact_amounts ? '***' : disclosure.net_income?.toLocaleString('ar-SA')} ر.س
+                  {settings?.mask_exact_amounts
+                    ? '***'
+                    : disclosure.net_income?.toLocaleString('ar-SA')}{' '}
+                  ر.س
                 </p>
               </div>
               <div className="text-center p-3 bg-background rounded-lg">
                 <p className="text-xs text-muted-foreground">حصة الورثة</p>
                 <p className="font-semibold">
-                  {settings?.mask_exact_amounts ? '***' : disclosure.charity_share?.toLocaleString('ar-SA')} ر.س
+                  {settings?.mask_exact_amounts
+                    ? '***'
+                    : disclosure.charity_share?.toLocaleString('ar-SA')}{' '}
+                  ر.س
                 </p>
               </div>
             </div>
-            
+
             {settings?.allow_export_pdf && (
               <div className="flex gap-2 justify-end">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={handleDownloadDisclosurePDF}
                   disabled={isGenerating === 'disclosure'}
@@ -408,8 +425,8 @@ export function FinancialReportsTab() {
             templates.map((template) => {
               const Icon = REPORT_ICONS[template.report_type] || REPORT_ICONS.default;
               return (
-                <div 
-                  key={template.id} 
+                <div
+                  key={template.id}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -424,20 +441,16 @@ export function FinancialReportsTab() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewReport(template)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleViewReport(template)}>
                       <Eye className="h-4 w-4 ms-2" />
                       عرض
                     </Button>
                     {settings?.allow_export_pdf && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => {
-                          toast.info("جاري تجهيز التقرير...");
+                          toast.info('جاري تجهيز التقرير...');
                           // يمكن إضافة توليد PDF هنا لاحقاً
                         }}
                       >
@@ -467,24 +480,24 @@ export function FinancialReportsTab() {
               id: 'monthly',
               name: 'ملخص التوزيعات الشهرية',
               description: 'عرض توزيعاتك خلال الأشهر الماضية',
-              icon: TrendingUp
+              icon: TrendingUp,
             },
             {
               id: 'annual',
               name: 'الملخص السنوي',
               description: 'إجمالي ما تم استلامه خلال السنة',
-              icon: Calendar
+              icon: Calendar,
             },
             {
               id: 'pending',
               name: 'المبالغ المعلقة',
               description: 'المبالغ في انتظار الصرف',
-              icon: DollarSign
-            }
+              icon: DollarSign,
+            },
           ].map((report) => {
             const Icon = report.icon;
             return (
-              <div 
+              <div
                 key={report.id}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
               >
@@ -497,8 +510,8 @@ export function FinancialReportsTab() {
                     <p className="text-sm text-muted-foreground">{report.description}</p>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => setQuickReportType(report.id as QuickReportType)}
                 >
@@ -566,9 +579,7 @@ export function FinancialReportsTab() {
               {quickReportType === 'monthly' && (
                 <div className="space-y-4">
                   <div className="text-center py-4 border-b">
-                    <p className="text-lg font-bold text-primary">
-                      آخر 12 شهر
-                    </p>
+                    <p className="text-lg font-bold text-primary">آخر 12 شهر</p>
                     <p className="text-sm text-muted-foreground">
                       عدد التوزيعات: {monthlyDistributions.length}
                     </p>
@@ -581,11 +592,16 @@ export function FinancialReportsTab() {
                   ) : (
                     <div className="space-y-2">
                       {monthlyDistributions.map((dist) => (
-                        <div key={dist.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div
+                          key={dist.id}
+                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                        >
                           <div>
                             <p className="font-medium">{dist.heir_type}</p>
                             <p className="text-sm text-muted-foreground">
-                              {format(new Date(dist.distribution_date), 'dd MMMM yyyy', { locale: ar })}
+                              {format(new Date(dist.distribution_date), 'dd MMMM yyyy', {
+                                locale: ar,
+                              })}
                             </p>
                           </div>
                           <span className="font-bold text-primary">
@@ -615,16 +631,17 @@ export function FinancialReportsTab() {
                     </div>
                     <div className="p-4 bg-muted rounded-lg text-center">
                       <p className="text-sm text-muted-foreground">عدد التوزيعات</p>
-                      <p className="text-2xl font-bold">
-                        {annualSummary?.distributionsCount || 0}
-                      </p>
+                      <p className="text-2xl font-bold">{annualSummary?.distributionsCount || 0}</p>
                     </div>
                   </div>
                   {annualSummary?.byType && Object.keys(annualSummary.byType).length > 0 && (
                     <div className="space-y-2">
                       <p className="font-medium">توزيع حسب النوع:</p>
                       {Object.entries(annualSummary.byType).map(([type, amount]) => (
-                        <div key={type} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                        <div
+                          key={type}
+                          className="flex items-center justify-between p-2 bg-muted/50 rounded"
+                        >
                           <span>{type}</span>
                           <span className="font-bold">{amount.toLocaleString('ar-SA')} ر.س</span>
                         </div>

@@ -6,14 +6,14 @@
 
 ## 📊 نظرة عامة
 
-| المقياس | القيمة |
-|---------|--------|
-| **إجمالي الجداول** | 202 جدول |
-| **سياسات RLS** | 675 سياسة |
-| **تغطية RLS** | 100% |
-| **Database Triggers** | 189 trigger |
-| **قاعدة البيانات** | PostgreSQL (Lovable Cloud) |
-| **Realtime** | مفعّل على الجداول الرئيسية |
+| المقياس               | القيمة                     |
+| --------------------- | -------------------------- |
+| **إجمالي الجداول**    | 202 جدول                   |
+| **سياسات RLS**        | 675 سياسة                  |
+| **تغطية RLS**         | 100%                       |
+| **Database Triggers** | 189 trigger                |
+| **قاعدة البيانات**    | PostgreSQL (Lovable Cloud) |
+| **Realtime**          | مفعّل على الجداول الرئيسية |
 
 ---
 
@@ -33,6 +33,7 @@
 ## 👥 المستخدمون والأدوار
 
 ### profiles
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users,
@@ -46,6 +47,7 @@ CREATE TABLE profiles (
 ```
 
 ### user_roles
+
 ```sql
 CREATE TABLE user_roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -56,6 +58,7 @@ CREATE TABLE user_roles (
 ```
 
 ### permissions
+
 ```sql
 CREATE TABLE permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -66,6 +69,7 @@ CREATE TABLE permissions (
 ```
 
 ### role_permissions
+
 ```sql
 CREATE TABLE role_permissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -80,6 +84,7 @@ CREATE TABLE role_permissions (
 ## 👨‍👩‍👧‍👦 المستفيدون والعائلات
 
 ### beneficiaries
+
 ```sql
 CREATE TABLE beneficiaries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -110,6 +115,7 @@ CREATE TABLE beneficiaries (
 ```
 
 ### families
+
 ```sql
 CREATE TABLE families (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -121,6 +127,7 @@ CREATE TABLE families (
 ```
 
 ### beneficiary_requests
+
 ```sql
 CREATE TABLE beneficiary_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -142,6 +149,7 @@ CREATE TABLE beneficiary_requests (
 ## 🏢 العقارات والوحدات
 
 ### properties
+
 ```sql
 CREATE TABLE properties (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -159,6 +167,7 @@ CREATE TABLE properties (
 ```
 
 ### property_units
+
 ```sql
 CREATE TABLE property_units (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -178,6 +187,7 @@ CREATE TABLE property_units (
 ## 🏪 المستأجرون والعقود
 
 ### tenants ✨ جديد
+
 ```sql
 CREATE TABLE tenants (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -200,6 +210,7 @@ CREATE TABLE tenants (
 ```
 
 ### tenant_ledger ✨ جديد
+
 ```sql
 CREATE TABLE tenant_ledger (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -221,6 +232,7 @@ CREATE TABLE tenant_ledger (
 ```
 
 ### contracts
+
 ```sql
 CREATE TABLE contracts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -241,6 +253,7 @@ CREATE TABLE contracts (
 ```
 
 ### rental_payments
+
 ```sql
 CREATE TABLE rental_payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -263,6 +276,7 @@ CREATE TABLE rental_payments (
 ## 💰 المحاسبة والمالية
 
 ### accounts (شجرة الحسابات)
+
 ```sql
 CREATE TABLE accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -284,6 +298,7 @@ CREATE TABLE accounts (
 ```
 
 ### journal_entries
+
 ```sql
 CREATE TABLE journal_entries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -304,6 +319,7 @@ CREATE TABLE journal_entries (
 ```
 
 ### journal_entry_lines
+
 ```sql
 CREATE TABLE journal_entry_lines (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -317,6 +333,7 @@ CREATE TABLE journal_entry_lines (
 ```
 
 ### fiscal_years
+
 ```sql
 CREATE TABLE fiscal_years (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -331,6 +348,7 @@ CREATE TABLE fiscal_years (
 ```
 
 ### invoices
+
 ```sql
 CREATE TABLE invoices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -355,6 +373,7 @@ CREATE TABLE invoices (
 ## 📤 التوزيعات والوقف
 
 ### waqf_units (أقلام الوقف)
+
 ```sql
 CREATE TABLE waqf_units (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -368,6 +387,7 @@ CREATE TABLE waqf_units (
 ```
 
 ### distributions
+
 ```sql
 CREATE TABLE distributions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -383,6 +403,7 @@ CREATE TABLE distributions (
 ```
 
 ### heir_distributions
+
 ```sql
 CREATE TABLE heir_distributions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -402,6 +423,7 @@ CREATE TABLE heir_distributions (
 ## 📁 الأرشفة والإشعارات
 
 ### documents
+
 ```sql
 CREATE TABLE documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -416,6 +438,7 @@ CREATE TABLE documents (
 ```
 
 ### notifications
+
 ```sql
 CREATE TABLE notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -455,7 +478,7 @@ BEGIN
   INTO v_balance
   FROM tenant_ledger
   WHERE tenant_id = p_tenant_id;
-  
+
   RETURN v_balance;
 END;
 $$ LANGUAGE plpgsql;
@@ -464,7 +487,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_tenant_ledger_balance()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.balance := calculate_tenant_balance(NEW.tenant_id) + 
+  NEW.balance := calculate_tenant_balance(NEW.tenant_id) +
                  NEW.debit_amount - NEW.credit_amount;
   RETURN NEW;
 END;
@@ -482,7 +505,7 @@ DECLARE
 BEGIN
   SELECT COALESCE(tax_percentage, 15) INTO property_tax_rate
   FROM properties WHERE id = NEW.property_id;
-  
+
   NEW.tax_amount := ROUND(NEW.amount_due * property_tax_rate / 100, 2);
   RETURN NEW;
 END;
@@ -497,7 +520,7 @@ CREATE OR REPLACE FUNCTION has_role(user_id UUID, role_name TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM user_roles 
+    SELECT 1 FROM user_roles
     WHERE user_id = $1 AND role = $2
   );
 END;
@@ -508,8 +531,8 @@ CREATE OR REPLACE FUNCTION is_staff(user_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM user_roles 
-    WHERE user_id = $1 
+    SELECT 1 FROM user_roles
+    WHERE user_id = $1
     AND role IN ('nazer', 'admin', 'accountant', 'cashier', 'archivist')
   );
 END;
@@ -521,9 +544,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ## 📊 الـ Views الرئيسية
 
 ### beneficiary_statistics
+
 ```sql
 CREATE VIEW beneficiary_statistics AS
-SELECT 
+SELECT
   b.id,
   b.full_name,
   b.category,
@@ -537,9 +561,10 @@ GROUP BY b.id;
 ```
 
 ### tenant_balance_summary ✨ جديد
+
 ```sql
 CREATE VIEW tenant_balance_summary AS
-SELECT 
+SELECT
   t.id,
   t.tenant_number,
   t.full_name,

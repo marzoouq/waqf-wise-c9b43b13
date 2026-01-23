@@ -1,9 +1,9 @@
-import { useFinancialReports } from "@/hooks/accounting/useFinancialReports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Printer, CheckCircle, XCircle, FileText } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
+import { useFinancialReports } from '@/hooks/accounting/useFinancialReports';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Printer, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
 
 export function EnhancedBalanceSheet() {
   const { balanceSheet, isLoading } = useFinancialReports();
@@ -29,21 +29,21 @@ export function EnhancedBalanceSheet() {
 
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
-    const { exportFinancialStatementToPDF } = await import("@/lib/exportHelpers");
+    const { exportFinancialStatementToPDF } = await import('@/lib/exportHelpers');
     const sections = [
       {
         title: 'الأصول',
         items: [
           { label: 'أصول متداولة', amount: balanceSheet.assets.current },
           { label: 'أصول ثابتة', amount: balanceSheet.assets.fixed },
-        ]
+        ],
       },
       {
         title: 'الخصوم',
         items: [
           { label: 'خصوم متداولة', amount: balanceSheet.liabilities.current },
           { label: 'خصوم طويلة الأجل', amount: balanceSheet.liabilities.longTerm },
-        ]
+        ],
       },
       {
         title: 'حقوق الملكية',
@@ -51,8 +51,8 @@ export function EnhancedBalanceSheet() {
           { label: 'رأس مال الوقف (رقبة الوقف)', amount: balanceSheet.equity.capital },
           { label: 'الاحتياطيات', amount: balanceSheet.equity.reserves },
           { label: 'الأرباح المحتجزة (صافي الدخل)', amount: balanceSheet.retainedEarnings || 0 },
-        ]
-      }
+        ],
+      },
     ];
 
     const totals = [
@@ -61,10 +61,10 @@ export function EnhancedBalanceSheet() {
     ];
 
     await exportFinancialStatementToPDF(
-      `قائمة المركز المالي - ${format(new Date(), "dd/MM/yyyy")}`,
+      `قائمة المركز المالي - ${format(new Date(), 'dd/MM/yyyy')}`,
       sections,
       totals,
-      `balance-sheet-${format(new Date(), "yyyyMMdd")}`
+      `balance-sheet-${format(new Date(), 'yyyyMMdd')}`
     );
   };
 
@@ -75,15 +75,25 @@ export function EnhancedBalanceSheet() {
           <div>
             <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة المركز المالي</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              كما في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
+              كما في: {format(new Date(), 'dd MMMM yyyy', { locale: ar })}
             </p>
           </div>
           <div className="flex gap-2 flex-wrap print:hidden">
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handlePrint}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={handlePrint}
+            >
               <Printer className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleExportPDF}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={handleExportPDF}
+            >
               <FileText className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
@@ -95,18 +105,18 @@ export function EnhancedBalanceSheet() {
           {/* Assets Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold border-b-2 border-info pb-2">الأصول</h3>
-            
+
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">أصول متداولة:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.assets.current)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center">
                 <span className="font-semibold">أصول ثابتة:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.assets.fixed)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center pt-2 border-t-2 border-info">
                 <span className="font-bold text-lg">إجمالي الأصول:</span>
                 <span className="font-mono font-bold text-lg text-info">
@@ -118,48 +128,52 @@ export function EnhancedBalanceSheet() {
 
           {/* Liabilities & Equity Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold border-b-2 border-warning pb-2">الخصوم وحقوق الملكية</h3>
-            
+            <h3 className="text-lg font-bold border-b-2 border-warning pb-2">
+              الخصوم وحقوق الملكية
+            </h3>
+
             <div className="space-y-3">
               <h4 className="font-semibold text-warning">الخصوم:</h4>
-              
+
               <div className="flex justify-between items-center pe-4">
                 <span>خصوم متداولة:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.current)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center pe-4">
                 <span>خصوم طويلة الأجل:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.longTerm)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center font-semibold">
                 <span>إجمالي الخصوم:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.total)}</span>
               </div>
 
               <h4 className="font-semibold text-accent pt-4">حقوق الملكية:</h4>
-              
+
               <div className="flex justify-between items-center pe-4">
                 <span>رأس مال الوقف (رقبة الوقف):</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.capital)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center pe-4">
                 <span>الاحتياطيات:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.reserves)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center pe-4">
                 <span>الأرباح المحتجزة (صافي الدخل):</span>
-                <span className="font-mono">{formatNumber(balanceSheet.retainedEarnings || 0)}</span>
+                <span className="font-mono">
+                  {formatNumber(balanceSheet.retainedEarnings || 0)}
+                </span>
               </div>
-              
+
               <div className="flex justify-between items-center font-semibold">
                 <span>إجمالي حقوق الملكية:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.total)}</span>
               </div>
-              
+
               <div className="flex justify-between items-center pt-2 border-t-2 border-warning">
                 <span className="font-bold text-lg">إجمالي الخصوم وحقوق الملكية:</span>
                 <span className="font-mono font-bold text-lg text-warning">

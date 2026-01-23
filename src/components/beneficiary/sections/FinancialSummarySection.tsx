@@ -4,9 +4,9 @@
  * @version 2.9.24
  */
 
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
-import { WaqfDistributionsSummaryCard } from "@/components/beneficiary/cards/WaqfDistributionsSummaryCard";
+import { BankBalanceCard } from '@/components/shared/BankBalanceCard';
+import { WaqfCorpusCard } from '@/components/shared/WaqfCorpusCard';
+import { WaqfDistributionsSummaryCard } from '@/components/beneficiary/cards/WaqfDistributionsSummaryCard';
 
 interface FinancialSummarySectionProps {
   beneficiaryId: string;
@@ -25,10 +25,10 @@ export function FinancialSummarySection({ beneficiaryId }: FinancialSummarySecti
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {/* الرصيد البنكي */}
         <BankBalanceCard compact />
-        
+
         {/* رقبة الوقف */}
         <WaqfCorpusCard compact />
-        
+
         {/* إجمالي المحصل */}
         <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
       </div>

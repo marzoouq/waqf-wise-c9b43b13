@@ -89,12 +89,12 @@ describe('BeneficiaryMobileCard Component', () => {
   it('should handle click event on card', async () => {
     const user = userEvent.setup();
     render(<BeneficiaryMobileCard beneficiary={mockBeneficiary} {...mockHandlers} />);
-    
+
     // Click on the card area (not the dropdown menu)
-    const cardButton = screen.getByRole('button', { name: /محمد أحمد/i }) || 
-                       screen.getAllByRole('button')[0];
+    const cardButton =
+      screen.getByRole('button', { name: /محمد أحمد/i }) || screen.getAllByRole('button')[0];
     await user.click(cardButton);
-    
+
     expect(mockHandlers.onViewProfile).toHaveBeenCalledWith(mockBeneficiary);
   });
 
@@ -106,16 +106,16 @@ describe('BeneficiaryMobileCard Component', () => {
 
   it('should display different status variants correctly', () => {
     const { rerender } = render(
-      <BeneficiaryMobileCard 
-        beneficiary={{ ...mockBeneficiary, status: 'موقوف' }} 
+      <BeneficiaryMobileCard
+        beneficiary={{ ...mockBeneficiary, status: 'موقوف' }}
         {...mockHandlers}
       />
     );
     expect(screen.getByText('موقوف')).toBeInTheDocument();
 
     rerender(
-      <BeneficiaryMobileCard 
-        beneficiary={{ ...mockBeneficiary, status: 'متوفي' }} 
+      <BeneficiaryMobileCard
+        beneficiary={{ ...mockBeneficiary, status: 'متوفي' }}
         {...mockHandlers}
       />
     );
@@ -125,7 +125,7 @@ describe('BeneficiaryMobileCard Component', () => {
   it('should render without phone number', () => {
     const beneficiaryWithoutPhone = { ...mockBeneficiary, phone: undefined };
     render(<BeneficiaryMobileCard beneficiary={beneficiaryWithoutPhone} {...mockHandlers} />);
-    
+
     // Should still render the card
     expect(screen.getByText('محمد أحمد')).toBeInTheDocument();
   });
@@ -133,7 +133,7 @@ describe('BeneficiaryMobileCard Component', () => {
   it('should render without national ID', () => {
     const beneficiaryWithoutID = { ...mockBeneficiary, national_id: undefined };
     render(<BeneficiaryMobileCard beneficiary={beneficiaryWithoutID} {...mockHandlers} />);
-    
+
     // Should still render the card
     expect(screen.getByText('محمد أحمد')).toBeInTheDocument();
   });

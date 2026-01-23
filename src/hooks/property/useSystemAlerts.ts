@@ -2,9 +2,9 @@
  * Hook for system alerts
  * نقل منطق البيانات من AlertsPanel component
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { NotificationService } from "@/services";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { NotificationService } from '@/services';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export function useSystemAlerts() {
   const queryClient = useQueryClient();
@@ -28,9 +28,7 @@ export function useSystemAlerts() {
     }
   };
 
-  const criticalAlerts = alerts.filter(
-    (a) => a.severity === "critical" || a.severity === "high"
-  );
+  const criticalAlerts = alerts.filter((a) => a.severity === 'critical' || a.severity === 'high');
 
   return {
     alerts,

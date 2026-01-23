@@ -1,15 +1,21 @@
-import { useState } from "react";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/ui/use-toast";
-import { DistributionService } from "@/services";
-import { Loader2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/ui/use-toast';
+import { DistributionService } from '@/services';
+import { Loader2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface PaymentVoucherDialogProps {
   open: boolean;
@@ -29,22 +35,22 @@ export function PaymentVoucherDialog({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    voucherType: "payment" as "receipt" | "payment" | "journal",
-    amount: "",
-    description: "",
-    paymentMethod: "bank_transfer" as "bank_transfer" | "cash" | "check" | "digital_wallet",
-    referenceNumber: "",
-    notes: "",
+    voucherType: 'payment' as 'receipt' | 'payment' | 'journal',
+    amount: '',
+    description: '',
+    paymentMethod: 'bank_transfer' as 'bank_transfer' | 'cash' | 'check' | 'digital_wallet',
+    referenceNumber: '',
+    notes: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
       toast({
-        title: "خطأ",
-        description: "يرجى إدخال مبلغ صحيح",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يرجى إدخال مبلغ صحيح',
+        variant: 'destructive',
       });
       return;
     }
@@ -66,28 +72,28 @@ export function PaymentVoucherDialog({
       });
 
       toast({
-        title: "تم بنجاح",
-        description: "تم إنشاء السند بنجاح",
+        title: 'تم بنجاح',
+        description: 'تم إنشاء السند بنجاح',
       });
 
       onOpenChange(false);
       onSuccess?.();
-      
+
       // إعادة تعيين النموذج
       setFormData({
-        voucherType: "payment",
-        amount: "",
-        description: "",
-        paymentMethod: "bank_transfer",
-        referenceNumber: "",
-        notes: "",
+        voucherType: 'payment',
+        amount: '',
+        description: '',
+        paymentMethod: 'bank_transfer',
+        referenceNumber: '',
+        notes: '',
       });
     } catch (error) {
       productionLogger.error('Error creating voucher:', error);
       toast({
-        title: "خطأ",
-        description: "فشل إنشاء السند. يرجى المحاولة مرة أخرى",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل إنشاء السند. يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -109,7 +115,12 @@ export function PaymentVoucherDialog({
                 <Label htmlFor="voucherType">نوع السند *</Label>
                 <Select
                   value={formData.voucherType}
-                  onValueChange={(value) => setFormData({ ...formData, voucherType: value as "receipt" | "payment" | "journal" })}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      voucherType: value as 'receipt' | 'payment' | 'journal',
+                    })
+                  }
                 >
                   <SelectTrigger id="voucherType">
                     <SelectValue />
@@ -154,7 +165,12 @@ export function PaymentVoucherDialog({
                 <Label htmlFor="paymentMethod">طريقة الدفع</Label>
                 <Select
                   value={formData.paymentMethod}
-                  onValueChange={(value) => setFormData({ ...formData, paymentMethod: value as "bank_transfer" | "cash" | "check" | "digital_wallet" })}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      paymentMethod: value as 'bank_transfer' | 'cash' | 'check' | 'digital_wallet',
+                    })
+                  }
                 >
                   <SelectTrigger id="paymentMethod">
                     <SelectValue />

@@ -1,8 +1,8 @@
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { TableHead } from "@/components/ui/table";
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TableHead } from '@/components/ui/table';
 
-export type SortDirection = "asc" | "desc" | null;
+export type SortDirection = 'asc' | 'desc' | null;
 
 interface SortableTableHeaderProps {
   label: string;
@@ -17,20 +17,20 @@ export function SortableTableHeader({
   sortKey,
   currentSort,
   onSort,
-  className = "",
+  className = '',
 }: SortableTableHeaderProps) {
   const isActive = currentSort?.key === sortKey;
   const direction = isActive ? currentSort.direction : null;
 
   const handleClick = () => {
-    let newDirection: SortDirection = "asc";
-    
-    if (direction === "asc") {
-      newDirection = "desc";
-    } else if (direction === "desc") {
+    let newDirection: SortDirection = 'asc';
+
+    if (direction === 'asc') {
+      newDirection = 'desc';
+    } else if (direction === 'desc') {
       newDirection = null;
     }
-    
+
     onSort(sortKey, newDirection);
   };
 
@@ -44,8 +44,8 @@ export function SortableTableHeader({
       >
         {label}
         {!isActive && <ArrowUpDown className="me-2 h-4 w-4" />}
-        {direction === "asc" && <ArrowUp className="me-2 h-4 w-4 text-primary" />}
-        {direction === "desc" && <ArrowDown className="me-2 h-4 w-4 text-primary" />}
+        {direction === 'asc' && <ArrowUp className="me-2 h-4 w-4 text-primary" />}
+        {direction === 'desc' && <ArrowDown className="me-2 h-4 w-4 text-primary" />}
       </Button>
     </TableHead>
   );

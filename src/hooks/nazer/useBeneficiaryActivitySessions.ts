@@ -3,11 +3,11 @@
  * @version 2.8.86
  */
 
-import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { SystemService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { SystemService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BeneficiarySession {
   id: string;
@@ -26,23 +26,23 @@ export interface BeneficiarySession {
 
 // ترجمة أسماء الصفحات
 const PAGE_NAMES: Record<string, string> = {
-  "/beneficiary-portal": "الصفحة الرئيسية",
-  "/beneficiary-portal/profile": "الملف الشخصي",
-  "/beneficiary-portal/distributions": "التوزيعات",
-  "/beneficiary-portal/statements": "كشف الحساب",
-  "/beneficiary-portal/properties": "العقارات",
-  "/beneficiary-portal/family": "العائلة",
-  "/beneficiary-portal/waqf": "الوقف",
-  "/beneficiary-portal/governance": "الحوكمة",
-  "/beneficiary-portal/budgets": "الميزانيات",
-  "/beneficiary-portal/requests": "الطلبات",
-  "/beneficiary-portal/documents": "المستندات",
-  "/beneficiary-portal/loans": "القروض",
+  '/beneficiary-portal': 'الصفحة الرئيسية',
+  '/beneficiary-portal/profile': 'الملف الشخصي',
+  '/beneficiary-portal/distributions': 'التوزيعات',
+  '/beneficiary-portal/statements': 'كشف الحساب',
+  '/beneficiary-portal/properties': 'العقارات',
+  '/beneficiary-portal/family': 'العائلة',
+  '/beneficiary-portal/waqf': 'الوقف',
+  '/beneficiary-portal/governance': 'الحوكمة',
+  '/beneficiary-portal/budgets': 'الميزانيات',
+  '/beneficiary-portal/requests': 'الطلبات',
+  '/beneficiary-portal/documents': 'المستندات',
+  '/beneficiary-portal/loans': 'القروض',
 };
 
 export function getPageName(path: string | null): string {
-  if (!path) return "غير محدد";
-  return PAGE_NAMES[path] || path.split("/").pop() || "غير محدد";
+  if (!path) return 'غير محدد';
+  return PAGE_NAMES[path] || path.split('/').pop() || 'غير محدد';
 }
 
 export function useBeneficiaryActivitySessions() {
@@ -61,13 +61,13 @@ export function useBeneficiaryActivitySessions() {
   // الاشتراك في التحديثات المباشرة
   useEffect(() => {
     const channel = supabase
-      .channel("beneficiary-sessions-realtime")
+      .channel('beneficiary-sessions-realtime')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "beneficiary_sessions",
+          event: '*',
+          schema: 'public',
+          table: 'beneficiary_sessions',
         },
         () => {
           // استخدام invalidateQueries بدلاً من refetch لتجنب إعادة التصيير غير الضرورية
@@ -84,13 +84,13 @@ export function useBeneficiaryActivitySessions() {
   const sessions = query.data || [];
 
   // تحديد المتصلين حالياً (نشاط خلال آخر 5 دقائق)
-  const onlineSessions = sessions.filter(s => {
+  const onlineSessions = sessions.filter((s) => {
     const lastActivity = new Date(s.last_activity);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return lastActivity > fiveMinutesAgo && s.is_online;
   });
 
-  const offlineSessions = sessions.filter(s => {
+  const offlineSessions = sessions.filter((s) => {
     const lastActivity = new Date(s.last_activity);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     return lastActivity <= fiveMinutesAgo || !s.is_online;

@@ -54,7 +54,7 @@ function isLogOptions(obj: unknown): obj is LogOptions {
   if (!obj || typeof obj !== 'object') return false;
   const keys = Object.keys(obj);
   const validKeys = ['context', 'userId', 'severity', 'metadata'];
-  return keys.some(key => validKeys.includes(key));
+  return keys.some((key) => validKeys.includes(key));
 }
 
 /**
@@ -129,7 +129,11 @@ class ProductionLogger implements ILogger {
       // النمط الجديد: error('message', error, options)
       message = messageOrError;
       if (errorOrOptions instanceof Error) {
-        errorData = { message: errorOrOptions.message, stack: errorOrOptions.stack, name: errorOrOptions.name };
+        errorData = {
+          message: errorOrOptions.message,
+          stack: errorOrOptions.stack,
+          name: errorOrOptions.name,
+        };
       } else if (errorOrOptions && !isLogOptions(errorOrOptions)) {
         errorData = errorOrOptions;
       }
@@ -138,7 +142,11 @@ class ProductionLogger implements ILogger {
       // النمط القديم: error(error, options)
       message = extractMessage(messageOrError);
       if (messageOrError instanceof Error) {
-        errorData = { message: messageOrError.message, stack: messageOrError.stack, name: messageOrError.name };
+        errorData = {
+          message: messageOrError.message,
+          stack: messageOrError.stack,
+          name: messageOrError.name,
+        };
       } else {
         errorData = messageOrError;
       }
@@ -219,8 +227,8 @@ class ProductionLogger implements ILogger {
 
   private async processLogs(logsToSend: LogEntry[]): Promise<void> {
     try {
-      const errorsOnly = logsToSend.filter(log => log.level === 'error');
-      
+      const errorsOnly = logsToSend.filter((log) => log.level === 'error');
+
       for (const log of errorsOnly.slice(0, 10)) {
         if (!log.message || typeof log.message !== 'string' || log.message.trim() === '') {
           continue;
@@ -233,7 +241,8 @@ class ProductionLogger implements ILogger {
               error_message: log.message.trim() || 'No message',
               severity: mapLevelToSeverity(log.level) || 'low',
               url: (typeof window !== 'undefined' ? window.location.href : 'server') || 'unknown',
-              user_agent: (typeof navigator !== 'undefined' ? navigator.userAgent : 'server') || 'unknown',
+              user_agent:
+                (typeof navigator !== 'undefined' ? navigator.userAgent : 'server') || 'unknown',
               additional_data: {
                 original_level: log.level,
                 timestamp: log.timestamp,
@@ -269,7 +278,7 @@ class ProductionLogger implements ILogger {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const user = sessionData?.session?.user;
-      
+
       await supabase.functions.invoke('log-error', {
         body: {
           error_type: mapLevelToErrorType(level),

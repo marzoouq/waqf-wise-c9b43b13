@@ -21,9 +21,11 @@ export function UpdateNotifier() {
       .then(({ swUnregistered, cachesDeleted }) => {
         if (swUnregistered || cachesDeleted > 0) {
           if (import.meta.env.DEV) {
-            console.warn(`✅ تنظيف SW: ${swUnregistered ? 'نعم' : 'لا'}, Caches محذوفة: ${cachesDeleted}`);
+            console.warn(
+              `✅ تنظيف SW: ${swUnregistered ? 'نعم' : 'لا'}, Caches محذوفة: ${cachesDeleted}`
+            );
           }
-          
+
           // إظهار toast فقط إذا تم حذف شيء فعلياً
           if (cachesDeleted > 0) {
             toast.success('تم تنظيف الكاش القديم', {

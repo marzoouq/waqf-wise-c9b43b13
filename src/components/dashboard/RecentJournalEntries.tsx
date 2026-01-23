@@ -1,10 +1,10 @@
-import { memo } from "react";
-import { useRecentJournalEntries } from "@/hooks/dashboard/useRecentJournalEntries";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/lib/date";
-import { FileText } from "lucide-react";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { memo } from 'react';
+import { useRecentJournalEntries } from '@/hooks/dashboard/useRecentJournalEntries';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDate } from '@/lib/date';
+import { FileText } from 'lucide-react';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 const RecentJournalEntries = memo(() => {
   const { data: entries, isLoading, error, refetch } = useRecentJournalEntries(5);
@@ -25,13 +25,21 @@ const RecentJournalEntries = memo(() => {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل القيود" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل القيود"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
     <Card className="shadow-soft">
       <CardHeader className="pb-2 sm:pb-4">
-        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">آخر القيود المحاسبية</CardTitle>
+        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">
+          آخر القيود المحاسبية
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {!entries || entries.length === 0 ? (
@@ -60,7 +68,7 @@ const RecentJournalEntries = memo(() => {
                     {entry.description}
                   </p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    {formatDate(entry.entry_date, "dd MMMM yyyy")}
+                    {formatDate(entry.entry_date, 'dd MMMM yyyy')}
                   </p>
                 </div>
               </div>
@@ -72,6 +80,6 @@ const RecentJournalEntries = memo(() => {
   );
 });
 
-RecentJournalEntries.displayName = "RecentJournalEntries";
+RecentJournalEntries.displayName = 'RecentJournalEntries';
 
 export default RecentJournalEntries;

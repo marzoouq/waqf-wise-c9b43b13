@@ -1,5 +1,5 @@
-import { type LucideIcon } from "lucide-react";
-import { UnifiedKPICard } from "./UnifiedKPICard";
+import { type LucideIcon } from 'lucide-react';
+import { UnifiedKPICard } from './UnifiedKPICard';
 
 interface CompactKPICardProps {
   title: string;
@@ -15,10 +15,10 @@ interface CompactKPICardProps {
 
 /**
  * CompactKPICard - بطاقة KPI مدمجة للجوال
- * 
+ *
  * Wrapper حول UnifiedKPICard مع size="compact"
  * للاستخدام في الشاشات الصغيرة أو عند الحاجة لبطاقات أصغر
- * 
+ *
  * ⚠️ API مغلق: لا يقبل className أو style أو children
  */
 export function CompactKPICard(props: CompactKPICardProps) {

@@ -3,17 +3,17 @@
  * @version 2.9.43
  */
 
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Key, Copy, Check } from "lucide-react";
-import { toast } from "sonner";
-import { TwoFactorService } from "@/services/two-factor.service";
-import { useProfile } from "@/hooks/auth/useProfile";
-import { useTwoFactorAuth } from "@/hooks/settings/useTwoFactorAuth";
-import { logger } from "@/lib/logger";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Key, Copy, Check } from 'lucide-react';
+import { toast } from 'sonner';
+import { TwoFactorService } from '@/services/two-factor.service';
+import { useProfile } from '@/hooks/auth/useProfile';
+import { useTwoFactorAuth } from '@/hooks/settings/useTwoFactorAuth';
+import { logger } from '@/lib/logger';
 
 interface TwoFactorDialogProps {
   open: boolean;
@@ -23,16 +23,16 @@ interface TwoFactorDialogProps {
 export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) => {
   const { profile } = useProfile();
   const { twoFactorEnabled, invalidate2FAStatus } = useTwoFactorAuth(profile?.user_id);
-  const [step, setStep] = useState<"enable" | "verify">("enable");
-  const [code, setCode] = useState("");
-  const [secret, setSecret] = useState("");
+  const [step, setStep] = useState<'enable' | 'verify'>('enable');
+  const [code, setCode] = useState('');
+  const [secret, setSecret] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const generateSecret = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    let secret = "";
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
     for (let i = 0; i < 32; i++) {
       secret += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -53,14 +53,14 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
     try {
       const newSecret = generateSecret();
       const newBackupCodes = generateBackupCodes();
-      
+
       setSecret(newSecret);
       setBackupCodes(newBackupCodes);
-      setStep("verify");
-      
-      toast.success("تم إنشاء رمز المصادقة الثنائية");
+      setStep('verify');
+
+      toast.success('تم إنشاء رمز المصادقة الثنائية');
     } catch (error) {
-      toast.error("حدث خطأ أثناء تفعيل المصادقة الثنائية");
+      toast.error('حدث خطأ أثناء تفعيل المصادقة الثنائية');
       logger.error(error, { context: 'enable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
@@ -69,21 +69,21 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
 
   const handleVerify = async () => {
     if (!code || code.length !== 6) {
-      toast.error("الرجاء إدخال رمز مكون من 6 أرقام");
+      toast.error('الرجاء إدخال رمز مكون من 6 أرقام');
       return;
     }
 
     setIsLoading(true);
     try {
-      await TwoFactorService.enable(profile?.user_id || "", secret, backupCodes);
+      await TwoFactorService.enable(profile?.user_id || '', secret, backupCodes);
 
       await invalidate2FAStatus();
-      toast.success("تم تفعيل المصادقة الثنائية بنجاح");
+      toast.success('تم تفعيل المصادقة الثنائية بنجاح');
       onOpenChange(false);
-      setStep("enable");
-      setCode("");
+      setStep('enable');
+      setCode('');
     } catch (error) {
-      toast.error("حدث خطأ أثناء التحقق من الرمز");
+      toast.error('حدث خطأ أثناء التحقق من الرمز');
       logger.error(error, { context: 'verify_2fa_code', severity: 'medium' });
     } finally {
       setIsLoading(false);
@@ -93,13 +93,13 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const handleDisable2FA = async () => {
     setIsLoading(true);
     try {
-      await TwoFactorService.disable(profile?.user_id || "");
+      await TwoFactorService.disable(profile?.user_id || '');
 
       await invalidate2FAStatus();
-      toast.success("تم إلغاء تفعيل المصادقة الثنائية");
+      toast.success('تم إلغاء تفعيل المصادقة الثنائية');
       onOpenChange(false);
     } catch (error) {
-      toast.error("حدث خطأ أثناء إلغاء التفعيل");
+      toast.error('حدث خطأ أثناء إلغاء التفعيل');
       logger.error(error, { context: 'disable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
@@ -109,18 +109,18 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     setCopiedCode(type);
-    toast.success("تم النسخ إلى الحافظة");
+    toast.success('تم النسخ إلى الحافظة');
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
-      title={twoFactorEnabled ? "إدارة المصادقة الثنائية" : "تفعيل المصادقة الثنائية"}
-      description={twoFactorEnabled
-        ? "يمكنك تعطيل المصادقة الثنائية من هنا"
-        : "أضف طبقة أمان إضافية لحسابك"}
+      title={twoFactorEnabled ? 'إدارة المصادقة الثنائية' : 'تفعيل المصادقة الثنائية'}
+      description={
+        twoFactorEnabled ? 'يمكنك تعطيل المصادقة الثنائية من هنا' : 'أضف طبقة أمان إضافية لحسابك'
+      }
       size="lg"
     >
       {twoFactorEnabled ? (
@@ -130,9 +130,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
               <Check className="h-5 w-5" />
               <span className="font-medium">المصادقة الثنائية مفعلة</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              حسابك محمي بالمصادقة الثنائية
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">حسابك محمي بالمصادقة الثنائية</p>
           </div>
 
           <Button
@@ -146,12 +144,12 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
         </div>
       ) : (
         <div className="space-y-4">
-          {step === "enable" && (
+          {step === 'enable' && (
             <>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  المصادقة الثنائية تضيف طبقة إضافية من الأمان لحسابك. عند التفعيل،
-                  ستحتاج إلى إدخال رمز من تطبيق المصادقة عند تسجيل الدخول.
+                  المصادقة الثنائية تضيف طبقة إضافية من الأمان لحسابك. عند التفعيل، ستحتاج إلى إدخال
+                  رمز من تطبيق المصادقة عند تسجيل الدخول.
                 </p>
               </div>
 
@@ -163,18 +161,14 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                 </ul>
               </div>
 
-              <Button
-                onClick={handleEnable2FA}
-                disabled={isLoading}
-                className="w-full"
-              >
+              <Button onClick={handleEnable2FA} disabled={isLoading} className="w-full">
                 <Key className="h-4 w-4 ms-2" />
                 تفعيل المصادقة الثنائية
               </Button>
             </>
           )}
 
-          {step === "verify" && (
+          {step === 'verify' && (
             <>
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-lg p-4">
@@ -186,9 +180,9 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => copyToClipboard(secret, "secret")}
+                      onClick={() => copyToClipboard(secret, 'secret')}
                     >
-                      {copiedCode === "secret" ? (
+                      {copiedCode === 'secret' ? (
                         <Check className="h-4 w-4 text-success" />
                       ) : (
                         <Copy className="h-4 w-4" />
@@ -206,7 +200,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                     type="text"
                     maxLength={6}
                     value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="000000"
                     className="text-center text-2xl tracking-widest"
                   />
@@ -241,11 +235,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setStep("enable")}
-                    className="flex-1"
-                  >
+                  <Button variant="outline" onClick={() => setStep('enable')} className="flex-1">
                     رجوع
                   </Button>
                   <Button

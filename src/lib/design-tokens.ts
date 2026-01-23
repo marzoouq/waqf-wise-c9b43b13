@@ -6,33 +6,33 @@
 export const DESIGN_TOKENS = {
   // Spacing System (based on 4px base)
   spacing: {
-    xs: '0.25rem',    // 4px
-    sm: '0.5rem',     // 8px
-    md: '0.75rem',    // 12px
-    lg: '1rem',       // 16px
-    xl: '1.5rem',     // 24px
-    '2xl': '2rem',    // 32px
-    '3xl': '3rem',    // 48px
-    '4xl': '4rem',    // 64px
+    xs: '0.25rem', // 4px
+    sm: '0.5rem', // 8px
+    md: '0.75rem', // 12px
+    lg: '1rem', // 16px
+    xl: '1.5rem', // 24px
+    '2xl': '2rem', // 32px
+    '3xl': '3rem', // 48px
+    '4xl': '4rem', // 64px
   },
 
   // Typography Scale
   typography: {
-    xs: '0.75rem',    // 12px
-    sm: '0.875rem',   // 14px
-    base: '1rem',     // 16px
-    lg: '1.125rem',   // 18px
-    xl: '1.25rem',    // 20px
-    '2xl': '1.5rem',  // 24px
+    xs: '0.75rem', // 12px
+    sm: '0.875rem', // 14px
+    base: '1rem', // 16px
+    lg: '1.125rem', // 18px
+    xl: '1.25rem', // 20px
+    '2xl': '1.5rem', // 24px
     '3xl': '1.875rem', // 30px
     '4xl': '2.25rem', // 36px
   },
 
   // Responsive Breakpoints
   breakpoints: {
-    xs: '320px',  // Mobile small
-    sm: '640px',  // Mobile
-    md: '768px',  // Tablet
+    xs: '320px', // Mobile small
+    sm: '640px', // Mobile
+    md: '768px', // Tablet
     lg: '1024px', // Desktop
     xl: '1280px', // Large Desktop
     '2xl': '1536px', // Extra Large
@@ -48,11 +48,11 @@ export const DESIGN_TOKENS = {
   // Border Radius
   radius: {
     none: '0',
-    sm: '0.25rem',   // 4px
-    md: '0.375rem',  // 6px
-    lg: '0.5rem',    // 8px
-    xl: '0.75rem',   // 12px
-    '2xl': '1rem',   // 16px
+    sm: '0.25rem', // 4px
+    md: '0.375rem', // 6px
+    lg: '0.5rem', // 8px
+    xl: '0.75rem', // 12px
+    '2xl': '1rem', // 16px
     full: '9999px',
   },
 
@@ -109,8 +109,8 @@ export const TYPOGRAPHY = {
 } as const;
 
 export const TOUCH = {
-  minSize: 'min-h-[44px] min-w-[44px]',      
-  minSpacing: 'gap-2',    
+  minSize: 'min-h-[44px] min-w-[44px]',
+  minSpacing: 'gap-2',
   buttonHeight: 'h-11',
   iconButton: 'h-11 w-11',
   buttonPadding: 'px-4 py-2',

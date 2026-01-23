@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { PropertyService, ContractService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { PropertyService, ContractService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface ContractWithProperty {
   id: string;
@@ -17,7 +17,10 @@ interface ContractWithProperty {
   } | null;
 }
 
-export function useBeneficiaryProperties(isCurrentYearPublished: boolean, publishStatusLoading: boolean) {
+export function useBeneficiaryProperties(
+  isCurrentYearPublished: boolean,
+  publishStatusLoading: boolean
+) {
   const { data: properties = [], isLoading: propertiesLoading } = useQuery({
     queryKey: QUERY_KEYS.PROPERTIES_FOR_BENEFICIARY,
     queryFn: () => PropertyService.getAll(),

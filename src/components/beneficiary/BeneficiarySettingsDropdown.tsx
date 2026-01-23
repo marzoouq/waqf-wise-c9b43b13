@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,28 +6,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import {
-  Settings,
-  Mail,
-  Phone,
-  Lock,
-  Bell,
-  Moon,
-  Sun,
-  LogOut,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { AuthService } from "@/services";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/ui/use-toast";
-import { EditEmailDialog } from "./EditEmailDialog";
-import { EditPhoneDialog } from "./EditPhoneDialog";
-import { NotificationPreferences } from "./NotificationPreferences";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Beneficiary } from "@/types/beneficiary";
-import { NotificationPreferences as NotificationPreferencesType } from "@/types/notifications";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Settings, Mail, Phone, Lock, Bell, Moon, Sun, LogOut } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { AuthService } from '@/services';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/ui/use-toast';
+import { EditEmailDialog } from './EditEmailDialog';
+import { EditPhoneDialog } from './EditPhoneDialog';
+import { NotificationPreferences } from './NotificationPreferences';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Beneficiary } from '@/types/beneficiary';
+import { NotificationPreferences as NotificationPreferencesType } from '@/types/notifications';
 
 interface BeneficiarySettingsDropdownProps {
   beneficiary: Beneficiary;
@@ -49,21 +40,21 @@ export function BeneficiarySettingsDropdown({
     try {
       await AuthService.logout();
       toast({
-        title: "تم تسجيل الخروج",
-        description: "نراك قريباً",
+        title: 'تم تسجيل الخروج',
+        description: 'نراك قريباً',
       });
-      navigate("/login");
+      navigate('/login');
     } catch {
       toast({
-        title: "خطأ",
-        description: "فشل تسجيل الخروج",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تسجيل الخروج',
+        variant: 'destructive',
       });
     }
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -98,12 +89,12 @@ export function BeneficiarySettingsDropdown({
             إعدادات الإشعارات
           </DropdownMenuItem>
           <DropdownMenuItem onClick={toggleTheme}>
-            {theme === "dark" ? (
+            {theme === 'dark' ? (
               <Sun className="ms-2 h-4 w-4" />
             ) : (
               <Moon className="ms-2 h-4 w-4" />
             )}
-            {theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}
+            {theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
@@ -120,7 +111,7 @@ export function BeneficiarySettingsDropdown({
         open={editEmailOpen}
         onOpenChange={setEditEmailOpen}
         beneficiaryId={beneficiary.id}
-        currentEmail={beneficiary.email || ""}
+        currentEmail={beneficiary.email || ''}
       />
       <EditPhoneDialog
         open={editPhoneOpen}
@@ -135,7 +126,10 @@ export function BeneficiarySettingsDropdown({
           </DialogHeader>
           <NotificationPreferences
             beneficiaryId={beneficiary.id}
-            currentPreferences={(beneficiary.notification_preferences as NotificationPreferencesType | null) || undefined}
+            currentPreferences={
+              (beneficiary.notification_preferences as NotificationPreferencesType | null) ||
+              undefined
+            }
           />
         </DialogContent>
       </Dialog>

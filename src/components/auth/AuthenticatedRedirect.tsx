@@ -1,7 +1,7 @@
 /**
  * مكون التوجيه للمستخدمين المسجلين
  * Redirect component for authenticated users
- * 
+ *
  * ✅ مستقل عن AuthContext - يستخدم Supabase مباشرة
  * ✅ يجلب الأدوار مباشرة ويوجه للوحة التحكم المناسبة
  * ✅ آمن للاستخدام في الصفحات الخفيفة
@@ -21,8 +21,10 @@ export default function AuthenticatedRedirect() {
 
     const checkAndRedirect = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (!mounted) return;
 
         if (!session) {
@@ -35,7 +37,7 @@ export default function AuthenticatedRedirect() {
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id);
-        
+
         if (!mounted) return;
 
         if (rolesError) {
@@ -44,18 +46,23 @@ export default function AuthenticatedRedirect() {
           return;
         }
 
-        const roles = rolesData?.map(r => r.role as AppRole) || [];
+        const roles = rolesData?.map((r) => r.role as AppRole) || [];
         const targetDashboard = getDashboardForRoles(roles);
-        
+
         // تخزين الأدوار مؤقتاً
         try {
-          localStorage.setItem('waqf_user_roles', JSON.stringify({
-            roles,
-            userId: session.user.id,
-            timestamp: Date.now()
-          }));
-        } catch { /* تجاهل أخطاء localStorage */ }
-        
+          localStorage.setItem(
+            'waqf_user_roles',
+            JSON.stringify({
+              roles,
+              userId: session.user.id,
+              timestamp: Date.now(),
+            })
+          );
+        } catch {
+          /* تجاهل أخطاء localStorage */
+        }
+
         navigate(targetDashboard, { replace: true });
       } catch (error) {
         if (mounted) {

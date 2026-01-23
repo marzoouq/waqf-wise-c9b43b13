@@ -4,10 +4,10 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  connectionMonitor, 
-  ConnectionEvent, 
-  ConnectionStats 
+import {
+  connectionMonitor,
+  ConnectionEvent,
+  ConnectionStats,
 } from '@/services/monitoring/connection-monitor.service';
 
 // أسباب انقطاع الاتصال الشائعة
@@ -51,16 +51,16 @@ export function useConnectionMonitor() {
   const checkRateLimit = useCallback(() => {
     const now = Date.now();
     const elapsed = now - lastResetRef.current;
-    
+
     // إعادة ضبط العداد كل دقيقة
     if (elapsed > 60000) {
       requestCountRef.current = 0;
       lastResetRef.current = now;
       setRateLimitWarning(false);
     }
-    
+
     requestCountRef.current++;
-    
+
     // تحذير عند اقتراب من الحد (100 طلب/دقيقة)
     if (requestCountRef.current > 80) {
       setRateLimitWarning(true);
@@ -71,7 +71,7 @@ export function useConnectionMonitor() {
         details: `${requestCountRef.current} طلب في آخر دقيقة`,
       });
     }
-    
+
     return requestCountRef.current > 100;
   }, []);
 
@@ -81,8 +81,8 @@ export function useConnectionMonitor() {
 
     // الاشتراك في الأحداث الجديدة
     const unsubscribeEvents = connectionMonitor.subscribe((event) => {
-      setEvents(prev => [event, ...prev].slice(0, 100));
-      
+      setEvents((prev) => [event, ...prev].slice(0, 100));
+
       // كشف Rate Limiting من الأخطاء
       if (event.errorCode === '429') {
         setRateLimitWarning(true);
@@ -115,21 +115,29 @@ export function useConnectionMonitor() {
     setEvents([]);
   }, []);
 
-  const logApiError = useCallback((url: string, status: number, message: string) => {
-    checkRateLimit();
-    connectionMonitor.logApiError(url, status, message);
-  }, [checkRateLimit]);
+  const logApiError = useCallback(
+    (url: string, status: number, message: string) => {
+      checkRateLimit();
+      connectionMonitor.logApiError(url, status, message);
+    },
+    [checkRateLimit]
+  );
 
   const logDatabaseError = useCallback((operation: string, error: string) => {
     connectionMonitor.logDatabaseError(operation, error);
   }, []);
 
-  const getDisconnectionCause = useCallback((errorCode?: string): typeof DISCONNECTION_CAUSES[keyof typeof DISCONNECTION_CAUSES] | null => {
-    if (errorCode === '429') return DISCONNECTION_CAUSES.RATE_LIMITING;
-    if (errorCode === '408' || errorCode === '0') return DISCONNECTION_CAUSES.NETWORK_TIMEOUT;
-    if (errorCode === '503') return DISCONNECTION_CAUSES.SERVER_OVERLOAD;
-    return null;
-  }, []);
+  const getDisconnectionCause = useCallback(
+    (
+      errorCode?: string
+    ): (typeof DISCONNECTION_CAUSES)[keyof typeof DISCONNECTION_CAUSES] | null => {
+      if (errorCode === '429') return DISCONNECTION_CAUSES.RATE_LIMITING;
+      if (errorCode === '408' || errorCode === '0') return DISCONNECTION_CAUSES.NETWORK_TIMEOUT;
+      if (errorCode === '503') return DISCONNECTION_CAUSES.SERVER_OVERLOAD;
+      return null;
+    },
+    []
+  );
 
   return {
     events,

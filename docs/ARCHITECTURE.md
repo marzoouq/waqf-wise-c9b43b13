@@ -3,6 +3,7 @@
 ## نظرة عامة
 
 منصة إدارة الوقف الإلكترونية مبنية على هندسة معمارية حديثة تتبع مبادئ الفصل بين الطبقات (Layered Architecture) مع التركيز على:
+
 - **قابلية الصيانة**: كود منظم وقابل للتطوير
 - **الأمان**: RLS policies و role-based access
 - **الأداء**: React Query caching و optimized queries
@@ -50,6 +51,7 @@ src/
 ## 🏗️ الطبقات المعمارية
 
 ### 1. طبقة العرض (Presentation Layer)
+
 **المسؤولية**: عرض البيانات وتفاعل المستخدم
 
 ```
@@ -61,6 +63,7 @@ Pages → Components → UI Components
 - **UI**: مكونات shadcn/ui الأساسية
 
 ### 2. طبقة المنطق (Logic Layer)
+
 **المسؤولية**: إدارة الحالة وربط البيانات
 
 ```
@@ -72,6 +75,7 @@ Hooks ← React Query ← Services
 - **State Management**: React Context للحالة العامة
 
 ### 3. طبقة الخدمات (Service Layer)
+
 **المسؤولية**: منطق الأعمال والتواصل مع قاعدة البيانات
 
 ```typescript
@@ -83,51 +87,52 @@ const beneficiaries = await BeneficiaryService.getAll();
 
 **Services المتوفرة (60+ خدمة):**
 
-| Service | الوظيفة |
-|---------|---------|
-| AccountingService | المحاسبة والقيود |
-| ApprovalService | الموافقات |
-| ArchiveService | الأرشفة |
-| AuditService | سجل العمليات |
-| AuthService | المصادقة والمستخدمين |
-| BankReconciliationService | التسوية البنكية |
-| BeneficiaryService | المستفيدين |
-| ChatbotService | الدردشة الآلية |
-| ContractService | العقود |
-| DashboardService | لوحات التحكم و KPIs |
-| DistributionService | التوزيعات |
-| DocumentationService | التوثيق |
-| EdgeFunctionService | Edge Functions |
-| FiscalYearService | السنوات المالية |
-| FundService | الصناديق |
-| GovernanceService | الحوكمة |
-| IntegrationService | التكاملات |
-| InvoiceService | الفواتير |
-| KnowledgeService | قاعدة المعرفة |
-| LoansService | القروض والأقساط |
-| MaintenanceService | الصيانة |
-| MessageService | الرسائل الداخلية |
-| MonitoringService | المراقبة |
-| NotificationService | الإشعارات |
-| NotificationSettingsService | إعدادات الإشعارات |
-| PaymentService | المدفوعات |
-| POSService | نقاط البيع |
-| PropertyService | العقارات والوحدات |
-| RealtimeService | Realtime subscriptions |
-| ReportsService | التقارير المتقدمة |
-| ReportService | إنشاء التقارير |
-| RequestService | الطلبات |
-| SecurityService | الأمان والصلاحيات |
-| SettingsService | الإعدادات |
-| StorageService | التخزين |
-| SystemService | النظام والمراقبة |
-| TenantService | المستأجرين |
-| TribeService | القبائل |
-| UIService | واجهة المستخدم |
-| UserService | المستخدمين |
-| VoucherService | السندات |
+| Service                     | الوظيفة                |
+| --------------------------- | ---------------------- |
+| AccountingService           | المحاسبة والقيود       |
+| ApprovalService             | الموافقات              |
+| ArchiveService              | الأرشفة                |
+| AuditService                | سجل العمليات           |
+| AuthService                 | المصادقة والمستخدمين   |
+| BankReconciliationService   | التسوية البنكية        |
+| BeneficiaryService          | المستفيدين             |
+| ChatbotService              | الدردشة الآلية         |
+| ContractService             | العقود                 |
+| DashboardService            | لوحات التحكم و KPIs    |
+| DistributionService         | التوزيعات              |
+| DocumentationService        | التوثيق                |
+| EdgeFunctionService         | Edge Functions         |
+| FiscalYearService           | السنوات المالية        |
+| FundService                 | الصناديق               |
+| GovernanceService           | الحوكمة                |
+| IntegrationService          | التكاملات              |
+| InvoiceService              | الفواتير               |
+| KnowledgeService            | قاعدة المعرفة          |
+| LoansService                | القروض والأقساط        |
+| MaintenanceService          | الصيانة                |
+| MessageService              | الرسائل الداخلية       |
+| MonitoringService           | المراقبة               |
+| NotificationService         | الإشعارات              |
+| NotificationSettingsService | إعدادات الإشعارات      |
+| PaymentService              | المدفوعات              |
+| POSService                  | نقاط البيع             |
+| PropertyService             | العقارات والوحدات      |
+| RealtimeService             | Realtime subscriptions |
+| ReportsService              | التقارير المتقدمة      |
+| ReportService               | إنشاء التقارير         |
+| RequestService              | الطلبات                |
+| SecurityService             | الأمان والصلاحيات      |
+| SettingsService             | الإعدادات              |
+| StorageService              | التخزين                |
+| SystemService               | النظام والمراقبة       |
+| TenantService               | المستأجرين             |
+| TribeService                | القبائل                |
+| UIService                   | واجهة المستخدم         |
+| UserService                 | المستخدمين             |
+| VoucherService              | السندات                |
 
 ### 4. طبقة البيانات (Data Layer)
+
 **المسؤولية**: Supabase + PostgreSQL
 
 - **202 جدول** في قاعدة البيانات
@@ -151,15 +156,15 @@ const beneficiaries = await BeneficiaryService.getAll();
 
 ### صلاحيات كل دور:
 
-| الدور | الصلاحيات |
-|-------|-----------|
-| **admin** | جميع الصلاحيات + إدارة النظام |
-| **nazer** | الموافقات + التوزيعات + التقارير الكاملة |
-| **accountant** | المحاسبة + القيود + التقارير المالية |
-| **cashier** | التحصيل + الصرف + نقطة البيع |
-| **archivist** | الأرشفة + المستندات |
-| **beneficiary** | بياناته الشخصية فقط |
-| **waqf_heir** | شفافية كاملة على بيانات الوقف |
+| الدور           | الصلاحيات                                |
+| --------------- | ---------------------------------------- |
+| **admin**       | جميع الصلاحيات + إدارة النظام            |
+| **nazer**       | الموافقات + التوزيعات + التقارير الكاملة |
+| **accountant**  | المحاسبة + القيود + التقارير المالية     |
+| **cashier**     | التحصيل + الصرف + نقطة البيع             |
+| **archivist**   | الأرشفة + المستندات                      |
+| **beneficiary** | بياناته الشخصية فقط                      |
+| **waqf_heir**   | شفافية كاملة على بيانات الوقف            |
 
 ---
 
@@ -209,7 +214,7 @@ const beneficiaries = await BeneficiaryService.getAll();
 // مثال: useNazerDashboardRealtime
 const tables = [
   'beneficiaries',
-  'properties', 
+  'properties',
   'contracts',
   'payments',
   'journal_entries',
@@ -244,10 +249,10 @@ queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
 ```typescript
 const QUERY_CONFIG = {
   REPORTS: {
-    staleTime: 2 * 60 * 1000,      // 2 minutes
+    staleTime: 2 * 60 * 1000, // 2 minutes
     refetchOnWindowFocus: true,
-    refetchInterval: 5 * 60 * 1000  // 5 minutes
-  }
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+  },
 };
 ```
 
@@ -277,12 +282,12 @@ const QUERY_CONFIG = {
 
 ### Contexts المتوفرة
 
-| Context | الوظيفة |
-|---------|---------|
-| `UsersContext` | بيانات وعمليات المستخدمين |
-| `UsersDialogsContext` | حالة حوارات المستخدمين |
-| `RolesContext` | بيانات وعمليات الأدوار |
-| `AuthContext` | المصادقة والمستخدم الحالي |
+| Context               | الوظيفة                   |
+| --------------------- | ------------------------- |
+| `UsersContext`        | بيانات وعمليات المستخدمين |
+| `UsersDialogsContext` | حالة حوارات المستخدمين    |
+| `RolesContext`        | بيانات وعمليات الأدوار    |
+| `AuthContext`         | المصادقة والمستخدم الحالي |
 
 ---
 

@@ -1,21 +1,21 @@
 /**
  * المكون الرئيسي للتطبيق - محسّن للأداء (v3.0)
  * Main Application Component - Performance Optimized
- * 
+ *
  * ✅ صفحات الدخول خفيفة ومستقلة عن AuthProvider
  * ✅ AuthProvider يُحمّل فقط للمسارات المحمية
  * ✅ LCP محسّن بشكل جذري
  * ✅ نظام إشعار التحديثات التلقائي
  */
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import { ThemeProvider } from "next-themes";
-import { HelmetProvider } from "react-helmet-async";
-import { initializeAppearanceSettings } from "@/components/settings/AppearanceSettingsDialog";
-import { initializeSupabaseInterceptor } from "@/integrations/supabase/request-interceptor";
-import { queryInvalidationManager } from "@/lib/query-invalidation-manager";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { ThemeProvider } from 'next-themes';
+import { HelmetProvider } from 'react-helmet-async';
+import { initializeAppearanceSettings } from '@/components/settings/AppearanceSettingsDialog';
+import { initializeSupabaseInterceptor } from '@/integrations/supabase/request-interceptor';
+import { queryInvalidationManager } from '@/lib/query-invalidation-manager';
 
 // ✅ تطبيق إعدادات المظهر المحفوظة فوراً
 initializeAppearanceSettings();
@@ -24,13 +24,13 @@ initializeAppearanceSettings();
 initializeSupabaseInterceptor();
 
 // ✅ استيراد خفيف للصفحات الأولية (بدون AuthContext)
-import LandingPageLight from "@/pages/LandingPageLight";
-import LoginLight from "@/pages/LoginLight";
-import { LightErrorBoundary } from "./components/shared/LightErrorBoundary";
-import { UpdateNotification } from "./components/shared/UpdateNotification";
+import LandingPageLight from '@/pages/LandingPageLight';
+import LoginLight from '@/pages/LoginLight';
+import { LightErrorBoundary } from './components/shared/LightErrorBoundary';
+import { UpdateNotification } from './components/shared/UpdateNotification';
 
 // ✅ Lazy load للمسارات المحمية (تحتاج AuthProvider)
-const ProtectedApp = lazy(() => import("./components/layout/ProtectedApp"));
+const ProtectedApp = lazy(() => import('./components/layout/ProtectedApp'));
 
 // Configure QueryClient
 // ✅ تحسين إعدادات QueryClient - المرحلة 10
@@ -45,10 +45,15 @@ const queryClient = new QueryClient({
       structuralSharing: true,
       networkMode: 'online',
       retry: (failureCount, error: unknown) => {
-        const errorObj = error && typeof error === 'object' ? error as { status?: number; message?: string } : {};
+        const errorObj =
+          error && typeof error === 'object'
+            ? (error as { status?: number; message?: string })
+            : {};
         // لا تعيد المحاولة لأخطاء المصادقة والصلاحيات
-        if (errorObj.status === 401 || errorObj.status === 403 || errorObj.status === 404) return false;
-        if (errorObj.message?.includes('auth') || errorObj.message?.includes('credentials')) return false;
+        if (errorObj.status === 401 || errorObj.status === 403 || errorObj.status === 404)
+          return false;
+        if (errorObj.message?.includes('auth') || errorObj.message?.includes('credentials'))
+          return false;
         if (errorObj.message?.includes('RLS') || errorObj.message?.includes('policy')) return false;
         return failureCount < 2; // ✅ تقليل عدد المحاولات من 3 إلى 2
       },
@@ -78,25 +83,25 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               {/* ✅ الصفحة الترحيبية - خفيفة */}
-              <Route 
-                path="/" 
+              <Route
+                path="/"
                 element={
                   <LightErrorBoundary>
                     <LandingPageLight />
                   </LightErrorBoundary>
-                } 
+                }
               />
-              
+
               {/* ✅ صفحة تسجيل الدخول - خفيفة ومستقلة */}
-              <Route 
-                path="/login" 
+              <Route
+                path="/login"
                 element={
                   <LightErrorBoundary>
                     <LoginLight />
                   </LightErrorBoundary>
-                } 
+                }
               />
-              
+
               {/* ✅ باقي المسارات (تحتاج AuthProvider) */}
               <Route
                 path="/*"

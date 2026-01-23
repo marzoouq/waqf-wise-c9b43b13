@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,31 +8,31 @@ const corsHeaders = {
 
 // 11 فئات الفحص الشامل
 const AUDIT_CATEGORIES = [
-  'architecture',      // البنية والمعمارية
-  'performance',       // الأداء
-  'components',        // المكونات
-  'functions',         // الوظائف
-  'buttons',           // الأزرار
-  'dashboards',        // لوحات التحكم
-  'roles',             // الأدوار والصلاحيات
-  'navigation',        // التنقلات
-  'tables',            // الجداول
-  'database',          // قاعدة البيانات
-  'tabs'               // التبويبات
+  'architecture', // البنية والمعمارية
+  'performance', // الأداء
+  'components', // المكونات
+  'functions', // الوظائف
+  'buttons', // الأزرار
+  'dashboards', // لوحات التحكم
+  'roles', // الأدوار والصلاحيات
+  'navigation', // التنقلات
+  'tables', // الجداول
+  'database', // قاعدة البيانات
+  'tabs', // التبويبات
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
-  'architecture': 'البنية والمعمارية',
-  'performance': 'الأداء',
-  'components': 'المكونات',
-  'functions': 'الوظائف',
-  'buttons': 'الأزرار',
-  'dashboards': 'لوحات التحكم',
-  'roles': 'الأدوار والصلاحيات',
-  'navigation': 'التنقلات',
-  'tables': 'الجداول',
-  'database': 'قاعدة البيانات',
-  'tabs': 'التبويبات'
+  architecture: 'البنية والمعمارية',
+  performance: 'الأداء',
+  components: 'المكونات',
+  functions: 'الوظائف',
+  buttons: 'الأزرار',
+  dashboards: 'لوحات التحكم',
+  roles: 'الأدوار والصلاحيات',
+  navigation: 'التنقلات',
+  tables: 'الجداول',
+  database: 'قاعدة البيانات',
+  tabs: 'التبويبات',
 };
 
 interface AuditFinding {
@@ -51,24 +51,24 @@ interface AuditFinding {
 
 // ============ Rate Limiting Configuration ============
 const RATE_LIMIT = {
-  maxRequests: 5,     // 5 فحوصات
-  windowMs: 3600000   // في الساعة (لأنها عملية ثقيلة)
+  maxRequests: 5, // 5 فحوصات
+  windowMs: 3600000, // في الساعة (لأنها عملية ثقيلة)
 };
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
     return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
   }
-  
+
   if (userLimit.count >= RATE_LIMIT.maxRequests) {
     return { allowed: false, remaining: 0 };
   }
-  
+
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
 }
@@ -86,23 +86,31 @@ serve(async (req) => {
         const parsed = JSON.parse(bodyClone);
         if (parsed.ping || parsed.healthCheck || parsed.testMode) {
           console.log('[ai-system-audit] Health check received');
-          return new Response(JSON.stringify({
-            status: 'healthy',
-            function: 'ai-system-audit',
-            timestamp: new Date().toISOString()
-          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+          return new Response(
+            JSON.stringify({
+              status: 'healthy',
+              function: 'ai-system-audit',
+              timestamp: new Date().toISOString(),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('[AI-SYSTEM-AUDIT] ❌ No authorization header');
-      return new Response(JSON.stringify({ success: false, error: 'غير مصرح - يجب تسجيل الدخول' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ success: false, error: 'غير مصرح - يجب تسجيل الدخول' }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -113,45 +121,55 @@ serve(async (req) => {
 
     // 🔐 التحقق من صحة التوكن والصلاحيات
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[AI-SYSTEM-AUDIT] ❌ Invalid token:', authError);
       return new Response(JSON.stringify({ success: false, error: 'رمز المصادقة غير صحيح' }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     // 🔐 التحقق من صلاحيات المستخدم (admin أو nazer فقط)
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+    const hasAccess = roles?.some((r) => ['admin', 'nazer'].includes(r.role));
     if (!hasAccess) {
       console.error('[AI-SYSTEM-AUDIT] ❌ Unauthorized role:', { userId: user.id, roles });
-      return new Response(JSON.stringify({ success: false, error: 'ليس لديك صلاحية للوصول لهذه الخدمة' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ success: false, error: 'ليس لديك صلاحية للوصول لهذه الخدمة' }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // 🔐 SECURITY: Rate Limiting
     const rateCheck = checkRateLimit(user.id);
     if (!rateCheck.allowed) {
       console.warn('[AI-SYSTEM-AUDIT] ⚠️ Rate limit exceeded for user:', user.id);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'تم تجاوز الحد الأقصى للفحوصات (5/ساعة). يرجى الانتظار.'
-      }), {
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'تم تجاوز الحد الأقصى للفحوصات (5/ساعة). يرجى الانتظار.',
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    console.log('[AI-SYSTEM-AUDIT] ✅ Authorized:', { userId: user.id, roles: roles?.map(r => r.role), rateLimitRemaining: rateCheck.remaining });
+    console.log('[AI-SYSTEM-AUDIT] ✅ Authorized:', {
+      userId: user.id,
+      roles: roles?.map((r) => r.role),
+      rateLimitRemaining: rateCheck.remaining,
+    });
 
     const { auditType = 'full', categories = AUDIT_CATEGORIES } = await req.json();
 
@@ -165,7 +183,7 @@ serve(async (req) => {
         audit_type: auditType,
         categories: categories,
         created_by: user.id,
-        severity_summary: { critical: 0, warning: 0, info: 0, success: 0 }
+        severity_summary: { critical: 0, warning: 0, info: 0, success: 0 },
       })
       .select()
       .maybeSingle();
@@ -184,7 +202,7 @@ serve(async (req) => {
       tablesCount: systemData.tables?.length || 0,
       rlsPoliciesCount: systemData.rlsPolicies?.length || 0,
       indexesCount: systemData.indexes?.length || 0,
-      hasSystemStats: !!systemData.systemStats
+      hasSystemStats: !!systemData.systemStats,
     });
 
     // استخدام AI لتحليل النظام
@@ -193,17 +211,17 @@ serve(async (req) => {
 
     // حساب ملخص الخطورة
     const severitySummary = {
-      critical: findings.filter(f => f.severity === 'critical').length,
-      warning: findings.filter(f => f.severity === 'warning').length,
-      info: findings.filter(f => f.severity === 'info').length,
-      success: findings.filter(f => f.severity === 'success').length
+      critical: findings.filter((f) => f.severity === 'critical').length,
+      warning: findings.filter((f) => f.severity === 'warning').length,
+      info: findings.filter((f) => f.severity === 'info').length,
+      success: findings.filter((f) => f.severity === 'success').length,
     };
 
     // تنفيذ الإصلاحات الآمنة تلقائياً (معطل حالياً لعدم وجود execute_sql)
     const autoFixResults: any[] = [];
-    
+
     // حفظ الإصلاحات المعلقة
-    const pendingFixes = findings.filter(f => !f.autoFixable && f.fixSql);
+    const pendingFixes = findings.filter((f) => !f.autoFixable && f.fixSql);
     if (pendingFixes.length > 0) {
       await savePendingFixes(supabase, auditId, pendingFixes);
     }
@@ -214,12 +232,12 @@ serve(async (req) => {
       .update({
         findings: findings,
         auto_fixes_applied: autoFixResults,
-        pending_fixes: pendingFixes.map(f => f.id),
+        pending_fixes: pendingFixes.map((f) => f.id),
         severity_summary: severitySummary,
-        total_issues: findings.filter(f => f.severity !== 'success').length,
-        fixed_issues: autoFixResults.filter(r => r.success).length,
+        total_issues: findings.filter((f) => f.severity !== 'success').length,
+        fixed_issues: autoFixResults.filter((r) => r.success).length,
         completed_at: new Date().toISOString(),
-        ai_analysis: generateAIAnalysisSummary(findings, severitySummary)
+        ai_analysis: generateAIAnalysisSummary(findings, severitySummary),
       })
       .eq('id', auditId);
 
@@ -229,32 +247,44 @@ serve(async (req) => {
 
     // إرسال إشعار Slack للمشاكل الحرجة
     if (severitySummary.critical > 0) {
-      await sendSlackNotification(supabase, auditId, severitySummary, findings.filter(f => f.severity === 'critical'));
+      await sendSlackNotification(
+        supabase,
+        auditId,
+        severitySummary,
+        findings.filter((f) => f.severity === 'critical')
+      );
     }
 
-    console.log(`[AI-SYSTEM-AUDIT] Audit completed successfully. Issues: ${findings.filter(f => f.severity !== 'success').length}`);
+    console.log(
+      `[AI-SYSTEM-AUDIT] Audit completed successfully. Issues: ${findings.filter((f) => f.severity !== 'success').length}`
+    );
 
-    return new Response(JSON.stringify({
-      success: true,
-      auditId,
-      findings,
-      severitySummary,
-      autoFixResults,
-      pendingFixes: pendingFixes.length
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        auditId,
+        findings,
+        severitySummary,
+        autoFixResults,
+        pendingFixes: pendingFixes.length,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : 'Unknown error';
     console.error('[AI-SYSTEM-AUDIT] Error:', error);
-    return new Response(JSON.stringify({
-      success: false,
-      error: errMsg
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: errMsg,
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -304,7 +334,10 @@ async function gatherSystemData(supabase: any, categories: string[]) {
 
   // جمع بيانات الأدوار والصلاحيات
   if (categories.includes('roles')) {
-    const { data: roles, error: rolesError } = await supabase.from('user_roles').select('*').limit(100);
+    const { data: roles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('*')
+      .limit(100);
     if (!rolesError) {
       data.roles = roles;
       console.log(`[AI-SYSTEM-AUDIT] Fetched ${roles?.length || 0} user roles`);
@@ -343,7 +376,11 @@ async function gatherSystemData(supabase: any, categories: string[]) {
   return data;
 }
 
-async function analyzeWithAI(systemData: any, categories: string[], apiKey?: string): Promise<AuditFinding[]> {
+async function analyzeWithAI(
+  systemData: any,
+  categories: string[],
+  apiKey?: string
+): Promise<AuditFinding[]> {
   // إذا لم يتوفر API key، استخدم التحليل المحلي المحسن
   if (!apiKey) {
     console.log('[AI-SYSTEM-AUDIT] No LOVABLE_API_KEY, using enhanced local analysis');
@@ -353,12 +390,12 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
   try {
     console.log('[AI-SYSTEM-AUDIT] Calling Lovable AI Gateway...');
     const prompt = buildAnalysisPrompt(systemData, categories);
-    
+
     // استخدام Lovable AI Gateway بدلاً من OpenRouter
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -385,16 +422,16 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
 3. الأخطاء المتكررة (warning/critical)
 4. المستخدمين بدون أدوار (warning)
 5. سياسات RLS الضعيفة (critical)
-6. أداء الاستعلامات (info/warning)`
+6. أداء الاستعلامات (info/warning)`,
           },
           {
             role: 'user',
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
         max_tokens: 4000,
-        temperature: 0.3
-      })
+        temperature: 0.3,
+      }),
     });
 
     // معالجة أخطاء Rate Limit والدفع
@@ -417,7 +454,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
     const result = await response.json();
     const content = result.choices?.[0]?.message?.content || '[]';
     console.log('[AI-SYSTEM-AUDIT] AI response received, parsing...');
-    
+
     // ✅ إضافة logging للرد الخام
     console.log('[AI-SYSTEM-AUDIT] AI raw response length:', content.length);
     console.log('[AI-SYSTEM-AUDIT] AI response preview:', content.substring(0, 500));
@@ -426,11 +463,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
     try {
       const directParse = JSON.parse(content.trim());
       if (Array.isArray(directParse)) {
-        console.log(`[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`);
+        console.log(
+          `[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`
+        );
         return directParse.map((f: any) => ({
           ...f,
           categoryLabel: CATEGORY_LABELS[f.category] || f.category,
-          fixed: false
+          fixed: false,
         }));
       }
     } catch (e) {
@@ -442,11 +481,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
     if (jsonMatch) {
       try {
         const aiFindings = JSON.parse(jsonMatch[0]);
-        console.log(`[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`);
+        console.log(
+          `[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`
+        );
         return aiFindings.map((f: any) => ({
           ...f,
           categoryLabel: CATEGORY_LABELS[f.category] || f.category,
-          fixed: false
+          fixed: false,
         }));
       } catch (parseError) {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse extracted JSON:', parseError);
@@ -459,11 +500,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
       try {
         const aiFindings = JSON.parse(codeBlockMatch[1].trim());
         if (Array.isArray(aiFindings)) {
-          console.log(`[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`);
+          console.log(
+            `[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`
+          );
           return aiFindings.map((f: any) => ({
             ...f,
             categoryLabel: CATEGORY_LABELS[f.category] || f.category,
-            fixed: false
+            fixed: false,
           }));
         }
       } catch (e) {
@@ -473,7 +516,6 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
 
     console.log('[AI-SYSTEM-AUDIT] All parsing attempts failed, using local analysis');
     return performEnhancedLocalAnalysis(systemData, categories);
-
   } catch (error) {
     console.error('[AI-SYSTEM-AUDIT] AI analysis error:', error);
     return performEnhancedLocalAnalysis(systemData, categories);
@@ -482,13 +524,13 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
 
 function buildAnalysisPrompt(systemData: any, categories: string[]): string {
   let prompt = 'قم بفحص النظام وتحديد المشاكل في الفئات التالية:\n\n';
-  
-  categories.forEach(cat => {
+
+  categories.forEach((cat) => {
     prompt += `## ${CATEGORY_LABELS[cat]}\n`;
   });
 
   prompt += '\n\nبيانات النظام:\n';
-  
+
   // تحديد حجم البيانات المرسلة
   const dataToSend = {
     tables: systemData.tables?.slice(0, 50),
@@ -497,11 +539,12 @@ function buildAnalysisPrompt(systemData: any, categories: string[]): string {
     systemStats: systemData.systemStats,
     errorLogsCount: systemData.errorLogs?.length || 0,
     rolesCount: systemData.roles?.length || 0,
-    tablesWithoutRLS: systemData.tables?.filter((t: any) => !t.has_rls)?.map((t: any) => t.table_name) || []
+    tablesWithoutRLS:
+      systemData.tables?.filter((t: any) => !t.has_rls)?.map((t: any) => t.table_name) || [],
   };
-  
+
   prompt += JSON.stringify(dataToSend, null, 2);
-  
+
   return prompt;
 }
 
@@ -516,7 +559,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
     // فحص الجداول بدون RLS
     if (systemData.tables && systemData.tables.length > 0) {
       const tablesWithoutRLS = systemData.tables.filter((t: any) => !t.has_rls);
-      
+
       tablesWithoutRLS.forEach((table: any) => {
         findings.push({
           id: `db-${idCounter++}`,
@@ -529,7 +572,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           fixSql: `ALTER TABLE public.${table.table_name} ENABLE ROW LEVEL SECURITY;`,
           rollbackSql: `ALTER TABLE public.${table.table_name} DISABLE ROW LEVEL SECURITY;`,
           autoFixable: false,
-          fixed: false
+          fixed: false,
         });
       });
 
@@ -537,7 +580,9 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
       const largeTables = systemData.tables.filter((t: any) => t.row_count > 10000);
       if (systemData.indexes) {
         largeTables.forEach((table: any) => {
-          const tableIndexes = systemData.indexes.filter((i: any) => i.table_name === table.table_name);
+          const tableIndexes = systemData.indexes.filter(
+            (i: any) => i.table_name === table.table_name
+          );
           if (tableIndexes.length < 2) {
             findings.push({
               id: `perf-${idCounter++}`,
@@ -548,7 +593,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
               description: `الجدول يحتوي على ${table.row_count} صف ولديه ${tableIndexes.length} فهرس فقط. قد يؤثر على أداء الاستعلامات.`,
               suggestion: 'أضف فهارس للأعمدة المستخدمة بشكل متكرر في WHERE و JOIN',
               autoFixable: false,
-              fixed: false
+              fixed: false,
             });
           }
         });
@@ -564,7 +609,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           title: 'جميع الجداول محمية بـ RLS',
           description: `جميع الجداول (${systemData.tables.length}) لديها سياسات RLS مفعلة`,
           autoFixable: false,
-          fixed: false
+          fixed: false,
         });
       }
     }
@@ -572,7 +617,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
     // فحص إحصائيات النظام
     if (systemData.systemStats) {
       const stats = systemData.systemStats;
-      
+
       if (stats.tables_without_rls > 0) {
         findings.push({
           id: `stats-${idCounter++}`,
@@ -583,7 +628,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           description: `يوجد ${stats.tables_without_rls} جدول في قاعدة البيانات بدون تفعيل RLS`,
           suggestion: 'قم بتفعيل RLS لجميع الجداول وأضف السياسات المناسبة',
           autoFixable: false,
-          fixed: false
+          fixed: false,
         });
       }
 
@@ -597,7 +642,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
         title: `حجم قاعدة البيانات: ${dbSizeMB} ميجابايت`,
         description: `إحصائيات: ${stats.tables_count} جدول، ${stats.policies_count} سياسة، ${stats.indexes_count} فهرس`,
         autoFixable: false,
-        fixed: false
+        fixed: false,
       });
     }
   }
@@ -621,12 +666,15 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           description: `تم رصد ${count} خطأ من هذا النوع في الفترة الأخيرة`,
           suggestion: 'راجع سجلات الأخطاء وأصلح السبب الجذري لهذه الأخطاء',
           autoFixable: false,
-          fixed: false
+          fixed: false,
         });
       }
     });
 
-    if (Object.keys(errorCounts).length === 0 || Object.values(errorCounts).every(c => (c as number) <= 5)) {
+    if (
+      Object.keys(errorCounts).length === 0 ||
+      Object.values(errorCounts).every((c) => (c as number) <= 5)
+    ) {
       findings.push({
         id: `success-errors`,
         category: 'performance',
@@ -635,7 +683,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
         title: 'لا توجد أخطاء متكررة',
         description: 'سجلات الأخطاء لا تظهر أي أنماط مقلقة',
         autoFixable: false,
-        fixed: false
+        fixed: false,
       });
     }
   }
@@ -653,7 +701,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
         description: 'يوجد مستخدمون في النظام بدون أدوار محددة مما قد يسبب مشاكل في الصلاحيات',
         suggestion: 'قم بتعيين أدوار مناسبة للمستخدمين من لوحة إدارة المستخدمين',
         autoFixable: false,
-        fixed: false
+        fixed: false,
       });
     } else {
       findings.push({
@@ -664,16 +712,16 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
         title: 'جميع المستخدمين لديهم أدوار',
         description: `جميع المستخدمين (${systemData.roles?.length || 0}) لديهم أدوار محددة`,
         autoFixable: false,
-        fixed: false
+        fixed: false,
       });
     }
   }
 
   // إضافة نتائج نجاح للفئات التي لم يتم فحصها بعمق
   const checkedCategories = ['database', 'tables', 'performance', 'roles'];
-  categories.forEach(cat => {
+  categories.forEach((cat) => {
     if (!checkedCategories.includes(cat)) {
-      const categoryFindings = findings.filter(f => f.category === cat);
+      const categoryFindings = findings.filter((f) => f.category === cat);
       if (categoryFindings.length === 0) {
         findings.push({
           id: `success-${cat}`,
@@ -683,7 +731,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           title: `${CATEGORY_LABELS[cat]} - لا توجد مشاكل واضحة`,
           description: `تم فحص ${CATEGORY_LABELS[cat]} ولم يتم العثور على مشاكل تستدعي الاهتمام`,
           autoFixable: false,
-          fixed: false
+          fixed: false,
         });
       }
     }
@@ -694,7 +742,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
 }
 
 async function savePendingFixes(supabase: any, auditId: string, findings: AuditFinding[]) {
-  const fixes = findings.map(f => ({
+  const fixes = findings.map((f) => ({
     audit_id: auditId,
     fix_type: f.category,
     category: f.categoryLabel,
@@ -702,7 +750,7 @@ async function savePendingFixes(supabase: any, auditId: string, findings: AuditF
     description: f.description,
     severity: f.severity,
     auto_fixable: f.autoFixable,
-    rollback_sql: f.rollbackSql
+    rollback_sql: f.rollbackSql,
   }));
 
   const { error } = await supabase.from('pending_system_fixes').insert(fixes);
@@ -716,7 +764,7 @@ async function savePendingFixes(supabase: any, auditId: string, findings: AuditF
 function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): string {
   const total = findings.length;
   const issues = total - summary.success;
-  
+
   let analysis = `## ملخص الفحص الذكي\n\n`;
   analysis += `تم فحص النظام والعثور على ${total} نتيجة:\n`;
   analysis += `- 🔴 مشاكل حرجة: ${summary.critical}\n`;
@@ -726,8 +774,8 @@ function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): stri
 
   if (summary.critical > 0) {
     analysis += `### ⚠️ تنبيه: يوجد ${summary.critical} مشكلة حرجة تحتاج اهتمام فوري!\n\n`;
-    const criticalFindings = findings.filter(f => f.severity === 'critical');
-    criticalFindings.forEach(f => {
+    const criticalFindings = findings.filter((f) => f.severity === 'critical');
+    criticalFindings.forEach((f) => {
       analysis += `- **${f.title}**: ${f.description}\n`;
     });
   }
@@ -735,7 +783,12 @@ function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): stri
   return analysis;
 }
 
-async function sendSlackNotification(supabase: any, auditId: string, summary: any, criticalFindings: AuditFinding[]) {
+async function sendSlackNotification(
+  supabase: any,
+  auditId: string,
+  summary: any,
+  criticalFindings: AuditFinding[]
+) {
   try {
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
     if (!slackWebhookUrl) {
@@ -753,41 +806,38 @@ async function sendSlackNotification(supabase: any, auditId: string, summary: an
             text: {
               type: 'plain_text',
               text: '🚨 تنبيه: مشاكل حرجة في النظام',
-              emoji: true
-            }
+              emoji: true,
+            },
           },
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `*تم اكتشاف ${summary.critical} مشكلة حرجة في الفحص الذكي*`
-            }
+              text: `*تم اكتشاف ${summary.critical} مشكلة حرجة في الفحص الذكي*`,
+            },
           },
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: criticalFindings.map(f => `• ${f.title}`).join('\n')
-            }
+              text: criticalFindings.map((f) => `• ${f.title}`).join('\n'),
+            },
           },
           {
             type: 'context',
             elements: [
               {
                 type: 'mrkdwn',
-                text: `Audit ID: ${auditId}`
-              }
-            ]
-          }
-        ]
-      })
+                text: `Audit ID: ${auditId}`,
+              },
+            ],
+          },
+        ],
+      }),
     });
-    
+
     // تحديث سجل الفحص بأن الإشعار تم إرساله
-    await supabase
-      .from('ai_system_audits')
-      .update({ slack_notified: true })
-      .eq('id', auditId);
+    await supabase.from('ai_system_audits').update({ slack_notified: true }).eq('id', auditId);
 
     console.log('[AI-SYSTEM-AUDIT] Slack notification sent successfully');
   } catch (error) {

@@ -2,16 +2,16 @@
  * Knowledge Downloads Tab Component
  * تبويب التنزيلات في قاعدة المعرفة
  */
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 const DOWNLOADABLE_FILES = [
-  "دليل المستخدم الكامل (PDF)",
-  "نموذج طلب مستفيد جديد",
-  "قالب تقرير مالي",
-  "نموذج عقد إيجار",
-  "دليل المحاسب السريع"
+  'دليل المستخدم الكامل (PDF)',
+  'نموذج طلب مستفيد جديد',
+  'قالب تقرير مالي',
+  'نموذج عقد إيجار',
+  'دليل المحاسب السريع',
 ];
 
 export function KnowledgeDownloadsTab() {
@@ -19,14 +19,12 @@ export function KnowledgeDownloadsTab() {
     <Card>
       <CardHeader>
         <CardTitle>ملفات قابلة للتنزيل</CardTitle>
-        <CardDescription>
-          أدلة PDF ونماذج وقوالب مفيدة
-        </CardDescription>
+        <CardDescription>أدلة PDF ونماذج وقوالب مفيدة</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {DOWNLOADABLE_FILES.map((item) => (
-            <div 
+            <div
               key={`download-${item}`}
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
             >

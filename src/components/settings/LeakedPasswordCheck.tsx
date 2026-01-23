@@ -24,7 +24,7 @@ export const LeakedPasswordCheck = () => {
     const isLeaked = await checkPasswordQuick(password);
     setResult({
       isLeaked,
-      message: isLeaked 
+      message: isLeaked
         ? '⚠️ تحذير: هذه الكلمة موجودة في قواعد البيانات المسربة! الرجاء تغييرها فوراً.'
         : '✅ كلمة المرور آمنة ولم يتم العثور عليها في التسريبات.',
     });
@@ -39,7 +39,7 @@ export const LeakedPasswordCheck = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form 
+        <form
           onSubmit={(e) => {
             e.preventDefault();
             handleCheck();
@@ -61,11 +61,7 @@ export const LeakedPasswordCheck = () => {
             </p>
           </div>
 
-          <Button 
-            type="submit"
-            disabled={isChecking || !password}
-            className="w-full"
-          >
+          <Button type="submit" disabled={isChecking || !password} className="w-full">
             {isChecking ? (
               <>
                 <Loader2 className="h-4 w-4 me-2 animate-spin" />

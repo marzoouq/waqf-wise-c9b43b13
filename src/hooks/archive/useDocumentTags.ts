@@ -29,7 +29,7 @@ export function useAddDocumentTag() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (tag: Omit<DocumentTag, 'id' | 'created_at' | 'created_by'>) => 
+    mutationFn: (tag: Omit<DocumentTag, 'id' | 'created_at' | 'created_by'>) =>
       ArchiveService.addDocumentTag(tag),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_TAGS(variables.document_id) });

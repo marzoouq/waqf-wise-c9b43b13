@@ -1,8 +1,8 @@
-import { UnifiedTimeline, TimelineEvent } from "@/components/unified/UnifiedTimeline";
-import { Distribution } from "@/hooks/distributions/useDistributions";
-import { CheckCircle, XCircle, Clock, FileText } from "lucide-react";
-import { useMemo } from "react";
-import { useDistributionTimeline } from "@/hooks/distributions/useDistributionTabsData";
+import { UnifiedTimeline, TimelineEvent } from '@/components/unified/UnifiedTimeline';
+import { Distribution } from '@/hooks/distributions/useDistributions';
+import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
+import { useMemo } from 'react';
+import { useDistributionTimeline } from '@/hooks/distributions/useDistributionTabsData';
 
 interface DistributionTimelineTabProps {
   distribution: Distribution | null;
@@ -27,7 +27,7 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
       metadata: {
         'عدد المستفيدين': distribution.beneficiaries_count,
         'المبلغ الإجمالي': `${distribution.total_amount?.toLocaleString()} ر.س`,
-      }
+      },
     });
 
     // أحداث الموافقات
@@ -42,10 +42,10 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
             icon: CheckCircle,
             color: 'success',
             metadata: {
-              'الموافق': approval.approver_name,
-              'المستوى': `المستوى ${approval.level}`,
-              ...(approval.notes && { 'ملاحظات': approval.notes })
-            }
+              الموافق: approval.approver_name,
+              المستوى: `المستوى ${approval.level}`,
+              ...(approval.notes && { ملاحظات: approval.notes }),
+            },
           });
         } else if (approval.status === 'مرفوض') {
           timelineEvents.push({
@@ -57,9 +57,9 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
             color: 'danger',
             metadata: {
               'المرفوض من': approval.approver_name,
-              'المستوى': `المستوى ${approval.level}`,
-              ...(approval.notes && { 'السبب': approval.notes })
-            }
+              المستوى: `المستوى ${approval.level}`,
+              ...(approval.notes && { السبب: approval.notes }),
+            },
           });
         } else if (approval.status === 'معلق') {
           timelineEvents.push({
@@ -70,9 +70,9 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
             icon: Clock,
             color: 'warning',
             metadata: {
-              'المطلوب': approval.approver_name,
-              'المستوى': `المستوى ${approval.level}`,
-            }
+              المطلوب: approval.approver_name,
+              المستوى: `المستوى ${approval.level}`,
+            },
           });
         }
       });
@@ -89,8 +89,8 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
           icon: FileText,
           color: 'primary',
           metadata: {
-            ...(item.performed_by_name && { 'المنفذ': item.performed_by_name }),
-          }
+            ...(item.performed_by_name && { المنفذ: item.performed_by_name }),
+          },
         });
       });
     }
@@ -107,11 +107,7 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
   }
 
   if (events.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground py-8">
-        لا توجد أحداث لهذا التوزيع
-      </div>
-    );
+    return <div className="text-center text-muted-foreground py-8">لا توجد أحداث لهذا التوزيع</div>;
   }
 
   return <UnifiedTimeline events={events} variant="default" showDate={true} />;

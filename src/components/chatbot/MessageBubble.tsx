@@ -1,11 +1,11 @@
-import { useState, memo } from "react";
-import { formatDate } from "@/lib/date";
-import { Bot, Copy, Check, User, Users, DollarSign, Building2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState, memo } from 'react';
+import { formatDate } from '@/lib/date';
+import { Bot, Copy, Check, User, Users, DollarSign, Building2 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -17,9 +17,7 @@ const StatCard = memo(function StatCard({ icon, label, value }: StatCardProps) {
   return (
     <Card className="p-3 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:border-primary/40 transition-all duration-300">
       <div className="flex items-center gap-2">
-        <div className="p-2 rounded-lg bg-primary/10 text-primary">
-          {icon}
-        </div>
+        <div className="p-2 rounded-lg bg-primary/10 text-primary">{icon}</div>
         <div className="flex-1">
           <p className="text-xs text-muted-foreground">{label}</p>
           <p className="text-base font-bold">{value}</p>
@@ -31,11 +29,15 @@ const StatCard = memo(function StatCard({ icon, label, value }: StatCardProps) {
 
 interface MessageBubbleProps {
   message: string;
-  messageType: "user" | "bot";
+  messageType: 'user' | 'bot';
   createdAt: string;
 }
 
-export const MessageBubble = memo(function MessageBubble({ message, messageType, createdAt }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({
+  message,
+  messageType,
+  createdAt,
+}: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
@@ -44,15 +46,15 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
       await navigator.clipboard.writeText(message);
       setCopied(true);
       toast({
-        title: "تم النسخ",
-        description: "تم نسخ الرسالة إلى الحافظة",
+        title: 'تم النسخ',
+        description: 'تم نسخ الرسالة إلى الحافظة',
       });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast({
-        title: "خطأ",
-        description: "فشل نسخ الرسالة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل نسخ الرسالة',
+        variant: 'destructive',
       });
     }
   };
@@ -63,61 +65,63 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
     const beneficiariesMatch = text.match(/(\d+)\s*مستفيد/);
     const propertiesMatch = text.match(/(\d+)\s*عقار/);
     const amountMatch = text.match(/([\d,]+)\s*ريال/);
-    
+
     if (beneficiariesMatch) {
       stats.push({
         icon: <Users className="h-4 w-4" />,
-        label: "المستفيدون",
+        label: 'المستفيدون',
         value: beneficiariesMatch[1],
       });
     }
     if (propertiesMatch) {
       stats.push({
         icon: <Building2 className="h-4 w-4" />,
-        label: "العقارات",
+        label: 'العقارات',
         value: propertiesMatch[1],
       });
     }
     if (amountMatch) {
       stats.push({
         icon: <DollarSign className="h-4 w-4" />,
-        label: "المبلغ",
-        value: amountMatch[1] + " ر.س",
+        label: 'المبلغ',
+        value: amountMatch[1] + ' ر.س',
       });
     }
     return stats;
   };
 
-  const stats = messageType === "bot" ? extractStats(message) : [];
+  const stats = messageType === 'bot' ? extractStats(message) : [];
 
   return (
-    <div 
+    <div
       className={cn(
-        "flex gap-3 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500",
-        messageType === "user" ? "justify-end" : "justify-start"
+        'flex gap-3 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500',
+        messageType === 'user' ? 'justify-end' : 'justify-start'
       )}
     >
-      {messageType === "bot" && (
+      {messageType === 'bot' && (
         <div className="flex-shrink-0">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
             <Bot className="h-5 w-5 text-primary-foreground" />
           </div>
         </div>
       )}
-      
-      <div className={cn(
-        "flex flex-col max-w-[85%] gap-2",
-        messageType === "user" ? "items-end" : "items-start"
-      )}>
+
+      <div
+        className={cn(
+          'flex flex-col max-w-[85%] gap-2',
+          messageType === 'user' ? 'items-end' : 'items-start'
+        )}
+      >
         <div
           className={cn(
-            "rounded-2xl px-5 py-3 shadow-sm transition-all duration-300 hover:shadow-md",
-            messageType === "user"
-              ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-sm"
-              : "bg-card rounded-bl-sm border border-border"
+            'rounded-2xl px-5 py-3 shadow-sm transition-all duration-300 hover:shadow-md',
+            messageType === 'user'
+              ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-sm'
+              : 'bg-card rounded-bl-sm border border-border'
           )}
         >
-          {messageType === "bot" ? (
+          {messageType === 'bot' ? (
             <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -154,7 +158,7 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                       );
                     }
                     return (
-                      <code className={cn("font-mono text-sm", className)} {...props}>
+                      <code className={cn('font-mono text-sm', className)} {...props}>
                         {children}
                       </code>
                     );
@@ -167,7 +171,9 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                   ),
                   // العناوين
                   h1: ({ children }) => (
-                    <h1 className="text-lg font-bold mb-3 text-foreground border-b border-border pb-2">{children}</h1>
+                    <h1 className="text-lg font-bold mb-3 text-foreground border-b border-border pb-2">
+                      {children}
+                    </h1>
                   ),
                   h2: ({ children }) => (
                     <h2 className="text-base font-bold mb-2 text-foreground">{children}</h2>
@@ -177,9 +183,9 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                   ),
                   // الروابط
                   a: ({ href, children }) => (
-                    <a 
-                      href={href} 
-                      target="_blank" 
+                    <a
+                      href={href}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline font-medium"
                     >
@@ -194,11 +200,11 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
                       </table>
                     </div>
                   ),
-                  thead: ({ children }) => (
-                    <thead className="bg-muted">{children}</thead>
-                  ),
+                  thead: ({ children }) => <thead className="bg-muted">{children}</thead>,
                   th: ({ children }) => (
-                    <th className="px-3 py-2 text-right font-semibold text-foreground">{children}</th>
+                    <th className="px-3 py-2 text-right font-semibold text-foreground">
+                      {children}
+                    </th>
                   ),
                   td: ({ children }) => (
                     <td className="px-3 py-2 text-right border-t border-border">{children}</td>
@@ -220,7 +226,7 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
             <p className="text-sm whitespace-pre-wrap leading-relaxed">{message}</p>
           )}
         </div>
-        
+
         {/* عرض الإحصائيات إذا كانت موجودة */}
         {stats.length > 0 && (
           <div className="grid grid-cols-2 gap-2 w-full max-w-md">
@@ -229,13 +235,11 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
             ))}
           </div>
         )}
-        
+
         <div className="flex items-center gap-2 px-2">
-          <span className="text-xs text-muted-foreground">
-            {formatDate(createdAt, "h:mm a")}
-          </span>
-          
-          {messageType === "bot" && (
+          <span className="text-xs text-muted-foreground">{formatDate(createdAt, 'h:mm a')}</span>
+
+          {messageType === 'bot' && (
             <button
               onClick={handleCopy}
               className="text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110"
@@ -250,8 +254,8 @@ export const MessageBubble = memo(function MessageBubble({ message, messageType,
           )}
         </div>
       </div>
-      
-      {messageType === "user" && (
+
+      {messageType === 'user' && (
         <div className="flex-shrink-0">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-2 border-primary/30">
             <User className="h-5 w-5 text-primary" />

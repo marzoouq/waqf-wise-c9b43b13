@@ -1,8 +1,8 @@
-import { Suspense } from "react";
-import { type LucideIcon } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SectionSkeleton } from "./SectionSkeleton";
-import { cn } from "@/lib/utils";
+import { Suspense } from 'react';
+import { type LucideIcon } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SectionSkeleton } from './SectionSkeleton';
+import { cn } from '@/lib/utils';
 
 interface TabItem {
   value: string;
@@ -19,25 +19,22 @@ interface UnifiedTabsSectionProps {
   contentClassName?: string;
 }
 
-export function UnifiedTabsSection({ 
-  tabs, 
+export function UnifiedTabsSection({
+  tabs,
   defaultTab,
   className,
-  contentClassName 
+  contentClassName,
 }: UnifiedTabsSectionProps) {
   return (
-    <Tabs 
-      defaultValue={defaultTab || tabs[0]?.value} 
-      className={cn("w-full", className)}
-    >
-      <TabsList 
+    <Tabs defaultValue={defaultTab || tabs[0]?.value} className={cn('w-full', className)}>
+      <TabsList
         className="grid w-full h-auto p-1 bg-muted/50"
         style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
       >
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
-            <TabsTrigger 
+            <TabsTrigger
               key={tab.value}
               value={tab.value}
               className="gap-1 sm:gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm relative"
@@ -54,15 +51,13 @@ export function UnifiedTabsSection({
         })}
       </TabsList>
 
-      {tabs.map(tab => (
-        <TabsContent 
-          key={tab.value} 
-          value={tab.value} 
-          className={cn("mt-4 sm:mt-6", contentClassName)}
+      {tabs.map((tab) => (
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className={cn('mt-4 sm:mt-6', contentClassName)}
         >
-          <Suspense fallback={<SectionSkeleton />}>
-            {tab.content}
-          </Suspense>
+          <Suspense fallback={<SectionSkeleton />}>{tab.content}</Suspense>
         </TabsContent>
       ))}
     </Tabs>

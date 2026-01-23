@@ -11,7 +11,13 @@ const defaultNavigationItems: NavigationItem[] = [
     label: 'الرئيسية',
     icon: Home,
     path: '/redirect',
-    matchPaths: ['/dashboard', '/nazer-dashboard', '/admin-dashboard', '/accountant-dashboard', '/beneficiary-portal'],
+    matchPaths: [
+      '/dashboard',
+      '/nazer-dashboard',
+      '/admin-dashboard',
+      '/accountant-dashboard',
+      '/beneficiary-portal',
+    ],
   },
   {
     id: 'beneficiaries',
@@ -47,9 +53,9 @@ interface BottomNavigationProps {
 /**
  * شريط التنقل السفلي للجوال - موحد ومحسّن للأداء
  */
-export const BottomNavigation = memo(function BottomNavigation({ 
+export const BottomNavigation = memo(function BottomNavigation({
   items,
-  ariaLabel = "التنقل السفلي"
+  ariaLabel = 'التنقل السفلي',
 }: BottomNavigationProps) {
   const navigationItems = items || defaultNavigationItems;
   const location = useLocation();
@@ -58,13 +64,13 @@ export const BottomNavigation = memo(function BottomNavigation({
   const isItemActive = useMemo(() => {
     return (item: NavigationItem) => {
       if (location.pathname === item.path) return true;
-      if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
+      if (item.matchPaths?.some((p) => location.pathname.startsWith(p))) return true;
       return false;
     };
   }, [location.pathname]);
 
   return (
-    <nav 
+    <nav
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background border-t border-border shadow-lg"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -80,26 +86,21 @@ export const BottomNavigation = memo(function BottomNavigation({
               key={item.id}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full relative",
-                "transition-colors duration-150",
-                "min-w-[60px] px-1 touch-manipulation",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground active:text-foreground"
+                'flex flex-col items-center justify-center flex-1 h-full relative',
+                'transition-colors duration-150',
+                'min-w-[60px] px-1 touch-manipulation',
+                isActive ? 'text-primary' : 'text-muted-foreground active:text-foreground'
               )}
-              aria-current={isActive ? "page" : undefined}
+              aria-current={isActive ? 'page' : undefined}
             >
               {/* Active indicator */}
               {isActive && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
               )}
-              
+
               <div className="relative">
-                <item.icon className={cn(
-                  "h-5 w-5",
-                  isActive && "scale-110"
-                )} />
-                
+                <item.icon className={cn('h-5 w-5', isActive && 'scale-110')} />
+
                 {/* Badge for notifications/requests */}
                 {item.badge && item.badge > 0 && (
                   <Badge
@@ -110,11 +111,8 @@ export const BottomNavigation = memo(function BottomNavigation({
                   </Badge>
                 )}
               </div>
-              
-              <span className={cn(
-                "text-[10px] mt-1",
-                isActive ? "font-bold" : "font-medium"
-              )}>
+
+              <span className={cn('text-[10px] mt-1', isActive ? 'font-bold' : 'font-medium')}>
                 {item.label}
               </span>
             </NavLink>

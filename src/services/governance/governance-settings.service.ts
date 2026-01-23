@@ -70,7 +70,7 @@ export class GovernanceSettingsService {
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) throw new Error("فشل في إنشاء إعدادات الرؤية");
+      if (!data) throw new Error('فشل في إنشاء إعدادات الرؤية');
       return data;
     } catch (error) {
       productionLogger.error('Error creating default visibility settings', error);
@@ -91,7 +91,7 @@ export class GovernanceSettingsService {
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) throw new Error("إعدادات الرؤية غير موجودة");
+      if (!data) throw new Error('إعدادات الرؤية غير موجودة');
       return data;
     } catch (error) {
       productionLogger.error('Error updating visibility settings', error);
@@ -122,7 +122,10 @@ export class GovernanceSettingsService {
   /**
    * تحديث إعدادات المنظمة
    */
-  static async updateOrganizationSettings(id: string | undefined, updates: Record<string, unknown>) {
+  static async updateOrganizationSettings(
+    id: string | undefined,
+    updates: Record<string, unknown>
+  ) {
     try {
       if (id) {
         const { data, error } = await supabase
@@ -133,7 +136,7 @@ export class GovernanceSettingsService {
           .maybeSingle();
 
         if (error) throw error;
-        if (!data) throw new Error("إعدادات المنظمة غير موجودة");
+        if (!data) throw new Error('إعدادات المنظمة غير موجودة');
         return data;
       } else {
         const { data, error } = await supabase
@@ -143,7 +146,7 @@ export class GovernanceSettingsService {
           .maybeSingle();
 
         if (error) throw error;
-        if (!data) throw new Error("فشل في إنشاء إعدادات المنظمة");
+        if (!data) throw new Error('فشل في إنشاء إعدادات المنظمة');
         return data;
       }
     } catch (error) {

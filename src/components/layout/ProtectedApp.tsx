@@ -1,31 +1,31 @@
 /**
  * التطبيق المحمي - يتضمن AuthProvider
  * Protected App - Includes AuthProvider
- * 
+ *
  * ✅ يُحمّل فقط للمسارات المحمية
  * ✅ AuthProvider يُهيأ هنا فقط
  */
 
-import { Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Toaster } from "@/components/ui/toaster";
-import { lazyPage } from "@/lib/lazyWithRetry";
-import { LazyErrorBoundary } from "@/components/shared/LazyErrorBoundary";
+import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
+import { lazyPage } from '@/lib/lazyWithRetry';
+import { LazyErrorBoundary } from '@/components/shared/LazyErrorBoundary';
 
 // ✅ Lazy load للصفحات العامة
-const Signup = lazy(() => import("@/pages/Signup"));
-const Install = lazy(() => import("@/pages/Install"));
-const Unauthorized = lazy(() => import("@/pages/Unauthorized"));
-const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
-const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
-const SecurityPolicyPage = lazy(() => import("@/pages/SecurityPolicy"));
-const FAQ = lazy(() => import("@/pages/FAQ"));
-const Contact = lazy(() => import("@/pages/Contact"));
-const TenantPortal = lazy(() => import("@/pages/TenantPortal"));
+const Signup = lazy(() => import('@/pages/Signup'));
+const Install = lazy(() => import('@/pages/Install'));
+const Unauthorized = lazy(() => import('@/pages/Unauthorized'));
+const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
+const TermsOfUse = lazy(() => import('@/pages/TermsOfUse'));
+const SecurityPolicyPage = lazy(() => import('@/pages/SecurityPolicy'));
+const FAQ = lazy(() => import('@/pages/FAQ'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const TenantPortal = lazy(() => import('@/pages/TenantPortal'));
 
 // ✅ Lazy load للتطبيق الرئيسي المحمي (مع Retry)
-const AppShell = lazyPage(() => import("./AppShell"));
+const AppShell = lazyPage(() => import('./AppShell'));
 
 // ✅ Fallback خفيف
 const LightFallback = () => (
@@ -49,7 +49,7 @@ export default function ProtectedApp() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/tenant-portal" element={<TenantPortal />} />
-          
+
           {/* المسارات المحمية */}
           <Route
             path="/*"
@@ -61,7 +61,7 @@ export default function ProtectedApp() {
           />
         </Routes>
       </Suspense>
-      
+
       {/* Toasts */}
       <Toaster />
     </AuthProvider>

@@ -12,17 +12,17 @@ export const test = base.extend<{
   visualPage: async ({ page }, use) => {
     // انتظار تحميل الصفحة بالكامل
     await page.waitForLoadState('domcontentloaded');
-    
+
     // انتظار تحميل الخطوط العربية
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
-    
+
     // انتظار استقرار الشبكة
     await page.waitForLoadState('networkidle').catch(() => {
       // تجاهل timeout إذا كانت الشبكة بطيئة
     });
-    
+
     await use(page);
   },
 });
@@ -43,7 +43,7 @@ export const fullPageOptions = {
 // خيارات مع إخفاء عناصر ديناميكية
 export const maskedOptions = (page: Page, selectors: string[] = []) => ({
   ...defaultScreenshotOptions,
-  mask: selectors.map(s => page.locator(s)),
+  mask: selectors.map((s) => page.locator(s)),
 });
 
 // دالة مساعدة لانتظار استقرار الصفحة

@@ -1,4 +1,4 @@
-import { FilterParams } from "@/types";
+import { FilterParams } from '@/types';
 
 /**
  * Generic filter function for lists
@@ -13,18 +13,16 @@ export function filterItems<T extends Record<string, unknown>>(
     const matchesSearch =
       !filters.searchQuery ||
       searchFields.some((field) =>
-        String(item[field])
-          .toLowerCase()
-          .includes(filters.searchQuery!.toLowerCase())
+        String(item[field]).toLowerCase().includes(filters.searchQuery!.toLowerCase())
       );
 
     // Status filter
     const matchesStatus =
-      !filters.status || filters.status === "all" || item.status === filters.status;
+      !filters.status || filters.status === 'all' || item.status === filters.status;
 
     // Category filter
     const matchesCategory =
-      !filters.category || filters.category === "all" || item.category === filters.category;
+      !filters.category || filters.category === 'all' || item.category === filters.category;
 
     // Date filters
     let matchesDateFrom = true;
@@ -32,14 +30,14 @@ export function filterItems<T extends Record<string, unknown>>(
 
     if (filters.dateFrom || filters.dateTo) {
       const itemDate = item.created_at || item.date || item.payment_date || item.entry_date;
-      
+
       if (itemDate) {
         const date = new Date(String(itemDate));
-        
+
         if (filters.dateFrom) {
           matchesDateFrom = date >= new Date(filters.dateFrom);
         }
-        
+
         if (filters.dateTo) {
           matchesDateTo = date <= new Date(filters.dateTo);
         }
@@ -53,12 +51,15 @@ export function filterItems<T extends Record<string, unknown>>(
 /**
  * Beneficiary specific filters
  */
-export function filterBeneficiaries<T extends { full_name: string; national_id: string; phone: string; status: string; category?: string }>(
-  beneficiaries: T[],
-  searchQuery: string,
-  statusFilter?: string,
-  categoryFilter?: string
-): T[] {
+export function filterBeneficiaries<
+  T extends {
+    full_name: string;
+    national_id: string;
+    phone: string;
+    status: string;
+    category?: string;
+  },
+>(beneficiaries: T[], searchQuery: string, statusFilter?: string, categoryFilter?: string): T[] {
   return beneficiaries.filter((beneficiary) => {
     const matchesSearch =
       !searchQuery ||
@@ -66,8 +67,10 @@ export function filterBeneficiaries<T extends { full_name: string; national_id: 
       beneficiary.national_id.includes(searchQuery) ||
       beneficiary.phone.includes(searchQuery);
 
-    const matchesStatus = !statusFilter || statusFilter === "all" || beneficiary.status === statusFilter;
-    const matchesCategory = !categoryFilter || categoryFilter === "all" || beneficiary.category === categoryFilter;
+    const matchesStatus =
+      !statusFilter || statusFilter === 'all' || beneficiary.status === statusFilter;
+    const matchesCategory =
+      !categoryFilter || categoryFilter === 'all' || beneficiary.category === categoryFilter;
 
     return matchesSearch && matchesStatus && matchesCategory;
   });
@@ -76,20 +79,18 @@ export function filterBeneficiaries<T extends { full_name: string; national_id: 
 /**
  * Properties specific filters
  */
-export function filterProperties<T extends { name: string; location: string; type: string; status: string }>(
-  properties: T[],
-  searchQuery: string,
-  statusFilter?: string,
-  typeFilter?: string
-): T[] {
+export function filterProperties<
+  T extends { name: string; location: string; type: string; status: string },
+>(properties: T[], searchQuery: string, statusFilter?: string, typeFilter?: string): T[] {
   return properties.filter((property) => {
     const matchesSearch =
       !searchQuery ||
       property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       property.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesStatus = !statusFilter || statusFilter === "all" || property.status === statusFilter;
-    const matchesType = !typeFilter || typeFilter === "all" || property.type === typeFilter;
+    const matchesStatus =
+      !statusFilter || statusFilter === 'all' || property.status === statusFilter;
+    const matchesType = !typeFilter || typeFilter === 'all' || property.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -98,7 +99,15 @@ export function filterProperties<T extends { name: string; location: string; typ
 /**
  * Payments specific filters
  */
-export function filterPayments<T extends { payment_number: string; payer_name: string; description: string; payment_type: string; payment_date: string }>(
+export function filterPayments<
+  T extends {
+    payment_number: string;
+    payer_name: string;
+    description: string;
+    payment_type: string;
+    payment_date: string;
+  },
+>(
   payments: T[],
   searchQuery: string,
   typeFilter?: string,
@@ -112,18 +121,18 @@ export function filterPayments<T extends { payment_number: string; payer_name: s
       payment.payer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       payment.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesType = !typeFilter || typeFilter === "all" || payment.payment_type === typeFilter;
+    const matchesType = !typeFilter || typeFilter === 'all' || payment.payment_type === typeFilter;
 
     let matchesDateFrom = true;
     let matchesDateTo = true;
 
     if (dateFrom || dateTo) {
       const paymentDate = new Date(payment.payment_date);
-      
+
       if (dateFrom) {
         matchesDateFrom = paymentDate >= new Date(dateFrom);
       }
-      
+
       if (dateTo) {
         matchesDateTo = paymentDate <= new Date(dateTo);
       }
@@ -162,11 +171,8 @@ export function getPaginationMeta(totalItems: number, page: number, pageSize: nu
 /**
  * Filter by status
  */
-export function filterByStatus<T extends { status: string }>(
-  items: T[],
-  status: string
-): T[] {
-  if (status === "all") return items;
+export function filterByStatus<T extends { status: string }>(items: T[], status: string): T[] {
+  if (status === 'all') return items;
   return items.filter((item) => item.status === status);
 }
 
@@ -179,7 +185,7 @@ export function filterByDateRange<T extends { date: string }>(
   dateTo?: string
 ): T[] {
   if (!dateFrom && !dateTo) return items;
-  
+
   return items.filter((item) => {
     const itemDate = new Date(item.date);
     if (dateFrom && itemDate < new Date(dateFrom)) return false;
@@ -197,11 +203,9 @@ export function searchByText<T extends Record<string, unknown>>(
   fields: (keyof T)[]
 ): T[] {
   if (!query) return items;
-  
+
   const lowerQuery = query.toLowerCase();
   return items.filter((item) =>
-    fields.some((field) =>
-      String(item[field]).toLowerCase().includes(lowerQuery)
-    )
+    fields.some((field) => String(item[field]).toLowerCase().includes(lowerQuery))
   );
 }

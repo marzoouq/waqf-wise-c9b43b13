@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useUserRole } from "@/hooks/auth/useUserRole";
-import { GovernanceService } from "@/services/governance.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useUserRole } from '@/hooks/auth/useUserRole';
+import { GovernanceService } from '@/services/governance.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface VisibilitySettings {
   id: string;
@@ -76,10 +76,15 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isWaqfHeir } = useUserRole();
-  
+
   const effectiveRole = targetRole || (isWaqfHeir ? 'waqf_heir' : 'beneficiary');
 
-  const { data: settings, isLoading, error, refetch } = useQuery({
+  const {
+    data: settings,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole),
     queryFn: async () => {
       const data = await GovernanceService.getVisibilitySettings(effectiveRole);
@@ -99,15 +104,15 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole) });
       toast({
-        title: "تم الحفظ",
+        title: 'تم الحفظ',
         description: `تم تحديث إعدادات الشفافية ${effectiveRole === 'waqf_heir' ? 'للورثة' : 'للمستفيدين'} بنجاح`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

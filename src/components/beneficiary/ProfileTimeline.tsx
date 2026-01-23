@@ -2,12 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { 
-  Clock, 
-  DollarSign, 
-  FileText, 
-  Edit
-} from 'lucide-react';
+import { Clock, DollarSign, FileText, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useBeneficiaryTimeline } from '@/hooks/beneficiary/useBeneficiaryTimeline';
@@ -43,16 +38,19 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
   const getStatusBadge = (status?: string) => {
     if (!status) return null;
 
-    const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      'معتمد': { label: 'معتمد', variant: 'default' },
-      'مدفوع': { label: 'مدفوع', variant: 'default' },
+    const statusConfig: Record<
+      string,
+      { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+    > = {
+      معتمد: { label: 'معتمد', variant: 'default' },
+      مدفوع: { label: 'مدفوع', variant: 'default' },
       'قيد المراجعة': { label: 'قيد المراجعة', variant: 'secondary' },
-      'معلق': { label: 'معلق', variant: 'secondary' },
-      'مرفوض': { label: 'مرفوض', variant: 'destructive' },
+      معلق: { label: 'معلق', variant: 'secondary' },
+      مرفوض: { label: 'مرفوض', variant: 'destructive' },
     };
 
     const config = statusConfig[status] || { label: status, variant: 'outline' as const };
-    
+
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -94,12 +92,8 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
                 <div className="bg-muted/50 rounded-lg p-4 hover:bg-muted/70 transition-colors">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground mb-1">
-                        {event.title}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {event.description}
-                      </p>
+                      <h4 className="font-semibold text-foreground mb-1">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground">{event.description}</p>
                     </div>
                     {event.amount && (
                       <div className="text-left">
@@ -109,7 +103,7 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-muted-foreground">
                       {format(new Date(event.date), 'PPP', { locale: ar })}

@@ -1,8 +1,11 @@
-import { ReactNode } from "react";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { getRoleTheme, getRoleDisplayName } from "@/config/roleThemes";
-import { cn } from "@/lib/utils";
+import { ReactNode } from 'react';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { getRoleTheme, getRoleDisplayName } from '@/config/roleThemes';
+import { cn } from '@/lib/utils';
 
 interface UnifiedDashboardLayoutProps {
   children: ReactNode;
@@ -19,7 +22,7 @@ export function UnifiedDashboardLayout({
   title,
   description,
   actions,
-  className
+  className,
 }: UnifiedDashboardLayoutProps) {
   const theme = getRoleTheme(role);
   const Icon = theme.icon;
@@ -34,25 +37,20 @@ export function UnifiedDashboardLayout({
             title={title || `لوحة تحكم ${roleDisplayName}`}
             description={description || `نظرة شاملة على عمليات ${roleDisplayName}`}
             icon={
-              <div className={cn(
-                "p-2 rounded-lg shadow-md",
-                `bg-gradient-to-br ${theme.gradient}`
-              )}>
+              <div
+                className={cn('p-2 rounded-lg shadow-md', `bg-gradient-to-br ${theme.gradient}`)}
+              >
                 <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-primary-foreground" />
               </div>
             }
           />
           {actions && (
-            <div className="flex items-center gap-2 flex-wrap justify-end">
-              {actions}
-            </div>
+            <div className="flex items-center gap-2 flex-wrap justify-end">{actions}</div>
           )}
         </div>
 
         {/* Content with consistent spacing */}
-        <div className={cn("space-y-4 sm:space-y-6", className)}>
-          {children}
-        </div>
+        <div className={cn('space-y-4 sm:space-y-6', className)}>{children}</div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

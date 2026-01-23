@@ -1,10 +1,10 @@
-import { Beneficiary } from "@/types/beneficiary";
-import BeneficiaryDialog from "./BeneficiaryDialog";
-import { AdvancedSearchDialog, SearchCriteria } from "./AdvancedSearchDialog";
-import { AttachmentsDialog } from "./AttachmentsDialog";
-import { ActivityLogDialog } from "./ActivityLogDialog";
-import { EnableLoginDialog } from "./EnableLoginDialog";
-import { TribeManagementDialog } from "./TribeManagementDialog";
+import { Beneficiary } from '@/types/beneficiary';
+import BeneficiaryDialog from './BeneficiaryDialog';
+import { AdvancedSearchDialog, SearchCriteria } from './AdvancedSearchDialog';
+import { AttachmentsDialog } from './AttachmentsDialog';
+import { ActivityLogDialog } from './ActivityLogDialog';
+import { EnableLoginDialog } from './EnableLoginDialog';
+import { TribeManagementDialog } from './TribeManagementDialog';
 
 interface BeneficiariesDialogsProps {
   dialogOpen: boolean;

@@ -3,13 +3,9 @@
  * @version 2.8.22
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { logger } from "@/lib/logger";
-import { 
-  BankStatementInsert, 
-  BankTransactionInsert,
-  BankTransactionMatch 
-} from "@/types/banking";
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
+import { BankStatementInsert, BankTransactionInsert, BankTransactionMatch } from '@/types/banking';
 
 export interface BankStatement {
   id: string;
@@ -48,16 +44,18 @@ export class BankReconciliationService {
   static async getStatements(): Promise<BankStatement[]> {
     try {
       const { data, error } = await supabase
-        .from("bank_statements")
-        .select(`
+        .from('bank_statements')
+        .select(
+          `
           *,
           bank_accounts!inner (
             bank_name,
             account_number,
             accounts (code, name_ar)
           )
-        `)
-        .order("statement_date", { ascending: false });
+        `
+        )
+        .order('statement_date', { ascending: false });
 
       if (error) throw error;
       return (data || []) as BankStatement[];
@@ -73,9 +71,9 @@ export class BankReconciliationService {
   static async getTransactions(): Promise<BankTransaction[]> {
     try {
       const { data, error } = await supabase
-        .from("bank_transactions")
-        .select("*")
-        .order("transaction_date", { ascending: false });
+        .from('bank_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
 
       if (error) throw error;
       return (data || []) as BankTransaction[];
@@ -90,13 +88,13 @@ export class BankReconciliationService {
    */
   static async createStatement(statement: BankStatementInsert): Promise<BankStatement> {
     const { data, error } = await supabase
-      .from("bank_statements")
+      .from('bank_statements')
       .insert([statement])
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء كشف الحساب");
+    if (!data) throw new Error('فشل في إنشاء كشف الحساب');
     return data as BankStatement;
   }
 
@@ -105,32 +103,35 @@ export class BankReconciliationService {
    */
   static async addTransaction(transaction: BankTransactionInsert): Promise<BankTransaction> {
     const { data, error } = await supabase
-      .from("bank_transactions")
+      .from('bank_transactions')
       .insert([transaction])
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إضافة الحركة البنكية");
+    if (!data) throw new Error('فشل في إضافة الحركة البنكية');
     return data as BankTransaction;
   }
 
   /**
    * مطابقة حركة بنكية
    */
-  static async matchTransaction({ transaction_id, journal_entry_id }: BankTransactionMatch): Promise<BankTransaction> {
+  static async matchTransaction({
+    transaction_id,
+    journal_entry_id,
+  }: BankTransactionMatch): Promise<BankTransaction> {
     const { data, error } = await supabase
-      .from("bank_transactions")
+      .from('bank_transactions')
       .update({
         is_matched: true,
         journal_entry_id: journal_entry_id,
       })
-      .eq("id", transaction_id)
+      .eq('id', transaction_id)
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("الحركة البنكية غير موجودة");
+    if (!data) throw new Error('الحركة البنكية غير موجودة');
     return data as BankTransaction;
   }
 
@@ -139,17 +140,17 @@ export class BankReconciliationService {
    */
   static async reconcileStatement(statementId: string): Promise<BankStatement> {
     const { data, error } = await supabase
-      .from("bank_statements")
+      .from('bank_statements')
       .update({
         status: 'reconciled',
         reconciled_at: new Date().toISOString(),
       })
-      .eq("id", statementId)
+      .eq('id', statementId)
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("كشف الحساب غير موجود");
+    if (!data) throw new Error('كشف الحساب غير موجود');
     return data as BankStatement;
   }
 }

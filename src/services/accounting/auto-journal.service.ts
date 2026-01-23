@@ -47,11 +47,13 @@ export class AutoJournalService {
   static async getTemplates(): Promise<AutoJournalTemplate[]> {
     const { data, error } = await supabase
       .from('auto_journal_templates')
-      .select('id, trigger_event, template_name, description, debit_accounts, credit_accounts, is_active, priority, created_at, created_by, updated_at')
+      .select(
+        'id, trigger_event, template_name, description, debit_accounts, credit_accounts, is_active, priority, created_at, created_by, updated_at'
+      )
       .order('priority', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map(item => ({
+    return (data || []).map((item) => ({
       ...item,
       debit_accounts: parseAccountMappings(item.debit_accounts),
       credit_accounts: parseAccountMappings(item.credit_accounts),
@@ -63,7 +65,9 @@ export class AutoJournalService {
   /**
    * جلب القوالب النشطة
    */
-  static async getActiveTemplates(): Promise<Database['public']['Tables']['auto_journal_templates']['Row'][]> {
+  static async getActiveTemplates(): Promise<
+    Database['public']['Tables']['auto_journal_templates']['Row'][]
+  > {
     try {
       const { data, error } = await supabase
         .from('auto_journal_templates')
@@ -113,7 +117,7 @@ export class AutoJournalService {
     if (template.credit_accounts) {
       updateData.credit_accounts = template.credit_accounts as unknown as Json;
     }
-    
+
     const { data, error } = await supabase
       .from('auto_journal_templates')
       .update(updateData)
@@ -130,15 +134,17 @@ export class AutoJournalService {
    * حذف قالب قيد تلقائي (Soft Delete)
    */
   static async deleteTemplate(id: string) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('auto_journal_templates')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id,
         deletion_reason: 'حذف بواسطة المستخدم',
-        is_active: false
+        is_active: false,
       })
       .eq('id', id);
 
@@ -179,15 +185,15 @@ export class AutoJournalService {
       if (!templates || templates.length === 0) return null;
 
       const template = templates[0];
-      
+
       // جلب قائمة الحسابات للبحث بالكود
       const { data: accountsList } = await supabase
         .from('accounts')
         .select('id, code')
         .eq('is_active', true);
-      
-      const accountCodeToId = new Map(accountsList?.map(a => [a.code, a.id]) || []);
-      
+
+      const accountCodeToId = new Map(accountsList?.map((a) => [a.code, a.id]) || []);
+
       // دالة للحصول على account_id من الكود أو المعرف
       const resolveAccountId = (acc: { account_code?: string; account_id?: string }) => {
         if (acc.account_code) {
@@ -196,24 +202,34 @@ export class AutoJournalService {
         return acc.account_id;
       };
 
-      const debitAccounts = template.debit_accounts as { account_code?: string; account_id?: string; percentage: number }[];
-      const creditAccounts = template.credit_accounts as { account_code?: string; account_id?: string; percentage: number }[];
+      const debitAccounts = template.debit_accounts as {
+        account_code?: string;
+        account_id?: string;
+        percentage: number;
+      }[];
+      const creditAccounts = template.credit_accounts as {
+        account_code?: string;
+        account_id?: string;
+        percentage: number;
+      }[];
 
       const lines = [
-        ...debitAccounts.map(acc => ({
+        ...debitAccounts.map((acc) => ({
           account_id: resolveAccountId(acc),
           debit_amount: (params.amount * (acc.percentage || 100)) / 100,
           credit_amount: 0,
         })),
-        ...creditAccounts.map(acc => ({
+        ...creditAccounts.map((acc) => ({
           account_id: resolveAccountId(acc),
           debit_amount: 0,
           credit_amount: (params.amount * (acc.percentage || 100)) / 100,
         })),
-      ].filter(line => line.account_id); // استبعاد السطور بدون حساب
+      ].filter((line) => line.account_id); // استبعاد السطور بدون حساب
 
       if (lines.length === 0) {
-        productionLogger.error('No valid accounts found for auto journal entry', { template: template.id });
+        productionLogger.error('No valid accounts found for auto journal entry', {
+          template: template.id,
+        });
         return null;
       }
 
@@ -227,15 +243,17 @@ export class AutoJournalService {
       // إنشاء القيد
       const { data: journalEntry, error: entryError } = await supabase
         .from('journal_entries')
-        .insert([{
-          description: params.description,
-          entry_date: new Date().toISOString().split('T')[0],
-          entry_number: `AUTO-${Date.now()}`,
-          status: 'draft',
-          reference_type: params.referenceType,
-          reference_id: params.referenceId,
-          fiscal_year_id: activeFY?.id || '',
-        }])
+        .insert([
+          {
+            description: params.description,
+            entry_date: new Date().toISOString().split('T')[0],
+            entry_number: `AUTO-${Date.now()}`,
+            status: 'draft',
+            reference_type: params.referenceType,
+            reference_id: params.referenceId,
+            fiscal_year_id: activeFY?.id || '',
+          },
+        ])
         .select()
         .maybeSingle();
 
@@ -249,35 +267,37 @@ export class AutoJournalService {
         line_number: index + 1,
       }));
 
-      await supabase
-        .from('journal_entry_lines')
-        .insert(entryLines);
+      await supabase.from('journal_entry_lines').insert(entryLines);
 
       // تسجيل في سجل القيود التلقائية
-      await supabase.from('auto_journal_log').insert([{
-        template_id: template.id,
-        trigger_event: params.trigger,
-        reference_id: params.referenceId,
-        reference_type: params.referenceType,
-        amount: params.amount,
-        journal_entry_id: journalEntry.id,
-        success: true,
-      }]);
+      await supabase.from('auto_journal_log').insert([
+        {
+          template_id: template.id,
+          trigger_event: params.trigger,
+          reference_id: params.referenceId,
+          reference_type: params.referenceType,
+          amount: params.amount,
+          journal_entry_id: journalEntry.id,
+          success: true,
+        },
+      ]);
 
       return journalEntry;
     } catch (error) {
       productionLogger.error('Error creating auto journal entry', error);
-      
+
       // تسجيل الخطأ في السجل
-      await supabase.from('auto_journal_log').insert([{
-        trigger_event: params.trigger,
-        reference_id: params.referenceId,
-        reference_type: params.referenceType,
-        amount: params.amount,
-        success: false,
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      }]);
-      
+      await supabase.from('auto_journal_log').insert([
+        {
+          trigger_event: params.trigger,
+          reference_id: params.referenceId,
+          reference_type: params.referenceType,
+          amount: params.amount,
+          success: false,
+          error_message: error instanceof Error ? error.message : 'Unknown error',
+        },
+      ]);
+
       throw error;
     }
   }

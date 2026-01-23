@@ -1,54 +1,66 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Link2, AlertCircle, FileText } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useAccountingLinkReport } from "@/hooks/reports/useAccountingLinkReport";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles } from "@/lib/pdf/arabic-pdf-utils";
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Download, Link2, AlertCircle, FileText } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useAccountingLinkReport } from '@/hooks/reports/useAccountingLinkReport';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  getDefaultTableStyles,
+} from '@/lib/pdf/arabic-pdf-utils';
 
 export function AccountingLinkReport() {
-  const [activeTab, setActiveTab] = useState("linked");
+  const [activeTab, setActiveTab] = useState('linked');
   const { linkedOperations, unlinkedOperations } = useAccountingLinkReport();
 
   const exportToPDF = async () => {
     const [jsPDFModule, autoTableModule] = await Promise.all([
       import('jspdf'),
-      import('jspdf-autotable')
+      import('jspdf-autotable'),
     ]);
-    
+
     const jsPDF = jsPDFModule.default;
     const autoTable = autoTableModule.default;
     const doc = new jsPDF();
-    
+
     // تحميل الخط العربي
     const fontName = await loadArabicFontToPDF(doc);
-    
+
     // إضافة ترويسة الوقف
     const startY = addWaqfHeader(doc, fontName, 'تقرير ربط العمليات المحاسبية');
 
-    const tableData = linkedOperations.map(op => [
+    const tableData = linkedOperations.map((op) => [
       op.type,
       op.number,
       op.description,
       `${op.amount.toLocaleString()} ر.س`,
-      format(new Date(op.date), "yyyy-MM-dd"),
-      op.journalEntry || "-",
+      format(new Date(op.date), 'yyyy-MM-dd'),
+      op.journalEntry || '-',
     ]);
 
     const tableStyles = getDefaultTableStyles(fontName);
 
     autoTable(doc, {
-      head: [["النوع", "الرقم", "الوصف", "المبلغ", "التاريخ", "رقم القيد"]],
+      head: [['النوع', 'الرقم', 'الوصف', 'المبلغ', 'التاريخ', 'رقم القيد']],
       body: tableData,
       startY: startY,
       ...tableStyles,
       headStyles: {
         fillColor: [59, 130, 246],
         textColor: [255, 255, 255],
-        fontStyle: "bold",
+        fontStyle: 'bold',
         font: fontName,
       },
       margin: { bottom: 30 },
@@ -57,7 +69,7 @@ export function AccountingLinkReport() {
       },
     });
 
-    doc.save(`تقرير-الربط-المحاسبي-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    doc.save(`تقرير-الربط-المحاسبي-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
@@ -70,9 +82,7 @@ export function AccountingLinkReport() {
                 <Link2 className="h-5 w-5" />
                 تقرير الربط المحاسبي
               </CardTitle>
-              <CardDescription>
-                تتبع ربط العمليات المالية بالقيود المحاسبية
-              </CardDescription>
+              <CardDescription>تتبع ربط العمليات المالية بالقيود المحاسبية</CardDescription>
             </div>
             <Button onClick={exportToPDF} variant="outline">
               <Download className="h-4 w-4 ms-2" />
@@ -100,10 +110,16 @@ export function AccountingLinkReport() {
                     <TableRow>
                       <TableHead className="text-xs sm:text-sm">النوع</TableHead>
                       <TableHead className="text-xs sm:text-sm whitespace-nowrap">الرقم</TableHead>
-                      <TableHead className="text-xs sm:text-sm hidden md:table-cell">الوصف</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                        الوصف
+                      </TableHead>
                       <TableHead className="text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
-                      <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
-                      <TableHead className="text-xs sm:text-sm whitespace-nowrap">رقم القيد</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
+                        التاريخ
+                      </TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap">
+                        رقم القيد
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -112,13 +128,17 @@ export function AccountingLinkReport() {
                         <TableCell className="text-xs sm:text-sm">
                           <Badge variant="outline">{op.type}</Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">{op.number}</TableCell>
-                        <TableCell className="text-xs sm:text-sm hidden md:table-cell">{op.description}</TableCell>
+                        <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">
+                          {op.number}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                          {op.description}
+                        </TableCell>
                         <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
                           {op.amount.toLocaleString()} ر.س
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
-                          {format(new Date(op.date), "dd MMM yyyy", { locale: ar })}
+                          {format(new Date(op.date), 'dd MMM yyyy', { locale: ar })}
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm">
                           <div className="flex items-center gap-2">
@@ -140,10 +160,18 @@ export function AccountingLinkReport() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="text-xs sm:text-sm">النوع</TableHead>
-                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">الرقم</TableHead>
-                        <TableHead className="text-xs sm:text-sm hidden md:table-cell">الوصف</TableHead>
-                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
-                        <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">
+                          الرقم
+                        </TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                          الوصف
+                        </TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">
+                          المبلغ
+                        </TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
+                          التاريخ
+                        </TableHead>
                         <TableHead className="text-xs sm:text-sm">السبب</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -153,13 +181,17 @@ export function AccountingLinkReport() {
                           <TableCell className="text-xs sm:text-sm">
                             <Badge variant="outline">{op.type}</Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">{op.number}</TableCell>
-                          <TableCell className="text-xs sm:text-sm hidden md:table-cell">{op.description}</TableCell>
+                          <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">
+                            {op.number}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                            {op.description}
+                          </TableCell>
                           <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
                             {op.amount.toLocaleString()} ر.س
                           </TableCell>
                           <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
-                            {format(new Date(op.date), "dd MMM yyyy", { locale: ar })}
+                            {format(new Date(op.date), 'dd MMM yyyy', { locale: ar })}
                           </TableCell>
                           <TableCell className="text-muted-foreground text-xs sm:text-sm">
                             {op.reason}

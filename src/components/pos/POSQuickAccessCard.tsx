@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Store, Play, Clock, CircleDollarSign } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useCashierShift } from "@/hooks/pos";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Store, Play, Clock, CircleDollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useCashierShift } from '@/hooks/pos';
 
 /**
  * بطاقة اختصار نقطة البيع للوحات التحكم
@@ -35,14 +35,18 @@ export function POSQuickAccessCard() {
                 <CircleDollarSign className="h-4 w-4 text-success" />
                 <div>
                   <p className="text-xs text-muted-foreground">التحصيل</p>
-                  <p className="font-semibold">{currentShift.total_collections?.toLocaleString('ar-SA')} ر.س</p>
+                  <p className="font-semibold">
+                    {currentShift.total_collections?.toLocaleString('ar-SA')} ر.س
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
                 <CircleDollarSign className="h-4 w-4 text-destructive" />
                 <div>
                   <p className="text-xs text-muted-foreground">الصرف</p>
-                  <p className="font-semibold">{currentShift.total_payments?.toLocaleString('ar-SA')} ر.س</p>
+                  <p className="font-semibold">
+                    {currentShift.total_payments?.toLocaleString('ar-SA')} ر.س
+                  </p>
                 </div>
               </div>
             </div>
@@ -54,10 +58,7 @@ export function POSQuickAccessCard() {
           </div>
         )}
 
-        <Button 
-          className="w-full gap-2" 
-          onClick={() => navigate('/pos')}
-        >
+        <Button className="w-full gap-2" onClick={() => navigate('/pos')}>
           {hasActiveShift ? (
             <>
               <Store className="h-4 w-4" />

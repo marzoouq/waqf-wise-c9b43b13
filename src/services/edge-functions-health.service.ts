@@ -5,16 +5,25 @@
 import { productionLogger } from '@/lib/logger';
 
 export type CheckType = 'ping' | 'json-required' | 'formdata';
-export type FunctionCategory = 'ai' | 'database' | 'notification' | 'backup' | 'security' | 'utility';
+export type FunctionCategory =
+  | 'ai'
+  | 'database'
+  | 'notification'
+  | 'backup'
+  | 'security'
+  | 'utility';
 
 // ✅ حدود زمنية مختلفة حسب نوع الوظيفة
-export const RESPONSE_TIME_THRESHOLDS: Record<FunctionCategory, { healthy: number; degraded: number }> = {
-  ai: { healthy: 8000, degraded: 20000 },           // AI: بطيئة طبيعياً (cold start + AI calls)
-  database: { healthy: 2000, degraded: 5000 },      // DB: متوسطة السرعة
-  notification: { healthy: 3000, degraded: 8000 },  // إشعارات: قد تتأخر قليلاً
-  backup: { healthy: 15000, degraded: 45000 },      // نسخ احتياطي: بطيء جداً طبيعياً
-  security: { healthy: 3000, degraded: 8000 },      // أمان: متوسطة
-  utility: { healthy: 5000, degraded: 12000 },      // أدوات: متنوعة
+export const RESPONSE_TIME_THRESHOLDS: Record<
+  FunctionCategory,
+  { healthy: number; degraded: number }
+> = {
+  ai: { healthy: 8000, degraded: 20000 }, // AI: بطيئة طبيعياً (cold start + AI calls)
+  database: { healthy: 2000, degraded: 5000 }, // DB: متوسطة السرعة
+  notification: { healthy: 3000, degraded: 8000 }, // إشعارات: قد تتأخر قليلاً
+  backup: { healthy: 15000, degraded: 45000 }, // نسخ احتياطي: بطيء جداً طبيعياً
+  security: { healthy: 3000, degraded: 8000 }, // أمان: متوسطة
+  utility: { healthy: 5000, degraded: 12000 }, // أدوات: متنوعة
 };
 
 export interface EdgeFunctionInfo {
@@ -54,68 +63,380 @@ export interface HealthCheckResult {
 // قائمة جميع Edge Functions في النظام مع تصنيف نوع الفحص
 export const ALL_EDGE_FUNCTIONS: EdgeFunctionInfo[] = [
   // AI Functions
-  { name: 'ai-system-audit', description: 'الفحص الذكي للنظام', requiresAuth: true, category: 'ai', checkType: 'ping' },
-  { name: 'chatbot', description: 'المساعد الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['message'] },
-  { name: 'generate-ai-insights', description: 'توليد الرؤى الذكية', requiresAuth: true, category: 'ai', checkType: 'ping' },
-  { name: 'generate-smart-alerts', description: 'توليد التنبيهات الذكية', requiresAuth: true, category: 'ai', checkType: 'ping' },
-  { name: 'intelligent-search', description: 'البحث الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['query'] },
-  { name: 'property-ai-assistant', description: 'مساعد العقارات الذكي', requiresAuth: true, category: 'ai', checkType: 'json-required', requiredFields: ['message'] },
-  { name: 'ocr-document', description: 'التعرف على النصوص', requiresAuth: true, category: 'ai', checkType: 'formdata' },
-  { name: 'extract-invoice-data', description: 'استخراج بيانات الفاتورة', requiresAuth: true, category: 'ai', checkType: 'ping' },
-  { name: 'auto-classify-document', description: 'تصنيف المستندات تلقائياً', requiresAuth: true, category: 'ai', checkType: 'ping' },
-  
+  {
+    name: 'ai-system-audit',
+    description: 'الفحص الذكي للنظام',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'ping',
+  },
+  {
+    name: 'chatbot',
+    description: 'المساعد الذكي',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'json-required',
+    requiredFields: ['message'],
+  },
+  {
+    name: 'generate-ai-insights',
+    description: 'توليد الرؤى الذكية',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'ping',
+  },
+  {
+    name: 'generate-smart-alerts',
+    description: 'توليد التنبيهات الذكية',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'ping',
+  },
+  {
+    name: 'intelligent-search',
+    description: 'البحث الذكي',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'json-required',
+    requiredFields: ['query'],
+  },
+  {
+    name: 'property-ai-assistant',
+    description: 'مساعد العقارات الذكي',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'json-required',
+    requiredFields: ['message'],
+  },
+  {
+    name: 'ocr-document',
+    description: 'التعرف على النصوص',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'formdata',
+  },
+  {
+    name: 'extract-invoice-data',
+    description: 'استخراج بيانات الفاتورة',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'ping',
+  },
+  {
+    name: 'auto-classify-document',
+    description: 'تصنيف المستندات تلقائياً',
+    requiresAuth: true,
+    category: 'ai',
+    checkType: 'ping',
+  },
+
   // Database Functions (تتطلب مصادقة admin/nazer)
-  { name: 'db-health-check', description: 'فحص صحة قاعدة البيانات', requiresAuth: true, category: 'database', checkType: 'ping' },
-  { name: 'db-performance-stats', description: 'إحصائيات الأداء', requiresAuth: true, category: 'database', checkType: 'ping' },
-  { name: 'run-vacuum', description: 'تنظيف قاعدة البيانات', requiresAuth: true, category: 'database', checkType: 'ping' },
-  { name: 'weekly-maintenance', description: 'الصيانة الأسبوعية', requiresAuth: true, category: 'database', checkType: 'ping' },
-  
+  {
+    name: 'db-health-check',
+    description: 'فحص صحة قاعدة البيانات',
+    requiresAuth: true,
+    category: 'database',
+    checkType: 'ping',
+  },
+  {
+    name: 'db-performance-stats',
+    description: 'إحصائيات الأداء',
+    requiresAuth: true,
+    category: 'database',
+    checkType: 'ping',
+  },
+  {
+    name: 'run-vacuum',
+    description: 'تنظيف قاعدة البيانات',
+    requiresAuth: true,
+    category: 'database',
+    checkType: 'ping',
+  },
+  {
+    name: 'weekly-maintenance',
+    description: 'الصيانة الأسبوعية',
+    requiresAuth: true,
+    category: 'database',
+    checkType: 'ping',
+  },
+
   // Backup Functions
-  { name: 'backup-database', description: 'نسخ قاعدة البيانات', requiresAuth: true, category: 'backup', checkType: 'ping' },
-  { name: 'restore-database', description: 'استعادة قاعدة البيانات', requiresAuth: true, category: 'backup', checkType: 'json-required', requiredFields: ['backupId'] },
-  { name: 'daily-backup', description: 'النسخ اليومي', requiresAuth: true, category: 'backup', checkType: 'ping' },
-  
+  {
+    name: 'backup-database',
+    description: 'نسخ قاعدة البيانات',
+    requiresAuth: true,
+    category: 'backup',
+    checkType: 'ping',
+  },
+  {
+    name: 'restore-database',
+    description: 'استعادة قاعدة البيانات',
+    requiresAuth: true,
+    category: 'backup',
+    checkType: 'json-required',
+    requiredFields: ['backupId'],
+  },
+  {
+    name: 'daily-backup',
+    description: 'النسخ اليومي',
+    requiresAuth: true,
+    category: 'backup',
+    checkType: 'ping',
+  },
+
   // Notification Functions
-  { name: 'send-notification', description: 'إرسال إشعار', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['userId', 'title', 'message'] },
-  { name: 'send-push-notification', description: 'إشعار فوري', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['userId', 'title'] },
-  { name: 'send-slack-alert', description: 'تنبيه Slack', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['message'] },
-  { name: 'send-invoice-email', description: 'إرسال فاتورة بالبريد', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['invoiceId'] },
-  { name: 'notify-admins', description: 'إشعار المديرين', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['message'] },
-  { name: 'notify-disclosure-published', description: 'إشعار نشر الإفصاح', requiresAuth: true, category: 'notification', checkType: 'json-required', requiredFields: ['disclosureId'] },
-  { name: 'daily-notifications', description: 'الإشعارات اليومية', requiresAuth: true, category: 'notification', checkType: 'ping' },
-  { name: 'contract-renewal-alerts', description: 'تنبيهات تجديد العقود', requiresAuth: false, category: 'notification', checkType: 'ping' },
-  
+  {
+    name: 'send-notification',
+    description: 'إرسال إشعار',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['userId', 'title', 'message'],
+  },
+  {
+    name: 'send-push-notification',
+    description: 'إشعار فوري',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['userId', 'title'],
+  },
+  {
+    name: 'send-slack-alert',
+    description: 'تنبيه Slack',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['message'],
+  },
+  {
+    name: 'send-invoice-email',
+    description: 'إرسال فاتورة بالبريد',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['invoiceId'],
+  },
+  {
+    name: 'notify-admins',
+    description: 'إشعار المديرين',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['message'],
+  },
+  {
+    name: 'notify-disclosure-published',
+    description: 'إشعار نشر الإفصاح',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'json-required',
+    requiredFields: ['disclosureId'],
+  },
+  {
+    name: 'daily-notifications',
+    description: 'الإشعارات اليومية',
+    requiresAuth: true,
+    category: 'notification',
+    checkType: 'ping',
+  },
+  {
+    name: 'contract-renewal-alerts',
+    description: 'تنبيهات تجديد العقود',
+    requiresAuth: false,
+    category: 'notification',
+    checkType: 'ping',
+  },
+
   // Security Functions
-  { name: 'check-leaked-password', description: 'فحص كلمات المرور المسربة', requiresAuth: true, category: 'security', checkType: 'ping' },
-  { name: 'biometric-auth', description: 'المصادقة البيومترية', requiresAuth: false, category: 'security', checkType: 'json-required', requiredFields: ['credentialId', 'userId'] },
-  { name: 'encrypt-file', description: 'تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'formdata' },
-  { name: 'decrypt-file', description: 'فك تشفير الملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
-  { name: 'secure-delete-file', description: 'حذف آمن للملفات', requiresAuth: true, category: 'security', checkType: 'json-required', requiredFields: ['fileId'] },
-  { name: 'cleanup-old-files', description: 'تنظيف الملفات القديمة', requiresAuth: true, category: 'security', checkType: 'ping' },
-  { name: 'cleanup-sensitive-files', description: 'تنظيف الملفات الحساسة', requiresAuth: true, category: 'security', checkType: 'ping' },
-  { name: 'scheduled-cleanup', description: 'التنظيف المجدول', requiresAuth: true, category: 'security', checkType: 'ping' },
-  
+  {
+    name: 'check-leaked-password',
+    description: 'فحص كلمات المرور المسربة',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'ping',
+  },
+  {
+    name: 'biometric-auth',
+    description: 'المصادقة البيومترية',
+    requiresAuth: false,
+    category: 'security',
+    checkType: 'json-required',
+    requiredFields: ['credentialId', 'userId'],
+  },
+  {
+    name: 'encrypt-file',
+    description: 'تشفير الملفات',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'formdata',
+  },
+  {
+    name: 'decrypt-file',
+    description: 'فك تشفير الملفات',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'json-required',
+    requiredFields: ['fileId'],
+  },
+  {
+    name: 'secure-delete-file',
+    description: 'حذف آمن للملفات',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'json-required',
+    requiredFields: ['fileId'],
+  },
+  {
+    name: 'cleanup-old-files',
+    description: 'تنظيف الملفات القديمة',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'ping',
+  },
+  {
+    name: 'cleanup-sensitive-files',
+    description: 'تنظيف الملفات الحساسة',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'ping',
+  },
+  {
+    name: 'scheduled-cleanup',
+    description: 'التنظيف المجدول',
+    requiresAuth: true,
+    category: 'security',
+    checkType: 'ping',
+  },
+
   // Utility Functions
-  { name: 'log-error', description: 'تسجيل الأخطاء', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['error'] },
-  { name: 'execute-auto-fix', description: 'تنفيذ الإصلاح التلقائي', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['fixId'] },
-  { name: 'admin-manage-beneficiary-password', description: 'إدارة كلمات مرور المستفيدين', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['beneficiaryId', 'action'] },
-  { name: 'reset-user-password', description: 'إعادة تعيين كلمة المرور', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['userId'] },
-  { name: 'update-user-email', description: 'تحديث البريد الإلكتروني', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['userId', 'newEmail'] },
-  { name: 'create-beneficiary-accounts', description: 'إنشاء حسابات المستفيدين', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'simulate-distribution', description: 'محاكاة التوزيع', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'distribute-revenue', description: 'توزيع الإيرادات', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['distributionId'] },
-  { name: 'generate-distribution-summary', description: 'ملخص التوزيع', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['distributionId'] },
-  { name: 'auto-create-journal', description: 'إنشاء القيود تلقائياً', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['entryData'] },
-  { name: 'generate-scheduled-report', description: 'التقارير المجدولة', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'weekly-report', description: 'التقرير الأسبوعي', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'publish-fiscal-year', description: 'نشر السنة المالية', requiresAuth: true, category: 'utility', checkType: 'json-required', requiredFields: ['fiscalYearId'] },
-  { name: 'support-auto-escalate', description: 'تصعيد التذاكر تلقائياً', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'zatca-submit', description: 'إرسال لـ ZATCA', requiresAuth: true, category: 'utility', checkType: 'ping' },
-  { name: 'backfill-rental-documents', description: 'استكمال وثائق الإيجار', requiresAuth: true, category: 'utility', checkType: 'ping' },
+  {
+    name: 'log-error',
+    description: 'تسجيل الأخطاء',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['error'],
+  },
+  {
+    name: 'execute-auto-fix',
+    description: 'تنفيذ الإصلاح التلقائي',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['fixId'],
+  },
+  {
+    name: 'admin-manage-beneficiary-password',
+    description: 'إدارة كلمات مرور المستفيدين',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['beneficiaryId', 'action'],
+  },
+  {
+    name: 'reset-user-password',
+    description: 'إعادة تعيين كلمة المرور',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['userId'],
+  },
+  {
+    name: 'update-user-email',
+    description: 'تحديث البريد الإلكتروني',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['userId', 'newEmail'],
+  },
+  {
+    name: 'create-beneficiary-accounts',
+    description: 'إنشاء حسابات المستفيدين',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'simulate-distribution',
+    description: 'محاكاة التوزيع',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'distribute-revenue',
+    description: 'توزيع الإيرادات',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['distributionId'],
+  },
+  {
+    name: 'generate-distribution-summary',
+    description: 'ملخص التوزيع',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['distributionId'],
+  },
+  {
+    name: 'auto-create-journal',
+    description: 'إنشاء القيود تلقائياً',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['entryData'],
+  },
+  {
+    name: 'generate-scheduled-report',
+    description: 'التقارير المجدولة',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'weekly-report',
+    description: 'التقرير الأسبوعي',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'publish-fiscal-year',
+    description: 'نشر السنة المالية',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'json-required',
+    requiredFields: ['fiscalYearId'],
+  },
+  {
+    name: 'support-auto-escalate',
+    description: 'تصعيد التذاكر تلقائياً',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'zatca-submit',
+    description: 'إرسال لـ ZATCA',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
+  {
+    name: 'backfill-rental-documents',
+    description: 'استكمال وثائق الإيجار',
+    requiresAuth: true,
+    category: 'utility',
+    checkType: 'ping',
+  },
 ];
 
 // دالة توليد البيانات الوهمية للفحص
-function generateDummyData(fields: string[]): Record<string, string | boolean | Record<string, boolean>> {
+function generateDummyData(
+  fields: string[]
+): Record<string, string | boolean | Record<string, boolean>> {
   const data: Record<string, string | boolean | Record<string, boolean>> = {};
   for (const field of fields) {
     switch (field) {
@@ -158,7 +479,10 @@ function generateDummyData(fields: string[]): Record<string, string | boolean | 
 /**
  * الحصول على الحدود الزمنية للوظيفة
  */
-export function getThresholdsForFunction(funcInfo?: EdgeFunctionInfo): { healthy: number; degraded: number } {
+export function getThresholdsForFunction(funcInfo?: EdgeFunctionInfo): {
+  healthy: number;
+  degraded: number;
+} {
   const category = funcInfo?.category || 'utility';
   return RESPONSE_TIME_THRESHOLDS[category];
 }
@@ -166,85 +490,88 @@ export function getThresholdsForFunction(funcInfo?: EdgeFunctionInfo): { healthy
 /**
  * الحصول على سبب الحالة والتوصية - مع حدود ديناميكية حسب نوع الوظيفة
  */
-export function getStatusDetails(result: HealthCheckResult, funcInfo?: EdgeFunctionInfo): { 
-  reason: string; 
-  recommendation: string 
+export function getStatusDetails(
+  result: HealthCheckResult,
+  funcInfo?: EdgeFunctionInfo
+): {
+  reason: string;
+  recommendation: string;
 } {
   const thresholds = getThresholdsForFunction(funcInfo);
   const categoryName = funcInfo?.category ? getCategoryLabel(funcInfo.category) : 'عامة';
-  
+
   // محمية (401/403) - تعمل بشكل صحيح!
   if (result.isProtected) {
     return {
       reason: `✓ الوظيفة محمية وتعمل بشكل صحيح - ترفض الطلبات غير المصرح بها (${result.responseTime}ms)`,
-      recommendation: 'لا يلزم إجراء - هذا السلوك المتوقع للوظائف المحمية'
+      recommendation: 'لا يلزم إجراء - هذا السلوك المتوقع للوظائف المحمية',
     };
   }
-  
+
   const time = result.responseTime || 0;
-  
+
   // صحية - ضمن الحدود الطبيعية لنوع الوظيفة
   if (result.success && time < thresholds.healthy) {
     return {
       reason: `✓ الوظيفة تعمل بشكل ممتاز (${time}ms) - ضمن الحدود الطبيعية لوظائف ${categoryName}`,
-      recommendation: 'لا يلزم إجراء - استمر في المراقبة الدورية'
+      recommendation: 'لا يلزم إجراء - استمر في المراقبة الدورية',
     };
   }
-  
+
   // مقبولة - بطيئة قليلاً لكن ضمن الحدود
   if (result.success && time < thresholds.degraded) {
     return {
       reason: `✓ الوظيفة تعمل (${time}ms) - مقبولة لوظائف ${categoryName} (الحد: ${thresholds.degraded}ms)`,
-      recommendation: 'الأداء مقبول - قد يتحسن بعد إعادة التشغيل (cold start)'
+      recommendation: 'الأداء مقبول - قد يتحسن بعد إعادة التشغيل (cold start)',
     };
   }
-  
+
   // بطيئة جداً - تجاوزت الحدود
   if (result.success && time >= thresholds.degraded) {
     return {
       reason: `⚠ استجابة بطيئة (${time}ms) - تجاوزت الحد المتوقع لوظائف ${categoryName} (${thresholds.degraded}ms)`,
-      recommendation: 'راجع كود الوظيفة للتحسين - تحقق من استعلامات DB وAPI calls الخارجية'
+      recommendation: 'راجع كود الوظيفة للتحسين - تحقق من استعلامات DB وAPI calls الخارجية',
     };
   }
-  
+
   // معطلة
   if (!result.success) {
     const error = result.error || 'خطأ غير معروف';
-    
+
     if (error.includes('500')) {
       return {
         reason: '✗ خطأ داخلي في الخادم (500) - مشكلة في كود الوظيفة',
-        recommendation: 'راجع logs الوظيفة للعثور على الخطأ وإصلاحه'
+        recommendation: 'راجع logs الوظيفة للعثور على الخطأ وإصلاحه',
       };
     }
     if (error.includes('502') || error.includes('503')) {
       return {
         reason: '✗ الوظيفة غير متاحة (502/503) - قد تكون معطلة أو في وضع الصيانة',
-        recommendation: 'تأكد من نشر الوظيفة بشكل صحيح وأنها لا تحتوي على أخطاء syntax'
+        recommendation: 'تأكد من نشر الوظيفة بشكل صحيح وأنها لا تحتوي على أخطاء syntax',
       };
     }
     if (error.includes('timeout') || error.includes('ETIMEDOUT')) {
       return {
         reason: '✗ انتهت مهلة الاتصال - الوظيفة لا تستجيب',
-        recommendation: 'تحقق من أن الوظيفة لا تحتوي على infinite loops أو عمليات طويلة'
+        recommendation: 'تحقق من أن الوظيفة لا تحتوي على infinite loops أو عمليات طويلة',
       };
     }
     if (error.includes('network') || error.includes('fetch') || error.includes('Failed')) {
       return {
         reason: '✗ مشكلة في الاتصال بالشبكة',
-        recommendation: 'تأكد من اتصال الإنترنت وأن Supabase متاح'
+        recommendation: 'تأكد من اتصال الإنترنت وأن Supabase متاح',
       };
     }
-    
+
     return {
       reason: `✗ فشل الفحص: ${error}`,
-      recommendation: 'راجع Edge Function logs للحصول على تفاصيل الخطأ'
+      recommendation: 'راجع Edge Function logs للحصول على تفاصيل الخطأ',
     };
   }
-  
+
   return {
     reason: 'لم يتم الفحص بعد',
-    recommendation: 'اضغط على زر الفحص للتحقق من حالة الوظيفة'
+    recommendation: 'اضغط على زر الفحص للتحقق من حالة الوظيفة',
   };
 }
 
@@ -270,7 +597,7 @@ export class EdgeFunctionsHealthService {
   static async checkFunction(functionName: string): Promise<HealthCheckResult> {
     const startTime = performance.now();
     const checkedAt = new Date().toISOString();
-    const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === functionName);
+    const funcInfo = ALL_EDGE_FUNCTIONS.find((f) => f.name === functionName);
 
     try {
       // ✅ FormData functions - فحص أساسي فقط
@@ -284,9 +611,9 @@ export class EdgeFunctionsHealthService {
               body: JSON.stringify({ ping: true, healthCheck: true }),
             }
           );
-          
+
           const responseTime = Math.round(performance.now() - startTime);
-          
+
           // نقبل أي رد (حتى 400/401) كدليل على أن الوظيفة تعمل
           return {
             function: functionName,
@@ -294,7 +621,7 @@ export class EdgeFunctionsHealthService {
             responseTime,
             checkedAt,
             note: 'FormData function - basic connectivity check',
-            error: response.status >= 400 ? `HTTP ${response.status}` : undefined
+            error: response.status >= 400 ? `HTTP ${response.status}` : undefined,
           };
         } catch (err: unknown) {
           const error = err as Error;
@@ -303,18 +630,21 @@ export class EdgeFunctionsHealthService {
             success: false,
             responseTime: Math.round(performance.now() - startTime),
             checkedAt,
-            error: error.message
+            error: error.message,
           };
         }
       }
 
       // ✅ JSON Required - إرسال بيانات وهمية مع ping
-      let body: Record<string, string | boolean | Record<string, boolean>> = { ping: true, healthCheck: true };
-      
+      let body: Record<string, string | boolean | Record<string, boolean>> = {
+        ping: true,
+        healthCheck: true,
+      };
+
       if (funcInfo?.checkType === 'json-required' && funcInfo.requiredFields) {
         body = { ...body, ...generateDummyData(funcInfo.requiredFields) };
       }
-      
+
       // ✅ للوظائف المحمية - نستخدم fetch مباشرة للتحقق من 401/403
       if (funcInfo?.requiresAuth) {
         try {
@@ -326,19 +656,22 @@ export class EdgeFunctionsHealthService {
               body: JSON.stringify(body),
             }
           );
-          
+
           const responseTime = Math.round(performance.now() - startTime);
-          
+
           // ✅ 401/403 للوظائف المحمية = الوظيفة تعمل! (ترفض غير المصرحين)
           if (response.status === 401 || response.status === 403) {
-            const details = getStatusDetails({ 
-              function: functionName, 
-              success: true, 
-              responseTime, 
-              checkedAt,
-              isProtected: true 
-            }, funcInfo);
-            
+            const details = getStatusDetails(
+              {
+                function: functionName,
+                success: true,
+                responseTime,
+                checkedAt,
+                isProtected: true,
+              },
+              funcInfo
+            );
+
             return {
               function: functionName,
               success: true,
@@ -347,20 +680,23 @@ export class EdgeFunctionsHealthService {
               isProtected: true,
               note: 'protected',
               statusReason: details.reason,
-              recommendation: details.recommendation
+              recommendation: details.recommendation,
             };
           }
-          
+
           // باقي الحالات
           const success = response.status < 500;
-          const details = getStatusDetails({ 
-            function: functionName, 
-            success, 
-            responseTime, 
-            checkedAt,
-            error: success ? undefined : `HTTP ${response.status}`
-          }, funcInfo);
-          
+          const details = getStatusDetails(
+            {
+              function: functionName,
+              success,
+              responseTime,
+              checkedAt,
+              error: success ? undefined : `HTTP ${response.status}`,
+            },
+            funcInfo
+          );
+
           return {
             function: functionName,
             success,
@@ -368,19 +704,22 @@ export class EdgeFunctionsHealthService {
             checkedAt,
             error: success ? undefined : `HTTP ${response.status}`,
             statusReason: details.reason,
-            recommendation: details.recommendation
+            recommendation: details.recommendation,
           };
         } catch (err: unknown) {
           const error = err as Error;
           const responseTime = Math.round(performance.now() - startTime);
-          const details = getStatusDetails({ 
-            function: functionName, 
-            success: false, 
-            responseTime, 
-            checkedAt,
-            error: error.message
-          }, funcInfo);
-          
+          const details = getStatusDetails(
+            {
+              function: functionName,
+              success: false,
+              responseTime,
+              checkedAt,
+              error: error.message,
+            },
+            funcInfo
+          );
+
           return {
             function: functionName,
             success: false,
@@ -388,7 +727,7 @@ export class EdgeFunctionsHealthService {
             checkedAt,
             error: error.message,
             statusReason: details.reason,
-            recommendation: details.recommendation
+            recommendation: details.recommendation,
           };
         }
       }
@@ -406,14 +745,17 @@ export class EdgeFunctionsHealthService {
       );
 
       const responseTime = Math.round(performance.now() - startTime);
-      
+
       // ✅ الكشف الذكي عن الحماية الضمنية
       // إذا أرجعت الوظيفة 401/403 رغم أنها معرفة كـ "غير محمية" = محمية ضمنياً
       if (response.status === 401 || response.status === 403) {
-        productionLogger.warn(`${functionName}: marked as public but returned ${response.status} - treating as implicitly protected`, { 
-          context: 'EdgeFunctionsHealth.checkFunction',
-          severity: 'low'
-        });
+        productionLogger.warn(
+          `${functionName}: marked as public but returned ${response.status} - treating as implicitly protected`,
+          {
+            context: 'EdgeFunctionsHealth.checkFunction',
+            severity: 'low',
+          }
+        );
         return {
           function: functionName,
           success: true,
@@ -422,21 +764,24 @@ export class EdgeFunctionsHealthService {
           isProtected: true,
           note: 'implicit-protection-detected',
           statusReason: `✓ الوظيفة محمية ضمنياً (${response.status}) - تتحقق من الصلاحيات داخلياً وتعمل بشكل صحيح`,
-          recommendation: 'يُفضل تحديث requiresAuth إلى true في تعريف الوظيفة للتوافق'
+          recommendation: 'يُفضل تحديث requiresAuth إلى true في تعريف الوظيفة للتوافق',
         };
       }
-      
+
       // ✅ 400 = الوظيفة تعمل وترفض البيانات الناقصة (سلوك صحيح)
       const success = response.ok || response.status === 400;
-      
-      const details = getStatusDetails({ 
-        function: functionName, 
-        success, 
-        responseTime, 
-        checkedAt,
-        error: response.ok ? undefined : `HTTP ${response.status}`
-      }, funcInfo);
-      
+
+      const details = getStatusDetails(
+        {
+          function: functionName,
+          success,
+          responseTime,
+          checkedAt,
+          error: response.ok ? undefined : `HTTP ${response.status}`,
+        },
+        funcInfo
+      );
+
       return {
         function: functionName,
         success,
@@ -444,25 +789,28 @@ export class EdgeFunctionsHealthService {
         checkedAt,
         error: response.ok ? undefined : `HTTP ${response.status}`,
         statusReason: details.reason,
-        recommendation: details.recommendation
+        recommendation: details.recommendation,
       };
     } catch (err: unknown) {
       const error = err as Error;
       const responseTime = Math.round(performance.now() - startTime);
-      const details = getStatusDetails({ 
-        function: functionName, 
-        success: false, 
-        responseTime, 
-        checkedAt,
-        error: error.message
-      }, funcInfo);
-      
-      productionLogger.error(error, { 
-        context: 'EdgeFunctionsHealth.checkFunction', 
+      const details = getStatusDetails(
+        {
+          function: functionName,
+          success: false,
+          responseTime,
+          checkedAt,
+          error: error.message,
+        },
+        funcInfo
+      );
+
+      productionLogger.error(error, {
+        context: 'EdgeFunctionsHealth.checkFunction',
         severity: 'medium',
-        functionName 
+        functionName,
       });
-      
+
       return {
         function: functionName,
         success: false,
@@ -470,7 +818,7 @@ export class EdgeFunctionsHealthService {
         checkedAt,
         error: error.message,
         statusReason: details.reason,
-        recommendation: details.recommendation
+        recommendation: details.recommendation,
       };
     }
   }
@@ -479,9 +827,7 @@ export class EdgeFunctionsHealthService {
    * فحص صحة مجموعة من Edge Functions
    */
   static async checkMultipleFunctions(functionNames: string[]): Promise<HealthCheckResult[]> {
-    const results = await Promise.all(
-      functionNames.map(name => this.checkFunction(name))
-    );
+    const results = await Promise.all(functionNames.map((name) => this.checkFunction(name)));
     return results;
   }
 
@@ -489,24 +835,26 @@ export class EdgeFunctionsHealthService {
    * فحص جميع Edge Functions
    */
   static async checkAllFunctions(): Promise<HealthCheckResult[]> {
-    const functionNames = ALL_EDGE_FUNCTIONS.map(f => f.name);
+    const functionNames = ALL_EDGE_FUNCTIONS.map((f) => f.name);
     return this.checkMultipleFunctions(functionNames);
   }
 
   /**
    * فحص Edge Functions حسب الفئة
    */
-  static async checkByCategory(category: EdgeFunctionInfo['category']): Promise<HealthCheckResult[]> {
-    const functions = ALL_EDGE_FUNCTIONS.filter(f => f.category === category);
-    return this.checkMultipleFunctions(functions.map(f => f.name));
+  static async checkByCategory(
+    category: EdgeFunctionInfo['category']
+  ): Promise<HealthCheckResult[]> {
+    const functions = ALL_EDGE_FUNCTIONS.filter((f) => f.category === category);
+    return this.checkMultipleFunctions(functions.map((f) => f.name));
   }
 
   /**
    * فحص Edge Functions حسب نوع الفحص
    */
   static async checkByCheckType(checkType: CheckType): Promise<HealthCheckResult[]> {
-    const functions = ALL_EDGE_FUNCTIONS.filter(f => f.checkType === checkType);
-    return this.checkMultipleFunctions(functions.map(f => f.name));
+    const functions = ALL_EDGE_FUNCTIONS.filter((f) => f.checkType === checkType);
+    return this.checkMultipleFunctions(functions.map((f) => f.name));
   }
 
   /**
@@ -520,29 +868,33 @@ export class EdgeFunctionsHealthService {
     protected: number;
     avgResponseTime: number;
   } {
-    const protectedCount = results.filter(r => r.isProtected).length;
-    
+    const protectedCount = results.filter((r) => r.isProtected).length;
+
     // حساب صحية/بطيئة بناءً على حدود كل فئة
-    const healthy = results.filter(r => {
+    const healthy = results.filter((r) => {
       if (!r.success || r.isProtected) return false;
-      const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === r.function);
+      const funcInfo = ALL_EDGE_FUNCTIONS.find((f) => f.name === r.function);
       const thresholds = getThresholdsForFunction(funcInfo);
       return (r.responseTime || 0) < thresholds.degraded; // مقبولة = صحية
     }).length;
-    
-    const degraded = results.filter(r => {
+
+    const degraded = results.filter((r) => {
       if (!r.success || r.isProtected) return false;
-      const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === r.function);
+      const funcInfo = ALL_EDGE_FUNCTIONS.find((f) => f.name === r.function);
       const thresholds = getThresholdsForFunction(funcInfo);
       return (r.responseTime || 0) >= thresholds.degraded; // تجاوزت الحد = بطيئة
     }).length;
-    
-    const unhealthy = results.filter(r => !r.success).length;
-    
-    const successfulResults = results.filter(r => r.success);
-    const avgResponseTime = successfulResults.length > 0
-      ? Math.round(successfulResults.reduce((sum, r) => sum + (r.responseTime || 0), 0) / successfulResults.length)
-      : 0;
+
+    const unhealthy = results.filter((r) => !r.success).length;
+
+    const successfulResults = results.filter((r) => r.success);
+    const avgResponseTime =
+      successfulResults.length > 0
+        ? Math.round(
+            successfulResults.reduce((sum, r) => sum + (r.responseTime || 0), 0) /
+              successfulResults.length
+          )
+        : 0;
 
     return {
       total: results.length,
@@ -550,7 +902,7 @@ export class EdgeFunctionsHealthService {
       degraded,
       unhealthy,
       protected: protectedCount,
-      avgResponseTime
+      avgResponseTime,
     };
   }
 
@@ -558,10 +910,10 @@ export class EdgeFunctionsHealthService {
    * تحويل نتيجة الفحص إلى حالة صحية - مع حدود ديناميكية
    */
   static resultToHealth(result: HealthCheckResult): EdgeFunctionHealth {
-    const funcInfo = ALL_EDGE_FUNCTIONS.find(f => f.name === result.function);
+    const funcInfo = ALL_EDGE_FUNCTIONS.find((f) => f.name === result.function);
     const thresholds = getThresholdsForFunction(funcInfo);
     let status: EdgeFunctionHealth['status'] = 'unknown';
-    
+
     if (result.isProtected || result.note === 'protected') {
       // ✅ الوظيفة المحمية = تعمل بشكل صحيح!
       status = 'protected';
@@ -590,7 +942,7 @@ export class EdgeFunctionsHealthService {
       isProtected: result.isProtected,
       statusReason: result.statusReason || details.reason,
       recommendation: result.recommendation || details.recommendation,
-      categoryThreshold: thresholds
+      categoryThreshold: thresholds,
     };
   }
 
@@ -599,9 +951,9 @@ export class EdgeFunctionsHealthService {
    */
   static getFunctionsByCheckType(): Record<CheckType, EdgeFunctionInfo[]> {
     return {
-      ping: ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'ping'),
-      'json-required': ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'json-required'),
-      formdata: ALL_EDGE_FUNCTIONS.filter(f => f.checkType === 'formdata'),
+      ping: ALL_EDGE_FUNCTIONS.filter((f) => f.checkType === 'ping'),
+      'json-required': ALL_EDGE_FUNCTIONS.filter((f) => f.checkType === 'json-required'),
+      formdata: ALL_EDGE_FUNCTIONS.filter((f) => f.checkType === 'formdata'),
     };
   }
 }

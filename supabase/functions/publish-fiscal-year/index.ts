@@ -1,10 +1,10 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { 
-  handleCors, 
-  jsonResponse, 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
   errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 3 عمليات نشر/ساعة لكل مستخدم ============
@@ -15,16 +15,16 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -50,10 +50,12 @@ Deno.serve(async (req) => {
             status: 'healthy',
             function: 'publish-fiscal-year',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -65,7 +67,10 @@ Deno.serve(async (req) => {
       return unauthorizedResponse('غير مصرح');
     }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(authHeader);
     if (authError || !user) {
       return unauthorizedResponse('المستخدم غير موجود');
     }
@@ -101,7 +106,7 @@ Deno.serve(async (req) => {
         success: true,
         testMode: true,
         message: 'معرف السنة المالية غير صالح',
-        fiscalYearId
+        fiscalYearId,
       });
     }
 
@@ -177,7 +182,6 @@ Deno.serve(async (req) => {
         published_at: new Date().toISOString(),
       },
     });
-
   } catch (error: unknown) {
     console.error('[publish-fiscal-year] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';

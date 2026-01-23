@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { AccountingService } from "@/services/accounting.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { AccountingService } from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface Budget {
   id: string;
@@ -26,8 +26,8 @@ export function useBudgets(fiscalYearId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { 
-    data: budgets = [], 
+  const {
+    data: budgets = [],
     isLoading,
     error,
     refetch,
@@ -37,13 +37,17 @@ export function useBudgets(fiscalYearId?: string) {
   });
 
   const addBudget = useMutation({
-    mutationFn: (budget: Omit<Budget, "id" | "created_at" | "updated_at" | "actual_amount" | "variance_amount" | "accounts">) => 
-      AccountingService.createBudget(budget),
+    mutationFn: (
+      budget: Omit<
+        Budget,
+        'id' | 'created_at' | 'updated_at' | 'actual_amount' | 'variance_amount' | 'accounts'
+      >
+    ) => AccountingService.createBudget(budget),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة الميزانية بنجاح",
+        title: 'تمت الإضافة بنجاح',
+        description: 'تم إضافة الميزانية بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -53,13 +57,13 @@ export function useBudgets(fiscalYearId?: string) {
   });
 
   const updateBudget = useMutation({
-    mutationFn: ({ id, ...updates }: Partial<Budget> & { id: string }) => 
+    mutationFn: ({ id, ...updates }: Partial<Budget> & { id: string }) =>
       AccountingService.updateBudget(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث الميزانية بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث الميزانية بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -73,8 +77,8 @@ export function useBudgets(fiscalYearId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف الميزانية بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف الميزانية بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -88,8 +92,8 @@ export function useBudgets(fiscalYearId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
-        title: "تم الحساب بنجاح",
-        description: "تم حساب الانحرافات بنجاح",
+        title: 'تم الحساب بنجاح',
+        description: 'تم حساب الانحرافات بنجاح',
       });
     },
     onError: createMutationErrorHandler({

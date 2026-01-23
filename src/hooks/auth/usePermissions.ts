@@ -2,11 +2,11 @@
  * usePermissions Hook - صلاحيات المستخدم
  * يستخدم UserService + RealtimeService
  */
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
-import { UserService, RealtimeService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
+import { UserService, RealtimeService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface Permission {
   id: string;
@@ -24,14 +24,19 @@ interface RolePermissionResult {
 export function usePermissions() {
   const { user } = useAuth();
 
-  const { data: permissions = [], isLoading, isFetching, refetch } = useQuery({
+  const {
+    data: permissions = [],
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.USER_PERMISSIONS(user?.id),
     queryFn: async () => {
       if (!user) return [];
 
       const result = await UserService.getUserPermissions(user.id);
       if (Array.isArray(result)) return [];
-      
+
       const { rolePermissions, userPermissions } = result;
       const permissionsMap = new Map<string, Permission>();
 
@@ -75,14 +80,27 @@ export function usePermissions() {
       () => refetch()
     );
 
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [user?.id, refetch]);
 
-  const permissionNames = permissions.map(p => p.name);
+  const permissionNames = permissions.map((p) => p.name);
   const hasPermission = (permission: string): boolean => permissionNames.includes(permission);
-  const hasAnyPermission = (perms: string[]): boolean => perms.some(p => permissionNames.includes(p));
-  const hasAllPermissions = (perms: string[]): boolean => perms.every(p => permissionNames.includes(p));
-  const getPermissionsByCategory = (category: string): Permission[] => permissions.filter(p => p.category === category);
+  const hasAnyPermission = (perms: string[]): boolean =>
+    perms.some((p) => permissionNames.includes(p));
+  const hasAllPermissions = (perms: string[]): boolean =>
+    perms.every((p) => permissionNames.includes(p));
+  const getPermissionsByCategory = (category: string): Permission[] =>
+    permissions.filter((p) => p.category === category);
 
-  return { permissions, permissionNames, hasPermission, hasAnyPermission, hasAllPermissions, getPermissionsByCategory, isLoading: isLoading || (!!user && isFetching) };
+  return {
+    permissions,
+    permissionNames,
+    hasPermission,
+    hasAnyPermission,
+    hasAllPermissions,
+    getPermissionsByCategory,
+    isLoading: isLoading || (!!user && isFetching),
+  };
 }

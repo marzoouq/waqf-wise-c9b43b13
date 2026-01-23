@@ -1,7 +1,7 @@
-import { useCallback } from "react";
-import { toast } from "sonner";
-import { Database } from "@/integrations/supabase/types";
-import { logger } from "@/lib/logger";
+import { useCallback } from 'react';
+import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
+import { logger } from '@/lib/logger';
 
 type AnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
@@ -17,20 +17,20 @@ export interface ExcelExportOptions {
 export function useExportToExcel() {
   const exportToExcel = useCallback(async (options: ExcelExportOptions) => {
     try {
-      const { exportToExcelMultiSheet } = await import("@/lib/excel-helper");
-      
+      const { exportToExcelMultiSheet } = await import('@/lib/excel-helper');
+
       await exportToExcelMultiSheet(options.sheets, options.filename);
 
-      toast.success("تم التصدير بنجاح", {
+      toast.success('تم التصدير بنجاح', {
         description: `تم تصدير البيانات إلى ${options.filename}`,
       });
     } catch (error) {
-      logger.error(error, { 
-        context: 'export_to_excel', 
-        severity: 'low'
+      logger.error(error, {
+        context: 'export_to_excel',
+        severity: 'low',
       });
-      toast.error("فشل التصدير", {
-        description: "حدث خطأ أثناء تصدير البيانات إلى Excel",
+      toast.error('فشل التصدير', {
+        description: 'حدث خطأ أثناء تصدير البيانات إلى Excel',
       });
     }
   }, []);
@@ -57,17 +57,17 @@ export function formatDisclosureForExcel(disclosure: AnnualDisclosure) {
     'عدد البنات': disclosure.daughters_count || 0,
     'عدد الزوجات': disclosure.wives_count || 0,
     'تاريخ الإفصاح': disclosure.disclosure_date,
-    'الحالة': disclosure.status,
+    الحالة: disclosure.status,
   };
 }
 
 // دالة مساعدة لتنسيق بيانات المستفيدين في الإفصاح
 export function formatDisclosureBeneficiariesForExcel(beneficiaries: DisclosureBeneficiary[]) {
-  return beneficiaries.map(b => ({
+  return beneficiaries.map((b) => ({
     'اسم المستفيد': b.beneficiary_name || '',
-    'النوع': b.beneficiary_type || '',
+    النوع: b.beneficiary_type || '',
     'المبلغ المخصص': b.allocated_amount?.toLocaleString() || '0',
     'عدد المدفوعات': b.payments_count || 0,
-    'العلاقة': b.relationship || '',
+    العلاقة: b.relationship || '',
   }));
 }

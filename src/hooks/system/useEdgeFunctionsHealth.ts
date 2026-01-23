@@ -3,12 +3,12 @@
  */
 
 import { useState, useCallback } from 'react';
-import { 
-  EdgeFunctionsHealthService, 
+import {
+  EdgeFunctionsHealthService,
   ALL_EDGE_FUNCTIONS,
   type EdgeFunctionHealth,
   type HealthCheckResult,
-  type EdgeFunctionInfo
+  type EdgeFunctionInfo,
 } from '@/services/edge-functions-health.service';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 
@@ -22,28 +22,28 @@ export function useEdgeFunctionsHealth() {
 
   // تصنيف الـ functions حسب الفئة
   const functionsByCategory = {
-    ai: functions.filter(f => f.category === 'ai'),
-    database: functions.filter(f => f.category === 'database'),
-    notification: functions.filter(f => f.category === 'notification'),
-    backup: functions.filter(f => f.category === 'backup'),
-    security: functions.filter(f => f.category === 'security'),
-    utility: functions.filter(f => f.category === 'utility'),
+    ai: functions.filter((f) => f.category === 'ai'),
+    database: functions.filter((f) => f.category === 'database'),
+    notification: functions.filter((f) => f.category === 'notification'),
+    backup: functions.filter((f) => f.category === 'backup'),
+    security: functions.filter((f) => f.category === 'security'),
+    utility: functions.filter((f) => f.category === 'utility'),
   };
 
   // تصنيف الـ functions حسب نوع الفحص
   const functionsByCheckType = {
-    ping: functions.filter(f => f.checkType === 'ping'),
-    'json-required': functions.filter(f => f.checkType === 'json-required'),
-    formdata: functions.filter(f => f.checkType === 'formdata'),
+    ping: functions.filter((f) => f.checkType === 'ping'),
+    'json-required': functions.filter((f) => f.checkType === 'json-required'),
+    formdata: functions.filter((f) => f.checkType === 'formdata'),
   };
 
   // فحص function واحدة
   const checkSingleFunction = useCallback(async (functionName: string) => {
     try {
       const result = await EdgeFunctionsHealthService.checkFunction(functionName);
-      
-      setLastResults(prev => {
-        const existing = prev.findIndex(r => r.function === functionName);
+
+      setLastResults((prev) => {
+        const existing = prev.findIndex((r) => r.function === functionName);
         if (existing >= 0) {
           const updated = [...prev];
           updated[existing] = result;
@@ -61,7 +61,7 @@ export function useEdgeFunctionsHealth() {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (_error: unknown) {
       toastError(`خطأ في فحص ${functionName}`);
       return null;
     }
@@ -85,11 +85,13 @@ export function useEdgeFunctionsHealth() {
     setIsChecking(false);
 
     const summary = EdgeFunctionsHealthService.calculateHealthSummary(results);
-    
+
     if (summary.unhealthy > 0) {
       toastError(`${summary.unhealthy} وظائف غير متاحة من ${summary.total}`);
     } else if (summary.degraded > 0) {
-      toastSuccess(`${summary.healthy} صحية، ${summary.protected} محمية، ${summary.degraded} بطيئة`);
+      toastSuccess(
+        `${summary.healthy} صحية، ${summary.protected} محمية، ${summary.degraded} بطيئة`
+      );
     } else {
       toastSuccess(`${summary.healthy} صحية، ${summary.protected} محمية - الكل يعمل ✓`);
     }
@@ -99,28 +101,34 @@ export function useEdgeFunctionsHealth() {
 
   // فحص جميع الـ functions
   const checkAllFunctions = useCallback(async () => {
-    const allNames = functions.map(f => f.name);
+    const allNames = functions.map((f) => f.name);
     return checkMultipleFunctions(allNames);
   }, [functions, checkMultipleFunctions]);
 
   // فحص فئة معينة
-  const checkCategory = useCallback(async (category: EdgeFunctionInfo['category']) => {
-    const categoryFunctions = functions.filter(f => f.category === category);
-    return checkMultipleFunctions(categoryFunctions.map(f => f.name));
-  }, [functions, checkMultipleFunctions]);
+  const checkCategory = useCallback(
+    async (category: EdgeFunctionInfo['category']) => {
+      const categoryFunctions = functions.filter((f) => f.category === category);
+      return checkMultipleFunctions(categoryFunctions.map((f) => f.name));
+    },
+    [functions, checkMultipleFunctions]
+  );
 
   // الحصول على حالة function معينة
-  const getFunctionHealth = useCallback((functionName: string): EdgeFunctionHealth | null => {
-    const result = lastResults.find(r => r.function === functionName);
-    if (!result) return null;
-    return EdgeFunctionsHealthService.resultToHealth(result);
-  }, [lastResults]);
+  const getFunctionHealth = useCallback(
+    (functionName: string): EdgeFunctionHealth | null => {
+      const result = lastResults.find((r) => r.function === functionName);
+      if (!result) return null;
+      return EdgeFunctionsHealthService.resultToHealth(result);
+    },
+    [lastResults]
+  );
 
   // الحصول على ملخص الصحة
   const healthSummary = EdgeFunctionsHealthService.calculateHealthSummary(lastResults);
 
   // تحويل النتائج إلى حالات صحية
-  const healthStatuses: EdgeFunctionHealth[] = lastResults.map(r => 
+  const healthStatuses: EdgeFunctionHealth[] = lastResults.map((r) =>
     EdgeFunctionsHealthService.resultToHealth(r)
   );
 
@@ -132,11 +140,11 @@ export function useEdgeFunctionsHealth() {
     lastResults,
     healthStatuses,
     healthSummary,
-    
+
     // الحالة
     isChecking,
     checkProgress,
-    
+
     // الإجراءات
     checkSingleFunction,
     checkMultipleFunctions,

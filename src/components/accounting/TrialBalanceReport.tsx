@@ -1,15 +1,22 @@
-import { useFinancialReports } from "@/hooks/accounting/useFinancialReports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Download, Printer, Scale, FileText } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
-import { TrialBalanceRow } from "@/types/supabase-helpers";
-import { EmptyAccountingState } from "./EmptyAccountingState";
-import { LoadingState } from "@/components/shared/LoadingState";
+import { useFinancialReports } from '@/hooks/accounting/useFinancialReports';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Download, Printer, Scale, FileText } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
+import { TrialBalanceRow } from '@/types/supabase-helpers';
+import { EmptyAccountingState } from './EmptyAccountingState';
+import { LoadingState } from '@/components/shared/LoadingState';
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
@@ -30,40 +37,44 @@ export function TrialBalanceReport() {
   };
 
   const handleExportExcel = async () => {
-    const { exportToExcel } = await import("@/lib/excel-helper");
-    
-    const exportData = trialBalance.map(acc => ({
+    const { exportToExcel } = await import('@/lib/excel-helper');
+
+    const exportData = trialBalance.map((acc) => ({
       'رمز الحساب': acc.code,
       'اسم الحساب': acc.name,
-      'مدين': acc.debit > 0 ? acc.debit.toFixed(2) : '0.00',
-      'دائن': acc.credit > 0 ? acc.credit.toFixed(2) : '0.00',
-      'الرصيد': acc.balance.toFixed(2),
+      مدين: acc.debit > 0 ? acc.debit.toFixed(2) : '0.00',
+      دائن: acc.credit > 0 ? acc.credit.toFixed(2) : '0.00',
+      الرصيد: acc.balance.toFixed(2),
     }));
 
     // Add total row
     exportData.push({
       'رمز الحساب': '',
       'اسم الحساب': 'الإجمالي',
-      'مدين': totalDebit.toFixed(2),
-      'دائن': totalCredit.toFixed(2),
-      'الرصيد': difference < 0.01 ? 'متوازن' : `فرق: ${difference.toFixed(2)}`,
+      مدين: totalDebit.toFixed(2),
+      دائن: totalCredit.toFixed(2),
+      الرصيد: difference < 0.01 ? 'متوازن' : `فرق: ${difference.toFixed(2)}`,
     });
 
-    await exportToExcel(exportData, `trial-balance-${format(new Date(), "yyyyMMdd")}`, "ميزان المراجعة");
+    await exportToExcel(
+      exportData,
+      `trial-balance-${format(new Date(), 'yyyyMMdd')}`,
+      'ميزان المراجعة'
+    );
   };
 
   const handleExportPDF = async () => {
-    const { exportToPDF } = await import("@/lib/exportHelpers");
-    
+    const { exportToPDF } = await import('@/lib/exportHelpers');
+
     const headers = ['رمز الحساب', 'اسم الحساب', 'مدين', 'دائن', 'الرصيد'];
-    const data = trialBalance.map(acc => [
+    const data = trialBalance.map((acc) => [
       acc.code,
       acc.name,
       acc.debit > 0 ? formatNumber(acc.debit) : '-',
       acc.credit > 0 ? formatNumber(acc.credit) : '-',
       formatNumber(acc.balance),
     ]);
-    
+
     // Add total row
     data.push([
       '',
@@ -74,17 +85,16 @@ export function TrialBalanceReport() {
     ]);
 
     await exportToPDF(
-      `ميزان المراجعة - ${format(new Date(), "dd/MM/yyyy")}`,
+      `ميزان المراجعة - ${format(new Date(), 'dd/MM/yyyy')}`,
       headers,
       data,
-      `trial-balance-${format(new Date(), "yyyyMMdd")}`
+      `trial-balance-${format(new Date(), 'yyyyMMdd')}`
     );
   };
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل ميزان المراجعة..." />;
   }
-
 
   if (trialBalance.length === 0) {
     return (
@@ -103,21 +113,36 @@ export function TrialBalanceReport() {
           <div>
             <CardTitle className="text-xl sm:text-2xl">ميزان المراجعة</CardTitle>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              التاريخ: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
+              التاريخ: {format(new Date(), 'dd MMMM yyyy', { locale: ar })}
             </p>
           </div>
           <div className="flex gap-2 print:hidden flex-wrap w-full sm:w-auto">
-            <Button variant="outline" size="sm" onClick={handlePrint} className="flex-1 sm:flex-none">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrint}
+              className="flex-1 sm:flex-none"
+            >
               <Printer className="ms-2 h-4 w-4" />
               <span className="hidden sm:inline">طباعة</span>
               <span className="sm:hidden">طباعة</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportPDF} className="flex-1 sm:flex-none">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPDF}
+              className="flex-1 sm:flex-none"
+            >
               <FileText className="ms-2 h-4 w-4" />
               <span className="hidden sm:inline">تصدير PDF</span>
               <span className="sm:hidden">PDF</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportExcel} className="flex-1 sm:flex-none">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportExcel}
+              className="flex-1 sm:flex-none"
+            >
               <Download className="ms-2 h-4 w-4" />
               <span className="hidden sm:inline">تصدير Excel</span>
               <span className="sm:hidden">Excel</span>
@@ -131,11 +156,21 @@ export function TrialBalanceReport() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رمز الحساب</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">اسم الحساب</TableHead>
-                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">مدين</TableHead>
-                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">دائن</TableHead>
-                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">الرصيد</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">
+                  رمز الحساب
+                </TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">
+                  اسم الحساب
+                </TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">
+                  مدين
+                </TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">
+                  دائن
+                </TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">
+                  الرصيد
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,24 +179,38 @@ export function TrialBalanceReport() {
                   <TableCell className="font-mono text-xs sm:text-sm">{account.code}</TableCell>
                   <TableCell className="text-xs sm:text-sm">{account.name}</TableCell>
                   <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
-                    {account.debit > 0 ? formatNumber(account.debit) : "-"}
+                    {account.debit > 0 ? formatNumber(account.debit) : '-'}
                   </TableCell>
                   <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
-                    {account.credit > 0 ? formatNumber(account.credit) : "-"}
+                    {account.credit > 0 ? formatNumber(account.credit) : '-'}
                   </TableCell>
                   <TableCell className="text-left font-mono font-semibold text-xs sm:text-sm whitespace-nowrap">
-                    <span className={account.balance > 0 ? "text-success" : account.balance < 0 ? "text-destructive" : ""}>
+                    <span
+                      className={
+                        account.balance > 0
+                          ? 'text-success'
+                          : account.balance < 0
+                            ? 'text-destructive'
+                            : ''
+                      }
+                    >
                       {formatNumber(account.balance)}
                     </span>
                   </TableCell>
                 </TableRow>
               ))}
-              
+
               {/* Total Row */}
               <TableRow className="bg-primary/10 font-bold">
-                <TableCell colSpan={2} className="text-right text-xs sm:text-sm">الإجمالي</TableCell>
-                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">{formatNumber(totalDebit)}</TableCell>
-                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">{formatNumber(totalCredit)}</TableCell>
+                <TableCell colSpan={2} className="text-right text-xs sm:text-sm">
+                  الإجمالي
+                </TableCell>
+                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
+                  {formatNumber(totalDebit)}
+                </TableCell>
+                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
+                  {formatNumber(totalCredit)}
+                </TableCell>
                 <TableCell className="text-left font-mono text-xs sm:text-sm">
                   {difference < 0.01 ? (
                     <Badge variant="default" className="gap-1 text-xs">

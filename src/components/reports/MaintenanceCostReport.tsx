@@ -2,15 +2,39 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Wrench, CheckCircle, Clock, DollarSign } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/ui/use-toast';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { useMaintenanceCostReport } from '@/hooks/reports/useMaintenanceCostReport';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))'];
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--status-success))',
+  'hsl(var(--status-warning))',
+  'hsl(var(--status-error))',
+];
 
 export function MaintenanceCostReport() {
   const { toast } = useToast();
@@ -21,17 +45,23 @@ export function MaintenanceCostReport() {
     if (!maintenanceData) return;
 
     const { exportToPDF } = await import('@/lib/exportHelpers');
-    const headers = ['العقار', 'التكلفة الإجمالية', 'العمليات المكتملة', 'العمليات المعلقة', 'متوسط التكلفة'];
-    const data = maintenanceData.map(m => [
+    const headers = [
+      'العقار',
+      'التكلفة الإجمالية',
+      'العمليات المكتملة',
+      'العمليات المعلقة',
+      'متوسط التكلفة',
+    ];
+    const data = maintenanceData.map((m) => [
       m.property_name,
       `${m.total_cost.toLocaleString('ar-SA')} ريال`,
       m.completed_count,
       m.pending_count,
-      `${m.avg_cost.toLocaleString('ar-SA')} ريال`
+      `${m.avg_cost.toLocaleString('ar-SA')} ريال`,
     ]);
 
     exportToPDF('تقرير تكاليف الصيانة', headers, data, 'maintenance_cost');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تقرير تكاليف الصيانة بنجاح',
@@ -43,16 +73,16 @@ export function MaintenanceCostReport() {
     if (!maintenanceData) return;
 
     const { exportToExcel } = await import('@/lib/exportHelpers');
-    const data = maintenanceData.map(m => ({
-      'العقار': m.property_name,
+    const data = maintenanceData.map((m) => ({
+      العقار: m.property_name,
       'التكلفة الإجمالية': m.total_cost,
       'العمليات المكتملة': m.completed_count,
       'العمليات المعلقة': m.pending_count,
-      'متوسط التكلفة': m.avg_cost
+      'متوسط التكلفة': m.avg_cost,
     }));
 
     exportToExcel(data, 'maintenance_cost', 'تكاليف الصيانة');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تقرير تكاليف الصيانة بنجاح',
@@ -62,7 +92,6 @@ export function MaintenanceCostReport() {
   if (isLoading) {
     return <LoadingState message="جاري تحليل تكاليف الصيانة..." />;
   }
-
 
   return (
     <div className="space-y-6">
@@ -162,16 +191,22 @@ export function MaintenanceCostReport() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xs sm:text-sm">العقار</TableHead>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">التكلفة الإجمالية</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">
+                    التكلفة الإجمالية
+                  </TableHead>
                   <TableHead className="text-xs sm:text-sm hidden md:table-cell">المكتمل</TableHead>
                   <TableHead className="text-xs sm:text-sm hidden md:table-cell">المعلق</TableHead>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">متوسط التكلفة</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
+                    متوسط التكلفة
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {maintenanceData?.map((maintenance) => (
                   <TableRow key={maintenance.property_id}>
-                    <TableCell className="font-medium text-xs sm:text-sm">{maintenance.property_name}</TableCell>
+                    <TableCell className="font-medium text-xs sm:text-sm">
+                      {maintenance.property_name}
+                    </TableCell>
                     <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">
                       {maintenance.total_cost.toLocaleString('ar-SA')} ريال
                     </TableCell>

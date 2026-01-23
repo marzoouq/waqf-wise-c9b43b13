@@ -1,17 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { AlertCircle, Mail, Phone, DollarSign } from "lucide-react";
-import { differenceInDays, format, arLocale as ar } from "@/lib/date";
-import { useToast } from "@/hooks/ui/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { AlertCircle, Mail, Phone, DollarSign } from 'lucide-react';
+import { differenceInDays, format, arLocale as ar } from '@/lib/date';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface RentalPayment {
   id: string;
@@ -35,25 +35,27 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
   const today = new Date();
 
   // حساب المتأخرات
-  const overduePayments = payments.filter((payment) => {
-    const dueDate = new Date(payment.due_date);
-    return payment.status === 'متأخر' && differenceInDays(today, dueDate) > 0;
-  }).sort((a, b) => {
-    const daysA = differenceInDays(today, new Date(a.due_date));
-    const daysB = differenceInDays(today, new Date(b.due_date));
-    return daysB - daysA; // الأقدم أولاً
-  });
+  const overduePayments = payments
+    .filter((payment) => {
+      const dueDate = new Date(payment.due_date);
+      return payment.status === 'متأخر' && differenceInDays(today, dueDate) > 0;
+    })
+    .sort((a, b) => {
+      const daysA = differenceInDays(today, new Date(a.due_date));
+      const daysB = differenceInDays(today, new Date(b.due_date));
+      return daysB - daysA; // الأقدم أولاً
+    });
 
   const totalArrears = overduePayments.reduce((sum, payment) => {
     const remaining = payment.amount_due - (payment.amount_paid || 0);
     return sum + remaining;
   }, 0);
 
-  const uniqueTenants = new Set(overduePayments.map(p => p.tenant_name)).size;
+  const uniqueTenants = new Set(overduePayments.map((p) => p.tenant_name)).size;
 
   const handleSendReminder = (payment: RentalPayment, method: 'email' | 'sms') => {
     toast({
-      title: "تم إرسال التذكير",
+      title: 'تم إرسال التذكير',
       description: `تم إرسال تذكير ${method === 'email' ? 'بريد إلكتروني' : 'رسالة نصية'} إلى ${payment.tenant_name}`,
     });
   };
@@ -63,10 +65,10 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
   };
 
   const getOverdueSeverity = (days: number) => {
-    if (days > 90) return { label: "حرج جداً", color: "destructive" };
-    if (days > 60) return { label: "حرج", color: "destructive" };
-    if (days > 30) return { label: "تحذير", color: "warning" };
-    return { label: "تأخر بسيط", color: "secondary" };
+    if (days > 90) return { label: 'حرج جداً', color: 'destructive' };
+    if (days > 60) return { label: 'حرج', color: 'destructive' };
+    if (days > 30) return { label: 'تحذير', color: 'warning' };
+    return { label: 'تأخر بسيط', color: 'secondary' };
   };
 
   if (overduePayments.length === 0) {
@@ -78,9 +80,7 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
               <DollarSign className="h-6 w-6 text-success" />
             </div>
             <h3 className="font-semibold text-lg">لا توجد متأخرات!</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              جميع الدفعات مسددة في موعدها
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">جميع الدفعات مسددة في موعدها</p>
           </div>
         </CardContent>
       </Card>
@@ -167,7 +167,7 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
                   return (
                     <TableRow key={payment.id}>
                       <TableCell className="font-medium">
-                        {payment.contract_number || "---"}
+                        {payment.contract_number || '---'}
                       </TableCell>
                       <TableCell>
                         <div>
@@ -178,11 +178,11 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {format(new Date(payment.due_date), "dd MMM yyyy", { locale: ar })}
+                        {format(new Date(payment.due_date), 'dd MMM yyyy', { locale: ar })}
                       </TableCell>
                       <TableCell>
-                        <Badge 
-                          variant={severity.color === "destructive" ? "destructive" : "secondary"}
+                        <Badge
+                          variant={severity.color === 'destructive' ? 'destructive' : 'secondary'}
                           className="gap-1"
                         >
                           <AlertCircle className="h-3 w-3" />
@@ -193,7 +193,10 @@ export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
                         {remainingAmount.toLocaleString('ar-SA')} ريال
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                        <Badge
+                          variant="outline"
+                          className="bg-destructive/10 text-destructive border-destructive/20"
+                        >
                           {severity.label}
                         </Badge>
                       </TableCell>

@@ -81,4 +81,4 @@ export const DB_SETTING_KEYS = [
   'error_tracker_circuit_breaker_timeout',
 ] as const;
 
-export type DBSettingKey = typeof DB_SETTING_KEYS[number];
+export type DBSettingKey = (typeof DB_SETTING_KEYS)[number];

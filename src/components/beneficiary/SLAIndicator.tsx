@@ -1,6 +1,6 @@
-import { Clock, AlertCircle, CheckCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface SLAIndicatorProps {
   slaDueAt?: string | null;
@@ -9,12 +9,7 @@ interface SLAIndicatorProps {
   showLabel?: boolean;
 }
 
-export function SLAIndicator({
-  slaDueAt,
-  status,
-  className,
-  showLabel = true,
-}: SLAIndicatorProps) {
+export function SLAIndicator({ slaDueAt, status, className, showLabel = true }: SLAIndicatorProps) {
   if (!slaDueAt) return null;
 
   const now = new Date();
@@ -24,14 +19,14 @@ export function SLAIndicator({
   const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
   // If completed, show success
-  if (status === "معتمد" || status === "مكتمل" || status === "مرفوض") {
+  if (status === 'معتمد' || status === 'مكتمل' || status === 'مرفوض') {
     return showLabel ? (
-      <Badge variant="outline" className={cn("gap-1 text-success", className)}>
+      <Badge variant="outline" className={cn('gap-1 text-success', className)}>
         <CheckCircle className="h-3 w-3" />
         <span>مكتمل</span>
       </Badge>
     ) : (
-      <CheckCircle className={cn("h-4 w-4 text-success", className)} />
+      <CheckCircle className={cn('h-4 w-4 text-success', className)} />
     );
   }
 
@@ -39,45 +34,36 @@ export function SLAIndicator({
   if (diffMs < 0) {
     const hoursOverdue = Math.abs(diffHours);
     return showLabel ? (
-      <Badge variant="destructive" className={cn("gap-1", className)}>
+      <Badge variant="destructive" className={cn('gap-1', className)}>
         <AlertCircle className="h-3 w-3" />
         <span>متأخر {hoursOverdue} ساعة</span>
       </Badge>
     ) : (
-      <AlertCircle className={cn("h-4 w-4 text-destructive", className)} />
+      <AlertCircle className={cn('h-4 w-4 text-destructive', className)} />
     );
   }
 
   // Less than 6 hours remaining (yellow/warning)
   if (diffHours < 6) {
     return showLabel ? (
-      <Badge
-        variant="outline"
-        className={cn("gap-1 border-warning text-warning", className)}
-      >
+      <Badge variant="outline" className={cn('gap-1 border-warning text-warning', className)}>
         <Clock className="h-3 w-3" />
         <span>
-          {diffHours > 0
-            ? `${diffHours} ساعة ${diffMinutes} دقيقة`
-            : `${diffMinutes} دقيقة`}
+          {diffHours > 0 ? `${diffHours} ساعة ${diffMinutes} دقيقة` : `${diffMinutes} دقيقة`}
         </span>
       </Badge>
     ) : (
-      <Clock className={cn("h-4 w-4 text-warning", className)} />
+      <Clock className={cn('h-4 w-4 text-warning', className)} />
     );
   }
 
   // More than 6 hours remaining (green)
   return showLabel ? (
-    <Badge variant="outline" className={cn("gap-1 text-success", className)}>
+    <Badge variant="outline" className={cn('gap-1 text-success', className)}>
       <Clock className="h-3 w-3" />
-      <span>
-        {diffHours > 24
-          ? `${Math.floor(diffHours / 24)} يوم`
-          : `${diffHours} ساعة`}
-      </span>
+      <span>{diffHours > 24 ? `${Math.floor(diffHours / 24)} يوم` : `${diffHours} ساعة`}</span>
     </Badge>
   ) : (
-    <Clock className={cn("h-4 w-4 text-success", className)} />
+    <Clock className={cn('h-4 w-4 text-success', className)} />
   );
 }

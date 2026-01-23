@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { useAccountDistribution } from "@/hooks/dashboard/useAccountDistribution";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useAccountDistribution } from '@/hooks/dashboard/useAccountDistribution';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -38,49 +38,68 @@ const AccountDistributionChart = () => {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل توزيع الحسابات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل توزيع الحسابات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
     <Card className="shadow-soft">
       <CardHeader className="pb-2 sm:pb-4">
-        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">توزيع الحسابات حسب النوع</CardTitle>
+        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">
+          توزيع الحسابات حسب النوع
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div style={{ width: '100%', minHeight: chartHeight }}>
           <ResponsiveContainer width="100%" height={chartHeight}>
             <PieChart>
-            <Pie
-              data={data as { name: string; value: number; count: number; [key: string]: string | number }[] || []}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={!isMobile ? (props) => {
-                const name = props.name || '';
-                const percent = props.percent || 0;
-                return `${name} ${(percent * 100).toFixed(0)}%`;
-              } : false}
-              outerRadius={outerRadius}
-              fill={DEFAULT_FILL}
-              dataKey="value"
-            >
-              {(data || []).map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-                direction: 'rtl',
-              }}
-              formatter={(value: number, name: string) => [`${value} حساب`, name]}
-            />
-              <Legend 
-              wrapperStyle={{ direction: 'rtl', paddingTop: '10px' }}
-              formatter={(value) => value}
-            />
+              <Pie
+                data={
+                  (data as {
+                    name: string;
+                    value: number;
+                    count: number;
+                    [key: string]: string | number;
+                  }[]) || []
+                }
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={
+                  !isMobile
+                    ? (props) => {
+                        const name = props.name || '';
+                        const percent = props.percent || 0;
+                        return `${name} ${(percent * 100).toFixed(0)}%`;
+                      }
+                    : false
+                }
+                outerRadius={outerRadius}
+                fill={DEFAULT_FILL}
+                dataKey="value"
+              >
+                {(data || []).map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  direction: 'rtl',
+                }}
+                formatter={(value: number, name: string) => [`${value} حساب`, name]}
+              />
+              <Legend
+                wrapperStyle={{ direction: 'rtl', paddingTop: '10px' }}
+                formatter={(value) => value}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>

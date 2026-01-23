@@ -1,18 +1,21 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Shield, Search, Save, RotateCcw, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { Shield, Search, Save, RotateCcw, CheckCircle } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -20,18 +23,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { type AppRole, ROLE_LABELS } from "@/types/roles";
-import { usePermissionsManagement } from "@/hooks/users/usePermissionsManagement";
+} from '@/components/ui/table';
+import { type AppRole, ROLE_LABELS } from '@/types/roles';
+import { usePermissionsManagement } from '@/hooks/users/usePermissionsManagement';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  funds: "المصارف",
-  accounting: "المحاسبة",
-  beneficiaries: "المستفيدين",
-  properties: "العقارات",
-  archive: "الأرشيف",
-  reports: "التقارير",
-  admin: "الإدارة",
+  funds: 'المصارف',
+  accounting: 'المحاسبة',
+  beneficiaries: 'المستفيدين',
+  properties: 'العقارات',
+  archive: 'الأرشيف',
+  reports: 'التقارير',
+  admin: 'الإدارة',
 };
 
 const PermissionsManagement = () => {
@@ -106,11 +109,7 @@ const PermissionsManagement = () => {
 
             {hasModifications && (
               <div className="flex gap-2 mt-4 pt-4 border-t">
-                <Button
-                  onClick={saveAllModifications}
-                  disabled={isSaving}
-                  className="gap-2"
-                >
+                <Button onClick={saveAllModifications} disabled={isSaving} className="gap-2">
                   <Save className="h-4 w-4" />
                   حفظ التغييرات ({modifications.size})
                 </Button>
@@ -132,9 +131,7 @@ const PermissionsManagement = () => {
                   {CATEGORY_LABELS[category] || category}
                   <Badge variant="outline">{permissions.length}</Badge>
                 </CardTitle>
-                <CardDescription>
-                  الصلاحيات المتعلقة بـ{CATEGORY_LABELS[category]}
-                </CardDescription>
+                <CardDescription>الصلاحيات المتعلقة بـ{CATEGORY_LABELS[category]}</CardDescription>
               </CardHeader>
               <CardContent>
                 {/* Mobile Card View */}
@@ -148,8 +145,8 @@ const PermissionsManagement = () => {
                       const isGranted = isPermissionGranted(perm.id);
                       const isModified = modifications.has(perm.id);
                       return (
-                        <div 
-                          key={perm.id} 
+                        <div
+                          key={perm.id}
                           className={`p-4 rounded-lg border ${isModified ? 'bg-muted/50 border-primary/30' : 'border-border/50'}`}
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -157,10 +154,14 @@ const PermissionsManagement = () => {
                               <p className="font-mono text-xs truncate">
                                 {perm.name}
                                 {isModified && (
-                                  <Badge variant="outline" className="me-2 text-[10px]">معدل</Badge>
+                                  <Badge variant="outline" className="me-2 text-[10px]">
+                                    معدل
+                                  </Badge>
                                 )}
                               </p>
-                              <p className="text-xs text-muted-foreground mt-1">{perm.description || "-"}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {perm.description || '-'}
+                              </p>
                             </div>
                             <div className="flex items-center gap-2">
                               <Switch
@@ -205,7 +206,7 @@ const PermissionsManagement = () => {
                           const isModified = modifications.has(perm.id);
 
                           return (
-                            <TableRow key={perm.id} className={isModified ? "bg-muted/50" : ""}>
+                            <TableRow key={perm.id} className={isModified ? 'bg-muted/50' : ''}>
                               <TableCell className="font-mono text-xs">
                                 {perm.name}
                                 {isModified && (
@@ -215,7 +216,7 @@ const PermissionsManagement = () => {
                                 )}
                               </TableCell>
                               <TableCell className="text-sm text-muted-foreground">
-                                {perm.description || "-"}
+                                {perm.description || '-'}
                               </TableCell>
                               <TableCell className="text-center">
                                 <div className="flex items-center justify-center gap-2">

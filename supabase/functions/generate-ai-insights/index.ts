@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ الأدوار المسموح لها بالتحليل الذكي ============
@@ -13,24 +13,24 @@ const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 
 // ============ Rate Limiting Configuration ============
 const RATE_LIMIT = {
-  maxRequests: 10,    // 10 تحليلات
-  windowMs: 3600000   // في الساعة
+  maxRequests: 10, // 10 تحليلات
+  windowMs: 3600000, // في الساعة
 };
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT.windowMs });
     return { allowed: true, remaining: RATE_LIMIT.maxRequests - 1 };
   }
-  
+
   if (userLimit.count >= RATE_LIMIT.maxRequests) {
     return { allowed: false, remaining: 0 };
   }
-  
+
   userLimit.count++;
   return { allowed: true, remaining: RATE_LIMIT.maxRequests - userLimit.count };
 }
@@ -50,10 +50,12 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'generate-ai-insights',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // ✅ التحقق من المصادقة
     const authHeader = req.headers.get('Authorization');
@@ -63,14 +65,17 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.error('Auth error:', authError);
       return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
@@ -90,8 +95,8 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', user.id);
 
-    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
-    
+    const hasPermission = userRoles?.some((r) => ALLOWED_ROLES.includes(r.role));
+
     if (!hasPermission) {
       await supabase.from('audit_logs').insert({
         user_id: user.id,
@@ -99,25 +104,32 @@ serve(async (req) => {
         action_type: 'UNAUTHORIZED_AI_INSIGHTS_ATTEMPT',
         table_name: 'custom_reports',
         description: `محاولة إنشاء تحليل ذكي غير مصرح بها من ${user.email}`,
-        severity: 'error'
+        severity: 'error',
       });
-      return forbiddenResponse('ليس لديك صلاحية لإنشاء تحليلات ذكية. مطلوب دور مدير أو ناظر أو محاسب.');
+      return forbiddenResponse(
+        'ليس لديك صلاحية لإنشاء تحليلات ذكية. مطلوب دور مدير أو ناظر أو محاسب.'
+      );
     }
 
     // 🔐 SECURITY: Rate Limiting
     const rateCheck = checkRateLimit(user.id);
     if (!rateCheck.allowed) {
       console.warn('⚠️ Rate limit exceeded for user:', user.id);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'تم تجاوز الحد الأقصى للتحليلات (10/ساعة). يرجى الانتظار.'
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'تم تجاوز الحد الأقصى للتحليلات (10/ساعة). يرجى الانتظار.',
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        }
+      );
     }
 
-    console.log(`Authorized AI insights by user: ${user.id}, Rate limit remaining: ${rateCheck.remaining}`);
+    console.log(
+      `Authorized AI insights by user: ${user.id}, Rate limit remaining: ${rateCheck.remaining}`
+    );
 
     const { reportType, dataQuery, filters } = await req.json();
 
@@ -163,7 +175,7 @@ serve(async (req) => {
 
     // تقليل حجم البيانات للإرسال للـ AI
     const summaryData = data ? JSON.stringify(data.slice(0, 5)) : '[]';
-    
+
     // التحقق من وجود API Key
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
@@ -172,32 +184,33 @@ serve(async (req) => {
     }
 
     console.log('Calling Lovable AI API...');
-    
+
     // استخدام AI لتحليل البيانات - Lovable AI Gateway
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${lovableApiKey}`,
+        Authorization: `Bearer ${lovableApiKey}`,
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',
-            content: 'أنت محلل بيانات خبير في إدارة الأوقاف. قم بتحليل البيانات المقدمة وقدم رؤى قيمة، اتجاهات، وتوصيات عملية. استخدم اللغة العربية واجعل التحليل واضحاً ومختصراً.'
+            content:
+              'أنت محلل بيانات خبير في إدارة الأوقاف. قم بتحليل البيانات المقدمة وقدم رؤى قيمة، اتجاهات، وتوصيات عملية. استخدم اللغة العربية واجعل التحليل واضحاً ومختصراً.',
           },
           {
             role: 'user',
-            content: `قم بتحليل هذه البيانات الخاصة بـ ${reportType}:\n\nعدد السجلات: ${data?.length || 0}\nعينة من البيانات:\n${summaryData}\n\nقدم تحليلاً مختصراً (500 كلمة كحد أقصى) يتضمن:\n1. الملخص التنفيذي\n2. الاتجاهات الرئيسية\n3. التوصيات العملية`
-          }
+            content: `قم بتحليل هذه البيانات الخاصة بـ ${reportType}:\n\nعدد السجلات: ${data?.length || 0}\nعينة من البيانات:\n${summaryData}\n\nقدم تحليلاً مختصراً (500 كلمة كحد أقصى) يتضمن:\n1. الملخص التنفيذي\n2. الاتجاهات الرئيسية\n3. التوصيات العملية`,
+          },
         ],
         max_tokens: 2000,
       }),
     });
 
     console.log('AI Response status:', aiResponse.status);
-    
+
     // معالجة أخطاء Rate Limit و Payment
     if (!aiResponse.ok) {
       if (aiResponse.status === 429) {
@@ -215,7 +228,7 @@ serve(async (req) => {
 
     const aiData = await aiResponse.json();
     console.log('AI Response received');
-    
+
     const analysis = aiData.choices?.[0]?.message?.content || 'لم يتم إنشاء تحليل';
 
     // حفظ التقرير مع معرف المستخدم
@@ -243,7 +256,7 @@ serve(async (req) => {
       table_name: 'custom_reports',
       record_id: report?.id,
       description: `تم إنشاء تحليل ذكي من نوع ${reportType} بواسطة ${user.email}`,
-      severity: 'info'
+      severity: 'info',
     });
 
     return jsonResponse({
@@ -254,9 +267,6 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('AI Insights Error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

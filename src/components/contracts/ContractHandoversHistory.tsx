@@ -16,12 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   ClipboardCheck,
   Eye,
@@ -37,17 +32,18 @@ import { UnitHandoverPrintTemplate } from './UnitHandoverPrintTemplate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { type Contract } from '@/hooks/property/useContracts';
 
-type UnitHandoverData = ReturnType<typeof useUnitHandovers>['handovers'] extends (infer T)[] | undefined ? T : never;
+type UnitHandoverData = ReturnType<typeof useUnitHandovers>['handovers'] extends
+  | (infer T)[]
+  | undefined
+  ? T
+  : never;
 
 interface ContractHandoversHistoryProps {
   contractId: string;
   contract: Contract;
 }
 
-export function ContractHandoversHistory({
-  contractId,
-  contract,
-}: ContractHandoversHistoryProps) {
+export function ContractHandoversHistory({ contractId, contract }: ContractHandoversHistoryProps) {
   const { handovers, isLoading } = useUnitHandovers(contractId);
   const [selectedHandover, setSelectedHandover] = useState<UnitHandoverData | null>(null);
   const [showPrintDialog, setShowPrintDialog] = useState(false);
@@ -108,20 +104,12 @@ export function ContractHandoversHistory({
                     })}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        handover.handover_type === 'تسليم'
-                          ? 'default'
-                          : 'secondary'
-                      }
-                    >
+                    <Badge variant={handover.handover_type === 'تسليم' ? 'default' : 'secondary'}>
                       {handover.handover_type}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">
-                      {handover.general_condition || '-'}
-                    </span>
+                    <span className="text-sm">{handover.general_condition || '-'}</span>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 text-xs">

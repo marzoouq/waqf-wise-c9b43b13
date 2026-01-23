@@ -1,5 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +43,13 @@ export function AgingReport() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل تقرير الأعمار" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل تقرير الأعمار"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -47,9 +60,7 @@ export function AgingReport() {
             <Clock className="h-5 w-5 text-primary" />
             تقرير أعمار الديون
           </CardTitle>
-          <CardDescription>
-            تحليل الديون المستحقة والمتأخرة حسب فترات العمر
-          </CardDescription>
+          <CardDescription>تحليل الديون المستحقة والمتأخرة حسب فترات العمر</CardDescription>
         </CardHeader>
         <CardContent>
           {/* ملخص الأعمار */}
@@ -129,9 +140,7 @@ export function AgingReport() {
                       <TableCell className="font-medium">
                         {item.beneficiary_name || 'غير معروف'}
                       </TableCell>
-                      <TableCell>
-                        {new Date(item.due_date).toLocaleDateString('ar-SA')}
-                      </TableCell>
+                      <TableCell>{new Date(item.due_date).toLocaleDateString('ar-SA')}</TableCell>
                       <TableCell>{formatCurrency(item.amount_due)}</TableCell>
                       <TableCell>
                         {item.daysPastDue > 0 && (
@@ -140,9 +149,7 @@ export function AgingReport() {
                             متأخر
                           </div>
                         )}
-                        {item.daysPastDue <= 0 && (
-                          <span className="text-success">جاري</span>
-                        )}
+                        {item.daysPastDue <= 0 && <span className="text-success">جاري</span>}
                       </TableCell>
                       <TableCell>
                         {getAgeCategoryBadge(item.ageCategory, item.daysPastDue)}

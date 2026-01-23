@@ -1,7 +1,7 @@
 /**
  * Error Boundary specifically for lazy-loaded components
  * يلتقط أخطاء تحميل الـ chunks ويعرض واجهة صديقة للمستخدم
- * 
+ *
  * يستخدم النظام الموحد لكشف الأخطاء
  */
 
@@ -9,11 +9,11 @@ import React, { Component, ReactNode } from 'react';
 import { AlertCircle, RefreshCw, Home, Wifi, WifiOff, Server, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  isChunkLoadError, 
-  getChunkErrorInfo, 
+import {
+  isChunkLoadError,
+  getChunkErrorInfo,
   logChunkError,
-  type ChunkErrorType 
+  type ChunkErrorType,
 } from '@/lib/errors/chunk-error-handler';
 
 interface Props {
@@ -44,25 +44,25 @@ export class LazyErrorBoundary extends Component<Props, State> {
       errorType: null,
       isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
       retryCount: 0,
-      isRetrying: false
+      isRetrying: false,
     };
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     const errorInfo = getChunkErrorInfo(error);
-    return { 
-      hasError: true, 
+    return {
+      hasError: true,
       error,
-      errorType: isChunkLoadError(error) ? errorInfo.type : null
+      errorType: isChunkLoadError(error) ? errorInfo.type : null,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log using unified handler
     if (isChunkLoadError(error)) {
-      logChunkError(error, { 
+      logChunkError(error, {
         component: 'LazyErrorBoundary',
-        attempt: this.state.retryCount + 1 
+        attempt: this.state.retryCount + 1,
       });
     }
 
@@ -79,15 +79,19 @@ export class LazyErrorBoundary extends Component<Props, State> {
 
     // Auto-retry logic (only once for chunk errors)
     const chunkErrorInfo = getChunkErrorInfo(error);
-    if (isChunkLoadError(error) && chunkErrorInfo.canRetry && this.state.retryCount < MAX_AUTO_RETRIES) {
+    if (
+      isChunkLoadError(error) &&
+      chunkErrorInfo.canRetry &&
+      this.state.retryCount < MAX_AUTO_RETRIES
+    ) {
       this.setState({ isRetrying: true });
       this.retryTimeout = setTimeout(() => {
-        this.setState(prev => ({
+        this.setState((prev) => ({
           hasError: false,
           error: null,
           errorType: null,
           retryCount: prev.retryCount + 1,
-          isRetrying: false
+          isRetrying: false,
         }));
       }, 1500);
     }
@@ -126,7 +130,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
       error: null,
       errorType: null,
       retryCount: 0,
-      isRetrying: false
+      isRetrying: false,
     });
   };
 
@@ -134,17 +138,17 @@ export class LazyErrorBoundary extends Component<Props, State> {
     try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
       }
-      
+
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map(reg => reg.unregister()));
+        await Promise.all(registrations.map((reg) => reg.unregister()));
       }
     } catch (e) {
       console.warn('Failed to clear caches:', e);
     }
-    
+
     window.location.reload();
   };
 
@@ -154,9 +158,9 @@ export class LazyErrorBoundary extends Component<Props, State> {
 
   getErrorIcon = (): ReactNode => {
     const { errorType, isOnline } = this.state;
-    
+
     if (!isOnline) return <WifiOff className="w-6 h-6 text-destructive" />;
-    
+
     switch (errorType) {
       case 'network':
         return <Wifi className="w-6 h-6 text-warning" />;
@@ -171,9 +175,9 @@ export class LazyErrorBoundary extends Component<Props, State> {
 
   getErrorTitle = (): string => {
     const { errorType, isOnline } = this.state;
-    
+
     if (!isOnline) return 'لا يوجد اتصال بالإنترنت';
-    
+
     switch (errorType) {
       case 'network':
         return 'مشكلة في الاتصال';
@@ -190,16 +194,16 @@ export class LazyErrorBoundary extends Component<Props, State> {
 
   getErrorDescription = (): string => {
     const { error, errorType, isOnline } = this.state;
-    
+
     if (!isOnline) {
       return 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى';
     }
-    
+
     if (error && isChunkLoadError(error)) {
       const errorInfo = getChunkErrorInfo(error);
       return errorInfo.userMessage;
     }
-    
+
     switch (errorType) {
       case 'update':
         return 'يرجى إعادة تحميل الصفحة للحصول على أحدث إصدار';
@@ -228,10 +232,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
                 {isRetrying ? 'جاري إعادة المحاولة...' : this.getErrorTitle()}
               </CardTitle>
               <CardDescription>
-                {isRetrying 
-                  ? 'يرجى الانتظار...'
-                  : this.getErrorDescription()
-                }
+                {isRetrying ? 'يرجى الانتظار...' : this.getErrorDescription()}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -261,31 +262,19 @@ export class LazyErrorBoundary extends Component<Props, State> {
               {/* Action buttons */}
               {!isRetrying && (
                 <div className="flex flex-col gap-2">
-                  <Button 
-                    onClick={this.handleRetry} 
-                    className="w-full"
-                    disabled={!isOnline}
-                  >
+                  <Button onClick={this.handleRetry} className="w-full" disabled={!isOnline}>
                     <RefreshCw className="w-4 h-4 ms-2" />
                     إعادة المحاولة
                   </Button>
-                  
+
                   {isChunkError && (
-                    <Button 
-                      variant="outline" 
-                      onClick={this.handleHardRefresh}
-                      className="w-full"
-                    >
+                    <Button variant="outline" onClick={this.handleHardRefresh} className="w-full">
                       <RefreshCw className="w-4 h-4 ms-2" />
                       تحديث الصفحة بالكامل
                     </Button>
                   )}
-                  
-                  <Button 
-                    variant="ghost" 
-                    onClick={this.handleGoHome}
-                    className="w-full"
-                  >
+
+                  <Button variant="ghost" onClick={this.handleGoHome} className="w-full">
                     <Home className="w-4 h-4 ms-2" />
                     العودة للرئيسية
                   </Button>

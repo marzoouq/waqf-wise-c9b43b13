@@ -1,7 +1,7 @@
 /**
  * مكونات المستفيد - التصدير المركزي
  * Beneficiary Components - Barrel Export
- * 
+ *
  * يمكن الاستيراد من:
  * 1. المجلد الرئيسي: @/components/beneficiary
  * 2. المجلدات الفرعية: @/components/beneficiary/profile
@@ -84,12 +84,7 @@ export { TabErrorBoundary } from './common/TabErrorBoundary';
 export { TabRenderer } from './TabRenderer';
 
 // ==================== Mobile Card Components ====================
-export { 
-  MobileCardBase, 
-  CardInfoRow, 
-  CardInfoGrid, 
-  CardInfoItem,
-} from './cards/MobileCardBase';
+export { MobileCardBase, CardInfoRow, CardInfoGrid, CardInfoItem } from './cards/MobileCardBase';
 
 // NOTE: NotificationsBell is now exported from @/components/layout/NotificationsBell
 // NotificationsCenter was removed as it was unused

@@ -2,7 +2,7 @@
  * E2E Tests - Responsive Design
  * @version 1.0.0
  */
-import { test, expect, devices } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Responsive Design', () => {
   test('should work on mobile viewport', async ({ page }) => {
@@ -26,8 +26,10 @@ test.describe('Responsive Design', () => {
   test('mobile menu should be accessible', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-    
-    const menuButton = page.locator('[aria-label*="menu"], [aria-label*="القائمة"], button:has(svg)').first();
+
+    const menuButton = page
+      .locator('[aria-label*="menu"], [aria-label*="القائمة"], button:has(svg)')
+      .first();
     if (await menuButton.isVisible()) {
       await menuButton.click();
       await page.waitForTimeout(300);

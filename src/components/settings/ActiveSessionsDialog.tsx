@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useState } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Monitor, 
-  Smartphone, 
-  Tablet, 
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import {
+  Monitor,
+  Smartphone,
+  Tablet,
   Globe,
   MapPin,
   Clock,
@@ -23,10 +23,10 @@ import {
   X,
   LogOut,
   Loader2,
-  AlertTriangle
-} from "lucide-react";
-import { useActiveSessions } from "@/hooks/auth/useActiveSessions";
-import { formatDate, formatRelative } from "@/lib/date";
+  AlertTriangle,
+} from 'lucide-react';
+import { useActiveSessions } from '@/hooks/auth/useActiveSessions';
+import { formatDate, formatRelative } from '@/lib/date';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +36,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 interface ActiveSessionsDialogProps {
   open: boolean;
@@ -44,15 +44,15 @@ interface ActiveSessionsDialogProps {
 }
 
 export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialogProps) {
-  const { 
-    sessions, 
-    isLoading, 
-    endSession, 
+  const {
+    sessions,
+    isLoading,
+    endSession,
     endAllOtherSessions,
     isEndingSession,
-    isEndingAllSessions 
+    isEndingAllSessions,
   } = useActiveSessions();
-  
+
   const [sessionToEnd, setSessionToEnd] = useState<string | null>(null);
   const [showEndAllDialog, setShowEndAllDialog] = useState(false);
 
@@ -74,12 +74,12 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
     }
   };
 
-  const currentSession = sessions.find(s => {
+  const currentSession = sessions.find((s) => {
     const sessionAge = Date.now() - new Date(s.last_activity_at).getTime();
     return sessionAge < 60000; // Less than 1 minute old = current
   });
 
-  const otherSessions = sessions.filter(s => s.id !== currentSession?.id);
+  const otherSessions = sessions.filter((s) => s.id !== currentSession?.id);
 
   return (
     <>
@@ -90,9 +90,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
               <Shield className="h-5 w-5 text-primary" />
               الجلسات النشطة
             </DialogTitle>
-            <DialogDescription>
-              إدارة جلسات تسجيل الدخول النشطة على جميع الأجهزة
-            </DialogDescription>
+            <DialogDescription>إدارة جلسات تسجيل الدخول النشطة على جميع الأجهزة</DialogDescription>
           </DialogHeader>
 
           {isLoading ? (
@@ -106,7 +104,9 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
                 {currentSession && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-muted-foreground">الجلسة الحالية</h3>
+                      <h3 className="text-sm font-semibold text-muted-foreground">
+                        الجلسة الحالية
+                      </h3>
                       <Badge variant="default" className="bg-success text-success-foreground">
                         نشط الآن
                       </Badge>
@@ -256,7 +256,7 @@ function SessionCard({ session, isCurrent, onEnd, isEnding }: SessionCardProps) 
                 </Badge>
               )}
             </div>
-            
+
             <div className="space-y-1 text-sm text-muted-foreground">
               {session.ip_address && (
                 <div className="flex items-center gap-2">
@@ -266,17 +266,15 @@ function SessionCard({ session, isCurrent, onEnd, isEnding }: SessionCardProps) 
               )}
               <div className="flex items-center gap-2">
                 <Clock className="h-3 w-3" />
-                <span>
-                  آخر نشاط: {formatRelative(session.last_activity_at)}
-                </span>
+                <span>آخر نشاط: {formatRelative(session.last_activity_at)}</span>
               </div>
               <div className="text-xs opacity-70">
-                تسجيل الدخول: {formatDate(session.created_at, "PPp")}
+                تسجيل الدخول: {formatDate(session.created_at, 'PPp')}
               </div>
             </div>
           </div>
         </div>
-        
+
         {!isCurrent && onEnd && (
           <Button
             variant="ghost"
@@ -285,11 +283,7 @@ function SessionCard({ session, isCurrent, onEnd, isEnding }: SessionCardProps) 
             disabled={isEnding}
             className="text-destructive hover:text-destructive hover:bg-destructive/10"
           >
-            {isEnding ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <X className="h-4 w-4" />
-            )}
+            {isEnding ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
           </Button>
         )}
       </div>
@@ -310,7 +304,7 @@ function getDeviceIcon(userAgent?: string) {
 }
 
 function getBrowserName(userAgent?: string) {
-  if (!userAgent) return "متصفح غير معروف";
+  if (!userAgent) return 'متصفح غير معروف';
   const ua = userAgent.toLowerCase();
   if (ua.includes('chrome')) return 'Chrome';
   if (ua.includes('firefox')) return 'Firefox';

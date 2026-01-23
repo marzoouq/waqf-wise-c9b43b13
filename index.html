@@ -2,36 +2,48 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    
+
     <!-- منع التخزين المؤقت للـ HTML -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <!-- CSP Meta Tag - Secure Configuration -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://*.lovableproject.com; manifest-src 'self' https://*.lovableproject.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
-    
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https: http:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://*.lovableproject.com; manifest-src 'self' https://*.lovableproject.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+    />
+
     <!-- Fonts: Google Fonts for Arabic -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- PWA Meta Tags -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="نظام الوقف">
-    <meta name="theme-color" content="#047857">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="نظام الوقف" />
+    <meta name="theme-color" content="#047857" />
+
     <!-- PWA Icons -->
-    <link rel="apple-touch-icon" href="/pwa-icon-192.png">
-    <link rel="manifest" href="/manifest.webmanifest">
-    
+    <link rel="apple-touch-icon" href="/pwa-icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
     <title>منصة إدارة الوقف الإلكترونية | نظام متكامل لإدارة الأوقاف</title>
-    <meta name="description" content="نظام إلكتروني متكامل لإدارة الأوقاف الإسلامية - إدارة المستفيدين، العقارات، المحاسبة، والتوزيعات المالية" />
+    <meta
+      name="description"
+      content="نظام إلكتروني متكامل لإدارة الأوقاف الإسلامية - إدارة المستفيدين، العقارات، المحاسبة، والتوزيعات المالية"
+    />
     <meta name="author" content="منصة الوقف" />
-    <meta name="keywords" content="إدارة الوقف، الأوقاف الإسلامية، المستفيدين، العقارات الوقفية، المحاسبة، التوزيعات المالية" />
+    <meta
+      name="keywords"
+      content="إدارة الوقف، الأوقاف الإسلامية، المستفيدين، العقارات الوقفية، المحاسبة، التوزيعات المالية"
+    />
 
     <meta property="og:title" content="منصة إدارة الوقف الإلكترونية" />
     <meta property="og:description" content="نظام إلكتروني متكامل لإدارة الأوقاف الإسلامية" />
@@ -43,22 +55,28 @@
     <meta name="twitter:title" content="منصة إدارة الوقف الإلكترونية" />
     <meta name="twitter:description" content="نظام إلكتروني متكامل لإدارة الأوقاف الإسلامية" />
     <meta name="twitter:image" content="https://waqf-ba7r.store/pwa-icon-512.png" />
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://waqf-ba7r.store/" />
-    
+
     <!-- Performance: Preconnect to Supabase API only -->
-    <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin>
-    <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
-    
+    <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co" />
+
     <!-- ✅ Preload critical resources for LCP -->
-    <link rel="modulepreload" href="/src/main.tsx">
-    
+    <link rel="modulepreload" href="/src/main.tsx" />
+
     <!-- Critical CSS inline for faster FCP/LCP -->
     <style>
       /* Reset and base styles */
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
       /* Font-display: swap to prevent FOIT */
       @font-face {
         font-family: 'Cairo';
@@ -67,7 +85,7 @@
         font-display: swap;
         src: local('Cairo');
       }
-      
+
       :root {
         --background: 48 20% 97%;
         --foreground: 150 25% 15%;
@@ -81,40 +99,91 @@
         --ring: 150 45% 35%;
         --radius: 0.75rem;
       }
-      
-      body { 
-        font-family: Cairo, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+      body {
+        font-family:
+          Cairo,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
         background: hsl(var(--background));
         color: hsl(var(--foreground));
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         line-height: 1.5;
       }
-      
-      #root { min-height: 100vh; }
-      
+
+      #root {
+        min-height: 100vh;
+      }
+
       /* ✅ Critical Login Page Styles (LCP) */
-      .min-h-screen { min-height: 100vh; }
-      .flex { display: flex; }
-      .items-center { align-items: center; }
-      .justify-center { justify-content: center; }
-      .p-4 { padding: 1rem; }
-      .bg-background { background: hsl(var(--background)); }
-      .bg-card { background: hsl(var(--card)); }
-      .text-foreground { color: hsl(var(--foreground)); }
-      .text-muted-foreground { color: hsl(var(--muted-foreground)); }
-      .rounded-xl { border-radius: 0.75rem; }
-      .shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-      .border { border: 1px solid hsl(var(--border)); }
-      .w-full { width: 100%; }
-      .max-w-md { max-width: 28rem; }
-      .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-      .font-bold { font-weight: 700; }
-      .text-center { text-align: center; }
-      .mb-2 { margin-bottom: 0.5rem; }
-      .mb-6 { margin-bottom: 1.5rem; }
-      .space-y-4 > * + * { margin-top: 1rem; }
-      
+      .min-h-screen {
+        min-height: 100vh;
+      }
+      .flex {
+        display: flex;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .justify-center {
+        justify-content: center;
+      }
+      .p-4 {
+        padding: 1rem;
+      }
+      .bg-background {
+        background: hsl(var(--background));
+      }
+      .bg-card {
+        background: hsl(var(--card));
+      }
+      .text-foreground {
+        color: hsl(var(--foreground));
+      }
+      .text-muted-foreground {
+        color: hsl(var(--muted-foreground));
+      }
+      .rounded-xl {
+        border-radius: 0.75rem;
+      }
+      .shadow-lg {
+        box-shadow:
+          0 10px 15px -3px rgb(0 0 0 / 0.1),
+          0 4px 6px -4px rgb(0 0 0 / 0.1);
+      }
+      .border {
+        border: 1px solid hsl(var(--border));
+      }
+      .w-full {
+        width: 100%;
+      }
+      .max-w-md {
+        max-width: 28rem;
+      }
+      .text-3xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+      }
+      .font-bold {
+        font-weight: 700;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .mb-2 {
+        margin-bottom: 0.5rem;
+      }
+      .mb-6 {
+        margin-bottom: 1.5rem;
+      }
+      .space-y-4 > * + * {
+        margin-top: 1rem;
+      }
+
       /* Loading spinner */
       .loading-container {
         position: fixed;
@@ -140,12 +209,19 @@
         font-family: Cairo, sans-serif;
       }
       @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+          transform: rotate(360deg);
+        }
       }
-      
+
       /* ✅ Gradient background for login */
       .bg-gradient-to-br {
-        background: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--background)), hsl(var(--muted)));
+        background: linear-gradient(
+          to bottom right,
+          hsl(var(--background)),
+          hsl(var(--background)),
+          hsl(var(--muted))
+        );
       }
     </style>
   </head>
@@ -154,16 +230,16 @@
     <div id="root">
       <!-- Instant loading - shown immediately before React loads (LCP element) -->
       <div id="app-loading" class="loading-container">
-        <div style="text-align: center;">
+        <div style="text-align: center">
           <div class="loading-spinner"></div>
           <p class="loading-text">جاري التحميل...</p>
         </div>
       </div>
     </div>
-    
+
     <!-- Main App -->
     <script type="module" src="/src/main.tsx"></script>
-    
+
     <!-- تنظيف Service Workers - مؤجل لنهاية التحميل لتحسين LCP -->
     <script src="/sw-cleanup.js" defer></script>
   </body>

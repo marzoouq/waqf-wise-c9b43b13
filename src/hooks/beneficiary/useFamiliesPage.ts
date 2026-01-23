@@ -15,7 +15,8 @@ export type FamilyWithHead = Family & {
 };
 
 export function useFamiliesPage() {
-  const { families, isLoading, error, refetch, addFamily, updateFamily, deleteFamily } = useFamilies();
+  const { families, isLoading, error, refetch, addFamily, updateFamily, deleteFamily } =
+    useFamilies();
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
@@ -33,14 +34,14 @@ export function useFamiliesPage() {
   }, []);
 
   const filteredFamilies = useMemo(() => {
-    return families.filter(family => {
-      const matchesSearch = 
+    return families.filter((family) => {
+      const matchesSearch =
         family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         family.tribe?.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesStatus = !advancedFilters.status || family.status === advancedFilters.status;
       const matchesTribe = !advancedFilters.tribe || family.tribe === advancedFilters.tribe;
-      
+
       return matchesSearch && matchesStatus && matchesTribe;
     });
   }, [families, searchQuery, advancedFilters]);
@@ -63,13 +64,13 @@ export function useFamiliesPage() {
 
   const stats = {
     total: families.length,
-    active: families.filter(f => matchesStatus(f.status, 'active')).length,
+    active: families.filter((f) => matchesStatus(f.status, 'active')).length,
     totalMembers: families.reduce((sum, f) => sum + f.total_members, 0),
   };
 
   const bulkDeleteConfirmation = useDeleteConfirmation<string[]>({
     onDelete: async (ids) => {
-      await Promise.all(ids.map(id => deleteFamily.mutateAsync(id)));
+      await Promise.all(ids.map((id) => deleteFamily.mutateAsync(id)));
       bulkSelection.clearSelection();
     },
     successMessage: `تم حذف ${bulkSelection.selectedCount} عائلة بنجاح`,
@@ -117,25 +118,28 @@ export function useFamiliesPage() {
         },
         onError: () => {
           toast.error('فشل حذف العائلة');
-        }
+        },
       });
     }
   };
 
   const handleSaveFamily = async (data: Partial<Family>) => {
     if (selectedFamily) {
-      updateFamily.mutate({ id: selectedFamily.id, updates: data }, {
-        onSuccess: () => {
-          toast.success('تم تحديث بيانات العائلة بنجاح');
-          setDialogOpen(false);
-          setSelectedFamily(null);
-        },
-        onError: () => {
-          toast.error('فشل تحديث العائلة');
+      updateFamily.mutate(
+        { id: selectedFamily.id, updates: data },
+        {
+          onSuccess: () => {
+            toast.success('تم تحديث بيانات العائلة بنجاح');
+            setDialogOpen(false);
+            setSelectedFamily(null);
+          },
+          onError: () => {
+            toast.error('فشل تحديث العائلة');
+          },
         }
-      });
+      );
     } else {
-      addFamily.mutate(data as Omit<Family, "created_at" | "id" | "total_members" | "updated_at">, {
+      addFamily.mutate(data as Omit<Family, 'created_at' | 'id' | 'total_members' | 'updated_at'>, {
         onSuccess: () => {
           toast.success('تم إضافة العائلة بنجاح');
           setDialogOpen(false);
@@ -143,7 +147,7 @@ export function useFamiliesPage() {
         },
         onError: () => {
           toast.error('فشل إضافة العائلة');
-        }
+        },
       });
     }
   };
@@ -158,30 +162,30 @@ export function useFamiliesPage() {
     isLoading,
     error,
     refetch,
-    
+
     // Pagination
     currentPage,
     setCurrentPage,
     itemsPerPage,
     handleItemsPerPageChange,
     totalPages,
-    
+
     // Filters
     searchQuery,
     setSearchQuery,
     advancedFilters,
     setAdvancedFilters,
-    
+
     // Sorting
     sortConfig,
     handleSort,
-    
+
     // Bulk Selection
     bulkSelection,
     handleBulkDelete,
     handleBulkExport,
     bulkDeleteConfirmation,
-    
+
     // Dialog States
     dialogOpen,
     setDialogOpen,
@@ -192,7 +196,7 @@ export function useFamiliesPage() {
     membersDialogOpen,
     setMembersDialogOpen,
     selectedFamilyForMembers,
-    
+
     // Handlers
     handleAddFamily,
     handleEditFamily,

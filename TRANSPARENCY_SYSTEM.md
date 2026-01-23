@@ -3,6 +3,7 @@
 ## 📋 نظرة عامة
 
 تم تطوير نظام شفافية متقدم يسمح للناظر بالتحكم الكامل في البيانات المتاحة لكل من:
+
 - **المستفيدين (beneficiary)**: المستفيدون من الدرجة الأولى (14 مستفيد)
 - **الورثة (waqf_heir)**: ورثة الواقف (2 وارث)
 
@@ -20,7 +21,7 @@
 CREATE TABLE beneficiary_visibility_settings (
   id UUID PRIMARY KEY,
   target_role TEXT DEFAULT 'beneficiary' CHECK (target_role IN ('beneficiary', 'waqf_heir')),
-  
+
   -- الأقسام الرئيسية (13)
   show_overview BOOLEAN,
   show_profile BOOLEAN,
@@ -35,7 +36,7 @@ CREATE TABLE beneficiary_visibility_settings (
   show_disclosures BOOLEAN,
   show_governance BOOLEAN,
   show_budgets BOOLEAN,
-  
+
   -- المستفيدون الآخرون (8)
   show_other_beneficiaries_names BOOLEAN,
   show_other_beneficiaries_amounts BOOLEAN,
@@ -45,14 +46,14 @@ CREATE TABLE beneficiary_visibility_settings (
   show_beneficiary_categories BOOLEAN,
   show_beneficiaries_statistics BOOLEAN,
   show_inactive_beneficiaries BOOLEAN,
-  
+
   -- البيانات الحساسة (5) - إخفاء جزئي
   mask_iban BOOLEAN,
   mask_phone_numbers BOOLEAN,
   mask_exact_amounts BOOLEAN,
   mask_tenant_info BOOLEAN,
   mask_national_ids BOOLEAN,
-  
+
   -- الجداول المالية (8)
   show_bank_balances BOOLEAN,
   show_bank_transactions BOOLEAN,
@@ -62,7 +63,7 @@ CREATE TABLE beneficiary_visibility_settings (
   show_maintenance_costs BOOLEAN,
   show_property_revenues BOOLEAN,
   show_expenses_breakdown BOOLEAN,
-  
+
   -- الحوكمة والقرارات (6)
   show_governance_meetings BOOLEAN,
   show_nazer_decisions BOOLEAN,
@@ -70,33 +71,33 @@ CREATE TABLE beneficiary_visibility_settings (
   show_strategic_plans BOOLEAN,
   show_audit_reports BOOLEAN,
   show_compliance_reports BOOLEAN,
-  
+
   -- القروض والفزعات (5)
   show_own_loans BOOLEAN,
   show_other_loans BOOLEAN,
   mask_loan_amounts BOOLEAN,
   show_emergency_aid BOOLEAN,
   show_emergency_statistics BOOLEAN,
-  
+
   -- الميزانيات والتخطيط (4)
   show_annual_budget BOOLEAN,
   show_budget_execution BOOLEAN,
   show_reserve_funds BOOLEAN,
   show_investment_plans BOOLEAN,
-  
+
   -- المحاسبة التفصيلية (3)
   show_journal_entries BOOLEAN,
   show_trial_balance BOOLEAN,
   show_ledger_details BOOLEAN,
-  
+
   -- التواصل والدعم (2)
   show_internal_messages BOOLEAN,
   show_support_tickets BOOLEAN,
-  
+
   -- الإعدادات العامة (2)
   allow_export_pdf BOOLEAN,
   allow_print BOOLEAN,
-  
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -155,29 +156,30 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isWaqfHeir } = useUserRole();
-  
+
   // تحديد الدور المستهدف تلقائياً
   const effectiveRole = targetRole || (isWaqfHeir ? 'waqf_heir' : 'beneficiary');
 
   // جلب الإعدادات حسب الدور
   const { data: settings, isLoading } = useQuery({
-    queryKey: ["visibility-settings", effectiveRole],
+    queryKey: ['visibility-settings', effectiveRole],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("beneficiary_visibility_settings")
-        .select("*")
+        .from('beneficiary_visibility_settings')
+        .select('*')
         .eq('target_role', effectiveRole)
         .maybeSingle();
-      
+
       // ... باقي الكود
-    }
+    },
   });
-  
+
   // ...
 }
 ```
 
 **المميزات:**
+
 - ✅ جلب تلقائي للإعدادات حسب دور المستخدم
 - ✅ دعم تمرير الدور يدوياً (للناظر عند الإدارة)
 - ✅ إنشاء تلقائي للإعدادات الافتراضية
@@ -191,6 +193,7 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
 **الوصول:** فقط للناظر (nazer) والمشرف (admin)
 
 **المميزات:**
+
 - 🎛️ **تبويبين منفصلين:**
   - تبويب "المستفيدون" (beneficiary)
   - تبويب "الورثة" (waqf_heir)
@@ -206,6 +209,7 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   8. المحاسبة التفصيلية (3 صلاحيات)
 
 **التبديل بين الأدوار:**
+
 ```tsx
 <Button
   variant={activeRole === 'beneficiary' ? 'default' : 'outline'}
@@ -231,17 +235,21 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
 
 ```tsx
 // التحقق من السماح بالوصول
-{activeTab === "profile" && settings?.show_profile && (
-  <BeneficiaryProfileTab beneficiary={beneficiary} />
-)}
+{
+  activeTab === 'profile' && settings?.show_profile && (
+    <BeneficiaryProfileTab beneficiary={beneficiary} />
+  );
+}
 
 // عرض رسالة "غير مصرح" عند عدم السماح
-{activeTab === "profile" && !settings?.show_profile && (
-  <Alert>
-    <Lock className="h-4 w-4" />
-    <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-  </Alert>
-)}
+{
+  activeTab === 'profile' && !settings?.show_profile && (
+    <Alert>
+      <Lock className="h-4 w-4" />
+      <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+    </Alert>
+  );
+}
 ```
 
 ---
@@ -263,11 +271,30 @@ const visibleItems = sidebarItems.filter((item) => {
 ```
 
 **العناصر مع مفاتيح الشفافية:**
+
 ```typescript
 const sidebarItems: SidebarItem[] = [
-  { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview", visibilityKey: "show_overview" },
-  { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile", visibilityKey: "show_profile" },
-  { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions", visibilityKey: "show_distributions" },
+  {
+    id: 'overview',
+    label: 'نظرة عامة',
+    icon: TrendingUp,
+    tab: 'overview',
+    visibilityKey: 'show_overview',
+  },
+  {
+    id: 'profile',
+    label: 'الملف الشخصي',
+    icon: User,
+    tab: 'profile',
+    visibilityKey: 'show_profile',
+  },
+  {
+    id: 'distributions',
+    label: 'التوزيعات',
+    icon: DollarSign,
+    tab: 'distributions',
+    visibilityKey: 'show_distributions',
+  },
   // ...
 ];
 ```
@@ -288,23 +315,23 @@ const sidebarItems: SidebarItem[] = [
   show_distributions: true,
   show_statements: true,
   show_properties: true,
-  
+
   // بيانات المستفيدين الآخرين: مخفية
   show_other_beneficiaries_names: false,
   show_other_beneficiaries_amounts: false,
   show_other_beneficiaries_personal_data: false,
-  
+
   // الإخفاء الجزئي: مفعل
   mask_iban: true,
   mask_phone_numbers: true,
   mask_tenant_info: true,
   mask_national_ids: true,
-  
+
   // المحاسبة التفصيلية: مخفية
   show_journal_entries: false,
   show_trial_balance: false,
   show_ledger_details: false,
-  
+
   // باقي الإعدادات: حسب السياق
 }
 ```
@@ -328,7 +355,7 @@ const sidebarItems: SidebarItem[] = [
   show_disclosures: true,
   show_governance: true,
   show_budgets: true,
-  
+
   show_other_beneficiaries_names: true,
   show_other_beneficiaries_amounts: true,
   show_other_beneficiaries_personal_data: true,
@@ -337,14 +364,14 @@ const sidebarItems: SidebarItem[] = [
   show_beneficiary_categories: true,
   show_beneficiaries_statistics: true,
   show_inactive_beneficiaries: true,
-  
+
   // ❌ لا إخفاء (شفافية كاملة)
   mask_iban: false,
   mask_phone_numbers: false,
   mask_exact_amounts: false,
   mask_tenant_info: false,
   mask_national_ids: false,
-  
+
   show_bank_balances: true,
   show_bank_transactions: true,
   show_bank_statements: true,
@@ -353,32 +380,32 @@ const sidebarItems: SidebarItem[] = [
   show_maintenance_costs: true,
   show_property_revenues: true,
   show_expenses_breakdown: true,
-  
+
   show_governance_meetings: true,
   show_nazer_decisions: true,
   show_policy_changes: true,
   show_strategic_plans: true,
   show_audit_reports: true,
   show_compliance_reports: true,
-  
+
   show_own_loans: true,
   show_other_loans: true,
   mask_loan_amounts: false,
   show_emergency_aid: true,
   show_emergency_statistics: true,
-  
+
   show_annual_budget: true,
   show_budget_execution: true,
   show_reserve_funds: true,
   show_investment_plans: true,
-  
+
   show_journal_entries: true,
   show_trial_balance: true,
   show_ledger_details: true,
-  
+
   show_internal_messages: true,
   show_support_tickets: true,
-  
+
   allow_export_pdf: true,
   allow_print: true,
 }
@@ -388,17 +415,17 @@ const sidebarItems: SidebarItem[] = [
 
 ## 📊 مقارنة الصلاحيات
 
-| الفئة | المستفيد (beneficiary) | الوارث (waqf_heir) |
-|------|----------------------|-------------------|
-| **الأقسام الأساسية** | ✅ معظمها مفعل | ✅ كل شيء مفعل |
-| **بيانات المستفيدين الآخرين** | ❌ مخفية | ✅ مرئية بالكامل |
-| **الإخفاء الجزئي** | ✅ مفعل (IBAN، هواتف...) | ❌ لا إخفاء |
-| **الجداول المالية** | ⚠️ جزئي | ✅ كل شيء |
-| **المحاسبة التفصيلية** | ❌ مخفية | ✅ مرئية بالكامل |
-| **القيود المحاسبية** | ❌ غير متاح | ✅ متاح |
-| **العقود والإيجارات** | ⚠️ محدود | ✅ كامل |
-| **الفواتير** | ⚠️ محدود | ✅ كل الفواتير |
-| **الحسابات البنكية** | ⚠️ محدود | ✅ كل الحسابات |
+| الفئة                         | المستفيد (beneficiary)   | الوارث (waqf_heir) |
+| ----------------------------- | ------------------------ | ------------------ |
+| **الأقسام الأساسية**          | ✅ معظمها مفعل           | ✅ كل شيء مفعل     |
+| **بيانات المستفيدين الآخرين** | ❌ مخفية                 | ✅ مرئية بالكامل   |
+| **الإخفاء الجزئي**            | ✅ مفعل (IBAN، هواتف...) | ❌ لا إخفاء        |
+| **الجداول المالية**           | ⚠️ جزئي                  | ✅ كل شيء          |
+| **المحاسبة التفصيلية**        | ❌ مخفية                 | ✅ مرئية بالكامل   |
+| **القيود المحاسبية**          | ❌ غير متاح              | ✅ متاح            |
+| **العقود والإيجارات**         | ⚠️ محدود                 | ✅ كامل            |
+| **الفواتير**                  | ⚠️ محدود                 | ✅ كل الفواتير     |
+| **الحسابات البنكية**          | ⚠️ محدود                 | ✅ كل الحسابات     |
 
 ---
 
@@ -407,6 +434,7 @@ const sidebarItems: SidebarItem[] = [
 ### 1. الناظر يريد إخفاء الحسابات البنكية عن المستفيدين
 
 **الخطوات:**
+
 1. الذهاب إلى `/transparency-settings`
 2. اختيار تبويب "المستفيدون"
 3. الذهاب لفئة "الجداول المالية"
@@ -414,6 +442,7 @@ const sidebarItems: SidebarItem[] = [
 5. حفظ الإعدادات
 
 **النتيجة:**
+
 - ❌ المستفيدون لا يرون تبويب "الحسابات البنكية" في القائمة الجانبية
 - ❌ لا يمكنهم الوصول للصفحة حتى بالرابط المباشر
 - ✅ الورثة لا يزالون يرون كل شيء
@@ -423,6 +452,7 @@ const sidebarItems: SidebarItem[] = [
 ### 2. الناظر يريد منع الوارث من رؤية القيود المحاسبية
 
 **الخطوات:**
+
 1. الذهاب إلى `/transparency-settings`
 2. اختيار تبويب "الورثة"
 3. الذهاب لفئة "المحاسبة التفصيلية"
@@ -430,6 +460,7 @@ const sidebarItems: SidebarItem[] = [
 5. حفظ الإعدادات
 
 **النتيجة:**
+
 - ❌ الوارث لا يرى القيود المحاسبية
 - ✅ باقي البيانات المالية متاحة
 - ✅ الموظفون والناظر لا يتأثرون
@@ -439,6 +470,7 @@ const sidebarItems: SidebarItem[] = [
 ### 3. عرض أسماء المستفيدين الآخرين فقط (بدون مبالغ)
 
 **الخطوات:**
+
 1. الذهاب إلى `/transparency-settings`
 2. اختيار تبويب "المستفيدون"
 3. الذهاب لفئة "المستفيدون الآخرون"
@@ -447,6 +479,7 @@ const sidebarItems: SidebarItem[] = [
 6. حفظ
 
 **النتيجة:**
+
 - ✅ المستفيد يرى أسماء الآخرين
 - ❌ لا يرى المبالغ المصروفة لهم
 - ✅ شفافية جزئية
@@ -489,9 +522,10 @@ const sidebarItems: SidebarItem[] = [
 **السبب:** Cache في المتصفح
 
 **الحل:**
+
 ```typescript
 // في useVisibilitySettings
-queryClient.invalidateQueries({ queryKey: ["visibility-settings"] });
+queryClient.invalidateQueries({ queryKey: ['visibility-settings'] });
 ```
 
 #### 2. الإعدادات لا تحفظ
@@ -499,9 +533,10 @@ queryClient.invalidateQueries({ queryKey: ["visibility-settings"] });
 **السبب:** مشكلة في RLS policies
 
 **الحل:**
+
 ```sql
 -- التحقق من سياسات التحديث
-SELECT * FROM pg_policies 
+SELECT * FROM pg_policies
 WHERE tablename = 'beneficiary_visibility_settings';
 ```
 
@@ -510,6 +545,7 @@ WHERE tablename = 'beneficiary_visibility_settings';
 **السبب:** دالة `is_waqf_heir()` لا تعمل
 
 **الحل:**
+
 ```sql
 -- التحقق من الدالة
 SELECT is_waqf_heir();
@@ -530,6 +566,7 @@ $$ LANGUAGE SQL STABLE SECURITY DEFINER;
 ## 📝 الخلاصة
 
 تم بناء نظام شفافية متقدم يوفر:
+
 - ✅ **50+ إعداد قابل للتخصيص**
 - ✅ **إعدادات منفصلة للمستفيدين والورثة**
 - ✅ **شفافية كاملة افتراضية للورثة**

@@ -35,9 +35,9 @@ export function useDashboardConfigs() {
     queryKey: QUERY_KEYS.DASHBOARD_CONFIGS,
     queryFn: async () => {
       const data = await DashboardService.getDashboardConfigs();
-      return (data || []).map(item => ({
+      return (data || []).map((item) => ({
         ...item,
-        layout_config: item.layout_config as unknown as { widgets: DashboardWidget[] }
+        layout_config: item.layout_config as unknown as { widgets: DashboardWidget[] },
       }));
     },
   });
@@ -47,10 +47,10 @@ export function useSaveDashboardConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (config: Omit<DashboardConfig, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => 
+    mutationFn: (config: Omit<DashboardConfig, 'id' | 'created_at' | 'updated_at' | 'user_id'>) =>
       DashboardService.saveDashboardConfig({
         ...config,
-        layout_config: config.layout_config as unknown as Json
+        layout_config: config.layout_config as unknown as Json,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_CONFIGS });
@@ -66,7 +66,7 @@ export function useUpdateDashboardConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, config }: { id: string; config: Partial<DashboardConfig> }) => 
+    mutationFn: ({ id, config }: { id: string; config: Partial<DashboardConfig> }) =>
       DashboardService.updateDashboardConfig(id, config),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_CONFIGS });

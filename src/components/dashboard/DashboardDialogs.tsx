@@ -1,13 +1,13 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import BeneficiaryDialog from "@/components/beneficiary/admin/BeneficiaryDialog";
-import { PropertyDialog } from "@/components/properties/PropertyDialog";
-import { DistributionDialog } from "@/components/funds/DistributionDialog";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { PropertyService } from "@/services/property.service";
-import { DistributionService } from "@/services/distribution.service";
-import { BeneficiaryCoreService } from "@/services/beneficiary";
-import type { Beneficiary } from "@/types/beneficiary";
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import BeneficiaryDialog from '@/components/beneficiary/admin/BeneficiaryDialog';
+import { PropertyDialog } from '@/components/properties/PropertyDialog';
+import { DistributionDialog } from '@/components/funds/DistributionDialog';
+import { AdminSendMessageDialog } from '@/components/messages/AdminSendMessageDialog';
+import { PropertyService } from '@/services/property.service';
+import { DistributionService } from '@/services/distribution.service';
+import { BeneficiaryCoreService } from '@/services/beneficiary';
+import type { Beneficiary } from '@/types/beneficiary';
 
 interface DashboardDialogsProps {
   beneficiaryDialogOpen: boolean;
@@ -35,20 +35,22 @@ export function DashboardDialogs({
 
   const handleSaveBeneficiary = async (data: Record<string, unknown>) => {
     try {
-      await BeneficiaryCoreService.create(data as Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>);
-      
+      await BeneficiaryCoreService.create(
+        data as Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>
+      );
+
       toast({
-        title: "تم الإضافة",
-        description: "تم إضافة المستفيد بنجاح",
+        title: 'تم الإضافة',
+        description: 'تم إضافة المستفيد بنجاح',
       });
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+      queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
       setBeneficiaryDialogOpen(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "خطأ غير معروف";
+      const errorMessage = err instanceof Error ? err.message : 'خطأ غير معروف';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: `حدث خطأ أثناء إضافة المستفيد: ${errorMessage}`,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -57,43 +59,48 @@ export function DashboardDialogs({
     try {
       await PropertyService.create(data);
       toast({
-        title: "تم الإضافة",
-        description: "تم إضافة العقار بنجاح",
+        title: 'تم الإضافة',
+        description: 'تم إضافة العقار بنجاح',
       });
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
       setPropertyDialogOpen(false);
     } catch (error) {
-      console.error("Error saving property:", error);
+      console.error('Error saving property:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إضافة العقار",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء إضافة العقار',
+        variant: 'destructive',
       });
     }
   };
 
-  const handleDistribute = async (data: { totalAmount: number; beneficiaries: number; notes?: string; month: string }) => {
+  const handleDistribute = async (data: {
+    totalAmount: number;
+    beneficiaries: number;
+    notes?: string;
+    month: string;
+  }) => {
     try {
       await DistributionService.create({
         distribution_date: new Date().toISOString(),
         total_amount: data.totalAmount,
         beneficiaries_count: data.beneficiaries,
         notes: data.notes || null,
-        status: "مكتمل",
+        status: 'مكتمل',
         month: data.month,
       });
       toast({
-        title: "تم الإنشاء",
-        description: "تم إنشاء التوزيع بنجاح",
+        title: 'تم الإنشاء',
+        description: 'تم إنشاء التوزيع بنجاح',
       });
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: ['distributions'] });
       setDistributionDialogOpen(false);
     } catch (error) {
-      console.error("Error creating distribution:", error);
+      console.error('Error creating distribution:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إنشاء التوزيع",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء إنشاء التوزيع',
+        variant: 'destructive',
       });
     }
   };
@@ -115,10 +122,7 @@ export function DashboardDialogs({
         onOpenChange={setDistributionDialogOpen}
         onDistribute={handleDistribute}
       />
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
+      <AdminSendMessageDialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} />
     </>
   );
 }

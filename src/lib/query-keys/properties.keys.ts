@@ -19,14 +19,17 @@ export const PROPERTIES_KEYS = {
   CONTRACTS: ['contracts'] as const,
   CONTRACT: (id: string) => ['contract', id] as const,
   TERMINATION_REQUESTS: ['termination-requests'] as const,
-  TERMINATION_REQUESTS_BY_CONTRACT: (contractId: string) => ['termination-requests', contractId] as const,
+  TERMINATION_REQUESTS_BY_CONTRACT: (contractId: string) =>
+    ['termination-requests', contractId] as const,
   RENT_ADJUSTMENT_REQUESTS: ['rent-adjustment-requests'] as const,
-  RENT_ADJUSTMENT_REQUESTS_BY_CONTRACT: (contractId: string) => ['rent-adjustment-requests', contractId] as const,
+  RENT_ADJUSTMENT_REQUESTS_BY_CONTRACT: (contractId: string) =>
+    ['rent-adjustment-requests', contractId] as const,
   UNIT_HANDOVERS: ['unit-handovers'] as const,
   UNIT_HANDOVERS_BY_CONTRACT: (contractId: string) => ['unit-handovers', contractId] as const,
   CONTRACT_NOTIFICATIONS: ['contract-notifications'] as const,
-  CONTRACT_NOTIFICATIONS_BY_CONTRACT: (contractId: string) => ['contract-notifications', contractId] as const,
-  
+  CONTRACT_NOTIFICATIONS_BY_CONTRACT: (contractId: string) =>
+    ['contract-notifications', contractId] as const,
+
   // Tenants
   TENANTS: ['tenants'] as const,
   TENANT: (id: string) => ['tenant', id] as const,
@@ -53,7 +56,8 @@ export const PROPERTIES_KEYS = {
   // Waqf
   WAQF_SUMMARY: ['waqf-summary'] as const,
   WAQF_UNITS: ['waqf-units'] as const,
-  WAQF_REVENUE: (waqfUnitId?: string, fiscalYearId?: string) => ['waqf_revenue', waqfUnitId, fiscalYearId] as const,
+  WAQF_REVENUE: (waqfUnitId?: string, fiscalYearId?: string) =>
+    ['waqf_revenue', waqfUnitId, fiscalYearId] as const,
   WAQF_BUDGETS: (fiscalYearId?: string) => ['waqf-budgets', fiscalYearId] as const,
   WAQF_RESERVES: ['waqf-reserves'] as const,
 } as const;

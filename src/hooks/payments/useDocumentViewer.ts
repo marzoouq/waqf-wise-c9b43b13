@@ -4,14 +4,16 @@
  * @version 2.9.43
  */
 
-import { useState } from "react";
-import { DocumentService, type InvoiceLine } from "@/services/document.service";
-import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
-import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState } from 'react';
+import { DocumentService, type InvoiceLine } from '@/services/document.service';
+import { generateInvoicePDF } from '@/lib/generateInvoicePDF';
+import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
+import { useToast } from '@/hooks/ui/use-toast';
 
 // تحويل بيانات الفاتورة من الخدمة إلى صيغة PDF
-function toInvoicePDFFormat(invoice: Awaited<ReturnType<typeof DocumentService.getInvoiceWithLines>>['invoice']) {
+function toInvoicePDFFormat(
+  invoice: Awaited<ReturnType<typeof DocumentService.getInvoiceWithLines>>['invoice']
+) {
   return {
     id: invoice.id,
     invoice_number: invoice.invoice_number,
@@ -29,7 +31,7 @@ function toInvoicePDFFormat(invoice: Awaited<ReturnType<typeof DocumentService.g
 
 // تحويل بنود الفاتورة لصيغة PDF
 function toInvoiceLinesPDFFormat(lines: InvoiceLine[]) {
-  return lines.map(line => ({
+  return lines.map((line) => ({
     line_number: line.line_number,
     description: line.description,
     quantity: line.quantity,
@@ -63,9 +65,9 @@ export function useDocumentViewer() {
   const viewInvoice = async (invoiceId: string) => {
     if (!invoiceId) {
       toast({
-        title: "تنبيه",
-        description: "لم يتم إصدار فاتورة لهذه الدفعة بعد",
-        variant: "destructive"
+        title: 'تنبيه',
+        description: 'لم يتم إصدار فاتورة لهذه الدفعة بعد',
+        variant: 'destructive',
       });
       return;
     }
@@ -76,9 +78,9 @@ export function useDocumentViewer() {
 
       if (!result) {
         toast({
-          title: "خطأ",
-          description: "فشل تحميل بيانات الفاتورة",
-          variant: "destructive"
+          title: 'خطأ',
+          description: 'فشل تحميل بيانات الفاتورة',
+          variant: 'destructive',
         });
         return;
       }
@@ -99,17 +101,17 @@ export function useDocumentViewer() {
         const pdfInvoice = toInvoicePDFFormat(invoice);
         const pdfLines = toInvoiceLinesPDFFormat(lines);
         await generateInvoicePDF(pdfInvoice, pdfLines, null);
-        
+
         toast({
-          title: "تم التوليد",
-          description: "تم توليد الفاتورة وتحميلها",
+          title: 'تم التوليد',
+          description: 'تم توليد الفاتورة وتحميلها',
         });
       }
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء عرض الفاتورة",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء عرض الفاتورة',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -119,9 +121,9 @@ export function useDocumentViewer() {
   const viewReceipt = async (receiptId: string) => {
     if (!receiptId) {
       toast({
-        title: "تنبيه",
-        description: "لم يتم إصدار سند قبض لهذه الدفعة بعد",
-        variant: "destructive"
+        title: 'تنبيه',
+        description: 'لم يتم إصدار سند قبض لهذه الدفعة بعد',
+        variant: 'destructive',
       });
       return;
     }
@@ -132,9 +134,9 @@ export function useDocumentViewer() {
 
       if (!receiptData) {
         toast({
-          title: "خطأ",
-          description: "فشل تحميل بيانات سند القبض",
-          variant: "destructive"
+          title: 'خطأ',
+          description: 'فشل تحميل بيانات سند القبض',
+          variant: 'destructive',
         });
         return;
       }
@@ -154,17 +156,17 @@ export function useDocumentViewer() {
         if (pdfReceipt) {
           await generateReceiptPDF(pdfReceipt, null);
         }
-        
+
         toast({
-          title: "تم التوليد",
-          description: "تم توليد سند القبض وتحميله",
+          title: 'تم التوليد',
+          description: 'تم توليد سند القبض وتحميله',
         });
       }
     } catch {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء عرض سند القبض",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء عرض سند القبض',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);

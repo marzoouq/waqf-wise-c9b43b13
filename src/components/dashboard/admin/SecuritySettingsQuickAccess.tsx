@@ -2,19 +2,19 @@
  * Security Settings Quick Access - الوصول السريع لإعدادات الأمان
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  Settings2, 
-  Shield, 
-  Key, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Settings2,
+  Shield,
+  Key,
   Lock,
   FileText,
   AlertTriangle,
   ExternalLink,
-  Fingerprint
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+  Fingerprint,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface QuickSettingItem {
   id: string;
@@ -26,32 +26,32 @@ interface QuickSettingItem {
 
 const quickSettings: QuickSettingItem[] = [
   {
-    id: "2fa",
+    id: '2fa',
     icon: <Fingerprint className="h-5 w-5 text-purple-500" />,
-    title: "المصادقة الثنائية",
-    description: "تفعيل التحقق بخطوتين للحسابات الإدارية",
-    link: "/settings",
+    title: 'المصادقة الثنائية',
+    description: 'تفعيل التحقق بخطوتين للحسابات الإدارية',
+    link: '/settings',
   },
   {
-    id: "password-policy",
+    id: 'password-policy',
     icon: <Key className="h-5 w-5 text-blue-500" />,
-    title: "سياسة كلمات المرور",
-    description: "تحديد متطلبات قوة كلمة المرور",
-    link: "/settings",
+    title: 'سياسة كلمات المرور',
+    description: 'تحديد متطلبات قوة كلمة المرور',
+    link: '/settings',
   },
   {
-    id: "session",
+    id: 'session',
     icon: <Lock className="h-5 w-5 text-orange-500" />,
-    title: "إعدادات الجلسات",
-    description: "مدة انتهاء الجلسة وتسجيل الخروج التلقائي",
-    link: "/settings",
+    title: 'إعدادات الجلسات',
+    description: 'مدة انتهاء الجلسة وتسجيل الخروج التلقائي',
+    link: '/settings',
   },
   {
-    id: "audit",
+    id: 'audit',
     icon: <FileText className="h-5 w-5 text-green-500" />,
-    title: "سجلات التدقيق",
-    description: "عرض جميع العمليات والتغييرات",
-    link: "/audit-logs",
+    title: 'سجلات التدقيق',
+    description: 'عرض جميع العمليات والتغييرات',
+    link: '/audit-logs',
   },
 ];
 
@@ -65,12 +65,7 @@ export function SecuritySettingsQuickAccess() {
           <Settings2 className="h-5 w-5 text-primary" />
           إعدادات الأمان السريعة
         </CardTitle>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => navigate("/security")}
-          className="gap-2"
-        >
+        <Button variant="outline" size="sm" onClick={() => navigate('/security')} className="gap-2">
           <Shield className="h-4 w-4" />
           <span className="hidden sm:inline">لوحة الأمان</span>
         </Button>
@@ -86,17 +81,11 @@ export function SecuritySettingsQuickAccess() {
                 {setting.icon}
                 <div>
                   <div className="font-medium text-sm">{setting.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {setting.description}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{setting.description}</div>
                 </div>
               </div>
               {setting.link && (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate(setting.link!)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => navigate(setting.link!)}>
                   <ExternalLink className="h-4 w-4" />
                 </Button>
               )}
@@ -109,11 +98,10 @@ export function SecuritySettingsQuickAccess() {
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
             <div>
-              <div className="font-medium text-sm text-yellow-700">
-                نصيحة أمنية
-              </div>
+              <div className="font-medium text-sm text-yellow-700">نصيحة أمنية</div>
               <div className="text-xs text-yellow-600 mt-1">
-                يُنصح بتفعيل المصادقة الثنائية لجميع الحسابات الإدارية وتغيير كلمات المرور بشكل دوري.
+                يُنصح بتفعيل المصادقة الثنائية لجميع الحسابات الإدارية وتغيير كلمات المرور بشكل
+                دوري.
               </div>
             </div>
           </div>

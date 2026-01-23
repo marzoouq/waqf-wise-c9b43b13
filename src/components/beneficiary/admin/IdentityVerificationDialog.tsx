@@ -36,13 +36,8 @@ export function IdentityVerificationDialog({
   onOpenChange,
   beneficiary,
 }: IdentityVerificationDialogProps) {
-  const {
-    formData,
-    updateFormData,
-    resetForm,
-    verify,
-    isVerifying,
-  } = useIdentityVerification(beneficiary);
+  const { formData, updateFormData, resetForm, verify, isVerifying } =
+    useIdentityVerification(beneficiary);
 
   const handleSubmit = () => {
     verify(undefined, {
@@ -94,15 +89,15 @@ export function IdentityVerificationDialog({
                 </div>
                 <div>
                   <span className="font-medium">رقم الهاتف:</span>
-                  <p className="text-muted-foreground" dir="ltr">{beneficiary.phone}</p>
+                  <p className="text-muted-foreground" dir="ltr">
+                    {beneficiary.phone}
+                  </p>
                 </div>
                 <div>
                   <span className="font-medium">الحالة الحالية:</span>
                   <div className="flex items-center gap-2 mt-1">
                     {getStatusIcon(beneficiary.verification_status || 'pending')}
-                    <Badge variant="outline">
-                      {beneficiary.verification_status || 'غير موثق'}
-                    </Badge>
+                    <Badge variant="outline">{beneficiary.verification_status || 'غير موثق'}</Badge>
                   </div>
                 </div>
                 <div>
@@ -123,9 +118,7 @@ export function IdentityVerificationDialog({
                   <Label htmlFor="verification_type">نوع التحقق</Label>
                   <Select
                     value={formData.verification_type}
-                    onValueChange={(value) =>
-                      updateFormData({ verification_type: value })
-                    }
+                    onValueChange={(value) => updateFormData({ verification_type: value })}
                   >
                     <SelectTrigger id="verification_type">
                       <SelectValue />
@@ -144,9 +137,7 @@ export function IdentityVerificationDialog({
                   <Label htmlFor="verification_method">طريقة التحقق</Label>
                   <Select
                     value={formData.verification_method}
-                    onValueChange={(value) =>
-                      updateFormData({ verification_method: value })
-                    }
+                    onValueChange={(value) => updateFormData({ verification_method: value })}
                   >
                     <SelectTrigger id="verification_method">
                       <SelectValue />
@@ -166,9 +157,7 @@ export function IdentityVerificationDialog({
                 <Label htmlFor="verification_status">حالة التحقق</Label>
                 <Select
                   value={formData.verification_status}
-                  onValueChange={(value) =>
-                    updateFormData({ verification_status: value })
-                  }
+                  onValueChange={(value) => updateFormData({ verification_status: value })}
                 >
                   <SelectTrigger id="verification_status">
                     <SelectValue />
@@ -187,9 +176,7 @@ export function IdentityVerificationDialog({
                 <Textarea
                   id="notes"
                   value={formData.notes}
-                  onChange={(e) =>
-                    updateFormData({ notes: e.target.value })
-                  }
+                  onChange={(e) => updateFormData({ notes: e.target.value })}
                   placeholder="أدخل أي ملاحظات حول عملية التحقق..."
                   rows={4}
                 />

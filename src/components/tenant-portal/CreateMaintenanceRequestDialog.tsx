@@ -4,61 +4,61 @@
  * @version 1.0.0
  */
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { matchesStatus } from "@/lib/constants";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { matchesStatus } from '@/lib/constants';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Camera, 
-  Upload, 
-  X, 
-  Wrench, 
-  MapPin, 
-  Calendar, 
-  Clock, 
-  Phone, 
-  Mail, 
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Camera,
+  Upload,
+  X,
+  Wrench,
+  MapPin,
+  Calendar,
+  Clock,
+  Phone,
+  Mail,
   AlertTriangle,
   CheckCircle2,
-  Building2
-} from "lucide-react";
-import { useCreateTenantRequest } from "@/hooks/tenant-portal/useTenantPortal";
-import { TenantContract } from "@/services/tenant-portal.service";
-import { toast } from "sonner";
+  Building2,
+} from 'lucide-react';
+import { useCreateTenantRequest } from '@/hooks/tenant-portal/useTenantPortal';
+import { TenantContract } from '@/services/tenant-portal.service';
+import { toast } from 'sonner';
 
 const maintenanceSchema = z.object({
-  title: z.string().min(5, "العنوان يجب أن يكون 5 أحرف على الأقل"),
-  description: z.string().min(20, "الوصف يجب أن يكون 20 حرف على الأقل"),
-  category: z.string().min(1, "اختر فئة الصيانة"),
-  priority: z.string().min(1, "اختر الأولوية"),
+  title: z.string().min(5, 'العنوان يجب أن يكون 5 أحرف على الأقل'),
+  description: z.string().min(20, 'الوصف يجب أن يكون 20 حرف على الأقل'),
+  category: z.string().min(1, 'اختر فئة الصيانة'),
+  priority: z.string().min(1, 'اختر الأولوية'),
   location_in_unit: z.string().optional(),
   preferred_date: z.string().optional(),
   preferred_time_slot: z.string().optional(),
   contact_preference: z.string().optional(),
   contact_phone: z.string().optional(),
-  contact_email: z.string().email().optional().or(z.literal("")),
+  contact_email: z.string().email().optional().or(z.literal('')),
   is_urgent: z.boolean().default(false),
   tenant_notes: z.string().optional(),
 });
@@ -72,54 +72,54 @@ interface CreateMaintenanceRequestDialogProps {
 }
 
 const MAINTENANCE_CATEGORIES = [
-  { value: "كهرباء", label: "كهرباء", icon: "⚡" },
-  { value: "سباكة", label: "سباكة", icon: "🔧" },
-  { value: "تكييف", label: "تكييف وتبريد", icon: "❄️" },
-  { value: "أجهزة", label: "أجهزة منزلية", icon: "📺" },
-  { value: "أبواب_نوافذ", label: "أبواب ونوافذ", icon: "🚪" },
-  { value: "دهانات", label: "دهانات وتشطيبات", icon: "🎨" },
-  { value: "مفاتيح", label: "مفاتيح وأقفال", icon: "🔑" },
-  { value: "تسربات", label: "تسربات مياه", icon: "💧" },
-  { value: "صرف", label: "صرف صحي", icon: "🚿" },
-  { value: "أخرى", label: "أخرى", icon: "📋" },
+  { value: 'كهرباء', label: 'كهرباء', icon: '⚡' },
+  { value: 'سباكة', label: 'سباكة', icon: '🔧' },
+  { value: 'تكييف', label: 'تكييف وتبريد', icon: '❄️' },
+  { value: 'أجهزة', label: 'أجهزة منزلية', icon: '📺' },
+  { value: 'أبواب_نوافذ', label: 'أبواب ونوافذ', icon: '🚪' },
+  { value: 'دهانات', label: 'دهانات وتشطيبات', icon: '🎨' },
+  { value: 'مفاتيح', label: 'مفاتيح وأقفال', icon: '🔑' },
+  { value: 'تسربات', label: 'تسربات مياه', icon: '💧' },
+  { value: 'صرف', label: 'صرف صحي', icon: '🚿' },
+  { value: 'أخرى', label: 'أخرى', icon: '📋' },
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: "منخفضة", label: "منخفضة", color: "bg-success/10 text-success" },
-  { value: "متوسطة", label: "متوسطة", color: "bg-warning/10 text-warning" },
-  { value: "عالية", label: "عالية", color: "bg-warning/20 text-warning" },
-  { value: "طارئة", label: "طارئة", color: "bg-destructive/10 text-destructive" },
+  { value: 'منخفضة', label: 'منخفضة', color: 'bg-success/10 text-success' },
+  { value: 'متوسطة', label: 'متوسطة', color: 'bg-warning/10 text-warning' },
+  { value: 'عالية', label: 'عالية', color: 'bg-warning/20 text-warning' },
+  { value: 'طارئة', label: 'طارئة', color: 'bg-destructive/10 text-destructive' },
 ];
 
 const LOCATION_OPTIONS = [
-  "غرفة المعيشة",
-  "المطبخ",
-  "الحمام الرئيسي",
-  "حمام الضيوف",
-  "غرفة النوم الرئيسية",
-  "غرفة النوم الثانية",
-  "غرفة النوم الثالثة",
-  "الصالة",
-  "المدخل",
-  "الشرفة/البلكونة",
-  "المستودع",
-  "موقف السيارات",
-  "السطح",
-  "الحديقة",
-  "أخرى",
+  'غرفة المعيشة',
+  'المطبخ',
+  'الحمام الرئيسي',
+  'حمام الضيوف',
+  'غرفة النوم الرئيسية',
+  'غرفة النوم الثانية',
+  'غرفة النوم الثالثة',
+  'الصالة',
+  'المدخل',
+  'الشرفة/البلكونة',
+  'المستودع',
+  'موقف السيارات',
+  'السطح',
+  'الحديقة',
+  'أخرى',
 ];
 
 const TIME_SLOTS = [
-  { value: "morning", label: "صباحاً (8ص - 12م)" },
-  { value: "afternoon", label: "ظهراً (12م - 4م)" },
-  { value: "evening", label: "مساءً (4م - 8م)" },
-  { value: "anytime", label: "أي وقت" },
+  { value: 'morning', label: 'صباحاً (8ص - 12م)' },
+  { value: 'afternoon', label: 'ظهراً (12م - 4م)' },
+  { value: 'evening', label: 'مساءً (4م - 8م)' },
+  { value: 'anytime', label: 'أي وقت' },
 ];
 
 const CONTACT_PREFERENCES = [
-  { value: "phone", label: "اتصال هاتفي", icon: Phone },
-  { value: "whatsapp", label: "واتساب", icon: Phone },
-  { value: "email", label: "بريد إلكتروني", icon: Mail },
+  { value: 'phone', label: 'اتصال هاتفي', icon: Phone },
+  { value: 'whatsapp', label: 'واتساب', icon: Phone },
+  { value: 'email', label: 'بريد إلكتروني', icon: Mail },
 ];
 
 export function CreateMaintenanceRequestDialog({
@@ -128,31 +128,31 @@ export function CreateMaintenanceRequestDialog({
   contracts,
 }: CreateMaintenanceRequestDialogProps) {
   const [step, setStep] = useState(1);
-  const [selectedContract, setSelectedContract] = useState<string>("");
+  const [selectedContract, setSelectedContract] = useState<string>('');
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  
+
   const { mutate: createRequest, isPending } = useCreateTenantRequest();
 
   const form = useForm<MaintenanceFormData>({
     resolver: zodResolver(maintenanceSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      category: "",
-      priority: "متوسطة",
-      location_in_unit: "",
-      preferred_date: "",
-      preferred_time_slot: "anytime",
-      contact_preference: "phone",
-      contact_phone: "",
-      contact_email: "",
+      title: '',
+      description: '',
+      category: '',
+      priority: 'متوسطة',
+      location_in_unit: '',
+      preferred_date: '',
+      preferred_time_slot: 'anytime',
+      contact_preference: 'phone',
+      contact_phone: '',
+      contact_email: '',
       is_urgent: false,
-      tenant_notes: "",
+      tenant_notes: '',
     },
   });
 
-  const selectedContractData = contracts.find(c => c.contract_id === selectedContract);
+  const selectedContractData = contracts.find((c) => c.contract_id === selectedContract);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -164,7 +164,7 @@ export function CreateMaintenanceRequestDialog({
       const newImages: string[] = [];
       for (const file of Array.from(files)) {
         if (images.length + newImages.length >= 5) {
-          toast.warning("الحد الأقصى 5 صور");
+          toast.warning('الحد الأقصى 5 صور');
           break;
         }
         const reader = new FileReader();
@@ -176,7 +176,7 @@ export function CreateMaintenanceRequestDialog({
       }
       setImages([...images, ...newImages]);
     } catch {
-      toast.error("فشل في رفع الصور");
+      toast.error('فشل في رفع الصور');
     } finally {
       setUploading(false);
     }
@@ -188,46 +188,49 @@ export function CreateMaintenanceRequestDialog({
 
   const onSubmit = (data: MaintenanceFormData) => {
     if (!selectedContract) {
-      toast.error("اختر الوحدة");
+      toast.error('اختر الوحدة');
       return;
     }
 
-    const contract = contracts.find(c => c.contract_id === selectedContract);
+    const contract = contracts.find((c) => c.contract_id === selectedContract);
     if (!contract) return;
 
-    createRequest({
-      propertyId: contract.property_id,
-      unitId: contract.unit_id || undefined,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      priority: data.priority,
-      locationInUnit: data.location_in_unit || undefined,
-      images: images.length > 0 ? images : undefined,
-      preferredDate: data.preferred_date || undefined,
-      preferredTimeSlot: data.preferred_time_slot || undefined,
-      contactPreference: data.contact_preference as "phone" | "email" | "whatsapp" | undefined,
-      contactPhone: data.contact_phone || undefined,
-      contactEmail: data.contact_email || undefined,
-      isUrgent: data.is_urgent,
-      tenantNotes: data.tenant_notes || undefined,
-    }, {
-      onSuccess: () => {
-        toast.success("تم إرسال طلب الصيانة بنجاح");
-        onOpenChange(false);
-        form.reset();
-        setImages([]);
-        setSelectedContract("");
-        setStep(1);
+    createRequest(
+      {
+        propertyId: contract.property_id,
+        unitId: contract.unit_id || undefined,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        locationInUnit: data.location_in_unit || undefined,
+        images: images.length > 0 ? images : undefined,
+        preferredDate: data.preferred_date || undefined,
+        preferredTimeSlot: data.preferred_time_slot || undefined,
+        contactPreference: data.contact_preference as 'phone' | 'email' | 'whatsapp' | undefined,
+        contactPhone: data.contact_phone || undefined,
+        contactEmail: data.contact_email || undefined,
+        isUrgent: data.is_urgent,
+        tenantNotes: data.tenant_notes || undefined,
       },
-      onError: (error) => {
-        toast.error(error.message || "فشل في إرسال الطلب");
-      },
-    });
+      {
+        onSuccess: () => {
+          toast.success('تم إرسال طلب الصيانة بنجاح');
+          onOpenChange(false);
+          form.reset();
+          setImages([]);
+          setSelectedContract('');
+          setStep(1);
+        },
+        onError: (error) => {
+          toast.error(error.message || 'فشل في إرسال الطلب');
+        },
+      }
+    );
   };
 
-  const isUrgent = form.watch("is_urgent");
-  const selectedCategory = form.watch("category");
+  const isUrgent = form.watch('is_urgent');
+  const selectedCategory = form.watch('category');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -237,9 +240,7 @@ export function CreateMaintenanceRequestDialog({
             <Wrench className="h-5 w-5 text-primary" />
             طلب صيانة جديد
           </DialogTitle>
-          <DialogDescription>
-            أدخل تفاصيل طلب الصيانة
-          </DialogDescription>
+          <DialogDescription>أدخل تفاصيل طلب الصيانة</DialogDescription>
         </DialogHeader>
 
         {/* Progress Steps */}
@@ -249,14 +250,14 @@ export function CreateMaintenanceRequestDialog({
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                   step >= s
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {step > s ? <CheckCircle2 className="h-4 w-4" /> : s}
               </div>
               {s < 3 && (
-                <div className={`w-12 h-1 rounded ${step > s ? "bg-primary" : "bg-muted"}`} />
+                <div className={`w-12 h-1 rounded ${step > s ? 'bg-primary' : 'bg-muted'}`} />
               )}
             </div>
           ))}
@@ -280,7 +281,13 @@ export function CreateMaintenanceRequestDialog({
                 ) : (
                   <>
                     <Select value={selectedContract} onValueChange={setSelectedContract}>
-                      <SelectTrigger className={!selectedContract && form.formState.isSubmitted ? "border-destructive" : ""}>
+                      <SelectTrigger
+                        className={
+                          !selectedContract && form.formState.isSubmitted
+                            ? 'border-destructive'
+                            : ''
+                        }
+                      >
                         <SelectValue placeholder="اختر الوحدة السكنية" />
                       </SelectTrigger>
                       <SelectContent>
@@ -289,7 +296,7 @@ export function CreateMaintenanceRequestDialog({
                             <div className="flex flex-col items-start">
                               <span className="font-medium">{contract.property_name}</span>
                               <span className="text-xs text-muted-foreground">
-                                {contract.unit_name || "الوحدة الرئيسية"} 
+                                {contract.unit_name || 'الوحدة الرئيسية'}
                                 {contract.unit_number && ` (${contract.unit_number})`}
                                 {contract.property_location && ` - ${contract.property_location}`}
                               </span>
@@ -307,10 +314,17 @@ export function CreateMaintenanceRequestDialog({
                               <p className="font-medium">{selectedContractData.property_name}</p>
                               <p className="text-sm text-muted-foreground">
                                 {selectedContractData.unit_name}
-                                {selectedContractData.property_location && ` • ${selectedContractData.property_location}`}
+                                {selectedContractData.property_location &&
+                                  ` • ${selectedContractData.property_location}`}
                               </p>
                             </div>
-                            <Badge variant={matchesStatus(selectedContractData.status, 'active') ? "default" : "secondary"}>
+                            <Badge
+                              variant={
+                                matchesStatus(selectedContractData.status, 'active')
+                                  ? 'default'
+                                  : 'secondary'
+                              }
+                            >
                               {selectedContractData.status}
                             </Badge>
                           </div>
@@ -329,9 +343,9 @@ export function CreateMaintenanceRequestDialog({
                     <Button
                       key={cat.value}
                       type="button"
-                      variant={selectedCategory === cat.value ? "default" : "outline"}
+                      variant={selectedCategory === cat.value ? 'default' : 'outline'}
                       className="justify-start gap-2 h-auto py-3"
-                      onClick={() => form.setValue("category", cat.value)}
+                      onClick={() => form.setValue('category', cat.value)}
                     >
                       <span>{cat.icon}</span>
                       <span>{cat.label}</span>
@@ -339,7 +353,9 @@ export function CreateMaintenanceRequestDialog({
                   ))}
                 </div>
                 {form.formState.errors.category && (
-                  <p className="text-sm text-destructive">{form.formState.errors.category.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.category.message}
+                  </p>
                 )}
               </div>
 
@@ -349,7 +365,7 @@ export function CreateMaintenanceRequestDialog({
                 <Input
                   id="title"
                   placeholder="مثال: تسريب مياه في الحمام"
-                  {...form.register("title")}
+                  {...form.register('title')}
                 />
                 {form.formState.errors.title && (
                   <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
@@ -363,10 +379,12 @@ export function CreateMaintenanceRequestDialog({
                   id="description"
                   placeholder="اشرح المشكلة بالتفصيل: متى بدأت؟ ما هي الأعراض؟ هل هناك أضرار؟"
                   rows={4}
-                  {...form.register("description")}
+                  {...form.register('description')}
                 />
                 {form.formState.errors.description && (
-                  <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.description.message}
+                  </p>
                 )}
               </div>
 
@@ -378,11 +396,11 @@ export function CreateMaintenanceRequestDialog({
                     <Badge
                       key={p.value}
                       className={`cursor-pointer px-4 py-2 ${
-                        form.watch("priority") === p.value
+                        form.watch('priority') === p.value
                           ? p.color
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
                       }`}
-                      onClick={() => form.setValue("priority", p.value)}
+                      onClick={() => form.setValue('priority', p.value)}
                     >
                       {p.label}
                     </Badge>
@@ -391,11 +409,13 @@ export function CreateMaintenanceRequestDialog({
               </div>
 
               {/* Urgent Toggle */}
-              <Card className={isUrgent ? "border-destructive/30 bg-destructive/5" : ""}>
+              <Card className={isUrgent ? 'border-destructive/30 bg-destructive/5' : ''}>
                 <CardContent className="py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <AlertTriangle className={`h-5 w-5 ${isUrgent ? "text-destructive" : "text-muted-foreground"}`} />
+                      <AlertTriangle
+                        className={`h-5 w-5 ${isUrgent ? 'text-destructive' : 'text-muted-foreground'}`}
+                      />
                       <div>
                         <p className="font-medium">حالة طارئة</p>
                         <p className="text-sm text-muted-foreground">
@@ -405,7 +425,7 @@ export function CreateMaintenanceRequestDialog({
                     </div>
                     <Switch
                       checked={isUrgent}
-                      onCheckedChange={(checked) => form.setValue("is_urgent", checked)}
+                      onCheckedChange={(checked) => form.setValue('is_urgent', checked)}
                     />
                   </div>
                 </CardContent>
@@ -423,8 +443,8 @@ export function CreateMaintenanceRequestDialog({
                   موقع المشكلة في الوحدة
                 </Label>
                 <Select
-                  value={form.watch("location_in_unit")}
-                  onValueChange={(v) => form.setValue("location_in_unit", v)}
+                  value={form.watch('location_in_unit')}
+                  onValueChange={(v) => form.setValue('location_in_unit', v)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الموقع" />
@@ -445,11 +465,18 @@ export function CreateMaintenanceRequestDialog({
                   <Camera className="h-4 w-4" />
                   صور المشكلة (اختياري - حد أقصى 5 صور)
                 </Label>
-                
+
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((img, index) => (
-                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border">
-                      <img src={img} alt={`صورة ${index + 1}`} className="w-full h-full object-cover" />
+                    <div
+                      key={index}
+                      className="relative aspect-square rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={img}
+                        alt={`صورة ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
                       <Button
                         type="button"
                         variant="destructive"
@@ -461,7 +488,7 @@ export function CreateMaintenanceRequestDialog({
                       </Button>
                     </div>
                   ))}
-                  
+
                   {images.length < 5 && (
                     <label className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors">
                       <input
@@ -492,7 +519,7 @@ export function CreateMaintenanceRequestDialog({
                   id="tenant_notes"
                   placeholder="أي معلومات إضافية تريد إضافتها..."
                   rows={3}
-                  {...form.register("tenant_notes")}
+                  {...form.register('tenant_notes')}
                 />
               </div>
             </div>
@@ -509,8 +536,8 @@ export function CreateMaintenanceRequestDialog({
                 </Label>
                 <Input
                   type="date"
-                  min={new Date().toISOString().split("T")[0]}
-                  {...form.register("preferred_date")}
+                  min={new Date().toISOString().split('T')[0]}
+                  {...form.register('preferred_date')}
                 />
               </div>
 
@@ -525,9 +552,11 @@ export function CreateMaintenanceRequestDialog({
                     <Button
                       key={slot.value}
                       type="button"
-                      variant={form.watch("preferred_time_slot") === slot.value ? "default" : "outline"}
+                      variant={
+                        form.watch('preferred_time_slot') === slot.value ? 'default' : 'outline'
+                      }
                       className="justify-center"
-                      onClick={() => form.setValue("preferred_time_slot", slot.value)}
+                      onClick={() => form.setValue('preferred_time_slot', slot.value)}
                     >
                       {slot.label}
                     </Button>
@@ -543,9 +572,11 @@ export function CreateMaintenanceRequestDialog({
                     <Button
                       key={pref.value}
                       type="button"
-                      variant={form.watch("contact_preference") === pref.value ? "default" : "outline"}
+                      variant={
+                        form.watch('contact_preference') === pref.value ? 'default' : 'outline'
+                      }
                       className="gap-2"
-                      onClick={() => form.setValue("contact_preference", pref.value)}
+                      onClick={() => form.setValue('contact_preference', pref.value)}
                     >
                       <pref.icon className="h-4 w-4" />
                       {pref.label}
@@ -562,7 +593,7 @@ export function CreateMaintenanceRequestDialog({
                   type="tel"
                   placeholder="05xxxxxxxx"
                   dir="ltr"
-                  {...form.register("contact_phone")}
+                  {...form.register('contact_phone')}
                 />
               </div>
 
@@ -574,7 +605,7 @@ export function CreateMaintenanceRequestDialog({
                   type="email"
                   placeholder="email@example.com"
                   dir="ltr"
-                  {...form.register("contact_email")}
+                  {...form.register('contact_email')}
                 />
               </div>
 
@@ -583,12 +614,22 @@ export function CreateMaintenanceRequestDialog({
                 <CardContent className="py-4 space-y-2">
                   <p className="font-medium">ملخص الطلب:</p>
                   <div className="text-sm space-y-1">
-                    <p><strong>الوحدة:</strong> {selectedContractData?.property_name}</p>
-                    <p><strong>النوع:</strong> {form.watch("category")}</p>
-                    <p><strong>العنوان:</strong> {form.watch("title")}</p>
-                    <p><strong>الأولوية:</strong> {form.watch("priority")}</p>
+                    <p>
+                      <strong>الوحدة:</strong> {selectedContractData?.property_name}
+                    </p>
+                    <p>
+                      <strong>النوع:</strong> {form.watch('category')}
+                    </p>
+                    <p>
+                      <strong>العنوان:</strong> {form.watch('title')}
+                    </p>
+                    <p>
+                      <strong>الأولوية:</strong> {form.watch('priority')}
+                    </p>
                     {isUrgent && (
-                      <Badge variant="destructive" className="mt-2">حالة طارئة</Badge>
+                      <Badge variant="destructive" className="mt-2">
+                        حالة طارئة
+                      </Badge>
                     )}
                   </div>
                 </CardContent>
@@ -607,21 +648,21 @@ export function CreateMaintenanceRequestDialog({
                 إلغاء
               </Button>
             )}
-            
+
             {step < 3 ? (
               <Button
                 type="button"
                 onClick={() => {
                   if (step === 1) {
                     if (!selectedContract) {
-                      toast.error("اختر الوحدة");
+                      toast.error('اختر الوحدة');
                       return;
                     }
-                    const categoryValid = form.getValues("category");
-                    const titleValid = form.getValues("title").length >= 5;
-                    const descValid = form.getValues("description").length >= 20;
+                    const categoryValid = form.getValues('category');
+                    const titleValid = form.getValues('title').length >= 5;
+                    const descValid = form.getValues('description').length >= 20;
                     if (!categoryValid || !titleValid || !descValid) {
-                      form.trigger(["category", "title", "description"]);
+                      form.trigger(['category', 'title', 'description']);
                       return;
                     }
                   }
@@ -632,7 +673,7 @@ export function CreateMaintenanceRequestDialog({
               </Button>
             ) : (
               <Button type="submit" disabled={isPending}>
-                {isPending ? "جاري الإرسال..." : "إرسال الطلب"}
+                {isPending ? 'جاري الإرسال...' : 'إرسال الطلب'}
               </Button>
             )}
           </div>

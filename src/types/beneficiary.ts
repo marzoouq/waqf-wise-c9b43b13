@@ -1,4 +1,4 @@
-import type { Json } from "@/integrations/supabase/types";
+import type { Json } from '@/integrations/supabase/types';
 
 // Notification preferences interface
 export interface NotificationPreferences {
@@ -127,10 +127,15 @@ export interface Beneficiary {
 }
 
 // Beneficiary insert type
-export type BeneficiaryInsert = Omit<Beneficiary, "id" | "created_at" | "updated_at" | "beneficiary_number">;
+export type BeneficiaryInsert = Omit<
+  Beneficiary,
+  'id' | 'created_at' | 'updated_at' | 'beneficiary_number'
+>;
 
 // Beneficiary update type
-export type BeneficiaryUpdate = Partial<Omit<Beneficiary, "id" | "created_at" | "updated_at" | "beneficiary_number">>;
+export type BeneficiaryUpdate = Partial<
+  Omit<Beneficiary, 'id' | 'created_at' | 'updated_at' | 'beneficiary_number'>
+>;
 
 // Beneficiary with statistics for dashboard
 export interface BeneficiaryWithStats extends Beneficiary {

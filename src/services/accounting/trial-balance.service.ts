@@ -15,7 +15,7 @@ type JournalEntryLineRow = Database['public']['Tables']['journal_entry_lines']['
 
 /**
  * ملخص البيانات المالية
- * 
+ *
  * ملاحظة: هذه البيانات من القيود المحاسبية وليست من التحصيل الفعلي
  * - totalRevenue: إيرادات الفترة المحاسبية (المصدر: accounts.current_balance لحسابات الإيرادات)
  * - totalExpenses: مصروفات الفترة (المصدر: accounts.current_balance لحسابات المصروفات)
@@ -80,7 +80,7 @@ export class TrialBalanceService {
         netIncome: 0,
       };
 
-      (accounts || []).forEach(account => {
+      (accounts || []).forEach((account) => {
         const balance = account.current_balance || 0;
         switch (account.account_type) {
           case 'asset':
@@ -130,12 +130,14 @@ export class TrialBalanceService {
       // جلب مجموع القيود لكل حساب
       let entriesQuery = supabase
         .from('journal_entry_lines')
-        .select('account_id, debit_amount, credit_amount, journal_entries!inner(status, fiscal_year_id)');
+        .select(
+          'account_id, debit_amount, credit_amount, journal_entries!inner(status, fiscal_year_id)'
+        );
 
       if (fiscalYearId) {
         entriesQuery = entriesQuery.eq('journal_entries.fiscal_year_id', fiscalYearId);
       }
-      
+
       entriesQuery = entriesQuery.eq('journal_entries.status', 'posted');
 
       const { data: lines, error: linesError } = await entriesQuery;
@@ -144,7 +146,7 @@ export class TrialBalanceService {
 
       // حساب المجاميع لكل حساب
       const accountTotals: Record<string, { debit: number; credit: number }> = {};
-      (lines || []).forEach(line => {
+      (lines || []).forEach((line) => {
         if (!accountTotals[line.account_id]) {
           accountTotals[line.account_id] = { debit: 0, credit: 0 };
         }
@@ -152,7 +154,7 @@ export class TrialBalanceService {
         accountTotals[line.account_id].credit += line.credit_amount || 0;
       });
 
-      const result = (accounts || []).map(account => ({
+      const result = (accounts || []).map((account) => ({
         ...account,
         debit_total: accountTotals[account.id]?.debit || 0,
         credit_total: accountTotals[account.id]?.credit || 0,
@@ -176,7 +178,10 @@ export class TrialBalanceService {
   /**
    * جلب دفتر الأستاذ العام
    */
-  static async getGeneralLedger(accountId: string, dateRange?: { from: string; to: string }): Promise<{
+  static async getGeneralLedger(
+    accountId: string,
+    dateRange?: { from: string; to: string }
+  ): Promise<{
     account: AccountRow;
     entries: (JournalEntryLineRow & { journal_entry: JournalEntryRow })[];
     openingBalance: number;
@@ -209,7 +214,7 @@ export class TrialBalanceService {
 
       if (error) throw error;
 
-      const entries = (data || []).map(line => ({
+      const entries = (data || []).map((line) => ({
         ...line,
         journal_entry: line.journal_entries as unknown as JournalEntryRow,
       }));
@@ -218,7 +223,7 @@ export class TrialBalanceService {
       let balance = account.current_balance || 0;
       const openingBalance = balance;
 
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (account.account_nature === 'debit') {
           balance += (entry.debit_amount || 0) - (entry.credit_amount || 0);
         } else {
@@ -249,8 +254,9 @@ export class TrialBalanceService {
     if (!params.accountId) return null;
 
     let query = supabase
-      .from("journal_entry_lines")
-      .select(`
+      .from('journal_entry_lines')
+      .select(
+        `
         *,
         journal_entry:journal_entries(
           entry_number,
@@ -258,15 +264,16 @@ export class TrialBalanceService {
           description,
           status
         )
-      `)
-      .eq("account_id", params.accountId)
-      .order("created_at", { ascending: true });
+      `
+      )
+      .eq('account_id', params.accountId)
+      .order('created_at', { ascending: true });
 
     if (params.dateFrom) {
-      query = query.gte("journal_entry.entry_date", params.dateFrom);
+      query = query.gte('journal_entry.entry_date', params.dateFrom);
     }
     if (params.dateTo) {
-      query = query.lte("journal_entry.entry_date", params.dateTo);
+      query = query.lte('journal_entry.entry_date', params.dateTo);
     }
 
     const { data, error } = await query;
@@ -291,9 +298,9 @@ export class TrialBalanceService {
     try {
       // جلب السنة المالية النشطة
       const { data: fiscalYear, error: fiscalError } = await supabase
-        .from("fiscal_years")
-        .select("id")
-        .eq("is_active", true)
+        .from('fiscal_years')
+        .select('id')
+        .eq('is_active', true)
         .maybeSingle();
 
       // إذا لم توجد سنة مالية نشطة، ارجع القيم الافتراضية
@@ -303,9 +310,7 @@ export class TrialBalanceService {
 
       // جلب القيود اليومية والأرصدة الافتتاحية بالتوازي
       const [entriesResult, openingBalancesResult] = await Promise.all([
-        supabase
-          .from("journal_entry_lines")
-          .select(`
+        supabase.from('journal_entry_lines').select(`
             debit_amount,
             credit_amount,
             account_id,
@@ -315,21 +320,26 @@ export class TrialBalanceService {
             )
           `),
         supabase
-          .from("opening_balances")
-          .select(`
+          .from('opening_balances')
+          .select(
+            `
             opening_balance,
             accounts (
               account_type,
               account_nature
             )
-          `)
-          .eq("fiscal_year_id", fiscalYear.id)
+          `
+          )
+          .eq('fiscal_year_id', fiscalYear.id),
       ]);
 
       // إذا فشل جلب القيود (RLS أو خطأ آخر)، ارجع القيم الافتراضية
       if (entriesResult.error) {
         // فقط سجل كتحذير وليس كخطأ إذا كان RLS
-        if (entriesResult.error.code === '42501' || entriesResult.error.message?.includes('permission')) {
+        if (
+          entriesResult.error.code === '42501' ||
+          entriesResult.error.message?.includes('permission')
+        ) {
           return defaultSummary;
         }
         productionLogger.warn('Could not fetch journal entries', entriesResult.error);

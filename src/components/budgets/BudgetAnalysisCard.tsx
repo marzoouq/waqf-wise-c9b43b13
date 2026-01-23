@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
-import { Budget } from "@/hooks/accounting/useBudgets";
-import { formatCurrency } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Budget } from '@/hooks/accounting/useBudgets';
+import { formatCurrency } from '@/lib/utils';
 
 interface BudgetAnalysisCardProps {
   budgets: Budget[];
@@ -15,8 +15,8 @@ export function BudgetAnalysisCard({ budgets }: BudgetAnalysisCardProps) {
   const utilizationRate = totalBudgeted > 0 ? (totalActual / totalBudgeted) * 100 : 0;
 
   // حساب الميزانيات المتجاوزة
-  const overBudget = budgets.filter(b => (b.actual_amount || 0) > b.budgeted_amount).length;
-  const underBudget = budgets.filter(b => (b.actual_amount || 0) < b.budgeted_amount).length;
+  const overBudget = budgets.filter((b) => (b.actual_amount || 0) > b.budgeted_amount).length;
+  const underBudget = budgets.filter((b) => (b.actual_amount || 0) < b.budgeted_amount).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -27,9 +27,7 @@ export function BudgetAnalysisCard({ budgets }: BudgetAnalysisCardProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(totalBudgeted)}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            لجميع الميزانيات ({budgets.length})
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">لجميع الميزانيات ({budgets.length})</p>
         </CardContent>
       </Card>
 
@@ -57,11 +55,13 @@ export function BudgetAnalysisCard({ budgets }: BudgetAnalysisCardProps) {
           )}
         </CardHeader>
         <CardContent>
-          <div className={`text-2xl font-bold ${totalVariance >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <div
+            className={`text-2xl font-bold ${totalVariance >= 0 ? 'text-success' : 'text-destructive'}`}
+          >
             {formatCurrency(Math.abs(totalVariance))}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {totalVariance >= 0 ? "توفير" : "تجاوز"}
+            {totalVariance >= 0 ? 'توفير' : 'تجاوز'}
           </p>
         </CardContent>
       </Card>

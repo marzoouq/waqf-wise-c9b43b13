@@ -1,23 +1,24 @@
 # قواعد الملكية المعمارية - Ownership Rules
+
 ## @version 3.0.0 | @lastUpdate 2025-12-24
 
 ## الملفات المحذوفة (Deleted Files)
 
-| الملف | السبب | التاريخ |
-|-------|-------|---------|
+| الملف                                     | السبب                   | التاريخ    |
+| ----------------------------------------- | ----------------------- | ---------- |
 | `src/hooks/dashboard/useDashboardKPIs.ts` | استخدم `useUnifiedKPIs` | 2025-12-24 |
-| `src/components/reports/KPIDashboard.tsx` | غير مستخدم | 2025-12-24 |
+| `src/components/reports/KPIDashboard.tsx` | غير مستخدم              | 2025-12-24 |
 
 ## من أين نستورد ماذا؟
 
-| المفهوم | المالك | المسار |
-|---------|--------|--------|
-| `QUERY_CONFIG` | Infrastructure | `@/infrastructure/react-query` |
-| `CACHE_TIMES` | Infrastructure | `@/infrastructure/react-query` |
-| `QUERY_KEYS` | Lib | `@/lib/query-keys` |
-| Dashboard KPIs | Hooks | `@/hooks/dashboard/useUnifiedKPIs` |
-| Pure Utilities | Lib | `@/lib` |
-| Services | Services | `@/services` |
+| المفهوم        | المالك         | المسار                             |
+| -------------- | -------------- | ---------------------------------- |
+| `QUERY_CONFIG` | Infrastructure | `@/infrastructure/react-query`     |
+| `CACHE_TIMES`  | Infrastructure | `@/infrastructure/react-query`     |
+| `QUERY_KEYS`   | Lib            | `@/lib/query-keys`                 |
+| Dashboard KPIs | Hooks          | `@/hooks/dashboard/useUnifiedKPIs` |
+| Pure Utilities | Lib            | `@/lib`                            |
+| Services       | Services       | `@/services`                       |
 
 ## ما الذي يُمنع تكراره؟
 
@@ -27,10 +28,10 @@
 
 ## Hooks مُوقّفة (Deprecated)
 
-| Hook | البديل | السبب |
-|------|--------|-------|
+| Hook               | البديل           | السبب                            |
+| ------------------ | ---------------- | -------------------------------- |
 | `useDashboardKPIs` | `useUnifiedKPIs` | **محذوف** - توحيد مصادر البيانات |
-| `useKPIs` | `useUnifiedKPIs` | مخصص لتقارير KPI فقط |
+| `useKPIs`          | `useUnifiedKPIs` | مخصص لتقارير KPI فقط             |
 
 ## Checklist قبل إنشاء Hook جديد
 

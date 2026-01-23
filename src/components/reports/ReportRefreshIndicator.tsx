@@ -1,8 +1,8 @@
-import { RefreshCw, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { memo } from "react";
+import { RefreshCw, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { memo } from 'react';
 
 interface ReportRefreshIndicatorProps {
   lastUpdated?: Date;
@@ -20,7 +20,7 @@ export const ReportRefreshIndicator = memo(function ReportRefreshIndicator({
       {lastUpdated && (
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
-          آخر تحديث: {format(lastUpdated, "HH:mm:ss", { locale: ar })}
+          آخر تحديث: {format(lastUpdated, 'HH:mm:ss', { locale: ar })}
         </span>
       )}
       <Button
@@ -30,8 +30,8 @@ export const ReportRefreshIndicator = memo(function ReportRefreshIndicator({
         disabled={isRefetching}
         className="h-7 px-2"
       >
-        <RefreshCw className={`h-3 w-3 ms-1 ${isRefetching ? "animate-spin" : ""}`} />
-        {isRefetching ? "جاري التحديث..." : "تحديث"}
+        <RefreshCw className={`h-3 w-3 ms-1 ${isRefetching ? 'animate-spin' : ''}`} />
+        {isRefetching ? 'جاري التحديث...' : 'تحديث'}
       </Button>
     </div>
   );

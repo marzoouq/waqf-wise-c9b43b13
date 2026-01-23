@@ -15,7 +15,7 @@ export { useBeneficiarySelector } from './useBeneficiarySelector';
 export { useTransferStatusTracker, type TransferStatus } from './useTransferStatusTracker';
 
 // ==================== Distribution Tabs Data Hooks ====================
-export { 
+export {
   useDistributionTimeline,
   useDistributionVouchers,
   usePaymentVouchersList,
@@ -23,5 +23,5 @@ export {
   type DistributionApproval,
   type ApprovalHistoryItem,
   type VoucherRecord,
-  type VoucherStats
+  type VoucherStats,
 } from './useDistributionTabsData';

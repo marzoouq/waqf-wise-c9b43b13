@@ -1,6 +1,6 @@
-import { formatDate } from "@/lib/date";
-import { PrintHeader } from "@/components/shared/PrintHeader";
-import { PrintFooter } from "@/components/shared/PrintFooter";
+import { formatDate } from '@/lib/date';
+import { PrintHeader } from '@/components/shared/PrintHeader';
+import { PrintFooter } from '@/components/shared/PrintFooter';
 
 interface Contract {
   id: string;
@@ -86,18 +86,15 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
           }
         }
       `}</style>
-      
+
       {/* ترويسة الوقف */}
-      <PrintHeader 
-        title="عقد إيجار" 
-        subtitle={`رقم العقد: ${contract.contract_number}`} 
-      />
+      <PrintHeader title="عقد إيجار" subtitle={`رقم العقد: ${contract.contract_number}`} />
 
       <div className="contract-section">
         <div className="section-title">بيانات العقار</div>
         <div className="info-row">
           <span className="info-label">اسم العقار:</span>
-          <span className="info-value">{contract.properties?.name || "-"}</span>
+          <span className="info-value">{contract.properties?.name || '-'}</span>
         </div>
       </div>
 
@@ -121,11 +118,11 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
         <div className="section-title">بيانات العقد</div>
         <div className="info-row">
           <span className="info-label">تاريخ البداية:</span>
-          <span className="info-value">{formatDate(contract.start_date, "dd/MM/yyyy")}</span>
+          <span className="info-value">{formatDate(contract.start_date, 'dd/MM/yyyy')}</span>
         </div>
         <div className="info-row">
           <span className="info-label">تاريخ النهاية:</span>
-          <span className="info-value">{formatDate(contract.end_date, "dd/MM/yyyy")}</span>
+          <span className="info-value">{formatDate(contract.end_date, 'dd/MM/yyyy')}</span>
         </div>
         <div className="info-row">
           <span className="info-label">الإيجار الشهري:</span>

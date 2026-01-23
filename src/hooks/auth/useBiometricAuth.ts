@@ -65,7 +65,8 @@ export function useBiometricAuth() {
     const checkSupport = async () => {
       if (window.PublicKeyCredential) {
         try {
-          const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          const available =
+            await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
           setIsSupported(available);
         } catch {
           setIsSupported(false);
@@ -91,99 +92,105 @@ export function useBiometricAuth() {
   }, []);
 
   // تسجيل بصمة جديدة
-  const registerBiometric = useCallback(async (deviceName?: string): Promise<boolean> => {
-    if (!isSupported) {
-      toast({
-        title: 'غير مدعوم',
-        description: 'جهازك لا يدعم المصادقة بالبصمة',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    const user = await BiometricService.getCurrentUser();
-    if (!user) {
-      toast({
-        title: 'خطأ',
-        description: 'يجب تسجيل الدخول أولاً',
-        variant: 'destructive',
-      });
-      return false;
-    }
-
-    setIsRegistering(true);
-
-    try {
-      // إنشاء challenge عشوائي
-      const challenge = crypto.getRandomValues(new Uint8Array(32));
-
-      // إعدادات التسجيل
-      const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-        challenge,
-        rp: {
-          name: 'منصة إدارة الوقف',
-          id: window.location.hostname,
-        },
-        user: {
-          id: stringToArrayBuffer(user.id),
-          name: user.email || user.id,
-          displayName: user.user_metadata?.full_name || user.email || 'مستخدم',
-        },
-        pubKeyCredParams: [
-          { alg: -7, type: 'public-key' },   // ES256
-          { alg: -257, type: 'public-key' }, // RS256
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          residentKey: 'preferred',
-        },
-        timeout: 60000,
-        attestation: 'none',
-      };
-
-      // إنشاء credential
-      const credential = await navigator.credentials.create({
-        publicKey: publicKeyCredentialCreationOptions,
-      }) as PublicKeyCredential;
-
-      if (!credential) {
-        throw new Error('فشل في إنشاء بيانات الاعتماد');
+  const registerBiometric = useCallback(
+    async (deviceName?: string): Promise<boolean> => {
+      if (!isSupported) {
+        toast({
+          title: 'غير مدعوم',
+          description: 'جهازك لا يدعم المصادقة بالبصمة',
+          variant: 'destructive',
+        });
+        return false;
       }
 
-      const response = credential.response as AuthenticatorAttestationResponse;
+      const user = await BiometricService.getCurrentUser();
+      if (!user) {
+        toast({
+          title: 'خطأ',
+          description: 'يجب تسجيل الدخول أولاً',
+          variant: 'destructive',
+        });
+        return false;
+      }
 
-      // تخزين credential في قاعدة البيانات
-      await BiometricService.registerCredential({
-        userId: user.id,
-        credentialId: arrayBufferToBase64(credential.rawId),
-        publicKey: arrayBufferToBase64(response.getPublicKey() || new ArrayBuffer(0)),
-        deviceName: deviceName || getDeviceName(),
-        deviceType: getDeviceType(),
-      });
+      setIsRegistering(true);
 
-      toast({
-        title: 'تم التسجيل بنجاح',
-        description: 'تم تفعيل المصادقة بالبصمة لحسابك',
-      });
+      try {
+        // إنشاء challenge عشوائي
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
 
-      await fetchCredentials();
-      return true;
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'فشل في تسجيل البصمة';
-      toast({
-        title: 'خطأ',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return false;
-    } finally {
-      setIsRegistering(false);
-    }
-  }, [isSupported, toast, fetchCredentials]);
+        // إعدادات التسجيل
+        const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
+          challenge,
+          rp: {
+            name: 'منصة إدارة الوقف',
+            id: window.location.hostname,
+          },
+          user: {
+            id: stringToArrayBuffer(user.id),
+            name: user.email || user.id,
+            displayName: user.user_metadata?.full_name || user.email || 'مستخدم',
+          },
+          pubKeyCredParams: [
+            { alg: -7, type: 'public-key' }, // ES256
+            { alg: -257, type: 'public-key' }, // RS256
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',
+            userVerification: 'required',
+            residentKey: 'preferred',
+          },
+          timeout: 60000,
+          attestation: 'none',
+        };
+
+        // إنشاء credential
+        const credential = (await navigator.credentials.create({
+          publicKey: publicKeyCredentialCreationOptions,
+        })) as PublicKeyCredential;
+
+        if (!credential) {
+          throw new Error('فشل في إنشاء بيانات الاعتماد');
+        }
+
+        const response = credential.response as AuthenticatorAttestationResponse;
+
+        // تخزين credential في قاعدة البيانات
+        await BiometricService.registerCredential({
+          userId: user.id,
+          credentialId: arrayBufferToBase64(credential.rawId),
+          publicKey: arrayBufferToBase64(response.getPublicKey() || new ArrayBuffer(0)),
+          deviceName: deviceName || getDeviceName(),
+          deviceType: getDeviceType(),
+        });
+
+        toast({
+          title: 'تم التسجيل بنجاح',
+          description: 'تم تفعيل المصادقة بالبصمة لحسابك',
+        });
+
+        await fetchCredentials();
+        return true;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'فشل في تسجيل البصمة';
+        toast({
+          title: 'خطأ',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        return false;
+      } finally {
+        setIsRegistering(false);
+      }
+    },
+    [isSupported, toast, fetchCredentials]
+  );
 
   // التحقق بالبصمة وتسجيل الدخول تلقائياً
-  const authenticateWithBiometric = useCallback(async (): Promise<{ success: boolean; userId?: string }> => {
+  const authenticateWithBiometric = useCallback(async (): Promise<{
+    success: boolean;
+    userId?: string;
+  }> => {
     if (!isSupported) {
       toast({
         title: 'غير مدعوم',
@@ -208,14 +215,14 @@ export function useBiometricAuth() {
 
       // الحصول على hostname الحالي
       const currentHostname = window.location.hostname;
-      
+
       // إعدادات المصادقة - استخدام نفس rpId المستخدم في التسجيل
       const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
         challenge,
         timeout: 60000,
         rpId: currentHostname,
         userVerification: 'required',
-        allowCredentials: userCredentials.map(cred => ({
+        allowCredentials: userCredentials.map((cred) => ({
           id: base64ToArrayBuffer(cred.credential_id),
           type: 'public-key' as const,
           transports: ['internal', 'hybrid'] as AuthenticatorTransport[],
@@ -224,32 +231,32 @@ export function useBiometricAuth() {
 
       // طلب المصادقة
       let assertion: PublicKeyCredential | null = null;
-      
+
       try {
-        assertion = await navigator.credentials.get({
+        assertion = (await navigator.credentials.get({
           publicKey: publicKeyCredentialRequestOptions,
-        }) as PublicKeyCredential;
+        })) as PublicKeyCredential;
       } catch (webauthnError) {
         if (import.meta.env.DEV) {
           console.error('WebAuthn get error:', webauthnError);
         }
-        
+
         // إذا فشل بسبب rpId، نحاول بدون rpId (للسماح بالمرونة)
         if (webauthnError instanceof Error && webauthnError.name === 'SecurityError') {
           const fallbackOptions: PublicKeyCredentialRequestOptions = {
             challenge,
             timeout: 60000,
             userVerification: 'required',
-            allowCredentials: userCredentials.map(cred => ({
+            allowCredentials: userCredentials.map((cred) => ({
               id: base64ToArrayBuffer(cred.credential_id),
               type: 'public-key' as const,
               transports: ['internal', 'hybrid'] as AuthenticatorTransport[],
             })),
           };
-          
-          assertion = await navigator.credentials.get({
+
+          assertion = (await navigator.credentials.get({
             publicKey: fallbackOptions,
-          }) as PublicKeyCredential;
+          })) as PublicKeyCredential;
         } else {
           throw webauthnError;
         }
@@ -261,9 +268,7 @@ export function useBiometricAuth() {
 
       // البحث عن credential المستخدم
       const usedCredentialId = arrayBufferToBase64(assertion.rawId);
-      const matchedCredential = userCredentials.find(
-        c => c.credential_id === usedCredentialId
-      );
+      const matchedCredential = userCredentials.find((c) => c.credential_id === usedCredentialId);
 
       if (!matchedCredential) {
         throw new Error('البصمة غير مسجلة في هذا الجهاز');
@@ -297,9 +302,9 @@ export function useBiometricAuth() {
       if (import.meta.env.DEV) {
         console.error('Biometric auth error:', error);
       }
-      
+
       let errorMessage = 'فشل في المصادقة بالبصمة';
-      
+
       if (error instanceof Error) {
         if (error.name === 'NotAllowedError') {
           errorMessage = 'تم إلغاء المصادقة أو رفض الإذن';
@@ -313,7 +318,7 @@ export function useBiometricAuth() {
           errorMessage = error.message;
         }
       }
-      
+
       toast({
         title: 'فشل التحقق',
         description: errorMessage,
@@ -326,26 +331,29 @@ export function useBiometricAuth() {
   }, [isSupported, toast]);
 
   // حذف بصمة
-  const removeCredential = useCallback(async (credentialId: string): Promise<boolean> => {
-    try {
-      await BiometricService.deleteCredential(credentialId);
+  const removeCredential = useCallback(
+    async (credentialId: string): Promise<boolean> => {
+      try {
+        await BiometricService.deleteCredential(credentialId);
 
-      toast({
-        title: 'تم الحذف',
-        description: 'تم حذف البصمة بنجاح',
-      });
+        toast({
+          title: 'تم الحذف',
+          description: 'تم حذف البصمة بنجاح',
+        });
 
-      await fetchCredentials();
-      return true;
-    } catch {
-      toast({
-        title: 'خطأ',
-        description: 'فشل في حذف البصمة',
-        variant: 'destructive',
-      });
-      return false;
-    }
-  }, [toast, fetchCredentials]);
+        await fetchCredentials();
+        return true;
+      } catch {
+        toast({
+          title: 'خطأ',
+          description: 'فشل في حذف البصمة',
+          variant: 'destructive',
+        });
+        return false;
+      }
+    },
+    [toast, fetchCredentials]
+  );
 
   // التحقق من وجود بصمات مسجلة للمستخدم الحالي
   const hasBiometricEnabled = credentials.length > 0;

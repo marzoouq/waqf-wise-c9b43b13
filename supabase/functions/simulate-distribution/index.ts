@@ -1,11 +1,6 @@
 // Edge Function: محاكاة توزيع متقدمة - مؤمّنة
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse,
-  forbiddenResponse 
-} from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse, forbiddenResponse } from '../_shared/cors.ts';
 
 // ============ الأدوار المسموح لها بمحاكاة التوزيع ============
 const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
@@ -18,16 +13,16 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -79,10 +74,12 @@ Deno.serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'simulate-distribution',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // ============ التحقق من المصادقة والصلاحيات ============
     const authHeader = req.headers.get('Authorization');
@@ -92,14 +89,17 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.error('Invalid token for distribution simulation:', authError?.message);
       return forbiddenResponse('جلسة غير صالحة');
@@ -116,8 +116,8 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', user.id);
 
-    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
-    
+    const hasPermission = userRoles?.some((r) => ALLOWED_ROLES.includes(r.role));
+
     if (!hasPermission) {
       // تسجيل محاولة الوصول غير المصرح بها
       await supabaseClient.from('audit_logs').insert({
@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
         action_type: 'UNAUTHORIZED_SIMULATION_ATTEMPT',
         table_name: 'distributions',
         description: `محاولة محاكاة توزيع غير مصرح بها من ${user.email}`,
-        severity: 'error'
+        severity: 'error',
       });
       return forbiddenResponse('ليس لديك صلاحية لمحاكاة التوزيع. مطلوب دور مدير أو ناظر أو محاسب.');
     }
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
 
     // 1. حساب الاستقطاعات
     const nazer_share = params.total_amount * (params.nazer_percentage || 0.05);
-    const reserve = params.total_amount * (params.reserve_percentage || 0.10);
+    const reserve = params.total_amount * (params.reserve_percentage || 0.1);
     const waqf_corpus = params.total_amount * (params.waqf_corpus_percentage || 0.05);
     const maintenance = params.total_amount * (params.maintenance_percentage || 0.03);
     const development = params.total_amount * (params.development_percentage || 0.02);
@@ -209,10 +209,7 @@ Deno.serve(async (req) => {
     if (activeLoans) {
       activeLoans.forEach((loan) => {
         const currentDeduction = loanDeductions.get(loan.beneficiary_id) || 0;
-        loanDeductions.set(
-          loan.beneficiary_id,
-          currentDeduction + (loan.monthly_installment || 0)
-        );
+        loanDeductions.set(loan.beneficiary_id, currentDeduction + (loan.monthly_installment || 0));
       });
     }
 
@@ -220,7 +217,7 @@ Deno.serve(async (req) => {
 
     // 4. توزيع المبلغ حسب الأولوية والفئة
     const distribution: DistributionDetail[] = [];
-    
+
     // تجميع المستفيدين حسب الأولوية
     const priorityGroups = new Map<number, BeneficiaryWithPriority[]>();
     beneficiaries.forEach((b: BeneficiaryWithPriority) => {
@@ -277,7 +274,8 @@ Deno.serve(async (req) => {
       },
       distributable_amount: Math.round(distributable_amount * 100) / 100,
       beneficiaries_count: beneficiaries.length,
-      total_distributed: Math.round(distribution.reduce((sum, d) => sum + d.allocated_amount, 0) * 100) / 100,
+      total_distributed:
+        Math.round(distribution.reduce((sum, d) => sum + d.allocated_amount, 0) * 100) / 100,
     };
 
     console.log('✅ اكتملت المحاكاة:', summary);
@@ -290,7 +288,7 @@ Deno.serve(async (req) => {
       table_name: 'distributions',
       description: `محاكاة توزيع بمبلغ ${params.total_amount} ريال بواسطة ${user.email}`,
       new_values: summary,
-      severity: 'info'
+      severity: 'info',
     });
 
     return jsonResponse({
@@ -306,9 +304,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('❌ خطأ في المحاكاة:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'حدث خطأ غير متوقع', 500);
   }
 });

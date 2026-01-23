@@ -4,7 +4,14 @@
  */
 
 // ==================== Core Dashboard Hooks ====================
-export { useDashboardConfigs, useSaveDashboardConfig, useUpdateDashboardConfig, useDeleteDashboardConfig, type DashboardConfig, type DashboardWidget } from './useDashboardConfig';
+export {
+  useDashboardConfigs,
+  useSaveDashboardConfig,
+  useUpdateDashboardConfig,
+  useDeleteDashboardConfig,
+  type DashboardConfig,
+  type DashboardWidget,
+} from './useDashboardConfig';
 // useDashboardKPIs removed - use useUnifiedKPIs directly
 export { useKPIs, type KPI } from './useKPIs';
 export { useUnifiedKPIs, type UnifiedKPIsData } from './useUnifiedKPIs';
@@ -18,9 +25,18 @@ export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgre
 // ==================== Realtime Dashboard Hooks ====================
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerDashboardRealtime';
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
-export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
-export { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from './useAccountantDashboardRealtime';
-export { useBeneficiaryDashboardRealtime, useBeneficiaryDashboardRefresh } from './useBeneficiaryDashboardRealtime';
+export {
+  useCashierDashboardRealtime,
+  useCashierDashboardRefresh,
+} from './useCashierDashboardRealtime';
+export {
+  useAccountantDashboardRealtime,
+  useAccountantDashboardRefresh,
+} from './useAccountantDashboardRealtime';
+export {
+  useBeneficiaryDashboardRealtime,
+  useBeneficiaryDashboardRefresh,
+} from './useBeneficiaryDashboardRealtime';
 
 // ==================== Dashboard Data Hooks ====================
 export { useRecentJournalEntries } from './useRecentJournalEntries';
@@ -33,7 +49,11 @@ export { useAccountDistribution } from './useAccountDistribution';
 // ==================== Re-exports from other folders ====================
 // useAdminKPIs removed - use useUnifiedKPIs directly
 // useAccountantKPIs removed - use useUnifiedKPIs directly
-export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
+export {
+  useArchivistDashboard,
+  useArchivistStats,
+  useRecentDocuments,
+} from '../archive/useArchivistDashboard';
 export { useInteractiveDashboard } from './useInteractiveDashboard';
 
 // ==================== Dashboard Charts Hooks ====================

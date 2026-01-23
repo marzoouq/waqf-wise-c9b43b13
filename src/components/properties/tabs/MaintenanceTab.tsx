@@ -1,24 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
-import { Search, Edit, Trash2 } from "lucide-react";
-import { useMaintenanceRequests, type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
-import { useMaintenanceSchedules } from "@/hooks/property/useMaintenanceSchedules";
-import { useTableSort } from "@/hooks/ui/useTableSort";
-import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
-import { Input } from "@/components/ui/input";
-import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format, arLocale as ar } from "@/lib/date";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
-import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
-import { PaginationControls } from "@/components/ui/pagination-controls";
-import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from 'react';
+import { Search, Edit, Trash2 } from 'lucide-react';
+import {
+  useMaintenanceRequests,
+  type MaintenanceRequest,
+} from '@/hooks/property/useMaintenanceRequests';
+import { useMaintenanceSchedules } from '@/hooks/property/useMaintenanceSchedules';
+import { useTableSort } from '@/hooks/ui/useTableSort';
+import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
+import { Input } from '@/components/ui/input';
+import { MaintenanceScheduleCalendar } from '@/components/maintenance/MaintenanceScheduleCalendar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { format, arLocale as ar } from '@/lib/date';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
+import { UnifiedDataTable } from '@/components/unified/UnifiedDataTable';
+import {
+  AdvancedFiltersDialog,
+  type FilterConfig,
+  type FiltersRecord,
+} from '@/components/shared/AdvancedFiltersDialog';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/lib/pagination.types';
+import { toast } from 'sonner';
 
 // تعريف الفلاتر
 const maintenanceFilterConfigs: FilterConfig[] = [
@@ -63,7 +70,7 @@ interface Props {
 }
 
 export const MaintenanceTab = ({ onEdit }: Props) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<MaintenanceRequest | null>(null);
@@ -73,7 +80,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   const { schedules } = useMaintenanceSchedules();
 
   const handleDeleteClick = (request: MaintenanceRequest) => {
-    if (request.status !== "جديد" && request.status !== "ملغي") {
+    if (request.status !== 'جديد' && request.status !== 'ملغي') {
       return;
     }
     setRequestToDelete(request);
@@ -90,7 +97,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   const filteredRequests = useMemo(() => {
     let result = requests || [];
-    
+
     // فلترة بالبحث
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -101,18 +108,18 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
           r.properties?.name.toLowerCase().includes(query)
       );
     }
-    
+
     // فلترة بالفلاتر المتقدمة
     if (advancedFilters.status) {
-      result = result.filter(r => r.status === advancedFilters.status);
+      result = result.filter((r) => r.status === advancedFilters.status);
     }
     if (advancedFilters.priority) {
-      result = result.filter(r => r.priority === advancedFilters.priority);
+      result = result.filter((r) => r.priority === advancedFilters.priority);
     }
     if (advancedFilters.category) {
-      result = result.filter(r => r.category === advancedFilters.category);
+      result = result.filter((r) => r.category === advancedFilters.category);
     }
-    
+
     return result;
   }, [requests, searchQuery, advancedFilters]);
 
@@ -155,16 +162,16 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   const handleBulkExport = () => {
     const selectedData = paginatedData
-      .filter(r => selectedIds.includes(r.id))
-      .map(r => ({
+      .filter((r) => selectedIds.includes(r.id))
+      .map((r) => ({
         'رقم الطلب': r.request_number,
-        'العقار': r.properties?.name || '-',
-        'العنوان': r.title,
-        'الفئة': r.category,
-        'الأولوية': r.priority,
-        'التاريخ': format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
+        العقار: r.properties?.name || '-',
+        العنوان: r.title,
+        الفئة: r.category,
+        الأولوية: r.priority,
+        التاريخ: format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
         'التكلفة المقدرة': (r.estimated_cost || 0).toLocaleString(),
-        'الحالة': r.status,
+        الحالة: r.status,
       }));
     return selectedData;
   };
@@ -176,29 +183,30 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      "جديد": "bg-primary/10 text-primary",
-      "قيد المراجعة": "bg-warning/10 text-warning",
-      "معتمد": "bg-info/10 text-info",
-      "قيد التنفيذ": "bg-accent/10 text-accent",
-      "مكتمل": "bg-success/10 text-success",
-      "ملغي": "bg-muted text-muted-foreground",
+      جديد: 'bg-primary/10 text-primary',
+      'قيد المراجعة': 'bg-warning/10 text-warning',
+      معتمد: 'bg-info/10 text-info',
+      'قيد التنفيذ': 'bg-accent/10 text-accent',
+      مكتمل: 'bg-success/10 text-success',
+      ملغي: 'bg-muted text-muted-foreground',
     };
-    return styles[status as keyof typeof styles] || "bg-muted";
+    return styles[status as keyof typeof styles] || 'bg-muted';
   };
 
   const getPriorityBadge = (priority: string) => {
     const styles = {
-      "عاجلة": "bg-destructive/10 text-destructive",
-      "عالية": "bg-warning/10 text-warning",
-      "عادية": "bg-primary/10 text-primary",
-      "منخفضة": "bg-muted text-muted-foreground",
+      عاجلة: 'bg-destructive/10 text-destructive',
+      عالية: 'bg-warning/10 text-warning',
+      عادية: 'bg-primary/10 text-primary',
+      منخفضة: 'bg-muted text-muted-foreground',
     };
-    return styles[priority as keyof typeof styles] || "bg-muted";
+    return styles[priority as keyof typeof styles] || 'bg-muted';
   };
 
-  const totalCost = requests?.reduce((sum, r) => sum + Number(r.actual_cost || r.estimated_cost || 0), 0) || 0;
-  const completed = requests?.filter(r => r.status === 'مكتمل').length || 0;
-  const pending = requests?.filter(r => r.status === 'قيد التنفيذ').length || 0;
+  const totalCost =
+    requests?.reduce((sum, r) => sum + Number(r.actual_cost || r.estimated_cost || 0), 0) || 0;
+  const completed = requests?.filter((r) => r.status === 'مكتمل').length || 0;
+  const pending = requests?.filter((r) => r.status === 'قيد التنفيذ').length || 0;
 
   return (
     <div className="space-y-6">
@@ -224,20 +232,30 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
         />
         {filteredRequests.length > 0 && (
           <ExportButton
-            data={filteredRequests.map(r => ({
+            data={filteredRequests.map((r) => ({
               'رقم الطلب': r.request_number,
-              'العقار': r.properties?.name || '-',
-              'العنوان': r.title,
-              'الفئة': r.category,
-              'الأولوية': r.priority,
-              'التاريخ': format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
+              العقار: r.properties?.name || '-',
+              العنوان: r.title,
+              الفئة: r.category,
+              الأولوية: r.priority,
+              التاريخ: format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
               'التكلفة المقدرة': (r.estimated_cost || 0).toLocaleString(),
               'التكلفة الفعلية': (r.actual_cost || 0).toLocaleString(),
-              'الحالة': r.status,
+              الحالة: r.status,
             }))}
             filename="طلبات_الصيانة"
             title="طلبات الصيانة"
-            headers={['رقم الطلب', 'العقار', 'العنوان', 'الفئة', 'الأولوية', 'التاريخ', 'التكلفة المقدرة', 'التكلفة الفعلية', 'الحالة']}
+            headers={[
+              'رقم الطلب',
+              'العقار',
+              'العنوان',
+              'الفئة',
+              'الأولوية',
+              'التاريخ',
+              'التكلفة المقدرة',
+              'التكلفة الفعلية',
+              'الحالة',
+            ]}
             variant="outline"
             size="sm"
           />
@@ -271,7 +289,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
         title="طلبات الصيانة"
         columns={[
           {
-            key: "select",
+            key: 'select',
             label: (
               <Checkbox
                 checked={isAllSelected}
@@ -289,64 +307,56 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             ),
           },
           {
-            key: "request_number",
-            label: "رقم الطلب",
-            render: (value: string) => <span className="font-medium">{value}</span>
+            key: 'request_number',
+            label: 'رقم الطلب',
+            render: (value: string) => <span className="font-medium">{value}</span>,
           },
           {
-            key: "properties",
-            label: "العقار",
+            key: 'properties',
+            label: 'العقار',
             hideOnTablet: true,
-            render: (_: unknown, row: MaintenanceRequest) => row.properties?.name || '-'
+            render: (_: unknown, row: MaintenanceRequest) => row.properties?.name || '-',
           },
           {
-            key: "title",
-            label: "العنوان"
+            key: 'title',
+            label: 'العنوان',
           },
           {
-            key: "category",
-            label: "الفئة",
-            hideOnMobile: true
+            key: 'category',
+            label: 'الفئة',
+            hideOnMobile: true,
           },
           {
-            key: "priority",
-            label: "الأولوية",
+            key: 'priority',
+            label: 'الأولوية',
             hideOnTablet: true,
-            render: (value: string) => (
-              <Badge className={getPriorityBadge(value)}>
-                {value}
-              </Badge>
-            )
+            render: (value: string) => <Badge className={getPriorityBadge(value)}>{value}</Badge>,
           },
           {
-            key: "requested_date",
-            label: "التاريخ",
+            key: 'requested_date',
+            label: 'التاريخ',
             hideOnTablet: true,
             render: (value: string) => (
               <span className="whitespace-nowrap">
                 {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
               </span>
-            )
+            ),
           },
           {
-            key: "cost",
-            label: "التكلفة",
+            key: 'cost',
+            label: 'التكلفة',
             hideOnMobile: true,
             render: (_: unknown, row: MaintenanceRequest) => (
               <span className="font-medium whitespace-nowrap">
-                {(Number(row.actual_cost || row.estimated_cost || 0)).toLocaleString()} ر.س
+                {Number(row.actual_cost || row.estimated_cost || 0).toLocaleString()} ر.س
               </span>
-            )
+            ),
           },
           {
-            key: "status",
-            label: "الحالة",
-            render: (value: string) => (
-              <Badge className={getStatusBadge(value)}>
-                {value}
-              </Badge>
-            )
-          }
+            key: 'status',
+            label: 'الحالة',
+            render: (value: string) => <Badge className={getStatusBadge(value)}>{value}</Badge>,
+          },
         ]}
         data={paginatedData}
         loading={isLoading}
@@ -362,7 +372,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             >
               <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-            {(request.status === "جديد" || request.status === "ملغي") && (
+            {(request.status === 'جديد' || request.status === 'ملغي') && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -395,8 +405,8 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             setPageSize(size);
             setCurrentPage(1);
           }}
-          onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-          onPrev={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
           onFirst={() => setCurrentPage(1)}
           onLast={() => setCurrentPage(totalPages)}
         />
@@ -408,7 +418,9 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
         onConfirm={handleDeleteConfirm}
         title="حذف طلب الصيانة"
         description="هل أنت متأكد من حذف هذا الطلب؟"
-        itemName={requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.title}` : ""}
+        itemName={
+          requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.title}` : ''
+        }
         isLoading={deleteRequest.isPending}
       />
 

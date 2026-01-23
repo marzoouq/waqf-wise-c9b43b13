@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 50 إشعار/دقيقة لكل مستخدم ============
@@ -16,21 +16,21 @@ const RATE_WINDOW = 60 * 1000; // 1 minute
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
 interface NotificationRequest {
   userId: string;
@@ -49,7 +49,12 @@ interface NotificationPreferences {
 }
 
 // قالب البريد الإلكتروني الاحترافي بالعربية
-function getEmailTemplate(title: string, message: string, type: string, actionUrl?: string): string {
+function getEmailTemplate(
+  title: string,
+  message: string,
+  type: string,
+  actionUrl?: string
+): string {
   const typeColors: Record<string, { bg: string; border: string; icon: string }> = {
     info: { bg: '#EBF5FF', border: '#3B82F6', icon: 'ℹ️' },
     success: { bg: '#ECFDF5', border: '#10B981', icon: '✅' },
@@ -106,7 +111,9 @@ function getEmailTemplate(title: string, message: string, type: string, actionUr
                 </table>
               </div>
               
-              ${actionUrl ? `
+              ${
+                actionUrl
+                  ? `
               <!-- Action Button -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
@@ -117,20 +124,22 @@ function getEmailTemplate(title: string, message: string, type: string, actionUr
                   </td>
                 </tr>
               </table>
-              ` : ''}
+              `
+                  : ''
+              }
               
               <!-- Divider -->
               <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
               
               <!-- Info -->
               <p style="margin: 0; color: #9ca3af; font-size: 13px; text-align: center;">
-                تم إرسال هذا الإشعار في ${new Date().toLocaleDateString('ar-SA', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
+                تم إرسال هذا الإشعار في ${new Date().toLocaleDateString('ar-SA', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
                   day: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })}
               </p>
             </td>
@@ -171,7 +180,7 @@ serve(async (req) => {
       return jsonResponse({
         status: 'healthy',
         function: 'send-notification',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -186,19 +195,19 @@ serve(async (req) => {
     );
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return unauthorizedResponse('Invalid token');
     }
 
     // ✅ فحص الصلاحيات - فقط المسؤولون يمكنهم إرسال إشعارات
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant'].includes(r.role));
+    const hasAccess = roles?.some((r) => ['admin', 'nazer', 'accountant'].includes(r.role));
     if (!hasAccess) {
       console.warn(`[send-notification] Unauthorized access by user: ${user.id}`);
       return forbiddenResponse('ليس لديك صلاحية لإرسال الإشعارات');
@@ -210,14 +219,14 @@ serve(async (req) => {
       return errorResponse('تجاوزت الحد المسموح (50 إشعار/دقيقة). يرجى الانتظار.', 429);
     }
 
-    const { 
-      userId, 
-      title, 
-      message, 
+    const {
+      userId,
+      title,
+      message,
       type = 'info',
       actionUrl,
       channel = 'app',
-      priority = 'medium'
+      priority = 'medium',
     }: NotificationRequest = body;
 
     if (!userId || !title || !message) {
@@ -232,17 +241,15 @@ serve(async (req) => {
 
     // 1. إنشاء إشعار داخل التطبيق (دائماً)
     if (channel === 'app' || channel === 'all') {
-      const { error: notifError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          title,
-          message,
-          type,
-          action_url: actionUrl,
-          channel: 'app',
-          is_read: false,
-        });
+      const { error: notifError } = await supabase.from('notifications').insert({
+        user_id: userId,
+        title,
+        message,
+        type,
+        action_url: actionUrl,
+        channel: 'app',
+        is_read: false,
+      });
 
       if (!notifError) {
         results.app = true;
@@ -265,14 +272,14 @@ serve(async (req) => {
         try {
           const emailHtml = getEmailTemplate(title, message, type, actionUrl);
 
-          const emailResponse = await fetch("https://api.resend.com/emails", {
-            method: "POST",
+          const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: "نظام إدارة الوقف <onboarding@resend.dev>",
+              from: 'نظام إدارة الوقف <onboarding@resend.dev>',
               to: [profile.email],
               subject: title,
               html: emailHtml,
@@ -284,7 +291,7 @@ serve(async (req) => {
           if (emailResponse.ok) {
             results.email = true;
             console.log(`📧 Email sent successfully to ${profile.email}`, emailResult);
-            
+
             // تسجيل في جدول الإشعارات كـ sent
             await supabase.from('notifications').insert({
               user_id: userId,
@@ -360,9 +367,6 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Notification error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });

@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface FinancialData {
   totalAssets: number;
@@ -36,7 +36,7 @@ export function useFiscalYearOptions() {
         .from('fiscal_years')
         .select('id, name, is_active, is_closed, start_date, end_date')
         .order('start_date', { ascending: false });
-      
+
       if (error) throw error;
       return data || [];
     },
@@ -53,7 +53,7 @@ export function useFinancialData(fiscalYearId?: string) {
     queryFn: async (): Promise<FinancialData> => {
       // جلب السنة المالية المحددة أو النشطة
       let targetFiscalYear: FiscalYearOption | null = null;
-      
+
       if (fiscalYearId) {
         const { data } = await supabase
           .from('fiscal_years')
@@ -72,7 +72,7 @@ export function useFinancialData(fiscalYearId?: string) {
 
       // جلب البيانات المالية الأساسية
       const financialData = await AccountingService.getFinancialData();
-      
+
       return {
         ...financialData,
         fiscalYearId: targetFiscalYear?.id,

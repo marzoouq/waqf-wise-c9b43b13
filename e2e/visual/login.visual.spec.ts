@@ -1,4 +1,10 @@
-import { test, expect, fullPageOptions, waitForPageStability, maskedOptions } from '../fixtures/visual-test.fixture';
+import {
+  test,
+  expect,
+  fullPageOptions,
+  waitForPageStability,
+  maskedOptions,
+} from '../fixtures/visual-test.fixture';
 import { dynamicSelectors } from '../fixtures/test-data';
 
 /**
@@ -28,7 +34,10 @@ test.describe('Login Page Visual Tests', () => {
 
   test('staff login tab @visual', async ({ page }) => {
     // النقر على تبويب الموظفين
-    const staffTab = page.locator('[role="tab"]').filter({ hasText: /موظف|staff|الموظفون/ }).first();
+    const staffTab = page
+      .locator('[role="tab"]')
+      .filter({ hasText: /موظف|staff|الموظفون/ })
+      .first();
     if (await staffTab.isVisible()) {
       await staffTab.click();
       await page.waitForTimeout(300);
@@ -40,7 +49,10 @@ test.describe('Login Page Visual Tests', () => {
 
   test('beneficiary login tab @visual', async ({ page }) => {
     // النقر على تبويب المستفيدين
-    const beneficiaryTab = page.locator('[role="tab"]').filter({ hasText: /مستفيد|beneficiary|المستفيدون/ }).first();
+    const beneficiaryTab = page
+      .locator('[role="tab"]')
+      .filter({ hasText: /مستفيد|beneficiary|المستفيدون/ })
+      .first();
     if (await beneficiaryTab.isVisible()) {
       await beneficiaryTab.click();
       await page.waitForTimeout(300);
@@ -60,7 +72,9 @@ test.describe('Login Page Visual Tests', () => {
   });
 
   test('email input empty state @visual', async ({ page }) => {
-    const emailInput = page.locator('input[type="email"], input[name="email"], #staff-email, #email').first();
+    const emailInput = page
+      .locator('input[type="email"], input[name="email"], #staff-email, #email')
+      .first();
     if (await emailInput.isVisible()) {
       await expect(emailInput).toHaveScreenshot('login-email-empty.png', {
         animations: 'disabled',
@@ -69,7 +83,9 @@ test.describe('Login Page Visual Tests', () => {
   });
 
   test('email input filled state @visual', async ({ page }) => {
-    const emailInput = page.locator('input[type="email"], input[name="email"], #staff-email, #email').first();
+    const emailInput = page
+      .locator('input[type="email"], input[name="email"], #staff-email, #email')
+      .first();
     if (await emailInput.isVisible()) {
       await emailInput.fill('test@example.com');
       await expect(emailInput).toHaveScreenshot('login-email-filled.png', {
@@ -79,7 +95,9 @@ test.describe('Login Page Visual Tests', () => {
   });
 
   test('email input focused state @visual', async ({ page }) => {
-    const emailInput = page.locator('input[type="email"], input[name="email"], #staff-email, #email').first();
+    const emailInput = page
+      .locator('input[type="email"], input[name="email"], #staff-email, #email')
+      .first();
     if (await emailInput.isVisible()) {
       await emailInput.focus();
       await expect(emailInput).toHaveScreenshot('login-email-focused.png', {

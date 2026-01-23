@@ -3,11 +3,11 @@
  * @version 1.0.0
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { GovernancePoliciesService } from "@/services/governance/governance-policies.service";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { GovernancePoliciesService } from '@/services/governance/governance-policies.service';
+import type { Database } from '@/integrations/supabase/types';
 
 type PolicyInsert = Database['public']['Tables']['governance_policies']['Insert'];
 type PolicyUpdate = Database['public']['Tables']['governance_policies']['Update'];
@@ -16,7 +16,8 @@ const QUERY_KEYS = {
   GOVERNANCE_POLICIES: ['governance', 'policies'] as const,
   GOVERNANCE_POLICY: (id: string) => ['governance', 'policies', id] as const,
   ACTIVE_POLICIES: ['governance', 'policies', 'active'] as const,
-  POLICIES_BY_CATEGORY: (category: string) => ['governance', 'policies', 'category', category] as const,
+  POLICIES_BY_CATEGORY: (category: string) =>
+    ['governance', 'policies', 'category', category] as const,
   POLICIES_STATS: ['governance', 'policies', 'stats'] as const,
 };
 
@@ -93,16 +94,16 @@ export function useCreatePolicy() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_POLICIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POLICIES_STATS });
       toast({
-        title: "تم إنشاء السياسة بنجاح",
-        description: "تم إضافة سياسة الحوكمة الجديدة",
+        title: 'تم إنشاء السياسة بنجاح',
+        description: 'تم إضافة سياسة الحوكمة الجديدة',
       });
     },
     onError: (error) => {
       productionLogger.error('Create policy mutation error:', error);
       toast({
-        title: "خطأ في إنشاء السياسة",
-        description: "حدث خطأ أثناء إنشاء السياسة، يرجى المحاولة مرة أخرى",
-        variant: "destructive",
+        title: 'خطأ في إنشاء السياسة',
+        description: 'حدث خطأ أثناء إنشاء السياسة، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
       });
     },
   });
@@ -123,16 +124,16 @@ export function useUpdatePolicy() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_POLICIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_POLICY(variables.id) });
       toast({
-        title: "تم تحديث السياسة",
-        description: "تم حفظ التغييرات بنجاح",
+        title: 'تم تحديث السياسة',
+        description: 'تم حفظ التغييرات بنجاح',
       });
     },
     onError: (error) => {
       productionLogger.error('Update policy mutation error:', error);
       toast({
-        title: "خطأ في تحديث السياسة",
-        description: "حدث خطأ أثناء تحديث السياسة",
-        variant: "destructive",
+        title: 'خطأ في تحديث السياسة',
+        description: 'حدث خطأ أثناء تحديث السياسة',
+        variant: 'destructive',
       });
     },
   });
@@ -152,16 +153,16 @@ export function useDeletePolicy() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_POLICIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POLICIES_STATS });
       toast({
-        title: "تم حذف السياسة",
-        description: "تم حذف السياسة بنجاح",
+        title: 'تم حذف السياسة',
+        description: 'تم حذف السياسة بنجاح',
       });
     },
     onError: (error) => {
       productionLogger.error('Delete policy mutation error:', error);
       toast({
-        title: "خطأ في حذف السياسة",
-        description: "حدث خطأ أثناء حذف السياسة",
-        variant: "destructive",
+        title: 'خطأ في حذف السياسة',
+        description: 'حدث خطأ أثناء حذف السياسة',
+        variant: 'destructive',
       });
     },
   });

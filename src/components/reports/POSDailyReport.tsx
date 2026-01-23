@@ -1,12 +1,8 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Table,
   TableBody,
@@ -14,12 +10,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { usePOSTransactions } from "@/hooks/pos/usePOSTransactions";
-import { usePOSStats } from "@/hooks/pos/usePOSStats";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { usePOSTransactions } from '@/hooks/pos/usePOSTransactions';
+import { usePOSStats } from '@/hooks/pos/usePOSStats';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import {
   FileDown,
   RefreshCw,
@@ -28,9 +24,9 @@ import {
   TrendingDown,
   Wallet,
   Receipt,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { exportToExcel } from "@/lib/excel-helper";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { exportToExcel } from '@/lib/excel-helper';
 
 export const POSDailyReport = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -38,26 +34,24 @@ export const POSDailyReport = () => {
   const { dailyStats } = usePOSStats(selectedDate);
 
   const filteredTransactions = transactions.filter(
-    (t) =>
-      format(new Date(t.created_at), "yyyy-MM-dd") ===
-      format(selectedDate, "yyyy-MM-dd")
+    (t) => format(new Date(t.created_at), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
   );
 
   const handleExport = async () => {
     const data = filteredTransactions.map((t) => ({
-      "رقم العملية": t.transaction_number,
+      'رقم العملية': t.transaction_number,
       النوع: t.transaction_type,
       المبلغ: t.amount,
-      "طريقة الدفع": t.payment_method,
-      الاسم: t.payer_name || "-",
-      الوصف: t.description || "-",
-      الوقت: format(new Date(t.created_at), "HH:mm:ss"),
+      'طريقة الدفع': t.payment_method,
+      الاسم: t.payer_name || '-',
+      الوصف: t.description || '-',
+      الوقت: format(new Date(t.created_at), 'HH:mm:ss'),
     }));
 
     await exportToExcel(
       data,
-      `تقرير يومي - ${format(selectedDate, "yyyy-MM-dd")}`,
-      "daily-pos-report"
+      `تقرير يومي - ${format(selectedDate, 'yyyy-MM-dd')}`,
+      'daily-pos-report'
     );
   };
 
@@ -70,7 +64,7 @@ export const POSDailyReport = () => {
             <PopoverTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <CalendarIcon className="h-4 w-4" />
-                {format(selectedDate, "yyyy/MM/dd", { locale: ar })}
+                {format(selectedDate, 'yyyy/MM/dd', { locale: ar })}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -100,7 +94,7 @@ export const POSDailyReport = () => {
               <p className="text-sm text-muted-foreground">إجمالي التحصيل</p>
             </div>
             <p className="text-2xl font-bold text-status-success">
-              {dailyStats.total_collections.toLocaleString("ar-SA")} ريال
+              {dailyStats.total_collections.toLocaleString('ar-SA')} ريال
             </p>
           </Card>
           <Card className="p-4 border-e-4 border-e-status-error">
@@ -109,7 +103,7 @@ export const POSDailyReport = () => {
               <p className="text-sm text-muted-foreground">إجمالي الصرف</p>
             </div>
             <p className="text-2xl font-bold text-status-error">
-              {dailyStats.total_payments.toLocaleString("ar-SA")} ريال
+              {dailyStats.total_payments.toLocaleString('ar-SA')} ريال
             </p>
           </Card>
           <Card className="p-4 border-e-4 border-e-primary">
@@ -118,7 +112,7 @@ export const POSDailyReport = () => {
               <p className="text-sm text-muted-foreground">صافي العمليات</p>
             </div>
             <p className="text-2xl font-bold">
-              {dailyStats.net_amount.toLocaleString("ar-SA")} ريال
+              {dailyStats.net_amount.toLocaleString('ar-SA')} ريال
             </p>
           </Card>
           <Card className="p-4 border-e-4 border-e-muted-foreground">
@@ -134,21 +128,15 @@ export const POSDailyReport = () => {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <Card className="p-3 text-center">
             <p className="text-xs text-muted-foreground mb-1">نقدي</p>
-            <p className="font-bold">
-              {dailyStats.cash_amount.toLocaleString("ar-SA")}
-            </p>
+            <p className="font-bold">{dailyStats.cash_amount.toLocaleString('ar-SA')}</p>
           </Card>
           <Card className="p-3 text-center">
             <p className="text-xs text-muted-foreground mb-1">شبكة</p>
-            <p className="font-bold">
-              {dailyStats.card_amount.toLocaleString("ar-SA")}
-            </p>
+            <p className="font-bold">{dailyStats.card_amount.toLocaleString('ar-SA')}</p>
           </Card>
           <Card className="p-3 text-center">
             <p className="text-xs text-muted-foreground mb-1">تحويل</p>
-            <p className="font-bold">
-              {dailyStats.transfer_amount.toLocaleString("ar-SA")}
-            </p>
+            <p className="font-bold">{dailyStats.transfer_amount.toLocaleString('ar-SA')}</p>
           </Card>
         </div>
 
@@ -181,35 +169,31 @@ export const POSDailyReport = () => {
               ) : (
                 filteredTransactions.map((transaction) => (
                   <TableRow key={transaction.id}>
-                    <TableCell className="font-medium">
-                      {transaction.transaction_number}
-                    </TableCell>
+                    <TableCell className="font-medium">{transaction.transaction_number}</TableCell>
                     <TableCell>
                       <Badge
                         className={cn(
-                          transaction.transaction_type === "تحصيل"
-                            ? "bg-status-success/20 text-status-success"
-                            : "bg-status-error/20 text-status-error"
+                          transaction.transaction_type === 'تحصيل'
+                            ? 'bg-status-success/20 text-status-success'
+                            : 'bg-status-error/20 text-status-error'
                         )}
                       >
                         {transaction.transaction_type}
                       </Badge>
                     </TableCell>
-                    <TableCell>{transaction.payer_name || "-"}</TableCell>
+                    <TableCell>{transaction.payer_name || '-'}</TableCell>
                     <TableCell
                       className={cn(
-                        "text-left font-semibold",
-                        transaction.transaction_type === "تحصيل"
-                          ? "text-status-success"
-                          : "text-status-error"
+                        'text-left font-semibold',
+                        transaction.transaction_type === 'تحصيل'
+                          ? 'text-status-success'
+                          : 'text-status-error'
                       )}
                     >
-                      {transaction.amount.toLocaleString("ar-SA")}
+                      {transaction.amount.toLocaleString('ar-SA')}
                     </TableCell>
                     <TableCell>{transaction.payment_method}</TableCell>
-                    <TableCell>
-                      {format(new Date(transaction.created_at), "HH:mm")}
-                    </TableCell>
+                    <TableCell>{format(new Date(transaction.created_at), 'HH:mm')}</TableCell>
                   </TableRow>
                 ))
               )}

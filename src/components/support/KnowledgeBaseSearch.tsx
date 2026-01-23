@@ -12,11 +12,11 @@ interface KnowledgeBaseSearchProps {
   popularSearches?: string[];
 }
 
-export function KnowledgeBaseSearch({ 
-  value, 
-  onChange, 
-  placeholder = "ابحث في قاعدة المعرفة...",
-  popularSearches = []
+export function KnowledgeBaseSearch({
+  value,
+  onChange,
+  placeholder = 'ابحث في قاعدة المعرفة...',
+  popularSearches = [],
 }: KnowledgeBaseSearchProps) {
   const [focused, setFocused] = useState(false);
 

@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AuthService } from "@/services/auth.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { TOAST_MESSAGES } from "@/lib/constants";
-import { useAuth } from "@/contexts/AuthContext";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AuthService } from '@/services/auth.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { TOAST_MESSAGES } from '@/lib/constants';
+import { useAuth } from '@/contexts/AuthContext';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface Profile {
   id: string;
@@ -33,19 +33,19 @@ export function useProfile() {
 
   const upsertProfile = useMutation({
     mutationFn: async (profileData: Partial<Profile>) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      if (!user?.id) throw new Error('User not authenticated');
       return AuthService.upsertProfile(user.id, profileData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROFILE() });
       toast({
         title: TOAST_MESSAGES.SUCCESS.UPDATE,
-        description: "تم تحديث الملف الشخصي بنجاح",
+        description: 'تم تحديث الملف الشخصي بنجاح',
       });
     },
-    onError: createMutationErrorHandler({ 
+    onError: createMutationErrorHandler({
       context: 'update_profile',
-      toastTitle: TOAST_MESSAGES.ERROR.UPDATE
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE,
     }),
   });
 

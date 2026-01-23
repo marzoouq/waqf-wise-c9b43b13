@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Save, RotateCcw, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Save, RotateCcw, CheckCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -10,11 +10,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Permission } from "@/hooks/auth/usePermissions";
-import { type AppRole } from "@/types/roles";
-import { useRolePermissionsData } from "@/hooks/permissions/useRolePermissionsData";
-import { ErrorState } from "@/components/shared/ErrorState";
+} from '@/components/ui/table';
+import { Permission } from '@/hooks/auth/usePermissions';
+import { type AppRole } from '@/types/roles';
+import { useRolePermissionsData } from '@/hooks/permissions/useRolePermissionsData';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface RolePermissionsMatrixProps {
   role: AppRole;
@@ -36,14 +36,16 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
   } = useRolePermissionsData(role);
 
   // Group permissions by category
-  const groupedPermissions = permissions.reduce((acc, perm) => {
-    if (!acc[perm.category]) {
-      acc[perm.category] = [];
-    }
-    acc[perm.category].push(perm);
-    return acc;
-  }, {} as Record<string, Permission[]>);
-
+  const groupedPermissions = permissions.reduce(
+    (acc, perm) => {
+      if (!acc[perm.category]) {
+        acc[perm.category] = [];
+      }
+      acc[perm.category].push(perm);
+      return acc;
+    },
+    {} as Record<string, Permission[]>
+  );
 
   if (isLoading) {
     return (
@@ -56,7 +58,13 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الصلاحيات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الصلاحيات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -78,11 +86,7 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
                   <Save className="h-4 w-4" />
                   حفظ التغييرات
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={resetModifications}
-                  className="gap-2"
-                >
+                <Button variant="outline" onClick={resetModifications} className="gap-2">
                   <RotateCcw className="h-4 w-4" />
                   إلغاء
                 </Button>
@@ -97,12 +101,8 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg">
-                  {getCategoryLabel(category)}
-                </CardTitle>
-                <CardDescription>
-                  {categoryPermissions.length} صلاحية
-                </CardDescription>
+                <CardTitle className="text-lg">{getCategoryLabel(category)}</CardTitle>
+                <CardDescription>{categoryPermissions.length} صلاحية</CardDescription>
               </div>
               <Badge variant="outline">{categoryPermissions.length}</Badge>
             </div>
@@ -121,9 +121,9 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
                   {categoryPermissions.map((perm) => {
                     const isGranted = isPermissionGranted(perm.id);
                     const isModified = modifications.has(perm.id);
-                    
+
                     return (
-                      <TableRow key={perm.id} className={isModified ? "bg-muted/50" : ""}>
+                      <TableRow key={perm.id} className={isModified ? 'bg-muted/50' : ''}>
                         <TableCell className="font-mono text-xs">
                           {perm.name}
                           {isModified && (
@@ -133,7 +133,7 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
                           )}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {perm.description || "-"}
+                          {perm.description || '-'}
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
@@ -159,13 +159,13 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
 
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
-    funds: "المصارف",
-    accounting: "المحاسبة",
-    beneficiaries: "المستفيدين",
-    properties: "العقارات",
-    archive: "الأرشيف",
-    reports: "التقارير",
-    admin: "الإدارة"
+    funds: 'المصارف',
+    accounting: 'المحاسبة',
+    beneficiaries: 'المستفيدين',
+    properties: 'العقارات',
+    archive: 'الأرشيف',
+    reports: 'التقارير',
+    admin: 'الإدارة',
   };
   return labels[category] || category;
 }

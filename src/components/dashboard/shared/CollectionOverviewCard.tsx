@@ -49,7 +49,15 @@ export function CollectionOverviewCard() {
             <Wallet className="h-5 w-5 text-primary" />
             نظرة عامة على التحصيل
           </span>
-          <Badge variant={stats.collectionRate >= 80 ? 'default' : stats.collectionRate >= 50 ? 'secondary' : 'destructive'}>
+          <Badge
+            variant={
+              stats.collectionRate >= 80
+                ? 'default'
+                : stats.collectionRate >= 50
+                  ? 'secondary'
+                  : 'destructive'
+            }
+          >
             {stats.collectionRate}%
           </Badge>
         </CardTitle>
@@ -63,10 +71,7 @@ export function CollectionOverviewCard() {
               {stats.collectionRate}%
             </span>
           </div>
-          <Progress 
-            value={stats.collectionRate} 
-            className="h-2"
-          />
+          <Progress value={stats.collectionRate} className="h-2" />
         </div>
 
         {/* المبالغ */}
@@ -80,15 +85,13 @@ export function CollectionOverviewCard() {
               {formatCurrency(stats.totalCollected)}
             </span>
           </div>
-          
+
           <div className="p-3 bg-muted/50 rounded-lg border">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Clock className="h-4 w-4" />
               <span className="text-xs font-medium">المستحق للفترة</span>
             </div>
-            <span className="text-lg font-bold">
-              {formatCurrency(stats.totalExpected)}
-            </span>
+            <span className="text-lg font-bold">{formatCurrency(stats.totalExpected)}</span>
           </div>
         </div>
 
@@ -101,7 +104,7 @@ export function CollectionOverviewCard() {
             <span className="text-lg font-bold">{stats.paidPayments}</span>
             <p className="text-xs text-muted-foreground">مدفوعة</p>
           </div>
-          
+
           <div className="text-center p-2">
             <div className="flex items-center justify-center gap-1 text-warning mb-1">
               <Clock className="h-3 w-3" />
@@ -109,7 +112,7 @@ export function CollectionOverviewCard() {
             <span className="text-lg font-bold">{stats.pendingPayments}</span>
             <p className="text-xs text-muted-foreground">معلقة</p>
           </div>
-          
+
           <div className="text-center p-2">
             <div className="flex items-center justify-center gap-1 text-destructive mb-1">
               <AlertTriangle className="h-3 w-3" />

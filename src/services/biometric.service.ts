@@ -57,15 +57,13 @@ export const BiometricService = {
     deviceName: string;
     deviceType: string;
   }): Promise<void> {
-    const { error } = await supabase
-      .from('webauthn_credentials')
-      .insert({
-        user_id: params.userId,
-        credential_id: params.credentialId,
-        public_key: params.publicKey,
-        device_name: params.deviceName,
-        device_type: params.deviceType,
-      });
+    const { error } = await supabase.from('webauthn_credentials').insert({
+      user_id: params.userId,
+      credential_id: params.credentialId,
+      public_key: params.publicKey,
+      device_name: params.deviceName,
+      device_type: params.deviceType,
+    });
 
     if (error) throw error;
   },
@@ -74,14 +72,16 @@ export const BiometricService = {
    * حذف credential (Soft Delete)
    */
   async deleteCredential(credentialId: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('webauthn_credentials')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id,
-        deletion_reason: 'حذف بواسطة المستخدم'
+        deletion_reason: 'حذف بواسطة المستخدم',
       })
       .eq('id', credentialId);
 
@@ -125,7 +125,9 @@ export const BiometricService = {
    * الحصول على المستخدم الحالي
    */
   async getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     return user;
   },
 };

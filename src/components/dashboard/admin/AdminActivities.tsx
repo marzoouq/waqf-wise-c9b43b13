@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useActivities } from "@/hooks/ui/useActivities";
-import { Clock } from "lucide-react";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useActivities } from '@/hooks/ui/useActivities';
+import { Clock } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const AdminActivities = () => {
   const { activities, isLoading } = useActivities();
@@ -78,7 +78,12 @@ export const AdminActivities = () => {
                 <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:text-xs text-muted-foreground">
                   <span className="truncate">{activity.user_name}</span>
                   <span>•</span>
-                  <span className="truncate">{new Date(activity.timestamp).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}</span>
+                  <span className="truncate">
+                    {new Date(activity.timestamp).toLocaleString('ar-SA', {
+                      dateStyle: 'short',
+                      timeStyle: 'short',
+                    })}
+                  </span>
                 </div>
               </div>
             </div>

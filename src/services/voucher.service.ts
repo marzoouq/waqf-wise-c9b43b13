@@ -1,7 +1,7 @@
-import { supabase } from "@/integrations/supabase/client";
-import { logger } from "@/lib/logger";
-import { productionLogger } from "@/lib/logger/production-logger";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
+import { productionLogger } from '@/lib/logger/production-logger';
+import type { Database } from '@/integrations/supabase/types';
 import { matchesStatus } from '@/lib/constants';
 
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
@@ -61,7 +61,7 @@ export class VoucherService {
         voucher_type: data.voucher_type,
         amount: data.amount,
         description: data.description,
-        status: "pending",
+        status: 'pending',
         beneficiary_id: data.beneficiary_id,
         payment_method: data.payment_method,
         notes: data.notes,
@@ -71,7 +71,7 @@ export class VoucherService {
       };
 
       const { data: voucher, error: insertError } = await supabase
-        .from("payment_vouchers")
+        .from('payment_vouchers')
         .insert([insertData])
         .select()
         .maybeSingle();
@@ -83,12 +83,12 @@ export class VoucherService {
       if (data.voucher_type === 'payment') {
         try {
           const { error: linkError } = await supabase.functions.invoke('link-voucher-journal', {
-            body: { 
-              voucher_id: voucher.id, 
-              create_journal: true 
-            }
+            body: {
+              voucher_id: voucher.id,
+              create_journal: true,
+            },
           });
-          
+
           if (linkError) {
             logger.error(linkError, {
               context: 'auto_link_voucher_journal',
@@ -96,7 +96,9 @@ export class VoucherService {
               metadata: { voucher_id: voucher.id },
             });
           } else {
-            productionLogger.debug('[VoucherService] ✅ تم ربط السند بقيد محاسبي', { voucher_number: voucher.voucher_number });
+            productionLogger.debug('[VoucherService] ✅ تم ربط السند بقيد محاسبي', {
+              voucher_number: voucher.voucher_number,
+            });
           }
         } catch (linkErr) {
           // تسجيل الخطأ لكن لا نوقف العملية
@@ -109,7 +111,7 @@ export class VoucherService {
 
       // 4. تسجيل النشاط
       await this.logActivity(
-        `تم إنشاء ${data.voucher_type === "receipt" ? "سند قبض" : "سند صرف"} رقم ${voucher.voucher_number} - ${data.amount} ريال`
+        `تم إنشاء ${data.voucher_type === 'receipt' ? 'سند قبض' : 'سند صرف'} رقم ${voucher.voucher_number} - ${data.amount} ريال`
       );
 
       return {
@@ -118,8 +120,8 @@ export class VoucherService {
       };
     } catch (error) {
       logger.error(error, {
-        context: "create_voucher",
-        severity: "high",
+        context: 'create_voucher',
+        severity: 'high',
       });
       throw error;
     }
@@ -132,22 +134,28 @@ export class VoucherService {
     try {
       // جلب السند للتحقق من وجود قيد
       const { data: existingVoucher } = await supabase
-        .from("payment_vouchers")
-        .select("id, voucher_number, journal_entry_id, voucher_type")
-        .eq("id", voucherId)
+        .from('payment_vouchers')
+        .select('id, voucher_number, journal_entry_id, voucher_type')
+        .eq('id', voucherId)
         .maybeSingle();
-      
+
       if (!existingVoucher) {
-        throw new Error("السند غير موجود");
+        throw new Error('السند غير موجود');
       }
 
       // إنشاء قيد إذا لم يكن موجوداً
-      if (existingVoucher && !existingVoucher.journal_entry_id && existingVoucher.voucher_type === 'payment') {
+      if (
+        existingVoucher &&
+        !existingVoucher.journal_entry_id &&
+        existingVoucher.voucher_type === 'payment'
+      ) {
         try {
           await supabase.functions.invoke('link-voucher-journal', {
-            body: { voucher_id: voucherId, create_journal: true }
+            body: { voucher_id: voucherId, create_journal: true },
           });
-          productionLogger.debug('[VoucherService] ✅ تم إنشاء قيد للسند', { voucher_number: existingVoucher.voucher_number });
+          productionLogger.debug('[VoucherService] ✅ تم إنشاء قيد للسند', {
+            voucher_number: existingVoucher.voucher_number,
+          });
         } catch (linkErr) {
           logger.error(linkErr, {
             context: 'mark_paid_link_journal',
@@ -157,21 +165,19 @@ export class VoucherService {
       }
 
       const { data: voucher, error: updateError } = await supabase
-        .from("payment_vouchers")
-        .update({ 
-          status: "paid",
+        .from('payment_vouchers')
+        .update({
+          status: 'paid',
           updated_at: new Date().toISOString(),
         })
-        .eq("id", voucherId)
+        .eq('id', voucherId)
         .select()
         .maybeSingle();
 
       if (updateError) throw updateError;
       if (!voucher) throw new Error('السند غير موجود');
 
-      await this.logActivity(
-        `تم تحديث حالة السند ${voucher.voucher_number} إلى مدفوع`
-      );
+      await this.logActivity(`تم تحديث حالة السند ${voucher.voucher_number} إلى مدفوع`);
 
       return {
         success: true,
@@ -179,8 +185,8 @@ export class VoucherService {
       };
     } catch (error) {
       logger.error(error, {
-        context: "mark_voucher_paid",
-        severity: "medium",
+        context: 'mark_voucher_paid',
+        severity: 'medium',
       });
       throw error;
     }
@@ -193,32 +199,34 @@ export class VoucherService {
   static async delete(voucherId: string, reason: string = 'تم الإلغاء') {
     try {
       const { data: voucher } = await supabase
-        .from("payment_vouchers")
-        .select("voucher_number, status")
-        .eq("id", voucherId)
-        .is("deleted_at", null)
+        .from('payment_vouchers')
+        .select('voucher_number, status')
+        .eq('id', voucherId)
+        .is('deleted_at', null)
         .maybeSingle();
 
       if (!voucher) {
-        throw new Error("السند غير موجود أو محذوف مسبقاً");
+        throw new Error('السند غير موجود أو محذوف مسبقاً');
       }
 
       if (matchesStatus(voucher?.status, 'paid')) {
-        throw new Error("لا يمكن حذف سند مدفوع");
+        throw new Error('لا يمكن حذف سند مدفوع');
       }
 
       // الحصول على معرف المستخدم الحالي
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       // Soft Delete بدلاً من الحذف الفيزيائي
       const { error: softDeleteError } = await supabase
-        .from("payment_vouchers")
+        .from('payment_vouchers')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: user?.id || null,
           deletion_reason: reason,
         })
-        .eq("id", voucherId);
+        .eq('id', voucherId);
 
       if (softDeleteError) throw softDeleteError;
 
@@ -231,8 +239,8 @@ export class VoucherService {
       };
     } catch (error) {
       logger.error(error, {
-        context: "soft_delete_voucher",
-        severity: "high",
+        context: 'soft_delete_voucher',
+        severity: 'high',
       });
       throw error;
     }
@@ -243,15 +251,15 @@ export class VoucherService {
    */
   private static validateVoucherData(data: VoucherData) {
     if (!data.voucher_type) {
-      throw new Error("نوع السند مطلوب");
+      throw new Error('نوع السند مطلوب');
     }
 
     if (!data.amount || data.amount <= 0) {
-      throw new Error("المبلغ يجب أن يكون أكبر من صفر");
+      throw new Error('المبلغ يجب أن يكون أكبر من صفر');
     }
 
-    if (!data.description || data.description.trim() === "") {
-      throw new Error("الوصف مطلوب");
+    if (!data.description || data.description.trim() === '') {
+      throw new Error('الوصف مطلوب');
     }
   }
 
@@ -260,17 +268,17 @@ export class VoucherService {
    */
   private static async logActivity(action: string) {
     try {
-      await supabase.from("activities").insert([
+      await supabase.from('activities').insert([
         {
-          user_name: "النظام",
+          user_name: 'النظام',
           action,
           timestamp: new Date().toISOString(),
         },
       ]);
     } catch (error) {
       logger.error(error, {
-        context: "log_voucher_activity",
-        severity: "low",
+        context: 'log_voucher_activity',
+        severity: 'low',
       });
     }
   }
@@ -278,36 +286,38 @@ export class VoucherService {
   /**
    * الحصول على بنود التوزيع للمستفيدين
    */
-  private static async getDistributionLines(distributionId: string): Promise<DistributionLineItem[]> {
+  private static async getDistributionLines(
+    distributionId: string
+  ): Promise<DistributionLineItem[]> {
     // جلب بيانات التوزيع
     const { data: distribution, error: distError } = await supabase
-      .from("distributions")
-      .select("*")
-      .eq("id", distributionId)
+      .from('distributions')
+      .select('*')
+      .eq('id', distributionId)
       .maybeSingle();
 
     if (distError) throw distError;
-    if (!distribution) throw new Error("التوزيع غير موجود");
+    if (!distribution) throw new Error('التوزيع غير موجود');
 
     // جلب المستفيدين المرتبطين بالتوزيع من payment_vouchers
     const { data: existingVouchers } = await supabase
-      .from("payment_vouchers")
-      .select("beneficiary_id, amount")
-      .eq("distribution_id", distributionId);
+      .from('payment_vouchers')
+      .select('beneficiary_id, amount')
+      .eq('distribution_id', distributionId);
 
     // إذا كانت هناك سندات موجودة، استخدمها
     if (existingVouchers && existingVouchers.length > 0) {
       const beneficiaryIds = existingVouchers
-        .map(v => v.beneficiary_id)
+        .map((v) => v.beneficiary_id)
         .filter((id): id is string => id !== null);
 
       const { data: beneficiaries } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, iban, bank_name")
-        .in("id", beneficiaryIds);
+        .from('beneficiaries')
+        .select('id, full_name, iban, bank_name')
+        .in('id', beneficiaryIds);
 
-      return existingVouchers.map(voucher => {
-        const beneficiary = beneficiaries?.find(b => b.id === voucher.beneficiary_id);
+      return existingVouchers.map((voucher) => {
+        const beneficiary = beneficiaries?.find((b) => b.id === voucher.beneficiary_id);
         return {
           beneficiary_id: voucher.beneficiary_id || '',
           beneficiary_name: beneficiary?.full_name || 'غير معروف',
@@ -320,20 +330,20 @@ export class VoucherService {
 
     // إذا لم توجد سندات، جلب المستفيدين النشطين وتوزيع المبلغ بالتساوي
     const { data: beneficiaries, error: beneficiariesError } = await supabase
-      .from("beneficiaries")
-      .select("id, full_name, iban, bank_name, category")
-      .in("status", ["نشط", "active"])
+      .from('beneficiaries')
+      .select('id, full_name, iban, bank_name, category')
+      .in('status', ['نشط', 'active'])
       .limit(100);
 
     if (beneficiariesError) throw beneficiariesError;
     if (!beneficiaries || beneficiaries.length === 0) {
-      throw new Error("لا يوجد مستفيدين نشطين للتوزيع");
+      throw new Error('لا يوجد مستفيدين نشطين للتوزيع');
     }
 
     // توزيع المبلغ بالتساوي
     const totalAmount = distribution.total_amount || 0;
     const amountPerBeneficiary = Math.floor(totalAmount / beneficiaries.length);
-    const remainder = totalAmount - (amountPerBeneficiary * beneficiaries.length);
+    const remainder = totalAmount - amountPerBeneficiary * beneficiaries.length;
 
     return beneficiaries.map((b, index) => ({
       beneficiary_id: b.id,
@@ -352,19 +362,19 @@ export class VoucherService {
     try {
       // الحصول على بيانات التوزيع
       const { data: distribution, error: distError } = await supabase
-        .from("distributions")
-        .select("*")
-        .eq("id", distributionId)
+        .from('distributions')
+        .select('*')
+        .eq('id', distributionId)
         .maybeSingle();
 
       if (distError) throw distError;
-      if (!distribution) throw new Error("التوزيع غير موجود");
+      if (!distribution) throw new Error('التوزيع غير موجود');
 
       // الحصول على بنود التوزيع
       const lines = await this.getDistributionLines(distributionId);
 
       if (lines.length === 0) {
-        throw new Error("لا توجد بنود للتوزيع");
+        throw new Error('لا توجد بنود للتوزيع');
       }
 
       // إنشاء سند لكل مستفيد
@@ -375,12 +385,12 @@ export class VoucherService {
       for (const line of lines) {
         try {
           const voucherData: VoucherData = {
-            voucher_type: "payment",
+            voucher_type: 'payment',
             amount: line.amount,
             beneficiary_id: line.beneficiary_id,
             description: `توزيع بتاريخ ${distribution.distribution_date} - ${line.beneficiary_name}`,
             distribution_id: distributionId,
-            payment_method: line.iban ? "bank_transfer" : "cash",
+            payment_method: line.iban ? 'bank_transfer' : 'cash',
             notes: line.iban ? `IBAN: ${line.iban}` : undefined,
           };
 
@@ -390,8 +400,8 @@ export class VoucherService {
         } catch (error) {
           failCount++;
           logger.error(error, {
-            context: "generate_voucher_for_beneficiary",
-            severity: "medium",
+            context: 'generate_voucher_for_beneficiary',
+            severity: 'medium',
             metadata: { beneficiary_id: line.beneficiary_id },
           });
         }
@@ -399,12 +409,12 @@ export class VoucherService {
 
       // تحديث حالة التوزيع
       await supabase
-        .from("distributions")
-        .update({ 
-          status: "completed",
+        .from('distributions')
+        .update({
+          status: 'completed',
           updated_at: new Date().toISOString(),
         })
-        .eq("id", distributionId);
+        .eq('id', distributionId);
 
       await this.logActivity(
         `تم توليد ${successCount} سند من التوزيع بتاريخ ${distribution.distribution_date}${failCount > 0 ? ` (${failCount} فشل)` : ''}`
@@ -419,8 +429,8 @@ export class VoucherService {
       };
     } catch (error) {
       logger.error(error, {
-        context: "generate_vouchers_from_distribution",
-        severity: "high",
+        context: 'generate_vouchers_from_distribution',
+        severity: 'high',
       });
       throw error;
     }
@@ -435,7 +445,7 @@ export class VoucherService {
     beneficiaryCount: number;
   }> {
     const lines = await this.getDistributionLines(distributionId);
-    
+
     return {
       lines,
       totalAmount: lines.reduce((sum, l) => sum + l.amount, 0),
@@ -449,11 +459,13 @@ export class VoucherService {
   static async getWithFilters(searchTerm?: string, status?: string): Promise<VoucherWithDetails[]> {
     let query = supabase
       .from('payment_vouchers')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries (full_name, national_id),
         distributions (total_amount, distribution_date)
-      `)
+      `
+      )
       .is('deleted_at', null) // استبعاد المحذوفة
       .order('created_at', { ascending: false });
 
@@ -461,7 +473,7 @@ export class VoucherService {
       query = query.or(`voucher_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
 
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       query = query.eq('status', status);
     }
 

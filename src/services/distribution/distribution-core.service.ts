@@ -34,9 +34,8 @@ export class DistributionCoreService {
         .is('deleted_at', null) // استبعاد المحذوفة
         .order('distribution_date', { ascending: false });
 
-      const { data, error } = status && status !== 'all' 
-        ? await query.eq('status', status)
-        : await query;
+      const { data, error } =
+        status && status !== 'all' ? await query.eq('status', status) : await query;
 
       if (error) throw error;
       return data || [];
@@ -68,7 +67,9 @@ export class DistributionCoreService {
   /**
    * إنشاء توزيع جديد
    */
-  static async create(distribution: Omit<DistributionInsert, 'id' | 'created_at' | 'updated_at'>): Promise<DistributionRow> {
+  static async create(
+    distribution: Omit<DistributionInsert, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<DistributionRow> {
     try {
       const { data, error } = await supabase
         .from('distributions')
@@ -88,7 +89,10 @@ export class DistributionCoreService {
   /**
    * تحديث توزيع
    */
-  static async update(id: string, updates: Partial<DistributionInsert>): Promise<DistributionRow | null> {
+  static async update(
+    id: string,
+    updates: Partial<DistributionInsert>
+  ): Promise<DistributionRow | null> {
     try {
       const { data, error } = await supabase
         .from('distributions')
@@ -117,7 +121,9 @@ export class DistributionCoreService {
       }
 
       // الحصول على معرف المستخدم الحالي
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       // Soft Delete بدلاً من الحذف الفيزيائي
       const { error } = await supabase
@@ -163,13 +169,13 @@ export class DistributionCoreService {
         .eq('distribution_id', id);
 
       if (vouchers && vouchers.length > 0) {
-        const beneficiaryIds = vouchers.map(v => v.beneficiary_id).filter(Boolean) as string[];
+        const beneficiaryIds = vouchers.map((v) => v.beneficiary_id).filter(Boolean) as string[];
         if (beneficiaryIds.length > 0) {
           await NotificationService.notifyDistributionApproved(id, beneficiaryIds);
         }
 
         // أرشفة التوزيع بعد الموافقة
-        this.archiveDistribution(data, vouchers).catch(err => {
+        this.archiveDistribution(data, vouchers).catch((err) => {
           logger.error(err, { context: 'distribution_auto_archive', severity: 'medium' });
         });
       }
@@ -185,31 +191,41 @@ export class DistributionCoreService {
    * أرشفة توزيع في نظام الأرشيف
    */
   static async archiveDistribution(
-    distribution: DistributionRow, 
-    vouchers?: { beneficiary_id: string | null; beneficiaries: { full_name: string } | null; amount: number | null; status: string | null }[]
+    distribution: DistributionRow,
+    vouchers?: {
+      beneficiary_id: string | null;
+      beneficiaries: { full_name: string } | null;
+      amount: number | null;
+      status: string | null;
+    }[]
   ): Promise<void> {
     try {
       // تحضير بيانات السندات
-      const voucherData = vouchers?.map(v => ({
-        beneficiary_name: v.beneficiaries?.full_name || 'غير محدد',
-        amount: v.amount || 0,
-        status: v.status || 'pending',
-      })) || [];
+      const voucherData =
+        vouchers?.map((v) => ({
+          beneficiary_name: v.beneficiaries?.full_name || 'غير محدد',
+          amount: v.amount || 0,
+          status: v.status || 'pending',
+        })) || [];
 
       // توليد PDF - استخدام month كاسم التوزيع
       const distributionName = distribution.month || `توزيع ${distribution.id.slice(0, 8)}`;
-      const pdfDoc = await generateDistributionPDF({
-        id: distribution.id,
-        name: distributionName,
-        distribution_date: distribution.distribution_date || new Date().toISOString().split('T')[0],
-        total_amount: distribution.total_amount || 0,
-        beneficiaries_count: distribution.beneficiaries_count || 0,
-        status: distribution.status || 'draft',
-        distribution_type: distribution.distribution_type || undefined,
-        notes: distribution.notes || undefined,
-        approved_by: distribution.approved_by || undefined,
-        approved_at: distribution.approved_at || undefined,
-      }, voucherData);
+      const pdfDoc = await generateDistributionPDF(
+        {
+          id: distribution.id,
+          name: distributionName,
+          distribution_date:
+            distribution.distribution_date || new Date().toISOString().split('T')[0],
+          total_amount: distribution.total_amount || 0,
+          beneficiaries_count: distribution.beneficiaries_count || 0,
+          status: distribution.status || 'draft',
+          distribution_type: distribution.distribution_type || undefined,
+          notes: distribution.notes || undefined,
+          approved_by: distribution.approved_by || undefined,
+          approved_at: distribution.approved_at || undefined,
+        },
+        voucherData
+      );
 
       const pdfBlob = pdfToBlob(pdfDoc);
       const fileName = `توزيع_${distributionName}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -223,9 +239,9 @@ export class DistributionCoreService {
         description: `تقرير التوزيع - ${distributionName} - ${distribution.beneficiaries_count} مستفيد`,
       });
 
-      logger.info('تم أرشفة التوزيع بنجاح', { 
-        context: 'distribution_archived', 
-        metadata: { distributionId: distribution.id } 
+      logger.info('تم أرشفة التوزيع بنجاح', {
+        context: 'distribution_archived',
+        metadata: { distributionId: distribution.id },
       });
     } catch (error) {
       logger.error(error, { context: 'archive_distribution_error', severity: 'medium' });
@@ -256,9 +272,12 @@ export class DistributionCoreService {
       const distributions = data || [];
       const totalAmount = distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0);
       const paidAmount = distributions
-        .filter(d => d.status === 'paid')
+        .filter((d) => d.status === 'paid')
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
-      const totalBeneficiaries = distributions.reduce((sum, d) => sum + (d.beneficiaries_count || 0), 0);
+      const totalBeneficiaries = distributions.reduce(
+        (sum, d) => sum + (d.beneficiaries_count || 0),
+        0
+      );
 
       return {
         totalDistributions: distributions.length,
@@ -285,13 +304,13 @@ export class DistributionCoreService {
 
     if (distributionMethod === 'equal') {
       const amountPerBeneficiary = totalAmount / beneficiaryIds.length;
-      return beneficiaryIds.map(id => ({
+      return beneficiaryIds.map((id) => ({
         beneficiary_id: id,
         amount: Math.round(amountPerBeneficiary * 100) / 100,
       }));
     }
 
-    return beneficiaryIds.map(id => ({
+    return beneficiaryIds.map((id) => ({
       beneficiary_id: id,
       amount: Math.round((totalAmount / beneficiaryIds.length) * 100) / 100,
     }));

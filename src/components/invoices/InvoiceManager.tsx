@@ -2,7 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Eye, Send, FileText } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 import { useInvoices } from '@/hooks/invoices/useInvoices';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -26,7 +33,7 @@ export function InvoiceManager() {
 
   const getZatcaStatusBadge = (status: string | null) => {
     if (!status) return <Badge variant="secondary">غير مرسل</Badge>;
-    
+
     if (status === 'accepted') {
       return <Badge className="bg-green-600">موافق عليه ✓</Badge>;
     } else if (status === 'submitted') {
@@ -50,7 +57,13 @@ export function InvoiceManager() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الفواتير" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الفواتير"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -103,9 +116,7 @@ export function InvoiceManager() {
                     <TableCell className="font-medium">{invoice.customer_name}</TableCell>
                     <TableCell>{formatCurrency(invoice.total_amount)}</TableCell>
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                    <TableCell>
-                      {getZatcaStatusBadge(invoice.zatca_status)}
-                    </TableCell>
+                    <TableCell>{getZatcaStatusBadge(invoice.zatca_status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="ghost" size="sm">
@@ -136,25 +147,19 @@ export function InvoiceManager() {
           <Card>
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">متوافق مع ZATCA</div>
-              <div className="text-2xl font-bold text-green-600">
-                {stats.zatcaCompliant}
-              </div>
+              <div className="text-2xl font-bold text-green-600">{stats.zatcaCompliant}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">مقبول</div>
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.accepted}
-              </div>
+              <div className="text-2xl font-bold text-blue-600">{stats.accepted}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">معلق</div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {stats.pending}
-              </div>
+              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
             </CardContent>
           </Card>
         </div>

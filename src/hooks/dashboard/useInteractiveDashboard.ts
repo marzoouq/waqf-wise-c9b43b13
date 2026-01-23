@@ -23,19 +23,29 @@ export function useInteractiveDashboard() {
 
   // استخدام ref لتجنب إعادة إنشاء الاشتراكات
   const queryClientRef = useRef(queryClient);
-  useEffect(() => { queryClientRef.current = queryClient; }, [queryClient]);
+  useEffect(() => {
+    queryClientRef.current = queryClient;
+  }, [queryClient]);
 
   // إحصائيات المستفيدين
-  const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt, error: beneficiariesError } = useQuery({
+  const {
+    data: beneficiariesStats,
+    isLoading: loadingBeneficiaries,
+    dataUpdatedAt,
+    error: beneficiariesError,
+  } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES(timeRange),
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
       const data = result.data || [];
-      
-      const categoryCount = data.reduce((acc, curr) => {
-        acc[curr.category] = (acc[curr.category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+
+      const categoryCount = data.reduce(
+        (acc, curr) => {
+          acc[curr.category] = (acc[curr.category] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       return Object.entries(categoryCount).map(([name, value]) => ({
         name,
@@ -81,7 +91,12 @@ export function useInteractiveDashboard() {
   };
 
   // إحصائيات المدفوعات - تشمل جدول payments وسندات الصرف والقبض
-  const { data: paymentsStats, isLoading: loadingPayments, isRefetching: isRefetchingPayments, error: paymentsError } = useQuery({
+  const {
+    data: paymentsStats,
+    isLoading: loadingPayments,
+    isRefetching: isRefetchingPayments,
+    error: paymentsError,
+  } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS(timeRange),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
@@ -95,7 +110,7 @@ export function useInteractiveDashboard() {
         .from('payments')
         .select('amount, payment_date, payment_type')
         .gte('payment_date', startDate.toISOString());
-      
+
       // جلب سندات الصرف والقبض المدفوعة
       const { data: vouchersData, error: vouchersErr } = await supabase
         .from('payment_vouchers')
@@ -107,50 +122,61 @@ export function useInteractiveDashboard() {
 
       // دمج البيانات من المصدرين
       const combinedData: Array<{ amount: number; date: string; type: string }> = [];
-      
+
       // إضافة المدفوعات
-      (paymentsData || []).forEach(p => {
+      (paymentsData || []).forEach((p) => {
         combinedData.push({
           amount: Number(p.amount),
           date: p.payment_date,
-          type: p.payment_type
+          type: p.payment_type,
         });
       });
 
       // إضافة السندات
-      (vouchersData || []).forEach(v => {
+      (vouchersData || []).forEach((v) => {
         combinedData.push({
           amount: Number(v.amount),
           date: v.created_at,
-          type: v.voucher_type
+          type: v.voucher_type,
         });
       });
 
-      const monthlyData = combinedData.reduce((acc, curr) => {
-        const month = new Date(curr.date).toLocaleDateString('ar-SA', { month: 'short' });
-        if (!acc[month]) {
-          acc[month] = { month, total: 0, count: 0 };
-        }
-        acc[month].total += curr.amount;
-        acc[month].count += 1;
-        return acc;
-      }, {} as Record<string, { month: string; total: number; count: number }>);
+      const monthlyData = combinedData.reduce(
+        (acc, curr) => {
+          const month = new Date(curr.date).toLocaleDateString('ar-SA', { month: 'short' });
+          if (!acc[month]) {
+            acc[month] = { month, total: 0, count: 0 };
+          }
+          acc[month].total += curr.amount;
+          acc[month].count += 1;
+          return acc;
+        },
+        {} as Record<string, { month: string; total: number; count: number }>
+      );
 
       return Object.values(monthlyData) as ChartDataPoint[];
     },
   });
 
   // إحصائيات العقارات
-  const { data: propertiesStats, isLoading: loadingProperties, isRefetching: isRefetchingProperties, error: propertiesError } = useQuery({
+  const {
+    data: propertiesStats,
+    isLoading: loadingProperties,
+    isRefetching: isRefetchingProperties,
+    error: propertiesError,
+  } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const data = await PropertyService.getAll();
 
-      const statusCount = (data || []).reduce((acc, curr) => {
-        acc[curr.status] = (acc[curr.status] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const statusCount = (data || []).reduce(
+        (acc, curr) => {
+          acc[curr.status] = (acc[curr.status] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       return Object.entries(statusCount).map(([name, value]) => ({
         name,

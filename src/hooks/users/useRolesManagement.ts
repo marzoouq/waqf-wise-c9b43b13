@@ -4,15 +4,15 @@
  * @version 2.9.11
  */
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { type AppRole } from "@/types/roles";
-import { UserService } from "@/services";
-import { invalidateUserQueries } from "@/lib/query-invalidation";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { useUsersFilter } from "./useUsersFilter";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { type AppRole } from '@/types/roles';
+import { UserService } from '@/services';
+import { invalidateUserQueries } from '@/lib/query-invalidation';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { useUsersFilter } from './useUsersFilter';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface UserWithRoles {
   id: string;
@@ -38,10 +38,10 @@ export interface RoleAuditLog {
 export function useRolesManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [addRoleDialogOpen, setAddRoleDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
-  const [newRole, setNewRole] = useState<AppRole>("user");
+  const [newRole, setNewRole] = useState<AppRole>('user');
   const [auditDialogOpen, setAuditDialogOpen] = useState(false);
 
   const { data: users = [], isLoading } = useQuery({
@@ -69,13 +69,17 @@ export function useRolesManagement() {
       UserService.addRole(userId, role as AppRole),
     onSuccess: () => {
       invalidateUserQueries(queryClient);
-      toast({ title: "تمت الإضافة", description: "تم إضافة الدور بنجاح" });
+      toast({ title: 'تمت الإضافة', description: 'تم إضافة الدور بنجاح' });
       setAddRoleDialogOpen(false);
       setSelectedUser(null);
     },
     onError: (error: Error) => {
-      productionLogger.error("Error adding role:", error);
-      toast({ title: "خطأ", description: error.message || "فشلت إضافة الدور", variant: "destructive" });
+      productionLogger.error('Error adding role:', error);
+      toast({
+        title: 'خطأ',
+        description: error.message || 'فشلت إضافة الدور',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -84,11 +88,15 @@ export function useRolesManagement() {
       UserService.removeRole(userId, role as AppRole),
     onSuccess: () => {
       invalidateUserQueries(queryClient);
-      toast({ title: "تم الحذف", description: "تم حذف الدور بنجاح" });
+      toast({ title: 'تم الحذف', description: 'تم حذف الدور بنجاح' });
     },
     onError: (error: Error) => {
-      productionLogger.error("Error removing role:", error);
-      toast({ title: "خطأ", description: error.message || "فشل حذف الدور", variant: "destructive" });
+      productionLogger.error('Error removing role:', error);
+      toast({
+        title: 'خطأ',
+        description: error.message || 'فشل حذف الدور',
+        variant: 'destructive',
+      });
     },
   });
 

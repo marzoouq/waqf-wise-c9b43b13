@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/ui/use-toast";
-import { Card, CardContent } from "@/components/ui/card";
-import { Eye } from "lucide-react";
-import { NotificationsPreviewDialog } from "./NotificationsPreviewDialog";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/ui/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Eye } from 'lucide-react';
+import { NotificationsPreviewDialog } from './NotificationsPreviewDialog';
 
 interface NotificationsSettingsDialogProps {
   open: boolean;
@@ -36,8 +36,8 @@ export function NotificationsSettingsDialog({
   const handleToggle = (key: keyof typeof settings) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
     toast({
-      title: "تم تحديث الإعدادات",
-      description: "تم حفظ تفضيلات الإشعارات بنجاح",
+      title: 'تم تحديث الإعدادات',
+      description: 'تم حفظ تفضيلات الإشعارات بنجاح',
     });
   };
 
@@ -67,7 +67,7 @@ export function NotificationsSettingsDialog({
           <Card>
             <CardContent className="pt-6 space-y-4">
               <h3 className="font-semibold mb-4">قنوات الإشعارات</h3>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="email">إشعارات البريد الإلكتروني</Label>
@@ -78,7 +78,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="email"
                   checked={settings.emailNotifications}
-                  onCheckedChange={() => handleToggle("emailNotifications")}
+                  onCheckedChange={() => handleToggle('emailNotifications')}
                 />
               </div>
 
@@ -92,7 +92,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="push"
                   checked={settings.pushNotifications}
-                  onCheckedChange={() => handleToggle("pushNotifications")}
+                  onCheckedChange={() => handleToggle('pushNotifications')}
                 />
               </div>
             </CardContent>
@@ -102,7 +102,7 @@ export function NotificationsSettingsDialog({
           <Card>
             <CardContent className="pt-6 space-y-4">
               <h3 className="font-semibold mb-4">أنواع الإشعارات</h3>
-              
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="approvals">تنبيهات الموافقات</Label>
@@ -113,7 +113,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="approvals"
                   checked={settings.approvalAlerts}
-                  onCheckedChange={() => handleToggle("approvalAlerts")}
+                  onCheckedChange={() => handleToggle('approvalAlerts')}
                 />
               </div>
 
@@ -127,7 +127,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="payments"
                   checked={settings.paymentAlerts}
-                  onCheckedChange={() => handleToggle("paymentAlerts")}
+                  onCheckedChange={() => handleToggle('paymentAlerts')}
                 />
               </div>
 
@@ -141,7 +141,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="journal"
                   checked={settings.journalEntryAlerts}
-                  onCheckedChange={() => handleToggle("journalEntryAlerts")}
+                  onCheckedChange={() => handleToggle('journalEntryAlerts')}
                 />
               </div>
 
@@ -155,7 +155,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="distributions"
                   checked={settings.distributionAlerts}
-                  onCheckedChange={() => handleToggle("distributionAlerts")}
+                  onCheckedChange={() => handleToggle('distributionAlerts')}
                 />
               </div>
 
@@ -169,7 +169,7 @@ export function NotificationsSettingsDialog({
                 <Switch
                   id="system"
                   checked={settings.systemAlerts}
-                  onCheckedChange={() => handleToggle("systemAlerts")}
+                  onCheckedChange={() => handleToggle('systemAlerts')}
                 />
               </div>
             </CardContent>

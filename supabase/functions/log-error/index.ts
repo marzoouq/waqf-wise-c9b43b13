@@ -1,11 +1,11 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // Interfaces for type safety
@@ -56,7 +56,7 @@ const errorReportSchema = z.object({
   url: z.string().max(2000).default('unknown'),
   user_agent: z.string().max(500).default('unknown'),
   user_id: z.string().uuid().optional(),
-  additional_data: z.record(z.unknown()).optional()
+  additional_data: z.record(z.unknown()).optional(),
 });
 
 type ErrorReport = z.infer<typeof errorReportSchema>;
@@ -69,11 +69,11 @@ Deno.serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط في البداية
     const bodyText = await req.text();
     let rawData: Record<string, unknown> = {};
-    
+
     if (bodyText && bodyText.trim() !== '') {
       try {
         rawData = JSON.parse(bodyText);
-        
+
         // ✅ Health Check Support - قبل أي عمليات أخرى (بدون تحقق من apikey)
         if (rawData.ping || rawData.healthCheck || rawData.testMode) {
           console.log('[log-error] Health check received');
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
             status: 'healthy',
             function: 'log-error',
             timestamp: new Date().toISOString(),
-            version: '4.1.0'
+            version: '4.1.0',
           });
         }
       } catch (parseError) {
@@ -116,9 +116,11 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(token);
       userId = user?.id || null;
-      
+
       if (userId) {
         // فحص عدد الطلبات خلال الدقيقة الأخيرة
         const { count } = await supabase
@@ -126,7 +128,7 @@ Deno.serve(async (req) => {
           .select('*', { count: 'exact', head: true })
           .eq('user_id', userId)
           .gte('created_at', new Date(Date.now() - 60000).toISOString());
-        
+
         if (count && count >= 100) {
           console.log(`⚠️ Rate limit exceeded for user ${userId}: ${count} requests`);
           return rateLimitResponse('Rate limit exceeded. Maximum 100 errors per minute.');
@@ -135,10 +137,10 @@ Deno.serve(async (req) => {
     }
 
     console.log('📥 Received data keys:', Object.keys(rawData));
-    
+
     // ✅ 3. فحص محسّن: تحقق من error_type أيضاً (ليس فقط level)
     const nonErrorTypes = ['info', 'debug', 'warning'];
-    
+
     // فحص level (للتوافق القديم)
     if (rawData.level && nonErrorTypes.includes(String(rawData.level))) {
       console.log(`ℹ️ Non-error log (level: ${rawData.level}) - skipping storage`);
@@ -148,7 +150,7 @@ Deno.serve(async (req) => {
         stored: false,
       });
     }
-    
+
     // ✅ فحص error_type (التنسيق الجديد من production-logger)
     if (rawData.error_type && nonErrorTypes.includes(String(rawData.error_type))) {
       console.log(`ℹ️ Non-error log (type: ${rawData.error_type}) - skipping storage`);
@@ -163,7 +165,7 @@ Deno.serve(async (req) => {
     // إذا كانت البيانات تحتوي على error/context فقط بدون error_type/error_message - تجاهل
     const hasErrorContext = 'error' in rawData && 'context' in rawData;
     const hasMissingFields = !rawData.error_type && !rawData.error_message;
-    
+
     if (hasErrorContext && hasMissingFields) {
       console.log('⚠️ Ignoring malformed error data (error/context format without proper fields)');
       return jsonResponse({
@@ -172,15 +174,18 @@ Deno.serve(async (req) => {
         stored: false,
       });
     }
-    
+
     // استخراج البيانات من error object إذا وجد
     const errorObj = rawData.error as Record<string, unknown> | undefined;
     const contextObj = rawData.context as Record<string, unknown> | undefined;
-    
+
     // إضافة قيم افتراضية للحقول الناقصة
     const normalizedData = {
       error_type: rawData.error_type || (errorObj?.name ? String(errorObj.name) : 'unknown_error'),
-      error_message: rawData.error_message || rawData.message || (errorObj?.message ? String(errorObj.message) : null),
+      error_message:
+        rawData.error_message ||
+        rawData.message ||
+        (errorObj?.message ? String(errorObj.message) : null),
       error_stack: rawData.error_stack || (errorObj?.stack ? String(errorObj.stack) : undefined),
       severity: rawData.severity || 'medium',
       url: rawData.url || (contextObj?.url ? String(contextObj.url) : 'unknown'),
@@ -188,7 +193,7 @@ Deno.serve(async (req) => {
       user_id: rawData.user_id,
       additional_data: rawData.additional_data || rawData.data || contextObj,
     };
-    
+
     // ✅ تجاهل الأخطاء بدون رسالة حقيقية
     if (!normalizedData.error_message || normalizedData.error_message === 'No message provided') {
       console.log('⚠️ Ignoring error without meaningful message');
@@ -198,26 +203,28 @@ Deno.serve(async (req) => {
         stored: false,
       });
     }
-    
+
     // ✅ 5. محاولة تحليل كخطأ باستخدام safeParse
     const parseResult = errorReportSchema.safeParse(normalizedData);
-    
+
     if (!parseResult.success) {
-      console.warn('⚠️ Data does not match error schema after normalization:', 
-        parseResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '));
+      console.warn(
+        '⚠️ Data does not match error schema after normalization:',
+        parseResult.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')
+      );
       return jsonResponse({
         success: true,
         message: 'Data received but not stored (invalid error format)',
         stored: false,
       });
     }
-    
+
     const errorReport = parseResult.data;
 
     // 🚦 6. Rate Limiting الذكي - منع الحلقات اللانهائية
     if (userId) {
       const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
-      
+
       const { data: recentErrors } = await supabase
         .from('system_error_logs')
         .select('error_type, error_message')
@@ -226,9 +233,9 @@ Deno.serve(async (req) => {
 
       if (recentErrors && recentErrors.length >= 15) {
         const sameTypeCount = recentErrors.filter(
-          e => e.error_type === errorReport.error_type
+          (e) => e.error_type === errorReport.error_type
         ).length;
-        
+
         if (sameTypeCount >= 5) {
           console.warn(`⚠️ Infinite loop detected for user ${userId}`);
           return rateLimitResponse('تم اكتشاف حلقة أخطاء لا نهائية. يرجى تحديث الصفحة.');
@@ -306,7 +313,11 @@ Deno.serve(async (req) => {
 /**
  * تطبيق قواعد الإشعارات وإرسال الإشعارات المناسبة
  */
-async function applyAlertRules(supabase: SupabaseClient, errorLog: ErrorLog, errorReport: ErrorReport) {
+async function applyAlertRules(
+  supabase: SupabaseClient,
+  errorLog: ErrorLog,
+  errorReport: ErrorReport
+) {
   try {
     const { data: rules, error: rulesError } = await supabase
       .from('alert_rules')
@@ -323,7 +334,7 @@ async function applyAlertRules(supabase: SupabaseClient, errorLog: ErrorLog, err
       const typedRule = rule as AlertRule;
       if (shouldApplyRule(typedRule, errorReport)) {
         console.log(`✅ Applying rule: ${typedRule.rule_name}`);
-        
+
         const { data: alert } = await supabase
           .from('system_alerts')
           .insert({
@@ -345,9 +356,17 @@ async function applyAlertRules(supabase: SupabaseClient, errorLog: ErrorLog, err
         await sendRoleNotifications(supabase, notifyRoles, errorLog, typedAlert);
 
         if (typedRule.auto_escalate && typedRule.escalation_delay_minutes) {
-          setTimeout(() => {
-            handleAutoEscalation(supabase, typedAlert.id, errorLog.id, typedRule.escalation_delay_minutes!);
-          }, typedRule.escalation_delay_minutes * 60 * 1000);
+          setTimeout(
+            () => {
+              handleAutoEscalation(
+                supabase,
+                typedAlert.id,
+                errorLog.id,
+                typedRule.escalation_delay_minutes!
+              );
+            },
+            typedRule.escalation_delay_minutes * 60 * 1000
+          );
         }
       }
     }
@@ -367,7 +386,7 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   const severityLevels = ['low', 'medium', 'high', 'critical'];
   const minSeverityIndex = severityLevels.indexOf(rule.min_severity || 'low');
   const currentSeverityIndex = severityLevels.indexOf(errorReport.severity);
-  
+
   if (currentSeverityIndex < minSeverityIndex) {
     return false;
   }
@@ -375,16 +394,22 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
+async function sendRoleNotifications(
+  supabase: SupabaseClient,
+  roles: string[],
+  errorLog: ErrorLog,
+  _alert: SystemAlert
+) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
-    const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
-    
+    const validRoles =
+      roles?.filter((r) => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
+
     if (validRoles.length === 0) {
       console.log('No valid roles provided for notifications');
       return;
     }
-    
+
     console.log(`Sending notifications to roles: ${validRoles.join(', ')}`);
 
     const { data: users, error: usersError } = await supabase
@@ -402,13 +427,18 @@ async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], 
     const { data: preferences } = await supabase
       .from('notification_preferences')
       .select('*')
-      .in('user_id', typedUsers.map((u: User) => u.user_id));
+      .in(
+        'user_id',
+        typedUsers.map((u: User) => u.user_id)
+      );
 
     const typedPreferences = (preferences || []) as NotificationPreference[];
     const notifications = [];
-    
+
     for (const user of typedUsers) {
-      const userPref = typedPreferences.find((p: NotificationPreference) => p.user_id === user.user_id);
+      const userPref = typedPreferences.find(
+        (p: NotificationPreference) => p.user_id === user.user_id
+      );
       const severityKey = `notify_${errorLog.severity}` as keyof NotificationPreference;
       const shouldNotify = userPref ? userPref[severityKey] !== false : true;
 
@@ -434,7 +464,12 @@ async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], 
   }
 }
 
-async function handleAutoEscalation(supabase: SupabaseClient, alertId: string, errorLogId: string, delayMinutes: number) {
+async function handleAutoEscalation(
+  supabase: SupabaseClient,
+  alertId: string,
+  errorLogId: string,
+  delayMinutes: number
+) {
   try {
     const { data: alert } = await supabase
       .from('system_alerts')
@@ -482,7 +517,11 @@ async function handleAutoEscalation(supabase: SupabaseClient, alertId: string, e
   }
 }
 
-async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: ErrorReport, errorLogId: string) {
+async function analyzeRecurringErrors(
+  supabase: SupabaseClient,
+  errorReport: ErrorReport,
+  errorLogId: string
+) {
   try {
     // ✅ لا تُنشئ تنبيهات تكرار لرسائل placeholder/فارغة
     const msg = (errorReport.error_message || '').trim();
@@ -508,7 +547,10 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
       .eq('status', 'active')
       .eq('alert_type', 'recurring_error')
       .eq('related_error_type', errorReport.error_type)
-      .eq('description', `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`)
+      .eq(
+        'description',
+        `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`
+      )
       .maybeSingle();
 
     // ملاحظة: لأن الوصف يحتوي العدد، قد لا نجد مطابقاً دائماً؛ نستخدم fallback على نفس related_error_type + alert_type
@@ -531,7 +573,9 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
           occurrence_count: similarErrors.length,
           description: `الخطأ "${errorReport.error_message}" تكرر ${similarErrors.length} مرة في الساعة الأخيرة`,
           metadata: {
-            ...(typeof (target as any).metadata === 'object' && (target as any).metadata ? (target as any).metadata : {}),
+            ...(typeof (target as any).metadata === 'object' && (target as any).metadata
+              ? (target as any).metadata
+              : {}),
             error_message: errorReport.error_message,
             last_seen_at: new Date().toISOString(),
             sample_error_log_id: errorLogId,
@@ -560,10 +604,14 @@ async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: Err
   }
 }
 
-async function attemptAutoFix(supabase: SupabaseClient, errorLog: ErrorLog, errorReport: ErrorReport) {
+async function attemptAutoFix(
+  supabase: SupabaseClient,
+  errorLog: ErrorLog,
+  errorReport: ErrorReport
+) {
   try {
     let fixStrategy = 'retry';
-    
+
     if (errorReport.error_type === 'network_error') {
       fixStrategy = 'retry';
     } else if (errorReport.error_type === 'database_connection') {

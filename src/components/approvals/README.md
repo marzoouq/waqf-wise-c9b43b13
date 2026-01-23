@@ -3,22 +3,26 @@
 ## المكونات الموجودة
 
 ### `ApprovalWorkflowBuilder` (في `/accounting`)
+
 **الهدف**: عرض وإدارة مسارات الموافقات المحفوظة في قاعدة البيانات
 
 **الاستخدام**:
+
 ```tsx
 import { ApprovalWorkflowBuilder } from '@/components/accounting/ApprovalWorkflowBuilder';
 
-<ApprovalWorkflowBuilder />
+<ApprovalWorkflowBuilder />;
 ```
 
 **المميزات**:
+
 - ✅ يقرأ البيانات من Supabase (`approval_workflows`)
 - ✅ يعرض المسارات النشطة والمعطلة
 - ✅ مرتبط بنظام المحاسبة
 - ✅ يستخدم `useApprovalWorkflows` hook
 
-**موقع الاستخدام**: 
+**موقع الاستخدام**:
+
 - صفحة المحاسبة المتقدمة (`AdvancedAccountingTab`)
 
 ---

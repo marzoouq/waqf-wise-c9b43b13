@@ -38,8 +38,7 @@ export class MessageService {
    */
   static async getInboxMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
-      const { data, error } = await supabase
-        .rpc('get_inbox_messages', { p_user_id: userId });
+      const { data, error } = await supabase.rpc('get_inbox_messages', { p_user_id: userId });
 
       if (error) throw error;
       return (data || []) as MessageWithUsers[];
@@ -54,8 +53,7 @@ export class MessageService {
    */
   static async getSentMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
-      const { data, error } = await supabase
-        .rpc('get_sent_messages', { p_user_id: userId });
+      const { data, error } = await supabase.rpc('get_sent_messages', { p_user_id: userId });
 
       if (error) throw error;
       return (data || []) as MessageWithUsers[];
@@ -70,8 +68,7 @@ export class MessageService {
    */
   static async getAllMessages(userId: string): Promise<MessageWithUsers[]> {
     try {
-      const { data, error } = await supabase
-        .rpc('get_user_messages', { p_user_id: userId });
+      const { data, error } = await supabase.rpc('get_user_messages', { p_user_id: userId });
 
       if (error) throw error;
       return (data || []) as MessageWithUsers[];
@@ -106,9 +103,7 @@ export class MessageService {
    */
   static async sendBulkMessages(messages: InternalMessageInsert[]): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('internal_messages')
-        .insert(messages);
+      const { error } = await supabase.from('internal_messages').insert(messages);
 
       if (error) throw error;
     } catch (error) {
@@ -145,7 +140,7 @@ export class MessageService {
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: userId,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         })
         .eq('id', messageId);
 
@@ -183,9 +178,9 @@ export class MessageService {
   static async getRecipients(userId: string): Promise<Recipient[]> {
     try {
       productionLogger.debug('Fetching recipients for user', { userId });
-      
+
       const { data, error } = await supabase.rpc('get_available_recipients', {
-        current_user_id: userId
+        current_user_id: userId,
       });
 
       if (error) {
@@ -195,12 +190,14 @@ export class MessageService {
 
       productionLogger.debug('Recipients fetched', { count: data?.length || 0 });
 
-      return (data || []).map((row: { id: string; name: string; role: string; role_key: string }) => ({
-        id: row.id,
-        name: row.name,
-        role: row.role,
-        roleKey: row.role_key
-      }));
+      return (data || []).map(
+        (row: { id: string; name: string; role: string; role_key: string }) => ({
+          id: row.id,
+          name: row.name,
+          role: row.role,
+          roleKey: row.role_key,
+        })
+      );
     } catch (error) {
       productionLogger.error('Error fetching recipients', error);
       throw error;

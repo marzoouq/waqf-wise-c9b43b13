@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 
 /**
  * Custom Hook مشترك لإدارة محاورات CRUD
  * يوفر حالة ودوال مشتركة للمحاورات (إنشاء/تعديل/حذف)
- * 
+ *
  * @template T - نوع العنصر
  * @returns كائن يحتوي على حالة المحاور ودوال إدارتها
  */

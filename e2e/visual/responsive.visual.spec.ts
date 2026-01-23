@@ -21,7 +21,6 @@ const viewportsToTest = [
 ];
 
 test.describe('Responsive Visual Tests', () => {
-  
   for (const viewport of viewportsToTest) {
     test.describe(`${viewport.name} (${viewport.width}x${viewport.height})`, () => {
       test.use({ viewport: { width: viewport.width, height: viewport.height } });
@@ -30,7 +29,7 @@ test.describe('Responsive Visual Tests', () => {
         test(`${pageConfig.name} page @visual @responsive`, async ({ page }) => {
           await page.goto(pageConfig.path);
           await waitForPageStability(page);
-          
+
           await expect(page).toHaveScreenshot(
             `responsive-${pageConfig.name}-${viewport.name}.png`,
             {
@@ -50,19 +49,21 @@ test.describe('Mobile-specific Visual Tests', () => {
   test('mobile navigation menu @visual @responsive', async ({ page }) => {
     await page.goto('/');
     await waitForPageStability(page);
-    
+
     // البحث عن زر القائمة الجانبية للموبايل
-    const menuButton = page.locator('[aria-label*="menu"], [aria-label*="قائمة"], button:has([class*="menu"])').first();
-    
+    const menuButton = page
+      .locator('[aria-label*="menu"], [aria-label*="قائمة"], button:has([class*="menu"])')
+      .first();
+
     if (await menuButton.isVisible()) {
       await expect(menuButton).toHaveScreenshot('mobile-menu-button.png', {
         animations: 'disabled',
       });
-      
+
       // فتح القائمة
       await menuButton.click();
       await page.waitForTimeout(500);
-      
+
       // التقاط القائمة المفتوحة
       await expect(page).toHaveScreenshot('mobile-menu-open.png', {
         animations: 'disabled',
@@ -73,7 +74,7 @@ test.describe('Mobile-specific Visual Tests', () => {
   test('mobile form inputs @visual @responsive', async ({ page }) => {
     await page.goto('/login');
     await waitForPageStability(page);
-    
+
     // التحقق من أن الحقول تعرض بشكل صحيح على الموبايل
     await expect(page).toHaveScreenshot('mobile-login-form.png', {
       fullPage: true,
@@ -84,7 +85,7 @@ test.describe('Mobile-specific Visual Tests', () => {
   test('mobile touch targets @visual @responsive', async ({ page }) => {
     await page.goto('/login');
     await waitForPageStability(page);
-    
+
     // التقاط الأزرار للتأكد من حجمها المناسب للمس
     const submitBtn = page.locator('button[type="submit"]').first();
     if (await submitBtn.isVisible()) {
@@ -101,7 +102,7 @@ test.describe('Tablet-specific Visual Tests', () => {
   test('tablet portrait layout @visual @responsive', async ({ page }) => {
     await page.goto('/');
     await waitForPageStability(page);
-    
+
     await expect(page).toHaveScreenshot('tablet-portrait-landing.png', {
       fullPage: true,
       animations: 'disabled',
@@ -115,7 +116,7 @@ test.describe('Tablet Landscape Visual Tests', () => {
   test('tablet landscape layout @visual @responsive', async ({ page }) => {
     await page.goto('/');
     await waitForPageStability(page);
-    
+
     await expect(page).toHaveScreenshot('tablet-landscape-landing.png', {
       fullPage: true,
       animations: 'disabled',
@@ -129,7 +130,7 @@ test.describe('Desktop Wide Visual Tests', () => {
   test('wide screen layout @visual @responsive', async ({ page }) => {
     await page.goto('/');
     await waitForPageStability(page);
-    
+
     await expect(page).toHaveScreenshot('wide-screen-landing.png', {
       fullPage: true,
       animations: 'disabled',
@@ -139,7 +140,7 @@ test.describe('Desktop Wide Visual Tests', () => {
   test('wide screen login @visual @responsive', async ({ page }) => {
     await page.goto('/login');
     await waitForPageStability(page);
-    
+
     await expect(page).toHaveScreenshot('wide-screen-login.png', {
       fullPage: true,
       animations: 'disabled',

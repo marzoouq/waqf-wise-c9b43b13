@@ -3,14 +3,14 @@
  * بطاقة ترحيب ذكية مع ملخص الحالة
  */
 
-import { useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Sun, Moon, Sunset, Sparkles, TrendingUp, Clock } from "lucide-react";
-import { Beneficiary } from "@/types/beneficiary";
-import { format, arLocale as ar } from "@/lib/date";
-import { motion } from "framer-motion";
-import { matchesStatus } from "@/lib/constants";
+import { useMemo } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Sun, Moon, Sunset, Sparkles, TrendingUp, Clock } from 'lucide-react';
+import { Beneficiary } from '@/types/beneficiary';
+import { format, arLocale as ar } from '@/lib/date';
+import { motion } from 'framer-motion';
+import { matchesStatus } from '@/lib/constants';
 
 interface WelcomeCardProps {
   beneficiary: Beneficiary;
@@ -20,16 +20,16 @@ export function WelcomeCard({ beneficiary }: WelcomeCardProps) {
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
-      return { text: "صباح الخير", icon: Sun, color: "text-amber-500" };
+      return { text: 'صباح الخير', icon: Sun, color: 'text-amber-500' };
     } else if (hour >= 12 && hour < 17) {
-      return { text: "مساء الخير", icon: Sunset, color: "text-orange-500" };
+      return { text: 'مساء الخير', icon: Sunset, color: 'text-orange-500' };
     } else {
-      return { text: "مساء الخير", icon: Moon, color: "text-indigo-500" };
+      return { text: 'مساء الخير', icon: Moon, color: 'text-indigo-500' };
     }
   }, []);
 
   const firstName = useMemo(() => {
-    return beneficiary.full_name.split(" ")[0];
+    return beneficiary.full_name.split(' ')[0];
   }, [beneficiary.full_name]);
 
   const currentDate = useMemo(() => new Date(), []);
@@ -64,14 +64,19 @@ export function WelcomeCard({ beneficiary }: WelcomeCardProps) {
 
             {/* معلومات سريعة - مخفية على الشاشات الصغيرة جداً */}
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 w-full sm:w-auto">
-              <Badge variant="secondary" className="bg-white/20 text-primary-foreground border-0 backdrop-blur-sm text-xs sm:text-sm">
+              <Badge
+                variant="secondary"
+                className="bg-white/20 text-primary-foreground border-0 backdrop-blur-sm text-xs sm:text-sm"
+              >
                 <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 me-1 sm:me-1.5" />
-                <span className="hidden xs:inline">{format(currentDate, "EEEE، d MMMM yyyy", { locale: ar })}</span>
-                <span className="xs:hidden">{format(currentDate, "d MMM", { locale: ar })}</span>
+                <span className="hidden xs:inline">
+                  {format(currentDate, 'EEEE، d MMMM yyyy', { locale: ar })}
+                </span>
+                <span className="xs:hidden">{format(currentDate, 'd MMM', { locale: ar })}</span>
               </Badge>
-              
-              <Badge 
-                variant="secondary" 
+
+              <Badge
+                variant="secondary"
                 className={`border-0 backdrop-blur-sm text-xs sm:text-sm ${
                   matchesStatus(beneficiary.status, 'active')
                     ? 'bg-emerald-500/30 text-white'
@@ -94,7 +99,7 @@ export function WelcomeCard({ beneficiary }: WelcomeCardProps) {
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-primary-foreground/70">رقم العضوية:</span>
-              <span className="font-semibold">{beneficiary.beneficiary_number || "—"}</span>
+              <span className="font-semibold">{beneficiary.beneficiary_number || '—'}</span>
             </div>
             {beneficiary.family_name && (
               <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">

@@ -1,22 +1,22 @@
-import { useState } from "react";
-import { Link2, Building2 } from "lucide-react";
+import { useState } from 'react';
+import { Link2, Building2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useUnlinkedProperties, useLinkProperty } from "@/hooks/waqf/useWaqfProperties";
+} from '@/components/ui/select';
+import { useUnlinkedProperties, useLinkProperty } from '@/hooks/waqf/useWaqfProperties';
 
 interface LinkPropertyDialogProps {
   open: boolean;
@@ -31,8 +31,8 @@ export function LinkPropertyDialog({
   waqfUnitId,
   onSuccess,
 }: LinkPropertyDialogProps) {
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
-  
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+
   const { data: properties = [], isLoading } = useUnlinkedProperties();
   const linkProperty = useLinkProperty();
 
@@ -44,7 +44,7 @@ export function LinkPropertyDialog({
       {
         onSuccess: () => {
           onOpenChange(false);
-          setSelectedPropertyId("");
+          setSelectedPropertyId('');
           onSuccess?.();
         },
       }
@@ -65,21 +65,14 @@ export function LinkPropertyDialog({
           <div className="space-y-2">
             <Label htmlFor="property">اختر العقار</Label>
             {isLoading ? (
-              <div className="text-center py-4 text-muted-foreground">
-                جاري التحميل...
-              </div>
+              <div className="text-center py-4 text-muted-foreground">جاري التحميل...</div>
             ) : properties.length === 0 ? (
               <div className="text-center py-4 border rounded-md bg-muted/50">
                 <Building2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  جميع العقارات مرتبطة بأقلام وقف
-                </p>
+                <p className="text-sm text-muted-foreground">جميع العقارات مرتبطة بأقلام وقف</p>
               </div>
             ) : (
-              <Select
-                value={selectedPropertyId}
-                onValueChange={setSelectedPropertyId}
-              >
+              <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
                 <SelectTrigger id="property">
                   <SelectValue placeholder="اختر عقار للربط" />
                 </SelectTrigger>
@@ -109,7 +102,7 @@ export function LinkPropertyDialog({
             disabled={!selectedPropertyId || linkProperty.isPending}
             className="gap-2"
           >
-            {linkProperty.isPending ? "جاري الحفظ..." : "ربط العقار"}
+            {linkProperty.isPending ? 'جاري الحفظ...' : 'ربط العقار'}
           </Button>
         </DialogFooter>
       </DialogContent>

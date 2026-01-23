@@ -32,10 +32,7 @@ export class RetryHandler {
     maxDelay: 10000,
   };
 
-  async execute<T>(
-    operation: () => Promise<T>,
-    config: Partial<RetryConfig> = {}
-  ): Promise<T> {
+  async execute<T>(operation: () => Promise<T>, config: Partial<RetryConfig> = {}): Promise<T> {
     const finalConfig = { ...this.defaultConfig, ...config };
     let lastError: Error | null = null;
     let currentDelay = finalConfig.delay;
@@ -43,19 +40,17 @@ export class RetryHandler {
     for (let attempt = 1; attempt <= finalConfig.maxAttempts; attempt++) {
       try {
         const result = await operation();
-        
+
         if (attempt > 1) {
-          await errorTracker.logError(
-            `Operation succeeded on attempt ${attempt}`,
-            'low',
-            { attempts: attempt }
-          );
+          await errorTracker.logError(`Operation succeeded on attempt ${attempt}`, 'low', {
+            attempts: attempt,
+          });
         }
-        
+
         return result;
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < finalConfig.maxAttempts) {
           await this.sleep(currentDelay);
           currentDelay = Math.min(
@@ -94,7 +89,7 @@ export class SmartCache {
       timestamp: Date.now(),
       expiresIn: ttl,
     });
-    
+
     if (import.meta.env.DEV) {
       productionLogger.debug(`💾 Cached data for key: ${key}`);
     }
@@ -102,13 +97,13 @@ export class SmartCache {
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return null;
     }
 
     const isExpired = Date.now() - entry.timestamp > entry.expiresIn;
-    
+
     if (isExpired) {
       this.cache.delete(key);
       if (import.meta.env.DEV) {
@@ -153,24 +148,22 @@ export class AutoRecovery {
     try {
       // محاولة تنفيذ العملية مع إعادة المحاولة التلقائية
       const data = await this.retryHandler.execute(operation);
-      
+
       // حفظ في الـ Cache
       this.cache.set(cacheKey, data, cacheTTL);
-      
+
       return { data, fromCache: false };
     } catch (error) {
       productionLogger.warn('⚠️ Operation failed, trying cache fallback...');
-      
+
       // محاولة الاسترجاع من الـ Cache
       const cachedData = this.cache.get<T>(cacheKey);
-      
+
       if (cachedData) {
         productionLogger.info('✅ Using cached data as fallback');
-        await errorTracker.logError(
-          'Used cache fallback after operation failure',
-          'medium',
-          { cacheKey }
-        );
+        await errorTracker.logError('Used cache fallback after operation failure', 'medium', {
+          cacheKey,
+        });
         return { data: cachedData, fromCache: true };
       }
 
@@ -186,11 +179,8 @@ export class AutoRecovery {
   async reconnectDatabase(): Promise<boolean> {
     try {
       productionLogger.info('🔄 Attempting to reconnect to database...');
-      
-      const { error } = await supabase
-        .from('beneficiaries')
-        .select('id')
-        .limit(1);
+
+      const { error } = await supabase.from('beneficiaries').select('id').limit(1);
 
       if (error) throw error;
 
@@ -209,7 +199,7 @@ export class AutoRecovery {
   async syncPendingData(): Promise<void> {
     try {
       productionLogger.info('🔄 Syncing pending data...');
-      
+
       const pendingData = localStorage.getItem('pending_operations');
       if (!pendingData) {
         productionLogger.debug('✅ No pending data to sync');
@@ -252,7 +242,7 @@ export class HealthMonitor {
   private checkInterval: number = 300000; // ⬆️ 5 دقائق بدل 2
   private intervalId: NodeJS.Timeout | null = null;
   private autoRecovery = new AutoRecovery();
-  
+
   // إضافات للتحكم بالتسجيل
   private lastRecordedStatus: string | null = null;
   private lastRecordTime: number = 0;
@@ -271,7 +261,7 @@ export class HealthMonitor {
 
     // Start immediate check
     this.performHealthCheck();
-    
+
     // Start periodic checks
     this.intervalId = setInterval(() => {
       this.performHealthCheck();
@@ -295,7 +285,7 @@ export class HealthMonitor {
 
   private async performHealthCheck(): Promise<void> {
     this.resetDailyCounter();
-    
+
     const checks = {
       database: await this.checkDatabase(),
       storage: await this.checkStorage(),
@@ -317,8 +307,8 @@ export class HealthMonitor {
     const statusChanged = this.lastRecordedStatus !== currentStatus;
     const hourPassed = now - this.lastRecordTime > this.minRecordInterval;
     const belowDailyLimit = this.todayRecords < this.maxRecordsPerDay;
-    
-    const shouldRecord = belowDailyLimit && (statusChanged || (!allHealthy) || hourPassed);
+
+    const shouldRecord = belowDailyLimit && (statusChanged || !allHealthy || hourPassed);
 
     if (shouldRecord) {
       try {
@@ -328,7 +318,7 @@ export class HealthMonitor {
           status: currentStatus,
           details: checks,
         });
-        
+
         this.lastRecordedStatus = currentStatus;
         this.lastRecordTime = now;
         this.todayRecords++;
@@ -345,10 +335,7 @@ export class HealthMonitor {
 
   private async checkDatabase(): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('beneficiaries')
-        .select('id')
-        .limit(1);
+      const { error } = await supabase.from('beneficiaries').select('id').limit(1);
       return !error;
     } catch {
       return false;
@@ -377,10 +364,14 @@ export class HealthMonitor {
 
     if (!checks.network) {
       productionLogger.warn('⚠️ Network is offline, will retry when online');
-      window.addEventListener('online', () => {
-        productionLogger.info('🌐 Network back online, resuming operations...');
-        this.autoRecovery.syncPendingData();
-      }, { once: true });
+      window.addEventListener(
+        'online',
+        () => {
+          productionLogger.info('🌐 Network back online, resuming operations...');
+          this.autoRecovery.syncPendingData();
+        },
+        { once: true }
+      );
     }
   }
 
@@ -390,7 +381,9 @@ export class HealthMonitor {
   private async createHealthAlert(checks: Record<string, boolean>): Promise<void> {
     try {
       // التحقق من وجود جلسة مصادقة قبل إنشاء التنبيه
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         productionLogger.warn('Skipping health alert creation - no auth session');
         return;
@@ -456,7 +449,7 @@ export class SelfHealingManager {
     } else {
       setTimeout(() => this.healthMonitor.start(), 7000);
     }
-    
+
     // معالجة الأحداث العامة
     this.setupGlobalHandlers();
   }
@@ -507,32 +500,35 @@ export class SelfHealingManager {
 /**
  * تنظيف التوزيعات المكررة
  */
-export async function cleanDuplicateDistributions(): Promise<{ cleaned: number; details: string[] }> {
+export async function cleanDuplicateDistributions(): Promise<{
+  cleaned: number;
+  details: string[];
+}> {
   try {
     const { data, error } = await supabase.rpc('find_duplicate_distributions');
-    
+
     if (error) {
       productionLogger.error('فشل البحث عن التوزيعات المكررة:', error);
       return { cleaned: 0, details: ['فشل الاتصال بقاعدة البيانات'] };
     }
-    
+
     const duplicates = data || [];
     if (duplicates.length === 0) {
       return { cleaned: 0, details: ['لا توجد توزيعات مكررة'] };
     }
-    
+
     // إلغاء التكرارات
     const { error: cleanError } = await supabase.rpc('cleanup_expired_sessions');
-    
+
     if (cleanError) {
       productionLogger.error('فشل تنظيف التوزيعات:', cleanError);
       return { cleaned: 0, details: ['فشل التنظيف'] };
     }
-    
+
     productionLogger.info(`✅ تم تنظيف ${duplicates.length} توزيعة مكررة`);
-    return { 
-      cleaned: duplicates.length, 
-      details: duplicates.map((d: { beneficiary_id: string }) => `المستفيد: ${d.beneficiary_id}`)
+    return {
+      cleaned: duplicates.length,
+      details: duplicates.map((d: { beneficiary_id: string }) => `المستفيد: ${d.beneficiary_id}`),
     };
   } catch (err) {
     productionLogger.error('خطأ في تنظيف التوزيعات:', err);
@@ -543,27 +539,30 @@ export async function cleanDuplicateDistributions(): Promise<{ cleaned: number; 
 /**
  * فحص التوازن المحاسبي
  */
-export async function verifyAccountingBalance(): Promise<{ balanced: boolean; unbalancedEntries: string[] }> {
+export async function verifyAccountingBalance(): Promise<{
+  balanced: boolean;
+  unbalancedEntries: string[];
+}> {
   try {
     const { data, error } = await supabase.rpc('check_accounting_balance');
-    
+
     if (error) {
       productionLogger.error('فشل فحص التوازن المحاسبي:', error);
       return { balanced: false, unbalancedEntries: ['فشل الاتصال'] };
     }
-    
+
     const unbalanced = data || [];
     const balanced = unbalanced.length === 0;
-    
+
     if (!balanced) {
       productionLogger.warn(`⚠️ وُجدت ${unbalanced.length} قيود غير متوازنة`);
     } else {
       productionLogger.info('✅ جميع القيود متوازنة');
     }
-    
-    return { 
-      balanced, 
-      unbalancedEntries: unbalanced.map((e: { entry_id: string }) => e.entry_id) 
+
+    return {
+      balanced,
+      unbalancedEntries: unbalanced.map((e: { entry_id: string }) => e.entry_id),
     };
   } catch (err) {
     productionLogger.error('خطأ في فحص التوازن:', err);
@@ -576,15 +575,15 @@ export async function verifyAccountingBalance(): Promise<{ balanced: boolean; un
  */
 export async function fixStuckApprovals(maxAgeDays: number = 30): Promise<{ fixed: number }> {
   try {
-    const { data, error } = await supabase.rpc('fix_stuck_approvals', { 
-      max_age_days: maxAgeDays 
+    const { data, error } = await supabase.rpc('fix_stuck_approvals', {
+      max_age_days: maxAgeDays,
     });
-    
+
     if (error) {
       productionLogger.error('فشل إصلاح الموافقات:', error);
       return { fixed: 0 };
     }
-    
+
     // التعامل مع البيانات المُرجَعة كمصفوفة أو رقم
     let fixedCount = 0;
     if (Array.isArray(data)) {
@@ -592,11 +591,11 @@ export async function fixStuckApprovals(maxAgeDays: number = 30): Promise<{ fixe
     } else if (typeof data === 'number') {
       fixedCount = data;
     }
-    
+
     if (fixedCount > 0) {
       productionLogger.info(`✅ تم إصلاح ${fixedCount} موافقة معلقة`);
     }
-    
+
     return { fixed: fixedCount };
   } catch (err) {
     productionLogger.error('خطأ في إصلاح الموافقات:', err);
@@ -610,12 +609,12 @@ export async function fixStuckApprovals(maxAgeDays: number = 30): Promise<{ fixe
 export async function cleanExpiredSessions(): Promise<{ cleaned: number }> {
   try {
     const { data, error } = await supabase.rpc('cleanup_expired_sessions');
-    
+
     if (error) {
       productionLogger.error('فشل تنظيف الجلسات:', error);
       return { cleaned: 0 };
     }
-    
+
     // التعامل مع البيانات المُرجَعة كمصفوفة أو رقم
     let cleaned = 0;
     if (Array.isArray(data) && data.length > 0) {
@@ -623,11 +622,11 @@ export async function cleanExpiredSessions(): Promise<{ cleaned: number }> {
     } else if (typeof data === 'number') {
       cleaned = data;
     }
-    
+
     if (cleaned > 0) {
       productionLogger.info(`✅ تم تنظيف ${cleaned} جلسة منتهية`);
     }
-    
+
     return { cleaned };
   } catch (err) {
     productionLogger.error('خطأ في تنظيف الجلسات:', err);
@@ -641,20 +640,20 @@ export async function cleanExpiredSessions(): Promise<{ cleaned: number }> {
 export async function checkAndFixRLS(): Promise<{ fixed: string[] }> {
   try {
     const { data, error } = await supabase.rpc('auto_repair_missing_rls');
-    
+
     if (error) {
       productionLogger.error('فشل إصلاح RLS:', error);
       return { fixed: [] };
     }
-    
+
     const fixed = (data || []).map((r: { table_name: string }) => r.table_name);
-    
+
     if (fixed.length > 0) {
       productionLogger.info(`✅ تم تفعيل RLS على: ${fixed.join(', ')}`);
     } else {
       productionLogger.info('✅ جميع الجداول مُأمَّنة');
     }
-    
+
     return { fixed };
   } catch (err) {
     productionLogger.error('خطأ في إصلاح RLS:', err);
@@ -673,9 +672,9 @@ export async function checkCronJobsHealth(): Promise<{ healthy: boolean; stopped
       .select('created_at')
       .order('created_at', { ascending: false })
       .limit(1);
-    
+
     const stoppedJobs: string[] = [];
-    
+
     // فحص النسخ الاحتياطي (يجب أن يكون خلال 24 ساعة)
     if (!backupErr && backups && backups.length > 0) {
       const lastBackup = new Date(backups[0].created_at);
@@ -684,13 +683,13 @@ export async function checkCronJobsHealth(): Promise<{ healthy: boolean; stopped
         stoppedJobs.push('backup-database');
       }
     }
-    
+
     const healthy = stoppedJobs.length === 0;
-    
+
     if (!healthy) {
       productionLogger.warn(`⚠️ وظائف متوقفة: ${stoppedJobs.join(', ')}`);
     }
-    
+
     return { healthy, stoppedJobs };
   } catch (err) {
     productionLogger.error('خطأ في فحص الوظائف:', err);
@@ -701,44 +700,45 @@ export async function checkCronJobsHealth(): Promise<{ healthy: boolean; stopped
 /**
  * فحص السجلات اليتيمة
  */
-export async function findOrphanRecords(): Promise<{ 
-  orphanPayments: number; 
+export async function findOrphanRecords(): Promise<{
+  orphanPayments: number;
   orphanContracts: number;
   orphanDistributions: number;
 }> {
   try {
     const { data, error } = await supabase.rpc('find_orphan_records');
-    
+
     if (error) {
       productionLogger.error('فشل البحث عن السجلات اليتيمة:', error);
       return { orphanPayments: 0, orphanContracts: 0, orphanDistributions: 0 };
     }
-    
+
     // التعامل مع مختلف أشكال البيانات المُرجَعة
     if (!data || !Array.isArray(data)) {
       return { orphanPayments: 0, orphanContracts: 0, orphanDistributions: 0 };
     }
-    
+
     // حساب اليتيمة من المصفوفة
     let orphanPayments = 0;
     let orphanContracts = 0;
     let orphanDistributions = 0;
-    
+
     for (const record of data) {
       // تحويل السجل لنوع مرن
       const rec = record as Record<string, unknown>;
-      
+
       if ('table_name' in rec && 'orphan_count' in rec) {
         // الشكل: كل سجل لجدول مختلف
         const tableName = rec.table_name as string;
         const count = typeof rec.orphan_count === 'number' ? rec.orphan_count : 0;
-        
+
         if (tableName === 'payments') orphanPayments = count;
         if (tableName === 'contracts') orphanContracts = count;
-        if (tableName === 'distributions' || tableName === 'heir_distributions') orphanDistributions = count;
+        if (tableName === 'distributions' || tableName === 'heir_distributions')
+          orphanDistributions = count;
       }
     }
-    
+
     return { orphanPayments, orphanContracts, orphanDistributions };
   } catch (err) {
     productionLogger.error('خطأ في البحث عن اليتيمة:', err);
@@ -759,7 +759,7 @@ export async function runComprehensiveSelfHealing(): Promise<{
   orphanRecords: { total: number };
 }> {
   productionLogger.info('🔧 بدء الإصلاح الذاتي الشامل...');
-  
+
   const [duplicates, accounting, approvals, sessions, rls, cron, orphans] = await Promise.all([
     cleanDuplicateDistributions(),
     verifyAccountingBalance(),
@@ -767,11 +767,11 @@ export async function runComprehensiveSelfHealing(): Promise<{
     cleanExpiredSessions(),
     checkAndFixRLS(),
     checkCronJobsHealth(),
-    findOrphanRecords()
+    findOrphanRecords(),
   ]);
-  
+
   productionLogger.info('✅ اكتمل الإصلاح الذاتي الشامل');
-  
+
   return {
     duplicatesClean: { cleaned: duplicates.cleaned },
     accountingCheck: { balanced: accounting.balanced },
@@ -779,9 +779,9 @@ export async function runComprehensiveSelfHealing(): Promise<{
     sessionsClean: { cleaned: sessions.cleaned },
     rlsFixed: { fixed: rls.fixed },
     cronHealth: { healthy: cron.healthy },
-    orphanRecords: { 
-      total: orphans.orphanPayments + orphans.orphanContracts + orphans.orphanDistributions 
-    }
+    orphanRecords: {
+      total: orphans.orphanPayments + orphans.orphanContracts + orphans.orphanDistributions,
+    },
   };
 }
 
@@ -797,11 +797,19 @@ export function getSelfHealing(): SelfHealingManager {
 
 // ✅ تصدير للتوافق الخلفي - لكن بتأجيل
 export const selfHealing = {
-  get retryHandler() { return getSelfHealing().retryHandler; },
-  get cache() { return getSelfHealing().cache; },
-  get autoRecovery() { return getSelfHealing().autoRecovery; },
-  get healthMonitor() { return getSelfHealing().healthMonitor; },
-  fetch: <T>(cacheKey: string, fetchFunction: () => Promise<T>, options?: { cacheTTL?: number }) => 
+  get retryHandler() {
+    return getSelfHealing().retryHandler;
+  },
+  get cache() {
+    return getSelfHealing().cache;
+  },
+  get autoRecovery() {
+    return getSelfHealing().autoRecovery;
+  },
+  get healthMonitor() {
+    return getSelfHealing().healthMonitor;
+  },
+  fetch: <T>(cacheKey: string, fetchFunction: () => Promise<T>, options?: { cacheTTL?: number }) =>
     getSelfHealing().fetch(cacheKey, fetchFunction, options),
   // دوال الإصلاح الذاتي الجديدة
   cleanDuplicateDistributions,
@@ -818,7 +826,5 @@ export const selfHealing = {
 export const retryOperation = <T>(operation: () => Promise<T>) =>
   getSelfHealing().retryHandler.execute(operation);
 
-export const fetchWithFallback = <T>(
-  cacheKey: string,
-  operation: () => Promise<T>
-) => getSelfHealing().autoRecovery.executeWithFallback(cacheKey, operation);
+export const fetchWithFallback = <T>(cacheKey: string, operation: () => Promise<T>) =>
+  getSelfHealing().autoRecovery.executeWithFallback(cacheKey, operation);

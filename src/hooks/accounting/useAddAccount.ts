@@ -1,12 +1,12 @@
 /**
  * Hook for adding/editing accounts
  */
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountingService } from "@/services";
-import { toast } from "sonner";
-import { AccountRow } from "@/types/supabase-helpers";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AccountingService } from '@/services';
+import { toast } from 'sonner';
+import { AccountRow } from '@/types/supabase-helpers';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface AddAccountFormData {
   code: string;
@@ -25,14 +25,20 @@ export function useAddAccount(onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async ({ data, existingAccount }: { data: AddAccountFormData; existingAccount?: AccountRow | null }) => {
+    mutationFn: async ({
+      data,
+      existingAccount,
+    }: {
+      data: AddAccountFormData;
+      existingAccount?: AccountRow | null;
+    }) => {
       setIsSubmitting(true);
-      
+
       // Check for duplicate code
       if (!existingAccount || (existingAccount && existingAccount.code !== data.code)) {
         const existingAccountCheck = await AccountingService.getAccountByCode(data.code);
         if (existingAccountCheck) {
-          throw new Error("رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.");
+          throw new Error('رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.');
         }
       }
 
@@ -56,12 +62,12 @@ export function useAddAccount(onSuccess?: () => void) {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
-      toast.success(variables.existingAccount ? "تم تحديث الحساب بنجاح" : "تم إضافة الحساب بنجاح");
+      toast.success(variables.existingAccount ? 'تم تحديث الحساب بنجاح' : 'تم إضافة الحساب بنجاح');
       setIsSubmitting(false);
       onSuccess?.();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "حدث خطأ أثناء حفظ الحساب");
+      toast.error(error.message || 'حدث خطأ أثناء حفظ الحساب');
       setIsSubmitting(false);
     },
   });

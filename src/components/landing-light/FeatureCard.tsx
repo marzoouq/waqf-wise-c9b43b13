@@ -1,7 +1,7 @@
 /**
  * مكون بطاقة ميزة خفيف
  */
-import React from "react";
+import React from 'react';
 
 interface FeatureCardProps {
   icon: React.ComponentType<{ className?: string }>;

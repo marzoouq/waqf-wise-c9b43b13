@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
@@ -16,7 +16,7 @@ interface VoucherJournalRequest {
 
 // حسابات افتراضية لسندات الصرف
 const DEFAULT_ACCOUNTS = {
-  cash: '1.1.1',      // النقدية والبنوك
+  cash: '1.1.1', // النقدية والبنوك
   beneficiary: '2.1', // الخصوم المتداولة (مستحقات المستفيدين)
 };
 
@@ -36,10 +36,12 @@ serve(async (req) => {
             status: 'healthy',
             function: 'link-voucher-journal',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة
@@ -56,7 +58,10 @@ serve(async (req) => {
 
     // 🔐 التحقق من صحة التوكن
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('[link-voucher-journal] ❌ Invalid token:', authError);
@@ -64,12 +69,11 @@ serve(async (req) => {
     }
 
     // 🔐 التحقق من الصلاحيات
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier'].includes(r.role));
+    const hasAccess = roles?.some((r) =>
+      ['admin', 'nazer', 'accountant', 'cashier'].includes(r.role)
+    );
     if (!hasAccess) {
       console.error('[link-voucher-journal] ❌ Unauthorized:', { userId: user.id });
       return errorResponse('ليس لديك صلاحية للوصول لهذه الخدمة', 403);
@@ -77,7 +81,8 @@ serve(async (req) => {
 
     console.log('[link-voucher-journal] ✅ Authorized:', { userId: user.id });
 
-    const { voucher_id, create_journal, journal_entry_id }: VoucherJournalRequest = await req.json();
+    const { voucher_id, create_journal, journal_entry_id }: VoucherJournalRequest =
+      await req.json();
 
     if (!voucher_id) {
       return errorResponse('يجب تحديد رقم سند الصرف', 400);
@@ -91,17 +96,19 @@ serve(async (req) => {
         success: true,
         testMode: true,
         message: 'معرف سند الصرف غير صالح',
-        voucher_id
+        voucher_id,
       });
     }
 
     // جلب بيانات سند الصرف
     const { data: voucher, error: voucherError } = await supabase
       .from('payment_vouchers')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries:beneficiary_id (id, full_name)
-      `)
+      `
+      )
       .eq('id', voucher_id)
       .maybeSingle();
 
@@ -123,7 +130,10 @@ serve(async (req) => {
 
     // إنشاء قيد جديد إذا طُلب ذلك
     if (create_journal) {
-      console.log('[link-voucher-journal] 📝 Creating new journal entry for voucher:', voucher.voucher_number);
+      console.log(
+        '[link-voucher-journal] 📝 Creating new journal entry for voucher:',
+        voucher.voucher_number
+      );
 
       // جلب السنة المالية النشطة
       const { data: fiscalYear } = await supabase
@@ -161,8 +171,8 @@ serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
-      const lastNumber = lastEntry?.entry_number 
-        ? parseInt(lastEntry.entry_number.split('-')[1], 10) 
+      const lastNumber = lastEntry?.entry_number
+        ? parseInt(lastEntry.entry_number.split('-')[1], 10)
         : 0;
       const newEntryNumber = `JE-${(lastNumber + 1).toString().padStart(6, '0')}`;
 
@@ -211,9 +221,7 @@ serve(async (req) => {
         },
       ];
 
-      const { error: linesError } = await supabase
-        .from('journal_entry_lines')
-        .insert(journalLines);
+      const { error: linesError } = await supabase.from('journal_entry_lines').insert(journalLines);
 
       if (linesError) {
         console.error('[link-voucher-journal] ❌ Lines creation error:', linesError);
@@ -240,7 +248,7 @@ serve(async (req) => {
     if (linkedJournalId) {
       const { error: updateError } = await supabase
         .from('payment_vouchers')
-        .update({ 
+        .update({
           journal_entry_id: linkedJournalId,
           updated_at: new Date().toISOString(),
         })
@@ -263,8 +271,8 @@ serve(async (req) => {
       record_id: voucher_id,
       severity: 'info',
       description: `تم ربط سند الصرف ${voucher.voucher_number} بقيد محاسبي`,
-      new_values: { 
-        voucher_id, 
+      new_values: {
+        voucher_id,
         journal_entry_id: linkedJournalId,
         amount: voucher.amount,
       },
@@ -274,11 +282,10 @@ serve(async (req) => {
       success: true,
       voucher_id,
       journal_entry_id: linkedJournalId,
-      message: create_journal 
+      message: create_journal
         ? 'تم إنشاء قيد محاسبي وربطه بسند الصرف بنجاح'
         : 'تم ربط سند الصرف بالقيد المحاسبي بنجاح',
     });
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('[link-voucher-journal] ❌ Error:', error);

@@ -78,11 +78,12 @@ export const useInvoiceOCR = () => {
 
       // 3. استدعاء Edge Function للاستخراج
       toast.info('جاري تحليل الفاتورة بالذكاء الاصطناعي...');
-      
-      const result = await EdgeFunctionService.invoke<{ success: boolean; data: ExtractedInvoiceData; error?: string }>(
-        'extract-invoice-data',
-        { image_base64: base64Data }
-      );
+
+      const result = await EdgeFunctionService.invoke<{
+        success: boolean;
+        data: ExtractedInvoiceData;
+        error?: string;
+      }>('extract-invoice-data', { image_base64: base64Data });
 
       if (!result.success || !result.data) {
         throw new Error(result.error || 'فشل استخراج البيانات');
@@ -90,7 +91,9 @@ export const useInvoiceOCR = () => {
 
       const extractedDataFromAPI = result.data.data;
       setExtractedData(extractedDataFromAPI);
-      toast.success(`تم استخراج البيانات بنجاح! (نسبة الثقة: ${extractedDataFromAPI.overall_confidence}%)`);
+      toast.success(
+        `تم استخراج البيانات بنجاح! (نسبة الثقة: ${extractedDataFromAPI.overall_confidence}%)`
+      );
 
       return {
         success: true,

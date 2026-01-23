@@ -1,31 +1,31 @@
-import { useMemo, useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { Beneficiary } from "@/types/beneficiary";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { useSavedSearches } from "@/hooks/ui/useSavedSearches";
-import { useBeneficiariesFilters } from "@/hooks/beneficiary/useBeneficiariesFilters";
-import { useBeneficiariesPageState } from "@/hooks/beneficiary/useBeneficiariesPageState";
-import { SearchCriteria } from "@/components/beneficiary/admin/AdvancedSearchDialog";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Beneficiary } from '@/types/beneficiary';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { useSavedSearches } from '@/hooks/ui/useSavedSearches';
+import { useBeneficiariesFilters } from '@/hooks/beneficiary/useBeneficiariesFilters';
+import { useBeneficiariesPageState } from '@/hooks/beneficiary/useBeneficiariesPageState';
+import { SearchCriteria } from '@/components/beneficiary/admin/AdvancedSearchDialog';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
 import {
   BeneficiariesHeader,
   BeneficiariesSearchBar,
   BeneficiariesStats,
   BeneficiariesTable,
-} from "@/components/beneficiary/admin/list";
-import { BeneficiariesDialogs } from "@/components/beneficiary/admin/BeneficiariesDialogs";
-import { PAGINATION } from "@/lib/constants";
-import { useDeleteConfirmation } from "@/hooks/shared";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+} from '@/components/beneficiary/admin/list';
+import { BeneficiariesDialogs } from '@/components/beneficiary/admin/BeneficiariesDialogs';
+import { PAGINATION } from '@/lib/constants';
+import { useDeleteConfirmation } from '@/hooks/shared';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 
 const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;
 
 const Beneficiaries = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   // ✅ استخدام Hook موحد لإدارة حالة الصفحة
   const {
     searchQuery,
@@ -50,9 +50,10 @@ const Beneficiaries = () => {
     setAdvancedCriteria,
   } = useBeneficiariesPageState();
 
-  const { beneficiaries, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
+  const { beneficiaries, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } =
+    useBeneficiaries();
   const { searches } = useSavedSearches();
-  
+
   const { filteredBeneficiaries, stats } = useBeneficiariesFilters(
     beneficiaries,
     searchQuery,
@@ -91,12 +92,17 @@ const Beneficiaries = () => {
     setDialogOpen(true);
   }, [setSelectedBeneficiary, setDialogOpen]);
 
-  const handleEditBeneficiary = useCallback((beneficiary: Beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setDialogOpen(true);
-  }, [setSelectedBeneficiary, setDialogOpen]);
+  const handleEditBeneficiary = useCallback(
+    (beneficiary: Beneficiary) => {
+      setSelectedBeneficiary(beneficiary);
+      setDialogOpen(true);
+    },
+    [setSelectedBeneficiary, setDialogOpen]
+  );
 
-  const handleSaveBeneficiary = async (data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleSaveBeneficiary = async (
+    data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>
+  ) => {
     if (selectedBeneficiary) {
       await updateBeneficiary({ id: selectedBeneficiary.id, ...data });
     } else {
@@ -105,9 +111,12 @@ const Beneficiaries = () => {
     setDialogOpen(false);
   };
 
-  const handleDeleteBeneficiary = useCallback((id: string) => {
-    confirmDelete(id);
-  }, [confirmDelete]);
+  const handleDeleteBeneficiary = useCallback(
+    (id: string) => {
+      confirmDelete(id);
+    },
+    [confirmDelete]
+  );
 
   const handleAdvancedSearch = (criteria: SearchCriteria) => {
     setAdvancedCriteria(criteria);
@@ -120,74 +129,83 @@ const Beneficiaries = () => {
   return (
     <PageErrorBoundary pageName="المستفيدون">
       <MobileOptimizedLayout>
-          <BeneficiariesHeader
-            filteredBeneficiaries={filteredBeneficiaries}
-            onAddBeneficiary={handleAddBeneficiary}
-            onImportSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })}
-          />
+        <BeneficiariesHeader
+          filteredBeneficiaries={filteredBeneficiaries}
+          onAddBeneficiary={handleAddBeneficiary}
+          onImportSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })}
+        />
 
-          <BeneficiariesSearchBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onAdvancedSearchClick={() => setAdvancedSearchOpen(true)}
-            onTribeManagementClick={() => setTribeManagementDialogOpen(true)}
-            savedSearches={searches}
-            onLoadSearch={handleLoadSavedSearch}
-          />
+        <BeneficiariesSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onAdvancedSearchClick={() => setAdvancedSearchOpen(true)}
+          onTribeManagementClick={() => setTribeManagementDialogOpen(true)}
+          savedSearches={searches}
+          onLoadSearch={handleLoadSavedSearch}
+        />
 
-          <BeneficiariesStats
-            total={stats.total}
-            active={stats.active}
-            suspended={stats.suspended}
-            families={stats.families}
-          />
+        <BeneficiariesStats
+          total={stats.total}
+          active={stats.active}
+          suspended={stats.suspended}
+          families={stats.families}
+        />
 
-          <BeneficiariesTable
-            beneficiaries={paginatedBeneficiaries}
-            isLoading={isLoading}
-            searchQuery={searchQuery}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={filteredBeneficiaries.length}
-            itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setCurrentPage}
-            onViewProfile={(b) => navigate(`/beneficiaries/${b.id}`)}
-            onEdit={handleEditBeneficiary}
-            onViewAttachments={(b) => { setSelectedBeneficiary(b); setAttachmentsDialogOpen(true); }}
-            onViewActivity={(b) => { setSelectedBeneficiary(b); setActivityLogDialogOpen(true); }}
-            onEnableLogin={(b) => { setSelectedBeneficiary(b); setEnableLoginDialogOpen(true); }}
-            onDelete={handleDeleteBeneficiary}
-          />
+        <BeneficiariesTable
+          beneficiaries={paginatedBeneficiaries}
+          isLoading={isLoading}
+          searchQuery={searchQuery}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredBeneficiaries.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+          onViewProfile={(b) => navigate(`/beneficiaries/${b.id}`)}
+          onEdit={handleEditBeneficiary}
+          onViewAttachments={(b) => {
+            setSelectedBeneficiary(b);
+            setAttachmentsDialogOpen(true);
+          }}
+          onViewActivity={(b) => {
+            setSelectedBeneficiary(b);
+            setActivityLogDialogOpen(true);
+          }}
+          onEnableLogin={(b) => {
+            setSelectedBeneficiary(b);
+            setEnableLoginDialogOpen(true);
+          }}
+          onDelete={handleDeleteBeneficiary}
+        />
 
-          <BeneficiariesDialogs
-            dialogOpen={dialogOpen}
-            setDialogOpen={setDialogOpen}
-            advancedSearchOpen={advancedSearchOpen}
-            setAdvancedSearchOpen={setAdvancedSearchOpen}
-            attachmentsDialogOpen={attachmentsDialogOpen}
-            setAttachmentsDialogOpen={setAttachmentsDialogOpen}
-            activityLogDialogOpen={activityLogDialogOpen}
-            setActivityLogDialogOpen={setActivityLogDialogOpen}
-            enableLoginDialogOpen={enableLoginDialogOpen}
-            setEnableLoginDialogOpen={setEnableLoginDialogOpen}
-            tribeManagementDialogOpen={tribeManagementDialogOpen}
-            setTribeManagementDialogOpen={setTribeManagementDialogOpen}
-            selectedBeneficiary={selectedBeneficiary}
-            onSaveBeneficiary={handleSaveBeneficiary}
-            onAdvancedSearch={handleAdvancedSearch}
-            onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ["beneficiaries"] })}
-          />
+        <BeneficiariesDialogs
+          dialogOpen={dialogOpen}
+          setDialogOpen={setDialogOpen}
+          advancedSearchOpen={advancedSearchOpen}
+          setAdvancedSearchOpen={setAdvancedSearchOpen}
+          attachmentsDialogOpen={attachmentsDialogOpen}
+          setAttachmentsDialogOpen={setAttachmentsDialogOpen}
+          activityLogDialogOpen={activityLogDialogOpen}
+          setActivityLogDialogOpen={setActivityLogDialogOpen}
+          enableLoginDialogOpen={enableLoginDialogOpen}
+          setEnableLoginDialogOpen={setEnableLoginDialogOpen}
+          tribeManagementDialogOpen={tribeManagementDialogOpen}
+          setTribeManagementDialogOpen={setTribeManagementDialogOpen}
+          selectedBeneficiary={selectedBeneficiary}
+          onSaveBeneficiary={handleSaveBeneficiary}
+          onAdvancedSearch={handleAdvancedSearch}
+          onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })}
+        />
 
-          <DeleteConfirmDialog
-            open={isDeleteOpen}
-            onOpenChange={onDeleteOpenChange}
-            onConfirm={executeDelete}
-            title={dialogTitle}
-            description={dialogDescription}
-            itemName={itemName}
-            isLoading={isDeleting}
-            isDestructive={true}
-          />
+        <DeleteConfirmDialog
+          open={isDeleteOpen}
+          onOpenChange={onDeleteOpenChange}
+          onConfirm={executeDelete}
+          title={dialogTitle}
+          description={dialogDescription}
+          itemName={itemName}
+          isLoading={isDeleting}
+          isDestructive={true}
+        />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

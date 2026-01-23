@@ -17,7 +17,8 @@ export class DistributionBeneficiaryService {
     try {
       const { data, error } = await supabase
         .from('heir_distributions')
-        .select(`
+        .select(
+          `
           id,
           share_amount,
           heir_type,
@@ -27,7 +28,8 @@ export class DistributionBeneficiaryService {
             name,
             is_closed
           )
-        `)
+        `
+        )
         .eq('beneficiary_id', beneficiaryId)
         .order('distribution_date', { ascending: false });
 
@@ -53,8 +55,8 @@ export class DistributionBeneficiaryService {
 
       if (!vouchers || vouchers.length === 0) return [];
 
-      const distributionIds = [...new Set(vouchers.map(v => v.distribution_id).filter(Boolean))];
-      
+      const distributionIds = [...new Set(vouchers.map((v) => v.distribution_id).filter(Boolean))];
+
       if (distributionIds.length === 0) return [];
 
       const { data, error } = await supabase
@@ -87,15 +89,15 @@ export class DistributionBeneficiaryService {
         .order('full_name');
 
       if (error) throw error;
-      
+
       let filtered = data || [];
       if (query.category) {
-        filtered = filtered.filter(b => b.category === query.category);
+        filtered = filtered.filter((b) => b.category === query.category);
       }
       if (query.hasBank) {
-        filtered = filtered.filter(b => !!b.iban);
+        filtered = filtered.filter((b) => !!b.iban);
       }
-      
+
       return filtered;
     } catch (error) {
       productionLogger.error('Error selecting beneficiaries', error);
@@ -109,11 +111,13 @@ export class DistributionBeneficiaryService {
   static async getFamilyMembers(familyName: string) {
     try {
       const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, national_id, relationship, gender, date_of_birth, status, is_head_of_family")
-        .eq("family_name", familyName)
-        .order("is_head_of_family", { ascending: false })
-        .order("full_name");
+        .from('beneficiaries')
+        .select(
+          'id, full_name, national_id, relationship, gender, date_of_birth, status, is_head_of_family'
+        )
+        .eq('family_name', familyName)
+        .order('is_head_of_family', { ascending: false })
+        .order('full_name');
 
       if (error) throw error;
       return data;
@@ -129,10 +133,10 @@ export class DistributionBeneficiaryService {
   static async getDisclosureBeneficiaries(disclosureId: string) {
     try {
       const { data, error } = await supabase
-        .from("disclosure_beneficiaries")
-        .select("*")
-        .eq("disclosure_id", disclosureId);
-      
+        .from('disclosure_beneficiaries')
+        .select('*')
+        .eq('disclosure_id', disclosureId);
+
       if (error) throw error;
       return data;
     } catch (error) {
@@ -144,12 +148,14 @@ export class DistributionBeneficiaryService {
   /**
    * جلب المستفيدين للقائمة المنسدلة
    */
-  static async getBeneficiariesForSelector(): Promise<{
-    id: string;
-    full_name: string;
-    national_id: string;
-    category: string;
-  }[]> {
+  static async getBeneficiariesForSelector(): Promise<
+    {
+      id: string;
+      full_name: string;
+      national_id: string;
+      category: string;
+    }[]
+  > {
     const { data, error } = await supabase
       .from('beneficiaries')
       .select('id, full_name, national_id, category')
@@ -162,13 +168,15 @@ export class DistributionBeneficiaryService {
   /**
    * حساب التوزيع الشرعي
    */
-  static async calculateShariahDistribution(totalAmount: number): Promise<{
-    beneficiary_id: string;
-    heir_type: string;
-    share_amount: number;
-    share_percentage: number;
-  }[]> {
-    const { data, error } = await supabase.rpc("calculate_shariah_distribution", {
+  static async calculateShariahDistribution(totalAmount: number): Promise<
+    {
+      beneficiary_id: string;
+      heir_type: string;
+      share_amount: number;
+      share_percentage: number;
+    }[]
+  > {
+    const { data, error } = await supabase.rpc('calculate_shariah_distribution', {
       p_total_amount: totalAmount,
     });
 

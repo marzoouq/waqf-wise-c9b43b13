@@ -5,10 +5,10 @@
  * ✅ LCP محسّن بشكل جذري
  */
 
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SEOHead } from "@/components/shared/SEOHead";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { SEOHead } from '@/components/shared/SEOHead';
+import { supabase } from '@/integrations/supabase/client';
 import {
   LightHeader,
   LightHeroSection,
@@ -17,7 +17,7 @@ import {
   LightHowItWorksSection,
   LightCTASection,
   LightFooter,
-} from "@/components/landing-light";
+} from '@/components/landing-light';
 
 export default function LandingPageLight() {
   const navigate = useNavigate();
@@ -26,10 +26,12 @@ export default function LandingPageLight() {
   // ✅ فحص سريع للجلسة - بدون AuthContext
   useEffect(() => {
     let mounted = true;
-    
+
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (mounted) {
           if (session) {
             // مستخدم مسجل - توجيه للتطبيق
@@ -44,10 +46,12 @@ export default function LandingPageLight() {
         }
       }
     };
-    
+
     checkSession();
-    
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   // ✅ عرض spinner أثناء التحقق
@@ -61,14 +65,14 @@ export default function LandingPageLight() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
-      <SEOHead 
+      <SEOHead
         title="الصفحة الرئيسية"
         description="منصة متكاملة لإدارة الأوقاف والمستفيدين - نظام حديث لإدارة العقارات والتوزيعات والمحاسبة"
       />
-      
+
       {/* Skip to main content */}
-      <a 
-        href="#main-content" 
+      <a
+        href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
       >
         تخطي إلى المحتوى الرئيسي

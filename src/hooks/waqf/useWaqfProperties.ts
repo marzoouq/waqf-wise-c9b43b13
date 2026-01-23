@@ -3,10 +3,10 @@
  * إدارة عقارات أقلام الوقف
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { WaqfService, type WaqfProperty, type UnlinkedProperty } from "@/services/waqf.service";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { WaqfService, type WaqfProperty, type UnlinkedProperty } from '@/services/waqf.service';
+import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useUnlinkedProperties() {
   return useQuery<UnlinkedProperty[]>({
@@ -34,10 +34,10 @@ export function useLinkProperty() {
       queryClient.invalidateQueries({ queryKey: ['waqf-unit-properties'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS });
-      toast.success("تم ربط العقار بنجاح");
+      toast.success('تم ربط العقار بنجاح');
     },
     onError: (error: Error) => {
-      toast.error("فشل في ربط العقار: " + error.message);
+      toast.error('فشل في ربط العقار: ' + error.message);
     },
   });
 }
@@ -52,10 +52,10 @@ export function useUnlinkProperty() {
       queryClient.invalidateQueries({ queryKey: ['waqf-unit-properties'] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS });
-      toast.success("تم إلغاء ربط العقار");
+      toast.success('تم إلغاء ربط العقار');
     },
     onError: (error: Error) => {
-      toast.error("فشل في إلغاء الربط: " + error.message);
+      toast.error('فشل في إلغاء الربط: ' + error.message);
     },
   });
 }

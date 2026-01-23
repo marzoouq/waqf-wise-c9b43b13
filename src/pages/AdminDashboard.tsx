@@ -1,37 +1,44 @@
-import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense, useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { SystemHealthMonitor } from "@/components/dashboard/admin/SystemHealthMonitor";
-import { UserManagementSection } from "@/components/dashboard/admin/UserManagementSection";
-import { SecurityAlertsSection } from "@/components/dashboard/admin/SecurityAlertsSection";
-import { AuditLogsPreview } from "@/components/dashboard/admin/AuditLogsPreview";
-import { SystemPerformanceChart } from "@/components/dashboard/admin/SystemPerformanceChart";
-import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityChart";
-import { AdminSettingsSection } from "@/components/dashboard/admin/AdminSettingsSection";
-import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
-import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
-import { AdminDashboardErrorBoundary } from "@/components/dashboard/admin/AdminDashboardErrorBoundary";
-import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
-import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
-import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
-import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
-import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
-import { LoginAttemptsSection } from "@/components/dashboard/admin/LoginAttemptsSection";
-import { PermissionsOverviewCard } from "@/components/dashboard/admin/PermissionsOverviewCard";
-import { SecuritySettingsQuickAccess } from "@/components/dashboard/admin/SecuritySettingsQuickAccess";
-import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
-import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
-import { DashboardQuickSwitch } from "@/components/dashboard/shared/DashboardQuickSwitch";
-import { AdminReportsSection } from "@/components/dashboard/admin/AdminReportsSection";
+import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Suspense, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { AdminSendMessageDialog } from '@/components/messages/AdminSendMessageDialog';
+import { SystemHealthMonitor } from '@/components/dashboard/admin/SystemHealthMonitor';
+import { UserManagementSection } from '@/components/dashboard/admin/UserManagementSection';
+import { SecurityAlertsSection } from '@/components/dashboard/admin/SecurityAlertsSection';
+import { AuditLogsPreview } from '@/components/dashboard/admin/AuditLogsPreview';
+import { SystemPerformanceChart } from '@/components/dashboard/admin/SystemPerformanceChart';
+import { UsersActivityChart } from '@/components/dashboard/admin/UsersActivityChart';
+import { AdminSettingsSection } from '@/components/dashboard/admin/AdminSettingsSection';
+import { AdminKPIs } from '@/components/dashboard/admin/AdminKPIs';
+import { LazyTabContent } from '@/components/dashboard/admin/LazyTabContent';
+import { AdminDashboardErrorBoundary } from '@/components/dashboard/admin/AdminDashboardErrorBoundary';
+import { UnifiedDashboardLayout } from '@/components/dashboard/UnifiedDashboardLayout';
+import { ChartSkeleton, SectionSkeleton } from '@/components/dashboard';
+import {
+  CurrentFiscalYearCard,
+  RevenueProgressCard,
+  FinancialCardsRow,
+} from '@/components/dashboard/shared';
+import { LastSyncIndicator } from '@/components/nazer/LastSyncIndicator';
+import {
+  useAdminDashboardRealtime,
+  useAdminDashboardRefresh,
+} from '@/hooks/dashboard/useAdminDashboardRealtime';
+import { LoginAttemptsSection } from '@/components/dashboard/admin/LoginAttemptsSection';
+import { PermissionsOverviewCard } from '@/components/dashboard/admin/PermissionsOverviewCard';
+import { SecuritySettingsQuickAccess } from '@/components/dashboard/admin/SecuritySettingsQuickAccess';
+import { AIInsightsWidget } from '@/components/dashboard/AIInsightsWidget';
+import { ScrollToTopButton } from '@/components/shared/ScrollToTopButton';
+import { DashboardQuickSwitch } from '@/components/dashboard/shared/DashboardQuickSwitch';
+import { AdminReportsSection } from '@/components/dashboard/admin/AdminReportsSection';
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("system");
+  const [activeTab, setActiveTab] = useState('system');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // تفعيل التحديثات المباشرة الموحدة
   useAdminDashboardRealtime();
   const { refreshAll } = useAdminDashboardRefresh();
@@ -58,10 +65,10 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2">
           {/* التنقل السريع بين اللوحات */}
           <DashboardQuickSwitch />
-          
-          <LastSyncIndicator 
-            lastUpdated={lastUpdated} 
-            onRefresh={handleRefresh} 
+
+          <LastSyncIndicator
+            lastUpdated={lastUpdated}
+            onRefresh={handleRefresh}
             isRefreshing={isRefreshing}
           />
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
@@ -74,40 +81,40 @@ export default function AdminDashboard() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* التبويبات - أيقونات فقط على الجوال */}
         <TabsList className="flex overflow-x-auto sm:grid sm:w-full sm:grid-cols-5 h-auto p-1 bg-muted/50 min-w-max sm:min-w-0">
-          <TabsTrigger 
-            value="system" 
+          <TabsTrigger
+            value="system"
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             title="النظام"
           >
             <LayoutDashboard className="h-4 w-4 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-xs sm:text-sm">النظام</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="users" 
+          <TabsTrigger
+            value="users"
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             title="المستخدمون"
           >
             <Users className="h-4 w-4 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-xs sm:text-sm">المستخدمون</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="security" 
+          <TabsTrigger
+            value="security"
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             title="الأمان"
           >
             <Lock className="h-4 w-4 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-xs sm:text-sm">الأمان</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="performance" 
+          <TabsTrigger
+            value="performance"
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             title="الأداء"
           >
             <Activity className="h-4 w-4 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-xs sm:text-sm">الأداء</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="settings" 
+          <TabsTrigger
+            value="settings"
             className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             title="الإعدادات"
           >
@@ -153,12 +160,11 @@ export default function AdminDashboard() {
           <Suspense fallback={<SectionSkeleton />}>
             <AdminReportsSection />
           </Suspense>
-
         </TabsContent>
 
         {/* Users Tab - Lazy Load */}
         <TabsContent value="users" className="space-y-6 mt-6">
-          <LazyTabContent isActive={activeTab === "users"}>
+          <LazyTabContent isActive={activeTab === 'users'}>
             <Suspense fallback={<ChartSkeleton />}>
               <UserManagementSection />
             </Suspense>
@@ -168,7 +174,7 @@ export default function AdminDashboard() {
 
         {/* Security Tab - Lazy Load */}
         <TabsContent value="security" className="space-y-6 mt-6">
-          <LazyTabContent isActive={activeTab === "security"}>
+          <LazyTabContent isActive={activeTab === 'security'}>
             {/* الصف الأول: محاولات الدخول + ملخص الأدوار */}
             <div className="grid gap-6 lg:grid-cols-2">
               <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل محاولات الدخول">
@@ -201,7 +207,7 @@ export default function AdminDashboard() {
 
         {/* Performance Tab - Lazy Load */}
         <TabsContent value="performance" className="space-y-6 mt-6">
-          <LazyTabContent isActive={activeTab === "performance"}>
+          <LazyTabContent isActive={activeTab === 'performance'}>
             <Suspense fallback={<ChartSkeleton />}>
               <SystemPerformanceChart />
             </Suspense>
@@ -214,7 +220,7 @@ export default function AdminDashboard() {
 
         {/* Settings Tab - Lazy Load */}
         <TabsContent value="settings" className="space-y-6 mt-6">
-          <LazyTabContent isActive={activeTab === "settings"}>
+          <LazyTabContent isActive={activeTab === 'settings'}>
             <Suspense fallback={<ChartSkeleton />}>
               <AdminSettingsSection />
             </Suspense>
@@ -222,10 +228,7 @@ export default function AdminDashboard() {
         </TabsContent>
       </Tabs>
 
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
+      <AdminSendMessageDialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} />
 
       {/* زر العودة للأعلى */}
       <ScrollToTopButton />

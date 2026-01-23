@@ -2,29 +2,29 @@
  * useBeneficiaryDashboardRealtime Hook
  * قناة Realtime موحدة لجميع بيانات بوابة المستفيد
  * يمنع تكرار الاشتراكات المتعددة
- * 
+ *
  * @version 2.9.2 - Phase 2 QUERY_KEYS unification
  */
 
-import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 // الجداول التي يحتاج المستفيد لمتابعتها
 const BENEFICIARY_WATCHED_TABLES = [
-  "beneficiaries",
-  "payments",
-  "distributions",
-  "heir_distributions",
-  "beneficiary_requests",
-  "properties",
-  "contracts",
-  "rental_payments",
-  "loans",
-  "fiscal_years",
-  "annual_disclosures",
+  'beneficiaries',
+  'payments',
+  'distributions',
+  'heir_distributions',
+  'beneficiary_requests',
+  'properties',
+  'contracts',
+  'rental_payments',
+  'loans',
+  'fiscal_years',
+  'annual_disclosures',
 ] as const;
 
 // مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
@@ -51,27 +51,29 @@ interface UseBeneficiaryDashboardRealtimeOptions {
 /**
  * اشتراك موحد لجميع تحديثات بوابة المستفيد
  */
-export function useBeneficiaryDashboardRealtime(options: UseBeneficiaryDashboardRealtimeOptions = {}) {
+export function useBeneficiaryDashboardRealtime(
+  options: UseBeneficiaryDashboardRealtimeOptions = {}
+) {
   const { enabled = true, beneficiaryId, onUpdate } = options;
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!enabled) return;
 
-    const channel = supabase.channel("beneficiary-dashboard-unified");
+    const channel = supabase.channel('beneficiary-dashboard-unified');
 
     // إضافة اشتراك لكل جدول
     BENEFICIARY_WATCHED_TABLES.forEach((table) => {
       channel.on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
+          event: '*',
+          schema: 'public',
           table,
         },
         (payload) => {
           productionLogger.debug(`Beneficiary Dashboard: ${table} updated`, { payload });
-          
+
           // تحديث الاستعلامات المرتبطة
           const queryKeys = INVALIDATION_MAP[table] || [];
           queryKeys.forEach((queryKey) => {
@@ -85,8 +87,8 @@ export function useBeneficiaryDashboardRealtime(options: UseBeneficiaryDashboard
     });
 
     channel.subscribe((status) => {
-      if (status === "SUBSCRIBED") {
-        productionLogger.debug("Beneficiary Dashboard Realtime: Subscribed successfully");
+      if (status === 'SUBSCRIBED') {
+        productionLogger.debug('Beneficiary Dashboard Realtime: Subscribed successfully');
       }
     });
 
@@ -104,9 +106,11 @@ export function useBeneficiaryDashboardRefresh() {
 
   const refreshAll = () => {
     // تحديث جميع الاستعلامات المرتبطة
-    Object.values(INVALIDATION_MAP).flat().forEach((queryKey) => {
-      queryClient.invalidateQueries({ queryKey });
-    });
+    Object.values(INVALIDATION_MAP)
+      .flat()
+      .forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey });
+      });
   };
 
   return { refreshAll };

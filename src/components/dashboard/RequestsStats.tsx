@@ -10,14 +10,17 @@ const RequestsStats = () => {
   const { requests, isLoading } = useRequests();
   const navigate = useNavigate();
 
-  const pendingRequests = safeFilter(requests, r => r.status === 'قيد المراجعة' || r.status === 'معلق');
-  const overdueRequests = safeFilter(requests, r => r.is_overdue);
-  const approvedRequests = safeFilter(requests, r => r.status === 'موافق');
-  const needsApproval = safeFilter(requests, r => r.status === 'قيد المراجعة');
+  const pendingRequests = safeFilter(
+    requests,
+    (r) => r.status === 'قيد المراجعة' || r.status === 'معلق'
+  );
+  const overdueRequests = safeFilter(requests, (r) => r.is_overdue);
+  const approvedRequests = safeFilter(requests, (r) => r.status === 'موافق');
+  const needsApproval = safeFilter(requests, (r) => r.status === 'قيد المراجعة');
 
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const recentRequests = safeFilter(requests, r => new Date(r.submitted_at) >= sevenDaysAgo);
+  const recentRequests = safeFilter(requests, (r) => new Date(r.submitted_at) >= sevenDaysAgo);
 
   const stats = [
     {
@@ -77,7 +80,7 @@ const RequestsStats = () => {
           </button>
         }
       />
-      
+
       <UnifiedStatsGrid columns={{ sm: 2, lg: 3 }}>
         {stats.map((stat) => (
           <UnifiedKPICard

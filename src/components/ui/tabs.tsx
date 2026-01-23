@@ -1,6 +1,6 @@
-import * as React from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { cn } from '@/lib/utils';
 
 // ==================== Types ====================
 interface TabsBadgeProps {
@@ -52,12 +52,12 @@ const TabsList = React.forwardRef<
     <div className="relative">
       {/* مؤشر التمرير الأيسر (في RTL يعني اليمين فعلياً) */}
       {showScrollIndicator && canScrollLeft && (
-        <div 
-          className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted to-transparent pointer-events-none z-10" 
+        <div
+          className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-muted to-transparent pointer-events-none z-10"
           aria-hidden="true"
         />
       )}
-      
+
       <TabsPrimitive.List
         ref={(node) => {
           // دمج refs
@@ -67,26 +67,26 @@ const TabsList = React.forwardRef<
         }}
         className={cn(
           // الأساسيات
-          "inline-flex h-11 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground",
+          'inline-flex h-11 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground',
           // التمرير الأفقي مع scroll-snap
-          "w-full flex-nowrap overflow-x-auto scrollbar-hide",
-          "scroll-smooth snap-x snap-mandatory",
+          'w-full flex-nowrap overflow-x-auto scrollbar-hide',
+          'scroll-smooth snap-x snap-mandatory',
           // دعم اللمس
-          "touch-pan-x",
+          'touch-pan-x',
           // إخفاء شريط التمرير
-          "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
-          className,
+          '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
+          className
         )}
-        style={{ 
+        style={{
           WebkitOverflowScrolling: 'touch',
         }}
         {...props}
       />
-      
+
       {/* مؤشر التمرير الأيمن (في RTL يعني اليسار فعلياً) */}
       {showScrollIndicator && canScrollRight && (
-        <div 
-          className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted to-transparent pointer-events-none z-10" 
+        <div
+          className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted to-transparent pointer-events-none z-10"
           aria-hidden="true"
         />
       )}
@@ -116,26 +116,26 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         // الأساسيات
-        "relative inline-flex items-center justify-center gap-2",
-        "whitespace-nowrap rounded-md px-4 py-2",
-        "text-sm font-medium",
+        'relative inline-flex items-center justify-center gap-2',
+        'whitespace-nowrap rounded-md px-4 py-2',
+        'text-sm font-medium',
         // الحجم الأدنى للمس
-        "min-h-[44px] min-w-[44px]",
+        'min-h-[44px] min-w-[44px]',
         // التمرير snap
-        "snap-start flex-shrink-0",
+        'snap-start flex-shrink-0',
         // الانتقالات
-        "ring-offset-background transition-all",
+        'ring-offset-background transition-all',
         `duration-150`,
         // الحالة النشطة مع مؤشر متحرك
-        "data-[state=active]:bg-background data-[state=active]:text-foreground",
-        "data-[state=active]:shadow-sm data-[state=active]:scale-[1.02]",
+        'data-[state=active]:bg-background data-[state=active]:text-foreground',
+        'data-[state=active]:shadow-sm data-[state=active]:scale-[1.02]',
         // التركيز
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         // التعطيل
-        "disabled:pointer-events-none disabled:opacity-50",
+        'disabled:pointer-events-none disabled:opacity-50',
         // Hover
-        "hover:bg-background/50 hover:text-foreground/80",
-        className,
+        'hover:bg-background/50 hover:text-foreground/80',
+        className
       )}
       {...props}
     >
@@ -145,19 +145,19 @@ const TabsTrigger = React.forwardRef<
           {icon}
         </span>
       )}
-      
+
       {/* النص */}
       <span>{children}</span>
-      
+
       {/* Badge */}
       {badge && badge.count !== undefined && badge.count > 0 && (
         <span
           className={cn(
-            "absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1",
-            "flex items-center justify-center",
-            "rounded-full text-[10px] font-bold",
-            "animate-in zoom-in-50 duration-200",
-            badgeVariants[badge.variant || 'default'],
+            'absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1',
+            'flex items-center justify-center',
+            'rounded-full text-[10px] font-bold',
+            'animate-in zoom-in-50 duration-200',
+            badgeVariants[badge.variant || 'default']
           )}
           aria-label={`${badge.count} إشعارات`}
         >
@@ -180,13 +180,14 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-3 ring-offset-background",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      'mt-3 ring-offset-background',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       // الحركة
-      animated && "data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-bottom-2",
-      animated && "data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0",
-      "duration-200",
-      className,
+      animated &&
+        'data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:slide-in-from-bottom-2',
+      animated && 'data-[state=inactive]:animate-out data-[state=inactive]:fade-out-0',
+      'duration-200',
+      className
     )}
     {...props}
   />

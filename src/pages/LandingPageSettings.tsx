@@ -1,32 +1,25 @@
-import { Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Globe, Mail, RefreshCw, FileText, HelpCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useLandingPageSettings } from "@/hooks/settings/useLandingPageSettings";
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Save, Globe, Mail, RefreshCw, FileText, HelpCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { useLandingPageSettings } from '@/hooks/settings/useLandingPageSettings';
 
 export default function LandingPageSettings() {
-  const {
-    isLoading,
-    error,
-    handleChange,
-    handleSave,
-    getValue,
-    refreshSettings,
-    isSaving,
-  } = useLandingPageSettings();
+  const { isLoading, error, handleChange, handleSave, getValue, refreshSettings, isSaving } =
+    useLandingPageSettings();
 
   if (isLoading) {
     return (
       <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
         <Skeleton className="h-8 w-64" />
         <div className="grid gap-4">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
@@ -35,7 +28,13 @@ export default function LandingPageSettings() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إعدادات الصفحة" onRetry={refreshSettings} />;
+    return (
+      <ErrorState
+        title="خطأ في التحميل"
+        message="فشل تحميل إعدادات الصفحة"
+        onRetry={refreshSettings}
+      />
+    );
   }
 
   return (
@@ -45,10 +44,7 @@ export default function LandingPageSettings() {
           <h1 className="text-2xl font-bold text-foreground">إعدادات الصفحة الترحيبية</h1>
           <p className="text-muted-foreground mt-1">تحكم بمحتوى وإعدادات الصفحة الرئيسية</p>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={refreshSettings}
-        >
+        <Button variant="outline" onClick={refreshSettings}>
           <RefreshCw className="h-4 w-4 ms-2" />
           تحديث
         </Button>
@@ -57,10 +53,30 @@ export default function LandingPageSettings() {
       <Tabs defaultValue="contact" className="space-y-4">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
           <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 gap-1 h-auto min-w-full sm:min-w-0">
-            <TabsTrigger value="contact" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">معلومات الاتصال</TabsTrigger>
-            <TabsTrigger value="social" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">التواصل الاجتماعي</TabsTrigger>
-            <TabsTrigger value="content" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">المحتوى</TabsTrigger>
-            <TabsTrigger value="legal" className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm">الصفحات القانونية</TabsTrigger>
+            <TabsTrigger
+              value="contact"
+              className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+            >
+              معلومات الاتصال
+            </TabsTrigger>
+            <TabsTrigger
+              value="social"
+              className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+            >
+              التواصل الاجتماعي
+            </TabsTrigger>
+            <TabsTrigger
+              value="content"
+              className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+            >
+              المحتوى
+            </TabsTrigger>
+            <TabsTrigger
+              value="legal"
+              className="px-3 sm:px-4 py-2 whitespace-nowrap text-xs sm:text-sm"
+            >
+              الصفحات القانونية
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -85,10 +101,7 @@ export default function LandingPageSettings() {
                     placeholder="info@example.com"
                     dir="ltr"
                   />
-                  <Button 
-                    onClick={() => handleSave('contact_email')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('contact_email')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -103,10 +116,7 @@ export default function LandingPageSettings() {
                     placeholder="+966 50 000 0000"
                     dir="ltr"
                   />
-                  <Button 
-                    onClick={() => handleSave('contact_phone')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('contact_phone')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -120,10 +130,7 @@ export default function LandingPageSettings() {
                     onChange={(e) => handleChange('contact_address', e.target.value)}
                     placeholder="الرياض، المملكة العربية السعودية"
                   />
-                  <Button 
-                    onClick={() => handleSave('contact_address')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('contact_address')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -153,10 +160,7 @@ export default function LandingPageSettings() {
                     placeholder="https://twitter.com/..."
                     dir="ltr"
                   />
-                  <Button 
-                    onClick={() => handleSave('social_twitter')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('social_twitter')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -171,10 +175,7 @@ export default function LandingPageSettings() {
                     placeholder="https://linkedin.com/..."
                     dir="ltr"
                   />
-                  <Button 
-                    onClick={() => handleSave('social_linkedin')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('social_linkedin')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -190,9 +191,7 @@ export default function LandingPageSettings() {
                 <FileText className="h-5 w-5 text-primary" />
                 محتوى الصفحة
               </CardTitle>
-              <CardDescription>
-                النصوص الرئيسية المعروضة في الصفحة الترحيبية
-              </CardDescription>
+              <CardDescription>النصوص الرئيسية المعروضة في الصفحة الترحيبية</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -203,10 +202,7 @@ export default function LandingPageSettings() {
                     onChange={(e) => handleChange('hero_title', e.target.value)}
                     placeholder="منصة إدارة الوقف الإلكترونية"
                   />
-                  <Button 
-                    onClick={() => handleSave('hero_title')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('hero_title')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -220,10 +216,7 @@ export default function LandingPageSettings() {
                     onChange={(e) => handleChange('hero_subtitle', e.target.value)}
                     placeholder="نظام متكامل لإدارة الأوقاف"
                   />
-                  <Button 
-                    onClick={() => handleSave('hero_subtitle')}
-                    disabled={isSaving}
-                  >
+                  <Button onClick={() => handleSave('hero_subtitle')} disabled={isSaving}>
                     <Save className="h-4 w-4" />
                   </Button>
                 </div>
@@ -238,7 +231,7 @@ export default function LandingPageSettings() {
                     placeholder="وصف مختصر عن المنصة..."
                     rows={3}
                   />
-                  <Button 
+                  <Button
                     onClick={() => handleSave('footer_description')}
                     disabled={isSaving}
                     className="self-start"
@@ -264,8 +257,8 @@ export default function LandingPageSettings() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Link 
-                  to="/privacy" 
+                <Link
+                  to="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
@@ -273,8 +266,8 @@ export default function LandingPageSettings() {
                   <h3 className="font-medium mb-1">سياسة الخصوصية</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
                 </Link>
-                <Link 
-                  to="/terms" 
+                <Link
+                  to="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
@@ -282,8 +275,8 @@ export default function LandingPageSettings() {
                   <h3 className="font-medium mb-1">شروط الاستخدام</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
                 </Link>
-                <Link 
-                  to="/security-policy" 
+                <Link
+                  to="/security-policy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
@@ -291,8 +284,8 @@ export default function LandingPageSettings() {
                   <h3 className="font-medium mb-1">سياسة الأمان</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
                 </Link>
-                <Link 
-                  to="/faq" 
+                <Link
+                  to="/faq"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
@@ -300,8 +293,8 @@ export default function LandingPageSettings() {
                   <h3 className="font-medium mb-1">الأسئلة الشائعة</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
                 </Link>
-                <Link 
-                  to="/contact" 
+                <Link
+                  to="/contact"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"

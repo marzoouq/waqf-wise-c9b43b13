@@ -3,9 +3,12 @@
  * Database Performance Monitoring Hook
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
-import { dbPerformanceService, type PerformanceAlert } from "@/services/monitoring/db-performance.service";
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import {
+  dbPerformanceService,
+  type PerformanceAlert,
+} from '@/services/monitoring/db-performance.service';
 
 const REFRESH_INTERVAL = 60000; // 60 ثانية (كان 30)
 const QUERY_KEY = 'db-performance-monitoring';
@@ -13,10 +16,10 @@ const STALE_TIME = 30000; // 30 ثانية
 const GC_TIME = 120000; // دقيقتين
 
 export function useDatabasePerformance() {
-  const { 
-    data: stats, 
-    isLoading, 
-    error, 
+  const {
+    data: stats,
+    isLoading,
+    error,
     refetch,
     dataUpdatedAt,
     isFetching,
@@ -38,20 +41,20 @@ export function useDatabasePerformance() {
   const topSequentialScans = useMemo(() => {
     if (!stats?.sequentialScans) return [];
     return [...stats.sequentialScans]
-      .filter(t => t.seq_scan > 0)
+      .filter((t) => t.seq_scan > 0)
       .sort((a, b) => b.seq_scan - a.seq_scan)
       .slice(0, 10);
   }, [stats]);
 
   const connectionsSummary = useMemo(() => {
     if (!stats?.connections) return { active: 0, idle: 0, total: 0 };
-    const active = stats.connections.find(c => c.state === 'active')?.count || 0;
-    const idle = stats.connections.find(c => c.state === 'idle')?.count || 0;
+    const active = stats.connections.find((c) => c.state === 'active')?.count || 0;
+    const idle = stats.connections.find((c) => c.state === 'idle')?.count || 0;
     return { active, idle, total: active + idle };
   }, [stats]);
 
-  const criticalAlerts = alerts.filter(a => a.type === 'critical');
-  const warningAlerts = alerts.filter(a => a.type === 'warning');
+  const criticalAlerts = alerts.filter((a) => a.type === 'critical');
+  const warningAlerts = alerts.filter((a) => a.type === 'warning');
 
   return {
     stats,

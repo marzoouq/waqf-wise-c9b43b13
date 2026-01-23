@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,15 +23,15 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { 
+    const {
       triggerType = 'manual',
       testCategories = ['edge-functions', 'database'],
-      notifyOnFailure = true
+      notifyOnFailure = true,
     } = await req.json().catch(() => ({}));
 
     const startTime = Date.now();
     const results: ScheduledTestResult[] = [];
-    
+
     // قائمة Edge Functions للاختبار
     const edgeFunctions = [
       'chatbot',
@@ -48,27 +48,27 @@ serve(async (req) => {
           const response = await fetch(`${supabaseUrl}/functions/v1/${funcName}`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${supabaseKey}`,
+              Authorization: `Bearer ${supabaseKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ testMode: true, ping: true }),
           });
-          
+
           const duration = Date.now() - funcStart;
-          
+
           if (response.ok || response.status === 401 || response.status === 403) {
             results.push({
               functionName: funcName,
               status: 'success',
               duration,
-              message: `HTTP ${response.status}`
+              message: `HTTP ${response.status}`,
             });
           } else {
             results.push({
               functionName: funcName,
               status: 'error',
               duration,
-              message: `HTTP ${response.status}: ${response.statusText}`
+              message: `HTTP ${response.status}: ${response.statusText}`,
             });
           }
         } catch (error: any) {
@@ -76,7 +76,7 @@ serve(async (req) => {
             functionName: funcName,
             status: error.message?.includes('timeout') ? 'timeout' : 'error',
             duration: Date.now() - funcStart,
-            message: error.message
+            message: error.message,
           });
         }
       }
@@ -84,7 +84,7 @@ serve(async (req) => {
 
     // اختبار الجداول الأساسية
     const criticalTables = ['profiles', 'beneficiaries', 'properties', 'distributions'];
-    
+
     if (testCategories.includes('database')) {
       for (const table of criticalTables) {
         const tableStart = Date.now();
@@ -94,22 +94,22 @@ serve(async (req) => {
             functionName: `db:${table}`,
             status: error ? 'error' : 'success',
             duration: Date.now() - tableStart,
-            message: error?.message
+            message: error?.message,
           });
         } catch (error: any) {
           results.push({
             functionName: `db:${table}`,
             status: 'error',
             duration: Date.now() - tableStart,
-            message: error.message
+            message: error.message,
           });
         }
       }
     }
 
     const totalDuration = Date.now() - startTime;
-    const passed = results.filter(r => r.status === 'success').length;
-    const failed = results.filter(r => r.status !== 'success').length;
+    const passed = results.filter((r) => r.status === 'success').length;
+    const failed = results.filter((r) => r.status !== 'success').length;
     const passRate = results.length > 0 ? (passed / results.length) * 100 : 0;
 
     // حفظ النتيجة في قاعدة البيانات
@@ -123,27 +123,35 @@ serve(async (req) => {
         avg_duration: Math.round(results.reduce((s, r) => s + r.duration, 0) / results.length),
         categories_summary: {
           'edge-functions': {
-            total: results.filter(r => !r.functionName.startsWith('db:')).length,
-            passed: results.filter(r => !r.functionName.startsWith('db:') && r.status === 'success').length,
-            failed: results.filter(r => !r.functionName.startsWith('db:') && r.status !== 'success').length
+            total: results.filter((r) => !r.functionName.startsWith('db:')).length,
+            passed: results.filter(
+              (r) => !r.functionName.startsWith('db:') && r.status === 'success'
+            ).length,
+            failed: results.filter(
+              (r) => !r.functionName.startsWith('db:') && r.status !== 'success'
+            ).length,
           },
-          'database': {
-            total: results.filter(r => r.functionName.startsWith('db:')).length,
-            passed: results.filter(r => r.functionName.startsWith('db:') && r.status === 'success').length,
-            failed: results.filter(r => r.functionName.startsWith('db:') && r.status !== 'success').length
-          }
+          database: {
+            total: results.filter((r) => r.functionName.startsWith('db:')).length,
+            passed: results.filter(
+              (r) => r.functionName.startsWith('db:') && r.status === 'success'
+            ).length,
+            failed: results.filter(
+              (r) => r.functionName.startsWith('db:') && r.status !== 'success'
+            ).length,
+          },
         },
         failed_tests_details: results
-          .filter(r => r.status !== 'success')
-          .map(r => ({
+          .filter((r) => r.status !== 'success')
+          .map((r) => ({
             testId: r.functionName,
             testName: r.functionName,
             category: r.functionName.startsWith('db:') ? 'database' : 'edge-functions',
-            message: r.message || 'Unknown error'
+            message: r.message || 'Unknown error',
           })),
         triggered_by: triggerType,
         run_duration_seconds: Math.round(totalDuration / 1000),
-        notes: `Scheduled test run: ${edgeFunctions.length} edge functions, ${criticalTables.length} tables`
+        notes: `Scheduled test run: ${edgeFunctions.length} edge functions, ${criticalTables.length} tables`,
       })
       .select()
       .maybeSingle();
@@ -165,8 +173,8 @@ serve(async (req) => {
           metadata: {
             testRunId: savedRun?.id,
             passRate,
-            failedTests: failed
-          }
+            failedTests: failed,
+          },
         });
       } catch (e) {
         console.error('Failed to create alert:', e);
@@ -181,26 +189,25 @@ serve(async (req) => {
           passed,
           failed,
           passRate: passRate.toFixed(1),
-          duration: totalDuration
+          duration: totalDuration,
         },
         results,
-        savedRunId: savedRun?.id
+        savedRunId: savedRun?.id,
       }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-
   } catch (error: any) {
     console.error('Scheduled tests error:', error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      JSON.stringify({
+        success: false,
+        error: error.message,
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }

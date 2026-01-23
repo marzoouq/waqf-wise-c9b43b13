@@ -2,13 +2,13 @@
  * useUsersFilter Hook
  * فلترة المستخدمين الموحدة - يُستخدم في Users و RolesManagement
  * @version 2.9.12
- * 
+ *
  * التحسينات:
  * - إضافة فلتر نوع المستخدم (staff/beneficiaries)
  */
 
-import { useState, useMemo } from "react";
-import type { AppRole } from "@/types/roles";
+import { useState, useMemo } from 'react';
+import type { AppRole } from '@/types/roles';
 
 // أدوار المشرفين والموظفين
 export const STAFF_ROLES: readonly AppRole[] = [
@@ -21,10 +21,7 @@ export const STAFF_ROLES: readonly AppRole[] = [
 ] as const;
 
 // أدوار المستفيدين
-export const BENEFICIARY_ROLES: readonly AppRole[] = [
-  'beneficiary',
-  'waqf_heir',
-] as const;
+export const BENEFICIARY_ROLES: readonly AppRole[] = ['beneficiary', 'waqf_heir'] as const;
 
 export type UserTypeFilter = 'staff' | 'beneficiaries';
 
@@ -61,9 +58,9 @@ interface UseUsersFilterReturn<T extends UserWithRoles> {
 export function useUsersFilter<T extends UserWithRoles>({
   users,
 }: UseUsersFilterOptions<T>): UseUsersFilterReturn<T> {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [userTypeFilter, setUserTypeFilter] = useState<UserTypeFilter>("staff");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [userTypeFilter, setUserTypeFilter] = useState<UserTypeFilter>('staff');
 
   // حساب عدد كل نوع
   const { staffCount, beneficiariesCount } = useMemo(() => {
@@ -71,9 +68,11 @@ export function useUsersFilter<T extends UserWithRoles>({
     let beneficiaries = 0;
 
     users.forEach((user) => {
-      const userRoles = user.roles_array || user.user_roles?.map(r => r.role) || [];
-      const hasStaffRole = userRoles.some(role => STAFF_ROLES.includes(role as AppRole));
-      const hasBeneficiaryRole = userRoles.some(role => BENEFICIARY_ROLES.includes(role as AppRole));
+      const userRoles = user.roles_array || user.user_roles?.map((r) => r.role) || [];
+      const hasStaffRole = userRoles.some((role) => STAFF_ROLES.includes(role as AppRole));
+      const hasBeneficiaryRole = userRoles.some((role) =>
+        BENEFICIARY_ROLES.includes(role as AppRole)
+      );
 
       if (hasStaffRole) staff++;
       if (hasBeneficiaryRole) beneficiaries++;
@@ -84,21 +83,21 @@ export function useUsersFilter<T extends UserWithRoles>({
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
-      const userRoles = user.roles_array || user.user_roles?.map(r => r.role) || [];
+      const userRoles = user.roles_array || user.user_roles?.map((r) => r.role) || [];
 
       // فلتر نوع المستخدم (مشرفين أو مستفيدين)
       const targetRoles = userTypeFilter === 'staff' ? STAFF_ROLES : BENEFICIARY_ROLES;
-      const matchesUserType = userRoles.some(role => targetRoles.includes(role as AppRole));
+      const matchesUserType = userRoles.some((role) => targetRoles.includes(role as AppRole));
 
       if (!matchesUserType) return false;
 
       // البحث في الاسم والبريد
       const matchesSearch =
-        (user.full_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (user.email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+        (user.full_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
       // فلترة الأدوار - دعم كلا التنسيقين
-      let matchesRole = roleFilter === "all";
+      let matchesRole = roleFilter === 'all';
       if (!matchesRole) {
         matchesRole = userRoles.includes(roleFilter);
       }
@@ -108,8 +107,8 @@ export function useUsersFilter<T extends UserWithRoles>({
   }, [users, searchTerm, roleFilter, userTypeFilter]);
 
   const resetFilters = () => {
-    setSearchTerm("");
-    setRoleFilter("all");
+    setSearchTerm('');
+    setRoleFilter('all');
   };
 
   return {

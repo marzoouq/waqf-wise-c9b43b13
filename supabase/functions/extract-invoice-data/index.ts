@@ -4,12 +4,12 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 interface ExtractedInvoiceData {
@@ -73,10 +73,12 @@ Deno.serve(async (req) => {
             status: 'healthy',
             function: 'extract-invoice-data',
             timestamp: new Date().toISOString(),
-            version: '2.1.0'
+            version: '2.1.0',
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -250,7 +252,7 @@ Deno.serve(async (req) => {
     console.log('✅ تم تحليل الصورة بنجاح');
 
     const content = aiResult.choices[0].message.content;
-    
+
     // استخراج JSON من الرد
     let extractedData: ExtractedInvoiceData;
     try {

@@ -2,7 +2,7 @@
 /**
  * AdaptiveLayout - نظام تخطيط متكيف
  * يوفر مكونات ذكية تتكيف مع حجم الشاشة ونوع الجهاز
- * 
+ *
  * @version 1.0.0
  */
 
@@ -36,7 +36,7 @@ const DeviceContext = createContext<DeviceContextValue | null>(null);
  */
 export function useDeviceType(): DeviceType {
   const isMobile = useIsMobile();
-  
+
   return useMemo(() => {
     if (typeof window === 'undefined') {
       return isMobile ? 'mobile' : 'desktop';
@@ -65,18 +65,21 @@ export function useOrientation(): Orientation {
 export function useDevice(): DeviceContextValue {
   const deviceType = useDeviceType();
   const orientation = useOrientation();
-  
-  return useMemo(() => ({
-    deviceType,
-    orientation,
-    isMobile: deviceType === 'mobile',
-    isTablet: deviceType === 'tablet',
-    isDesktop: deviceType === 'desktop',
-    isPortrait: orientation === 'portrait',
-    isLandscape: orientation === 'landscape',
-    screenWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
-    screenHeight: typeof window !== 'undefined' ? window.innerHeight : 768,
-  }), [deviceType, orientation]);
+
+  return useMemo(
+    () => ({
+      deviceType,
+      orientation,
+      isMobile: deviceType === 'mobile',
+      isTablet: deviceType === 'tablet',
+      isDesktop: deviceType === 'desktop',
+      isPortrait: orientation === 'portrait',
+      isLandscape: orientation === 'landscape',
+      screenWidth: typeof window !== 'undefined' ? window.innerWidth : 1024,
+      screenHeight: typeof window !== 'undefined' ? window.innerHeight : 768,
+    }),
+    [deviceType, orientation]
+  );
 }
 
 /**
@@ -112,12 +115,8 @@ interface DeviceProviderProps {
  */
 export function DeviceProvider({ children }: DeviceProviderProps) {
   const device = useDevice();
-  
-  return (
-    <DeviceContext.Provider value={device}>
-      {children}
-    </DeviceContext.Provider>
-  );
+
+  return <DeviceContext.Provider value={device}>{children}</DeviceContext.Provider>;
 }
 
 // ==================== Components ====================
@@ -143,7 +142,7 @@ export function AdaptiveContainer({
   className,
 }: AdaptiveContainerProps) {
   const deviceType = useDeviceType();
-  
+
   const content = useMemo(() => {
     switch (deviceType) {
       case 'mobile':
@@ -156,12 +155,8 @@ export function AdaptiveContainer({
         return desktopLayout;
     }
   }, [deviceType, mobileLayout, tabletLayout, desktopLayout]);
-  
-  return (
-    <div className={cn('w-full', className)}>
-      {content}
-    </div>
-  );
+
+  return <div className={cn('w-full', className)}>{content}</div>;
 }
 
 interface ResponsiveGridProps {
@@ -262,24 +257,15 @@ export function AdaptiveStack({
     md: 'gap-3 sm:gap-4',
     lg: 'gap-4 sm:gap-6',
   };
-  
+
   const directionClasses = useMemo(() => {
     const mobileClass = mobileDirection === 'vertical' ? 'flex-col' : 'flex-row';
     const desktopClass = desktopDirection === 'vertical' ? 'md:flex-col' : 'md:flex-row';
     return `${mobileClass} ${desktopClass}`;
   }, [mobileDirection, desktopDirection]);
-  
+
   return (
-    <div
-      className={cn(
-        'flex w-full',
-        directionClasses,
-        gapSize[gap],
-        className
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn('flex w-full', directionClasses, gapSize[gap], className)}>{children}</div>
   );
 }
 
@@ -297,11 +283,11 @@ interface ShowOnProps {
  */
 export function ShowOn({ devices, children, fallback = null }: ShowOnProps) {
   const deviceType = useDeviceType();
-  
+
   if (devices.includes(deviceType)) {
     return <>{children}</>;
   }
-  
+
   return <>{fallback}</>;
 }
 
@@ -317,11 +303,11 @@ interface HideOnProps {
  */
 export function HideOn({ devices, children }: HideOnProps) {
   const deviceType = useDeviceType();
-  
+
   if (devices.includes(deviceType)) {
     return null;
   }
-  
+
   return <>{children}</>;
 }
 
@@ -349,7 +335,7 @@ export function AdaptiveText({
   as: Component = 'span',
 }: AdaptiveTextProps) {
   const deviceType = useDeviceType();
-  
+
   const text = useMemo(() => {
     switch (deviceType) {
       case 'mobile':
@@ -362,7 +348,7 @@ export function AdaptiveText({
         return desktop;
     }
   }, [deviceType, mobile, tablet, desktop]);
-  
+
   return <Component className={className}>{text}</Component>;
 }
 
@@ -378,10 +364,20 @@ export function adaptiveClasses(options: {
   base?: string;
 }): string {
   const { mobile = '', tablet = '', desktop = '', base = '' } = options;
-  
+
   // إضافة prefixes للـ breakpoints
-  const tabletClass = tablet ? tablet.split(' ').map(c => `sm:${c}`).join(' ') : '';
-  const desktopClass = desktop ? desktop.split(' ').map(c => `lg:${c}`).join(' ') : '';
-  
+  const tabletClass = tablet
+    ? tablet
+        .split(' ')
+        .map((c) => `sm:${c}`)
+        .join(' ')
+    : '';
+  const desktopClass = desktop
+    ? desktop
+        .split(' ')
+        .map((c) => `lg:${c}`)
+        .join(' ')
+    : '';
+
   return cn(base, mobile, tabletClass, desktopClass);
 }

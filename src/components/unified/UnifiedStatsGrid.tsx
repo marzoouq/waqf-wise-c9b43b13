@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 interface UnifiedStatsGridProps {
   children: ReactNode;
@@ -11,11 +11,7 @@ interface UnifiedStatsGridProps {
  * UnifiedStatsGrid - شبكة إحصائيات موحدة
  * تستخدم لعرض بطاقات KPI بشكل متناسق مع دعم responsive
  */
-export function UnifiedStatsGrid({
-  children,
-  columns = 4,
-  className,
-}: UnifiedStatsGridProps) {
+export function UnifiedStatsGrid({ children, columns = 4, className }: UnifiedStatsGridProps) {
   // Handle responsive columns object or simple number
   const getGridClasses = () => {
     if (typeof columns === 'object') {
@@ -26,25 +22,15 @@ export function UnifiedStatsGrid({
       if (columns.xl) classes.push(`xl:grid-cols-${columns.xl}`);
       return classes.join(' ');
     }
-    
+
     const gridColumns = {
-      1: "grid-cols-1",
-      2: "grid-cols-1 sm:grid-cols-2",
-      3: "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3",
-      4: "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+      1: 'grid-cols-1',
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3',
+      4: 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
     };
     return gridColumns[columns];
   };
 
-  return (
-    <div
-      className={cn(
-        "grid gap-4 sm:gap-6",
-        getGridClasses(),
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
+  return <div className={cn('grid gap-4 sm:gap-6', getGridClasses(), className)}>{children}</div>;
 }

@@ -4,17 +4,17 @@
  * @version 2.9.13
  */
 
-import { Button } from "@/components/ui/button";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Edit, Trash2, CheckCircle, XCircle, Key, Mail } from "lucide-react";
-import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
-import type { UserProfile } from "@/types/auth";
-import { useUsersContext } from "@/contexts/UsersContext";
-import { useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
-import { usePermissions } from "@/hooks/auth/usePermissions";
-import { useToast } from "@/hooks/ui/use-toast";
+import { Button } from '@/components/ui/button';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Edit, Trash2, CheckCircle, XCircle, Key, Mail } from 'lucide-react';
+import { ROLE_LABELS, ROLE_COLORS, type AppRole } from '@/types/roles';
+import type { UserProfile } from '@/types/auth';
+import { useUsersContext } from '@/contexts/UsersContext';
+import { useUsersDialogsContext } from '@/contexts/UsersDialogsContext';
+import { usePermissions } from '@/hooks/auth/usePermissions';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface UsersTableRowWithContextProps {
   user: UserProfile;
@@ -23,24 +23,16 @@ interface UsersTableRowWithContextProps {
 export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps) {
   const { toast } = useToast();
   const { hasPermission } = usePermissions();
-  
-  // استخدام Context مباشرة
-  const { 
-    currentUserId, 
-    updateStatus, 
-    showNotAvailableToast 
-  } = useUsersContext();
-  
-  const {
-    openEditRolesDialog,
-    openEditEmailDialog,
-    openResetPasswordDialog,
-    openDeleteDialog,
-  } = useUsersDialogsContext();
 
-  const canEditEmail = hasPermission("admin.edit_user_email");
+  // استخدام Context مباشرة
+  const { currentUserId, updateStatus, showNotAvailableToast } = useUsersContext();
+
+  const { openEditRolesDialog, openEditEmailDialog, openResetPasswordDialog, openDeleteDialog } =
+    useUsersDialogsContext();
+
+  const canEditEmail = hasPermission('admin.edit_user_email');
   const isCurrentUser = user.user_id === currentUserId;
-  const isNazer = user.user_roles?.some(r => r.role === "nazer");
+  const isNazer = user.user_roles?.some((r) => r.role === 'nazer');
   const hasUserId = !!user.user_id;
 
   // معالجة الإجراءات مع التحقق من user_id
@@ -55,18 +47,18 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
   // معالجة الحذف مع التحقق
   const handleDelete = () => {
     if (isCurrentUser) {
-      toast({ 
-        title: "تحذير", 
-        description: "لا يمكنك حذف حسابك الخاص", 
-        variant: "destructive" 
+      toast({
+        title: 'تحذير',
+        description: 'لا يمكنك حذف حسابك الخاص',
+        variant: 'destructive',
       });
       return;
     }
     if (isNazer) {
-      toast({ 
-        title: "تحذير", 
-        description: "لا يمكن حذف حساب الناظر", 
-        variant: "destructive" 
+      toast({
+        title: 'تحذير',
+        description: 'لا يمكن حذف حساب الناظر',
+        variant: 'destructive',
       });
       return;
     }
@@ -75,13 +67,9 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
 
   return (
     <TableRow>
-      <TableCell className="font-medium text-xs sm:text-sm">
-        {user.full_name}
-      </TableCell>
+      <TableCell className="font-medium text-xs sm:text-sm">{user.full_name}</TableCell>
       <TableCell className="text-xs sm:text-sm">{user.email}</TableCell>
-      <TableCell className="hidden md:table-cell text-xs sm:text-sm">
-        {user.phone || "-"}
-      </TableCell>
+      <TableCell className="hidden md:table-cell text-xs sm:text-sm">{user.phone || '-'}</TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
           {user.user_roles?.map((roleObj, idx) => {
@@ -117,9 +105,7 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
         </div>
       </TableCell>
       <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
-        {user.last_login_at
-          ? new Date(user.last_login_at).toLocaleDateString("ar-SA")
-          : "-"}
+        {user.last_login_at ? new Date(user.last_login_at).toLocaleDateString('ar-SA') : '-'}
       </TableCell>
       <TableCell>
         <div className="flex gap-1">
@@ -127,7 +113,7 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
             variant="ghost"
             size="sm"
             onClick={() => handleAction(() => openEditRolesDialog(user))}
-            title={hasUserId ? "تعديل الأدوار" : "غير متاح"}
+            title={hasUserId ? 'تعديل الأدوار' : 'غير متاح'}
             disabled={!hasUserId}
           >
             <Edit className="h-4 w-4" />
@@ -137,7 +123,7 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
               variant="ghost"
               size="sm"
               onClick={() => handleAction(() => openEditEmailDialog(user))}
-              title={hasUserId ? "تعديل البريد" : "غير متاح"}
+              title={hasUserId ? 'تعديل البريد' : 'غير متاح'}
               disabled={!hasUserId}
             >
               <Mail className="h-4 w-4" />
@@ -147,7 +133,7 @@ export function UsersTableRowWithContext({ user }: UsersTableRowWithContextProps
             variant="ghost"
             size="sm"
             onClick={() => handleAction(() => openResetPasswordDialog(user))}
-            title={hasUserId ? "تعيين كلمة مرور" : "غير متاح"}
+            title={hasUserId ? 'تعيين كلمة مرور' : 'غير متاح'}
             disabled={!hasUserId}
           >
             <Key className="h-4 w-4" />

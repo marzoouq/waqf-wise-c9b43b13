@@ -3,9 +3,9 @@
  * @version 2.8.67
  */
 
-import { useState, useEffect } from "react";
-import { PropertyService } from "@/services";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { PropertyService } from '@/services';
+import { toast } from 'sonner';
 
 interface Property {
   id: string;
@@ -17,7 +17,7 @@ interface Property {
 
 export function useLinkProperty(isOpen: boolean) {
   const [properties, setProperties] = useState<Property[]>([]);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -34,9 +34,9 @@ export function useLinkProperty(isOpen: boolean) {
       setProperties(data as Property[]);
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.error("Error fetching properties:", error);
+        console.error('Error fetching properties:', error);
       }
-      toast.error("فشل في جلب العقارات");
+      toast.error('فشل في جلب العقارات');
     } finally {
       setIsLoading(false);
     }
@@ -44,22 +44,22 @@ export function useLinkProperty(isOpen: boolean) {
 
   const linkProperty = async (waqfUnitId: string, onSuccess?: () => void) => {
     if (!selectedPropertyId) {
-      toast.error("الرجاء اختيار عقار");
+      toast.error('الرجاء اختيار عقار');
       return false;
     }
 
     setIsSaving(true);
     try {
       await PropertyService.linkToWaqfUnit(selectedPropertyId, waqfUnitId);
-      toast.success("تم ربط العقار بنجاح");
-      setSelectedPropertyId("");
+      toast.success('تم ربط العقار بنجاح');
+      setSelectedPropertyId('');
       onSuccess?.();
       return true;
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.error("Error linking property:", error);
+        console.error('Error linking property:', error);
       }
-      toast.error("فشل في ربط العقار");
+      toast.error('فشل في ربط العقار');
       return false;
     } finally {
       setIsSaving(false);

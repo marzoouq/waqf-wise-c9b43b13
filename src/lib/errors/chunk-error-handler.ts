@@ -1,7 +1,7 @@
 /**
  * نظام موحد لكشف ومعالجة أخطاء تحميل الـ Chunks
  * Unified Chunk Load Error Detection & Handling System
- * 
+ *
  * يحل محل التعريفات المتكررة في:
  * - LazyErrorBoundary
  * - GlobalErrorBoundary
@@ -29,7 +29,7 @@ const CHUNK_ERROR_PATTERNS = [
   'unexpected token',
   'syntax error',
   'network error',
-  'load failed'
+  'load failed',
 ] as const;
 
 /**
@@ -38,25 +38,25 @@ const CHUNK_ERROR_PATTERNS = [
  */
 export function isChunkLoadError(error: unknown): boolean {
   if (!error) return false;
-  
+
   // Handle Error objects
   if (error instanceof Error) {
     const msg = error.message.toLowerCase();
     const name = error.name.toLowerCase();
-    
+
     // Check error name first
     if (name === 'chunkloaderror') return true;
-    
+
     // Check message patterns
-    return CHUNK_ERROR_PATTERNS.some(pattern => msg.includes(pattern));
+    return CHUNK_ERROR_PATTERNS.some((pattern) => msg.includes(pattern));
   }
-  
+
   // Handle string errors
   if (typeof error === 'string') {
     const msg = error.toLowerCase();
-    return CHUNK_ERROR_PATTERNS.some(pattern => msg.includes(pattern));
+    return CHUNK_ERROR_PATTERNS.some((pattern) => msg.includes(pattern));
   }
-  
+
   // Handle objects with message property
   if (typeof error === 'object' && error !== null) {
     const errObj = error as Record<string, unknown>;
@@ -64,7 +64,7 @@ export function isChunkLoadError(error: unknown): boolean {
       return isChunkLoadError(errObj.message);
     }
   }
-  
+
   return false;
 }
 
@@ -77,30 +77,27 @@ export function getChunkErrorType(error: unknown): ChunkErrorType {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     return 'network';
   }
-  
+
   if (!(error instanceof Error)) {
     return 'unknown';
   }
-  
+
   const msg = error.message.toLowerCase();
-  
+
   // Network errors
   if (
     msg.includes('network error') ||
-    msg.includes('failed to fetch') && !msg.includes('module') ||
+    (msg.includes('failed to fetch') && !msg.includes('module')) ||
     msg.includes('net::err')
   ) {
     return 'network';
   }
-  
+
   // Server errors (404, 500, etc.)
-  if (
-    msg.includes('404') ||
-    msg.includes('not found')
-  ) {
+  if (msg.includes('404') || msg.includes('not found')) {
     return 'update'; // 404 usually means new version deployed
   }
-  
+
   if (
     msg.includes('500') ||
     msg.includes('502') ||
@@ -110,21 +107,17 @@ export function getChunkErrorType(error: unknown): ChunkErrorType {
   ) {
     return 'server';
   }
-  
+
   // Timeout errors
-  if (
-    msg.includes('timeout') ||
-    msg.includes('timed out') ||
-    msg.includes('aborted')
-  ) {
+  if (msg.includes('timeout') || msg.includes('timed out') || msg.includes('aborted')) {
     return 'timeout';
   }
-  
+
   // Default: likely a version mismatch (most common case)
   if (msg.includes('dynamically imported module') || msg.includes('loading chunk')) {
     return 'update';
   }
-  
+
   return 'unknown';
 }
 
@@ -135,39 +128,39 @@ export function getChunkErrorType(error: unknown): ChunkErrorType {
 export function getChunkErrorInfo(error: unknown): ChunkErrorInfo {
   const type = getChunkErrorType(error);
   const originalMessage = error instanceof Error ? error.message : String(error);
-  
+
   const errorInfoMap: Record<ChunkErrorType, Omit<ChunkErrorInfo, 'type' | 'message'>> = {
     network: {
       userMessage: 'تحقق من اتصالك بالإنترنت وحاول مرة أخرى',
       canRetry: true,
-      shouldReload: false
+      shouldReload: false,
     },
     update: {
       userMessage: 'تم تحديث التطبيق. جاري إعادة التحميل...',
       canRetry: false,
-      shouldReload: true
+      shouldReload: true,
     },
     server: {
       userMessage: 'خطأ في الخادم. يرجى المحاولة لاحقاً',
       canRetry: true,
-      shouldReload: false
+      shouldReload: false,
     },
     timeout: {
       userMessage: 'انتهت مهلة التحميل. تحقق من سرعة الإنترنت',
       canRetry: true,
-      shouldReload: false
+      shouldReload: false,
     },
     unknown: {
       userMessage: 'حدث خطأ أثناء تحميل الصفحة',
       canRetry: true,
-      shouldReload: false
-    }
+      shouldReload: false,
+    },
   };
-  
+
   return {
     type,
     message: originalMessage,
-    ...errorInfoMap[type]
+    ...errorInfoMap[type],
   };
 }
 
@@ -184,21 +177,21 @@ export async function logChunkError(
 ): Promise<void> {
   const errorInfo = getChunkErrorInfo(error);
   const timestamp = new Date().toISOString();
-  
+
   // Store in session for debugging
   try {
     const logs = JSON.parse(sessionStorage.getItem('chunk_error_logs') || '[]');
     logs.push({
       timestamp,
       ...errorInfo,
-      ...context
+      ...context,
     });
     // Keep only last 10 errors
     sessionStorage.setItem('chunk_error_logs', JSON.stringify(logs.slice(-10)));
   } catch {
     // Ignore storage errors
   }
-  
+
   // Debug logging عبر اللوجر في التطوير
   try {
     const { logger } = await import('@/lib/logger');

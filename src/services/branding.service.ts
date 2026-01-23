@@ -6,7 +6,7 @@
  * تتبع نمط Component → Hook → Service → Supabase
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface WaqfBranding {
   id: string;
@@ -23,7 +23,13 @@ export interface WaqfBranding {
 
 export type WaqfBrandingPublic = Pick<
   WaqfBranding,
-  'id' | 'nazer_name' | 'waqf_logo_url' | 'show_logo_in_pdf' | 'show_stamp_in_pdf' | 'created_at' | 'updated_at'
+  | 'id'
+  | 'nazer_name'
+  | 'waqf_logo_url'
+  | 'show_logo_in_pdf'
+  | 'show_stamp_in_pdf'
+  | 'created_at'
+  | 'updated_at'
 >;
 
 export const BrandingService = {
@@ -31,11 +37,7 @@ export const BrandingService = {
    * جلب بيانات الهوية البصرية الكاملة (للموظفين المصرح لهم)
    */
   async getBranding(): Promise<WaqfBranding | null> {
-    const { data, error } = await supabase
-      .from("waqf_branding")
-      .select("*")
-      .limit(1)
-      .maybeSingle();
+    const { data, error } = await supabase.from('waqf_branding').select('*').limit(1).maybeSingle();
 
     if (error) {
       // إذا كان خطأ الصلاحيات، نحاول الـ View العامة
@@ -53,8 +55,8 @@ export const BrandingService = {
    */
   async getPublicBranding(): Promise<WaqfBrandingPublic | null> {
     const { data, error } = await supabase
-      .from("waqf_branding_public")
-      .select("*")
+      .from('waqf_branding_public')
+      .select('*')
       .limit(1)
       .maybeSingle();
 
@@ -65,20 +67,18 @@ export const BrandingService = {
   /**
    * رفع صورة (ختم/توقيع/شعار)
    */
-  async uploadImage(file: File, type: "stamp" | "signature" | "logo"): Promise<string> {
-    const fileExt = file.name.split(".").pop();
+  async uploadImage(file: File, type: 'stamp' | 'signature' | 'logo'): Promise<string> {
+    const fileExt = file.name.split('.').pop();
     const fileName = `${type}_${Date.now()}.${fileExt}`;
     const filePath = `waqf-branding/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from("documents")
+      .from('documents')
       .upload(filePath, file, { upsert: true });
 
     if (uploadError) throw uploadError;
 
-    const { data: urlData } = supabase.storage
-      .from("documents")
-      .getPublicUrl(filePath);
+    const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filePath);
 
     return urlData.publicUrl;
   },
@@ -87,10 +87,7 @@ export const BrandingService = {
    * تحديث بيانات الهوية البصرية
    */
   async updateBranding(brandingId: string, updates: Partial<WaqfBranding>): Promise<void> {
-    const { error } = await supabase
-      .from("waqf_branding")
-      .update(updates)
-      .eq("id", brandingId);
+    const { error } = await supabase.from('waqf_branding').update(updates).eq('id', brandingId);
 
     if (error) throw error;
   },

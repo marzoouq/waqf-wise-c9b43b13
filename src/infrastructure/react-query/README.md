@@ -6,11 +6,11 @@
 
 ## الملفات
 
-| الملف | الوصف |
-|-------|-------|
+| الملف            | الوصف                              |
+| ---------------- | ---------------------------------- |
 | `queryConfig.ts` | إعدادات الاستعلامات (QUERY_CONFIG) |
-| `cacheTimes.ts` | أوقات الكاش (CACHE_TIMES) |
-| `index.ts` | التصدير المركزي |
+| `cacheTimes.ts`  | أوقات الكاش (CACHE_TIMES)          |
+| `index.ts`       | التصدير المركزي                    |
 
 ## قواعد الملكية
 
@@ -46,24 +46,24 @@ function useMyData() {
   return useQuery({
     queryKey: QUERY_KEYS.MY_DATA,
     queryFn: fetchMyData,
-    ...QUERY_CONFIG.DEFAULT
+    ...QUERY_CONFIG.DEFAULT,
   });
 }
 ```
 
 ## إعدادات متوفرة
 
-| الإعداد | الاستخدام |
-|---------|----------|
-| `DEFAULT` | الاستعلامات العامة |
+| الإعداد          | الاستخدام              |
+| ---------------- | ---------------------- |
+| `DEFAULT`        | الاستعلامات العامة     |
 | `DASHBOARD_KPIS` | مؤشرات الأداء الرئيسية |
-| `ADMIN_KPIS` | لوحة المسؤول |
-| `REPORTS` | التقارير |
-| `REALTIME` | البيانات الحية |
-| `STATIC` | البيانات الثابتة |
-| `APPROVALS` | الموافقات |
-| `ALERTS` | التنبيهات |
-| `CHARTS` | الرسوم البيانية |
-| `ACTIVITIES` | الأنشطة |
-| `TASKS` | المهام |
-| `LOANS` | القروض |
+| `ADMIN_KPIS`     | لوحة المسؤول           |
+| `REPORTS`        | التقارير               |
+| `REALTIME`       | البيانات الحية         |
+| `STATIC`         | البيانات الثابتة       |
+| `APPROVALS`      | الموافقات              |
+| `ALERTS`         | التنبيهات              |
+| `CHARTS`         | الرسوم البيانية        |
+| `ACTIVITIES`     | الأنشطة                |
+| `TASKS`          | المهام                 |
+| `LOANS`          | القروض                 |

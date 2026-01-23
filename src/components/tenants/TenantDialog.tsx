@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,9 +91,7 @@ export function TenantDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {tenant ? 'تعديل بيانات المستأجر' : 'إضافة مستأجر جديد'}
-          </DialogTitle>
+          <DialogTitle>{tenant ? 'تعديل بيانات المستأجر' : 'إضافة مستأجر جديد'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -109,9 +102,7 @@ export function TenantDialog({
               <Input
                 id="full_name"
                 value={formData.full_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, full_name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                 required
               />
             </div>
@@ -121,9 +112,7 @@ export function TenantDialog({
               <Label htmlFor="tenant_type">نوع المستأجر</Label>
               <Select
                 value={formData.tenant_type}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, tenant_type: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, tenant_type: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -140,9 +129,7 @@ export function TenantDialog({
               <Label htmlFor="id_type">نوع الهوية</Label>
               <Select
                 value={formData.id_type}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, id_type: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, id_type: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -161,9 +148,7 @@ export function TenantDialog({
               <Input
                 id="id_number"
                 value={formData.id_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, id_number: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, id_number: e.target.value })}
                 required
               />
             </div>
@@ -174,9 +159,7 @@ export function TenantDialog({
               <Input
                 id="tax_number"
                 value={formData.tax_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, tax_number: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, tax_number: e.target.value })}
                 placeholder="300000000000003"
               />
             </div>
@@ -187,9 +170,7 @@ export function TenantDialog({
               <Input
                 id="commercial_register"
                 value={formData.commercial_register}
-                onChange={(e) =>
-                  setFormData({ ...formData, commercial_register: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, commercial_register: e.target.value })}
               />
             </div>
 
@@ -200,9 +181,7 @@ export function TenantDialog({
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 dir="ltr"
               />
             </div>
@@ -214,9 +193,7 @@ export function TenantDialog({
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 dir="ltr"
               />
             </div>
@@ -227,9 +204,7 @@ export function TenantDialog({
               <Input
                 id="city"
                 value={formData.city}
-                onChange={(e) =>
-                  setFormData({ ...formData, city: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               />
             </div>
 
@@ -238,9 +213,7 @@ export function TenantDialog({
               <Label htmlFor="status">الحالة</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, status: value })
-                }
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -259,9 +232,7 @@ export function TenantDialog({
               <Input
                 id="national_address"
                 value={formData.national_address}
-                onChange={(e) =>
-                  setFormData({ ...formData, national_address: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, national_address: e.target.value })}
                 placeholder="AAAA1234 - حي - مدينة"
               />
             </div>
@@ -272,9 +243,7 @@ export function TenantDialog({
               <Textarea
                 id="address"
                 value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 rows={2}
               />
             </div>
@@ -285,20 +254,14 @@ export function TenantDialog({
               <Textarea
                 id="notes"
                 value={formData.notes}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={2}
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
             <Button type="submit" disabled={isLoading}>

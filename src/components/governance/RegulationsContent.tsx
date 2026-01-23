@@ -8,11 +8,11 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen } from "lucide-react";
-import { regulationsParts, RegulationPart } from "./regulations-data";
+} from '@/components/ui/accordion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen } from 'lucide-react';
+import { regulationsParts, RegulationPart } from './regulations-data';
 
 interface RegulationsContentProps {
   filteredParts?: RegulationPart[];
@@ -28,15 +28,15 @@ export function RegulationsContent({
   searchQuery,
 }: RegulationsContentProps) {
   const parts = filteredParts || regulationsParts;
-  
+
   // تمييز النص المطابق للبحث
   const highlightText = (text: string): React.ReactNode => {
     if (!searchQuery || searchQuery.length < 2) return text;
-    
+
     const regex = new RegExp(`(${searchQuery})`, 'gi');
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
+
+    return parts.map((part, index) =>
       regex.test(part) ? (
         <mark key={index} className="bg-warning/30 px-0.5 rounded">
           {part}
@@ -61,8 +61,8 @@ export function RegulationsContent({
         </div>
       </CardHeader>
       <CardContent>
-        <Accordion 
-          type="multiple" 
+        <Accordion
+          type="multiple"
           className="w-full space-y-2"
           value={expandedParts}
           onValueChange={onExpandedChange}
@@ -70,16 +70,20 @@ export function RegulationsContent({
           {parts.map((part) => {
             const Icon = part.icon;
             return (
-              <AccordionItem 
-                key={part.id} 
+              <AccordionItem
+                key={part.id}
                 value={part.id}
                 data-part-id={part.id}
                 className={`border rounded-lg px-4 ${part.highlight ? 'border-destructive/30 bg-destructive/5' : ''}`}
               >
                 <AccordionTrigger className="hover:no-underline py-3">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${part.highlight ? 'bg-destructive/10' : 'bg-muted'}`}>
-                      <Icon className={`h-4 w-4 ${part.highlight ? 'text-destructive' : 'text-muted-foreground'}`} />
+                    <div
+                      className={`p-2 rounded-lg ${part.highlight ? 'bg-destructive/10' : 'bg-muted'}`}
+                    >
+                      <Icon
+                        className={`h-4 w-4 ${part.highlight ? 'text-destructive' : 'text-muted-foreground'}`}
+                      />
                     </div>
                     <span className="text-sm font-semibold text-right">
                       {highlightText(part.title)}
@@ -95,25 +99,33 @@ export function RegulationsContent({
                         </h4>
                         <div className="space-y-3">
                           {chapter.content.map((section, sectionIndex) => (
-                            <div 
-                              key={sectionIndex} 
+                            <div
+                              key={sectionIndex}
                               className={`space-y-2 p-3 rounded-lg ${
-                                section.highlight 
-                                  ? 'bg-warning/10 border border-warning/30' 
+                                section.highlight
+                                  ? 'bg-warning/10 border border-warning/30'
                                   : 'bg-muted/50'
                               }`}
                             >
-                              <h5 className={`text-sm font-medium ${section.highlight ? 'text-warning' : ''}`}>
+                              <h5
+                                className={`text-sm font-medium ${section.highlight ? 'text-warning' : ''}`}
+                              >
                                 {highlightText(section.subtitle)}
                                 {section.highlight && (
-                                  <Badge variant="outline" className="me-2 text-xs bg-warning/20 border-warning/30">
+                                  <Badge
+                                    variant="outline"
+                                    className="me-2 text-xs bg-warning/20 border-warning/30"
+                                  >
                                     هام
                                   </Badge>
                                 )}
                               </h5>
                               <ul className="space-y-1.5">
                                 {section.items.map((item, itemIndex) => (
-                                  <li key={itemIndex} className="text-sm text-muted-foreground flex items-start gap-2">
+                                  <li
+                                    key={itemIndex}
+                                    className="text-sm text-muted-foreground flex items-start gap-2"
+                                  >
                                     <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-destructive flex-shrink-0" />
                                     <span className="leading-relaxed">{highlightText(item)}</span>
                                   </li>

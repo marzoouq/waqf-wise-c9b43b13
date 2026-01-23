@@ -4,10 +4,10 @@
  * @description تم تحديثه لاستخدام Soft Delete
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { matchesStatus } from '@/lib/constants';
-import { SoftDeleteService } from "@/services/shared/soft-delete.service";
+import { SoftDeleteService } from '@/services/shared/soft-delete.service';
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
@@ -63,25 +63,25 @@ export class PaymentService {
    */
   static async getAll(filters?: PaymentFilters): Promise<Payment[]> {
     let query = supabase
-      .from("payments")
-      .select("*")
-      .is("deleted_at", null)
-      .order("payment_date", { ascending: false });
+      .from('payments')
+      .select('*')
+      .is('deleted_at', null)
+      .order('payment_date', { ascending: false });
 
     if (filters?.payment_type) {
-      query = query.eq("payment_type", filters.payment_type);
+      query = query.eq('payment_type', filters.payment_type);
     }
     if (filters?.payment_method) {
-      query = query.eq("payment_method", filters.payment_method);
+      query = query.eq('payment_method', filters.payment_method);
     }
     if (filters?.status) {
-      query = query.eq("status", filters.status);
+      query = query.eq('status', filters.status);
     }
     if (filters?.startDate) {
-      query = query.gte("payment_date", filters.startDate);
+      query = query.gte('payment_date', filters.startDate);
     }
     if (filters?.endDate) {
-      query = query.lte("payment_date", filters.endDate);
+      query = query.lte('payment_date', filters.endDate);
     }
     if (filters?.limit) {
       query = query.limit(filters.limit);
@@ -96,11 +96,7 @@ export class PaymentService {
    * جلب مدفوعة بالمعرف
    */
   static async getById(id: string): Promise<Payment | null> {
-    const { data, error } = await supabase
-      .from("payments")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+    const { data, error } = await supabase.from('payments').select('*').eq('id', id).maybeSingle();
 
     if (error) throw error;
     return data;
@@ -110,11 +106,7 @@ export class PaymentService {
    * إنشاء مدفوعة جديدة
    */
   static async create(payment: PaymentInsert): Promise<Payment> {
-    const { data, error } = await supabase
-      .from("payments")
-      .insert(payment)
-      .select()
-      .maybeSingle();
+    const { data, error } = await supabase.from('payments').insert(payment).select().maybeSingle();
 
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء المدفوعة');
@@ -126,9 +118,9 @@ export class PaymentService {
    */
   static async update(id: string, updates: PaymentUpdate): Promise<Payment | null> {
     const { data, error } = await supabase
-      .from("payments")
+      .from('payments')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 
@@ -149,14 +141,14 @@ export class PaymentService {
   static async createApprovals(paymentId: string): Promise<void> {
     const approvals = [
       { level: 1, approver_name: 'المشرف المالي' },
-      { level: 2, approver_name: 'المدير' }
+      { level: 2, approver_name: 'المدير' },
     ];
 
     const { error } = await supabase.from('payment_approvals').insert(
-      approvals.map(approval => ({
+      approvals.map((approval) => ({
         payment_id: paymentId,
         ...approval,
-        status: 'معلق'
+        status: 'معلق',
       }))
     );
 
@@ -172,9 +164,9 @@ export class PaymentService {
     pendingApprovals: number;
   }> {
     const [receipts, payments, pending] = await Promise.all([
-      supabase.from("payments").select("amount").eq("payment_type", "receipt"),
-      supabase.from("payments").select("amount").eq("payment_type", "payment"),
-      supabase.from("payments").select("id", { count: 'exact' }).in("status", ["معلق", "pending"]),
+      supabase.from('payments').select('amount').eq('payment_type', 'receipt'),
+      supabase.from('payments').select('amount').eq('payment_type', 'payment'),
+      supabase.from('payments').select('id', { count: 'exact' }).in('status', ['معلق', 'pending']),
     ]);
 
     return {
@@ -207,11 +199,13 @@ export class PaymentService {
 
     return {
       total: vouchers.length,
-      draft: vouchers.filter(v => matchesStatus(v.status, 'draft')).length,
-      paid: vouchers.filter(v => matchesStatus(v.status, 'paid')).length,
-      thisMonth: vouchers.filter(v => new Date(v.created_at) >= thisMonth).length,
+      draft: vouchers.filter((v) => matchesStatus(v.status, 'draft')).length,
+      paid: vouchers.filter((v) => matchesStatus(v.status, 'paid')).length,
+      thisMonth: vouchers.filter((v) => new Date(v.created_at) >= thisMonth).length,
       totalAmount: vouchers.reduce((sum, v) => sum + (v.amount || 0), 0),
-      paidAmount: vouchers.filter(v => matchesStatus(v.status, 'paid')).reduce((sum, v) => sum + (v.amount || 0), 0),
+      paidAmount: vouchers
+        .filter((v) => matchesStatus(v.status, 'paid'))
+        .reduce((sum, v) => sum + (v.amount || 0), 0),
     };
   }
 
@@ -220,10 +214,12 @@ export class PaymentService {
    */
   static async getBankAccounts(): Promise<BankAccount[]> {
     const { data, error } = await supabase
-      .from("bank_accounts")
-      .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
-      .is("deleted_at", null)
-      .order("bank_name", { ascending: true });
+      .from('bank_accounts')
+      .select(
+        'id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at'
+      )
+      .is('deleted_at', null)
+      .order('bank_name', { ascending: true });
 
     if (error) throw error;
     return (data || []) as BankAccount[];
@@ -232,9 +228,11 @@ export class PaymentService {
   /**
    * إضافة حساب بنكي
    */
-  static async createBankAccount(bankAccount: Database['public']['Tables']['bank_accounts']['Insert']) {
+  static async createBankAccount(
+    bankAccount: Database['public']['Tables']['bank_accounts']['Insert']
+  ) {
     const { data, error } = await supabase
-      .from("bank_accounts")
+      .from('bank_accounts')
       .insert([bankAccount])
       .select()
       .maybeSingle();
@@ -247,11 +245,14 @@ export class PaymentService {
   /**
    * تحديث حساب بنكي
    */
-  static async updateBankAccount(id: string, updates: Database['public']['Tables']['bank_accounts']['Update']) {
+  static async updateBankAccount(
+    id: string,
+    updates: Database['public']['Tables']['bank_accounts']['Update']
+  ) {
     const { data, error } = await supabase
-      .from("bank_accounts")
+      .from('bank_accounts')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 
@@ -271,9 +272,9 @@ export class PaymentService {
    */
   static async getPaymentsWithContractDetails(): Promise<PaymentWithContractDetails[]> {
     const { data, error } = await supabase
-      .from("payments_with_contract_details")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .from('payments_with_contract_details')
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return (data || []) as PaymentWithContractDetails[];
@@ -285,7 +286,9 @@ export class PaymentService {
   static async getPaymentSchedules(distributionId?: string): Promise<PaymentScheduleResult[]> {
     let query = supabase
       .from('payment_schedules')
-      .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
+      .select(
+        'id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at'
+      )
       .is('deleted_at', null)
       .order('scheduled_date', { ascending: true });
 
@@ -316,7 +319,10 @@ export class PaymentService {
   /**
    * تحديث جدول مدفوعات
    */
-  static async updatePaymentSchedule(id: string, updates: Partial<PaymentScheduleInsert>): Promise<PaymentScheduleRow> {
+  static async updatePaymentSchedule(
+    id: string,
+    updates: Partial<PaymentScheduleInsert>
+  ): Promise<PaymentScheduleRow> {
     const { data, error } = await supabase
       .from('payment_schedules')
       .update(updates)
@@ -339,11 +345,10 @@ export class PaymentService {
   /**
    * إنشاء جداول مدفوعات متعددة
    */
-  static async createBatchSchedules(schedules: PaymentScheduleInsert[]): Promise<PaymentScheduleRow[]> {
-    const { data, error } = await supabase
-      .from('payment_schedules')
-      .insert(schedules)
-      .select();
+  static async createBatchSchedules(
+    schedules: PaymentScheduleInsert[]
+  ): Promise<PaymentScheduleRow[]> {
+    const { data, error } = await supabase.from('payment_schedules').insert(schedules).select();
 
     if (error) throw error;
     return data || [];

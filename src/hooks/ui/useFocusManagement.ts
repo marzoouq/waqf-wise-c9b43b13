@@ -3,11 +3,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { 
-  getFocusableElements, 
-  trapFocus, 
-  createFocusRestore 
-} from '@/lib/accessibility';
+import { getFocusableElements, trapFocus, createFocusRestore } from '@/lib/accessibility';
 import { hapticFeedback } from '@/lib/mobile-ux';
 
 // ==================== Focus Trap Hook ====================
@@ -114,11 +110,7 @@ interface UseRovingTabindexReturn {
 
 export function useRovingTabindex(
   itemCount: number,
-  {
-    orientation = 'vertical',
-    wrap = true,
-    rtl = true,
-  }: UseRovingTabindexOptions = {}
+  { orientation = 'vertical', wrap = true, rtl = true }: UseRovingTabindexOptions = {}
 ): UseRovingTabindexReturn {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
@@ -135,17 +127,13 @@ export function useRovingTabindex(
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, currentIndex: number) => {
       let nextIndex = currentIndex;
-      
+
       const isHorizontal = orientation === 'horizontal' || orientation === 'both';
       const isVertical = orientation === 'vertical' || orientation === 'both';
 
       // تحديد المفاتيح بناءً على الاتجاه و RTL
-      const nextKey = isHorizontal 
-        ? (rtl ? 'ArrowLeft' : 'ArrowRight')
-        : null;
-      const prevKey = isHorizontal
-        ? (rtl ? 'ArrowRight' : 'ArrowLeft')
-        : null;
+      const nextKey = isHorizontal ? (rtl ? 'ArrowLeft' : 'ArrowRight') : null;
+      const prevKey = isHorizontal ? (rtl ? 'ArrowRight' : 'ArrowLeft') : null;
       const downKey = isVertical ? 'ArrowDown' : null;
       const upKey = isVertical ? 'ArrowUp' : null;
 

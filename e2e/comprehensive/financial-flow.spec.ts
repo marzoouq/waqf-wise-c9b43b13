@@ -21,7 +21,9 @@ test.describe('التدفقات المالية الشاملة', () => {
       await emailInput.fill('accountant@waqf.test');
       await page.locator('input[type="password"]').fill('accountant123');
       await page.locator('button[type="submit"]').click();
-      await page.waitForURL(/\/(dashboard|accounting|accountant)/, { timeout: 10000 }).catch(() => {});
+      await page
+        .waitForURL(/\/(dashboard|accounting|accountant)/, { timeout: 10000 })
+        .catch(() => {});
     }
   });
 
@@ -38,14 +40,24 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     // البحث عن تبويب الحسابات
-    const accountsTab = page.locator('button:has-text("الحسابات"), [role="tab"]:has-text("دليل الحسابات")');
-    if (await accountsTab.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    const accountsTab = page.locator(
+      'button:has-text("الحسابات"), [role="tab"]:has-text("دليل الحسابات")'
+    );
+    if (
+      await accountsTab
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await accountsTab.first().click();
       await waitForPageLoad(page);
 
       // التحقق من وجود جدول الحسابات
       const table = page.locator('table, [role="tree"], .accounts-tree');
-      const hasTable = await table.first().isVisible({ timeout: 3000 }).catch(() => false);
+      const hasTable = await table
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false);
       console.log(`دليل الحسابات: ${hasTable ? '✓ موجود' : '⚠ غير موجود'}`);
     }
   });
@@ -55,12 +67,20 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     const journalTab = page.locator('button:has-text("القيود"), [role="tab"]:has-text("اليومية")');
-    if (await journalTab.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await journalTab
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await journalTab.first().click();
       await waitForPageLoad(page);
 
       const table = page.locator('table, [role="grid"]');
-      const hasTable = await table.first().isVisible({ timeout: 3000 }).catch(() => false);
+      const hasTable = await table
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false);
       console.log(`القيود اليومية: ${hasTable ? '✓ موجودة' : '⚠ غير موجودة'}`);
     }
   });
@@ -70,13 +90,21 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     const addButton = page.locator('button:has-text("إضافة قيد"), button:has-text("قيد جديد")');
-    if (await addButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await addButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await addButton.first().click();
       await waitForPageLoad(page);
 
       // التحقق من ظهور نموذج القيد
       const form = page.locator('[role="dialog"], form');
-      const hasForm = await form.first().isVisible({ timeout: 2000 }).catch(() => false);
+      const hasForm = await form
+        .first()
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       console.log(`نموذج القيد: ${hasForm ? '✓ يظهر' : '⚠ لا يظهر'}`);
 
       await page.keyboard.press('Escape');
@@ -88,9 +116,8 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasInvoiceContent = content.includes('فاتورة') || 
-                              content.includes('invoice') || 
-                              content.length > 500;
+    const hasInvoiceContent =
+      content.includes('فاتورة') || content.includes('invoice') || content.length > 500;
     expect(hasInvoiceContent).toBe(true);
   });
 
@@ -99,9 +126,8 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasPaymentContent = content.includes('دفع') || 
-                              content.includes('payment') || 
-                              content.length > 500;
+    const hasPaymentContent =
+      content.includes('دفع') || content.includes('payment') || content.length > 500;
     expect(hasPaymentContent).toBe(true);
   });
 
@@ -126,7 +152,10 @@ test.describe('التدفقات المالية الشاملة', () => {
     await waitForPageLoad(page);
 
     const table = page.locator('table, [role="grid"], .distribution-card');
-    const hasContent = await table.first().isVisible({ timeout: 5000 }).catch(() => false);
+    const hasContent = await table
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     console.log(`التوزيعات: ${hasContent ? '✓ موجودة' : '⚠ غير موجودة'}`);
   });
 
@@ -153,9 +182,8 @@ test.describe('التقارير المالية', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasReportContent = content.includes('تقرير') || 
-                              content.includes('report') || 
-                              content.length > 500;
+    const hasReportContent =
+      content.includes('تقرير') || content.includes('report') || content.length > 500;
     expect(hasReportContent).toBe(true);
   });
 
@@ -164,7 +192,12 @@ test.describe('التقارير المالية', () => {
     await waitForPageLoad(page);
 
     const exportButton = page.locator('button:has-text("تصدير"), button:has-text("PDF")');
-    if (await exportButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await exportButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('زر التصدير: ✓ موجود');
     }
   });
@@ -192,7 +225,12 @@ test.describe('سير عمل الموافقات', () => {
     await waitForPageLoad(page);
 
     const statusFilter = page.locator('select, [role="combobox"]');
-    if (await statusFilter.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await statusFilter
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await statusFilter.first().click();
       await waitForPageLoad(page);
       console.log('فلتر الحالة: ✓ يعمل');

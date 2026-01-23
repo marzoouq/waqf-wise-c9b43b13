@@ -3,8 +3,8 @@
  * @version 2.1.0 - مع دعم matchesStatus و withRetry
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { PROPERTY_STATUS, matchesStatus } from "@/lib/constants";
+import { supabase } from '@/integrations/supabase/client';
+import { PROPERTY_STATUS, matchesStatus } from '@/lib/constants';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface DashboardKPIs {
@@ -26,7 +26,7 @@ export interface SystemOverviewStats {
 
 /**
  * بيانات مؤشرات الأداء الموحدة
- * 
+ *
  * ملاحظة هامة حول مصادر البيانات:
  * - totalRevenue: إجمالي المحصّل فعلياً (المصدر: rental_payments + payment_vouchers)
  * - monthlyReturn: الإيراد الشهري من العقود (المصدر: contracts.monthly_rent)
@@ -78,15 +78,33 @@ export const KPIService = {
       requestsRes,
       documentsRes,
     ] = await Promise.all([
-      supabase.from("beneficiaries").select("id, status", { count: "exact" }).is("deleted_at", null),
-      supabase.from("properties").select("id, status", { count: "exact" }).is("deleted_at", null),
-      supabase.from("contracts").select("id, status", { count: "exact" }).is("deleted_at", null),
-      supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }).is("deleted_at", null),
-      supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع").is("deleted_at", null),
+      supabase
+        .from('beneficiaries')
+        .select('id, status', { count: 'exact' })
+        .is('deleted_at', null),
+      supabase.from('properties').select('id, status', { count: 'exact' }).is('deleted_at', null),
+      supabase.from('contracts').select('id, status', { count: 'exact' }).is('deleted_at', null),
+      supabase
+        .from('loans')
+        .select('id, status, loan_amount, paid_amount', { count: 'exact' })
+        .is('deleted_at', null),
+      supabase
+        .from('rental_payments')
+        .select('id, amount_paid, status')
+        .eq('status', 'مدفوع')
+        .is('deleted_at', null),
       // إضافة: سندات القبض المدفوعة (مع فلتر الحذف)
-      supabase.from("payment_vouchers").select("id, amount, voucher_type, status").eq("status", "paid").eq("voucher_type", "receipt").is("deleted_at", null),
-      supabase.from("beneficiary_requests").select("id, status", { count: "exact" }).is("deleted_at", null),
-      supabase.from("documents").select("id", { count: "exact" }).is("deleted_at", null),
+      supabase
+        .from('payment_vouchers')
+        .select('id, amount, voucher_type, status')
+        .eq('status', 'paid')
+        .eq('voucher_type', 'receipt')
+        .is('deleted_at', null),
+      supabase
+        .from('beneficiary_requests')
+        .select('id, status', { count: 'exact' })
+        .is('deleted_at', null),
+      supabase.from('documents').select('id', { count: 'exact' }).is('deleted_at', null),
     ]);
 
     const beneficiaries = beneficiariesRes.data || [];
@@ -98,33 +116,43 @@ export const KPIService = {
     const requests = requestsRes.data || [];
 
     // استخدام matchesStatus للمقارنة الآمنة
-    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
-    // العقارات النشطة = المؤجرة بالكامل + الجزئية (بها وحدات مؤجرة)
-    const occupiedProperties = properties.filter(p => 
-      matchesStatus(p.status, PROPERTY_STATUS.RENTED) ||
-      matchesStatus(p.status, PROPERTY_STATUS.PARTIAL)
+    const activeBeneficiaries = beneficiaries.filter((b) =>
+      matchesStatus(b.status, 'active')
     ).length;
-    const activeContracts = contracts.filter(c => matchesStatus(c.status, 'active')).length;
-    const activeLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
-    const totalLoansAmount = loans.reduce((sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)), 0);
-    
+    // العقارات النشطة = المؤجرة بالكامل + الجزئية (بها وحدات مؤجرة)
+    const occupiedProperties = properties.filter(
+      (p) =>
+        matchesStatus(p.status, PROPERTY_STATUS.RENTED) ||
+        matchesStatus(p.status, PROPERTY_STATUS.PARTIAL)
+    ).length;
+    const activeContracts = contracts.filter((c) => matchesStatus(c.status, 'active')).length;
+    const activeLoans = loans.filter((l) => matchesStatus(l.status, 'active')).length;
+    const totalLoansAmount = loans.reduce(
+      (sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)),
+      0
+    );
+
     // حساب إجمالي التحصيل من دفعات الإيجار + سندات القبض
     const rentalPaymentsTotal = rentalPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
     const vouchersTotal = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
     const totalPayments = rentalPaymentsTotal + vouchersTotal;
-    
-    const pendingRequests = requests.filter(r => matchesStatus(r.status, 'pending')).length;
+
+    const pendingRequests = requests.filter((r) => matchesStatus(r.status, 'pending')).length;
 
     return {
       beneficiaries: {
         total: beneficiaries.length,
         active: activeBeneficiaries,
-        percentage: beneficiaries.length > 0 ? Math.round((activeBeneficiaries / beneficiaries.length) * 100) : 0,
+        percentage:
+          beneficiaries.length > 0
+            ? Math.round((activeBeneficiaries / beneficiaries.length) * 100)
+            : 0,
       },
       properties: {
         total: properties.length,
         occupied: occupiedProperties,
-        percentage: properties.length > 0 ? Math.round((occupiedProperties / properties.length) * 100) : 0,
+        percentage:
+          properties.length > 0 ? Math.round((occupiedProperties / properties.length) * 100) : 0,
       },
       contracts: { total: contracts.length, active: activeContracts },
       loans: { total: loans.length, active: activeLoans, amount: totalLoansAmount },
@@ -152,81 +180,91 @@ export const KPIService = {
       journalEntriesStatusResult,
       // إضافة: سندات الصرف والقبض + أقلام الوقف
       vouchersResult,
-      waqfUnitsResult
+      waqfUnitsResult,
     ] = await Promise.all([
       supabase.from('beneficiaries').select('id, status').is('deleted_at', null),
       supabase.from('families').select('id').is('deleted_at', null),
       supabase.from('properties').select('id, status').is('deleted_at', null),
-      supabase.from('contracts').select('id, status, monthly_rent, payment_frequency').is('deleted_at', null),
+      supabase
+        .from('contracts')
+        .select('id, status, monthly_rent, payment_frequency')
+        .is('deleted_at', null),
       supabase.from('funds').select('id, is_active').is('deleted_at', null),
       supabase.from('beneficiary_requests').select('id, status, is_overdue').is('deleted_at', null),
       supabase.from('loans').select('id, status').is('deleted_at', null),
       supabase.from('rental_payments').select('id, amount_paid, status').is('deleted_at', null),
       supabase.from('journal_entries').select('id, status, entry_date').is('deleted_at', null),
       // سندات الصرف والقبض المدفوعة (مع فلتر الحذف)
-      supabase.from('payment_vouchers').select('id, amount, voucher_type, status').eq('status', 'paid').is('deleted_at', null),
+      supabase
+        .from('payment_vouchers')
+        .select('id, amount, voucher_type, status')
+        .eq('status', 'paid')
+        .is('deleted_at', null),
       // أرصدة أقلام الوقف
-      supabase.from('waqf_units').select('id, current_balance, total_income, total_expenses').is('deleted_at', null)
+      supabase
+        .from('waqf_units')
+        .select('id, current_balance, total_income, total_expenses')
+        .is('deleted_at', null),
     ]);
 
     const beneficiaries = beneficiariesResult.data || [];
     const totalBeneficiaries = beneficiaries.length;
     // استخدام matchesStatus للمقارنة الآمنة بين العربي والإنجليزي
-    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
+    const activeBeneficiaries = beneficiaries.filter((b) =>
+      matchesStatus(b.status, 'active')
+    ).length;
 
     const totalFamilies = familiesResult.data?.length || 0;
 
     const properties = propertiesResult.data || [];
     const totalProperties = properties.length;
     // ✅ تصحيح: العقارات النشطة تشمل "نشط" و "مؤجر"
-    const activeProperties = properties.filter(p => 
-      matchesStatus(p.status, 'active') || matchesStatus(p.status, 'مؤجر')
+    const activeProperties = properties.filter(
+      (p) => matchesStatus(p.status, 'active') || matchesStatus(p.status, 'مؤجر')
     ).length;
 
     const contracts = contractsResult.data || [];
     // ✅ تصحيح: حساب العقارات المشغولة = عدد العقود النشطة
-    const activeContracts = contracts.filter(c => matchesStatus(c.status, 'active'));
+    const activeContracts = contracts.filter((c) => matchesStatus(c.status, 'active'));
     const occupiedProperties = activeContracts.length;
-    
-    const monthlyReturn = activeContracts
-      .reduce((sum, c) => {
-        const rent = c.monthly_rent || 0;
-        const frequency = c.payment_frequency;
-        if (frequency === 'سنوي' || frequency === 'annual') {
-          return sum + (rent / 12);
-        }
-        if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
-          return sum + (rent / 3);
-        }
-        return sum + rent;
-      }, 0);
+
+    const monthlyReturn = activeContracts.reduce((sum, c) => {
+      const rent = c.monthly_rent || 0;
+      const frequency = c.payment_frequency;
+      if (frequency === 'سنوي' || frequency === 'annual') {
+        return sum + rent / 12;
+      }
+      if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
+        return sum + rent / 3;
+      }
+      return sum + rent;
+    }, 0);
 
     const funds = fundsResult.data || [];
     const totalFunds = funds.length;
-    const activeFunds = funds.filter(f => f.is_active).length;
+    const activeFunds = funds.filter((f) => f.is_active).length;
 
     const requests = requestsResult.data || [];
-    const pendingRequests = requests.filter(r => matchesStatus(r.status, 'pending')).length;
-    const overdueRequests = requests.filter(r => r.is_overdue).length;
+    const pendingRequests = requests.filter((r) => matchesStatus(r.status, 'pending')).length;
+    const overdueRequests = requests.filter((r) => r.is_overdue).length;
 
     const loans = loansResult.data || [];
-    const pendingLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
+    const pendingLoans = loans.filter((l) => matchesStatus(l.status, 'active')).length;
 
     const rentalPayments = paymentsResult.data || [];
-    const completedPayments = rentalPayments.filter(p => p.status === 'مدفوع');
-    const rentalRevenue = completedPayments
-      .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+    const completedPayments = rentalPayments.filter((p) => p.status === 'مدفوع');
+    const rentalRevenue = completedPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
 
     // حساب الإيرادات من سندات القبض المدفوعة
     const vouchers = vouchersResult.data || [];
-    const receiptVouchers = vouchers.filter(v => v.voucher_type === 'receipt');
+    const receiptVouchers = vouchers.filter((v) => v.voucher_type === 'receipt');
     const vouchersRevenue = receiptVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
 
     // إجمالي الإيرادات = إيجارات + سندات قبض
     const totalRevenue = rentalRevenue + vouchersRevenue;
 
     // حساب المصروفات من سندات الصرف المدفوعة
-    const paymentVouchers = vouchers.filter(v => v.voucher_type === 'payment');
+    const paymentVouchers = vouchers.filter((v) => v.voucher_type === 'payment');
     const vouchersExpenses = paymentVouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
 
     // أرصدة أقلام الوقف الفعلية
@@ -238,37 +276,38 @@ export const KPIService = {
     let accountingExpenses = 0;
     try {
       const { data: expenseAccounts } = await supabase
-        .from("accounts")
-        .select("id")
-        .eq("account_type", "expense");
-      
+        .from('accounts')
+        .select('id')
+        .eq('account_type', 'expense');
+
       if (expenseAccounts && expenseAccounts.length > 0) {
-        const accountIds = expenseAccounts.map(a => a.id);
+        const accountIds = expenseAccounts.map((a) => a.id);
         const { data: expenseEntries } = await supabase
-          .from("journal_entry_lines")
-          .select("debit_amount")
-          .in("account_id", accountIds);
-        
-        accountingExpenses = expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
+          .from('journal_entry_lines')
+          .select('debit_amount')
+          .in('account_id', accountIds);
+
+        accountingExpenses =
+          expenseEntries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
     } catch (error) {
-      productionLogger.error("Error calculating expenses:", error);
+      productionLogger.error('Error calculating expenses:', error);
     }
 
     // إجمالي المصروفات = مصروفات محاسبية + سندات صرف + مصروفات أقلام الوقف
     const totalExpenses = Math.max(accountingExpenses, vouchersExpenses, totalWaqfExpenses);
 
     const netIncome = totalRevenue - totalExpenses;
-    const availableBudget = totalWaqfBalance > 0 ? totalWaqfBalance : (netIncome > 0 ? netIncome : 0);
+    const availableBudget = totalWaqfBalance > 0 ? totalWaqfBalance : netIncome > 0 ? netIncome : 0;
     const totalAssets = totalRevenue;
 
     // حساب إحصائيات القيود المحاسبية
     const journalEntries = journalEntriesStatusResult.data || [];
     const todayStr = now.toISOString().split('T')[0];
-    const draftJournalEntries = journalEntries.filter(e => e.status === 'draft').length;
-    const postedJournalEntries = journalEntries.filter(e => e.status === 'posted').length;
-    const cancelledJournalEntries = journalEntries.filter(e => e.status === 'cancelled').length;
-    const todayJournalEntries = journalEntries.filter(e => e.entry_date === todayStr).length;
+    const draftJournalEntries = journalEntries.filter((e) => e.status === 'draft').length;
+    const postedJournalEntries = journalEntries.filter((e) => e.status === 'posted').length;
+    const cancelledJournalEntries = journalEntries.filter((e) => e.status === 'cancelled').length;
+    const todayJournalEntries = journalEntries.filter((e) => e.entry_date === todayStr).length;
     const totalJournalEntries = journalEntries.length;
     const pendingApprovals = draftJournalEntries; // الموافقات المعلقة = القيود المسودة
 
@@ -296,7 +335,7 @@ export const KPIService = {
       cancelledJournalEntries,
       todayJournalEntries,
       totalJournalEntries,
-      lastUpdated: now
+      lastUpdated: now,
     };
   },
 
@@ -304,34 +343,24 @@ export const KPIService = {
    * جلب مؤشرات الأداء الأساسية للداشبورد
    */
   async getDashboardKPIs(): Promise<DashboardKPIs> {
-    const [
-      beneficiariesCount,
-      propertiesCount,
-      totalPayments,
-      activeContracts
-    ] = await Promise.all([
-      supabase
-        .from('beneficiaries')
-        .select('id', { count: 'exact', head: true }),
-      
-      supabase
-        .from('properties')
-        .select('id', { count: 'exact', head: true }),
-      
-      supabase
-        .from('payments')
-        .select('amount')
-        .limit(1000)
-        .then(res => {
-          if (res.error) throw res.error;
-          return res.data.reduce((sum, p) => sum + Number(p.amount), 0);
-        }),
-      
-      supabase
-        .from('contracts')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'نشط'),
-    ]);
+    const [beneficiariesCount, propertiesCount, totalPayments, activeContracts] = await Promise.all(
+      [
+        supabase.from('beneficiaries').select('id', { count: 'exact', head: true }),
+
+        supabase.from('properties').select('id', { count: 'exact', head: true }),
+
+        supabase
+          .from('payments')
+          .select('amount')
+          .limit(1000)
+          .then((res) => {
+            if (res.error) throw res.error;
+            return res.data.reduce((sum, p) => sum + Number(p.amount), 0);
+          }),
+
+        supabase.from('contracts').select('id', { count: 'exact', head: true }).eq('status', 'نشط'),
+      ]
+    );
 
     return {
       beneficiaries: beneficiariesCount.count || 0,
@@ -346,12 +375,14 @@ export const KPIService = {
    */
   async getKPIDefinitions(category?: string) {
     let query = supabase
-      .from("kpi_definitions")
-      .select("id, kpi_name, kpi_code, description, calculation_formula, data_source, target_value, unit, chart_type, is_active, category, created_at")
-      .eq("is_active", true);
+      .from('kpi_definitions')
+      .select(
+        'id, kpi_name, kpi_code, description, calculation_formula, data_source, target_value, unit, chart_type, is_active, category, created_at'
+      )
+      .eq('is_active', true);
 
     if (category) {
-      query = query.eq("category", category);
+      query = query.eq('category', category);
     }
 
     const { data, error } = await query;
@@ -364,107 +395,110 @@ export const KPIService = {
    */
   async calculateKPIValue(kpiCode: string): Promise<number> {
     switch (kpiCode) {
-      case "distribution_rate": {
-        const { data } = await supabase.from("distributions").select("total_amount, status");
+      case 'distribution_rate': {
+        const { data } = await supabase.from('distributions').select('total_amount, status');
         const total = data?.reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
-        const completed = data?.filter(d => d.status === "completed" || d.status === "معتمد")
-          .reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
+        const completed =
+          data
+            ?.filter((d) => d.status === 'completed' || d.status === 'معتمد')
+            .reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
         return total > 0 ? (completed / total) * 100 : 0;
       }
 
-      case "occupancy_rate": {
+      case 'occupancy_rate': {
         // حساب نسبة الإشغال الفعلية من العقود النشطة والعقارات
         const [contractsRes, propertiesRes] = await Promise.all([
-          supabase.from("contracts").select("property_id").eq("status", "نشط"),
-          supabase.from("properties").select("id", { count: "exact", head: true })
+          supabase.from('contracts').select('property_id').eq('status', 'نشط'),
+          supabase.from('properties').select('id', { count: 'exact', head: true }),
         ]);
-        const occupiedCount = new Set(contractsRes.data?.map(c => c.property_id)).size;
+        const occupiedCount = new Set(contractsRes.data?.map((c) => c.property_id)).size;
         const totalProperties = propertiesRes.count || 1;
         return Math.round((occupiedCount / totalProperties) * 100);
       }
 
-      case "collection_rate": {
+      case 'collection_rate': {
         // حساب نسبة التحصيل الفعلية من دفعات الإيجار
         const { data: payments } = await supabase
-          .from("rental_payments")
-          .select("amount_due, amount_paid, status");
+          .from('rental_payments')
+          .select('amount_due, amount_paid, status');
         const totalDue = payments?.reduce((sum, p) => sum + (p.amount_due || 0), 0) || 1;
-        const totalPaid = payments
-          ?.filter(p => p.status === 'مدفوع')
-          .reduce((sum, p) => sum + (p.amount_paid || 0), 0) || 0;
+        const totalPaid =
+          payments
+            ?.filter((p) => p.status === 'مدفوع')
+            .reduce((sum, p) => sum + (p.amount_paid || 0), 0) || 0;
         return Math.round((totalPaid / totalDue) * 100);
       }
 
-      case "approval_time":
+      case 'approval_time':
         return 2.5;
 
-      case "beneficiary_satisfaction":
+      case 'beneficiary_satisfaction':
         // لا يوجد نظام تقييم حالياً - قيمة ثابتة
         return 88;
 
-      case "pending_requests": {
+      case 'pending_requests': {
         const { count } = await supabase
-          .from("beneficiary_requests")
-          .select("*", { count: "exact", head: true })
-          .in("status", ["معلق", "pending", "قيد المراجعة"]);
+          .from('beneficiary_requests')
+          .select('*', { count: 'exact', head: true })
+          .in('status', ['معلق', 'pending', 'قيد المراجعة']);
         return count || 0;
       }
 
-      case "monthly_revenue": {
+      case 'monthly_revenue': {
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
-        
+
         const { data } = await supabase
-          .from("payments")
-          .select("amount")
-          .eq("payment_type", "receipt")
-          .gte("payment_date", startOfMonth.toISOString());
+          .from('payments')
+          .select('amount')
+          .eq('payment_type', 'receipt')
+          .gte('payment_date', startOfMonth.toISOString());
         return data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
       }
 
-      case "monthly_expenses": {
+      case 'monthly_expenses': {
         // حساب المصروفات الشهرية من القيود المحاسبية
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
-        
+
         // جلب حسابات المصروفات
         const { data: expenseAccounts } = await supabase
-          .from("accounts")
-          .select("id")
-          .eq("account_type", "expense");
-        
+          .from('accounts')
+          .select('id')
+          .eq('account_type', 'expense');
+
         if (!expenseAccounts || expenseAccounts.length === 0) return 0;
-        
-        const accountIds = expenseAccounts.map(a => a.id);
-        
+
+        const accountIds = expenseAccounts.map((a) => a.id);
+
         // جلب بنود القيود لهذه الحسابات
         const { data: entries } = await supabase
-          .from("journal_entry_lines")
-          .select("debit_amount, account_id, created_at")
-          .in("account_id", accountIds)
-          .gte("created_at", startOfMonth.toISOString());
-        
+          .from('journal_entry_lines')
+          .select('debit_amount, account_id, created_at')
+          .in('account_id', accountIds)
+          .gte('created_at', startOfMonth.toISOString());
+
         return entries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
 
-      case "total_expenses": {
+      case 'total_expenses': {
         // حساب إجمالي المصروفات من القيود المحاسبية
         const { data: expenseAccounts } = await supabase
-          .from("accounts")
-          .select("id")
-          .eq("account_type", "expense");
-        
+          .from('accounts')
+          .select('id')
+          .eq('account_type', 'expense');
+
         if (!expenseAccounts || expenseAccounts.length === 0) return 0;
-        
-        const accountIds = expenseAccounts.map(a => a.id);
-        
+
+        const accountIds = expenseAccounts.map((a) => a.id);
+
         const { data: entries } = await supabase
-          .from("journal_entry_lines")
-          .select("debit_amount")
-          .in("account_id", accountIds);
-        
+          .from('journal_entry_lines')
+          .select('debit_amount')
+          .in('account_id', accountIds);
+
         return entries?.reduce((sum, e) => sum + (e.debit_amount || 0), 0) || 0;
       }
 

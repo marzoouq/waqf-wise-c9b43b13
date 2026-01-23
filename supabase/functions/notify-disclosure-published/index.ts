@@ -1,10 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -14,7 +10,7 @@ serve(async (req) => {
     // ✅ Health Check Support - يجب أن يكون أول شيء
     const bodyText = await req.clone().text();
     let parsedBody: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         parsedBody = JSON.parse(bodyText);
@@ -23,10 +19,12 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'notify-disclosure-published',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     const disclosure_id = parsedBody.disclosure_id as string | undefined;
@@ -40,13 +38,13 @@ serve(async (req) => {
         testMode: true,
         message: 'اختبار ناجح - لم يتم إرسال إشعارات فعلية',
         notificationsCount: 0,
-        emailsCount: 0
+        emailsCount: 0,
       });
     }
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     if (!disclosure_id) {
@@ -73,8 +71,8 @@ serve(async (req) => {
 
     // إنشاء إشعارات لكل مستفيد
     const notifications = beneficiaries
-      .filter(b => b.user_id) // فقط المستفيدين الذين لديهم حسابات
-      .map(b => ({
+      .filter((b) => b.user_id) // فقط المستفيدين الذين لديهم حسابات
+      .map((b) => ({
         user_id: b.user_id,
         title: `إفصاح سنوي جديد - ${disclosure.year}`,
         message: `تم نشر الإفصاح السنوي لوقف ${disclosure.waqf_name} لعام ${disclosure.year}. يمكنك الاطلاع على التفاصيل الكاملة من لوحة التحكم.`,
@@ -94,7 +92,7 @@ serve(async (req) => {
 
     // إرسال إشعارات بريد إلكتروني للمستفيدين الذين فعّلوا البريد
     const emailNotifications = beneficiaries.filter(
-      b => b.email && b.notification_preferences?.email !== false
+      (b) => b.email && b.notification_preferences?.email !== false
     );
 
     console.log(`Created ${notifications.length} notifications for disclosure ${disclosure_id}`);
@@ -107,9 +105,6 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      400
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 400);
   }
 });
