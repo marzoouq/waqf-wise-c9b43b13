@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import xss from 'https://esm.sh/xss@1.0.14';
 import { 
   handleCors, 
   jsonResponse, 
@@ -237,9 +238,11 @@ Deno.serve(async (req) => {
     }
 
     // 🧹 7. تنظيف رسائل الخطأ من HTML tags
-    errorReport.error_message = errorReport.error_message
-      .replace(/<[^>]*>/g, '')
-      .substring(0, 2000);
+    errorReport.error_message = xss(errorReport.error_message, {
+      whiteList: {},
+      stripIgnoreTag: true,
+      stripIgnoreTagBody: ['script', 'style', 'iframe'],
+    }).substring(0, 2000);
 
     if (errorReport.error_stack) {
       errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
