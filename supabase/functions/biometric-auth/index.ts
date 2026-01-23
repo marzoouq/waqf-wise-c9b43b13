@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
-    const { credentialId, userId, challenge } = bodyData;
+    const { credentialId, userId, challenge: _challenge } = bodyData;
     
     // ✅ التحقق من وجود المعاملات
     if (!credentialId || !userId) {

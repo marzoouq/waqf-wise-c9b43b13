@@ -98,9 +98,9 @@ serve(async (req) => {
     const userId = bodyData.userId as string | undefined;
     const title = bodyData.title as string | undefined;
     const notificationBody = bodyData.body as string | undefined;
-    const icon = bodyData.icon as string | undefined;
-    const badge = bodyData.badge as string | undefined;
-    const data = bodyData.data as Record<string, unknown> | undefined;
+    const _icon = bodyData.icon as string | undefined;
+    const _badge = bodyData.badge as string | undefined;
+    const _data = bodyData.data as Record<string, unknown> | undefined;
     const actionUrl = bodyData.actionUrl as string | undefined;
 
     if (!userId || !title || !notificationBody) {

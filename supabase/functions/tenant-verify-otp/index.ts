@@ -19,7 +19,7 @@ interface Tenant {
   email: string;
 }
 
-interface ContractWithTenant {
+interface _ContractWithTenant {
   id: string;
   tenant_id: string;
   tenants: Tenant;

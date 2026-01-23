@@ -2,12 +2,12 @@
  * useAuditLogsEnhanced Hook - سجلات التدقيق المحسّنة
  * @version 1.0.0
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 // Reserved for future mutations and toast notifications
-// import { useMutation } from "@tanstack/react-query";
+// import { useQueryClient, useMutation } from "@tanstack/react-query";
 // import { toast } from "sonner";
 
 export interface EnhancedAuditLog {
