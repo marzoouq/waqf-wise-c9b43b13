@@ -59,7 +59,8 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>({
       cleanup();
       // استعادة التركيز
       if (restoreFocus) {
-        focusRestore.current.restore();
+        const restore = focusRestore.current;
+        restore.restore();
       }
     };
   }, [enabled, autoFocus, restoreFocus]);
