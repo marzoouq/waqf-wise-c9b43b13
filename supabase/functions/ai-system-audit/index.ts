@@ -433,7 +433,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
           fixed: false
         }));
       }
-    } catch (e) {
+    } catch (_e) {
       console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
     }
 
@@ -466,7 +466,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
             fixed: false
           }));
         }
-      } catch (e) {
+      } catch (_e) {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
       }
     }
@@ -715,7 +715,7 @@ async function savePendingFixes(supabase: any, auditId: string, findings: AuditF
 
 function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): string {
   const total = findings.length;
-  const issues = total - summary.success;
+  const _issues = total - summary.success;
   
   let analysis = `## ملخص الفحص الذكي\n\n`;
   analysis += `تم فحص النظام والعثور على ${total} نتيجة:\n`;

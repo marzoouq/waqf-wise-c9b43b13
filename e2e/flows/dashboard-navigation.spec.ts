@@ -11,7 +11,7 @@ const TEST_USER = {
 };
 
 // Dashboard routes by role
-const ROLE_DASHBOARDS = {
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',

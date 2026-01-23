@@ -106,7 +106,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, beneficiaryId, nationalId, newPassword } = body;
+    const { action, beneficiaryId, _nationalId, newPassword } = body;
 
     console.log('✅ Admin manage password request:', { 
       action, 

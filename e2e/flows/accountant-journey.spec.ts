@@ -69,7 +69,7 @@ test.describe('رحلة المحاسب الكاملة', () => {
     await waitForPageLoad(page);
     
     // البحث عن مؤشر التوازن
-    const balanceIndicator = page.locator('text=متوازن, text=balanced, .balance-ok, [data-balanced="true"]');
+    const _balanceIndicator = page.locator('text=متوازن, text=balanced, .balance-ok, [data-balanced="true"]');
     
     const content = await page.content();
     expect(content.length).toBeGreaterThan(100);
