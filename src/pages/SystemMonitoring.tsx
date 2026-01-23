@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import {
   Activity,
   AlertTriangle,
@@ -17,19 +17,19 @@ import {
   Shield,
   Bell,
   RefreshCw,
-} from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { formatRelative } from "@/lib/date";
-import { SystemError, SystemAlert } from "@/types/monitoring";
-import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
-import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
-import { SystemHealthDashboard } from "@/components/system/SystemHealthDashboard";
-import { LivePerformanceChart } from "@/components/system/LivePerformanceChart";
-import { MonitoringSettingsDialog } from "@/components/system/MonitoringSettingsDialog";
-import { useSystemMonitoring } from "@/hooks/system/useSystemMonitoring";
+} from 'lucide-react';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { formatRelative } from '@/lib/date';
+import { SystemError, SystemAlert } from '@/types/monitoring';
+import { AdminAlertsPanel } from '@/components/system/AdminAlertsPanel';
+import { SelfHealingToolsPanel } from '@/components/system/SelfHealingToolsPanel';
+import { SystemHealthDashboard } from '@/components/system/SystemHealthDashboard';
+import { LivePerformanceChart } from '@/components/system/LivePerformanceChart';
+import { MonitoringSettingsDialog } from '@/components/system/MonitoringSettingsDialog';
+import { useSystemMonitoring } from '@/hooks/system/useSystemMonitoring';
 
 export default function SystemMonitoring() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   const {
@@ -66,9 +66,9 @@ export default function SystemMonitoring() {
               <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">تحديث</span>
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="gap-1"
               onClick={() => setSettingsDialogOpen(true)}
             >
@@ -120,7 +120,9 @@ export default function SystemMonitoring() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 gap-1">
-              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 sm:px-4">نظرة عامة</TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 sm:px-4">
+                نظرة عامة
+              </TabsTrigger>
               <TabsTrigger value="live" className="text-xs sm:text-sm px-3 sm:px-4 gap-1">
                 <span className="h-2 w-2 bg-status-success rounded-full animate-pulse"></span>
                 مباشر
@@ -133,9 +135,15 @@ export default function SystemMonitoring() {
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="errors" className="text-xs sm:text-sm px-3 sm:px-4">الأخطاء</TabsTrigger>
-              <TabsTrigger value="fixes" className="text-xs sm:text-sm px-3 sm:px-4">الإصلاح</TabsTrigger>
-              <TabsTrigger value="tools" className="text-xs sm:text-sm px-3 sm:px-4">أدوات</TabsTrigger>
+              <TabsTrigger value="errors" className="text-xs sm:text-sm px-3 sm:px-4">
+                الأخطاء
+              </TabsTrigger>
+              <TabsTrigger value="fixes" className="text-xs sm:text-sm px-3 sm:px-4">
+                الإصلاح
+              </TabsTrigger>
+              <TabsTrigger value="tools" className="text-xs sm:text-sm px-3 sm:px-4">
+                أدوات
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -147,9 +155,7 @@ export default function SystemMonitoring() {
               </CardHeader>
               <CardContent>
                 {!recentErrors || recentErrors.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    لا توجد أخطاء مسجلة
-                  </p>
+                  <p className="text-center text-muted-foreground py-8">لا توجد أخطاء مسجلة</p>
                 ) : (
                   <div className="space-y-3">
                     {recentErrors.map((error: SystemError) => (
@@ -161,11 +167,11 @@ export default function SystemMonitoring() {
                           <div className="flex items-center gap-2 mb-1">
                             <Badge
                               variant={
-                                error.severity === "critical"
-                                  ? "destructive"
-                                  : error.severity === "high"
-                                  ? "default"
-                                  : "secondary"
+                                error.severity === 'critical'
+                                  ? 'destructive'
+                                  : error.severity === 'high'
+                                    ? 'default'
+                                    : 'secondary'
                               }
                             >
                               {error.severity}
@@ -221,13 +227,9 @@ export default function SystemMonitoring() {
                             <Badge variant="destructive">{alert.severity}</Badge>
                             <span className="font-semibold">{alert.title}</span>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {alert.description}
-                          </p>
+                          <p className="text-sm text-muted-foreground mb-2">{alert.description}</p>
                           {alert.occurrence_count > 1 && (
-                            <Badge variant="outline">
-                              تكرر {alert.occurrence_count} مرة
-                            </Badge>
+                            <Badge variant="outline">تكرر {alert.occurrence_count} مرة</Badge>
                           )}
                         </div>
                         <Button
@@ -253,10 +255,13 @@ export default function SystemMonitoring() {
               </CardHeader>
               <CardContent>
                 <p className="text-center text-muted-foreground">
-                  راجع صفحة{" "}
-                  <Link to="/system-error-logs" className="text-primary underline hover:text-primary/80 transition-colors">
+                  راجع صفحة{' '}
+                  <Link
+                    to="/system-error-logs"
+                    className="text-primary underline hover:text-primary/80 transition-colors"
+                  >
                     سجل الأخطاء
-                  </Link>{" "}
+                  </Link>{' '}
                   للتفاصيل الكاملة
                 </p>
               </CardContent>
@@ -297,11 +302,11 @@ export default function SystemMonitoring() {
                         </div>
                         <Badge
                           variant={
-                            attempt.status === "success"
-                              ? "default"
-                              : attempt.status === "failed"
-                              ? "destructive"
-                              : "secondary"
+                            attempt.status === 'success'
+                              ? 'default'
+                              : attempt.status === 'failed'
+                                ? 'destructive'
+                                : 'secondary'
                           }
                         >
                           {attempt.status}
@@ -321,10 +326,7 @@ export default function SystemMonitoring() {
         </Tabs>
 
         {/* Settings Dialog */}
-        <MonitoringSettingsDialog
-          open={settingsDialogOpen}
-          onOpenChange={setSettingsDialogOpen}
-        />
+        <MonitoringSettingsDialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen} />
       </div>
     </PageErrorBoundary>
   );

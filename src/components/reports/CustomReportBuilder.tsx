@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import {
   Plus,
   Trash2,
@@ -22,53 +22,51 @@ import {
   Settings,
   Filter,
   BarChart3,
-  Loader2
-} from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useCustomReports, type ReportResult } from "@/hooks/reports/useCustomReports";
-import { ReportResultsPreview } from "./ReportResultsPreview";
-import type { CustomReportFilter } from "@/types/reports/index";
-import { ReportService } from "@/services";
+  Loader2,
+} from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useCustomReports, type ReportResult } from '@/hooks/reports/useCustomReports';
+import { ReportResultsPreview } from './ReportResultsPreview';
+import type { CustomReportFilter } from '@/types/reports/index';
+import { ReportService } from '@/services';
 
 export function CustomReportBuilder() {
   const { toast } = useToast();
   const { executeDirectReport, REPORT_FIELDS } = useCustomReports();
-  
-  const [reportName, setReportName] = useState("");
-  const [reportDescription, setReportDescription] = useState("");
-  const [reportType, setReportType] = useState<string>("");
+
+  const [reportName, setReportName] = useState('');
+  const [reportDescription, setReportDescription] = useState('');
+  const [reportType, setReportType] = useState<string>('');
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [filters, setFilters] = useState<CustomReportFilter[]>([]);
-  const [groupBy, setGroupBy] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>("");
-  
+  const [groupBy, setGroupBy] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('');
+
   const [isRunning, setIsRunning] = useState(false);
   const [reportResult, setReportResult] = useState<ReportResult | null>(null);
 
   const reportTypes = [
-    { value: "beneficiaries", label: "تقرير المستفيدين" },
-    { value: "payments", label: "تقرير المدفوعات" },
-    { value: "properties", label: "تقرير العقارات" },
-    { value: "distributions", label: "تقرير التوزيعات" },
-    { value: "loans", label: "تقرير القروض" },
-    { value: "contracts", label: "تقرير العقود" },
+    { value: 'beneficiaries', label: 'تقرير المستفيدين' },
+    { value: 'payments', label: 'تقرير المدفوعات' },
+    { value: 'properties', label: 'تقرير العقارات' },
+    { value: 'distributions', label: 'تقرير التوزيعات' },
+    { value: 'loans', label: 'تقرير القروض' },
+    { value: 'contracts', label: 'تقرير العقود' },
   ];
 
   // الحصول على الحقول المتاحة حسب نوع التقرير
   const getAvailableFields = (type: string): string[] => {
-    return REPORT_FIELDS[type]?.map(f => f.label) || [];
+    return REPORT_FIELDS[type]?.map((f) => f.label) || [];
   };
 
   const handleFieldToggle = (field: string) => {
-    setSelectedFields(prev =>
-      prev.includes(field)
-        ? prev.filter(f => f !== field)
-        : [...prev, field]
+    setSelectedFields((prev) =>
+      prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field]
     );
   };
 
   const addFilter = () => {
-    setFilters([...filters, { field: "", operator: "equals", value: "" }]);
+    setFilters([...filters, { field: '', operator: 'equals', value: '' }]);
   };
 
   const removeFilter = (index: number) => {
@@ -84,9 +82,9 @@ export function CustomReportBuilder() {
   const handleSaveReport = async () => {
     if (!reportName || !reportType || selectedFields.length === 0) {
       toast({
-        variant: "destructive",
-        title: "خطأ في البيانات",
-        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: 'destructive',
+        title: 'خطأ في البيانات',
+        description: 'يرجى ملء جميع الحقول المطلوبة',
       });
       return;
     }
@@ -96,19 +94,21 @@ export function CustomReportBuilder() {
         template_name: reportName,
         description: reportDescription,
         report_type: reportType,
-        template_config: JSON.parse(JSON.stringify({
-          type: reportType,
-          fields: selectedFields,
-          filters,
-          groupBy,
-          sortBy,
-        })),
+        template_config: JSON.parse(
+          JSON.stringify({
+            type: reportType,
+            fields: selectedFields,
+            filters,
+            groupBy,
+            sortBy,
+          })
+        ),
         is_public: false,
       });
 
       toast({
-        title: "تم الحفظ بنجاح",
-        description: "تم حفظ قالب التقرير المخصص",
+        title: 'تم الحفظ بنجاح',
+        description: 'تم حفظ قالب التقرير المخصص',
       });
 
       // Reset form
@@ -116,8 +116,8 @@ export function CustomReportBuilder() {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء الحفظ';
       toast({
-        variant: "destructive",
-        title: "حدث خطأ",
+        variant: 'destructive',
+        title: 'حدث خطأ',
         description: errorMessage,
       });
     }
@@ -126,9 +126,9 @@ export function CustomReportBuilder() {
   const handleRunReport = async () => {
     if (!reportType || selectedFields.length === 0) {
       toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "يرجى اختيار نوع التقرير والحقول المطلوبة",
+        variant: 'destructive',
+        title: 'خطأ',
+        description: 'يرجى اختيار نوع التقرير والحقول المطلوبة',
       });
       return;
     }
@@ -137,16 +137,16 @@ export function CustomReportBuilder() {
     try {
       const result = await executeDirectReport(reportType, selectedFields, sortBy);
       setReportResult(result);
-      
+
       toast({
-        title: "تم توليد التقرير",
+        title: 'تم توليد التقرير',
         description: `تم جلب ${result.totalCount} سجل`,
       });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تشغيل التقرير';
       toast({
-        variant: "destructive",
-        title: "خطأ في التقرير",
+        variant: 'destructive',
+        title: 'خطأ في التقرير',
         description: errorMessage,
       });
     } finally {
@@ -155,63 +155,63 @@ export function CustomReportBuilder() {
   };
 
   const resetForm = () => {
-    setReportName("");
-    setReportDescription("");
-    setReportType("");
+    setReportName('');
+    setReportDescription('');
+    setReportType('');
     setSelectedFields([]);
     setFilters([]);
-    setGroupBy("");
-    setSortBy("");
+    setGroupBy('');
+    setSortBy('');
     setReportResult(null);
   };
 
   // ✅ Dynamic import - دوال التصدير تُحمّل فقط عند الحاجة
   const handleExportPDF = async () => {
     if (!reportResult) return;
-    
+
     const { exportToPDF } = await import('@/lib/exportHelpers');
-    const headers = reportResult.columns.map(c => c.label);
-    const rows = reportResult.data.map(row => 
-      reportResult.columns.map(col => String(row[col.key] ?? '—'))
+    const headers = reportResult.columns.map((c) => c.label);
+    const rows = reportResult.data.map((row) =>
+      reportResult.columns.map((col) => String(row[col.key] ?? '—'))
     );
-    
+
     exportToPDF(
       reportName || 'تقرير مخصص',
       headers,
       rows,
       `custom-report-${new Date().toISOString().split('T')[0]}`
     );
-    
-    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة PDF" });
+
+    toast({ title: 'تم التصدير', description: 'تم تصدير التقرير بصيغة PDF' });
   };
 
   const handleExportExcel = async () => {
     if (!reportResult) return;
-    
+
     const { exportToExcel } = await import('@/lib/exportHelpers');
-    const data = reportResult.data.map(row => {
+    const data = reportResult.data.map((row) => {
       const obj: Record<string, unknown> = {};
-      reportResult.columns.forEach(col => {
+      reportResult.columns.forEach((col) => {
         obj[col.label] = row[col.key];
       });
       return obj;
     });
-    
+
     exportToExcel(data, reportName || 'تقرير-مخصص');
-    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة Excel" });
+    toast({ title: 'تم التصدير', description: 'تم تصدير التقرير بصيغة Excel' });
   };
 
   const handleExportCSV = async () => {
     if (!reportResult) return;
-    
+
     const { exportToCSV } = await import('@/lib/exportHelpers');
-    const headers = reportResult.columns.map(c => c.label);
-    const rows = reportResult.data.map(row => 
-      reportResult.columns.map(col => String(row[col.key] ?? ''))
+    const headers = reportResult.columns.map((c) => c.label);
+    const rows = reportResult.data.map((row) =>
+      reportResult.columns.map((col) => String(row[col.key] ?? ''))
     );
-    
+
     exportToCSV(headers, rows, reportName || 'تقرير-مخصص');
-    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة CSV" });
+    toast({ title: 'تم التصدير', description: 'تم تصدير التقرير بصيغة CSV' });
   };
 
   const availableFields = reportType ? getAvailableFields(reportType) : [];
@@ -250,11 +250,14 @@ export function CustomReportBuilder() {
 
           <div className="space-y-2">
             <Label htmlFor="report-type">نوع التقرير *</Label>
-            <Select value={reportType} onValueChange={(value) => {
-              setReportType(value);
-              setSelectedFields([]);
-              setReportResult(null);
-            }}>
+            <Select
+              value={reportType}
+              onValueChange={(value) => {
+                setReportType(value);
+                setSelectedFields([]);
+                setReportResult(null);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر نوع التقرير" />
               </SelectTrigger>
@@ -340,7 +343,7 @@ export function CustomReportBuilder() {
                         <Label>الحقل</Label>
                         <Select
                           value={filter.field}
-                          onValueChange={(value) => updateFilter(index, "field", value)}
+                          onValueChange={(value) => updateFilter(index, 'field', value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="اختر" />
@@ -359,7 +362,7 @@ export function CustomReportBuilder() {
                         <Label>المعامل</Label>
                         <Select
                           value={filter.operator}
-                          onValueChange={(value) => updateFilter(index, "operator", value)}
+                          onValueChange={(value) => updateFilter(index, 'operator', value)}
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -378,17 +381,13 @@ export function CustomReportBuilder() {
                         <Label>القيمة</Label>
                         <Input
                           value={String(filter.value)}
-                          onChange={(e) => updateFilter(index, "value", e.target.value)}
+                          onChange={(e) => updateFilter(index, 'value', e.target.value)}
                           placeholder="القيمة"
                         />
                       </div>
                     </div>
 
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => removeFilter(index)}
-                    >
+                    <Button size="icon" variant="ghost" onClick={() => removeFilter(index)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

@@ -1,4 +1,5 @@
 # معمارية التطبيق - Architecture Overview
+
 > الإصدار: 3.1.0 | تاريخ التحديث: 2025-12-24
 
 ## 📐 البنية المعمارية
@@ -73,13 +74,14 @@ useQuery({ queryKey: QUERY_KEYS.BENEFICIARIES });
 useQuery({ queryKey: QUERY_KEYS.BENEFICIARY(id) });
 
 // تكوينات الكاش
-useQuery({ 
+useQuery({
   queryKey: QUERY_KEYS.REPORTS,
-  ...QUERY_CONFIG.REPORTS // staleTime: 2 دقائق
+  ...QUERY_CONFIG.REPORTS, // staleTime: 2 دقائق
 });
 ```
 
 ### فئات المفاتيح:
+
 - **Beneficiaries**: 18 مفتاح
 - **Properties**: 4 مفاتيح
 - **Accounting**: 22 مفتاح
@@ -92,6 +94,7 @@ useQuery({
 ### خدمات مقسمة (Split Services):
 
 #### 1. Accounting Services (`src/services/accounting/`)
+
 ```
 ├── journal.service.ts      # القيود المحاسبية
 ├── accounts.service.ts     # شجرة الحسابات
@@ -100,6 +103,7 @@ useQuery({
 ```
 
 #### 2. Beneficiary Services (`src/services/beneficiary/`)
+
 ```
 ├── crud.service.ts         # CRUD operations
 ├── stats.service.ts        # الإحصائيات
@@ -108,6 +112,7 @@ useQuery({
 ```
 
 #### 3. Dashboard Services (`src/services/dashboard/`)
+
 ```
 ├── kpi.service.ts          # مؤشرات الأداء
 ├── financial-cards.service.ts # بطاقات مالية
@@ -116,6 +121,7 @@ useQuery({
 ```
 
 #### 4. Report Services (`src/services/report/`)
+
 ```
 ├── template.service.ts     # قوالب التقارير
 ├── disclosure.service.ts   # الإفصاحات
@@ -125,21 +131,22 @@ useQuery({
 
 ## 📊 إحصائيات المعمارية
 
-| المقياس | العدد |
-|---------|-------|
-| إجمالي الخدمات | 60+ |
-| إجمالي الـ Hooks | 300+ |
-| مجلدات الـ Hooks | 38 |
-| مفاتيح QUERY_KEYS | 350+ (8 ملفات) |
-| أنواع `any` | 7 (مبررة) |
-| تغطية RLS | 100% (675 سياسة) |
-| Edge Functions | 50 |
-| Database Tables | 231 |
-| Database Triggers | 200 |
+| المقياس           | العدد            |
+| ----------------- | ---------------- |
+| إجمالي الخدمات    | 60+              |
+| إجمالي الـ Hooks  | 300+             |
+| مجلدات الـ Hooks  | 38               |
+| مفاتيح QUERY_KEYS | 350+ (8 ملفات)   |
+| أنواع `any`       | 7 (مبررة)        |
+| تغطية RLS         | 100% (675 سياسة) |
+| Edge Functions    | 50               |
+| Database Tables   | 231              |
+| Database Triggers | 200              |
 
 ## ✅ قواعد المعمارية
 
 ### 1. فصل الطبقات
+
 ```
 ❌ Component → Supabase (مرفوض)
 ❌ Hook → Supabase (مرفوض إلا Realtime)
@@ -147,6 +154,7 @@ useQuery({
 ```
 
 ### 2. منع `any`
+
 ```typescript
 // ❌ مرفوض
 const data: any = response;
@@ -157,6 +165,7 @@ const data: unknown = untypedResponse;
 ```
 
 ### 3. استخدام QUERY_KEYS
+
 ```typescript
 // ❌ مرفوض
 useQuery({ queryKey: ['beneficiaries'] });
@@ -166,6 +175,7 @@ useQuery({ queryKey: QUERY_KEYS.BENEFICIARIES });
 ```
 
 ### 4. Realtime في Hooks فقط
+
 ```typescript
 // ✅ مقبول - Realtime في hooks
 const channel = supabase.channel('updates')
@@ -188,6 +198,7 @@ const channel = supabase.channel('updates')
 ## 📝 أمثلة الاستخدام
 
 ### إنشاء Hook جديد
+
 ```typescript
 // src/hooks/beneficiary/useBeneficiaryData.ts
 import { useQuery } from '@tanstack/react-query';
@@ -203,15 +214,14 @@ export function useBeneficiaryData(id: string) {
 ```
 
 ### إنشاء Service جديد
+
 ```typescript
 // src/services/example.service.ts
 import { supabase } from '@/integrations/supabase/client';
 
 export const ExampleService = {
   async getAll() {
-    const { data, error } = await supabase
-      .from('examples')
-      .select('*');
+    const { data, error } = await supabase.from('examples').select('*');
     if (error) throw error;
     return data;
   },

@@ -1,4 +1,5 @@
 # الملفات المحمية من التعديل
+
 ## Protected Files - DO NOT MODIFY
 
 > **تاريخ الفحص:** 2026-01-19
@@ -18,77 +19,77 @@
 
 ### 1. لوحة المشرف (Admin Dashboard) - Level: CRITICAL
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/pages/AdminDashboard.tsx` | الصفحة الرئيسية للوحة المشرف | ✅ |
-| `src/components/dashboard/admin/AdminKPIs.tsx` | بطاقات KPIs الموحدة | ✅ |
-| `src/components/dashboard/admin/SystemHealthMonitor.tsx` | مراقبة صحة النظام | ✅ |
-| `src/components/dashboard/admin/AdminDashboardErrorBoundary.tsx` | معالج الأخطاء | ✅ |
-| `src/components/dashboard/admin/LazyTabContent.tsx` | التحميل الكسول للتبويبات | ✅ |
-| `src/components/dashboard/admin/AuditLogsPreview.tsx` | معاينة سجلات التدقيق | ✅ |
-| `src/components/dashboard/admin/SecurityAlertsSection.tsx` | قسم التنبيهات الأمنية | ✅ |
-| `src/components/dashboard/admin/LoginAttemptsSection.tsx` | قسم محاولات الدخول | ✅ |
-| `src/components/dashboard/admin/PermissionsOverviewCard.tsx` | ملخص الصلاحيات | ✅ |
-| `src/components/dashboard/admin/SecuritySettingsQuickAccess.tsx` | الوصول السريع للأمان | ✅ |
-| `src/components/dashboard/admin/UserManagementSection.tsx` | إدارة المستخدمين | ✅ |
-| `src/components/dashboard/admin/SystemPerformanceChart.tsx` | رسم بياني الأداء | ✅ |
-| `src/components/dashboard/admin/UsersActivityChart.tsx` | رسم بياني نشاط المستخدمين | ✅ |
-| `src/components/dashboard/admin/AdminSettingsSection.tsx` | قسم الإعدادات | ✅ |
-| `src/components/dashboard/admin/AdminReportsSection.tsx` | قسم التقارير | ✅ |
-| `src/hooks/dashboard/useAdminDashboardRealtime.ts` | اشتراكات Realtime الموحدة | ✅ |
+| الملف                                                            | الوصف                        | حالة الفحص |
+| ---------------------------------------------------------------- | ---------------------------- | ---------- |
+| `src/pages/AdminDashboard.tsx`                                   | الصفحة الرئيسية للوحة المشرف | ✅         |
+| `src/components/dashboard/admin/AdminKPIs.tsx`                   | بطاقات KPIs الموحدة          | ✅         |
+| `src/components/dashboard/admin/SystemHealthMonitor.tsx`         | مراقبة صحة النظام            | ✅         |
+| `src/components/dashboard/admin/AdminDashboardErrorBoundary.tsx` | معالج الأخطاء                | ✅         |
+| `src/components/dashboard/admin/LazyTabContent.tsx`              | التحميل الكسول للتبويبات     | ✅         |
+| `src/components/dashboard/admin/AuditLogsPreview.tsx`            | معاينة سجلات التدقيق         | ✅         |
+| `src/components/dashboard/admin/SecurityAlertsSection.tsx`       | قسم التنبيهات الأمنية        | ✅         |
+| `src/components/dashboard/admin/LoginAttemptsSection.tsx`        | قسم محاولات الدخول           | ✅         |
+| `src/components/dashboard/admin/PermissionsOverviewCard.tsx`     | ملخص الصلاحيات               | ✅         |
+| `src/components/dashboard/admin/SecuritySettingsQuickAccess.tsx` | الوصول السريع للأمان         | ✅         |
+| `src/components/dashboard/admin/UserManagementSection.tsx`       | إدارة المستخدمين             | ✅         |
+| `src/components/dashboard/admin/SystemPerformanceChart.tsx`      | رسم بياني الأداء             | ✅         |
+| `src/components/dashboard/admin/UsersActivityChart.tsx`          | رسم بياني نشاط المستخدمين    | ✅         |
+| `src/components/dashboard/admin/AdminSettingsSection.tsx`        | قسم الإعدادات                | ✅         |
+| `src/components/dashboard/admin/AdminReportsSection.tsx`         | قسم التقارير                 | ✅         |
+| `src/hooks/dashboard/useAdminDashboardRealtime.ts`               | اشتراكات Realtime الموحدة    | ✅         |
 
 ### 2. لوحة الناظر (Nazer Dashboard) - Level: CRITICAL
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/pages/NazerDashboard.tsx` | الصفحة الرئيسية للناظر | ✅ |
-| `src/hooks/dashboard/useNazerDashboardRealtime.ts` | اشتراكات Realtime | ✅ |
+| الملف                                              | الوصف                  | حالة الفحص |
+| -------------------------------------------------- | ---------------------- | ---------- |
+| `src/pages/NazerDashboard.tsx`                     | الصفحة الرئيسية للناظر | ✅         |
+| `src/hooks/dashboard/useNazerDashboardRealtime.ts` | اشتراكات Realtime      | ✅         |
 
 ### 3. الـ Hooks الموحدة (Unified Hooks) - Level: HIGH
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/hooks/dashboard/useUnifiedKPIs.ts` | مصدر الحقيقة الموحد لـ KPIs | ✅ |
-| `src/hooks/dashboard/useCollectionStats.ts` | إحصائيات التحصيل | ✅ |
-| `src/hooks/dashboard/useRevenueProgress.ts` | تقدم الإيرادات | ✅ |
+| الملف                                       | الوصف                       | حالة الفحص |
+| ------------------------------------------- | --------------------------- | ---------- |
+| `src/hooks/dashboard/useUnifiedKPIs.ts`     | مصدر الحقيقة الموحد لـ KPIs | ✅         |
+| `src/hooks/dashboard/useCollectionStats.ts` | إحصائيات التحصيل            | ✅         |
+| `src/hooks/dashboard/useRevenueProgress.ts` | تقدم الإيرادات              | ✅         |
 
 ### 4. الخدمات الأساسية (Core Services) - Level: HIGH
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/services/dashboard/kpi.service.ts` | خدمة KPIs الموحدة | ✅ |
-| `src/services/property/property-stats.service.ts` | إحصائيات العقارات | ✅ |
-| `src/services/tenant.service.ts` | خدمة المستأجرين | ✅ |
-| `src/services/system.service.ts` | خدمة النظام | ✅ |
+| الملف                                             | الوصف             | حالة الفحص |
+| ------------------------------------------------- | ----------------- | ---------- |
+| `src/services/dashboard/kpi.service.ts`           | خدمة KPIs الموحدة | ✅         |
+| `src/services/property/property-stats.service.ts` | إحصائيات العقارات | ✅         |
+| `src/services/tenant.service.ts`                  | خدمة المستأجرين   | ✅         |
+| `src/services/system.service.ts`                  | خدمة النظام       | ✅         |
 
 ### 5. الثوابت والتكوين (Constants & Config) - Level: HIGH
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/lib/constants.ts` | ثوابت النظام الموحدة | ✅ |
-| `src/lib/query-keys.ts` | مفاتيح الاستعلامات الموحدة | ✅ |
-| `src/config/permissions.ts` | تكوين الصلاحيات | ✅ |
-| `src/types/roles.ts` | أنواع الأدوار الموحدة | ✅ |
+| الملف                       | الوصف                      | حالة الفحص |
+| --------------------------- | -------------------------- | ---------- |
+| `src/lib/constants.ts`      | ثوابت النظام الموحدة       | ✅         |
+| `src/lib/query-keys.ts`     | مفاتيح الاستعلامات الموحدة | ✅         |
+| `src/config/permissions.ts` | تكوين الصلاحيات            | ✅         |
+| `src/types/roles.ts`        | أنواع الأدوار الموحدة      | ✅         |
 
 ### 6. المصادقة والأمان (Auth & Security) - Level: CRITICAL
 
-| الملف | الوصف | حالة الفحص |
-|-------|-------|------------|
-| `src/contexts/AuthContext.tsx` | سياق المصادقة | ✅ |
-| `src/components/auth/ProtectedRoute.tsx` | المسار المحمي | ✅ |
-| `src/hooks/auth/useAuth.ts` | hook المصادقة | ✅ |
-| `src/hooks/auth/usePermissions.ts` | hook الصلاحيات | ✅ |
+| الملف                                    | الوصف          | حالة الفحص |
+| ---------------------------------------- | -------------- | ---------- |
+| `src/contexts/AuthContext.tsx`           | سياق المصادقة  | ✅         |
+| `src/components/auth/ProtectedRoute.tsx` | المسار المحمي  | ✅         |
+| `src/hooks/auth/useAuth.ts`              | hook المصادقة  | ✅         |
+| `src/hooks/auth/usePermissions.ts`       | hook الصلاحيات | ✅         |
 
 ---
 
 ## 🔒 سياسات التخزين المحمية
 
-| Bucket | الحالة | سياسة الوصول |
-|--------|--------|--------------|
-| `beneficiary-documents` | 🔒 خاص | الناظر/المشرف فقط |
-| `request-attachments` | 🔒 خاص | المستفيد ملفاته فقط |
-| `archive-documents` | 🔒 خاص | الموظفون فقط |
-| `documents` | 🔒 خاص | الموظفون فقط |
+| Bucket                  | الحالة | سياسة الوصول        |
+| ----------------------- | ------ | ------------------- |
+| `beneficiary-documents` | 🔒 خاص | الناظر/المشرف فقط   |
+| `request-attachments`   | 🔒 خاص | المستفيد ملفاته فقط |
+| `archive-documents`     | 🔒 خاص | الموظفون فقط        |
+| `documents`             | 🔒 خاص | الموظفون فقط        |
 
 ---
 
@@ -117,6 +118,7 @@
 ## 📝 قواعد التعديل
 
 ### 🚫 ممنوع منعاً باتاً:
+
 1. **حذف أي ملف** من المشروع (قاعدة صارمة)
 2. تعديل الملفات المحمية أثناء إصلاح أخطاء عامة
 3. إضافة imports جديدة دون مراجعة
@@ -124,6 +126,7 @@
 5. تعديل سياسات RLS للـ buckets
 
 ### ✅ مسموح:
+
 - تعديل بطلب صريح من المستخدم
 - إصلاح أخطاء TypeScript فقط إذا كانت تمنع البناء
 - تحديث النصوص (العناوين، الترجمة)
@@ -134,17 +137,17 @@
 ## 🛡️ القاعدة الذهبية
 
 > **⚠️ يُمنع حذف أي ملف من المشروع إلا بطلب صريح ومباشر من المستخدم.**
-> 
+>
 > هذه القاعدة غير قابلة للتفاوض وتنطبق على جميع الملفات بدون استثناء.
 
 ---
 
 ## 🔄 تاريخ التحديثات
 
-| التاريخ | الإجراء | المنفذ |
-|---------|---------|--------|
+| التاريخ    | الإجراء                      | المنفذ |
+| ---------- | ---------------------------- | ------ |
 | 2026-01-19 | إنشاء الملف وفحص لوحة المشرف | النظام |
-| 2026-01-19 | تأمين storage buckets | النظام |
+| 2026-01-19 | تأمين storage buckets        | النظام |
 
 ---
 

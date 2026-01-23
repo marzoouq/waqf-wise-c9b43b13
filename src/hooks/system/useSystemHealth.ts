@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { SystemService, type SystemHealth } from "@/services/system.service";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { SystemService, type SystemHealth } from '@/services/system.service';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export function useSystemHealth() {
   return useQuery({

@@ -35,10 +35,7 @@ export function SkipLinks({ links = DEFAULT_SKIP_LINKS, className }: SkipLinksPr
   };
 
   return (
-    <nav 
-      aria-label="روابط التخطي"
-      className={cn('skip-links-container', className)}
-    >
+    <nav aria-label="روابط التخطي" className={cn('skip-links-container', className)}>
       {links.map((link) => (
         <a
           key={link.id}
@@ -73,13 +70,9 @@ interface MainContentProps {
   className?: string;
 }
 
-export function MainContent({ 
-  children, 
-  id = 'main-content',
-  className 
-}: MainContentProps) {
+export function MainContent({ children, id = 'main-content', className }: MainContentProps) {
   return (
-    <main 
+    <main
       id={id}
       role="main"
       tabIndex={-1}
@@ -100,14 +93,14 @@ interface NavigationWrapperProps {
   className?: string;
 }
 
-export function NavigationWrapper({ 
-  children, 
+export function NavigationWrapper({
+  children,
   id = 'main-navigation',
   label = ARIA_LABELS.navigation.main,
-  className 
+  className,
 }: NavigationWrapperProps) {
   return (
-    <nav 
+    <nav
       id={id}
       role="navigation"
       aria-label={label}
@@ -127,11 +120,7 @@ interface VisuallyHiddenProps {
 }
 
 export function VisuallyHidden({ children, as: Component = 'span' }: VisuallyHiddenProps) {
-  return (
-    <Component className="sr-only">
-      {children}
-    </Component>
-  );
+  return <Component className="sr-only">{children}</Component>;
 }
 
 // ==================== Live Region ====================
@@ -143,11 +132,11 @@ interface LiveRegionProps {
   relevant?: 'additions' | 'removals' | 'text' | 'all';
 }
 
-export function LiveRegion({ 
-  children, 
+export function LiveRegion({
+  children,
   priority = 'polite',
   atomic = true,
-  relevant = 'additions'
+  relevant = 'additions',
 }: LiveRegionProps) {
   return (
     <div
@@ -188,7 +177,7 @@ export function FocusTrap({ children, active = true, className }: FocusTrapProps
       const focusableElements = container.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      
+
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
 

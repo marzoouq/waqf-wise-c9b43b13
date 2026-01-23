@@ -27,12 +27,16 @@ export function BackgroundMonitor() {
   useEffect(() => {
     if (!shouldMonitor) return;
 
-    const showWarning = (key: string, message: string, severity: 'warning' | 'error' = 'warning') => {
+    const showWarning = (
+      key: string,
+      message: string,
+      severity: 'warning' | 'error' = 'warning'
+    ) => {
       const now = Date.now();
       const lastShown = shownWarnings.get(key) || 0;
-      
+
       if (now - lastShown < WARN_COOLDOWN_MS) return;
-      
+
       shownWarnings.set(key, now);
 
       if (severity === 'error') {
@@ -48,10 +52,14 @@ export function BackgroundMonitor() {
     const checkMemory = () => {
       if (!('memory' in performance)) return;
 
-      const memory = (performance as Performance & { memory: {
-        usedJSHeapSize: number;
-        jsHeapSizeLimit: number;
-      }}).memory;
+      const memory = (
+        performance as Performance & {
+          memory: {
+            usedJSHeapSize: number;
+            jsHeapSizeLimit: number;
+          };
+        }
+      ).memory;
 
       const usage = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
 
@@ -66,7 +74,7 @@ export function BackgroundMonitor() {
     const handleOffline = () => {
       showWarning('offline', '📡 انقطع الاتصال بالإنترنت', 'error');
     };
-    
+
     const handleOnline = () => {
       toast.success('✅ تم استعادة الاتصال بالإنترنت');
     };

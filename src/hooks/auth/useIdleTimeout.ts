@@ -58,18 +58,18 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
 
     // إضافة المستمعين
-    events.forEach(event => {
+    events.forEach((event) => {
       window.addEventListener(event, handleActivity, { passive: true });
     });
 
     // التنظيف
     return () => {
       clearTimeout(startDelay);
-      
-      events.forEach(event => {
+
+      events.forEach((event) => {
         window.removeEventListener(event, handleActivity);
       });
-      
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;

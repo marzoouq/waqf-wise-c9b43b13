@@ -1,19 +1,19 @@
 /**
  * 🔒 PROTECTED FILE - ADR-005
  * Critical financial operation - Revenue Distribution
- * 
+ *
  * Uses SERVICE_ROLE_KEY for database access.
  * Any change requires: ADR update + Security review + Financial approval
  * See: docs/ARCHITECTURE_DECISIONS.md
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { 
-  handleCors, 
-  jsonResponse, 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
   errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 3 توزيعات/ساعة لكل مستخدم ============
@@ -24,16 +24,16 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return true;
   }
-  
+
   if (userLimit.count >= RATE_LIMIT) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         function: 'distribute-revenue',
         testMode: !!bodyData.testMode,
         message: bodyData.testMode ? 'اختبار ناجح - لم يتم تنفيذ توزيع فعلي' : undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -94,7 +94,10 @@ Deno.serve(async (req) => {
     }
 
     // Verify user is nazer or admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(authHeader);
     if (authError || !user) {
       return unauthorizedResponse('المستخدم غير موجود');
     }
@@ -137,14 +140,16 @@ Deno.serve(async (req) => {
     console.log(`[distribute-revenue] Starting distribution: ${totalAmount} SAR`);
 
     // Calculate shariah-based distribution
-    const { data: heirShares, error: calcError } = await supabase
-      .rpc('calculate_shariah_distribution', { p_total_amount: totalAmount });
+    const { data: heirShares, error: calcError } = await supabase.rpc(
+      'calculate_shariah_distribution',
+      { p_total_amount: totalAmount }
+    );
 
     if (calcError) {
       console.error('[distribute-revenue] Calculation error:', calcError);
       return errorResponse('خطأ في حساب التوزيع: ' + calcError.message, 500);
     }
-    
+
     // التحقق من وجود بيانات
     if (!heirShares || heirShares.length === 0) {
       return errorResponse('لا يوجد مستفيدون مؤهلون للتوزيع', 400);
@@ -159,7 +164,7 @@ Deno.serve(async (req) => {
       .select('id, full_name, user_id')
       .in('id', beneficiaryIds);
 
-    const beneficiaryMap = new Map(beneficiaries?.map(b => [b.id, b]) || []);
+    const beneficiaryMap = new Map(beneficiaries?.map((b) => [b.id, b]) || []);
 
     // Create heir_distributions records with executed_by_user_id for judicial chain of custody
     const distributionRecords = heirShares.map((heir: HeirShare) => ({
@@ -183,11 +188,15 @@ Deno.serve(async (req) => {
       return errorResponse('خطأ في إنشاء سجلات التوزيع: ' + insertError.message, 500);
     }
 
-    console.log(`[distribute-revenue] Created ${insertedDistributions?.length} distribution records`);
+    console.log(
+      `[distribute-revenue] Created ${insertedDistributions?.length} distribution records`
+    );
 
     // Create payment records for each heir with executed_by_user_id
     const paymentRecords = heirShares.map((heir: HeirShare) => {
-      const distribution = insertedDistributions?.find(d => d.beneficiary_id === heir.beneficiary_id);
+      const distribution = insertedDistributions?.find(
+        (d) => d.beneficiary_id === heir.beneficiary_id
+      );
       return {
         payment_number: `PAY-${Date.now()}-${heir.beneficiary_id.substring(0, 8)}`,
         payment_date: distributionDate,
@@ -203,9 +212,7 @@ Deno.serve(async (req) => {
       };
     });
 
-    const { error: paymentError } = await supabase
-      .from('payments')
-      .insert(paymentRecords);
+    const { error: paymentError } = await supabase.from('payments').insert(paymentRecords);
 
     if (paymentError) {
       console.error('[distribute-revenue] Payment insert error:', paymentError);
@@ -216,15 +223,15 @@ Deno.serve(async (req) => {
       await supabase
         .from('beneficiaries')
         .update({
-          total_received: supabase.rpc('increment_field', { 
-            row_id: heir.beneficiary_id, 
-            field_name: 'total_received', 
-            increment_value: heir.share_amount 
+          total_received: supabase.rpc('increment_field', {
+            row_id: heir.beneficiary_id,
+            field_name: 'total_received',
+            increment_value: heir.share_amount,
           }),
-          account_balance: supabase.rpc('increment_field', { 
-            row_id: heir.beneficiary_id, 
-            field_name: 'account_balance', 
-            increment_value: heir.share_amount 
+          account_balance: supabase.rpc('increment_field', {
+            row_id: heir.beneficiary_id,
+            field_name: 'account_balance',
+            increment_value: heir.share_amount,
           }),
         })
         .eq('id', heir.beneficiary_id);
@@ -280,21 +287,22 @@ Deno.serve(async (req) => {
         fiscalYearId,
         distributionDate,
         heirsCount: heirShares.length,
-        distributionIds: insertedDistributions?.map(d => d.id),
+        distributionIds: insertedDistributions?.map((d) => d.id),
         summary: {
           wivesShare: summary.wivesShare,
           sonsShare: summary.sonsShare,
-          daughtersShare: summary.daughtersShare
-        }
+          daughtersShare: summary.daughtersShare,
+        },
       },
       severity: 'critical',
-      ip_address: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown',
+      ip_address:
+        req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown',
       user_agent: req.headers.get('user-agent') || 'unknown',
       metadata: {
         timestamp: new Date().toISOString(),
         notifyHeirs: notifyHeirs || false,
-        notes: notes || null
-      }
+        notes: notes || null,
+      },
     };
 
     const { error: auditError } = await supabase.from('audit_logs').insert(auditRecord);
@@ -311,7 +319,6 @@ Deno.serve(async (req) => {
       message: 'تم توزيع الغلة بنجاح',
       summary,
     });
-
   } catch (error: unknown) {
     console.error('[distribute-revenue] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';

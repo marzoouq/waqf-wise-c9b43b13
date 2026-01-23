@@ -1,6 +1,6 @@
 /**
  * Request Service - خدمة إدارة الطلبات
- * 
+ *
  * تتولى منطق الأعمال لنظام طلبات المستفيدين
  */
 
@@ -36,11 +36,13 @@ export class RequestService {
   static async getAll(beneficiaryId?: string) {
     let query = supabase
       .from('beneficiary_requests')
-      .select(`
+      .select(
+        `
         *,
         request_type:request_types(name_ar, description),
         beneficiary:beneficiaries(full_name)
-      `)
+      `
+      )
       .order('submitted_at', { ascending: false });
 
     if (beneficiaryId) {
@@ -58,11 +60,13 @@ export class RequestService {
   static async getById(requestId: string) {
     const { data, error } = await supabase
       .from('beneficiary_requests')
-      .select(`
+      .select(
+        `
         *,
         request_type:request_types(name_ar, description),
         beneficiary:beneficiaries(full_name)
-      `)
+      `
+      )
       .eq('id', requestId)
       .maybeSingle();
 
@@ -73,7 +77,9 @@ export class RequestService {
   /**
    * إنشاء طلب جديد
    */
-  static async create(data: RequestData): Promise<{ success: boolean; id?: string; message: string }> {
+  static async create(
+    data: RequestData
+  ): Promise<{ success: boolean; id?: string; message: string }> {
     try {
       if (!data.beneficiary_id || !data.request_type_id || !data.description) {
         return { success: false, message: 'البيانات المطلوبة ناقصة' };
@@ -100,7 +106,9 @@ export class RequestService {
 
       return { success: true, id: request.id, message: 'تم تقديم الطلب بنجاح' };
     } catch (error) {
-      productionLogger.error('Error in RequestService.create', error, { context: 'request_service' });
+      productionLogger.error('Error in RequestService.create', error, {
+        context: 'request_service',
+      });
       return { success: false, message: 'فشل في إنشاء الطلب' };
     }
   }
@@ -124,7 +132,9 @@ export class RequestService {
    * حذف طلب (Soft Delete)
    */
   static async delete(id: string, reason?: string) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const { error } = await supabase
       .from('beneficiary_requests')
       .update({
@@ -274,7 +284,7 @@ export class RequestService {
     try {
       // يتم التصعيد تلقائياً عبر function
       const { error } = await supabase.rpc('escalate_overdue_requests');
-      
+
       if (error) throw error;
       return { success: true };
     } catch (error) {
@@ -291,7 +301,9 @@ export class RequestService {
   static async getWorkflow(requestId: string) {
     const { data, error } = await supabase
       .from('request_workflows')
-      .select('id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at')
+      .select(
+        'id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at'
+      )
       .eq('request_id', requestId)
       .maybeSingle();
 
@@ -302,31 +314,29 @@ export class RequestService {
   // ==================== المرفقات ====================
   static async getAttachments(requestId: string) {
     const { data, error } = await supabase
-      .from("request_attachments")
-      .select("*")
-      .eq("request_id", requestId)
-      .order("uploaded_at", { ascending: false });
+      .from('request_attachments')
+      .select('*')
+      .eq('request_id', requestId)
+      .order('uploaded_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
   }
 
   static async uploadAttachment(requestId: string, file: File, description?: string) {
-    const fileExt = file.name.split(".").pop();
+    const fileExt = file.name.split('.').pop();
     const fileName = `${requestId}/${Date.now()}.${fileExt}`;
-    
+
     const { error: uploadError } = await supabase.storage
-      .from("request-attachments")
+      .from('request-attachments')
       .upload(fileName, file);
 
     if (uploadError) throw uploadError;
 
-    const { data: urlData } = supabase.storage
-      .from("request-attachments")
-      .getPublicUrl(fileName);
+    const { data: urlData } = supabase.storage.from('request-attachments').getPublicUrl(fileName);
 
     const { data, error } = await supabase
-      .from("request_attachments")
+      .from('request_attachments')
       .insert({
         request_id: requestId,
         file_name: file.name,
@@ -343,16 +353,16 @@ export class RequestService {
 
     // Update attachments_count
     const { data: currentRequest } = await supabase
-      .from("beneficiary_requests")
-      .select("attachments_count")
-      .eq("id", requestId)
+      .from('beneficiary_requests')
+      .select('attachments_count')
+      .eq('id', requestId)
       .maybeSingle();
 
     if (currentRequest) {
       await supabase
-        .from("beneficiary_requests")
+        .from('beneficiary_requests')
         .update({ attachments_count: (currentRequest.attachments_count || 0) + 1 })
-        .eq("id", requestId);
+        .eq('id', requestId);
     }
 
     return data;
@@ -362,18 +372,18 @@ export class RequestService {
     // ملاحظة: جدول request_attachments محمي بـ trigger - الحذف سيفشل تلقائياً
     // نقوم بتحديث عداد الملحقات فقط
     const { data: currentRequest } = await supabase
-      .from("beneficiary_requests")
-      .select("attachments_count")
-      .eq("id", requestId)
+      .from('beneficiary_requests')
+      .select('attachments_count')
+      .eq('id', requestId)
       .maybeSingle();
 
     if (currentRequest) {
       await supabase
-        .from("beneficiary_requests")
+        .from('beneficiary_requests')
         .update({ attachments_count: Math.max((currentRequest.attachments_count || 0) - 1, 0) })
-        .eq("id", requestId);
+        .eq('id', requestId);
     }
-    
+
     // محاولة الحذف ستفشل بواسطة trigger إذا كان محمياً
     console.warn('Attachment deletion prevented by database trigger - record preserved for audit');
   }
@@ -382,49 +392,55 @@ export class RequestService {
   static async getComments(requestId: string) {
     // جلب التعليقات
     const { data: comments, error } = await supabase
-      .from("request_comments")
-      .select("*")
-      .eq("request_id", requestId)
-      .order("created_at", { ascending: false });
+      .from('request_comments')
+      .select('*')
+      .eq('request_id', requestId)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     if (!comments || comments.length === 0) return [];
 
     // جمع جميع user_ids الفريدة
-    const userIds = [...new Set(comments.filter(c => c.user_id).map(c => c.user_id))];
-    
+    const userIds = [...new Set(comments.filter((c) => c.user_id).map((c) => c.user_id))];
+
     // استعلام واحد لجلب جميع الملفات الشخصية (بدلاً من N استعلام)
     let profilesMap: Record<string, { full_name: string; email: string }> = {};
-    
+
     if (userIds.length > 0) {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email")
-        .in("user_id", userIds);
-      
+        .from('profiles')
+        .select('user_id, full_name, email')
+        .in('user_id', userIds);
+
       if (profiles) {
-        profilesMap = profiles.reduce((acc, p) => {
-          acc[p.user_id] = { full_name: p.full_name || "مستخدم", email: p.email || "" };
-          return acc;
-        }, {} as Record<string, { full_name: string; email: string }>);
+        profilesMap = profiles.reduce(
+          (acc, p) => {
+            acc[p.user_id] = { full_name: p.full_name || 'مستخدم', email: p.email || '' };
+            return acc;
+          },
+          {} as Record<string, { full_name: string; email: string }>
+        );
       }
     }
 
     // دمج البيانات
     return comments.map((comment) => ({
       ...comment,
-      profiles: comment.user_id && profilesMap[comment.user_id] 
-        ? profilesMap[comment.user_id] 
-        : { full_name: "مستخدم", email: "" },
+      profiles:
+        comment.user_id && profilesMap[comment.user_id]
+          ? profilesMap[comment.user_id]
+          : { full_name: 'مستخدم', email: '' },
     }));
   }
 
   static async addComment(requestId: string, comment: string, isInternal = false) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("غير مصرح");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('غير مصرح');
 
     const { data, error } = await supabase
-      .from("request_comments")
+      .from('request_comments')
       .insert([{ request_id: requestId, comment, is_internal: isInternal, user_id: user.id }])
       .select()
       .maybeSingle();
@@ -436,9 +452,9 @@ export class RequestService {
 
   static async updateComment(id: string, comment: string) {
     const { data, error } = await supabase
-      .from("request_comments")
+      .from('request_comments')
       .update({ comment })
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 
@@ -457,14 +473,16 @@ export class RequestService {
   static async getAllWithBeneficiary() {
     const { data, error } = await supabase
       .from('beneficiary_requests')
-      .select(`
+      .select(
+        `
         *,
         beneficiary:beneficiaries(
           full_name,
           national_id,
           phone
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;

@@ -3,8 +3,8 @@
  * @version 3.0.0 - تم إصلاح مشكلة تراكم القنوات
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { supabase } from '@/integrations/supabase/client';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type RealtimeCallback = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void;
 
@@ -17,7 +17,6 @@ export class RealtimeService {
   // ✅ Debounce removal لتقليل فتح/إغلاق اتصال Realtime
   private static removalTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
   private static readonly CHANNEL_IDLE_TTL_MS = 60_000;
-
 
   /**
    * الاشتراك في جدول - يعيد استخدام القناة الموجودة
@@ -44,7 +43,6 @@ export class RealtimeService {
       };
     }
 
-
     // التحقق من الحد الأقصى
     if (this.channels.size >= MAX_CHANNELS) {
       console.warn(`[RealtimeService] Max channels (${MAX_CHANNELS}) reached. Cleaning up all.`);
@@ -59,9 +57,12 @@ export class RealtimeService {
       .channel(channelName)
       .on('postgres_changes', { event: '*', schema: 'public', table }, (payload) => {
         // توزيع الحدث لجميع الـ callbacks
-        this.channelCallbacks.get(channelName)?.forEach(cb => {
-          try { cb(payload); } 
-          catch (e) { console.error(`[RealtimeService] Callback error:`, e); }
+        this.channelCallbacks.get(channelName)?.forEach((cb) => {
+          try {
+            cb(payload);
+          } catch (e) {
+            console.error(`[RealtimeService] Callback error:`, e);
+          }
         });
       })
       .subscribe();
@@ -69,7 +70,9 @@ export class RealtimeService {
     this.channels.set(channelName, channel);
 
     if (import.meta.env.DEV) {
-      console.log(`[RealtimeService] Created channel: ${channelName}. Total: ${this.channels.size}`);
+      console.log(
+        `[RealtimeService] Created channel: ${channelName}. Total: ${this.channels.size}`
+      );
     }
 
     return { channel, unsubscribe: () => this.removeCallback(channelName, callback) };
@@ -80,13 +83,13 @@ export class RealtimeService {
    */
   static subscribeToChanges(tables: string[], callback: RealtimeCallback) {
     const channelName = `multi-${tables.sort().join('-')}`;
-    
+
     // إذا كانت القناة موجودة
     if (this.channels.has(channelName)) {
       this.channelCallbacks.get(channelName)?.add(callback);
-      return { 
-        channel: this.channels.get(channelName)!, 
-        unsubscribe: () => this.removeCallback(channelName, callback)
+      return {
+        channel: this.channels.get(channelName)!,
+        unsubscribe: () => this.removeCallback(channelName, callback),
       };
     }
 
@@ -95,13 +98,20 @@ export class RealtimeService {
     this.channelCallbacks.set(channelName, callbacks);
 
     let channel = supabase.channel(channelName);
-    tables.forEach(table => {
-      channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, (payload) => {
-        this.channelCallbacks.get(channelName)?.forEach(cb => {
-          try { cb(payload); } 
-          catch (e) { console.error(`[RealtimeService] Multi-callback error:`, e); }
-        });
-      });
+    tables.forEach((table) => {
+      channel = channel.on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table },
+        (payload) => {
+          this.channelCallbacks.get(channelName)?.forEach((cb) => {
+            try {
+              cb(payload);
+            } catch (e) {
+              console.error(`[RealtimeService] Multi-callback error:`, e);
+            }
+          });
+        }
+      );
     });
     channel.subscribe();
 
@@ -143,9 +153,11 @@ export class RealtimeService {
       supabase.removeChannel(channel);
       this.channels.delete(channelName);
       this.channelCallbacks.delete(channelName);
-      
+
       if (import.meta.env.DEV) {
-        console.log(`[RealtimeService] Removed channel: ${channelName}. Remaining: ${this.channels.size}`);
+        console.log(
+          `[RealtimeService] Removed channel: ${channelName}. Remaining: ${this.channels.size}`
+        );
       }
     }
   }
@@ -154,7 +166,7 @@ export class RealtimeService {
     this.removalTimers.forEach((t) => clearTimeout(t));
     this.removalTimers.clear();
 
-    this.channels.forEach(channel => supabase.removeChannel(channel));
+    this.channels.forEach((channel) => supabase.removeChannel(channel));
     this.channels.clear();
     this.channelCallbacks.clear();
 
@@ -168,7 +180,7 @@ export class RealtimeService {
     if (this.channels.has(name)) {
       return this.channels.get(name)!;
     }
-    
+
     const channel = supabase.channel(name);
     this.channels.set(name, channel);
     return channel;
@@ -183,7 +195,7 @@ export class RealtimeService {
     this.channels.forEach((_, name) => {
       info.push({
         name,
-        callbacks: this.channelCallbacks.get(name)?.size || 0
+        callbacks: this.channelCallbacks.get(name)?.size || 0,
       });
     });
     return info;

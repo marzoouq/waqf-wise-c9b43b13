@@ -8,18 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Wifi, 
-  WifiOff, 
-  AlertTriangle, 
-  Clock, 
-  Server, 
-  Database, 
+import {
+  Wifi,
+  WifiOff,
+  AlertTriangle,
+  Clock,
+  Server,
+  Database,
   Zap,
   RefreshCw,
   Trash2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useConnectionMonitor, ConnectionEvent } from '@/hooks/system/useConnectionMonitor';
 import { formatDistanceToNow } from 'date-fns';
@@ -67,12 +67,13 @@ export function ConnectionStatusPanel({ compact = false }: ConnectionStatusPanel
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const getStatusIcon = () => {
     if (!isOnline) return <WifiOff className="h-5 w-5 text-red-500" />;
-    if (stats.currentStatus === 'degraded') return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+    if (stats.currentStatus === 'degraded')
+      return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
     return <Wifi className="h-5 w-5 text-green-500" />;
   };
 
@@ -195,14 +196,10 @@ function EventCard({ event }: { event: ConnectionEvent }) {
         <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
           <span>{typeLabels[event.type]}</span>
           <span>•</span>
-          <span>
-            {formatDistanceToNow(event.timestamp, { addSuffix: true, locale: ar })}
-          </span>
+          <span>{formatDistanceToNow(event.timestamp, { addSuffix: true, locale: ar })}</span>
         </div>
         {event.details && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">
-            {event.details}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1 truncate">{event.details}</p>
         )}
         {event.duration && (
           <p className="text-xs text-muted-foreground">

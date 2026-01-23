@@ -3,8 +3,8 @@
  * Add Fiscal Year Dialog
  */
 
-import { useState } from "react";
-import { useCreateFiscalYear } from "@/hooks/fiscal-years/useCreateFiscalYear";
+import { useState } from 'react';
+import { useCreateFiscalYear } from '@/hooks/fiscal-years/useCreateFiscalYear';
 import {
   Dialog,
   DialogContent,
@@ -12,15 +12,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { CalendarIcon, Archive, Save, Loader2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { CalendarIcon, Archive, Save, Loader2 } from 'lucide-react';
 
 interface AddFiscalYearDialogProps {
   open: boolean;
@@ -44,9 +44,9 @@ interface FiscalYearFormData {
 
 export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogProps) {
   const [formData, setFormData] = useState<FiscalYearFormData>({
-    name: "",
-    start_date: "",
-    end_date: "",
+    name: '',
+    start_date: '',
+    end_date: '',
     is_historical: true,
     total_revenues: 0,
     total_expenses: 0,
@@ -54,7 +54,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
     waqif_share: 0,
     beneficiary_distributions: 0,
     waqf_corpus: 0,
-    notes: "",
+    notes: '',
   });
 
   const netIncome = formData.total_revenues - formData.total_expenses;
@@ -67,9 +67,9 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      start_date: "",
-      end_date: "",
+      name: '',
+      start_date: '',
+      end_date: '',
       is_historical: true,
       total_revenues: 0,
       total_expenses: 0,
@@ -77,15 +77,15 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
       waqif_share: 0,
       beneficiary_distributions: 0,
       waqf_corpus: 0,
-      notes: "",
+      notes: '',
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.start_date || !formData.end_date) {
-      toast.error("يرجى ملء جميع الحقول المطلوبة");
+      toast.error('يرجى ملء جميع الحقول المطلوبة');
       return;
     }
 
@@ -93,9 +93,8 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
   };
 
   const updateField = (field: keyof FiscalYearFormData, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,7 +118,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                 id="name"
                 placeholder="مثال: السنة المالية 2023-2024"
                 value={formData.name}
-                onChange={(e) => updateField("name", e.target.value)}
+                onChange={(e) => updateField('name', e.target.value)}
                 required
               />
             </div>
@@ -131,7 +130,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                   id="start_date"
                   type="date"
                   value={formData.start_date}
-                  onChange={(e) => updateField("start_date", e.target.value)}
+                  onChange={(e) => updateField('start_date', e.target.value)}
                   required
                 />
               </div>
@@ -141,7 +140,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                   id="end_date"
                   type="date"
                   value={formData.end_date}
-                  onChange={(e) => updateField("end_date", e.target.value)}
+                  onChange={(e) => updateField('end_date', e.target.value)}
                   required
                 />
               </div>
@@ -162,7 +161,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
               <Switch
                 id="is_historical"
                 checked={formData.is_historical}
-                onCheckedChange={(checked) => updateField("is_historical", checked)}
+                onCheckedChange={(checked) => updateField('is_historical', checked)}
               />
             </div>
           </div>
@@ -171,7 +170,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
           {formData.is_historical && (
             <>
               <Separator />
-              
+
               <div className="space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
                   <Archive className="h-4 w-4" />
@@ -188,8 +187,10 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.total_revenues || ""}
-                      onChange={(e) => updateField("total_revenues", parseFloat(e.target.value) || 0)}
+                      value={formData.total_revenues || ''}
+                      onChange={(e) =>
+                        updateField('total_revenues', parseFloat(e.target.value) || 0)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -200,8 +201,10 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.total_expenses || ""}
-                      onChange={(e) => updateField("total_expenses", parseFloat(e.target.value) || 0)}
+                      value={formData.total_expenses || ''}
+                      onChange={(e) =>
+                        updateField('total_expenses', parseFloat(e.target.value) || 0)
+                      }
                     />
                   </div>
                 </div>
@@ -210,7 +213,9 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                 <div className="p-3 bg-primary/5 rounded-lg border">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">صافي الدخل (محسوب):</span>
-                    <span className={`font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}>
+                    <span
+                      className={`font-bold ${netIncome >= 0 ? 'text-success' : 'text-destructive'}`}
+                    >
                       {netIncome.toLocaleString('ar-SA')} ر.س
                     </span>
                   </div>
@@ -226,8 +231,8 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.nazer_share || ""}
-                      onChange={(e) => updateField("nazer_share", parseFloat(e.target.value) || 0)}
+                      value={formData.nazer_share || ''}
+                      onChange={(e) => updateField('nazer_share', parseFloat(e.target.value) || 0)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -238,8 +243,8 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.waqif_share || ""}
-                      onChange={(e) => updateField("waqif_share", parseFloat(e.target.value) || 0)}
+                      value={formData.waqif_share || ''}
+                      onChange={(e) => updateField('waqif_share', parseFloat(e.target.value) || 0)}
                     />
                   </div>
                 </div>
@@ -253,8 +258,10 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.beneficiary_distributions || ""}
-                      onChange={(e) => updateField("beneficiary_distributions", parseFloat(e.target.value) || 0)}
+                      value={formData.beneficiary_distributions || ''}
+                      onChange={(e) =>
+                        updateField('beneficiary_distributions', parseFloat(e.target.value) || 0)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -265,8 +272,8 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.waqf_corpus || ""}
-                      onChange={(e) => updateField("waqf_corpus", parseFloat(e.target.value) || 0)}
+                      value={formData.waqf_corpus || ''}
+                      onChange={(e) => updateField('waqf_corpus', parseFloat(e.target.value) || 0)}
                     />
                   </div>
                 </div>
@@ -278,7 +285,7 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
                     id="notes"
                     placeholder="أي ملاحظات إضافية عن السنة المالية..."
                     value={formData.notes}
-                    onChange={(e) => updateField("notes", e.target.value)}
+                    onChange={(e) => updateField('notes', e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -287,17 +294,10 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
           )}
 
           <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button
-              type="submit"
-              disabled={isCreating}
-            >
+            <Button type="submit" disabled={isCreating}>
               {isCreating ? (
                 <>
                   <Loader2 className="h-4 w-4 ms-2 animate-spin" />

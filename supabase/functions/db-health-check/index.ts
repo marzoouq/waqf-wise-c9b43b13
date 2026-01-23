@@ -2,22 +2,22 @@
  * 🔒 PROTECTED FILE - ADR-005
  * Edge Function لفحص صحة قاعدة البيانات الشامل
  * Comprehensive Database Health Check Edge Function
- * 
+ *
  * Uses SERVICE_ROLE_KEY for database access.
  * Any change requires: ADR update + Security review
  * See: docs/ARCHITECTURE_DECISIONS.md
- * 
+ *
  * ✅ محمي بـ: JWT + Role Check (admin/nazer) + Rate Limiting
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
-  unauthorizedResponse, 
-  forbiddenResponse 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
+  unauthorizedResponse,
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 10 طلبات/ساعة ============
@@ -25,19 +25,23 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = 10;
 const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 
-function checkRateLimit(identifier: string): { allowed: boolean; remaining: number; resetIn: number } {
+function checkRateLimit(identifier: string): {
+  allowed: boolean;
+  remaining: number;
+  resetIn: number;
+} {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
-  
+
   if (!record || now > record.resetTime) {
     rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_WINDOW });
     return { allowed: true, remaining: RATE_LIMIT - 1, resetIn: RATE_WINDOW };
   }
-  
+
   if (record.count >= RATE_LIMIT) {
     return { allowed: false, remaining: 0, resetIn: record.resetTime - now };
   }
-  
+
   record.count++;
   return { allowed: true, remaining: RATE_LIMIT - record.count, resetIn: record.resetTime - now };
 }
@@ -107,21 +111,23 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
-        
+
         // ✅ Health Check Support
         if (bodyData.ping || bodyData.healthCheck || bodyData.testMode) {
           console.log('[db-health-check] Health check received');
           return jsonResponse({
             status: 'healthy',
             function: 'db-health-check',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // ============ المصادقة والتفويض ============
@@ -132,38 +138,44 @@ serve(async (req) => {
     // 1️⃣ فحص CRON_SECRET للمهام المجدولة
     const cronSecret = req.headers.get('x-cron-secret');
     const expectedCronSecret = Deno.env.get('CRON_SECRET');
-    
+
     if (cronSecret && expectedCronSecret && cronSecret === expectedCronSecret) {
       isAuthorized = true;
       authMethod = 'cron';
       console.log('[db-health-check] ✅ Authorized via CRON_SECRET');
-      
+
       // Rate limiting للمهام المجدولة
       const rateLimitResult = checkRateLimit('cron_db_health');
       if (!rateLimitResult.allowed) {
         console.warn('[db-health-check] Rate limit exceeded for CRON');
-        return errorResponse(`تجاوز الحد المسموح. يرجى الانتظار ${Math.ceil(rateLimitResult.resetIn / 60000)} دقيقة.`, 429);
+        return errorResponse(
+          `تجاوز الحد المسموح. يرجى الانتظار ${Math.ceil(rateLimitResult.resetIn / 60000)} دقيقة.`,
+          429
+        );
       }
     }
 
     // 2️⃣ فحص JWT للمستخدمين
     if (!isAuthorized) {
       const authHeader = req.headers.get('Authorization');
-      
+
       if (!authHeader) {
         console.warn('[db-health-check] ❌ No authentication provided');
         return unauthorizedResponse('المصادقة مطلوبة - يرجى تسجيل الدخول');
       }
 
       const token = authHeader.replace('Bearer ', '');
-      
+
       const supabaseAuth = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_ANON_KEY') ?? ''
       );
 
-      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-      
+      const {
+        data: { user },
+        error: authError,
+      } = await supabaseAuth.auth.getUser(token);
+
       if (authError || !user) {
         console.warn('[db-health-check] ❌ Invalid token:', authError?.message);
         return unauthorizedResponse('جلسة غير صالحة - يرجى إعادة تسجيل الدخول');
@@ -186,11 +198,13 @@ serve(async (req) => {
       }
 
       const allowedRoles = ['admin', 'nazer'];
-      const hasAccess = roles?.some(r => allowedRoles.includes(r.role));
+      const hasAccess = roles?.some((r) => allowedRoles.includes(r.role));
 
       if (!hasAccess) {
         console.warn(`[db-health-check] ❌ Forbidden - User ${user.id} lacks required role`);
-        return forbiddenResponse('ليس لديك صلاحية لعرض صحة قاعدة البيانات - يتطلب صلاحية مدير أو ناظر');
+        return forbiddenResponse(
+          'ليس لديك صلاحية لعرض صحة قاعدة البيانات - يتطلب صلاحية مدير أو ناظر'
+        );
       }
 
       isAuthorized = true;
@@ -209,7 +223,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch all health data in parallel
@@ -270,18 +284,14 @@ serve(async (req) => {
       action_type: 'db_health_check',
       user_id: authorizedUserId,
       description: `فحص صحة قاعدة البيانات (${authMethod})`,
-      new_values: { summary }
+      new_values: { summary },
     });
 
     console.log('[db-health-check] Health check completed successfully');
 
     return jsonResponse({ success: true, data: report });
-
   } catch (error) {
     console.error('[db-health-check] Error:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'خطأ غير معروف',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'خطأ غير معروف', 500);
   }
 });

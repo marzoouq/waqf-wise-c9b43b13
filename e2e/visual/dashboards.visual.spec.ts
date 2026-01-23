@@ -1,4 +1,10 @@
-import { test, expect, enableDarkMode, enableLightMode, waitForPageStability } from '../fixtures/visual-test.fixture';
+import {
+  test,
+  expect,
+  enableDarkMode,
+  enableLightMode,
+  waitForPageStability,
+} from '../fixtures/visual-test.fixture';
 
 /**
  * Dashboards Visual Regression Tests
@@ -181,7 +187,7 @@ test.describe('Beneficiary Portal Visual Tests', () => {
   test('beneficiary mobile bottom nav @visual @dashboard', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.waitForTimeout(500);
-    
+
     const bottomNav = page.locator('[class*="bottom"], [aria-label*="تنقل"]').first();
     if (await bottomNav.isVisible()) {
       await expect(bottomNav).toHaveScreenshot('dashboard-beneficiary-bottom-nav.png', {
@@ -193,15 +199,13 @@ test.describe('Beneficiary Portal Visual Tests', () => {
 
 // اختبارات مقارنة الثيمات للوحات التحكم
 test.describe('Dashboard Theme Comparison Tests', () => {
-  
   for (const dashboard of dashboards) {
     test.describe(`${dashboard.name} Theme Comparison`, () => {
-      
       test(`${dashboard.name} - light mode @visual @dashboard @theme`, async ({ page }) => {
         await page.goto(dashboard.path);
         await waitForPageStability(page);
         await enableLightMode(page);
-        
+
         await expect(page).toHaveScreenshot(`dashboard-${dashboard.name}-light.png`, {
           fullPage: true,
           animations: 'disabled',
@@ -212,17 +216,19 @@ test.describe('Dashboard Theme Comparison Tests', () => {
         await page.goto(dashboard.path);
         await waitForPageStability(page);
         await enableDarkMode(page);
-        
+
         await expect(page).toHaveScreenshot(`dashboard-${dashboard.name}-dark.png`, {
           fullPage: true,
           animations: 'disabled',
         });
       });
 
-      test(`${dashboard.name} - sidebar light vs dark @visual @dashboard @theme`, async ({ page }) => {
+      test(`${dashboard.name} - sidebar light vs dark @visual @dashboard @theme`, async ({
+        page,
+      }) => {
         await page.goto(dashboard.path);
         await waitForPageStability(page);
-        
+
         const sidebar = page.locator('[class*="sidebar"], aside, nav').first();
         if (await sidebar.isVisible()) {
           // Light mode
@@ -230,7 +236,7 @@ test.describe('Dashboard Theme Comparison Tests', () => {
           await expect(sidebar).toHaveScreenshot(`dashboard-${dashboard.name}-sidebar-light.png`, {
             animations: 'disabled',
           });
-          
+
           // Dark mode
           await enableDarkMode(page);
           await expect(sidebar).toHaveScreenshot(`dashboard-${dashboard.name}-sidebar-dark.png`, {
@@ -239,10 +245,12 @@ test.describe('Dashboard Theme Comparison Tests', () => {
         }
       });
 
-      test(`${dashboard.name} - cards light vs dark @visual @dashboard @theme`, async ({ page }) => {
+      test(`${dashboard.name} - cards light vs dark @visual @dashboard @theme`, async ({
+        page,
+      }) => {
         await page.goto(dashboard.path);
         await waitForPageStability(page);
-        
+
         const cards = page.locator('[class*="card"], [class*="Card"]').first();
         if (await cards.isVisible()) {
           // Light mode
@@ -250,7 +258,7 @@ test.describe('Dashboard Theme Comparison Tests', () => {
           await expect(cards).toHaveScreenshot(`dashboard-${dashboard.name}-cards-light.png`, {
             animations: 'disabled',
           });
-          
+
           // Dark mode
           await enableDarkMode(page);
           await expect(cards).toHaveScreenshot(`dashboard-${dashboard.name}-cards-dark.png`, {
@@ -272,18 +280,17 @@ test.describe('Dashboard Responsive Tests', () => {
 
   for (const dashboard of dashboards) {
     for (const viewport of viewports) {
-      test(`${dashboard.name} - ${viewport.name} @visual @dashboard @responsive`, async ({ page }) => {
+      test(`${dashboard.name} - ${viewport.name} @visual @dashboard @responsive`, async ({
+        page,
+      }) => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await page.goto(dashboard.path);
         await waitForPageStability(page);
-        
-        await expect(page).toHaveScreenshot(
-          `dashboard-${dashboard.name}-${viewport.name}.png`,
-          {
-            fullPage: true,
-            animations: 'disabled',
-          }
-        );
+
+        await expect(page).toHaveScreenshot(`dashboard-${dashboard.name}-${viewport.name}.png`, {
+          fullPage: true,
+          animations: 'disabled',
+        });
       });
     }
   }
@@ -291,24 +298,25 @@ test.describe('Dashboard Responsive Tests', () => {
 
 // اختبارات التفاعل مع القائمة الجانبية
 test.describe('Dashboard Sidebar Interaction Tests', () => {
-  
   test('admin sidebar collapse/expand @visual @dashboard', async ({ page }) => {
     await page.goto('/dashboard');
     await waitForPageStability(page);
-    
+
     // البحث عن زر طي القائمة
-    const collapseBtn = page.locator('[aria-label*="collapse"], [aria-label*="طي"], button:has([class*="chevron"])').first();
-    
+    const collapseBtn = page
+      .locator('[aria-label*="collapse"], [aria-label*="طي"], button:has([class*="chevron"])')
+      .first();
+
     if (await collapseBtn.isVisible()) {
       // الحالة الموسعة
       await expect(page).toHaveScreenshot('dashboard-sidebar-expanded.png', {
         animations: 'disabled',
       });
-      
+
       // النقر للطي
       await collapseBtn.click();
       await page.waitForTimeout(500);
-      
+
       // الحالة المطوية
       await expect(page).toHaveScreenshot('dashboard-sidebar-collapsed.png', {
         animations: 'disabled',
@@ -320,14 +328,14 @@ test.describe('Dashboard Sidebar Interaction Tests', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/dashboard');
     await waitForPageStability(page);
-    
+
     // البحث عن زر فتح القائمة
     const menuBtn = page.locator('[aria-label*="menu"], [aria-label*="قائمة"]').first();
-    
+
     if (await menuBtn.isVisible()) {
       await menuBtn.click();
       await page.waitForTimeout(500);
-      
+
       await expect(page).toHaveScreenshot('dashboard-mobile-drawer-open.png', {
         animations: 'disabled',
       });

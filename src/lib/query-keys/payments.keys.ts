@@ -9,7 +9,8 @@ export const PAYMENTS_KEYS = {
   PAYMENT_VOUCHERS: ['payment_vouchers'] as const,
   PAYMENT_VOUCHER: (id: string) => ['payment_voucher', id] as const,
   PAYMENT_VOUCHERS_LIST: ['payment-vouchers-list'] as const,
-  PAYMENT_VOUCHERS_FILTERED: (searchTerm?: string, status?: string) => ['payment-vouchers', searchTerm, status] as const,
+  PAYMENT_VOUCHERS_FILTERED: (searchTerm?: string, status?: string) =>
+    ['payment-vouchers', searchTerm, status] as const,
   PAYMENTS_WITH_APPROVALS: ['payments_with_approvals'] as const,
   PAYMENTS_WITH_CONTRACTS: (count: number) => ['payments-with-contracts', count] as const,
   PAYMENT_SCHEDULES: (distributionId?: string) => ['payment-schedules', distributionId] as const,
@@ -21,8 +22,10 @@ export const PAYMENTS_KEYS = {
   DISTRIBUTION_DETAILS: (id: string) => ['distribution-details', id] as const,
   HEIR_DISTRIBUTIONS: ['heir-distributions'] as const,
   DISTRIBUTIONS_WITH_APPROVALS: ['distributions_with_approvals'] as const,
-  DISTRIBUTION_VOUCHERS_TAB: (distributionId: string) => ['distribution-vouchers-tab', distributionId] as const,
-  DISTRIBUTION_VOUCHERS_STATS_TAB: (distributionId: string) => ['distribution-vouchers-stats-tab', distributionId] as const,
+  DISTRIBUTION_VOUCHERS_TAB: (distributionId: string) =>
+    ['distribution-vouchers-tab', distributionId] as const,
+  DISTRIBUTION_VOUCHERS_STATS_TAB: (distributionId: string) =>
+    ['distribution-vouchers-stats-tab', distributionId] as const,
   DISTRIBUTION_ANALYSIS: ['distribution-analysis'] as const,
   DISTRIBUTION_STATUS_STATS: ['distribution-status-stats'] as const,
   DISTRIBUTION_SETTINGS: ['distribution-settings'] as const,
@@ -59,7 +62,8 @@ export const PAYMENTS_KEYS = {
   POS: ['pos'] as const,
   POS_CURRENT_SHIFT: ['pos', 'current-shift'] as const,
   POS_SHIFTS: ['pos', 'shifts'] as const,
-  POS_SHIFTS_REPORT: (startDate?: string, endDate?: string) => ['pos-shifts-report', startDate, endDate] as const,
+  POS_SHIFTS_REPORT: (startDate?: string, endDate?: string) =>
+    ['pos-shifts-report', startDate, endDate] as const,
   POS_DAILY_STATS: (date: string) => ['pos-daily-stats', date] as const,
   POS_SHIFT_STATS: (shiftId: string) => ['pos-shift-stats', shiftId] as const,
 

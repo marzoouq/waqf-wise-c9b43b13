@@ -3,11 +3,11 @@
  * @version 2.9.43
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { InvoiceLine } from "@/types/invoice-line";
+import { supabase } from '@/integrations/supabase/client';
+import type { InvoiceLine } from '@/types/invoice-line';
 
 // إعادة تصدير للتوافق
-export type { InvoiceLine } from "@/types/invoice-line";
+export type { InvoiceLine } from '@/types/invoice-line';
 
 export interface InvoiceData {
   id: string;
@@ -72,7 +72,9 @@ export const DocumentService = {
   /**
    * جلب بيانات الفاتورة مع البنود
    */
-  async getInvoiceWithLines(invoiceId: string): Promise<{ invoice: InvoiceData; lines: InvoiceLine[] } | null> {
+  async getInvoiceWithLines(
+    invoiceId: string
+  ): Promise<{ invoice: InvoiceData; lines: InvoiceLine[] } | null> {
     const { data, error } = await supabase
       .from('invoices')
       .select('*, invoice_lines(*)')
@@ -110,7 +112,9 @@ export const DocumentService = {
   async getReceipt(receiptId: string): Promise<ReceiptData | null> {
     const { data, error } = await supabase
       .from('payments')
-      .select('id, payment_number, payment_date, amount, description, payment_method, beneficiary_id, reference_number, payer_name')
+      .select(
+        'id, payment_number, payment_date, amount, description, payment_method, beneficiary_id, reference_number, payer_name'
+      )
       .eq('id', receiptId)
       .maybeSingle();
 
@@ -121,7 +125,9 @@ export const DocumentService = {
   /**
    * البحث عن مستند مؤرشف
    */
-  async findArchivedDocument(documentName: string): Promise<{ id: string; name: string; file_path: string } | null> {
+  async findArchivedDocument(
+    documentName: string
+  ): Promise<{ id: string; name: string; file_path: string } | null> {
     const { data, error } = await supabase
       .from('documents')
       .select('id, name, file_path')
@@ -138,7 +144,9 @@ export const DocumentService = {
   async getOrganizationSettings(): Promise<OrganizationSettings | null> {
     const { data, error } = await supabase
       .from('organization_settings')
-      .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
+      .select(
+        'id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number'
+      )
       .maybeSingle();
 
     if (error) throw error;

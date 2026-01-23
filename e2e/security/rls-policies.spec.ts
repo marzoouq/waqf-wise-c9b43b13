@@ -4,7 +4,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 /**
  * Real RLS (Row Level Security) Policy Tests
  * اختبارات سياسات أمان صف البيانات الحقيقية
- * 
+ *
  * تتصل هذه الاختبارات بـ Supabase الفعلي للتحقق من policies
  */
 
@@ -55,7 +55,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to beneficiaries table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, error } = await supabase.from('beneficiaries').select('*').limit(1);
+      const { data } = await supabase.from('beneficiaries').select('*').limit(1);
 
       // Should return empty or error due to RLS
       expect(data?.length || 0).toBe(0);
@@ -64,7 +64,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to audit_logs table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, error } = await supabase.from('audit_logs').select('*').limit(1);
+      const { data } = await supabase.from('audit_logs').select('*').limit(1);
 
       expect(data?.length || 0).toBe(0);
     });
@@ -91,7 +91,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         console.warn('⚠️ Beneficiary test user not available:', authError.message);
         test.skip();
@@ -107,7 +107,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
           expect(b.user_id).toBe(user.user?.id);
         });
       }
-      
+
       expect(beneficiaries?.length).toBeLessThanOrEqual(1);
     });
 
@@ -115,14 +115,14 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.admin);
-      
+
       if (authError) {
         console.warn('⚠️ Admin test user not available:', authError.message);
         test.skip();
         return;
       }
 
-      const { data: beneficiaries, error } = await supabase.from('beneficiaries').select('*').limit(10);
+      const { error } = await supabase.from('beneficiaries').select('*').limit(10);
 
       // Admin should have access
       expect(error).toBeNull();
@@ -133,7 +133,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.nazer);
-      
+
       if (authError) {
         console.warn('⚠️ Nazer test user not available:', authError.message);
         test.skip();
@@ -152,7 +152,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
 
       // Try as nazer first
       const { error: nazerAuthError } = await supabase.auth.signInWithPassword(TEST_USERS.nazer);
-      
+
       if (!nazerAuthError) {
         const { data: nazerData } = await supabase.from('audit_logs').select('*').limit(1);
         // Nazer should not see audit logs (or empty result)
@@ -163,7 +163,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
 
       // Try as admin
       const { error: adminAuthError } = await supabase.auth.signInWithPassword(TEST_USERS.admin);
-      
+
       if (!adminAuthError) {
         const { data: adminData, error } = await supabase.from('audit_logs').select('*').limit(1);
         // Admin should have access
@@ -175,14 +175,14 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
       }
 
       const { data } = await supabase.from('audit_logs').select('*').limit(1);
-      
+
       expect(data?.length || 0).toBe(0);
     });
   });
@@ -192,7 +192,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -214,7 +214,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.accountant);
-      
+
       if (authError) {
         console.warn('⚠️ Accountant test user not available');
         test.skip();
@@ -230,7 +230,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.accountant);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -247,7 +247,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.nazer);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -262,7 +262,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -280,7 +280,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -297,7 +297,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
 
       // Try as beneficiary
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -318,7 +318,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -340,7 +340,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -361,7 +361,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;
@@ -382,7 +382,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
       const { error: authError } = await supabase.auth.signInWithPassword(TEST_USERS.beneficiary);
-      
+
       if (authError) {
         test.skip();
         return;

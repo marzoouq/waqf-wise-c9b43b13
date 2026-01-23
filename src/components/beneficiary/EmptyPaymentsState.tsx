@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Receipt, TrendingUp } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Receipt, TrendingUp } from 'lucide-react';
 
 export function EmptyPaymentsState() {
   return (
@@ -10,9 +10,7 @@ export function EmptyPaymentsState() {
             <Receipt className="h-12 w-12 text-primary/70" />
           </div>
         </div>
-        <h3 className="text-lg font-semibold mb-2 text-foreground">
-          لا توجد مدفوعات حتى الآن
-        </h3>
+        <h3 className="text-lg font-semibold mb-2 text-foreground">لا توجد مدفوعات حتى الآن</h3>
         <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
           عند صرف المستحقات، ستظهر جميع التفاصيل المالية هنا بشفافية كاملة
         </p>

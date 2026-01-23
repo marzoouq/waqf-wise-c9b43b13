@@ -1,8 +1,8 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Landmark, Menu, X } from "lucide-react";
-import { useState, useCallback } from "react";
-import { cn } from "@/lib/utils";
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Landmark, Menu, X } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,36 +10,39 @@ export function LandingHeader() {
   const navigate = useNavigate();
 
   const navLinks = [
-    { label: "الرئيسية", href: "#hero" },
-    { label: "المميزات", href: "#features" },
-    { label: "عن المنصة", href: "#stats" },
-    { label: "كيف يعمل", href: "#how-it-works" },
+    { label: 'الرئيسية', href: '#hero' },
+    { label: 'المميزات', href: '#features' },
+    { label: 'عن المنصة', href: '#stats' },
+    { label: 'كيف يعمل', href: '#how-it-works' },
   ];
 
-  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    
-    const sectionId = href.replace("#", "");
-    
-    // إذا لم نكن في الصفحة الرئيسية، انتقل إليها أولاً
-    if (location.pathname !== "/") {
-      navigate("/" + href);
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      e.preventDefault();
+
+      const sectionId = href.replace('#', '');
+
+      // إذا لم نكن في الصفحة الرئيسية، انتقل إليها أولاً
+      if (location.pathname !== '/') {
+        navigate('/' + href);
+        setIsMenuOpen(false);
+        return;
+      }
+
+      // إذا كنا في الصفحة الرئيسية، انتقل للقسم مباشرة
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
       setIsMenuOpen(false);
-      return;
-    }
-    
-    // إذا كنا في الصفحة الرئيسية، انتقل للقسم مباشرة
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    
-    setIsMenuOpen(false);
-  }, [location.pathname, navigate]);
+    },
+    [location.pathname, navigate]
+  );
 
   const toggleMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIsMenuOpen(prev => !prev);
+    setIsMenuOpen((prev) => !prev);
   }, []);
 
   return (
@@ -99,8 +102,8 @@ export function LandingHeader() {
         {/* Mobile Menu */}
         <div
           className={cn(
-            "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isMenuOpen ? "max-h-[400px] pb-4 opacity-100" : "max-h-0 opacity-0"
+            'md:hidden overflow-hidden transition-all duration-300 ease-in-out',
+            isMenuOpen ? 'max-h-[400px] pb-4 opacity-100' : 'max-h-0 opacity-0'
           )}
         >
           <nav className="flex flex-col gap-1 pt-2">
@@ -116,9 +119,7 @@ export function LandingHeader() {
             ))}
             <div className="flex flex-col gap-2 mt-4 px-4">
               <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full">
-                  تسجيل الدخول
-                </Button>
+                <Button className="w-full">تسجيل الدخول</Button>
               </Link>
             </div>
           </nav>

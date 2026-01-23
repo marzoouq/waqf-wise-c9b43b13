@@ -1,4 +1,9 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ThumbsUp, Eye } from 'lucide-react';
@@ -32,16 +37,16 @@ export function FAQAccordion({ faqs, onRate }: FAQAccordionProps) {
   return (
     <Accordion type="single" collapsible className="w-full space-y-2">
       {faqs.map((faq) => (
-        <AccordionItem 
-          key={faq.id} 
+        <AccordionItem
+          key={faq.id}
           value={faq.id}
           className="border rounded-lg px-4 hover:shadow-md transition-shadow"
         >
           <AccordionTrigger className="hover:no-underline">
             <div className="flex items-start justify-between w-full gap-4">
               <span className="text-right font-medium">{faq.question}</span>
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={categoryColors[faq.category as keyof typeof categoryColors]}
               >
                 {getCategoryLabel(faq.category)}
@@ -49,10 +54,8 @@ export function FAQAccordion({ faqs, onRate }: FAQAccordionProps) {
             </div>
           </AccordionTrigger>
           <AccordionContent className="text-right space-y-4">
-            <div className="text-muted-foreground whitespace-pre-line">
-              {faq.answer}
-            </div>
-            
+            <div className="text-muted-foreground whitespace-pre-line">{faq.answer}</div>
+
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
@@ -64,13 +67,9 @@ export function FAQAccordion({ faqs, onRate }: FAQAccordionProps) {
                   {faq.helpful_count || 0} مفيدة
                 </span>
               </div>
-              
+
               {onRate && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onRate(faq.id)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => onRate(faq.id)}>
                   <ThumbsUp className="h-4 w-4 ms-2" />
                   مفيدة
                 </Button>

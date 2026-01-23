@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Printer, CheckCircle, UserCheck } from "lucide-react";
-import { matchesStatus } from "@/lib/constants";
-import { Badge } from "@/components/ui/badge";
-import ApprovalDialog from "./ApprovalDialog";
+import { useState } from 'react';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Printer, CheckCircle, UserCheck } from 'lucide-react';
+import { matchesStatus } from '@/lib/constants';
+import { Badge } from '@/components/ui/badge';
+import ApprovalDialog from './ApprovalDialog';
 import {
   Table,
   TableBody,
@@ -13,10 +13,10 @@ import {
   TableHeader,
   TableRow,
   TableFooter,
-} from "@/components/ui/table";
-import { format, arLocale as ar } from "@/lib/date";
-import { BadgeVariant } from "@/types";
-import { useViewJournalEntry } from "@/hooks/accounting/useViewJournalEntry";
+} from '@/components/ui/table';
+import { format, arLocale as ar } from '@/lib/date';
+import { BadgeVariant } from '@/types';
+import { useViewJournalEntry } from '@/hooks/accounting/useViewJournalEntry';
 
 type JournalEntry = {
   id: string;
@@ -35,14 +35,11 @@ type Props = {
 
 const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
-  
-  const {
-    lines,
-    totalDebit,
-    totalCredit,
-    postEntry,
-    isPosting,
-  } = useViewJournalEntry(entry.id, open);
+
+  const { lines, totalDebit, totalCredit, postEntry, isPosting } = useViewJournalEntry(
+    entry.id,
+    open
+  );
 
   const handlePrint = () => {
     window.print();
@@ -57,18 +54,18 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: BadgeVariant }> = {
-      draft: { label: "مسودة", variant: "secondary" },
-      posted: { label: "مرحّل", variant: "default" },
-      cancelled: { label: "ملغى", variant: "destructive" },
+      draft: { label: 'مسودة', variant: 'secondary' },
+      posted: { label: 'مرحّل', variant: 'default' },
+      cancelled: { label: 'ملغى', variant: 'destructive' },
     };
-    const config = variants[status] || { label: status, variant: "outline" };
+    const config = variants[status] || { label: status, variant: 'outline' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   return (
     <>
-      <ResponsiveDialog 
-        open={open} 
+      <ResponsiveDialog
+        open={open}
         onOpenChange={onOpenChange}
         title="تفاصيل القيد المحاسبي"
         size="xl"
@@ -82,7 +79,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
             <div>
               <div className="text-sm text-muted-foreground">التاريخ</div>
               <div className="font-semibold">
-                {format(new Date(entry.entry_date), "dd MMMM yyyy", { locale: ar })}
+                {format(new Date(entry.entry_date), 'dd MMMM yyyy', { locale: ar })}
               </div>
             </div>
             <div>
@@ -93,7 +90,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
               <div>
                 <div className="text-sm text-muted-foreground">تاريخ الترحيل</div>
                 <div className="font-semibold">
-                  {format(new Date(entry.posted_at), "dd MMMM yyyy", { locale: ar })}
+                  {format(new Date(entry.posted_at), 'dd MMMM yyyy', { locale: ar })}
                 </div>
               </div>
             )}
@@ -121,10 +118,10 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
                   </TableCell>
                   <TableCell>{line.description}</TableCell>
                   <TableCell className="text-center font-mono">
-                    {Number(line.debit_amount) > 0 ? Number(line.debit_amount).toFixed(2) : "-"}
+                    {Number(line.debit_amount) > 0 ? Number(line.debit_amount).toFixed(2) : '-'}
                   </TableCell>
                   <TableCell className="text-center font-mono">
-                    {Number(line.credit_amount) > 0 ? Number(line.credit_amount).toFixed(2) : "-"}
+                    {Number(line.credit_amount) > 0 ? Number(line.credit_amount).toFixed(2) : '-'}
                   </TableCell>
                 </TableRow>
               ))}

@@ -3,10 +3,10 @@
  * @version 2.8.44
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { FiscalYearService } from "@/services";
-import type { ClosingPreview, FiscalYearSummary } from "@/types/fiscal-year-closing";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { FiscalYearService } from '@/services';
+import type { ClosingPreview, FiscalYearSummary } from '@/types/fiscal-year-closing';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useClosingPreview(fiscalYearId: string, enabled: boolean = true) {
   return useQuery({

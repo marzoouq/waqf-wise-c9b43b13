@@ -3,9 +3,9 @@
  * @version 2.8.67
  */
 
-import { useState } from "react";
-import { EdgeFunctionService } from "@/services";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { EdgeFunctionService } from '@/services';
+import { toast } from 'sonner';
 
 type ZATCAStatus = 'pending' | 'success' | 'error';
 
@@ -16,7 +16,11 @@ export function useZATCASubmit() {
   const submitToZATCA = async (invoiceId: string) => {
     setIsSubmitting(true);
     try {
-      const result = await EdgeFunctionService.invoke<{ success: boolean; submissionId?: string; error?: string }>('zatca-submit', {
+      const result = await EdgeFunctionService.invoke<{
+        success: boolean;
+        submissionId?: string;
+        error?: string;
+      }>('zatca-submit', {
         invoiceId,
       });
 
@@ -24,21 +28,21 @@ export function useZATCASubmit() {
 
       if (result.data?.success) {
         setZatcaStatus('success');
-        toast.success("تم إرسال الفاتورة إلى هيئة الزكاة والضريبة", {
+        toast.success('تم إرسال الفاتورة إلى هيئة الزكاة والضريبة', {
           description: `رقم الإرسال: ${result.data.submissionId}`,
         });
         return true;
       } else {
         setZatcaStatus('error');
-        toast.error("فشل إرسال الفاتورة", {
-          description: result.data?.error || "حدث خطأ غير متوقع",
+        toast.error('فشل إرسال الفاتورة', {
+          description: result.data?.error || 'حدث خطأ غير متوقع',
         });
         return false;
       }
     } catch {
       setZatcaStatus('error');
-      toast.error("خطأ في الاتصال", {
-        description: "تعذر الاتصال بخدمة هيئة الزكاة والضريبة",
+      toast.error('خطأ في الاتصال', {
+        description: 'تعذر الاتصال بخدمة هيئة الزكاة والضريبة',
       });
       return false;
     } finally {

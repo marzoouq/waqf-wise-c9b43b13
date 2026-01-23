@@ -1,14 +1,19 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-react";
-import { useCashFlowCalculation } from "@/hooks/accounting/useCashFlowCalculation";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyAccountingState } from "./EmptyAccountingState";
-import { format, arLocale as ar } from "@/lib/date";
-import { toast } from "sonner";
-import { formatCurrency, formatNumber } from "@/lib/utils";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { useCashFlowCalculation } from '@/hooks/accounting/useCashFlowCalculation';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { EmptyAccountingState } from './EmptyAccountingState';
+import { format, arLocale as ar } from '@/lib/date';
+import { toast } from 'sonner';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  WAQF_COLORS,
+} from '@/lib/pdf/arabic-pdf-utils';
 
 export function CashFlowStatement() {
   const { isLoading, isCalculating, latestFlow, handleCalculate } = useCashFlowCalculation();
@@ -23,120 +28,120 @@ export function CashFlowStatement() {
 
   const handleExport = async () => {
     if (!latestFlow) {
-      toast.error("لا توجد بيانات للتصدير");
+      toast.error('لا توجد بيانات للتصدير');
       return;
     }
 
     try {
       const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF();
-      
+
       // تحميل الخط العربي
       const fontName = await loadArabicFontToPDF(doc);
-      
+
       // إضافة ترويسة الوقف
       let yPos = addWaqfHeader(doc, fontName, 'قائمة التدفقات النقدية');
-      
+
       // الفترة
-      doc.setFont(fontName, "normal");
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(10);
       doc.setTextColor(...WAQF_COLORS.muted);
       const pageWidth = doc.internal.pageSize.width;
-      const periodText = `من ${format(new Date(latestFlow.period_start), "dd/MM/yyyy")} إلى ${format(new Date(latestFlow.period_end), "dd/MM/yyyy")}`;
-      doc.text(periodText, pageWidth / 2, yPos, { align: "center" });
+      const periodText = `من ${format(new Date(latestFlow.period_start), 'dd/MM/yyyy')} إلى ${format(new Date(latestFlow.period_end), 'dd/MM/yyyy')}`;
+      doc.text(periodText, pageWidth / 2, yPos, { align: 'center' });
       yPos += 15;
-      
+
       // التدفقات التشغيلية
-      doc.setFont(fontName, "bold");
+      doc.setFont(fontName, 'bold');
       doc.setFontSize(12);
       doc.setTextColor(...WAQF_COLORS.primary);
       doc.setFillColor(240, 240, 240);
-      doc.rect(15, yPos - 5, 180, 10, "F");
-      doc.text("التدفقات النقدية من الأنشطة التشغيلية", pageWidth - 20, yPos, { align: "right" });
+      doc.rect(15, yPos - 5, 180, 10, 'F');
+      doc.text('التدفقات النقدية من الأنشطة التشغيلية', pageWidth - 20, yPos, { align: 'right' });
       yPos += 12;
-      
-      doc.setFont(fontName, "normal");
+
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      doc.text("صافي التدفقات التشغيلية:", pageWidth - 25, yPos, { align: "right" });
-      doc.text(`${formatNumber(latestFlow.operating_activities)} ر.س`, 25, yPos, { align: "left" });
+      doc.text('صافي التدفقات التشغيلية:', pageWidth - 25, yPos, { align: 'right' });
+      doc.text(`${formatNumber(latestFlow.operating_activities)} ر.س`, 25, yPos, { align: 'left' });
       yPos += 15;
-      
+
       // التدفقات الاستثمارية
-      doc.setFont(fontName, "bold");
+      doc.setFont(fontName, 'bold');
       doc.setFontSize(12);
       doc.setTextColor(...WAQF_COLORS.primary);
       doc.setFillColor(240, 240, 240);
-      doc.rect(15, yPos - 5, 180, 10, "F");
-      doc.text("التدفقات النقدية من الأنشطة الاستثمارية", pageWidth - 20, yPos, { align: "right" });
+      doc.rect(15, yPos - 5, 180, 10, 'F');
+      doc.text('التدفقات النقدية من الأنشطة الاستثمارية', pageWidth - 20, yPos, { align: 'right' });
       yPos += 12;
-      
-      doc.setFont(fontName, "normal");
+
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      doc.text("صافي التدفقات الاستثمارية:", pageWidth - 25, yPos, { align: "right" });
-      doc.text(`${formatNumber(latestFlow.investing_activities)} ر.س`, 25, yPos, { align: "left" });
+      doc.text('صافي التدفقات الاستثمارية:', pageWidth - 25, yPos, { align: 'right' });
+      doc.text(`${formatNumber(latestFlow.investing_activities)} ر.س`, 25, yPos, { align: 'left' });
       yPos += 15;
-      
+
       // التدفقات التمويلية
-      doc.setFont(fontName, "bold");
+      doc.setFont(fontName, 'bold');
       doc.setFontSize(12);
       doc.setTextColor(...WAQF_COLORS.primary);
       doc.setFillColor(240, 240, 240);
-      doc.rect(15, yPos - 5, 180, 10, "F");
-      doc.text("التدفقات النقدية من الأنشطة التمويلية", pageWidth - 20, yPos, { align: "right" });
+      doc.rect(15, yPos - 5, 180, 10, 'F');
+      doc.text('التدفقات النقدية من الأنشطة التمويلية', pageWidth - 20, yPos, { align: 'right' });
       yPos += 12;
-      
-      doc.setFont(fontName, "normal");
+
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
-      doc.text("صافي التدفقات التمويلية:", pageWidth - 25, yPos, { align: "right" });
-      doc.text(`${formatNumber(latestFlow.financing_activities)} ر.س`, 25, yPos, { align: "left" });
+      doc.text('صافي التدفقات التمويلية:', pageWidth - 25, yPos, { align: 'right' });
+      doc.text(`${formatNumber(latestFlow.financing_activities)} ر.س`, 25, yPos, { align: 'left' });
       yPos += 20;
-      
+
       // خط فاصل
       doc.setLineWidth(0.5);
       doc.setDrawColor(...WAQF_COLORS.primary);
       doc.line(15, yPos, 195, yPos);
       yPos += 10;
-      
+
       // صافي التدفق النقدي
-      doc.setFont(fontName, "bold");
+      doc.setFont(fontName, 'bold');
       doc.setFontSize(14);
-      doc.text("صافي التغير في النقد:", pageWidth - 20, yPos, { align: "right" });
+      doc.text('صافي التغير في النقد:', pageWidth - 20, yPos, { align: 'right' });
       if (latestFlow.net_cash_flow >= 0) {
         doc.setTextColor(0, 150, 0);
       } else {
         doc.setTextColor(200, 0, 0);
       }
-      doc.text(`${formatNumber(latestFlow.net_cash_flow)} ر.س`, 25, yPos, { align: "left" });
+      doc.text(`${formatNumber(latestFlow.net_cash_flow)} ر.س`, 25, yPos, { align: 'left' });
       doc.setTextColor(0, 0, 0);
       yPos += 12;
-      
+
       // النقد في بداية ونهاية الفترة
-      doc.setFont(fontName, "normal");
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(10);
-      doc.text("النقد في بداية الفترة:", pageWidth - 25, yPos, { align: "right" });
-      doc.text(`${formatNumber(latestFlow.opening_cash)} ر.س`, 25, yPos, { align: "left" });
+      doc.text('النقد في بداية الفترة:', pageWidth - 25, yPos, { align: 'right' });
+      doc.text(`${formatNumber(latestFlow.opening_cash)} ر.س`, 25, yPos, { align: 'left' });
       yPos += 8;
-      
-      doc.setFont(fontName, "bold");
-      doc.text("النقد في نهاية الفترة:", pageWidth - 25, yPos, { align: "right" });
+
+      doc.setFont(fontName, 'bold');
+      doc.text('النقد في نهاية الفترة:', pageWidth - 25, yPos, { align: 'right' });
       doc.setTextColor(...WAQF_COLORS.primary);
-      doc.text(`${formatNumber(latestFlow.closing_cash)} ر.س`, 25, yPos, { align: "left" });
-      
+      doc.text(`${formatNumber(latestFlow.closing_cash)} ر.س`, 25, yPos, { align: 'left' });
+
       // إضافة التذييل
       addWaqfFooter(doc, fontName);
-      
-      const filename = `قائمة-التدفقات-النقدية-${format(new Date(), "yyyyMMdd-HHmmss")}.pdf`;
+
+      const filename = `قائمة-التدفقات-النقدية-${format(new Date(), 'yyyyMMdd-HHmmss')}.pdf`;
       doc.save(filename);
-      
-      toast.success("تم تصدير قائمة التدفقات النقدية بنجاح", {
+
+      toast.success('تم تصدير قائمة التدفقات النقدية بنجاح', {
         description: `تم حفظ الملف: ${filename}`,
       });
     } catch {
-      toast.error("حدث خطأ أثناء تصدير PDF", {
-        description: "الرجاء المحاولة مرة أخرى",
+      toast.error('حدث خطأ أثناء تصدير PDF', {
+        description: 'الرجاء المحاولة مرة أخرى',
       });
     }
   };
@@ -147,7 +152,7 @@ export function CashFlowStatement() {
         icon={<Activity className="h-12 w-12" />}
         title="لا توجد بيانات متاحة"
         description="قم بحساب التدفقات النقدية للفترة المالية لعرض البيانات"
-        actionLabel={isCalculating ? "جاري الحساب..." : "حساب التدفقات النقدية"}
+        actionLabel={isCalculating ? 'جاري الحساب...' : 'حساب التدفقات النقدية'}
         onAction={handleCalculate}
       />
     );
@@ -159,8 +164,8 @@ export function CashFlowStatement() {
         <div>
           <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة التدفقات النقدية</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            من {format(new Date(latestFlow.period_start), "dd MMMM yyyy", { locale: ar })} إلى{" "}
-            {format(new Date(latestFlow.period_end), "dd MMMM yyyy", { locale: ar })}
+            من {format(new Date(latestFlow.period_start), 'dd MMMM yyyy', { locale: ar })} إلى{' '}
+            {format(new Date(latestFlow.period_end), 'dd MMMM yyyy', { locale: ar })}
           </p>
         </div>
         <div className="flex gap-2 print:hidden flex-wrap">
@@ -191,7 +196,7 @@ export function CashFlowStatement() {
                 )}
                 <span
                   className={`font-semibold ${
-                    latestFlow.operating_activities >= 0 ? "text-success" : "text-destructive"
+                    latestFlow.operating_activities >= 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {formatCurrency(latestFlow.operating_activities)}
@@ -215,7 +220,7 @@ export function CashFlowStatement() {
                 )}
                 <span
                   className={`font-semibold ${
-                    latestFlow.investing_activities >= 0 ? "text-success" : "text-destructive"
+                    latestFlow.investing_activities >= 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {formatCurrency(latestFlow.investing_activities)}
@@ -239,7 +244,7 @@ export function CashFlowStatement() {
                 )}
                 <span
                   className={`font-semibold ${
-                    latestFlow.financing_activities >= 0 ? "text-success" : "text-destructive"
+                    latestFlow.financing_activities >= 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {formatCurrency(latestFlow.financing_activities)}
@@ -258,7 +263,7 @@ export function CashFlowStatement() {
                 <span className="font-medium">صافي التغير في النقد</span>
                 <span
                   className={`font-semibold ${
-                    latestFlow.net_cash_flow >= 0 ? "text-success" : "text-destructive"
+                    latestFlow.net_cash_flow >= 0 ? 'text-success' : 'text-destructive'
                   }`}
                 >
                   {formatCurrency(latestFlow.net_cash_flow)}

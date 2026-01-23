@@ -11,7 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAutoJournalTemplates } from '@/hooks/accounting/useAutoJournalTemplates';
 import { Plus, Trash2 } from 'lucide-react';
 import type { AutoJournalTemplate, AccountMapping } from '@/types/auto-journal';
@@ -129,163 +135,157 @@ export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Prop
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {template ? 'تعديل قالب قيد تلقائي' : 'قالب قيد تلقائي جديد'}
-          </DialogTitle>
-          <DialogDescription>
-            حدد الحدث المُشغل والحسابات المحاسبية
-          </DialogDescription>
+          <DialogTitle>{template ? 'تعديل قالب قيد تلقائي' : 'قالب قيد تلقائي جديد'}</DialogTitle>
+          <DialogDescription>حدد الحدث المُشغل والحسابات المحاسبية</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label>الحدث المُشغل *</Label>
-          <Select
-            value={formData.trigger_event}
-            onValueChange={(value) => setFormData({ ...formData, trigger_event: value })}
-            disabled={!!template}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="اختر الحدث" />
-            </SelectTrigger>
-            <SelectContent>
-              {triggerEvents.map((event) => (
-                <SelectItem key={event.value} value={event.value}>
-                  {event.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>اسم القالب *</Label>
-          <Input
-            value={formData.template_name}
-            onChange={(e) => setFormData({ ...formData, template_name: e.target.value })}
-            placeholder="مثال: قيد دفع مستحقات"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>الوصف</Label>
-          <Textarea
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="وصف مختصر للقالب"
-            rows={2}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>الأولوية</Label>
-          <Input
-            type="number"
-            value={formData.priority}
-            onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-            min="1"
-            max="1000"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label>الحسابات المدينة *</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addDebitAccount}>
-              <Plus className="h-4 w-4 ms-1" />
-              إضافة
-            </Button>
+          <div className="space-y-2">
+            <Label>الحدث المُشغل *</Label>
+            <Select
+              value={formData.trigger_event}
+              onValueChange={(value) => setFormData({ ...formData, trigger_event: value })}
+              disabled={!!template}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الحدث" />
+              </SelectTrigger>
+              <SelectContent>
+                {triggerEvents.map((event) => (
+                  <SelectItem key={event.value} value={event.value}>
+                    {event.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          {formData.debit_accounts.map((acc, idx) => (
-            <div key={idx} className="flex gap-2">
-              <Input
-                placeholder="رمز الحساب"
-                value={acc.account_code}
-                onChange={(e) => {
-                  const newAccounts = [...formData.debit_accounts];
-                  newAccounts[idx].account_code = e.target.value;
-                  setFormData({ ...formData, debit_accounts: newAccounts });
-                }}
-                required
-              />
-              <Input
-                type="number"
-                placeholder="النسبة %"
-                value={acc.percentage}
-                onChange={(e) => {
-                  const newAccounts = [...formData.debit_accounts];
-                  newAccounts[idx].percentage = parseInt(e.target.value);
-                  setFormData({ ...formData, debit_accounts: newAccounts });
-                }}
-                className="w-28"
-              />
-              {formData.debit_accounts.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeDebitAccount(idx)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label>الحسابات الدائنة *</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addCreditAccount}>
-              <Plus className="h-4 w-4 ms-1" />
-              إضافة
-            </Button>
+          <div className="space-y-2">
+            <Label>اسم القالب *</Label>
+            <Input
+              value={formData.template_name}
+              onChange={(e) => setFormData({ ...formData, template_name: e.target.value })}
+              placeholder="مثال: قيد دفع مستحقات"
+              required
+            />
           </div>
-          {formData.credit_accounts.map((acc, idx) => (
-            <div key={idx} className="flex gap-2">
-              <Input
-                placeholder="رمز الحساب"
-                value={acc.account_code}
-                onChange={(e) => {
-                  const newAccounts = [...formData.credit_accounts];
-                  newAccounts[idx].account_code = e.target.value;
-                  setFormData({ ...formData, credit_accounts: newAccounts });
-                }}
-                required
-              />
-              <Input
-                type="number"
-                placeholder="النسبة %"
-                value={acc.percentage}
-                onChange={(e) => {
-                  const newAccounts = [...formData.credit_accounts];
-                  newAccounts[idx].percentage = parseInt(e.target.value);
-                  setFormData({ ...formData, credit_accounts: newAccounts });
-                }}
-                className="w-28"
-              />
-              {formData.credit_accounts.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeCreditAccount(idx)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
 
-        <div className="flex gap-2 justify-end pt-4">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            إلغاء
-          </Button>
-          <Button type="submit">
-            {template ? 'تحديث' : 'إنشاء'}
-          </Button>
-        </div>
+          <div className="space-y-2">
+            <Label>الوصف</Label>
+            <Textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="وصف مختصر للقالب"
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الأولوية</Label>
+            <Input
+              type="number"
+              value={formData.priority}
+              onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+              min="1"
+              max="1000"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>الحسابات المدينة *</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addDebitAccount}>
+                <Plus className="h-4 w-4 ms-1" />
+                إضافة
+              </Button>
+            </div>
+            {formData.debit_accounts.map((acc, idx) => (
+              <div key={idx} className="flex gap-2">
+                <Input
+                  placeholder="رمز الحساب"
+                  value={acc.account_code}
+                  onChange={(e) => {
+                    const newAccounts = [...formData.debit_accounts];
+                    newAccounts[idx].account_code = e.target.value;
+                    setFormData({ ...formData, debit_accounts: newAccounts });
+                  }}
+                  required
+                />
+                <Input
+                  type="number"
+                  placeholder="النسبة %"
+                  value={acc.percentage}
+                  onChange={(e) => {
+                    const newAccounts = [...formData.debit_accounts];
+                    newAccounts[idx].percentage = parseInt(e.target.value);
+                    setFormData({ ...formData, debit_accounts: newAccounts });
+                  }}
+                  className="w-28"
+                />
+                {formData.debit_accounts.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeDebitAccount(idx)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>الحسابات الدائنة *</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addCreditAccount}>
+                <Plus className="h-4 w-4 ms-1" />
+                إضافة
+              </Button>
+            </div>
+            {formData.credit_accounts.map((acc, idx) => (
+              <div key={idx} className="flex gap-2">
+                <Input
+                  placeholder="رمز الحساب"
+                  value={acc.account_code}
+                  onChange={(e) => {
+                    const newAccounts = [...formData.credit_accounts];
+                    newAccounts[idx].account_code = e.target.value;
+                    setFormData({ ...formData, credit_accounts: newAccounts });
+                  }}
+                  required
+                />
+                <Input
+                  type="number"
+                  placeholder="النسبة %"
+                  value={acc.percentage}
+                  onChange={(e) => {
+                    const newAccounts = [...formData.credit_accounts];
+                    newAccounts[idx].percentage = parseInt(e.target.value);
+                    setFormData({ ...formData, credit_accounts: newAccounts });
+                  }}
+                  className="w-28"
+                />
+                {formData.credit_accounts.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeCreditAccount(idx)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2 justify-end pt-4">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              إلغاء
+            </Button>
+            <Button type="submit">{template ? 'تحديث' : 'إنشاء'}</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

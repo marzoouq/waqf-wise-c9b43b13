@@ -243,16 +243,10 @@ export type StatusConfigMap = Record<string, StatusBadgeConfig>;
 // دالة مساعدة لحساب التقدم
 export function calculateProgress(approvals: BaseApproval[]): ApprovalProgress {
   const total = approvals.length;
-  const approved = approvals.filter(a => 
-    a.status === 'approved' || a.status === 'موافق'
-  ).length;
-  const pending = approvals.filter(a => 
-    a.status === 'pending' || a.status === 'معلق'
-  ).length;
-  const rejected = approvals.filter(a => 
-    a.status === 'rejected' || a.status === 'مرفوض'
-  ).length;
-  
+  const approved = approvals.filter((a) => a.status === 'approved' || a.status === 'موافق').length;
+  const pending = approvals.filter((a) => a.status === 'pending' || a.status === 'معلق').length;
+  const rejected = approvals.filter((a) => a.status === 'rejected' || a.status === 'مرفوض').length;
+
   const percentage = total > 0 ? (approved / total) * 100 : 0;
 
   return {
@@ -269,17 +263,18 @@ export function getNextPendingApproval<T extends { status: ApprovalStatus; level
   approvals: T[]
 ): T | undefined {
   return approvals
-    .filter(a => a.status === 'معلق' || a.status === 'pending')
+    .filter((a) => a.status === 'معلق' || a.status === 'pending')
     .sort((a, b) => a.level - b.level)[0];
 }
 
 // دالة للتحقق من اكتمال الموافقات
 export function areAllApprovalsCompleted(approvals: BaseApproval[]): boolean {
-  return approvals.every(a => 
-    a.status === 'approved' || 
-    a.status === 'موافق' || 
-    a.status === 'rejected' || 
-    a.status === 'مرفوض'
+  return approvals.every(
+    (a) =>
+      a.status === 'approved' ||
+      a.status === 'موافق' ||
+      a.status === 'rejected' ||
+      a.status === 'مرفوض'
   );
 }
 

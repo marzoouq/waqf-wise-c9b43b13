@@ -1,11 +1,7 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
 interface SendInvoiceEmailRequest {
   invoiceId: string;
@@ -23,7 +19,7 @@ const handler = async (req: Request): Promise<Response> => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let body: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         body = JSON.parse(bodyText);
@@ -40,7 +36,7 @@ const handler = async (req: Request): Promise<Response> => {
         function: 'send-invoice-email',
         testMode: !!body.testMode,
         message: body.testMode ? 'اختبار ناجح - لم يتم إرسال بريد فعلي' : undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -56,21 +52,21 @@ const handler = async (req: Request): Promise<Response> => {
       return errorResponse('معرف الفاتورة والبريد الإلكتروني مطلوبان', 400);
     }
 
-    console.log("Sending invoice email:", {
+    console.log('Sending invoice email:', {
       invoiceId,
       customerEmail,
       invoiceNumber,
     });
 
     // Send email using Resend API
-    const emailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "نظام إدارة الوقف <onboarding@resend.dev>",
+        from: 'نظام إدارة الوقف <onboarding@resend.dev>',
         to: [customerEmail],
         subject: `فاتورة رقم ${invoiceNumber}`,
         html: `
@@ -227,19 +223,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!emailResponse.ok) {
       const errorData = await emailResponse.json();
-      throw new Error(errorData.message || "Failed to send email");
+      throw new Error(errorData.message || 'Failed to send email');
     }
 
     const responseData = await emailResponse.json();
-    console.log("Email sent successfully:", responseData);
+    console.log('Email sent successfully:', responseData);
 
     return jsonResponse(responseData);
   } catch (error: unknown) {
-    console.error("Error in send-invoice-email function:", error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    console.error('Error in send-invoice-email function:', error);
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 };
 

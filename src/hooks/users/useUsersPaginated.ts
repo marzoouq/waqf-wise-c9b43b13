@@ -4,12 +4,12 @@
  * @version 2.9.11
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { AuthService } from "@/services/auth.service";
-import type { UserProfile } from "@/types/auth";
-import type { PaginatedResult } from "@/lib/pagination.types";
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { AuthService } from '@/services/auth.service';
+import type { UserProfile } from '@/types/auth';
+import type { PaginatedResult } from '@/lib/pagination.types';
 
 interface UseUsersPaginatedOptions {
   initialPage?: number;
@@ -18,16 +18,16 @@ interface UseUsersPaginatedOptions {
 
 export function useUsersPaginated(options: UseUsersPaginatedOptions = {}) {
   const { initialPage = 1, initialPageSize = 15 } = options;
-  
+
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const query = useQuery({
-    queryKey: [...QUERY_KEYS.USERS, "paginated", page, pageSize],
+    queryKey: [...QUERY_KEYS.USERS, 'paginated', page, pageSize],
     queryFn: async (): Promise<PaginatedResult<UserProfile>> => {
       // جلب جميع المستخدمين (لأن AuthService لا تدعم pagination حالياً)
       const allUsers = await AuthService.getUsers();
-      
+
       // حساب pagination محلياً
       const totalItems = allUsers.length;
       const totalPages = Math.ceil(totalItems / pageSize);

@@ -1,6 +1,6 @@
-import * as React from "react";
+import * as React from 'react';
 
-import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
+import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -21,20 +21,20 @@ function genId() {
 
 type Action =
   | {
-      type: "ADD_TOAST";
+      type: 'ADD_TOAST';
       toast: ToasterToast;
     }
   | {
-      type: "UPDATE_TOAST";
+      type: 'UPDATE_TOAST';
       toast: Partial<ToasterToast>;
     }
   | {
-      type: "DISMISS_TOAST";
-      toastId?: ToasterToast["id"];
+      type: 'DISMISS_TOAST';
+      toastId?: ToasterToast['id'];
     }
   | {
-      type: "REMOVE_TOAST";
-      toastId?: ToasterToast["id"];
+      type: 'REMOVE_TOAST';
+      toastId?: ToasterToast['id'];
     };
 
 interface State {
@@ -51,7 +51,7 @@ const addToRemoveQueue = (toastId: string) => {
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
     dispatch({
-      type: "REMOVE_TOAST",
+      type: 'REMOVE_TOAST',
       toastId: toastId,
     });
   }, TOAST_REMOVE_DELAY);
@@ -61,19 +61,19 @@ const addToRemoveQueue = (toastId: string) => {
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case 'ADD_TOAST':
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
       };
 
-    case "UPDATE_TOAST":
+    case 'UPDATE_TOAST':
       return {
         ...state,
         toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
       };
 
-    case "DISMISS_TOAST": {
+    case 'DISMISS_TOAST': {
       const { toastId } = action;
 
       // ! Side effects ! - This could be extracted into a dismissToast() action,
@@ -94,11 +94,11 @@ export const reducer = (state: State, action: Action): State => {
                 ...t,
                 open: false,
               }
-            : t,
+            : t
         ),
       };
     }
-    case "REMOVE_TOAST":
+    case 'REMOVE_TOAST':
       if (action.toastId === undefined) {
         return {
           ...state,
@@ -123,20 +123,20 @@ function dispatch(action: Action) {
   });
 }
 
-type Toast = Omit<ToasterToast, "id">;
+type Toast = Omit<ToasterToast, 'id'>;
 
 function toast({ ...props }: Toast) {
   const id = genId();
 
   const update = (props: ToasterToast) =>
     dispatch({
-      type: "UPDATE_TOAST",
+      type: 'UPDATE_TOAST',
       toast: { ...props, id },
     });
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+  const dismiss = () => dispatch({ type: 'DISMISS_TOAST', toastId: id });
 
   dispatch({
-    type: "ADD_TOAST",
+    type: 'ADD_TOAST',
     toast: {
       ...props,
       id,
@@ -170,30 +170,30 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss: (toastId?: string) => dispatch({ type: 'DISMISS_TOAST', toastId }),
   };
 }
 
 // Toast Helper Functions for common patterns
-export function toastSuccess(message: string, title: string = "نجح") {
+export function toastSuccess(message: string, title: string = 'نجح') {
   return toast({
     title: `✅ ${title}`,
     description: message,
-    variant: "default",
+    variant: 'default',
     duration: 3000,
   });
 }
 
-export function toastError(message: string, title: string = "خطأ") {
+export function toastError(message: string, title: string = 'خطأ') {
   return toast({
     title: `❌ ${title}`,
     description: message,
-    variant: "destructive",
+    variant: 'destructive',
     duration: 5000,
   });
 }
 
-export function toastWarning(message: string, title: string = "تنبيه") {
+export function toastWarning(message: string, title: string = 'تنبيه') {
   return toast({
     title: `⚠️ ${title}`,
     description: message,
@@ -201,7 +201,7 @@ export function toastWarning(message: string, title: string = "تنبيه") {
   });
 }
 
-export function toastInfo(message: string, title: string = "معلومة") {
+export function toastInfo(message: string, title: string = 'معلومة') {
   return toast({
     title: `ℹ️ ${title}`,
     description: message,

@@ -32,11 +32,11 @@ export class BeneficiaryCoreService {
   /**
    * جلب قائمة المستفيدين مع الفلاتر
    */
-  static async getAll(filters?: BeneficiaryFilters): Promise<{ data: Beneficiary[]; count: number }> {
+  static async getAll(
+    filters?: BeneficiaryFilters
+  ): Promise<{ data: Beneficiary[]; count: number }> {
     try {
-      let query = supabase
-        .from('beneficiaries')
-        .select('*', { count: 'exact' });
+      let query = supabase.from('beneficiaries').select('*', { count: 'exact' });
 
       if (filters?.status && filters.status !== 'all') {
         query = query.eq('status', filters.status);
@@ -51,11 +51,13 @@ export class BeneficiaryCoreService {
         query = query.eq('verification_status', filters.verificationStatus);
       }
       if (filters?.search) {
-        query = query.or(`full_name.ilike.%${filters.search}%,national_id.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
+        query = query.or(
+          `full_name.ilike.%${filters.search}%,national_id.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`
+        );
       }
 
       query = query.order('created_at', { ascending: false });
-      
+
       if (filters?.page && filters?.limit) {
         const from = (filters.page - 1) * filters.limit;
         const to = from + filters.limit - 1;
@@ -76,7 +78,10 @@ export class BeneficiaryCoreService {
    * جلب مستفيد واحد بالـ ID
    * 🔐 SECURITY: RLS يتحقق من صلاحية الوصول على مستوى قاعدة البيانات
    */
-  static async getById(id: string, _options?: { skipAuthCheck?: boolean }): Promise<Beneficiary | null> {
+  static async getById(
+    id: string,
+    _options?: { skipAuthCheck?: boolean }
+  ): Promise<Beneficiary | null> {
     try {
       // التحقق من صحة UUID
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -128,7 +133,9 @@ export class BeneficiaryCoreService {
   /**
    * إضافة مستفيد جديد
    */
-  static async create(beneficiary: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>): Promise<Beneficiary> {
+  static async create(
+    beneficiary: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<Beneficiary> {
     try {
       const existing = await this.getByNationalId(beneficiary.national_id);
       if (existing) {
@@ -176,15 +183,17 @@ export class BeneficiaryCoreService {
    */
   static async delete(id: string): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from('beneficiaries')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: user?.id,
           deletion_reason: 'حذف بواسطة المستخدم',
-          status: 'محذوف'
+          status: 'محذوف',
         })
         .eq('id', id);
 
@@ -229,9 +238,9 @@ export class BeneficiaryCoreService {
 
       const stats: BeneficiaryStats = {
         total: data?.length || 0,
-        active: data?.filter(b => matchesStatus(b.status, 'active')).length || 0,
-        inactive: data?.filter(b => matchesStatus(b.status, 'inactive')).length || 0,
-        pending: data?.filter(b => matchesStatus(b.status, 'pending')).length || 0,
+        active: data?.filter((b) => matchesStatus(b.status, 'active')).length || 0,
+        inactive: data?.filter((b) => matchesStatus(b.status, 'inactive')).length || 0,
+        pending: data?.filter((b) => matchesStatus(b.status, 'pending')).length || 0,
         totalPaid: data?.reduce((sum, b) => sum + (b.total_received || 0), 0) || 0,
         totalPending: data?.reduce((sum, b) => sum + (b.pending_amount || 0), 0) || 0,
       };
@@ -370,15 +379,18 @@ export class BeneficiaryCoreService {
   /**
    * تحديث تفضيلات الإشعارات
    */
-  static async updateNotificationPreferences(beneficiaryId: string, preferences: {
-    email?: boolean;
-    sms?: boolean;
-    push?: boolean;
-  }): Promise<Beneficiary> {
+  static async updateNotificationPreferences(
+    beneficiaryId: string,
+    preferences: {
+      email?: boolean;
+      sms?: boolean;
+      push?: boolean;
+    }
+  ): Promise<Beneficiary> {
     try {
       const { data, error } = await supabase
         .from('beneficiaries')
-        .update({ 
+        .update({
           notification_preferences: preferences,
           updated_at: new Date().toISOString(),
         })

@@ -25,7 +25,12 @@ export interface SystemAlert {
 export function useAdminAlerts() {
   const queryClient = useQueryClient();
 
-  const { data: alerts = [], isLoading, refetch, error } = useQuery({
+  const {
+    data: alerts = [],
+    isLoading,
+    refetch,
+    error,
+  } = useQuery({
     queryKey: QUERY_KEYS.ADMIN_ALERTS,
     queryFn: () => SystemService.getAdminAlerts(),
     staleTime: 60 * 1000,
@@ -50,7 +55,9 @@ export function useAdminAlerts() {
 
   // تجميع التنبيهات
   const activeAlerts = alerts.filter((a: SystemAlert) => matchesStatus(a.status, 'active'));
-  const acknowledgedAlerts = alerts.filter((a: SystemAlert) => matchesStatus(a.status, 'acknowledged'));
+  const acknowledgedAlerts = alerts.filter((a: SystemAlert) =>
+    matchesStatus(a.status, 'acknowledged')
+  );
 
   return {
     alerts: alerts as SystemAlert[],

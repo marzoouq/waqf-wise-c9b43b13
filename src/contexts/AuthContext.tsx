@@ -79,13 +79,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // تنظيف الجلسات التالفة
   const cleanupInvalidSession = useCallback(async () => {
     try {
-      const keysToClean = Object.keys(localStorage).filter(key => 
-        key.includes('supabase') || key.includes('sb-')
+      const keysToClean = Object.keys(localStorage).filter(
+        (key) => key.includes('supabase') || key.includes('sb-')
       );
-      keysToClean.forEach(key => localStorage.removeItem(key));
-      
+      keysToClean.forEach((key) => localStorage.removeItem(key));
+
       await supabase.auth.signOut({ scope: 'local' });
-      
+
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -101,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     try {
       const data = await AuthService.getProfile(userId);
-      
+
       if (!data) {
         // ✅ إعادة المحاولة فوراً بدون تأخير
         const retryData = await AuthService.getProfile(userId);
@@ -121,16 +121,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // جلب البيانات بشكل متوازي
-  const fetchUserData = useCallback(async (userId: string) => {
-    try {
-      await Promise.all([
-        fetchProfile(userId),
-        fetchUserRoles(userId)
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchProfile, fetchUserRoles]);
+  const fetchUserData = useCallback(
+    async (userId: string) => {
+      try {
+        await Promise.all([fetchProfile(userId), fetchUserRoles(userId)]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [fetchProfile, fetchUserRoles]
+  );
 
   // ✅ إزالة Lazy Auth - نجلب البيانات دائماً عند وجود جلسة
 
@@ -145,23 +145,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         productionLogger.debug('🔐 [AuthContext] بدء التهيئة...');
         productionLogger.debug('🔐 [AuthContext] المسار:', window.location.pathname);
       }
-      
+
       try {
         // ✅ جلب الجلسة الحالية
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-        
+        const {
+          data: { session: currentSession },
+          error,
+        } = await supabase.auth.getSession();
+
         if (import.meta.env.DEV) {
-          productionLogger.debug('🔐 [AuthContext] نتيجة getSession:', { hasSession: !!currentSession });
+          productionLogger.debug('🔐 [AuthContext] نتيجة getSession:', {
+            hasSession: !!currentSession,
+          });
         }
-        
+
         if (!isMounted) return;
 
         if (error) {
           const errorMsg = error.message?.toLowerCase() || '';
-          if (errorMsg.includes('invalid') || 
-              errorMsg.includes('bad_jwt') || 
-              errorMsg.includes('missing sub claim') ||
-              errorMsg.includes('expired')) {
+          if (
+            errorMsg.includes('invalid') ||
+            errorMsg.includes('bad_jwt') ||
+            errorMsg.includes('missing sub claim') ||
+            errorMsg.includes('expired')
+          ) {
             productionLogger.warn('Invalid session detected, cleaning up', error.message);
             await cleanupInvalidSession();
             setIsLoading(false);
@@ -173,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // ✅ تحديث الحالة
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        
+
         // ✅ جلب البيانات دائماً عند وجود جلسة
         if (currentSession?.user) {
           await fetchUserData(currentSession.user.id);
@@ -181,7 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
           setRolesLoading(false);
         }
-        
+
         if (import.meta.env.DEV) {
           productionLogger.debug('🔐 [AuthContext] انتهاء التهيئة');
         }
@@ -199,9 +206,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // ✅ إعداد المستمع لتغييرات الجلسة
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!isMounted) return;
-      
+
       // ✅ تجاهل الأحداث قبل اكتمال التهيئة الأولية
       if (event === 'INITIAL_SESSION') {
         return;
@@ -242,7 +251,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (newSession?.user) {
         setSession(newSession);
         setUser(newSession.user);
-        
+
         // ✅ جلب البيانات دائماً عند SIGNED_IN (تسجيل دخول جديد)
         if (event === 'SIGNED_IN') {
           if (!isInitialized) {
@@ -277,7 +286,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         p_email: email,
         p_ip_address: 'client',
         p_success: !error,
-        p_user_agent: navigator.userAgent
+        p_user_agent: navigator.userAgent,
       });
     } catch (logError) {
       // لا نوقف تسجيل الدخول إذا فشل التسجيل
@@ -327,32 +336,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRoles([]);
       rolesCache.current = [];
       setRolesLoading(false);
-      
+
       // ✅ 2. تنظيف React Query cache بالكامل
       queryInvalidationManager.resetForNewUser();
-      
+
       // ✅ 3. استخدام AuthService للتنظيف الشامل
       await AuthService.logout({ keepTheme: true, scope: 'global' });
-      
+
       toast({
-        title: "تم تسجيل الخروج",
-        description: "تم تسجيل خروجك بنجاح",
+        title: 'تم تسجيل الخروج',
+        description: 'تم تسجيل خروجك بنجاح',
       });
     } catch (error: unknown) {
       // ✅ التنظيف مضمون حتى لو حدث خطأ (تم أعلاه)
       const err = error as { message?: string };
-      
+
       // لا نعرض خطأ إذا كان بسبب انتهاء الجلسة
       if (!err?.message?.includes('session') && !err?.message?.includes('JWT')) {
         toast({
-          title: "تحذير",
-          description: "تم تسجيل الخروج مع بعض التحذيرات",
-          variant: "default",
+          title: 'تحذير',
+          description: 'تم تسجيل الخروج مع بعض التحذيرات',
+          variant: 'default',
         });
       } else {
         toast({
-          title: "تم تسجيل الخروج",
-          description: "تم تسجيل خروجك بنجاح",
+          title: 'تم تسجيل الخروج',
+          description: 'تم تسجيل خروجك بنجاح',
         });
       }
     }
@@ -366,7 +375,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     let currentRoles = rolesCache.current;
-    
+
     if (currentRoles.length === 0) {
       currentRoles = await fetchUserRoles(user.id);
     }
@@ -382,7 +391,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     let currentRoles = rolesCache.current;
-    
+
     if (currentRoles.length === 0) {
       currentRoles = await fetchUserRoles(user.id);
     }
@@ -391,13 +400,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // ✅ قائمة المسارات العامة التي لا تحتاج انتظار التهيئة
-  const PUBLIC_ROUTES = ['/', '/login', '/signup', '/install', '/unauthorized', '/privacy', '/terms', '/security-policy', '/faq', '/contact'];
-  
+  const PUBLIC_ROUTES = [
+    '/',
+    '/login',
+    '/signup',
+    '/install',
+    '/unauthorized',
+    '/privacy',
+    '/terms',
+    '/security-policy',
+    '/faq',
+    '/contact',
+  ];
+
   // ✅ التحقق إذا كان المسار الحالي عام
-  const isPublicRoute = typeof window !== 'undefined' && PUBLIC_ROUTES.includes(window.location.pathname);
-  
+  const isPublicRoute =
+    typeof window !== 'undefined' && PUBLIC_ROUTES.includes(window.location.pathname);
+
   // ✅ إظهار التحميل فقط للصفحات المحمية
-  const effectiveIsLoading = isPublicRoute ? false : (!isInitialized || isLoading);
+  const effectiveIsLoading = isPublicRoute ? false : !isInitialized || isLoading;
 
   const value = {
     user,

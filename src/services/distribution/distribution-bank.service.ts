@@ -17,7 +17,7 @@ export class DistributionBankService {
   static async uploadBankStatement(disclosureId: string, file: File): Promise<string> {
     try {
       const filePath = `disclosures/${disclosureId}/bank_statement_${Date.now()}.pdf`;
-      
+
       const { error: uploadError } = await supabase.storage
         .from('disclosure-documents')
         .upload(filePath, file);
@@ -53,25 +53,27 @@ export class DistributionBankService {
       if (!distribution) throw new Error('التوزيع غير موجود');
 
       const vouchers = await getVouchers(distributionId);
-      
+
       const fileNumber = `BTF-${Date.now()}`;
       const totalAmount = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
 
       const { data, error } = await supabase
         .from('bank_transfer_files')
-        .insert([{
-          file_number: fileNumber,
-          distribution_id: distributionId,
-          file_format: 'CSV',
-          total_transactions: vouchers.length,
-          total_amount: totalAmount,
-          status: 'pending',
-        }])
+        .insert([
+          {
+            file_number: fileNumber,
+            distribution_id: distributionId,
+            file_format: 'CSV',
+            total_transactions: vouchers.length,
+            total_amount: totalAmount,
+            status: 'pending',
+          },
+        ])
         .select()
         .maybeSingle();
 
       if (error) throw error;
-      if (!data) throw new Error("فشل في إنشاء ملف التحويل البنكي");
+      if (!data) throw new Error('فشل في إنشاء ملف التحويل البنكي');
       return data;
     } catch (error) {
       productionLogger.error('Error generating bank transfer', error);
@@ -82,7 +84,9 @@ export class DistributionBankService {
   /**
    * تتبع حالة التحويل
    */
-  static async trackTransferStatus(transferId: string): Promise<Database['public']['Tables']['bank_transfer_files']['Row'] | null> {
+  static async trackTransferStatus(
+    transferId: string
+  ): Promise<Database['public']['Tables']['bank_transfer_files']['Row'] | null> {
     try {
       const { data, error } = await supabase
         .from('bank_transfer_files')
@@ -101,19 +105,23 @@ export class DistributionBankService {
   /**
    * جلب تفاصيل التحويلات البنكية
    */
-  static async getTransferDetails(transferFileId: string): Promise<{
-    id: string;
-    beneficiary_name: string;
-    iban: string;
-    amount: number;
-    status: string;
-    reference_number?: string | null;
-    error_message?: string | null;
-    processed_at?: string | null;
-  }[]> {
+  static async getTransferDetails(transferFileId: string): Promise<
+    {
+      id: string;
+      beneficiary_name: string;
+      iban: string;
+      amount: number;
+      status: string;
+      reference_number?: string | null;
+      error_message?: string | null;
+      processed_at?: string | null;
+    }[]
+  > {
     const { data, error } = await supabase
       .from('bank_transfer_details')
-      .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
+      .select(
+        'id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at'
+      )
       .eq('transfer_file_id', transferFileId)
       .order('created_at', { ascending: false });
     if (error) throw error;
@@ -126,20 +134,21 @@ export class DistributionBankService {
   static async getByFiscalYear(fiscalYearId: string): Promise<DistributionRow[]> {
     try {
       const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-      
+      const token =
+        session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
       const data = await abortableFetch<DistributionRow[]>(
         `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/distributions?fiscal_year_id=eq.${fiscalYearId}&order=distribution_date.desc`,
         {
           headers: {
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
           timeout: 30000,
         }
       );
-      
+
       return data;
     } catch (error) {
       productionLogger.error('Error fetching fiscal year distributions', error);

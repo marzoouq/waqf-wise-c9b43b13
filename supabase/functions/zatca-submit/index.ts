@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
+import {
+  handleCors,
+  jsonResponse,
   errorResponse,
   unauthorizedResponse,
-  forbiddenResponse
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 interface ZATCASubmitRequest {
@@ -35,7 +35,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -52,7 +52,7 @@ serve(async (req) => {
         function: 'zatca-submit',
         testMode: !!bodyData.testMode,
         message: bodyData.testMode ? 'اختبار ناجح - لم يتم إرسال فعلي لزاتكا' : undefined,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -70,7 +70,10 @@ serve(async (req) => {
 
     // التحقق من صحة التوكن
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       console.error('ZATCA submission: Invalid or expired token');
@@ -78,13 +81,10 @@ serve(async (req) => {
     }
 
     // التحقق من صلاحيات المستخدم
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasPermission = roles?.some(r => ALLOWED_ROLES.includes(r.role));
-    
+    const hasPermission = roles?.some((r) => ALLOWED_ROLES.includes(r.role));
+
     if (!hasPermission) {
       console.warn('ZATCA submission: Unauthorized role attempt by:', user.id);
       return forbiddenResponse('ليس لديك صلاحية إرسال الفواتير لهيئة الزكاة والضريبة');
@@ -162,7 +162,6 @@ serve(async (req) => {
       invoice_hash: invoiceHash,
       zatca_response: simulatedResponse,
     });
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('Error submitting to ZATCA:', error);
@@ -195,7 +194,7 @@ async function generateInvoiceHash(invoice: Invoice): Promise<string> {
   const data = encoder.encode(hashInput);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 function generateInvoiceXML(invoice: Invoice, qrData: string, hash: string): string {

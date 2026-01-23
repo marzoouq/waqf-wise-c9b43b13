@@ -3,10 +3,10 @@
  * Sequential Scans Bar Chart
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { TableScanStats } from "@/services/monitoring/db-performance.service";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { TableScanStats } from '@/services/monitoring/db-performance.service';
 
 interface SequentialScansChartProps {
   data: TableScanStats[];
@@ -28,16 +28,17 @@ export function SequentialScansChart({ data, isLoading }: SequentialScansChartPr
     );
   }
 
-  const chartData = data.slice(0, 10).map(item => ({
+  const chartData = data.slice(0, 10).map((item) => ({
     name: item.table_name.replace('public.', ''),
     seqScan: item.seq_scan,
     idxScan: item.idx_scan,
     seqPct: item.seq_pct,
-    displayValue: item.seq_scan > 1000000 
-      ? `${(item.seq_scan / 1000000).toFixed(1)}M`
-      : item.seq_scan > 1000 
-      ? `${(item.seq_scan / 1000).toFixed(0)}K`
-      : item.seq_scan.toString(),
+    displayValue:
+      item.seq_scan > 1000000
+        ? `${(item.seq_scan / 1000000).toFixed(1)}M`
+        : item.seq_scan > 1000
+          ? `${(item.seq_scan / 1000).toFixed(0)}K`
+          : item.seq_scan.toString(),
   }));
 
   const getBarColor = (pct: number) => {
@@ -61,20 +62,21 @@ export function SequentialScansChart({ data, isLoading }: SequentialScansChartPr
             layout="vertical"
             margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
           >
-            <XAxis type="number" tickFormatter={(v) => 
-              v > 1000000 ? `${(v/1000000).toFixed(1)}M` : 
-              v > 1000 ? `${(v/1000).toFixed(0)}K` : v
-            } />
-            <YAxis 
-              type="category" 
-              dataKey="name" 
-              width={90}
-              tick={{ fontSize: 12 }}
+            <XAxis
+              type="number"
+              tickFormatter={(v) =>
+                v > 1000000
+                  ? `${(v / 1000000).toFixed(1)}M`
+                  : v > 1000
+                    ? `${(v / 1000).toFixed(0)}K`
+                    : v
+              }
             />
-            <Tooltip 
+            <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 12 }} />
+            <Tooltip
               formatter={(value: number, name: string) => [
                 value.toLocaleString(),
-                name === 'seqScan' ? 'Sequential Scans' : 'Index Scans'
+                name === 'seqScan' ? 'Sequential Scans' : 'Index Scans',
               ]}
               labelFormatter={(label) => `جدول: ${label}`}
               contentStyle={{
@@ -91,7 +93,7 @@ export function SequentialScansChart({ data, isLoading }: SequentialScansChartPr
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        
+
         <div className="flex items-center justify-center gap-6 mt-4 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-success" />

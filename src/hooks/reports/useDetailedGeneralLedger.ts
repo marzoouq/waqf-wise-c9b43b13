@@ -30,11 +30,17 @@ export function useDetailedGeneralLedger() {
     queryKey: ['accounts_list'],
     queryFn: async () => {
       const data = await AccountingService.getAccounts();
-      return (data || []).filter(acc => acc.is_active).sort((a, b) => a.code.localeCompare(b.code));
+      return (data || [])
+        .filter((acc) => acc.is_active)
+        .sort((a, b) => a.code.localeCompare(b.code));
     },
   });
 
-  const { data: ledgerEntries, isLoading: loadingEntries, error } = useQuery({
+  const {
+    data: ledgerEntries,
+    isLoading: loadingEntries,
+    error,
+  } = useQuery({
     queryKey: ['general_ledger', selectedAccount, startDate, endDate],
     queryFn: async (): Promise<LedgerEntry[]> => {
       if (!selectedAccount) return [];

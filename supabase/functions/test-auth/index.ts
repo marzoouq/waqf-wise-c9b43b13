@@ -1,14 +1,14 @@
 /**
  * Test Auth Edge Function
- * 
+ *
  * وظيفة للحصول على JWT لمستخدم الاختبار
  * تُستخدم فقط في CI/CD للاختبارات
- * 
+ *
  * @security - تقبل فقط بريد @test.local
  * @security - تتطلب CI_SECRET للتشغيل
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -27,7 +27,7 @@ serve(async (req) => {
   try {
     const bodyData = await req.json().catch(() => ({}));
     const { email, password, action, ping, healthCheck, testMode } = bodyData;
-    
+
     // ✅ Health Check Support / Test Mode - يعمل بدون CI_SECRET
     if (ping || healthCheck || testMode || action === 'health-check') {
       console.log('[test-auth] Health check / test mode received');
@@ -37,23 +37,23 @@ serve(async (req) => {
           function: 'test-auth',
           message: 'Test auth function is running',
           timestamp: new Date().toISOString(),
-          testMode: testMode || false
+          testMode: testMode || false,
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
+
     // ✅ SECURITY: التحقق من CI_SECRET - مطلوب للعمليات الفعلية فقط
     const ciSecret = req.headers.get('X-CI-Secret');
     const expectedCiSecret = Deno.env.get('CI_SECRET');
-    
+
     // إذا لم يكن CI_SECRET مُعدّاً في البيئة، نرفض الطلبات غير health check
     if (!expectedCiSecret) {
       console.error('[test-auth] CI_SECRET not configured - only health checks allowed');
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Test auth function is disabled in this environment',
-          hint: 'CI_SECRET must be configured to use this function'
+          hint: 'CI_SECRET must be configured to use this function',
         }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -62,9 +62,9 @@ serve(async (req) => {
     if (!ciSecret || ciSecret !== expectedCiSecret) {
       console.error('[test-auth] Invalid or missing CI_SECRET');
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Unauthorized - Invalid CI secret',
-          hint: 'This function requires a valid X-CI-Secret header'
+          hint: 'This function requires a valid X-CI-Secret header',
         }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -73,22 +73,22 @@ serve(async (req) => {
     // Validate required fields
     if (!email || !password) {
       console.log('[test-auth] Missing email or password');
-      return new Response(
-        JSON.stringify({ error: 'Email and password are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Security check: Only allow test users
     const allowedDomains = ['@test.local', '@ci-test.local', '@integration-test.local'];
-    const isTestUser = allowedDomains.some(domain => email.endsWith(domain));
-    
+    const isTestUser = allowedDomains.some((domain) => email.endsWith(domain));
+
     if (!isTestUser) {
       console.log(`[test-auth] Rejected non-test email: ${email}`);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Only test users are allowed',
-          hint: 'Email must end with @test.local, @ci-test.local, or @integration-test.local'
+          hint: 'Email must end with @test.local, @ci-test.local, or @integration-test.local',
         }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -100,17 +100,17 @@ serve(async (req) => {
 
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error('[test-auth] Missing Supabase environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
-        persistSession: false
-      }
+        persistSession: false,
+      },
     });
 
     console.log(`[test-auth] Attempting login for: ${email}`);
@@ -124,9 +124,9 @@ serve(async (req) => {
     if (error) {
       console.error(`[test-auth] Login failed: ${error.message}`);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: error.message,
-          code: error.name || 'AUTH_ERROR'
+          code: error.name || 'AUTH_ERROR',
         }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -134,38 +134,37 @@ serve(async (req) => {
 
     if (!data.session) {
       console.error('[test-auth] No session returned');
-      return new Response(
-        JSON.stringify({ error: 'No session created' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'No session created' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log(`[test-auth] Login successful for: ${email}`);
 
     // Return the JWT token
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
         expires_at: data.session.expires_at,
         expires_in: data.session.expires_in,
         user_id: data.user?.id,
         email: data.user?.email,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
-      { 
+      {
         status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error(`[test-auth] Error: ${errorMessage}`);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: errorMessage,
-        type: 'INTERNAL_ERROR'
+        type: 'INTERNAL_ERROR',
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -21,13 +21,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils';
-import { 
-  Calculator, 
-  Loader2, 
-  AlertTriangle,
-  Calendar,
-  Edit2
-} from 'lucide-react';
+import { Calculator, Loader2, AlertTriangle, Calendar, Edit2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -71,9 +65,7 @@ export function EarlyTerminationDialog({
 }: EarlyTerminationDialogProps) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [terminationDate, setTerminationDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [terminationDate, setTerminationDate] = useState(new Date().toISOString().split('T')[0]);
   const [manualMode, setManualMode] = useState(false);
   const [manualAmount, setManualAmount] = useState('');
   const [penalty, setPenalty] = useState('0');
@@ -95,20 +87,20 @@ export function EarlyTerminationDialog({
     // حساب المدة المستخدمة
     const usedMonths = differenceInMonths(termDate, startDate);
     const usedDays = differenceInDays(termDate, startDate) % 30;
-    
+
     // حساب المبلغ للفترة المستخدمة
     const dailyRate = contract.monthly_rent / 30;
-    const amountForUsedPeriod = (usedMonths * contract.monthly_rent) + (usedDays * dailyRate);
-    
+    const amountForUsedPeriod = usedMonths * contract.monthly_rent + usedDays * dailyRate;
+
     // المبلغ المتبقي
     const remainingAmount = totalContractValue - amountForUsedPeriod;
-    
+
     // الغرامة
     const penaltyAmount = parseFloat(penalty) || 0;
-    
+
     // التأمين
-    const securityDeposit = returnDeposit ? (contract.security_deposit || 0) : 0;
-    
+    const securityDeposit = returnDeposit ? contract.security_deposit || 0 : 0;
+
     // التسوية النهائية
     // إذا كان المتبقي أكبر من الصفر = المستأجر له مبلغ (استرداد)
     // إذا كان المتبقي سالب = المستأجر عليه مبلغ
@@ -144,16 +136,14 @@ export function EarlyTerminationDialog({
 
     setIsSubmitting(true);
     try {
-      const finalAmount = manualMode 
-        ? parseFloat(manualAmount) 
-        : calculation.finalSettlement;
+      const finalAmount = manualMode ? parseFloat(manualAmount) : calculation.finalSettlement;
 
       // 1. تحديث حالة العقد
       const { error: contractError } = await supabase
         .from('contracts')
-        .update({ 
+        .update({
           status: 'منتهي',
-          notes: `${contract.notes || ''}\n\n--- إنهاء مبكر ---\nتاريخ الإنهاء: ${terminationDate}\nالتسوية: ${formatCurrency(Math.abs(finalAmount))} ${finalAmount > 0 ? '(استرداد للمستأجر)' : '(مستحق على المستأجر)'}\n${notes ? 'ملاحظات: ' + notes : ''}`
+          notes: `${contract.notes || ''}\n\n--- إنهاء مبكر ---\nتاريخ الإنهاء: ${terminationDate}\nالتسوية: ${formatCurrency(Math.abs(finalAmount))} ${finalAmount > 0 ? '(استرداد للمستأجر)' : '(مستحق على المستأجر)'}\n${notes ? 'ملاحظات: ' + notes : ''}`,
         })
         .eq('id', contract.id);
 
@@ -188,7 +178,7 @@ export function EarlyTerminationDialog({
           current_contract_id: null,
           current_tenant_id: null,
           occupancy_status: 'شاغر',
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('current_contract_id', contract.id);
 
@@ -273,11 +263,7 @@ export function EarlyTerminationDialog({
                     <Calculator className="h-4 w-4" />
                     حساب التسوية
                   </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setManualMode(!manualMode)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => setManualMode(!manualMode)}>
                     <Edit2 className="h-4 w-4 ms-1" />
                     {manualMode ? 'حساب تلقائي' : 'تعديل يدوي'}
                   </Button>
@@ -287,7 +273,7 @@ export function EarlyTerminationDialog({
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">الفترة المستخدمة</span>
                     <span>
-                      {calculation.usedPeriodMonths} شهر 
+                      {calculation.usedPeriodMonths} شهر
                       {calculation.usedPeriodDays > 0 && ` و ${calculation.usedPeriodDays} يوم`}
                     </span>
                   </div>
@@ -297,19 +283,22 @@ export function EarlyTerminationDialog({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">المبلغ المتبقي</span>
-                    <span className="text-success">{formatCurrency(calculation.remainingAmount)}</span>
+                    <span className="text-success">
+                      {formatCurrency(calculation.remainingAmount)}
+                    </span>
                   </div>
-                  
+
                   {contract.security_deposit && contract.security_deposit > 0 && (
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">التأمين</span>
-                        <Switch
-                          checked={returnDeposit}
-                          onCheckedChange={setReturnDeposit}
-                        />
+                        <Switch checked={returnDeposit} onCheckedChange={setReturnDeposit} />
                       </div>
-                      <span className={returnDeposit ? 'text-success' : 'text-muted-foreground line-through'}>
+                      <span
+                        className={
+                          returnDeposit ? 'text-success' : 'text-muted-foreground line-through'
+                        }
+                      >
                         {formatCurrency(contract.security_deposit)}
                       </span>
                     </div>
@@ -317,7 +306,9 @@ export function EarlyTerminationDialog({
 
                   {/* الغرامة */}
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="penalty" className="text-muted-foreground">غرامة (اختياري)</Label>
+                    <Label htmlFor="penalty" className="text-muted-foreground">
+                      غرامة (اختياري)
+                    </Label>
                     <Input
                       id="penalty"
                       type="number"
@@ -351,7 +342,9 @@ export function EarlyTerminationDialog({
                         <Badge variant={calculation.isRefund ? 'default' : 'destructive'}>
                           {calculation.isRefund ? 'استرداد للمستأجر' : 'مستحق على المستأجر'}
                         </Badge>
-                        <span className={calculation.isRefund ? 'text-success' : 'text-destructive'}>
+                        <span
+                          className={calculation.isRefund ? 'text-success' : 'text-destructive'}
+                        >
                           {formatCurrency(Math.abs(calculation.finalSettlement))}
                         </span>
                       </div>
@@ -379,11 +372,7 @@ export function EarlyTerminationDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleSubmit} 
-            disabled={isSubmitting}
-          >
+          <Button variant="destructive" onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin ms-2" />

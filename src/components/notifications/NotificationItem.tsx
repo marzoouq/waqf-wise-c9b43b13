@@ -1,7 +1,7 @@
-import { Bell, CheckCircle, AlertCircle, DollarSign, FileText, Users } from "lucide-react";
-import { formatRelative } from "@/lib/date";
-import { cn } from "@/lib/utils";
-import type { Notification } from "@/hooks/notifications/useNotifications";
+import { Bell, CheckCircle, AlertCircle, DollarSign, FileText, Users } from 'lucide-react';
+import { formatRelative } from '@/lib/date';
+import { cn } from '@/lib/utils';
+import type { Notification } from '@/hooks/notifications/useNotifications';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -9,41 +9,45 @@ interface NotificationItemProps {
   onClick?: () => void;
 }
 
-const getNotificationIcon = (type: Notification["type"]) => {
+const getNotificationIcon = (type: Notification['type']) => {
   switch (type) {
-    case "approval":
+    case 'approval':
       return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-success" />;
-    case "payment":
+    case 'payment':
       return <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-info" />;
-    case "journal_entry":
+    case 'journal_entry':
       return <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />;
-    case "distribution":
+    case 'distribution':
       return <Users className="w-4 h-4 sm:w-5 sm:h-5 text-warning" />;
-    case "system":
+    case 'system':
       return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-warning" />;
     default:
       return <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />;
   }
 };
 
-const getNotificationBg = (type: Notification["type"]) => {
+const getNotificationBg = (type: Notification['type']) => {
   switch (type) {
-    case "approval":
-      return "bg-success-light dark:bg-success/10";
-    case "payment":
-      return "bg-info-light dark:bg-info/10";
-    case "journal_entry":
-      return "bg-accent/10 dark:bg-accent/5";
-    case "distribution":
-      return "bg-warning-light dark:bg-warning/10";
-    case "system":
-      return "bg-warning-light dark:bg-warning/10";
+    case 'approval':
+      return 'bg-success-light dark:bg-success/10';
+    case 'payment':
+      return 'bg-info-light dark:bg-info/10';
+    case 'journal_entry':
+      return 'bg-accent/10 dark:bg-accent/5';
+    case 'distribution':
+      return 'bg-warning-light dark:bg-warning/10';
+    case 'system':
+      return 'bg-warning-light dark:bg-warning/10';
     default:
-      return "bg-muted";
+      return 'bg-muted';
   }
 };
 
-export const NotificationItem = ({ notification, onMarkAsRead, onClick }: NotificationItemProps) => {
+export const NotificationItem = ({
+  notification,
+  onMarkAsRead,
+  onClick,
+}: NotificationItemProps) => {
   const handleClick = () => {
     if (!notification.is_read) {
       onMarkAsRead(notification.id);
@@ -55,20 +59,24 @@ export const NotificationItem = ({ notification, onMarkAsRead, onClick }: Notifi
     <div
       onClick={handleClick}
       className={cn(
-        "p-3 sm:p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0",
-        !notification.is_read && "bg-accent/50"
+        'p-3 sm:p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0',
+        !notification.is_read && 'bg-accent/50'
       )}
     >
       <div className="flex gap-2 sm:gap-3">
-        <div className={cn("p-1.5 sm:p-2 rounded-full h-fit", getNotificationBg(notification.type))}>
+        <div
+          className={cn('p-1.5 sm:p-2 rounded-full h-fit', getNotificationBg(notification.type))}
+        >
           {getNotificationIcon(notification.type)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h4 className={cn(
-              "text-xs sm:text-sm font-medium",
-              !notification.is_read && "font-semibold"
-            )}>
+            <h4
+              className={cn(
+                'text-xs sm:text-sm font-medium',
+                !notification.is_read && 'font-semibold'
+              )}
+            >
               {notification.title}
             </h4>
             {!notification.is_read && (

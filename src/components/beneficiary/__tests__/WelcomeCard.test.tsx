@@ -31,7 +31,7 @@ describe('WelcomeCard Component', () => {
 
   it('should render welcome message with beneficiary name', () => {
     render(<WelcomeCard beneficiary={mockBeneficiary} />);
-    
+
     // Should show greeting
     expect(screen.getByText(/صباح الخير|مساء الخير/)).toBeInTheDocument();
     // Should show first name
@@ -41,9 +41,9 @@ describe('WelcomeCard Component', () => {
   it('should display time-based greeting', () => {
     const now = new Date();
     const hour = now.getHours();
-    
+
     render(<WelcomeCard beneficiary={mockBeneficiary} />);
-    
+
     if (hour >= 5 && hour < 12) {
       expect(screen.getByText(/صباح الخير/)).toBeInTheDocument();
     } else {
@@ -53,7 +53,7 @@ describe('WelcomeCard Component', () => {
 
   it('should show current date', () => {
     render(<WelcomeCard beneficiary={mockBeneficiary} />);
-    
+
     // Check for date elements (year)
     const currentYear = new Date().getFullYear();
     expect(screen.getByText(new RegExp(currentYear.toString()))).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('WelcomeCard Component', () => {
   it('should render without family name', () => {
     const beneficiaryWithoutFamily = { ...mockBeneficiary, family_name: undefined };
     render(<WelcomeCard beneficiary={beneficiaryWithoutFamily} />);
-    
+
     // Should still render the card
     expect(screen.getByText(/مساء الخير|صباح الخير/)).toBeInTheDocument();
   });
@@ -95,7 +95,7 @@ describe('WelcomeCard Component', () => {
   it('should render without beneficiary number', () => {
     const beneficiaryWithoutNumber = { ...mockBeneficiary, beneficiary_number: undefined };
     render(<WelcomeCard beneficiary={beneficiaryWithoutNumber} />);
-    
+
     // Should show em-dash for missing number
     expect(screen.getByText('—')).toBeInTheDocument();
   });

@@ -3,9 +3,9 @@
  * Hook لجلب إحصائيات العقارات - يستخدم Service Layer
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { PropertyService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { PropertyService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface PropertyStats {
   totalProperties: number;

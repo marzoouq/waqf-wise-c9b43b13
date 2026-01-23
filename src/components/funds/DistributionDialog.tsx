@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
 import {
   Form,
   FormControl,
@@ -10,23 +10,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, Calculator, Loader2 } from "lucide-react";
-import { EdgeFunctionService } from "@/services";
-import { productionLogger } from "@/lib/logger/production-logger";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/ui/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Eye, Calculator, Loader2 } from 'lucide-react';
+import { EdgeFunctionService } from '@/services';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface SimulationResult {
   success: boolean;
@@ -62,13 +69,9 @@ interface SimulationResult {
 }
 
 const distributionSchema = z.object({
-  month: z.string().min(1, { message: "الشهر الهجري مطلوب" }),
-  totalAmount: z.coerce
-    .number()
-    .min(1, { message: "المبلغ الإجمالي يجب أن يكون أكبر من صفر" }),
-  beneficiaries: z.coerce
-    .number()
-    .min(1, { message: "عدد المستفيدين يجب أن يكون 1 على الأقل" }),
+  month: z.string().min(1, { message: 'الشهر الهجري مطلوب' }),
+  totalAmount: z.coerce.number().min(1, { message: 'المبلغ الإجمالي يجب أن يكون أكبر من صفر' }),
+  beneficiaries: z.coerce.number().min(1, { message: 'عدد المستفيدين يجب أن يكون 1 على الأقل' }),
   notes: z.string().optional(),
 });
 
@@ -80,11 +83,7 @@ interface DistributionDialogProps {
   onDistribute: (data: DistributionFormValues) => void;
 }
 
-export function DistributionDialog({
-  open,
-  onOpenChange,
-  onDistribute,
-}: DistributionDialogProps) {
+export function DistributionDialog({ open, onOpenChange, onDistribute }: DistributionDialogProps) {
   const { toast } = useToast();
   const [showSimulation, setShowSimulation] = useState(false);
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -93,36 +92,36 @@ export function DistributionDialog({
   const form = useForm<DistributionFormValues>({
     resolver: zodResolver(distributionSchema),
     defaultValues: {
-      month: "",
+      month: '',
       totalAmount: 0,
       beneficiaries: 0,
-      notes: "",
+      notes: '',
     },
   });
 
   const hijriMonths = [
-    "محرم",
-    "صفر",
-    "ربيع الأول",
-    "ربيع الثاني",
-    "جمادى الأولى",
-    "جمادى الآخرة",
-    "رجب",
-    "شعبان",
-    "رمضان",
-    "شوال",
-    "ذو القعدة",
-    "ذو الحجة",
+    'محرم',
+    'صفر',
+    'ربيع الأول',
+    'ربيع الثاني',
+    'جمادى الأولى',
+    'جمادى الآخرة',
+    'رجب',
+    'شعبان',
+    'رمضان',
+    'شوال',
+    'ذو القعدة',
+    'ذو الحجة',
   ];
 
   const handleSimulate = async () => {
     const values = form.getValues();
-    
+
     if (values.totalAmount <= 0) {
       toast({
-        title: "خطأ",
-        description: "المبلغ الإجمالي يجب أن يكون أكبر من صفر",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'المبلغ الإجمالي يجب أن يكون أكبر من صفر',
+        variant: 'destructive',
       });
       return;
     }
@@ -157,15 +156,15 @@ export function DistributionDialog({
       });
 
       toast({
-        title: "تمت المحاكاة بنجاح",
+        title: 'تمت المحاكاة بنجاح',
         description: `سيتم توزيع ${data.summary.total_distributed.toLocaleString()} ر.س على ${data.summary.beneficiaries_count} مستفيد`,
       });
     } catch (error) {
       productionLogger.error('Distribution simulation failed', error);
       toast({
-        title: "خطأ في المحاكاة",
+        title: 'خطأ في المحاكاة',
         description: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsSimulating(false);
@@ -175,7 +174,7 @@ export function DistributionDialog({
   const handleSubmit = (data: DistributionFormValues) => {
     onDistribute(data);
     toast({
-      title: "تم إنشاء التوزيع بنجاح",
+      title: 'تم إنشاء التوزيع بنجاح',
       description: `تم إنشاء توزيع ${data.month} بمبلغ ${data.totalAmount.toLocaleString()} ر.س`,
     });
     form.reset();
@@ -185,8 +184,8 @@ export function DistributionDialog({
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="إنشاء توزيع جديد"
       description="قم بإدخال بيانات التوزيع الشهري للمستفيدين"
@@ -282,7 +281,9 @@ export function DistributionDialog({
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="p-3 bg-muted rounded-lg">
                     <span className="text-muted-foreground block mb-1">الإيرادات الإجمالية</span>
-                    <p className="font-bold text-lg">{simulationResult.summary.total_revenues.toLocaleString()} ر.س</p>
+                    <p className="font-bold text-lg">
+                      {simulationResult.summary.total_revenues.toLocaleString()} ر.س
+                    </p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
                     <span className="text-muted-foreground block mb-1">إجمالي الاستقطاعات</span>
@@ -298,23 +299,33 @@ export function DistributionDialog({
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">نصيب الناظر (5%):</span>
-                      <span>{simulationResult.summary.deductions.nazer_share.toLocaleString()} ر.س</span>
+                      <span>
+                        {simulationResult.summary.deductions.nazer_share.toLocaleString()} ر.س
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">احتياطي (10%):</span>
-                      <span>{simulationResult.summary.deductions.reserve.toLocaleString()} ر.س</span>
+                      <span>
+                        {simulationResult.summary.deductions.reserve.toLocaleString()} ر.س
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">أصل الوقف (5%):</span>
-                      <span>{simulationResult.summary.deductions.waqf_corpus.toLocaleString()} ر.س</span>
+                      <span>
+                        {simulationResult.summary.deductions.waqf_corpus.toLocaleString()} ر.س
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">صيانة (3%):</span>
-                      <span>{simulationResult.summary.deductions.maintenance.toLocaleString()} ر.س</span>
+                      <span>
+                        {simulationResult.summary.deductions.maintenance.toLocaleString()} ر.س
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">تطوير (2%):</span>
-                      <span>{simulationResult.summary.deductions.development.toLocaleString()} ر.س</span>
+                      <span>
+                        {simulationResult.summary.deductions.development.toLocaleString()} ر.س
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -329,7 +340,9 @@ export function DistributionDialog({
                   </div>
                   <div className="flex justify-between items-center mt-2 text-sm">
                     <span className="text-muted-foreground">عدد المستفيدين:</span>
-                    <span className="font-semibold">{simulationResult.summary.beneficiaries_count} مستفيد</span>
+                    <span className="font-semibold">
+                      {simulationResult.summary.beneficiaries_count} مستفيد
+                    </span>
                   </div>
                 </div>
 
@@ -349,7 +362,9 @@ export function DistributionDialog({
                       {simulationResult.details.slice(0, 10).map((detail) => (
                         <TableRow key={detail.beneficiary_id}>
                           <TableCell className="font-medium">{detail.beneficiary_name}</TableCell>
-                          <TableCell className="text-sm text-muted-foreground">{detail.category}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {detail.category}
+                          </TableCell>
                           <TableCell className="text-sm">{detail.priority_level}</TableCell>
                           <TableCell className="text-left font-semibold">
                             {detail.allocated_amount.toLocaleString()} ر.س
@@ -359,7 +374,8 @@ export function DistributionDialog({
                       {simulationResult.summary.beneficiaries_count > 10 && (
                         <TableRow>
                           <TableCell colSpan={4} className="text-center text-muted-foreground">
-                            ... وعدد {simulationResult.summary.beneficiaries_count - 10} مستفيد آخرين
+                            ... وعدد {simulationResult.summary.beneficiaries_count - 10} مستفيد
+                            آخرين
                           </TableCell>
                         </TableRow>
                       )}
@@ -371,11 +387,7 @@ export function DistributionDialog({
           )}
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
             <Button

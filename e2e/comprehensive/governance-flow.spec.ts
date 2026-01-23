@@ -29,9 +29,8 @@ test.describe('نظام الحوكمة', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasContent = content.includes('قرار') || 
-                       content.includes('حوكمة') || 
-                       content.length > 500;
+    const hasContent =
+      content.includes('قرار') || content.includes('حوكمة') || content.length > 500;
     expect(hasContent).toBe(true);
   });
 
@@ -40,12 +39,20 @@ test.describe('نظام الحوكمة', () => {
     await waitForPageLoad(page);
 
     const addButton = page.locator('button:has-text("قرار جديد"), button:has-text("إضافة")');
-    if (await addButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await addButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await addButton.first().click();
       await waitForPageLoad(page);
 
       const form = page.locator('[role="dialog"], form');
-      const hasForm = await form.first().isVisible({ timeout: 2000 }).catch(() => false);
+      const hasForm = await form
+        .first()
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       console.log(`نموذج القرار: ${hasForm ? '✓ يظهر' : '⚠ لا يظهر'}`);
 
       await page.keyboard.press('Escape');
@@ -68,8 +75,15 @@ test.describe('نظام الحوكمة', () => {
     await page.goto('/governance-decisions');
     await waitForPageLoad(page);
 
-    const voteButton = page.locator('button:has-text("تصويت"), button:has-text("موافق"), button:has-text("رفض")');
-    if (await voteButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    const voteButton = page.locator(
+      'button:has-text("تصويت"), button:has-text("موافق"), button:has-text("رفض")'
+    );
+    if (
+      await voteButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('أزرار التصويت: ✓ موجودة');
     }
   });
@@ -101,7 +115,12 @@ test.describe('الإفصاحات السنوية', () => {
     await waitForPageLoad(page);
 
     const exportButton = page.locator('button:has-text("تصدير"), button:has-text("PDF")');
-    if (await exportButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await exportButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('زر تصدير الإفصاح: ✓ موجود');
     }
   });
@@ -113,9 +132,8 @@ test.describe('لوحة تحكم الناظر', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasNazerContent = content.includes('ناظر') || 
-                            content.includes('إدارة') || 
-                            content.length > 500;
+    const hasNazerContent =
+      content.includes('ناظر') || content.includes('إدارة') || content.length > 500;
     expect(hasNazerContent).toBe(true);
   });
 
@@ -133,7 +151,12 @@ test.describe('لوحة تحكم الناظر', () => {
     await waitForPageLoad(page);
 
     const distributeButton = page.locator('button:has-text("توزيع"), button:has-text("صرف")');
-    if (await distributeButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await distributeButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('زر التوزيع: ✓ موجود');
     }
   });
@@ -143,7 +166,12 @@ test.describe('لوحة تحكم الناظر', () => {
     await waitForPageLoad(page);
 
     const publishButton = page.locator('button:has-text("نشر"), button:has-text("إغلاق السنة")');
-    if (await publishButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await publishButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('زر النشر: ✓ موجود');
     }
   });
@@ -155,7 +183,10 @@ test.describe('سجلات التدقيق', () => {
     await waitForPageLoad(page);
 
     const table = page.locator('table, [role="grid"]');
-    const hasTable = await table.first().isVisible({ timeout: 5000 }).catch(() => false);
+    const hasTable = await table
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     console.log(`سجلات التدقيق: ${hasTable ? '✓ موجودة' : '⚠ غير موجودة'}`);
   });
 
@@ -164,7 +195,12 @@ test.describe('سجلات التدقيق', () => {
     await waitForPageLoad(page);
 
     const filterInput = page.locator('input[type="search"], [role="combobox"]');
-    if (await filterInput.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await filterInput
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('فلتر السجلات: ✓ موجود');
     }
   });
@@ -176,7 +212,10 @@ test.describe('إدارة المستخدمين', () => {
     await waitForPageLoad(page);
 
     const table = page.locator('table, [role="grid"]');
-    const hasTable = await table.first().isVisible({ timeout: 5000 }).catch(() => false);
+    const hasTable = await table
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     console.log(`قائمة المستخدمين: ${hasTable ? '✓ موجودة' : '⚠ غير موجودة'}`);
   });
 
@@ -185,12 +224,20 @@ test.describe('إدارة المستخدمين', () => {
     await waitForPageLoad(page);
 
     const addButton = page.locator('button:has-text("إضافة"), button:has-text("مستخدم جديد")');
-    if (await addButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await addButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       await addButton.first().click();
       await waitForPageLoad(page);
 
       const form = page.locator('[role="dialog"], form');
-      const hasForm = await form.first().isVisible({ timeout: 2000 }).catch(() => false);
+      const hasForm = await form
+        .first()
+        .isVisible({ timeout: 2000 })
+        .catch(() => false);
       console.log(`نموذج المستخدم: ${hasForm ? '✓ يظهر' : '⚠ لا يظهر'}`);
 
       await page.keyboard.press('Escape');

@@ -1,10 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Plus, Wrench } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, Plus, Wrench } from 'lucide-react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  isToday,
+  arLocale as ar,
+} from '@/lib/date';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface MaintenanceSchedule {
   id: string;
@@ -22,10 +31,10 @@ interface MaintenanceScheduleCalendarProps {
   onScheduleClick?: (schedule: MaintenanceSchedule) => void;
 }
 
-export const MaintenanceScheduleCalendar = ({ 
-  schedules, 
+export const MaintenanceScheduleCalendar = ({
+  schedules,
   onAddSchedule,
-  onScheduleClick 
+  onScheduleClick,
 }: MaintenanceScheduleCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -34,11 +43,11 @@ export const MaintenanceScheduleCalendar = ({
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   // تصفية الصيانات النشطة فقط
-  const activeSchedules = schedules.filter(s => s.is_active);
+  const activeSchedules = schedules.filter((s) => s.is_active);
 
   // الحصول على الصيانات لليوم المحدد
   const getSchedulesForDay = (date: Date) => {
-    return activeSchedules.filter(schedule => 
+    return activeSchedules.filter((schedule) =>
       isSameDay(new Date(schedule.next_maintenance_date), date)
     );
   };
@@ -90,7 +99,7 @@ export const MaintenanceScheduleCalendar = ({
               الشهر السابق
             </Button>
             <h3 className="text-lg font-semibold">
-              {format(currentDate, "MMMM yyyy", { locale: ar })}
+              {format(currentDate, 'MMMM yyyy', { locale: ar })}
             </h3>
             <Button variant="outline" size="sm" onClick={nextMonth}>
               الشهر التالي
@@ -99,16 +108,21 @@ export const MaintenanceScheduleCalendar = ({
 
           {/* أيام الأسبوع */}
           <div className="grid grid-cols-7 gap-2 mb-2">
-            {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'].map((day) => (
-              <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
-                {day}
-              </div>
-            ))}
+            {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'].map(
+              (day) => (
+                <div
+                  key={day}
+                  className="text-center text-sm font-medium text-muted-foreground py-2"
+                >
+                  {day}
+                </div>
+              )
+            )}
           </div>
 
           {/* أيام الشهر */}
           <div className="grid grid-cols-7 gap-2">
-          {daysInMonth.map((day) => {
+            {daysInMonth.map((day) => {
               const daySchedules = getSchedulesForDay(day);
               const hasSchedules = daySchedules.length > 0;
               const today = isToday(day);
@@ -117,18 +131,17 @@ export const MaintenanceScheduleCalendar = ({
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    "min-h-[80px] p-2 rounded-lg border transition-colors",
-                    today && "border-primary bg-primary/5",
-                    hasSchedules && "bg-accent/50 hover:bg-accent cursor-pointer",
-                    !hasSchedules && "hover:bg-accent/30"
+                    'min-h-[80px] p-2 rounded-lg border transition-colors',
+                    today && 'border-primary bg-primary/5',
+                    hasSchedules && 'bg-accent/50 hover:bg-accent cursor-pointer',
+                    !hasSchedules && 'hover:bg-accent/30'
                   )}
                 >
                   <div className="flex flex-col h-full">
-                    <div className={cn(
-                      "text-sm font-medium mb-1",
-                      today && "text-primary font-bold"
-                    )}>
-                      {format(day, "d")}
+                    <div
+                      className={cn('text-sm font-medium mb-1', today && 'text-primary font-bold')}
+                    >
+                      {format(day, 'd')}
                     </div>
 
                     {hasSchedules && (
@@ -138,7 +151,7 @@ export const MaintenanceScheduleCalendar = ({
                             key={schedule.id}
                             onClick={() => onScheduleClick?.(schedule)}
                             className={cn(
-                              "text-xs p-1 rounded truncate",
+                              'text-xs p-1 rounded truncate',
                               getPriorityColor(schedule.priority)
                             )}
                             title={schedule.schedule_name}
@@ -169,17 +182,23 @@ export const MaintenanceScheduleCalendar = ({
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            الصيانات المجدولة هذا الشهر ({activeSchedules.filter(s => 
-              isSameMonth(new Date(s.next_maintenance_date), currentDate)
-            ).length})
+            الصيانات المجدولة هذا الشهر (
+            {
+              activeSchedules.filter((s) =>
+                isSameMonth(new Date(s.next_maintenance_date), currentDate)
+              ).length
+            }
+            )
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {activeSchedules
-              .filter(s => isSameMonth(new Date(s.next_maintenance_date), currentDate))
-              .sort((a, b) => 
-                new Date(a.next_maintenance_date).getTime() - new Date(b.next_maintenance_date).getTime()
+              .filter((s) => isSameMonth(new Date(s.next_maintenance_date), currentDate))
+              .sort(
+                (a, b) =>
+                  new Date(a.next_maintenance_date).getTime() -
+                  new Date(b.next_maintenance_date).getTime()
               )
               .map((schedule) => (
                 <div
@@ -188,10 +207,7 @@ export const MaintenanceScheduleCalendar = ({
                   onClick={() => onScheduleClick?.(schedule)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "p-2 rounded-lg",
-                      getPriorityColor(schedule.priority)
-                    )}>
+                    <div className={cn('p-2 rounded-lg', getPriorityColor(schedule.priority))}>
                       <Wrench className="h-4 w-4" />
                     </div>
                     <div>
@@ -204,13 +220,13 @@ export const MaintenanceScheduleCalendar = ({
                   <div className="text-left">
                     <Badge variant="outline" className="gap-1">
                       <Calendar className="h-3 w-3" />
-                      {format(new Date(schedule.next_maintenance_date), "dd MMM", { locale: ar })}
+                      {format(new Date(schedule.next_maintenance_date), 'dd MMM', { locale: ar })}
                     </Badge>
                   </div>
                 </div>
               ))}
 
-            {activeSchedules.filter(s => 
+            {activeSchedules.filter((s) =>
               isSameMonth(new Date(s.next_maintenance_date), currentDate)
             ).length === 0 && (
               <div className="text-center py-6 text-muted-foreground">

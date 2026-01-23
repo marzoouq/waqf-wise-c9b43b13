@@ -2,10 +2,10 @@
  * useAuditLogs Hook - سجلات التدقيق
  * يستخدم AuditService
  */
-import { useQuery } from "@tanstack/react-query";
-import { AuditService } from "@/services";
-import type { AuditLogFilters } from "@/types/audit";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AuditService } from '@/services';
+import type { AuditLogFilters } from '@/types/audit';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export const useAuditLogs = (filters?: AuditLogFilters) => {
   return useQuery({

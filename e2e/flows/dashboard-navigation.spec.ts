@@ -28,15 +28,18 @@ test.describe('Dashboard Access Control', () => {
     await page.waitForTimeout(2000);
 
     const currentUrl = page.url();
-    const isProtected = 
-      currentUrl.includes('/login') || 
+    const isProtected =
+      currentUrl.includes('/login') ||
       currentUrl.includes('/auth') ||
       currentUrl.includes('/unauthorized');
 
     // If still on dashboard, check for auth prompt
     if (currentUrl.includes('/dashboard')) {
       const authElements = page.locator('text=تسجيل الدخول, text=الرجاء تسجيل الدخول');
-      const hasAuthPrompt = await authElements.first().isVisible().catch(() => false);
+      const hasAuthPrompt = await authElements
+        .first()
+        .isVisible()
+        .catch(() => false);
       expect(hasAuthPrompt || isProtected).toBeTruthy();
     } else {
       expect(isProtected).toBeTruthy();
@@ -52,8 +55,8 @@ test.describe('Dashboard Access Control', () => {
     // Should be redirected or show login prompt
     expect(
       currentUrl.includes('/login') ||
-      currentUrl.includes('/auth') ||
-      currentUrl.includes('/beneficiary-portal')
+        currentUrl.includes('/auth') ||
+        currentUrl.includes('/beneficiary-portal')
     ).toBeTruthy();
   });
 });
@@ -62,7 +65,7 @@ test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
   async function loginAsTestUser(page: any) {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
 
@@ -124,7 +127,7 @@ test.describe('Sidebar Navigation', () => {
 
           // URL should change or content should update
           const newUrl = page.url();
-          
+
           // Go back for next test
           if (newUrl !== initialUrl) {
             await page.goBack();
@@ -139,9 +142,11 @@ test.describe('Sidebar Navigation', () => {
     const loggedIn = await loginAsTestUser(page);
     test.skip(!loggedIn, 'Could not login');
 
-    const collapseButton = page.locator(
-      '[aria-label*="collapse"], [aria-label*="طي"], button:has([class*="chevron"]), button:has([class*="menu"])'
-    ).first();
+    const collapseButton = page
+      .locator(
+        '[aria-label*="collapse"], [aria-label*="طي"], button:has([class*="chevron"]), button:has([class*="menu"])'
+      )
+      .first();
 
     if (await collapseButton.isVisible()) {
       const sidebar = page.locator('aside, [class*="sidebar"]').first();
@@ -165,10 +170,10 @@ test.describe('Mobile Navigation', () => {
 
   test('should show mobile menu button on small screens', async ({ page }) => {
     await page.goto('/login');
-    
+
     // Login first
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -177,9 +182,9 @@ test.describe('Mobile Navigation', () => {
       try {
         await page.waitForURL(/\/(dashboard|redirect|home)/, { timeout: 10000 });
 
-        const menuButton = page.locator(
-          '[aria-label*="menu"], [aria-label*="قائمة"], button:has([class*="menu"])'
-        ).first();
+        const menuButton = page
+          .locator('[aria-label*="menu"], [aria-label*="قائمة"], button:has([class*="menu"])')
+          .first();
 
         // Mobile menu button should be visible
         const isVisible = await menuButton.isVisible().catch(() => false);
@@ -192,9 +197,9 @@ test.describe('Mobile Navigation', () => {
 
   test('should open mobile drawer on menu click', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -210,8 +215,11 @@ test.describe('Mobile Navigation', () => {
           await page.waitForTimeout(300);
 
           const drawer = page.locator('[role="dialog"], [class*="drawer"], [class*="sheet"]');
-          const isDrawerOpen = await drawer.first().isVisible().catch(() => false);
-          
+          const isDrawerOpen = await drawer
+            .first()
+            .isVisible()
+            .catch(() => false);
+
           expect(isDrawerOpen).toBeTruthy();
         }
       } catch {
@@ -222,9 +230,9 @@ test.describe('Mobile Navigation', () => {
 
   test('should close mobile drawer on outside click', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -244,8 +252,11 @@ test.describe('Mobile Navigation', () => {
           await page.waitForTimeout(300);
 
           const drawer = page.locator('[role="dialog"]:visible, [class*="drawer"]:visible');
-          const isDrawerVisible = await drawer.first().isVisible().catch(() => false);
-          
+          const isDrawerVisible = await drawer
+            .first()
+            .isVisible()
+            .catch(() => false);
+
           expect(isDrawerVisible).toBeFalsy();
         }
       } catch {
@@ -258,9 +269,9 @@ test.describe('Mobile Navigation', () => {
 test.describe('Breadcrumb Navigation', () => {
   test('should show breadcrumb on inner pages', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -278,8 +289,11 @@ test.describe('Breadcrumb Navigation', () => {
         );
 
         // Breadcrumb may or may not be implemented
-        const hasBreadcrumb = await breadcrumb.first().isVisible().catch(() => false);
-        
+        const hasBreadcrumb = await breadcrumb
+          .first()
+          .isVisible()
+          .catch(() => false);
+
         // Log result for visibility
         console.log(`Breadcrumb present: ${hasBreadcrumb}`);
       } catch {
@@ -292,9 +306,9 @@ test.describe('Breadcrumb Navigation', () => {
 test.describe('Dashboard Content Loading', () => {
   test('should display loading state then content', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -319,9 +333,9 @@ test.describe('Dashboard Content Loading', () => {
 test.describe('Dashboard Quick Actions', () => {
   test('should display quick action buttons', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -347,9 +361,9 @@ test.describe('Dashboard Quick Actions', () => {
 test.describe('Dashboard Statistics Cards', () => {
   test('should display statistics cards', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -374,9 +388,9 @@ test.describe('Dashboard Statistics Cards', () => {
 test.describe('User Profile Menu', () => {
   test('should display user profile dropdown', async ({ page }) => {
     await page.goto('/login');
-    
+
     const emailInput = page.locator('input[type="email"]').first();
-    
+
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await page.locator('input[type="password"]').first().fill(TEST_USER.password);
@@ -386,9 +400,9 @@ test.describe('User Profile Menu', () => {
         await page.waitForURL(/\/(dashboard|redirect|home)/, { timeout: 10000 });
 
         // Look for user menu
-        const userMenu = page.locator(
-          '[aria-label*="user"], [aria-label*="المستخدم"], button:has([class*="avatar"])'
-        ).first();
+        const userMenu = page
+          .locator('[aria-label*="user"], [aria-label*="المستخدم"], button:has([class*="avatar"])')
+          .first();
 
         if (await userMenu.isVisible()) {
           await userMenu.click();
@@ -396,7 +410,10 @@ test.describe('User Profile Menu', () => {
 
           // Dropdown should appear
           const dropdown = page.locator('[role="menu"], [class*="dropdown"]');
-          const isDropdownVisible = await dropdown.first().isVisible().catch(() => false);
+          const isDropdownVisible = await dropdown
+            .first()
+            .isVisible()
+            .catch(() => false);
 
           expect(isDropdownVisible).toBeTruthy();
         }

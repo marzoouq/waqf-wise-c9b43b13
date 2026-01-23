@@ -40,16 +40,13 @@ export function useResetPassword(beneficiary: BeneficiaryInfo, onSuccess?: () =>
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        'admin-manage-beneficiary-password',
-        {
-          body: {
-            action: 'reset-password',
-            beneficiaryId: beneficiary.id,
-            newPassword: newPassword,
-          },
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('admin-manage-beneficiary-password', {
+        body: {
+          action: 'reset-password',
+          beneficiaryId: beneficiary.id,
+          newPassword: newPassword,
+        },
+      });
 
       if (error) {
         productionLogger.warn('Error resetting password:', error);
@@ -63,7 +60,7 @@ export function useResetPassword(beneficiary: BeneficiaryInfo, onSuccess?: () =>
       if (import.meta.env.DEV) productionLogger.debug('Password reset successful', data);
       toast.success('تم إعادة تعيين كلمة المرور بنجاح');
       setIsSuccess(true);
-      
+
       if (onSuccess) {
         onSuccess();
       }

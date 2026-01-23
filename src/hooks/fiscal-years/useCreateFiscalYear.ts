@@ -3,10 +3,10 @@
  * إنشاء سنة مالية جديدة
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiscalYearService } from "@/services/fiscal-year.service";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FiscalYearService } from '@/services/fiscal-year.service';
+import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface FiscalYearFormData {
   name: string;
@@ -61,14 +61,14 @@ export function useCreateFiscalYear(onSuccess?: () => void) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS });
-      toast.success("تم إضافة السنة المالية بنجاح");
+      toast.success('تم إضافة السنة المالية بنجاح');
       onSuccess?.();
     },
     onError: (error) => {
       if (import.meta.env.DEV) {
-        console.error("Error creating fiscal year:", error);
+        console.error('Error creating fiscal year:', error);
       }
-      toast.error("فشل في إضافة السنة المالية");
+      toast.error('فشل في إضافة السنة المالية');
     },
   });
 

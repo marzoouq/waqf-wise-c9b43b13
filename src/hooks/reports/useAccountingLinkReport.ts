@@ -3,9 +3,9 @@
  * @version 2.8.45
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { ReportService, type OperationRecord } from "@/services/report.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { ReportService, type OperationRecord } from '@/services/report.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { OperationRecord };
 

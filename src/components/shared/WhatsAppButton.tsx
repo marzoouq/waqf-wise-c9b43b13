@@ -1,36 +1,36 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MessageCircle, Send, Clock, AlertTriangle, Heart } from "lucide-react";
+} from '@/components/ui/dropdown-menu';
+import { MessageCircle, Send, Clock, AlertTriangle, Heart } from 'lucide-react';
 
 interface WhatsAppButtonProps {
   phone: string;
   tenantName: string;
   amount?: number;
   daysRemaining?: number;
-  variant?: "icon" | "button" | "ghost";
-  size?: "sm" | "default";
+  variant?: 'icon' | 'button' | 'ghost';
+  size?: 'sm' | 'default';
   showLabel?: boolean;
 }
 
 const formatPhoneNumber = (phone: string): string => {
   // إزالة أي أحرف غير رقمية
-  let cleaned = phone.replace(/\D/g, "");
-  
+  let cleaned = phone.replace(/\D/g, '');
+
   // إذا كان الرقم يبدأ بـ 0، نضيف 966
-  if (cleaned.startsWith("0")) {
-    cleaned = "966" + cleaned.substring(1);
+  if (cleaned.startsWith('0')) {
+    cleaned = '966' + cleaned.substring(1);
   }
-  
+
   // إذا لم يبدأ بـ 966، نضيفها
-  if (!cleaned.startsWith("966")) {
-    cleaned = "966" + cleaned;
+  if (!cleaned.startsWith('966')) {
+    cleaned = '966' + cleaned;
   }
-  
+
   return cleaned;
 };
 
@@ -42,7 +42,7 @@ const generateReminderMessage = (
   return `مرحباً ${tenantName}،
 
 نذكركم بموعد استحقاق الإيجار:
-📅 المبلغ: ${amount.toLocaleString("ar-SA")} ريال
+📅 المبلغ: ${amount.toLocaleString('ar-SA')} ريال
 ⏰ الأيام المتبقية: ${daysRemaining} يوم
 
 شكراً لتعاونكم 🙏`;
@@ -56,7 +56,7 @@ const generateOverdueMessage = (
   return `مرحباً ${tenantName}،
 
 نود تذكيركم بوجود مبلغ مستحق:
-💰 المبلغ المتأخر: ${amount.toLocaleString("ar-SA")} ريال
+💰 المبلغ المتأخر: ${amount.toLocaleString('ar-SA')} ريال
 ⚠️ عدد أيام التأخير: ${daysOverdue} يوم
 
 يرجى التواصل معنا لترتيب الدفع
@@ -82,7 +82,7 @@ const openWhatsApp = (phone: string, message: string) => {
   const formattedPhone = formatPhoneNumber(phone);
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
-  window.open(whatsappUrl, "_blank");
+  window.open(whatsappUrl, '_blank');
 };
 
 export function WhatsAppButton({
@@ -90,8 +90,8 @@ export function WhatsAppButton({
   tenantName,
   amount = 0,
   daysRemaining = 0,
-  variant = "icon",
-  size = "default",
+  variant = 'icon',
+  size = 'default',
   showLabel = true,
 }: WhatsAppButtonProps) {
   if (!phone) return null;
@@ -116,7 +116,7 @@ export function WhatsAppButton({
     openWhatsApp(phone, message);
   };
 
-  if (variant === "button") {
+  if (variant === 'button') {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -126,7 +126,7 @@ export function WhatsAppButton({
             className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
           >
             <MessageCircle className="h-4 w-4 ms-2" />
-            {showLabel && "واتساب"}
+            {showLabel && 'واتساب'}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
@@ -151,7 +151,7 @@ export function WhatsAppButton({
     );
   }
 
-  if (variant === "ghost") {
+  if (variant === 'ghost') {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

@@ -4,17 +4,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Building, Calendar, FileText, CreditCard, AlertTriangle, Receipt, ChevronDown } from 'lucide-react';
+import {
+  Building,
+  Calendar,
+  FileText,
+  CreditCard,
+  AlertTriangle,
+  Receipt,
+  ChevronDown,
+} from 'lucide-react';
 import { useTenantContracts } from '@/hooks/tenants/useTenantContracts';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { EarlyTerminationDialog } from '@/components/contracts/EarlyTerminationDialog';
 import { ContractReceipts } from '@/components/contracts/ContractReceipts';
 import { matchesStatus } from '@/lib/constants';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface TenantContractsProps {
   tenantId: string;
@@ -38,12 +42,15 @@ interface ContractData {
   } | null;
 }
 
-const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  'نشط': { label: 'نشط', variant: 'default' },
-  'active': { label: 'نشط', variant: 'default' },
-  'منتهي': { label: 'منتهي', variant: 'secondary' },
-  'ملغي': { label: 'ملغي', variant: 'destructive' },
-  'مسودة': { label: 'مسودة', variant: 'outline' },
+const statusLabels: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
+  نشط: { label: 'نشط', variant: 'default' },
+  active: { label: 'نشط', variant: 'default' },
+  منتهي: { label: 'منتهي', variant: 'secondary' },
+  ملغي: { label: 'ملغي', variant: 'destructive' },
+  مسودة: { label: 'مسودة', variant: 'outline' },
 };
 
 export function TenantContracts({ tenantId }: TenantContractsProps) {
@@ -62,7 +69,13 @@ export function TenantContracts({ tenantId }: TenantContractsProps) {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل العقود" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل العقود"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (contracts.length === 0) {
@@ -98,9 +111,9 @@ export function TenantContracts({ tenantId }: TenantContractsProps) {
           const isExpanded = expandedContract === contract.id;
 
           return (
-            <Collapsible 
-              key={contract.id} 
-              open={isExpanded} 
+            <Collapsible
+              key={contract.id}
+              open={isExpanded}
               onOpenChange={(open) => setExpandedContract(open ? contract.id : null)}
             >
               <Card>
@@ -153,26 +166,28 @@ export function TenantContracts({ tenantId }: TenantContractsProps) {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="mt-3 pt-3 border-t flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <CreditCard className="h-4 w-4" />
                       <span>نوع الدفع: {contract.payment_frequency || 'شهري'}</span>
                     </div>
-                    
+
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm">
                         <Receipt className="h-4 w-4 ms-1" />
                         السندات
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        />
                       </Button>
                     </CollapsibleTrigger>
                   </div>
 
                   <CollapsibleContent className="mt-4">
-                    <ContractReceipts 
-                      contractId={contract.id} 
-                      tenantName={contract.tenant_name || ''} 
+                    <ContractReceipts
+                      contractId={contract.id}
+                      tenantName={contract.tenant_name || ''}
                     />
                   </CollapsibleContent>
                 </CardContent>

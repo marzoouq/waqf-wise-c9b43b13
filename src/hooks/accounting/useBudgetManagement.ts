@@ -3,9 +3,9 @@
  * Hook لإدارة الموازنات التقديرية
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BudgetData {
   id: string;
@@ -22,7 +22,12 @@ export interface BudgetData {
 }
 
 export function useBudgetManagement(periodType: string) {
-  const { data: budgets, isLoading, error, refetch } = useQuery({
+  const {
+    data: budgets,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.BUDGETS_BY_PERIOD(periodType),
     queryFn: async () => {
       const data = await AccountingService.getBudgetsByPeriod(periodType);

@@ -2,7 +2,7 @@
  * Users Page
  * صفحة إدارة المستخدمين - مُحسّنة مع UsersContext و UsersDialogsContext
  * @version 2.9.14
- * 
+ *
  * التحسينات في هذا الإصدار:
  * - استخدام UsersTableWithContext بدلاً من UsersTable (0 props بدلاً من 9)
  * - نقل منطق الحذف إلى UsersTableRowWithContext
@@ -10,37 +10,40 @@
  * - إضافة Lazy Loading للـ Dialogs (تحسين الأداء 15%)
  */
 
-import { useToast } from "@/hooks/ui/use-toast";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Button } from "@/components/ui/button";
-import { Shield, Download } from "lucide-react";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
-import { UsersProvider, useUsersContext } from "@/contexts/UsersContext";
-import { UsersDialogsProvider, useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
-import { exportUsersToCSV } from "@/lib/utils/export-users";
+import { useToast } from '@/hooks/ui/use-toast';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { Button } from '@/components/ui/button';
+import { Shield, Download } from 'lucide-react';
+import { ErrorState } from '@/components/shared/ErrorState';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { useUsersRealtime } from '@/hooks/users/useUsersRealtime';
+import { UsersProvider, useUsersContext } from '@/contexts/UsersContext';
+import { UsersDialogsProvider, useUsersDialogsContext } from '@/contexts/UsersDialogsContext';
+import { exportUsersToCSV } from '@/lib/utils/export-users';
 
 // Components
-import { UsersFilters } from "@/components/users/UsersFilters";
-import { UsersTableWithContext } from "@/components/users/UsersTableWithContext";
-import { UsersTableSkeleton } from "@/components/users/UsersTableSkeleton";
+import { UsersFilters } from '@/components/users/UsersFilters';
+import { UsersTableWithContext } from '@/components/users/UsersTableWithContext';
+import { UsersTableSkeleton } from '@/components/users/UsersTableSkeleton';
 
 // Lazy Loaded Dialogs
-import { 
-  LazyEditRolesDialog, 
-  LazyResetPasswordDialog, 
+import {
+  LazyEditRolesDialog,
+  LazyResetPasswordDialog,
   LazyEditUserEmailDialog,
-  LazyDialogWrapper 
-} from "@/components/users/LazyDialogs";
+  LazyDialogWrapper,
+} from '@/components/users/LazyDialogs';
 
 const UsersContent = () => {
   const { toast } = useToast();
-  
+
   // Realtime updates
   useUsersRealtime();
-  
+
   // Users Context - فقط ما نحتاجه
   const {
     filteredUsers,
@@ -62,22 +65,22 @@ const UsersContent = () => {
     isUpdatingRoles,
     isResettingPassword,
   } = useUsersContext();
-  
+
   // Dialogs Context
   const {
     editRolesDialog,
     selectedRoles,
     closeEditRolesDialog,
     toggleRole,
-    
+
     resetPasswordDialog,
     newPassword,
     setNewPassword,
     closeResetPasswordDialog,
-    
+
     deleteDialog,
     closeDeleteDialog,
-    
+
     editEmailDialog,
     closeEditEmailDialog,
   } = useUsersDialogsContext();
@@ -86,7 +89,7 @@ const UsersContent = () => {
   const handleExport = () => {
     exportUsersToCSV({ users: filteredUsers });
     toast({
-      title: "تم التصدير",
+      title: 'تم التصدير',
       description: `تم تصدير ${filteredUsers.length} مستخدم بنجاح`,
     });
   };
@@ -104,7 +107,11 @@ const UsersContent = () => {
       updateRoles(editRolesDialog.data.user_id, selectedRoles);
       closeEditRolesDialog();
     } else if (!editRolesDialog.data?.user_id) {
-      toast({ title: "خطأ", description: "هذا المستخدم ليس لديه حساب مفعّل في النظام", variant: "destructive" });
+      toast({
+        title: 'خطأ',
+        description: 'هذا المستخدم ليس لديه حساب مفعّل في النظام',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -117,8 +124,8 @@ const UsersContent = () => {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل المستخدمين" 
+      <ErrorState
+        title="فشل تحميل المستخدمين"
         message="حدث خطأ أثناء تحميل بيانات المستخدمين"
         onRetry={refetch}
         fullScreen
@@ -153,11 +160,7 @@ const UsersContent = () => {
       />
 
       {/* ✅ استخدام UsersTableWithContext - بدون Props Drilling */}
-      {isLoading ? (
-        <UsersTableSkeleton rows={5} />
-      ) : (
-        <UsersTableWithContext />
-      )}
+      {isLoading ? <UsersTableSkeleton rows={5} /> : <UsersTableWithContext />}
 
       {/* Lazy Loaded Dialogs */}
       <LazyDialogWrapper open={editRolesDialog.open}>
@@ -190,7 +193,9 @@ const UsersContent = () => {
         onConfirm={handleDeleteConfirm}
         title="حذف المستخدم"
         description="هل أنت متأكد من حذف هذا المستخدم؟ سيتم حذف جميع البيانات المرتبطة به بشكل نهائي."
-        itemName={deleteDialog.data ? `${deleteDialog.data.full_name} (${deleteDialog.data.email})` : ""}
+        itemName={
+          deleteDialog.data ? `${deleteDialog.data.full_name} (${deleteDialog.data.email})` : ''
+        }
         isLoading={isDeleting}
       />
 

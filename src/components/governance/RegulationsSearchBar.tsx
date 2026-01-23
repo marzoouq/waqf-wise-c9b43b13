@@ -43,12 +43,7 @@ export function RegulationsSearchBar({
         />
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClear}
-              className="h-6 w-6 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={onClear} className="h-6 w-6 p-0">
               <X className="h-3 w-3" />
             </Button>
           )}
@@ -75,9 +70,7 @@ export function RegulationsSearchBar({
                     <div className="flex items-start gap-2">
                       <FileText className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-muted-foreground truncate">
-                          {result.partTitle}
-                        </p>
+                        <p className="text-xs text-muted-foreground truncate">{result.partTitle}</p>
                         {result.chapterTitle && (
                           <p className="text-xs text-muted-foreground truncate">
                             ← {result.chapterTitle}

@@ -1,12 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { logger } from "@/lib/logger";
-import { LoansService, RealtimeService } from "@/services";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useActivities } from '@/hooks/ui/useActivities';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { useJournalEntries } from '@/hooks/accounting/useJournalEntries';
+import { useEffect } from 'react';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { logger } from '@/lib/logger';
+import { LoansService, RealtimeService } from '@/services';
 
 export interface LoanPayment {
   id: string;
@@ -40,7 +40,12 @@ export function useLoanPayments(loanId?: string) {
   }, [queryClient]);
 
   // Fetch payments
-  const { data: payments = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: payments = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['loan_payments', loanId],
     queryFn: () => LoansService.getLoanPayments(loanId),
     enabled: !!loanId,
@@ -49,7 +54,9 @@ export function useLoanPayments(loanId?: string) {
 
   // Add payment mutation
   const addPayment = useMutation({
-    mutationFn: async (payment: Omit<LoanPayment, 'id' | 'payment_number' | 'created_at' | 'journal_entry_id'>) => {
+    mutationFn: async (
+      payment: Omit<LoanPayment, 'id' | 'payment_number' | 'created_at' | 'journal_entry_id'>
+    ) => {
       // Insert payment
       const paymentData = await LoansService.addLoanPayment({
         loan_id: payment.loan_id,
@@ -63,18 +70,19 @@ export function useLoanPayments(loanId?: string) {
       // Update installment if specified
       if (payment.installment_id) {
         const installments = await LoansService.getInstallments(payment.loan_id);
-        const installment = installments.find(i => i.id === payment.installment_id);
+        const installment = installments.find((i) => i.id === payment.installment_id);
 
         if (installment) {
           const newPaidAmount = (installment.paid_amount || 0) + payment.payment_amount;
           const newRemainingAmount = installment.total_amount - newPaidAmount;
-          const newStatus = newRemainingAmount <= 0 ? 'paid' : newPaidAmount > 0 ? 'partial' : installment.status;
+          const newStatus =
+            newRemainingAmount <= 0 ? 'paid' : newPaidAmount > 0 ? 'partial' : installment.status;
 
           await LoansService.updateInstallment(payment.installment_id, {
             paid_amount: newPaidAmount,
             remaining_amount: newRemainingAmount,
             status: newStatus,
-            paid_at: newStatus === 'paid' ? new Date().toISOString() : installment.paid_at
+            paid_at: newStatus === 'paid' ? new Date().toISOString() : installment.paid_at,
           });
         }
       }
@@ -104,7 +112,7 @@ export function useLoanPayments(loanId?: string) {
       queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
-      
+
       addActivity({
         action: `تم تسجيل دفعة قرض: ${data.payment_number}`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
@@ -113,14 +121,14 @@ export function useLoanPayments(loanId?: string) {
       });
 
       toast({
-        title: "تم تسجيل الدفعة بنجاح",
+        title: 'تم تسجيل الدفعة بنجاح',
         description: `رقم الدفعة: ${data.payment_number}`,
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في تسجيل الدفعة",
+        variant: 'destructive',
+        title: 'خطأ في تسجيل الدفعة',
         description: error.message,
       });
     },

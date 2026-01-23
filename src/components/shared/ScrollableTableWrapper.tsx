@@ -12,11 +12,11 @@ interface ScrollableTableWrapperProps {
 function throttle<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
   let lastCall = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  
+
   return ((...args: Parameters<T>) => {
     const now = Date.now();
     const remaining = ms - (now - lastCall);
-    
+
     if (remaining <= 0) {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -54,16 +54,16 @@ export function ScrollableTableWrapper({
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
     }
-    
+
     rafRef.current = requestAnimationFrame(() => {
       const el = scrollRef.current;
       if (!el) return;
 
       const { scrollLeft, scrollWidth, clientWidth } = el;
-      
+
       // تحقق من إمكانية التمرير لليسار
       setShowLeftIndicator(scrollLeft > 10);
-      
+
       // تحقق من إمكانية التمرير لليمين
       setShowRightIndicator(scrollLeft < scrollWidth - clientWidth - 10);
     });
@@ -81,7 +81,7 @@ export function ScrollableTableWrapper({
 
     // ✅ إضافة مستمع للتمرير مع passive: true
     scrollElement.addEventListener('scroll', throttledCheck, { passive: true });
-    
+
     // إضافة مستمع لتغيير حجم النافذة
     window.addEventListener('resize', throttledCheck);
 
@@ -96,13 +96,14 @@ export function ScrollableTableWrapper({
 
   const scroll = useCallback((direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
-    
+
     const scrollAmount = 300;
-    const newScrollLeft = scrollRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
-    
+    const newScrollLeft =
+      scrollRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
+
     scrollRef.current.scrollTo({
       left: newScrollLeft,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }, []);
 
@@ -134,13 +135,13 @@ export function ScrollableTableWrapper({
       <div
         ref={scrollRef}
         className={cn(
-          "overflow-x-auto overflow-y-visible",
-          "scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent",
-          "hover:scrollbar-thumb-primary/40",
+          'overflow-x-auto overflow-y-visible',
+          'scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent',
+          'hover:scrollbar-thumb-primary/40',
           // دعم Touch على الجوال
-          "touch-pan-x",
+          'touch-pan-x',
           // Snap للتمرير السلس
-          "snap-x snap-mandatory",
+          'snap-x snap-mandatory',
           className
         )}
         style={{
@@ -157,7 +158,7 @@ export function ScrollableTableWrapper({
             </div>
           </div>
         )}
-        
+
         {children}
       </div>
 

@@ -3,11 +3,11 @@
  * @version 2.9.0
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { GovernanceService } from "@/services";
-import type { EligibleVoter, GovernanceDecisionInput } from "@/services/governance.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
+import { GovernanceService } from '@/services';
+import type { EligibleVoter, GovernanceDecisionInput } from '@/services/governance.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { supabase } from '@/integrations/supabase/client';
 
 // ==================== Governance Data Hook ====================
 export function useGovernanceData() {

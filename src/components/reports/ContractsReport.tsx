@@ -2,36 +2,45 @@
  * تقارير العقود
  * يعرض تقرير شامل لجميع العقود مع إحصائيات
  */
-import { memo } from "react";
-import { matchesStatus } from "@/lib/constants";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, FileText, AlertTriangle } from "lucide-react";
-import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
-import { useContractsStats } from "@/hooks/contracts/useContractsStats";
-import { ContractsStatsCards } from "@/components/contracts/ContractsStatsCards";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { format, arLocale as ar } from "@/lib/date";
-import { toast } from "sonner";
-import { type Contract } from "@/hooks/property/useContracts";
+import { memo } from 'react';
+import { matchesStatus } from '@/lib/constants';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, FileText, AlertTriangle } from 'lucide-react';
+import { useContractsPaginated } from '@/hooks/property/useContractsPaginated';
+import { useContractsStats } from '@/hooks/contracts/useContractsStats';
+import { ContractsStatsCards } from '@/components/contracts/ContractsStatsCards';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { format, arLocale as ar } from '@/lib/date';
+import { toast } from 'sonner';
+import { type Contract } from '@/hooks/property/useContracts';
 
 export const ContractsReport = memo(function ContractsReport() {
   const { contracts, isLoading } = useContractsPaginated();
   const stats = useContractsStats(contracts as Contract[]);
 
   const handleExportPDF = async () => {
-    const { exportToPDF } = await import("@/lib/exportHelpers");
-    const headers = ["رقم العقد", "المستأجر", "العقار", "نوع العقد", "تاريخ البداية", "تاريخ النهاية", "الإيجار", "الحالة"];
+    const { exportToPDF } = await import('@/lib/exportHelpers');
+    const headers = [
+      'رقم العقد',
+      'المستأجر',
+      'العقار',
+      'نوع العقد',
+      'تاريخ البداية',
+      'تاريخ النهاية',
+      'الإيجار',
+      'الحالة',
+    ];
     const data = (contracts || []).map((c) => [
       c.contract_number,
       c.tenant_name,
@@ -43,28 +52,28 @@ export const ContractsReport = memo(function ContractsReport() {
       c.status,
     ]);
 
-    exportToPDF("تقرير العقود", headers, data, "contracts_report");
-    toast.success("تم تصدير تقرير العقود بنجاح");
+    exportToPDF('تقرير العقود', headers, data, 'contracts_report');
+    toast.success('تم تصدير تقرير العقود بنجاح');
   };
 
   const handleExportExcel = async () => {
-    const { exportToExcel } = await import("@/lib/exportHelpers");
+    const { exportToExcel } = await import('@/lib/exportHelpers');
     const data = (contracts || []).map((c) => ({
-      "رقم العقد": c.contract_number,
-      "المستأجر": c.tenant_name,
-      "رقم الهوية": c.tenant_id_number,
-      "الهاتف": c.tenant_phone,
-      "العقار": c.properties?.name || '-',
-      "نوع العقد": c.contract_type,
-      "تاريخ البداية": format(new Date(c.start_date), 'yyyy/MM/dd', { locale: ar }),
-      "تاريخ النهاية": format(new Date(c.end_date), 'yyyy/MM/dd', { locale: ar }),
-      "الإيجار الشهري": Number(c.monthly_rent),
-      "التأمين": Number(c.security_deposit || 0),
-      "الحالة": c.status,
+      'رقم العقد': c.contract_number,
+      المستأجر: c.tenant_name,
+      'رقم الهوية': c.tenant_id_number,
+      الهاتف: c.tenant_phone,
+      العقار: c.properties?.name || '-',
+      'نوع العقد': c.contract_type,
+      'تاريخ البداية': format(new Date(c.start_date), 'yyyy/MM/dd', { locale: ar }),
+      'تاريخ النهاية': format(new Date(c.end_date), 'yyyy/MM/dd', { locale: ar }),
+      'الإيجار الشهري': Number(c.monthly_rent),
+      التأمين: Number(c.security_deposit || 0),
+      الحالة: c.status,
     }));
 
-    exportToExcel(data, "contracts_report", "العقود");
-    toast.success("تم تصدير تقرير العقود بنجاح");
+    exportToExcel(data, 'contracts_report', 'العقود');
+    toast.success('تم تصدير تقرير العقود بنجاح');
   };
 
   if (isLoading) {
@@ -141,7 +150,9 @@ export const ContractsReport = memo(function ContractsReport() {
                   <TableRow key={contract.id}>
                     <TableCell className="font-medium">{contract.contract_number}</TableCell>
                     <TableCell>{contract.tenant_name}</TableCell>
-                    <TableCell className="hidden md:table-cell">{contract.properties?.name || '-'}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {contract.properties?.name || '-'}
+                    </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline">{contract.contract_type}</Badge>
                     </TableCell>
@@ -157,8 +168,11 @@ export const ContractsReport = memo(function ContractsReport() {
                     <TableCell>
                       <Badge
                         variant={
-                          matchesStatus(contract.status, 'active') ? "default" :
-                          matchesStatus(contract.status, 'expired') ? "secondary" : "outline"
+                          matchesStatus(contract.status, 'active')
+                            ? 'default'
+                            : matchesStatus(contract.status, 'expired')
+                              ? 'secondary'
+                              : 'outline'
                         }
                       >
                         {contract.status}
@@ -174,12 +188,12 @@ export const ContractsReport = memo(function ContractsReport() {
               إجمالي العقود: {stats.total} | نشطة: {stats.active} | منتهية: {stats.expired}
             </span>
             <div className="space-x-4 rtl:space-x-reverse">
-            <span className="font-semibold">
-              الإيراد الشهري من العقود: {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
-            </span>
-            <span className="font-semibold text-success">
-              الإيراد السنوي المتوقع: {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال
-            </span>
+              <span className="font-semibold">
+                الإيراد الشهري من العقود: {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
+              </span>
+              <span className="font-semibold text-success">
+                الإيراد السنوي المتوقع: {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال
+              </span>
             </div>
           </div>
         </CardContent>

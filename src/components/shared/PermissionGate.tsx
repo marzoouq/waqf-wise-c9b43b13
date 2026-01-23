@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { usePermissions } from "@/hooks/auth/usePermissions";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ReactNode } from 'react';
+import { usePermissions } from '@/hooks/auth/usePermissions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface PermissionGateProps {
   permission: string | string[];
@@ -10,31 +10,29 @@ interface PermissionGateProps {
   showLoader?: boolean; // Show skeleton loader while checking permissions
 }
 
-export function PermissionGate({ 
-  permission, 
-  fallback = null, 
+export function PermissionGate({
+  permission,
+  fallback = null,
   children,
   requireAll = false,
-  showLoader = false
+  showLoader = false,
 }: PermissionGateProps) {
   const { hasPermission, hasAnyPermission, hasAllPermissions, isLoading } = usePermissions();
-  
+
   if (isLoading) {
     if (showLoader) {
       return <Skeleton className="h-20 w-full" />;
     }
     return null;
   }
-  
+
   let allowed = false;
-  
+
   if (Array.isArray(permission)) {
-    allowed = requireAll 
-      ? hasAllPermissions(permission)
-      : hasAnyPermission(permission);
+    allowed = requireAll ? hasAllPermissions(permission) : hasAnyPermission(permission);
   } else {
     allowed = hasPermission(permission);
   }
-  
+
   return allowed ? <>{children}</> : <>{fallback}</>;
 }

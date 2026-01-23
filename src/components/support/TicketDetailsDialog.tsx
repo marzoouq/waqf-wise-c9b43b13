@@ -51,13 +51,9 @@ const statusLabels = {
   cancelled: 'ملغية',
 };
 
-export function TicketDetailsDialog({
-  ticketId,
-  open,
-  onOpenChange,
-}: TicketDetailsDialogProps) {
+export function TicketDetailsDialog({ ticketId, open, onOpenChange }: TicketDetailsDialogProps) {
   const [newComment, setNewComment] = useState('');
-  
+
   const { data: ticket, isLoading: ticketLoading } = useSupportTicket(ticketId || '');
   const { comments, addComment } = useTicketComments(ticketId || '');
 
@@ -65,7 +61,7 @@ export function TicketDetailsDialog({
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    
+
     await addComment.mutateAsync({ comment: newComment });
     setNewComment('');
   };
@@ -77,7 +73,7 @@ export function TicketDetailsDialog({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="text-2xl">
-                {ticketLoading ? "جاري التحميل..." : ticket?.subject || "تفاصيل التذكرة"}
+                {ticketLoading ? 'جاري التحميل...' : ticket?.subject || 'تفاصيل التذكرة'}
               </DialogTitle>
               {ticket && (
                 <DialogDescription className="mt-1">
@@ -112,9 +108,7 @@ export function TicketDetailsDialog({
                 <User className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">المستخدم</p>
-                  <p className="text-sm font-medium">
-                    {ticket.beneficiary_id || 'غير محدد'}
-                  </p>
+                  <p className="text-sm font-medium">{ticket.beneficiary_id || 'غير محدد'}</p>
                 </div>
               </div>
             </div>
@@ -140,14 +134,9 @@ export function TicketDetailsDialog({
                 {comments && comments.length > 0 ? (
                   <div className="space-y-4">
                     {comments.map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="p-3 rounded-lg bg-muted/50 space-y-2"
-                      >
+                      <div key={comment.id} className="p-3 rounded-lg bg-muted/50 space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium">
-                            {comment.user_id || 'مستخدم'}
-                          </span>
+                          <span className="font-medium">{comment.user_id || 'مستخدم'}</span>
                           <span className="text-muted-foreground">
                             {format(new Date(comment.created_at), 'PPp', { locale: ar })}
                           </span>
@@ -162,9 +151,7 @@ export function TicketDetailsDialog({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    لا توجد تعليقات بعد
-                  </p>
+                  <p className="text-center text-muted-foreground py-8">لا توجد تعليقات بعد</p>
                 )}
               </ScrollArea>
 
@@ -190,9 +177,7 @@ export function TicketDetailsDialog({
             </div>
           </div>
         ) : (
-          <p className="text-center text-muted-foreground py-8">
-            التذكرة غير موجودة
-          </p>
+          <p className="text-center text-muted-foreground py-8">التذكرة غير موجودة</p>
         )}
       </DialogContent>
     </Dialog>

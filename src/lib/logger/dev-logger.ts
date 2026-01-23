@@ -13,7 +13,7 @@ function isLogOptions(obj: unknown): obj is LogOptions {
   if (!obj || typeof obj !== 'object') return false;
   const keys = Object.keys(obj);
   const validKeys = ['context', 'userId', 'severity', 'metadata'];
-  return keys.some(key => validKeys.includes(key));
+  return keys.some((key) => validKeys.includes(key));
 }
 
 /**
@@ -59,7 +59,11 @@ class DevLogger implements ILogger {
       // النمط الجديد: error('message', error, options)
       message = messageOrError;
       if (errorOrOptions instanceof Error) {
-        errorData = { message: errorOrOptions.message, stack: errorOrOptions.stack, name: errorOrOptions.name };
+        errorData = {
+          message: errorOrOptions.message,
+          stack: errorOrOptions.stack,
+          name: errorOrOptions.name,
+        };
       } else if (errorOrOptions && !isLogOptions(errorOrOptions)) {
         errorData = errorOrOptions;
       }
@@ -67,7 +71,11 @@ class DevLogger implements ILogger {
       // النمط القديم: error(error, options)
       message = extractMessage(messageOrError);
       if (messageOrError instanceof Error) {
-        errorData = { message: messageOrError.message, stack: messageOrError.stack, name: messageOrError.name };
+        errorData = {
+          message: messageOrError.message,
+          stack: messageOrError.stack,
+          name: messageOrError.name,
+        };
       } else {
         errorData = messageOrError;
       }

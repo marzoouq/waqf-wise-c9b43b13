@@ -18,7 +18,7 @@ const ITEMS_PER_PAGE = 20;
 
 export function useInvoicesPage() {
   const { invoices, isLoading, error, refetch, deleteInvoice } = useInvoices();
-  
+
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -36,51 +36,50 @@ export function useInvoicesPage() {
 
   // Statistics
   const statistics = useMemo(() => {
-    if (!invoices) return {
-      totalSales: 0,
-      paidCount: 0,
-      pendingCount: 0,
-      overdueAmount: 0,
-      overdueCount: 0,
-      totalCount: 0
-    };
+    if (!invoices)
+      return {
+        totalSales: 0,
+        paidCount: 0,
+        pendingCount: 0,
+        overdueAmount: 0,
+        overdueCount: 0,
+        totalCount: 0,
+      };
 
     return {
       totalSales: invoices
-        .filter(i => i.status === 'paid')
+        .filter((i) => i.status === 'paid')
         .reduce((sum, i) => sum + i.total_amount, 0),
-      
-      paidCount: invoices.filter(i => i.status === 'paid').length,
-      
-      pendingCount: invoices.filter(i => 
-        i.status === 'sent' || i.status === 'draft'
-      ).length,
-      
+
+      paidCount: invoices.filter((i) => i.status === 'paid').length,
+
+      pendingCount: invoices.filter((i) => i.status === 'sent' || i.status === 'draft').length,
+
       overdueAmount: invoices
-        .filter(i => i.status === 'overdue')
+        .filter((i) => i.status === 'overdue')
         .reduce((sum, i) => sum + i.total_amount, 0),
-      
-      overdueCount: invoices.filter(i => i.status === 'overdue').length,
-      
-      totalCount: invoices.length
+
+      overdueCount: invoices.filter((i) => i.status === 'overdue').length,
+
+      totalCount: invoices.length,
     };
   }, [invoices]);
 
   // Filtered invoices
   const filteredInvoices = useMemo(() => {
     if (!invoices) return [];
-    
-    return invoices.filter(invoice => {
-      const matchesSearch = 
+
+    return invoices.filter((invoice) => {
+      const matchesSearch =
         invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
         invoice.customer_name.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
-      
-      const matchesDateRange = 
+
+      const matchesDateRange =
         (!dateFrom || invoice.invoice_date >= dateFrom) &&
         (!dateTo || invoice.invoice_date <= dateTo);
-      
+
       return matchesSearch && matchesStatus && matchesDateRange;
     });
   }, [invoices, searchQuery, statusFilter, dateFrom, dateTo]);
@@ -137,13 +136,13 @@ export function useInvoicesPage() {
     isLoading,
     error,
     refetch,
-    
+
     // Pagination
     currentPage,
     setCurrentPage,
     totalPages,
     itemsPerPage: ITEMS_PER_PAGE,
-    
+
     // Filters
     searchQuery,
     setSearchQuery,
@@ -153,7 +152,7 @@ export function useInvoicesPage() {
     setDateFrom,
     dateTo,
     setDateTo,
-    
+
     // Dialog States
     addDialogOpen,
     setAddDialogOpen,
@@ -165,7 +164,7 @@ export function useInvoicesPage() {
     invoiceToDelete,
     isEditMode,
     selectedInvoice,
-    
+
     // Handlers
     handleDeleteClick,
     handleDeleteConfirm,

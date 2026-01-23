@@ -46,10 +46,11 @@ test.describe('مراقبة النظام', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasHealthContent = content.includes('صحة') || 
-                              content.includes('health') || 
-                              content.includes('قاعدة') ||
-                              content.length > 500;
+    const hasHealthContent =
+      content.includes('صحة') ||
+      content.includes('health') ||
+      content.includes('قاعدة') ||
+      content.length > 500;
     expect(hasHealthContent).toBe(true);
   });
 
@@ -66,7 +67,10 @@ test.describe('مراقبة النظام', () => {
     await waitForPageLoad(page);
 
     const table = page.locator('table, [role="grid"]');
-    const hasTable = await table.first().isVisible({ timeout: 5000 }).catch(() => false);
+    const hasTable = await table
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     console.log(`سجلات الأخطاء: ${hasTable ? '✓ موجودة' : '⚠ غير موجودة'}`);
   });
 
@@ -85,9 +89,8 @@ test.describe('الأمان', () => {
     await waitForPageLoad(page);
 
     const content = await page.content();
-    const hasSecurityContent = content.includes('أمان') || 
-                                content.includes('security') || 
-                                content.length > 500;
+    const hasSecurityContent =
+      content.includes('أمان') || content.includes('security') || content.length > 500;
     expect(hasSecurityContent).toBe(true);
   });
 
@@ -142,7 +145,12 @@ test.describe('الذكاء الاصطناعي', () => {
     await waitForPageLoad(page);
 
     const chatInput = page.locator('input[type="text"], textarea');
-    if (await chatInput.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    if (
+      await chatInput
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('حقل المحادثة: ✓ موجود');
     }
   });
@@ -195,7 +203,10 @@ test.describe('الدعم والمساعدة', () => {
     await waitForPageLoad(page);
 
     const form = page.locator('form');
-    const hasForm = await form.first().isVisible({ timeout: 3000 }).catch(() => false);
+    const hasForm = await form
+      .first()
+      .isVisible({ timeout: 3000 })
+      .catch(() => false);
     console.log(`نموذج الاتصال: ${hasForm ? '✓ موجود' : '⚠ غير موجود'}`);
   });
 });
@@ -213,8 +224,15 @@ test.describe('نقطة البيع', () => {
     await page.goto('/point-of-sale');
     await waitForPageLoad(page);
 
-    const newTransactionButton = page.locator('button:has-text("معاملة"), button:has-text("تحصيل")');
-    if (await newTransactionButton.first().isVisible({ timeout: 3000 }).catch(() => false)) {
+    const newTransactionButton = page.locator(
+      'button:has-text("معاملة"), button:has-text("تحصيل")'
+    );
+    if (
+      await newTransactionButton
+        .first()
+        .isVisible({ timeout: 3000 })
+        .catch(() => false)
+    ) {
       console.log('زر المعاملة: ✓ موجود');
     }
   });

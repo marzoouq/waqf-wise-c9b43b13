@@ -1,9 +1,9 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { useMemo } from "react";
-import type { AppRole } from "@/types/roles";
+import { useAuth } from '@/contexts/AuthContext';
+import { useMemo } from 'react';
+import type { AppRole } from '@/types/roles';
 
 // Re-export AppRole for backward compatibility
-export type { AppRole } from "@/types/roles";
+export type { AppRole } from '@/types/roles';
 
 /**
  * Hook للحصول على أدوار المستخدم من AuthContext
@@ -11,21 +11,22 @@ export type { AppRole } from "@/types/roles";
  */
 export function useUserRole() {
   const { roles: authRoles, rolesLoading, hasRole: authHasRole } = useAuth();
-  
+
   // تحويل الأدوار إلى AppRole type
   const roles = useMemo(() => authRoles as AppRole[], [authRoles]);
-  
-  const hasRole = (role: AppRole) => (typeof authHasRole === 'function' ? authHasRole(role) : false);
-  const primaryRole = (roles[0] || "user") as AppRole;
 
-  const isNazer = hasRole("nazer");
-  const isAdmin = hasRole("admin");
-  const isAccountant = hasRole("accountant");
-  const isCashier = hasRole("cashier");
-  const isArchivist = hasRole("archivist");
-  const isBeneficiary = hasRole("beneficiary");
-  const isWaqfHeir = hasRole("waqf_heir");
-  const isUser = hasRole("user");
+  const hasRole = (role: AppRole) =>
+    typeof authHasRole === 'function' ? authHasRole(role) : false;
+  const primaryRole = (roles[0] || 'user') as AppRole;
+
+  const isNazer = hasRole('nazer');
+  const isAdmin = hasRole('admin');
+  const isAccountant = hasRole('accountant');
+  const isCashier = hasRole('cashier');
+  const isArchivist = hasRole('archivist');
+  const isBeneficiary = hasRole('beneficiary');
+  const isWaqfHeir = hasRole('waqf_heir');
+  const isUser = hasRole('user');
 
   return {
     roles,

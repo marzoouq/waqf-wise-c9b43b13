@@ -3,21 +3,28 @@
  * @version 2.9.12 - إضافة matchesStatus و withRetry
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import { CONTRACT_STATUS, matchesStatus } from "@/lib/constants";
-import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, type PaginatedResponse, type PaginationParams } from "@/lib/pagination.types";
-import { archiveDocument, pdfToBlob } from "@/lib/archiveDocument";
-import { generateContractPDF } from "@/lib/pdf/generateContractPDF";
-import { logger } from "@/lib/logger";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import { CONTRACT_STATUS, matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+  type PaginatedResponse,
+  type PaginationParams,
+} from '@/lib/pagination.types';
+import { archiveDocument, pdfToBlob } from '@/lib/archiveDocument';
+import { generateContractPDF } from '@/lib/pdf/generateContractPDF';
+import { logger } from '@/lib/logger';
 
 type Contract = Database['public']['Tables']['contracts']['Row'];
 type ContractInsert = Database['public']['Tables']['contracts']['Insert'];
 
 export class ContractService {
   static async getAll(filters?: { status?: string; propertyId?: string }): Promise<Contract[]> {
-    let query = supabase.from('contracts').select('*')
+    let query = supabase
+      .from('contracts')
+      .select('*')
       .is('deleted_at', null) // استبعاد المحذوفة
       .order('created_at', { ascending: false });
     if (filters?.status) query = query.eq('status', filters.status);
@@ -30,10 +37,12 @@ export class ContractService {
   static async getAllWithProperties() {
     const { data, error } = await supabase
       .from('contracts')
-      .select(`
+      .select(
+        `
         *,
         properties(name, type, location)
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -46,7 +55,11 @@ export class ContractService {
   static async getPaginated(
     params: PaginationParams = { page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZE },
     filters?: { status?: string; propertyId?: string }
-  ): Promise<PaginatedResponse<Contract & { properties?: { name: string; type: string; location: string } | null }>> {
+  ): Promise<
+    PaginatedResponse<
+      Contract & { properties?: { name: string; type: string; location: string } | null }
+    >
+  > {
     const { page, pageSize } = params;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
@@ -63,10 +76,10 @@ export class ContractService {
       .select(`*, properties(name, type, location)`)
       .order('created_at', { ascending: false })
       .range(from, to);
-    
+
     if (filters?.status) dataQuery = dataQuery.eq('status', filters.status);
     if (filters?.propertyId) dataQuery = dataQuery.eq('property_id', filters.propertyId);
-    
+
     const { data, error } = await dataQuery;
     if (error) throw error;
 
@@ -87,14 +100,17 @@ export class ContractService {
   }
 
   static async getByPropertyId(propertyId: string): Promise<Contract[]> {
-    const { data, error } = await supabase.from('contracts').select('*').eq('property_id', propertyId);
+    const { data, error } = await supabase
+      .from('contracts')
+      .select('*')
+      .eq('property_id', propertyId);
     if (error) throw error;
     return data || [];
   }
 
   static async create(contract: ContractInsert & { unit_ids?: string[] }): Promise<Contract> {
     const { unit_ids, ...contractData } = contract;
-    
+
     const { data, error } = await supabase
       .from('contracts')
       .insert([contractData])
@@ -104,12 +120,16 @@ export class ContractService {
     if (error) {
       // تحسين رسائل الخطأ للمستخدم
       if (error.code === '23503') {
-        const customError = new Error('بيانات المستأجر أو العقار غير صالحة. يرجى التحقق من البيانات.') as Error & { code?: string };
+        const customError = new Error(
+          'بيانات المستأجر أو العقار غير صالحة. يرجى التحقق من البيانات.'
+        ) as Error & { code?: string };
         customError.code = '23503';
         throw customError;
       }
       if (error.message?.includes('occupied_units_check')) {
-        const customError = new Error('يوجد تعارض في عدد الوحدات المشغولة') as Error & { code?: string };
+        const customError = new Error('يوجد تعارض في عدد الوحدات المشغولة') as Error & {
+          code?: string;
+        };
         customError.code = 'occupied_units_check';
         throw customError;
       }
@@ -119,14 +139,12 @@ export class ContractService {
 
     // ربط الوحدات بالعقد - الـ Trigger يحدث حالة الوحدات تلقائياً
     if (data && unit_ids && unit_ids.length > 0) {
-      const contractUnits = unit_ids.map(unitId => ({
+      const contractUnits = unit_ids.map((unitId) => ({
         contract_id: data.id,
         property_unit_id: unitId,
       }));
 
-      const { error: unitsError } = await supabase
-        .from('contract_units')
-        .insert(contractUnits);
+      const { error: unitsError } = await supabase.from('contract_units').insert(contractUnits);
 
       if (unitsError) {
         logger.error(unitsError, { context: 'contract_units_insert', severity: 'medium' });
@@ -142,11 +160,11 @@ export class ContractService {
         p_start_date: data.start_date,
         p_end_date: data.end_date,
         p_monthly_rent: data.monthly_rent,
-        p_payment_frequency: data.payment_frequency
+        p_payment_frequency: data.payment_frequency,
       });
 
       // أرشفة العقد تلقائياً
-      this.archiveContract(data).catch(err => {
+      this.archiveContract(data).catch((err) => {
         logger.error(err, { context: 'contract_auto_archive', severity: 'medium' });
       });
     }
@@ -198,9 +216,9 @@ export class ContractService {
         description: `عقد إيجار - ${contract.tenant_name} - ${contract.contract_number}`,
       });
 
-      logger.info('تم أرشفة العقد بنجاح', { 
-        context: 'contract_archived', 
-        metadata: { contractId: contract.id } 
+      logger.info('تم أرشفة العقد بنجاح', {
+        context: 'contract_archived',
+        metadata: { contractId: contract.id },
       });
     } catch (error) {
       logger.error(error, { context: 'archive_contract_error', severity: 'medium' });
@@ -208,7 +226,12 @@ export class ContractService {
   }
 
   static async update(id: string, updates: Partial<Contract>): Promise<Contract | null> {
-    const { data, error } = await supabase.from('contracts').update(updates).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('contracts')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -219,15 +242,20 @@ export class ContractService {
    */
   static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
     // الحصول على معرف المستخدم الحالي
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     // Soft Delete بدلاً من الحذف الفيزيائي
-    const { error } = await supabase.from('contracts').update({
-      deleted_at: new Date().toISOString(),
-      deleted_by: user?.id || null,
-      deletion_reason: reason,
-    }).eq('id', id);
-    
+    const { error } = await supabase
+      .from('contracts')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason,
+      })
+      .eq('id', id);
+
     if (error) throw error;
   }
 
@@ -238,7 +266,7 @@ export class ContractService {
       .eq('id', id)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) return null;
 
@@ -249,7 +277,7 @@ export class ContractService {
         current_contract_id: null,
         current_tenant_id: null,
         occupancy_status: 'شاغر',
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('current_contract_id', id);
 
@@ -259,7 +287,9 @@ export class ContractService {
   static async getExpiringSoon(days: number = 30): Promise<Contract[]> {
     const future = new Date();
     future.setDate(future.getDate() + days);
-    const { data, error } = await supabase.from('contracts').select('*')
+    const { data, error } = await supabase
+      .from('contracts')
+      .select('*')
       .eq('status', CONTRACT_STATUS.ACTIVE)
       .lte('end_date', future.toISOString().split('T')[0]);
     if (error) throw error;
@@ -270,29 +300,34 @@ export class ContractService {
     const contracts = await withRetry(() => this.getAll(), SUPABASE_RETRY_OPTIONS);
     return {
       total: contracts.length,
-      active: contracts.filter(c => matchesStatus(c.status, 'active')).length,
-      expired: contracts.filter(c => matchesStatus(c.status, 'expired')).length,
-      totalRent: contracts.filter(c => matchesStatus(c.status, 'active')).reduce((s, c) => s + (c.monthly_rent || 0), 0),
+      active: contracts.filter((c) => matchesStatus(c.status, 'active')).length,
+      expired: contracts.filter((c) => matchesStatus(c.status, 'expired')).length,
+      totalRent: contracts
+        .filter((c) => matchesStatus(c.status, 'active'))
+        .reduce((s, c) => s + (c.monthly_rent || 0), 0),
     };
   }
 
-  static async getActiveWithProperties(): Promise<{
-    id: string;
-    contract_number: string;
-    tenant_name: string;
-    monthly_rent: number;
-    start_date: string;
-    end_date: string;
-    status: string;
-    properties: {
-      name: string;
-      type: string;
-      location: string;
-    } | null;
-  }[]> {
+  static async getActiveWithProperties(): Promise<
+    {
+      id: string;
+      contract_number: string;
+      tenant_name: string;
+      monthly_rent: number;
+      start_date: string;
+      end_date: string;
+      status: string;
+      properties: {
+        name: string;
+        type: string;
+        location: string;
+      } | null;
+    }[]
+  > {
     const { data, error } = await supabase
       .from('contracts')
-      .select(`
+      .select(
+        `
         id,
         contract_number,
         tenant_name,
@@ -305,7 +340,8 @@ export class ContractService {
           type,
           location
         )
-      `)
+      `
+      )
       .eq('status', 'نشط')
       .order('created_at', { ascending: false });
 

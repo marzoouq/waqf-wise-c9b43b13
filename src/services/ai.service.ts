@@ -34,7 +34,9 @@ export class AIService {
   /**
    * توليد رؤى جديدة
    */
-  static async generateInsights(reportType: 'beneficiaries' | 'properties' | 'financial' | 'loans') {
+  static async generateInsights(
+    reportType: 'beneficiaries' | 'properties' | 'financial' | 'loans'
+  ) {
     const { data, error } = await supabase.functions.invoke('generate-ai-insights', {
       body: { reportType },
     });

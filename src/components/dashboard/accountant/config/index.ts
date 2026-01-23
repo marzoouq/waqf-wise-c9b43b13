@@ -1,1 +1,1 @@
-export { ACCOUNTANT_QUICK_ACTIONS, type QuickAction } from "./quickActionsConfig";
+export { ACCOUNTANT_QUICK_ACTIONS, type QuickAction } from './quickActionsConfig';

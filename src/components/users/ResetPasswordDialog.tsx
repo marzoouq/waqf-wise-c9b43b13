@@ -3,13 +3,13 @@
  * حوار إعادة تعيين كلمة المرور
  */
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import type { UserProfile } from "@/hooks/users/useUsersManagement";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import type { UserProfile } from '@/hooks/users/useUsersManagement';
 
 interface ResetPasswordDialogProps {
   open: boolean;
@@ -32,12 +32,12 @@ export function ResetPasswordDialog({
 }: ResetPasswordDialogProps) {
   const handleClose = () => {
     onOpenChange(false);
-    onPasswordChange("");
+    onPasswordChange('');
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="تعيين كلمة مرور مؤقتة"
       description={`تعيين كلمة مرور جديدة للمستخدم: ${user?.full_name}`}
@@ -63,9 +63,7 @@ export function ResetPasswordDialog({
             className="text-left"
             dir="ltr"
           />
-          <p className="text-xs text-muted-foreground">
-            مثال: User@123456
-          </p>
+          <p className="text-xs text-muted-foreground">مثال: User@123456</p>
         </div>
       </div>
 
@@ -73,11 +71,8 @@ export function ResetPasswordDialog({
         <Button variant="outline" onClick={handleClose}>
           إلغاء
         </Button>
-        <Button
-          onClick={onReset}
-          disabled={password.length < 8 || isResetting || !user?.user_id}
-        >
-          {isResetting ? "جاري التحديث..." : "تعيين كلمة المرور"}
+        <Button onClick={onReset} disabled={password.length < 8 || isResetting || !user?.user_id}>
+          {isResetting ? 'جاري التحديث...' : 'تعيين كلمة المرور'}
         </Button>
       </div>
     </ResponsiveDialog>

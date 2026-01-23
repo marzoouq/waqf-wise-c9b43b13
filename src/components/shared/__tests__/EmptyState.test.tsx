@@ -7,11 +7,7 @@ import userEvent from '@testing-library/user-event';
 describe('EmptyState', () => {
   it('renders with required props', () => {
     const { getByText } = render(
-      <EmptyState
-        icon={FileText}
-        title="لا توجد بيانات"
-        description="ابدأ بإضافة بيانات جديدة"
-      />
+      <EmptyState icon={FileText} title="لا توجد بيانات" description="ابدأ بإضافة بيانات جديدة" />
     );
 
     expect(getByText('لا توجد بيانات')).toBeInTheDocument();
@@ -38,11 +34,7 @@ describe('EmptyState', () => {
 
   it('does not render action button when not provided', () => {
     const { queryByRole } = render(
-      <EmptyState
-        icon={FileText}
-        title="لا توجد بيانات"
-        description="ابدأ بإضافة بيانات جديدة"
-      />
+      <EmptyState icon={FileText} title="لا توجد بيانات" description="ابدأ بإضافة بيانات جديدة" />
     );
 
     expect(queryByRole('button')).not.toBeInTheDocument();

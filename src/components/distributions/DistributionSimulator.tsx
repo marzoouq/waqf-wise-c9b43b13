@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -12,11 +12,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Calculator, Play } from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { matchesStatus } from "@/lib/constants";
+} from '@/components/ui/table';
+import { Calculator, Play } from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { matchesStatus } from '@/lib/constants';
 
 interface SimulationResult {
   beneficiary_id: string;
@@ -49,14 +49,14 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
   const [results, setResults] = useState<SimulationResult[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
+  const activeBeneficiaries = beneficiaries.filter((b) => matchesStatus(b.status, 'active'));
 
   const runSimulation = () => {
     if (totalAmount <= 0) {
       toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "يرجى إدخال مبلغ صحيح للتوزيع",
+        variant: 'destructive',
+        title: 'خطأ',
+        description: 'يرجى إدخال مبلغ صحيح للتوزيع',
       });
       return;
     }
@@ -64,14 +64,14 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
     setIsSimulating(true);
 
     // حساب الاستقطاعات الإجمالية
-    const totalDeductionPercentage = nazerPercentage + reservePercentage + 
-                                     developmentPercentage + maintenancePercentage;
+    const totalDeductionPercentage =
+      nazerPercentage + reservePercentage + developmentPercentage + maintenancePercentage;
 
     if (totalDeductionPercentage >= 100) {
       toast({
-        variant: "destructive",
-        title: "خطأ في النسب",
-        description: "مجموع الاستقطاعات يجب أن يكون أقل من 100%",
+        variant: 'destructive',
+        title: 'خطأ في النسب',
+        description: 'مجموع الاستقطاعات يجب أن يكون أقل من 100%',
       });
       setIsSimulating(false);
       return;
@@ -82,9 +82,14 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
     const availableForDistribution = totalAmount - deductionsAmount;
 
     // تجميع المستفيدين حسب الفئة
-    interface Beneficiary { id: string; full_name: string; category: string; status: string; }
+    interface Beneficiary {
+      id: string;
+      full_name: string;
+      category: string;
+      status: string;
+    }
     const categoryGroups: Record<string, Beneficiary[]> = {};
-    activeBeneficiaries.forEach(b => {
+    activeBeneficiaries.forEach((b) => {
       if (!categoryGroups[b.category]) {
         categoryGroups[b.category] = [];
       }
@@ -104,7 +109,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
       const categoryAmount = availableForDistribution * (categoryWeights[category] || 0.3);
       const perBeneficiaryAmount = categoryAmount / beneficiariesInCategory.length;
 
-      beneficiariesInCategory.forEach(b => {
+      beneficiariesInCategory.forEach((b) => {
         const deductions = {
           nazer: perBeneficiaryAmount * (nazerPercentage / 100),
           reserve: perBeneficiaryAmount * (reservePercentage / 100),
@@ -130,13 +135,14 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
     setIsSimulating(false);
 
     toast({
-      title: "اكتملت المحاكاة",
+      title: 'اكتملت المحاكاة',
       description: `تم توزيع ${totalAmount.toLocaleString()} ر.س على ${simulationResults.length} مستفيد`,
     });
   };
 
-  const totalDeductions = results.reduce((sum, r) => 
-    sum + Object.values(r.deductions).reduce((a, b) => a + b, 0), 0
+  const totalDeductions = results.reduce(
+    (sum, r) => sum + Object.values(r.deductions).reduce((a, b) => a + b, 0),
+    0
   );
   const totalNetDistributed = results.reduce((sum, r) => sum + r.net_amount, 0);
 
@@ -155,149 +161,157 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
               إعدادات المحاكاة
             </CardTitle>
           </CardHeader>
-        <CardContent className="space-y-6">
-          {/* إدخال البيانات */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="total-amount">إجمالي المبلغ (ر.س)</Label>
-              <Input
-                id="total-amount"
-                type="number"
-                value={totalAmount}
-                onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
-                placeholder="100000"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="nazer">استقطاع الناظر (%)</Label>
-              <Input
-                id="nazer"
-                type="number"
-                step="0.1"
-                value={nazerPercentage}
-                onChange={(e) => setNazerPercentage(parseFloat(e.target.value) || 0)}
-                placeholder="5"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="reserve">الاحتياطي (%)</Label>
-              <Input
-                id="reserve"
-                type="number"
-                step="0.1"
-                value={reservePercentage}
-                onChange={(e) => setReservePercentage(parseFloat(e.target.value) || 0)}
-                placeholder="10"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="development">التطوير (%)</Label>
-              <Input
-                id="development"
-                type="number"
-                step="0.1"
-                value={developmentPercentage}
-                onChange={(e) => setDevelopmentPercentage(parseFloat(e.target.value) || 0)}
-                placeholder="5"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="maintenance">الصيانة (%)</Label>
-              <Input
-                id="maintenance"
-                type="number"
-                step="0.1"
-                value={maintenancePercentage}
-                onChange={(e) => setMaintenancePercentage(parseFloat(e.target.value) || 0)}
-                placeholder="5"
-              />
-            </div>
-          </div>
-
-          <Button onClick={runSimulation} className="w-full" disabled={isSimulating}>
-            <Play className="h-4 w-4 ms-2" />
-            {isSimulating ? "جاري المحاكاة..." : "تشغيل المحاكاة"}
-          </Button>
-
-          {/* الملخص */}
-          {results.length > 0 && (
-            <>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">المبلغ الإجمالي</p>
-                  <p className="text-lg font-bold text-primary">
-                    {totalAmount.toLocaleString('ar-SA')} ر.س
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">الاستقطاعات</p>
-                  <p className="text-lg font-bold text-warning">
-                    {totalDeductions.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">صافي الموزع</p>
-                  <p className="text-lg font-bold text-success">
-                    {totalNetDistributed.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-1">عدد المستفيدين</p>
-                  <p className="text-lg font-bold text-info">
-                    {results.length}
-                  </p>
-                </div>
+          <CardContent className="space-y-6">
+            {/* إدخال البيانات */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="total-amount">إجمالي المبلغ (ر.س)</Label>
+                <Input
+                  id="total-amount"
+                  type="number"
+                  value={totalAmount}
+                  onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
+                  placeholder="100000"
+                />
               </div>
 
-              {/* جدول النتائج */}
-              <div className="border rounded-lg overflow-hidden">
-                <div className="max-h-96 overflow-y-auto">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-background">
-                      <TableRow>
-                        <TableHead>المستفيد</TableHead>
-                        <TableHead>الفئة</TableHead>
-                        <TableHead className="text-center">المبلغ المخصص</TableHead>
-                        <TableHead className="text-center">الاستقطاعات</TableHead>
-                        <TableHead className="text-center">الصافي</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {results.map((result) => {
-                        const totalDeduction = Object.values(result.deductions).reduce((a, b) => a + b, 0);
-                        return (
-                          <TableRow key={result.beneficiary_id}>
-                            <TableCell className="font-medium">
-                              {result.beneficiary_name}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{result.category}</Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {result.allocated_amount.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
-                            </TableCell>
-                            <TableCell className="text-center text-warning">
-                              {totalDeduction.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
-                            </TableCell>
-                            <TableCell className="text-center font-bold text-success">
-                              {result.net_amount.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="nazer">استقطاع الناظر (%)</Label>
+                <Input
+                  id="nazer"
+                  type="number"
+                  step="0.1"
+                  value={nazerPercentage}
+                  onChange={(e) => setNazerPercentage(parseFloat(e.target.value) || 0)}
+                  placeholder="5"
+                />
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="reserve">الاحتياطي (%)</Label>
+                <Input
+                  id="reserve"
+                  type="number"
+                  step="0.1"
+                  value={reservePercentage}
+                  onChange={(e) => setReservePercentage(parseFloat(e.target.value) || 0)}
+                  placeholder="10"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="development">التطوير (%)</Label>
+                <Input
+                  id="development"
+                  type="number"
+                  step="0.1"
+                  value={developmentPercentage}
+                  onChange={(e) => setDevelopmentPercentage(parseFloat(e.target.value) || 0)}
+                  placeholder="5"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="maintenance">الصيانة (%)</Label>
+                <Input
+                  id="maintenance"
+                  type="number"
+                  step="0.1"
+                  value={maintenancePercentage}
+                  onChange={(e) => setMaintenancePercentage(parseFloat(e.target.value) || 0)}
+                  placeholder="5"
+                />
+              </div>
+            </div>
+
+            <Button onClick={runSimulation} className="w-full" disabled={isSimulating}>
+              <Play className="h-4 w-4 ms-2" />
+              {isSimulating ? 'جاري المحاكاة...' : 'تشغيل المحاكاة'}
+            </Button>
+
+            {/* الملخص */}
+            {results.length > 0 && (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">المبلغ الإجمالي</p>
+                    <p className="text-lg font-bold text-primary">
+                      {totalAmount.toLocaleString('ar-SA')} ر.س
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">الاستقطاعات</p>
+                    <p className="text-lg font-bold text-warning">
+                      {totalDeductions.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">صافي الموزع</p>
+                    <p className="text-lg font-bold text-success">
+                      {totalNetDistributed.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}{' '}
+                      ر.س
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-1">عدد المستفيدين</p>
+                    <p className="text-lg font-bold text-info">{results.length}</p>
+                  </div>
+                </div>
+
+                {/* جدول النتائج */}
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="max-h-96 overflow-y-auto">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-background">
+                        <TableRow>
+                          <TableHead>المستفيد</TableHead>
+                          <TableHead>الفئة</TableHead>
+                          <TableHead className="text-center">المبلغ المخصص</TableHead>
+                          <TableHead className="text-center">الاستقطاعات</TableHead>
+                          <TableHead className="text-center">الصافي</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {results.map((result) => {
+                          const totalDeduction = Object.values(result.deductions).reduce(
+                            (a, b) => a + b,
+                            0
+                          );
+                          return (
+                            <TableRow key={result.beneficiary_id}>
+                              <TableCell className="font-medium">
+                                {result.beneficiary_name}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{result.category}</Badge>
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {result.allocated_amount.toLocaleString('ar-SA', {
+                                  maximumFractionDigits: 2,
+                                })}
+                              </TableCell>
+                              <TableCell className="text-center text-warning">
+                                {totalDeduction.toLocaleString('ar-SA', {
+                                  maximumFractionDigits: 2,
+                                })}
+                              </TableCell>
+                              <TableCell className="text-center font-bold text-success">
+                                {result.net_amount.toLocaleString('ar-SA', {
+                                  maximumFractionDigits: 2,
+                                })}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </ResponsiveDialog>
   );
 }

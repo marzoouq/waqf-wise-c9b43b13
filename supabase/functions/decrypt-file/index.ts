@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  rateLimitResponse 
+  rateLimitResponse,
 } from '../_shared/cors.ts';
 
 // ✅ Rate Limiting للحماية من Brute Force
@@ -16,16 +16,16 @@ const WINDOW_MS = 60 * 1000; // دقيقة واحدة
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(userId);
-  
+
   if (!record || now - record.lastAttempt > WINDOW_MS) {
     rateLimitMap.set(userId, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   if (record.count >= MAX_ATTEMPTS) {
     return false;
   }
-  
+
   record.count++;
   record.lastAttempt = now;
   return true;
@@ -43,7 +43,7 @@ serve(async (req) => {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
     let bodyData: Record<string, unknown> = {};
-    
+
     if (bodyText) {
       try {
         bodyData = JSON.parse(bodyText);
@@ -59,7 +59,7 @@ serve(async (req) => {
         status: 'healthy',
         function: 'decrypt-file',
         timestamp: new Date().toISOString(),
-        version: '2.1.0'
+        version: '2.1.0',
       });
     }
 
@@ -74,8 +74,11 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
       return unauthorizedResponse('فشل التحقق من الهوية');
     }
@@ -109,15 +112,13 @@ serve(async (req) => {
     }
 
     // التحقق من صلاحية المستخدم
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const userRoles = roles?.map(r => r.role) || [];
-    const hasAccess = userRoles.includes('admin') || 
-                     userRoles.includes('nazer') || 
-                     fileRecord.uploaded_by === user.id;
+    const userRoles = roles?.map((r) => r.role) || [];
+    const hasAccess =
+      userRoles.includes('admin') ||
+      userRoles.includes('nazer') ||
+      fileRecord.uploaded_by === user.id;
 
     if (!hasAccess) {
       // تسجيل محاولة وصول مرفوضة
@@ -129,7 +130,7 @@ serve(async (req) => {
         access_type: 'decrypt',
         access_reason: accessReason || 'محاولة فك تشفير',
         was_granted: false,
-        denial_reason: 'صلاحيات غير كافية'
+        denial_reason: 'صلاحيات غير كافية',
       });
 
       throw new Error('ليس لديك صلاحية للوصول لهذا الملف');
@@ -151,34 +152,30 @@ serve(async (req) => {
 
     // قراءة البيانات المشفرة
     const encryptedText = await encryptedFileData.text();
-    const encryptedBytes = Uint8Array.from(atob(encryptedText), c => c.charCodeAt(0));
+    const encryptedBytes = Uint8Array.from(atob(encryptedText), (c) => c.charCodeAt(0));
 
     // استيراد مفتاح التشفير
     const keyBase64 = fileRecord.encryption_keys.metadata.key_base64;
-    const keyBytes = Uint8Array.from(atob(keyBase64), c => c.charCodeAt(0));
-    
+    const keyBytes = Uint8Array.from(atob(keyBase64), (c) => c.charCodeAt(0));
+
     const key = await crypto.subtle.importKey(
-      "raw",
+      'raw',
       keyBytes,
-      { name: "AES-GCM", length: 256 },
+      { name: 'AES-GCM', length: 256 },
       false,
-      ["decrypt"]
+      ['decrypt']
     );
 
     // فك تشفير IV
-    const iv = Uint8Array.from(atob(fileRecord.encryption_iv), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(fileRecord.encryption_iv), (c) => c.charCodeAt(0));
 
     // فك التشفير
-    const decryptedData = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv },
-      key,
-      encryptedBytes
-    );
+    const decryptedData = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encryptedBytes);
 
     // التحقق من checksum
-    const checksumBuffer = await crypto.subtle.digest("SHA-256", decryptedData);
+    const checksumBuffer = await crypto.subtle.digest('SHA-256', decryptedData);
     const checksumArray = Array.from(new Uint8Array(checksumBuffer));
-    const calculatedChecksum = checksumArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const calculatedChecksum = checksumArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
     if (calculatedChecksum !== fileRecord.checksum) {
       throw new Error('فشل التحقق من سلامة الملف - checksum غير متطابق');
@@ -196,20 +193,18 @@ serve(async (req) => {
       record_id: fileId,
       access_type: 'decrypt',
       access_reason: accessReason || 'فك تشفير ملف',
-      was_granted: true
+      was_granted: true,
     });
 
     // تحديث عداد الوصول
-    await supabase
-      .from('encrypted_data_registry')
-      .upsert({
-        table_name: 'encrypted_files',
-        column_name: 'file_data',
-        record_id: fileId,
-        encryption_key_id: fileRecord.encryption_key_id,
-        last_accessed_at: new Date().toISOString(),
-        access_count: (fileRecord.metadata?.access_count || 0) + 1
-      });
+    await supabase.from('encrypted_data_registry').upsert({
+      table_name: 'encrypted_files',
+      column_name: 'file_data',
+      record_id: fileId,
+      encryption_key_id: fileRecord.encryption_key_id,
+      last_accessed_at: new Date().toISOString(),
+      access_count: (fileRecord.metadata?.access_count || 0) + 1,
+    });
 
     console.log(`✅ تم فك تشفير الملف بنجاح: ${fileId}`);
 
@@ -221,22 +216,22 @@ serve(async (req) => {
         original_name: fileRecord.original_file_name,
         mime_type: fileRecord.mime_type,
         size: fileRecord.file_size,
-        data: decryptedBase64
-      }
+        data: decryptedBase64,
+      },
     });
   } catch (error) {
     console.error('❌ خطأ في فك تشفير الملف:', error);
-    
+
     // تسجيل تفاصيل كاملة للمطورين
     console.error('Full error details:', {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     // رسالة آمنة للعميل (لا تكشف تفاصيل داخلية)
     let safeMessage = 'حدث خطأ أثناء فك تشفير الملف';
-    
+
     if (error instanceof Error) {
       if (error.message.includes('غير مصرح') || error.message.includes('صلاحية')) {
         safeMessage = 'ليس لديك صلاحية للوصول لهذا الملف';
@@ -248,7 +243,7 @@ serve(async (req) => {
         safeMessage = 'فشل التحقق من سلامة الملف';
       }
     }
-    
+
     return errorResponse(safeMessage, 500);
   }
 });

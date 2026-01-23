@@ -5,21 +5,21 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { HomeIcon } from "lucide-react";
+} from '@/components/ui/breadcrumb';
+import { HomeIcon } from 'lucide-react';
 
 interface AccountingBreadcrumbProps {
   activeTab: string;
 }
 
 const tabLabels: Record<string, string> = {
-  accounts: "شجرة الحسابات",
-  entries: "القيود المحاسبية",
-  budgets: "الميزانيات",
-  "trial-balance": "ميزان المراجعة",
-  ledger: "دفتر الأستاذ",
-  "bank-accounts": "الحسابات البنكية",
-  "cash-flow": "التدفقات النقدية",
+  accounts: 'شجرة الحسابات',
+  entries: 'القيود المحاسبية',
+  budgets: 'الميزانيات',
+  'trial-balance': 'ميزان المراجعة',
+  ledger: 'دفتر الأستاذ',
+  'bank-accounts': 'الحسابات البنكية',
+  'cash-flow': 'التدفقات النقدية',
 };
 
 export function AccountingBreadcrumb({ activeTab }: AccountingBreadcrumbProps) {

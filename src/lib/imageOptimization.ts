@@ -1,6 +1,6 @@
 /**
  * خدمة تحسين الصور وتحسين LCP (Largest Contentful Paint)
- * 
+ *
  * تشمل:
  * - تحسين الأحجام والجودة
  * - دعم WebP و AVIF
@@ -8,7 +8,7 @@
  * - تحسين LCP
  * - Priority Hints للصور المهمة
  * - Blur Placeholder للتحميل التدريجي
- * 
+ *
  * @version 2.0.0 - تحسينات المرحلة الثالثة
  */
 
@@ -33,9 +33,9 @@ const formatSupportCache: Record<string, boolean> = {};
  */
 export function supportsWebP(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   if ('webp' in formatSupportCache) return formatSupportCache.webp;
-  
+
   const canvas = document.createElement('canvas');
   if (canvas.getContext && canvas.getContext('2d')) {
     const result = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
@@ -51,9 +51,9 @@ export function supportsWebP(): boolean {
  */
 export function supportsAVIF(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   if ('avif' in formatSupportCache) return formatSupportCache.avif;
-  
+
   const canvas = document.createElement('canvas');
   if (canvas.getContext && canvas.getContext('2d')) {
     const result = canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0;
@@ -80,9 +80,7 @@ export function generateSrcSet(
   baseUrl: string,
   widths: number[] = [320, 640, 768, 1024, 1280, 1536]
 ): string {
-  return widths
-    .map(width => `${optimizeImageUrl(baseUrl, { width })} ${width}w`)
-    .join(', ');
+  return widths.map((width) => `${optimizeImageUrl(baseUrl, { width })} ${width}w`).join(', ');
 }
 
 /**
@@ -96,9 +94,7 @@ export function generateSizes(
     { maxWidth: '1280px', size: '100vw' },
   ]
 ): string {
-  const sizesArray = breakpoints.map(
-    bp => `(max-width: ${bp.maxWidth}) ${bp.size}`
-  );
+  const sizesArray = breakpoints.map((bp) => `(max-width: ${bp.maxWidth}) ${bp.size}`);
   sizesArray.push('100vw'); // القيمة الافتراضية
   return sizesArray.join(', ');
 }
@@ -107,21 +103,13 @@ export function generateSizes(
  * تحسين URL الصورة
  * ملاحظة: يمكن دمجه مع خدمة CDN أو Cloudinary لتحسين فعلي
  */
-export function optimizeImageUrl(
-  url: string,
-  options: ImageOptimizationOptions = {}
-): string {
+export function optimizeImageUrl(url: string, options: ImageOptimizationOptions = {}): string {
   // إذا كانت الصورة من Supabase Storage
   if (url.includes('supabase')) {
-    const {
-      width,
-      height,
-      quality = 80,
-      format = 'webp',
-    } = options;
+    const { width, height, quality = 80, format = 'webp' } = options;
 
     const params = new URLSearchParams();
-    
+
     if (width) params.set('width', width.toString());
     if (height) params.set('height', height.toString());
     params.set('quality', quality.toString());
@@ -169,16 +157,13 @@ export function calculateOptimalDimensions(
 /**
  * تحميل مسبق للصور المهمة (preload)
  */
-export function preloadImage(
-  src: string,
-  options: ImageOptimizationOptions = {}
-): Promise<void> {
+export function preloadImage(src: string, options: ImageOptimizationOptions = {}): Promise<void> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    
+
     img.onload = () => resolve();
     img.onerror = reject;
-    
+
     const optimizedSrc = optimizeImageUrl(src, options);
     img.src = optimizedSrc;
   });
@@ -191,37 +176,34 @@ export async function preloadImages(
   urls: string[],
   options: ImageOptimizationOptions = {}
 ): Promise<void[]> {
-  return Promise.all(urls.map(url => preloadImage(url, options)));
+  return Promise.all(urls.map((url) => preloadImage(url, options)));
 }
 
 /**
  * ضغط صورة من base64
  */
-export async function compressImage(
-  base64: string,
-  quality: number = 0.8
-): Promise<string> {
+export async function compressImage(base64: string, quality: number = 0.8): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    
+
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
-      
+
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         reject(new Error('Failed to get canvas context'));
         return;
       }
-      
+
       ctx.drawImage(img, 0, 0);
-      
+
       // ضغط الصورة
       const compressed = canvas.toDataURL('image/jpeg', quality);
       resolve(compressed);
     };
-    
+
     img.onerror = reject;
     img.src = base64;
   });
@@ -230,19 +212,17 @@ export async function compressImage(
 /**
  * الحصول على أبعاد الصورة
  */
-export function getImageDimensions(
-  src: string
-): Promise<{ width: number; height: number }> {
+export function getImageDimensions(src: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    
+
     img.onload = () => {
       resolve({
         width: img.naturalWidth,
         height: img.naturalHeight,
       });
     };
-    
+
     img.onerror = reject;
     img.src = src;
   });
@@ -259,16 +239,16 @@ export function optimizeLCP() {
     'img[data-priority="high"], img[fetchpriority="high"]'
   );
 
-  criticalImages.forEach(img => {
+  criticalImages.forEach((img) => {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
     link.href = img.src;
-    
+
     if (img.srcset) {
       link.setAttribute('imagesrcset', img.srcset);
     }
-    
+
     document.head.appendChild(link);
   });
 }
@@ -278,12 +258,15 @@ export function optimizeLCP() {
  */
 export function observeLCP(callback: (lcp: number) => void) {
   if (typeof window === 'undefined') return;
-  
+
   try {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1] as PerformanceEntry & { renderTime?: number; loadTime?: number };
-      
+      const lastEntry = entries[entries.length - 1] as PerformanceEntry & {
+        renderTime?: number;
+        loadTime?: number;
+      };
+
       if (lastEntry) {
         callback(lastEntry.renderTime || lastEntry.loadTime || 0);
       }
@@ -303,7 +286,7 @@ export function optimizePageImages() {
 
   const images = document.querySelectorAll<HTMLImageElement>('img:not([data-optimized])');
 
-  images.forEach(img => {
+  images.forEach((img) => {
     // إضافة lazy loading
     if (!img.loading) {
       img.loading = 'lazy';

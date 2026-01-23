@@ -21,7 +21,7 @@ describe('Input Validation Security', () => {
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
         .replace(/javascript:/gi, '')
         .replace(/on\w+=/gi, '');
-      
+
       expect(sanitized).not.toContain('<script');
       expect(sanitized.toLowerCase()).not.toContain('javascript:');
     });
@@ -33,7 +33,7 @@ describe('Input Validation Security', () => {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
-      
+
       expect(escaped).toBe('&lt;div&gt;Test &amp; &quot;quotes&quot;&lt;/div&gt;');
     });
   });
@@ -42,7 +42,7 @@ describe('Input Validation Security', () => {
     const sqlInjectionAttempts = [
       "'; DROP TABLE users; --",
       "1' OR '1'='1",
-      "1; DELETE FROM beneficiaries",
+      '1; DELETE FROM beneficiaries',
       "' UNION SELECT * FROM user_roles --",
       "admin'--",
     ];
@@ -146,7 +146,7 @@ describe('Input Validation Security', () => {
     it('should validate file size limits', () => {
       const maxFileSizeMB = 10;
       const fileSizeBytes = 5 * 1024 * 1024; // 5MB
-      
+
       expect(fileSizeBytes <= maxFileSizeMB * 1024 * 1024).toBe(true);
     });
   });
@@ -156,12 +156,12 @@ describe('Authentication Security', () => {
   describe('Password Requirements', () => {
     const validatePassword = (password: string): { valid: boolean; errors: string[] } => {
       const errors: string[] = [];
-      
+
       if (password.length < 8) errors.push('Password must be at least 8 characters');
       if (!/[A-Z]/.test(password)) errors.push('Password must contain uppercase letter');
       if (!/[a-z]/.test(password)) errors.push('Password must contain lowercase letter');
       if (!/\d/.test(password)) errors.push('Password must contain a number');
-      
+
       return { valid: errors.length === 0, errors };
     };
 

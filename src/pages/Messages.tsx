@@ -1,7 +1,10 @@
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { MessageCenter } from "@/components/messages/MessageCenter";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MessageSquare } from "lucide-react";
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { MessageCenter } from '@/components/messages/MessageCenter';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MessageSquare } from 'lucide-react';
 
 export default function Messages() {
   return (

@@ -2,41 +2,48 @@
  * Knowledge Base Page - Refactored
  * صفحة قاعدة المعرفة - مُعاد هيكلتها
  */
-import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Search, FileText, HelpCircle, Video, Download } from "lucide-react";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { useKnowledgeArticles, useKnowledgeFAQs } from "@/hooks/ui/useKnowledgeArticles";
+import { useState, useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BookOpen, Search, FileText, HelpCircle, Video, Download } from 'lucide-react';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { useKnowledgeArticles, useKnowledgeFAQs } from '@/hooks/ui/useKnowledgeArticles';
 import {
   KnowledgeArticlesTab,
   KnowledgeFAQsTab,
   KnowledgeVideosTab,
   KnowledgeDownloadsTab,
-} from "@/components/knowledge";
+} from '@/components/knowledge';
 
 const KnowledgeBase = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
   const { data: articles = [], isLoading: articlesLoading } = useKnowledgeArticles();
   const { data: faqs = [], isLoading: faqsLoading } = useKnowledgeFAQs();
 
-  const filteredArticles = useMemo(() => 
-    articles.filter(article =>
-      article.title.includes(searchQuery) || 
-      article.description?.includes(searchQuery) ||
-      article.category.includes(searchQuery)
-    ), [articles, searchQuery]);
+  const filteredArticles = useMemo(
+    () =>
+      articles.filter(
+        (article) =>
+          article.title.includes(searchQuery) ||
+          article.description?.includes(searchQuery) ||
+          article.category.includes(searchQuery)
+      ),
+    [articles, searchQuery]
+  );
 
-  const filteredFAQs = useMemo(() => 
-    faqs.filter(faq =>
-      faq.question.includes(searchQuery) || 
-      faq.answer.includes(searchQuery)
-    ), [faqs, searchQuery]);
+  const filteredFAQs = useMemo(
+    () =>
+      faqs.filter((faq) => faq.question.includes(searchQuery) || faq.answer.includes(searchQuery)),
+    [faqs, searchQuery]
+  );
 
   if (articlesLoading || faqsLoading) {
     return <LoadingState message="جاري تحميل قاعدة المعرفة..." />;

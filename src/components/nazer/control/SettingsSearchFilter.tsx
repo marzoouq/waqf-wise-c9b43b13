@@ -1,19 +1,19 @@
 /**
  * مكون البحث والفلترة للإعدادات
- * 
+ *
  * @version 2.8.91
  */
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search, X, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { Search, X, Filter } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface SettingCategory {
   id: string;
@@ -54,13 +54,13 @@ export function SettingsSearchFilter({
             variant="ghost"
             size="icon"
             className="absolute left-1 top-1/2 -translate-y-1/2 h-6 w-6"
-            onClick={() => onSearchChange("")}
+            onClick={() => onSearchChange('')}
           >
             <X className="h-3 w-3" />
           </Button>
         )}
       </div>
-      
+
       <Select value={selectedCategory} onValueChange={onCategoryChange}>
         <SelectTrigger className="w-full sm:w-[200px]">
           <Filter className="h-4 w-4 ms-2" />
@@ -68,10 +68,10 @@ export function SettingsSearchFilter({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">كل الفئات</SelectItem>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <SelectItem key={cat.id} value={cat.id}>
               <div className="flex items-center gap-2">
-                <cat.icon className={cn("h-4 w-4", cat.iconColor)} />
+                <cat.icon className={cn('h-4 w-4', cat.iconColor)} />
                 {cat.title}
               </div>
             </SelectItem>

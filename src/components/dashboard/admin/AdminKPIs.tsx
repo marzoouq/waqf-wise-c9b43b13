@@ -1,14 +1,23 @@
-import { memo, useMemo } from "react";
-import { Users, UsersRound, Building2, Wallet, AlertCircle, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
-import { formatCurrency, formatNumber } from "@/lib/utils";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { memo, useMemo } from 'react';
+import {
+  Users,
+  UsersRound,
+  Building2,
+  Wallet,
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+} from 'lucide-react';
+import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export const AdminKPIs = memo(() => {
   const { data, isLoading, isError, refresh } = useUnifiedKPIs();
-  
+
   // تحويل البيانات الموحدة لصيغة KPIs المشرف
   const kpis = useMemo(() => {
     if (!data) return undefined;
@@ -38,60 +47,60 @@ export const AdminKPIs = memo(() => {
 
     return [
       {
-        title: "إجمالي المستفيدين",
+        title: 'إجمالي المستفيدين',
         value: formatNumber(kpis.totalBeneficiaries),
         icon: Users,
-        variant: "default" as const,
+        variant: 'default' as const,
         trend: `${calculateTrend(kpis.activeBeneficiaries, kpis.totalBeneficiaries)}% نشط`,
       },
       {
-        title: "العائلات",
+        title: 'العائلات',
         value: formatNumber(kpis.totalFamilies),
         icon: UsersRound,
-        variant: "default" as const,
-        trend: "مسجلة في النظام",
+        variant: 'default' as const,
+        trend: 'مسجلة في النظام',
       },
       {
-        title: "العقارات",
+        title: 'العقارات',
         value: formatNumber(kpis.totalProperties),
         icon: Building2,
-        variant: "success" as const,
+        variant: 'success' as const,
         trend: `${kpis.occupiedProperties} مؤجر`,
       },
       {
-        title: "الأقلام النشطة",
+        title: 'الأقلام النشطة',
         value: formatNumber(kpis.activeFunds),
         icon: Wallet,
-        variant: "warning" as const,
+        variant: 'warning' as const,
         trend: `من ${kpis.totalFunds} إجمالي`,
       },
       {
-        title: "الطلبات المعلقة",
+        title: 'الطلبات المعلقة',
         value: formatNumber(kpis.pendingRequests),
         icon: Clock,
-        variant: "default" as const,
+        variant: 'default' as const,
         trend: `${kpis.overdueRequests} متأخر`,
       },
       {
-        title: "الطلبات المتأخرة",
+        title: 'الطلبات المتأخرة',
         value: formatNumber(kpis.overdueRequests),
         icon: AlertCircle,
-        variant: "danger" as const,
-        trend: "يحتاج معالجة عاجلة",
+        variant: 'danger' as const,
+        trend: 'يحتاج معالجة عاجلة',
       },
       {
-        title: "إجمالي المحصّل",
+        title: 'إجمالي المحصّل',
         value: formatCurrency(kpis.totalRevenue),
         icon: TrendingUp,
-        variant: "success" as const,
+        variant: 'success' as const,
         trend: `مصروفات: ${formatCurrency(kpis.totalExpenses)}`,
       },
       {
-        title: "صافي الدخل",
+        title: 'صافي الدخل',
         value: formatCurrency(kpis.netIncome),
         icon: kpis.netIncome >= 0 ? TrendingUp : TrendingDown,
-        variant: kpis.netIncome >= 0 ? "success" as const : "danger" as const,
-        trend: "بعد خصم المصروفات",
+        variant: kpis.netIncome >= 0 ? ('success' as const) : ('danger' as const),
+        trend: 'بعد خصم المصروفات',
       },
     ];
   }, [kpis]);
@@ -100,20 +109,16 @@ export const AdminKPIs = memo(() => {
     return (
       <UnifiedStatsGrid>
         {[...Array(8)].map((_, i) => (
-          <UnifiedKPICard
-            key={`skeleton-${i}`}
-            title=""
-            value="0"
-            icon={Users}
-            loading={true}
-          />
+          <UnifiedKPICard key={`skeleton-${i}`} title="" value="0" icon={Users} loading={true} />
         ))}
       </UnifiedStatsGrid>
     );
   }
 
   if (isError) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات المشرف" onRetry={refresh} />;
+    return (
+      <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات المشرف" onRetry={refresh} />
+    );
   }
 
   if (!kpis || stats.length === 0) {

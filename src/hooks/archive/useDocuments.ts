@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { ArchiveService } from "@/services/archive.service";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { TOAST_MESSAGES, QUERY_STALE_TIME } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { ArchiveService } from '@/services/archive.service';
 
 export interface Document {
   id: string;
@@ -24,21 +24,26 @@ export function useDocuments() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: documents = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: documents = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.DOCUMENTS,
     queryFn: () => ArchiveService.getDocuments(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
 
   const addDocument = useMutation({
-    mutationFn: (document: Parameters<typeof ArchiveService.createDocument>[0]) => 
+    mutationFn: (document: Parameters<typeof ArchiveService.createDocument>[0]) =>
       ArchiveService.createDocument(document),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FOLDERS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.ADD,
-        description: "تم رفع المستند بنجاح",
+        description: 'تم رفع المستند بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -48,13 +53,13 @@ export function useDocuments() {
   });
 
   const updateDocument = useMutation({
-    mutationFn: ({ id, ...updates }: Partial<Document> & { id: string }) => 
+    mutationFn: ({ id, ...updates }: Partial<Document> & { id: string }) =>
       ArchiveService.updateDocument(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.UPDATE,
-        description: "تم تحديث المستند بنجاح",
+        description: 'تم تحديث المستند بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -68,13 +73,13 @@ export function useDocuments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       toast({
-        title: "تم الحذف",
-        description: "تم حذف المستند بنجاح",
+        title: 'تم الحذف',
+        description: 'تم حذف المستند بنجاح',
       });
     },
     onError: createMutationErrorHandler({
       context: 'delete_document',
-      toastTitle: "خطأ في الحذف",
+      toastTitle: 'خطأ في الحذف',
     }),
   });
 

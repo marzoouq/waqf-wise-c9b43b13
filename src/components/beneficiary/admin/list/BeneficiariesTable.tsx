@@ -1,21 +1,21 @@
-import { memo, useMemo } from "react";
-import { MoreVertical, Eye, Edit, FileText, Activity, Key, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { matchesStatus } from "@/lib/constants";
+import { memo, useMemo } from 'react';
+import { MoreVertical, Eye, Edit, FileText, Activity, Key, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { matchesStatus } from '@/lib/constants';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { Pagination } from "@/components/ui/pagination";
-import { Beneficiary } from "@/types/beneficiary";
-import { BeneficiaryMobileCard } from "./BeneficiaryMobileCard";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
+} from '@/components/ui/dropdown-menu';
+import { UnifiedDataTable } from '@/components/unified/UnifiedDataTable';
+import { Pagination } from '@/components/ui/pagination';
+import { Beneficiary } from '@/types/beneficiary';
+import { BeneficiaryMobileCard } from './BeneficiaryMobileCard';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 interface BeneficiariesTableProps {
   beneficiaries: Beneficiary[];
@@ -51,92 +51,98 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
   onDelete,
 }: BeneficiariesTableProps) {
   const isMobile = useIsMobile();
-  
+
   // Define columns with responsive visibility
-  const columns = useMemo(() => [
-    {
-      key: "beneficiary_number",
-      label: "رقم المستفيد",
-      render: (_: unknown, row: Beneficiary) => (
-        <Badge variant="secondary" className="whitespace-nowrap text-xs">
-          {row.beneficiary_number || 'قيد الإنشاء'}
-        </Badge>
-      )
-    },
-    {
-      key: "full_name",
-      label: "الاسم",
-      render: (_: unknown, row: Beneficiary) => (
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <span className="text-primary font-semibold text-xs sm:text-sm">
-              {row.full_name.charAt(0)}
+  const columns = useMemo(
+    () => [
+      {
+        key: 'beneficiary_number',
+        label: 'رقم المستفيد',
+        render: (_: unknown, row: Beneficiary) => (
+          <Badge variant="secondary" className="whitespace-nowrap text-xs">
+            {row.beneficiary_number || 'قيد الإنشاء'}
+          </Badge>
+        ),
+      },
+      {
+        key: 'full_name',
+        label: 'الاسم',
+        render: (_: unknown, row: Beneficiary) => (
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-primary font-semibold text-xs sm:text-sm">
+                {row.full_name.charAt(0)}
+              </span>
+            </div>
+            <span className="truncate max-w-[100px] sm:max-w-[150px] md:max-w-none font-medium">
+              {row.full_name}
             </span>
           </div>
-          <span className="truncate max-w-[100px] sm:max-w-[150px] md:max-w-none font-medium">
-            {row.full_name}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "national_id",
-      label: "رقم الهوية",
-      hideOnMobile: true,
-      render: (value: string) => <span className="font-mono">{value}</span>
-    },
-    {
-      key: "family_name",
-      label: "العائلة",
-      hideOnTablet: true,
-      render: (value: string) => value || "-"
-    },
-    {
-      key: "category",
-      label: "الفئة",
-      hideOnTablet: true,
-      render: (value: string) => (
-        <Badge variant="outline" className="border-primary/30 text-xs">
-          {value}
-        </Badge>
-      )
-    },
-    {
-      key: "status",
-      label: "الحالة",
-      render: (_: unknown, row: Beneficiary) => (
-        <div className="flex items-center gap-1">
-          <Badge
-            className={
-              matchesStatus(row.status, 'active')
-                ? "bg-success/10 text-success hover:bg-success/20 border border-success/30 text-xs"
-                : "bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 text-xs"
-            }
-          >
-            {row.status}
+        ),
+      },
+      {
+        key: 'national_id',
+        label: 'رقم الهوية',
+        hideOnMobile: true,
+        render: (value: string) => <span className="font-mono">{value}</span>,
+      },
+      {
+        key: 'family_name',
+        label: 'العائلة',
+        hideOnTablet: true,
+        render: (value: string) => value || '-',
+      },
+      {
+        key: 'category',
+        label: 'الفئة',
+        hideOnTablet: true,
+        render: (value: string) => (
+          <Badge variant="outline" className="border-primary/30 text-xs">
+            {value}
           </Badge>
-          {row.can_login && (
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs">
-              <Key className="h-2 w-2 sm:h-3 sm:w-3 ms-1" />
-              مفعل
+        ),
+      },
+      {
+        key: 'status',
+        label: 'الحالة',
+        render: (_: unknown, row: Beneficiary) => (
+          <div className="flex items-center gap-1">
+            <Badge
+              className={
+                matchesStatus(row.status, 'active')
+                  ? 'bg-success/10 text-success hover:bg-success/20 border border-success/30 text-xs'
+                  : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 text-xs'
+              }
+            >
+              {row.status}
             </Badge>
-          )}
-        </div>
-      )
-    },
-    {
-      key: "phone",
-      label: "رقم الهاتف",
-      hideOnMobile: true,
-      render: (value: string) => <span className="font-mono">{value}</span>
-    },
-    {
-      key: "total_received",
-      label: "إجمالي المدفوعات",
-      hideOnTablet: true,
-      render: () => <span className="font-semibold text-primary">-</span>
-    }
-  ], []);
+            {row.can_login && (
+              <Badge
+                variant="outline"
+                className="bg-primary/10 text-primary border-primary/30 text-xs"
+              >
+                <Key className="h-2 w-2 sm:h-3 sm:w-3 ms-1" />
+                مفعل
+              </Badge>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'phone',
+        label: 'رقم الهاتف',
+        hideOnMobile: true,
+        render: (value: string) => <span className="font-mono">{value}</span>,
+      },
+      {
+        key: 'total_received',
+        label: 'إجمالي المدفوعات',
+        hideOnTablet: true,
+        render: () => <span className="font-semibold text-primary">-</span>,
+      },
+    ],
+    []
+  );
 
   // Actions dropdown for each row (desktop)
   const renderActions = (beneficiary: Beneficiary) => (
@@ -167,13 +173,10 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onEnableLogin(beneficiary)}>
           <Key className="ms-2 h-4 w-4" />
-          {beneficiary.can_login ? "إدارة الحساب" : "تفعيل حساب الدخول"}
+          {beneficiary.can_login ? 'إدارة الحساب' : 'تفعيل حساب الدخول'}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="text-destructive"
-          onClick={() => onDelete(beneficiary.id)}
-        >
+        <DropdownMenuItem className="text-destructive" onClick={() => onDelete(beneficiary.id)}>
           <Trash2 className="ms-2 h-4 w-4" />
           حذف المستفيد
         </DropdownMenuItem>
@@ -211,11 +214,13 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
             <CardTitle className="text-base">قائمة المستفيدين</CardTitle>
           </CardHeader>
         </Card>
-        
+
         {beneficiaries.length === 0 ? (
           <Card className="shadow-soft">
             <CardContent className="p-6 text-center text-muted-foreground">
-              {searchQuery ? "لا توجد نتائج تطابق البحث" : "لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد."}
+              {searchQuery
+                ? 'لا توجد نتائج تطابق البحث'
+                : 'لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد.'}
             </CardContent>
           </Card>
         ) : (
@@ -234,7 +239,7 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
                 />
               ))}
             </div>
-            
+
             {totalPages > 1 && (
               <Card className="shadow-soft mt-3">
                 <CardContent className="p-3">
@@ -261,13 +266,17 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
       columns={columns}
       data={beneficiaries}
       loading={isLoading}
-      emptyMessage={searchQuery ? "لا توجد نتائج تطابق البحث" : "لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد."}
+      emptyMessage={
+        searchQuery
+          ? 'لا توجد نتائج تطابق البحث'
+          : 'لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد.'
+      }
       pagination={{
         currentPage,
         totalPages,
         totalItems,
         itemsPerPage,
-        onPageChange
+        onPageChange,
       }}
       actions={renderActions}
       showMobileScrollHint={false}

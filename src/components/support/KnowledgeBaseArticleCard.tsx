@@ -34,8 +34,8 @@ export function KnowledgeBaseArticleCard({ article, onView }: KnowledgeBaseArtic
               </Badge>
             )}
           </div>
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={categoryColors[article.category as keyof typeof categoryColors]}
           >
             {article.category === 'getting_started' && 'البداية'}

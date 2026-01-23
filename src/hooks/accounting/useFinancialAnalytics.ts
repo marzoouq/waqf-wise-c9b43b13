@@ -110,13 +110,19 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       );
 
       const currentAssets = safeReduce(
-        safeFilter(typedAccounts, (a: Account) => a.account_type === 'asset' && a.code.startsWith('1')),
+        safeFilter(
+          typedAccounts,
+          (a: Account) => a.account_type === 'asset' && a.code.startsWith('1')
+        ),
         (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
       const currentLiabilities = safeReduce(
-        safeFilter(typedAccounts, (a: Account) => a.account_type === 'liability' && a.code.startsWith('21')),
+        safeFilter(
+          typedAccounts,
+          (a: Account) => a.account_type === 'liability' && a.code.startsWith('21')
+        ),
         (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
@@ -135,29 +141,35 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       // جلب سطور القيود للفترة المحددة
       const journalLines = await AccountingService.getJournalEntriesWithLines();
-      const filteredLines = (journalLines || []).flatMap(entry => 
-        (entry.journal_entry_lines || []).filter((_line: JournalEntryLineRaw) => {
-          const entryDate = entry.entry_date;
-          return entry.status === 'posted' && 
-                 entryDate >= periodStart && 
-                 entryDate <= periodEnd;
-        }).map((line: JournalEntryLineRaw) => ({
-          ...line,
-          accounts: line.accounts,
-          journal_entries: { entry_date: entry.entry_date }
-        }))
+      const filteredLines = (journalLines || []).flatMap((entry) =>
+        (entry.journal_entry_lines || [])
+          .filter((_line: JournalEntryLineRaw) => {
+            const entryDate = entry.entry_date;
+            return entry.status === 'posted' && entryDate >= periodStart && entryDate <= periodEnd;
+          })
+          .map((line: JournalEntryLineRaw) => ({
+            ...line,
+            accounts: line.accounts,
+            journal_entries: { entry_date: entry.entry_date },
+          }))
       );
 
       const typedLines = filteredLines as JournalEntryLine[];
 
       const totalRevenue = safeReduce(
-        safeFilter(typedLines, (line: JournalEntryLine) => line.accounts?.account_type === 'revenue'),
+        safeFilter(
+          typedLines,
+          (line: JournalEntryLine) => line.accounts?.account_type === 'revenue'
+        ),
         (sum: number, line: JournalEntryLine) => sum + (line.credit_amount - line.debit_amount),
         0
       );
 
       const totalExpenses = safeReduce(
-        safeFilter(typedLines, (line: JournalEntryLine) => line.accounts?.account_type === 'expense'),
+        safeFilter(
+          typedLines,
+          (line: JournalEntryLine) => line.accounts?.account_type === 'expense'
+        ),
         (sum: number, line: JournalEntryLine) => sum + (line.debit_amount - line.credit_amount),
         0
       );
@@ -247,7 +259,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         },
       ];
 
-      const insertData = kpiData.map(kpi => ({
+      const insertData = kpiData.map((kpi) => ({
         ...kpi,
         metadata: kpi.metadata as unknown as Json,
       }));
@@ -281,28 +293,28 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       // جلب البيانات التاريخية
       const journalEntries = await AccountingService.getJournalEntriesWithLines();
-      const filteredEntries = journalEntries.filter(entry => {
+      const filteredEntries = journalEntries.filter((entry) => {
         const entryDate = new Date(entry.entry_date);
-        return entry.status === 'posted' && 
-               entryDate >= startDate && 
-               entryDate <= endDate;
+        return entry.status === 'posted' && entryDate >= startDate && entryDate <= endDate;
       });
 
       const monthlyTotals = new Map<string, number>();
-      
-      filteredEntries.forEach(entry => {
+
+      filteredEntries.forEach((entry) => {
         (entry.journal_entry_lines || []).forEach((line: JournalEntryLineRaw) => {
           const matchesAccount = !accountId || line.account_id === accountId;
-          const matchesType = !forecastType || 
+          const matchesType =
+            !forecastType ||
             (forecastType === 'revenue' && line.accounts?.account_type === 'revenue') ||
             (forecastType === 'expense' && line.accounts?.account_type === 'expense');
 
           if (matchesAccount || matchesType) {
             const month = new Date(entry.entry_date).toISOString().substring(0, 7);
-            const amount = forecastType === 'revenue' 
-              ? line.credit_amount - line.debit_amount
-              : line.debit_amount - line.credit_amount;
-            
+            const amount =
+              forecastType === 'revenue'
+                ? line.credit_amount - line.debit_amount
+                : line.debit_amount - line.credit_amount;
+
             monthlyTotals.set(month, (monthlyTotals.get(month) || 0) + amount);
           }
         });
@@ -311,20 +323,18 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       const totals = Array.from(monthlyTotals.values());
       const avgMonthly = totals.length > 0 ? totals.reduce((a, b) => a + b, 0) / totals.length : 0;
 
-      const trend = totals.length > 1 
-        ? (totals[totals.length - 1] - totals[0]) / totals.length
-        : 0;
+      const trend = totals.length > 1 ? (totals[totals.length - 1] - totals[0]) / totals.length : 0;
 
       const forecasts = [];
       for (let i = 1; i <= months; i++) {
         const forecastDate = new Date();
         forecastDate.setMonth(forecastDate.getMonth() + i);
-        
+
         const periodStart = new Date(forecastDate.getFullYear(), forecastDate.getMonth(), 1);
         const periodEnd = new Date(forecastDate.getFullYear(), forecastDate.getMonth() + 1, 0);
 
-        const forecastedAmount = avgMonthly + (trend * i);
-        const confidence = Math.max(0.5, 1 - (i * 0.1));
+        const forecastedAmount = avgMonthly + trend * i;
+        const confidence = Math.max(0.5, 1 - i * 0.1);
 
         forecasts.push({
           forecast_type: forecastType,

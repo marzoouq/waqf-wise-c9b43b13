@@ -21,7 +21,12 @@ export function useLoanApprovals() {
   const { addToHistory } = useApprovalHistory();
 
   // جلب القروض مع الموافقات
-  const { data: loans, isLoading, error, refetch } = useQuery<LoanForApproval[]>({
+  const {
+    data: loans,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<LoanForApproval[]>({
     queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS,
     queryFn: async () => {
       const data = await LoansService.getLoansWithApprovals();
@@ -31,11 +36,11 @@ export function useLoanApprovals() {
 
   // mutation للموافقة أو الرفض
   const approveMutation = useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      approvalId, 
-      action, 
-      notes 
+    mutationFn: async ({
+      loanId,
+      approvalId,
+      action,
+      notes,
     }: {
       loanId: string;
       approvalId: string;
@@ -43,12 +48,12 @@ export function useLoanApprovals() {
       notes: string;
     }) => {
       const status = action === 'approve' ? 'موافق' : 'مرفوض';
-      
+
       await LoansService.updateLoanApproval(approvalId, {
         status,
         notes,
         approved_at: new Date().toISOString(),
-        approver_id: user?.id
+        approver_id: user?.id,
       });
 
       // سجل في تاريخ الموافقات
@@ -59,7 +64,7 @@ export function useLoanApprovals() {
         action: action === 'approve' ? 'approved' : 'rejected',
         performed_by: user?.id || '',
         performed_by_name: user?.user_metadata?.full_name || 'مستخدم',
-        notes
+        notes,
       });
 
       // إذا تمت الموافقة النهائية، إنشاء القيد المحاسبي
@@ -85,10 +90,10 @@ export function useLoanApprovals() {
       invalidateAccountingQueries(queryClient);
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
-      
+
       toast({
         title: 'تمت العملية بنجاح',
-        description: data.action === 'approve' ? 'تمت الموافقة على القرض' : 'تم رفض القرض'
+        description: data.action === 'approve' ? 'تمت الموافقة على القرض' : 'تم رفض القرض',
       });
     },
     onError: (error) => {
@@ -96,9 +101,9 @@ export function useLoanApprovals() {
       toast({
         title: 'خطأ في العملية',
         description: errorMessage,
-        variant: 'destructive'
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   return {

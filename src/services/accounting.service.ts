@@ -1,6 +1,6 @@
 /**
  * Accounting Service - خدمة المحاسبة (Facade)
- * 
+ *
  * هذا الملف يعيد تصدير جميع خدمات المحاسبة للحفاظ على التوافق مع الكود الحالي.
  * الخدمات الفعلية موجودة في مجلد src/services/accounting/
  */
@@ -106,7 +106,7 @@ export class AccountingService {
   static createAutoJournalEntry = AutoJournalServiceImport.createAutoJournalEntry;
 
   // ==================== Fiscal Year Operations ====================
-  
+
   /**
    * جلب السنوات المالية النشطة
    */
@@ -131,8 +131,9 @@ export class AccountingService {
    */
   static async getFiscalYearClosings() {
     const { data, error } = await supabase
-      .from("fiscal_year_closings")
-      .select(`
+      .from('fiscal_year_closings')
+      .select(
+        `
         *,
         fiscal_years (
           id,
@@ -142,8 +143,9 @@ export class AccountingService {
           is_active,
           is_closed
         )
-      `)
-      .order("closing_date", { ascending: false });
+      `
+      )
+      .order('closing_date', { ascending: false });
 
     if (error) throw error;
     return data || [];
@@ -154,9 +156,9 @@ export class AccountingService {
    */
   static async getClosingByFiscalYear(fiscalYearId: string) {
     const { data, error } = await supabase
-      .from("fiscal_year_closings")
-      .select("*")
-      .eq("fiscal_year_id", fiscalYearId)
+      .from('fiscal_year_closings')
+      .select('*')
+      .eq('fiscal_year_id', fiscalYearId)
       .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
@@ -166,9 +168,11 @@ export class AccountingService {
   /**
    * إنشاء إقفال سنة مالية
    */
-  static async createFiscalYearClosing(closing: Database['public']['Tables']['fiscal_year_closings']['Insert']) {
+  static async createFiscalYearClosing(
+    closing: Database['public']['Tables']['fiscal_year_closings']['Insert']
+  ) {
     const { data, error } = await supabase
-      .from("fiscal_year_closings")
+      .from('fiscal_year_closings')
       .insert(closing)
       .select()
       .maybeSingle();
@@ -181,11 +185,14 @@ export class AccountingService {
   /**
    * تحديث إقفال سنة مالية
    */
-  static async updateFiscalYearClosing(id: string, updates: Database['public']['Tables']['fiscal_year_closings']['Update']) {
+  static async updateFiscalYearClosing(
+    id: string,
+    updates: Database['public']['Tables']['fiscal_year_closings']['Update']
+  ) {
     const { data, error } = await supabase
-      .from("fiscal_year_closings")
+      .from('fiscal_year_closings')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .maybeSingle();
 
@@ -197,10 +204,9 @@ export class AccountingService {
    * حساب ملخص السنة المالية
    */
   static async calculateFiscalYearSummary(fiscalYearId: string) {
-    const { data, error } = await supabase
-      .rpc("calculate_fiscal_year_summary", {
-        p_fiscal_year_id: fiscalYearId,
-      });
+    const { data, error } = await supabase.rpc('calculate_fiscal_year_summary', {
+      p_fiscal_year_id: fiscalYearId,
+    });
 
     if (error) throw error;
     return data;
@@ -211,7 +217,9 @@ export class AccountingService {
   /**
    * جلب بيانات التدفق النقدي
    */
-  static async getCashFlowData(fiscalYearId: string): Promise<Database['public']['Tables']['cash_flows']['Row'][]> {
+  static async getCashFlowData(
+    fiscalYearId: string
+  ): Promise<Database['public']['Tables']['cash_flows']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('cash_flows')
@@ -270,18 +278,20 @@ export class AccountingService {
       const openingCash = bankAccount?.current_balance || 0;
 
       const { data, error } = await supabase
-        .from("cash_flows")
-        .insert([{
-          fiscal_year_id: params.fiscalYearId,
-          period_start: params.periodStart,
-          period_end: params.periodEnd,
-          operating_activities: 0,
-          investing_activities: 0,
-          financing_activities: 0,
-          net_cash_flow: 0,
-          opening_cash: openingCash,
-          closing_cash: openingCash,
-        }])
+        .from('cash_flows')
+        .insert([
+          {
+            fiscal_year_id: params.fiscalYearId,
+            period_start: params.periodStart,
+            period_end: params.periodEnd,
+            operating_activities: 0,
+            investing_activities: 0,
+            financing_activities: 0,
+            net_cash_flow: 0,
+            opening_cash: openingCash,
+            closing_cash: openingCash,
+          },
+        ])
         .select()
         .maybeSingle();
 
@@ -298,7 +308,9 @@ export class AccountingService {
   /**
    * جلب سير عمل الموافقات
    */
-  static async getApprovalWorkflows(): Promise<Database['public']['Tables']['approval_workflows']['Row'][]> {
+  static async getApprovalWorkflows(): Promise<
+    Database['public']['Tables']['approval_workflows']['Row'][]
+  > {
     try {
       const { data, error } = await supabase
         .from('approval_workflows')
@@ -319,13 +331,15 @@ export class AccountingService {
    */
   static async getPendingApprovals() {
     const { data, error } = await supabase
-      .from("approvals")
-      .select(`
+      .from('approvals')
+      .select(
+        `
         *,
         journal_entry:journal_entries(*)
-      `)
-      .in("status", ["pending", "معلق"])
-      .order("created_at", { ascending: false })
+      `
+      )
+      .in('status', ['pending', 'معلق'])
+      .order('created_at', { ascending: false })
       .limit(10);
 
     if (error) throw error;
@@ -337,14 +351,16 @@ export class AccountingService {
    */
   static async getApprovalWorkflowStatus() {
     const { data, error } = await supabase
-      .from("approval_status")
-      .select(`
+      .from('approval_status')
+      .select(
+        `
         *,
         approval_steps (*)
-      `)
-      .in("status", ["pending", "معلق"])
-      .order("started_at", { ascending: false });
-    
+      `
+      )
+      .in('status', ['pending', 'معلق'])
+      .order('started_at', { ascending: false });
+
     if (error) throw error;
     return data || [];
   }
@@ -396,15 +412,17 @@ export class AccountingService {
     if (error) throw error;
 
     const today = new Date().toISOString().split('T')[0];
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      .toISOString()
+      .split('T')[0];
 
     return {
-      pendingApprovals: entries?.filter(e => e.status === 'draft').length || 0, // pending_approval mapped to draft
-      draftEntries: entries?.filter(e => e.status === 'draft').length || 0,
-      postedEntries: entries?.filter(e => e.status === 'posted').length || 0,
-      cancelledEntries: entries?.filter(e => e.status === 'cancelled').length || 0,
-      todayEntries: entries?.filter(e => e.entry_date === today).length || 0,
-      monthlyTotal: entries?.filter(e => e.entry_date >= monthStart).length || 0,
+      pendingApprovals: entries?.filter((e) => e.status === 'draft').length || 0, // pending_approval mapped to draft
+      draftEntries: entries?.filter((e) => e.status === 'draft').length || 0,
+      postedEntries: entries?.filter((e) => e.status === 'posted').length || 0,
+      cancelledEntries: entries?.filter((e) => e.status === 'cancelled').length || 0,
+      todayEntries: entries?.filter((e) => e.entry_date === today).length || 0,
+      monthlyTotal: entries?.filter((e) => e.entry_date >= monthStart).length || 0,
       totalEntries: entries?.length || 0,
     };
   }
@@ -414,7 +432,7 @@ export class AccountingService {
    */
   static async getTrialBalanceSimple() {
     const result = await TrialBalanceService.getTrialBalance();
-    return result.accounts.map(acc => ({
+    return result.accounts.map((acc) => ({
       account_id: acc.id,
       code: acc.code,
       name: acc.name_ar,
@@ -436,11 +454,14 @@ export class AccountingService {
 
     if (error) throw error;
 
-    let currentAssets = 0, fixedAssets = 0;
-    let currentLiabilities = 0, longTermLiabilities = 0;
-    let capital = 0, reserves = 0;
+    let currentAssets = 0,
+      fixedAssets = 0;
+    let currentLiabilities = 0,
+      longTermLiabilities = 0;
+    let capital = 0,
+      reserves = 0;
 
-    (accounts || []).forEach(acc => {
+    (accounts || []).forEach((acc) => {
       const balance = acc.current_balance || 0;
       // الأصول المتداولة (1.1.x)
       if (acc.code.startsWith('1.1')) currentAssets += balance;
@@ -462,7 +483,11 @@ export class AccountingService {
 
     return {
       assets: { current: currentAssets, fixed: fixedAssets, total: totalAssets },
-      liabilities: { current: currentLiabilities, longTerm: longTermLiabilities, total: totalLiabilities },
+      liabilities: {
+        current: currentLiabilities,
+        longTerm: longTermLiabilities,
+        total: totalLiabilities,
+      },
       equity: { capital, reserves, total: totalEquity },
       retainedEarnings: totalAssets - totalLiabilities - totalEquity,
     };
@@ -480,10 +505,14 @@ export class AccountingService {
 
     if (error) throw error;
 
-    let propertyRevenue = 0, investmentRevenue = 0, otherRevenue = 0;
-    let administrativeExp = 0, operationalExp = 0, beneficiariesExp = 0;
+    let propertyRevenue = 0,
+      investmentRevenue = 0,
+      otherRevenue = 0;
+    let administrativeExp = 0,
+      operationalExp = 0,
+      beneficiariesExp = 0;
 
-    (accounts || []).forEach(acc => {
+    (accounts || []).forEach((acc) => {
       const balance = acc.current_balance || 0;
       // إيرادات عقارية (4.1.x)
       if (acc.code.startsWith('4.1')) propertyRevenue += balance;
@@ -503,8 +532,18 @@ export class AccountingService {
     const totalExpenses = administrativeExp + operationalExp + beneficiariesExp;
 
     return {
-      revenue: { property: propertyRevenue, investment: investmentRevenue, other: otherRevenue, total: totalRevenue },
-      expenses: { administrative: administrativeExp, operational: operationalExp, beneficiaries: beneficiariesExp, total: totalExpenses },
+      revenue: {
+        property: propertyRevenue,
+        investment: investmentRevenue,
+        other: otherRevenue,
+        total: totalRevenue,
+      },
+      expenses: {
+        administrative: administrativeExp,
+        operational: operationalExp,
+        beneficiaries: beneficiariesExp,
+        total: totalExpenses,
+      },
       netIncome: totalRevenue - totalExpenses,
     };
   }
@@ -521,25 +560,34 @@ export class AccountingService {
    */
   static async getCashierStats() {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const [bankAccountRes, receiptsRes, paymentsRes, pendingRes] = await Promise.all([
       supabase.from('accounts').select('current_balance').eq('code', '1.1.1').maybeSingle(),
-      supabase.from('journal_entry_lines')
+      supabase
+        .from('journal_entry_lines')
         .select('debit_amount, journal_entries!inner(entry_date, status)')
         .gte('journal_entries.entry_date', today)
         .eq('journal_entries.status', 'posted'),
-      supabase.from('journal_entry_lines')
+      supabase
+        .from('journal_entry_lines')
         .select('credit_amount, journal_entries!inner(entry_date, status)')
         .gte('journal_entries.entry_date', today)
         .eq('journal_entries.status', 'posted'),
-      supabase.from('journal_entries')
+      supabase
+        .from('journal_entries')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'draft'),
     ]);
 
-    const todayReceipts = (receiptsRes.data || []).reduce((sum, line) => sum + (line.debit_amount || 0), 0);
-    const todayPayments = (paymentsRes.data || []).reduce((sum, line) => sum + (line.credit_amount || 0), 0);
-    
+    const todayReceipts = (receiptsRes.data || []).reduce(
+      (sum, line) => sum + (line.debit_amount || 0),
+      0
+    );
+    const todayPayments = (paymentsRes.data || []).reduce(
+      (sum, line) => sum + (line.credit_amount || 0),
+      0
+    );
+
     return {
       cashBalance: bankAccountRes.data?.current_balance || 0,
       todayReceipts,
@@ -552,7 +600,12 @@ export class AccountingService {
    * جلب حسابات الإيرادات
    */
   static async getRevenueAccounts() {
-    const { data, error } = await supabase.from('accounts').select('*').eq('account_type', 'revenue').eq('is_active', true).order('code');
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('*')
+      .eq('account_type', 'revenue')
+      .eq('is_active', true)
+      .order('code');
     if (error) throw error;
     return data || [];
   }
@@ -561,10 +614,14 @@ export class AccountingService {
    * جلب المعاملات الموحدة
    */
   static async getUnifiedTransactions() {
-    const { data, error } = await supabase.from('journal_entries').select('*').order('entry_date', { ascending: false }).limit(100);
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .order('entry_date', { ascending: false })
+      .limit(100);
     if (error) throw error;
     // تحويل إلى UnifiedTransaction
-    return (data || []).map(entry => ({
+    return (data || []).map((entry) => ({
       source: 'journal_entries',
       source_name_ar: 'قيد محاسبي',
       source_name_en: 'Journal Entry',
@@ -588,13 +645,10 @@ export class AccountingService {
    * جلب الفواتير
    */
   static async getInvoices(statusFilter?: string) {
-    let query = supabase
-      .from("invoices")
-      .select("*")
-      .order("invoice_date", { ascending: false });
+    let query = supabase.from('invoices').select('*').order('invoice_date', { ascending: false });
 
-    if (statusFilter && statusFilter !== "all") {
-      query = query.eq("status", statusFilter);
+    if (statusFilter && statusFilter !== 'all') {
+      query = query.eq('status', statusFilter);
     }
 
     const { data, error } = await query;
@@ -607,9 +661,9 @@ export class AccountingService {
    */
   static async updateInvoiceStatus(invoiceId: string, status: string) {
     const { error } = await supabase
-      .from("invoices")
+      .from('invoices')
       .update({ status, updated_at: new Date().toISOString() })
-      .eq("id", invoiceId);
+      .eq('id', invoiceId);
 
     if (error) throw error;
   }
@@ -671,9 +725,7 @@ export class JournalEntryFormService {
       credit_amount: line.credit_amount || 0,
     }));
 
-    const { error: linesError } = await supabase
-      .from('journal_entry_lines')
-      .insert(linesData);
+    const { error: linesError } = await supabase.from('journal_entry_lines').insert(linesData);
 
     if (linesError) throw linesError;
 

@@ -11,7 +11,12 @@ export function useCashierShift() {
   const queryClient = useQueryClient();
 
   // جلب الجلسة الحالية النشطة
-  const { data: currentShift, isLoading: isLoadingShift, error: shiftError, refetch: refetchShift } = useQuery({
+  const {
+    data: currentShift,
+    isLoading: isLoadingShift,
+    error: shiftError,
+    refetch: refetchShift,
+  } = useQuery({
     queryKey: QUERY_KEYS.POS_CURRENT_SHIFT,
     queryFn: () => POSService.getCurrentShift(),
   });

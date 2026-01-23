@@ -3,11 +3,15 @@
  * @version 2.9.2
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { DashboardService, RealtimeService, type FiscalYearCorpus as ServiceFiscalYearCorpus } from "@/services";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import {
+  DashboardService,
+  RealtimeService,
+  type FiscalYearCorpus as ServiceFiscalYearCorpus,
+} from '@/services';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 // Re-export type for backward compatibility
 export type FiscalYearCorpus = ServiceFiscalYearCorpus;
@@ -20,19 +24,16 @@ export function useBankBalance() {
 
   // Realtime subscription
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      "accounts",
-      (payload) => {
-        const record = payload.new as { code?: string } | null;
-        if (record?.code === "1.1.1") {
-          productionLogger.info("Bank balance updated via realtime", { payload });
-          setLastUpdated(new Date());
-          setIsLive(true);
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_BALANCE_REALTIME });
-          setTimeout(() => setIsLive(false), 3000);
-        }
+    const subscription = RealtimeService.subscribeToTable('accounts', (payload) => {
+      const record = payload.new as { code?: string } | null;
+      if (record?.code === '1.1.1') {
+        productionLogger.info('Bank balance updated via realtime', { payload });
+        setLastUpdated(new Date());
+        setIsLive(true);
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_BALANCE_REALTIME });
+        setTimeout(() => setIsLive(false), 3000);
       }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -60,16 +61,13 @@ export function useWaqfCorpus() {
 
   // Realtime subscription
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      "fiscal_year_closings",
-      (payload) => {
-        productionLogger.info("Waqf corpus updated via realtime", { payload });
-        setLastUpdated(new Date());
-        setIsLive(true);
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_CORPUS_REALTIME });
-        setTimeout(() => setIsLive(false), 3000);
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('fiscal_year_closings', (payload) => {
+      productionLogger.info('Waqf corpus updated via realtime', { payload });
+      setLastUpdated(new Date());
+      setIsLive(true);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_CORPUS_REALTIME });
+      setTimeout(() => setIsLive(false), 3000);
+    });
 
     return () => {
       subscription.unsubscribe();

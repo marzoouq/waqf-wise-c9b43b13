@@ -1,7 +1,7 @@
 /**
  * LazyImage Component
  * مكون تحميل الصور الكسول محسّن لـ LCP
- * 
+ *
  * ميزات:
  * - Lazy loading باستخدام Intersection Observer
  * - دعم responsive images (srcset)
@@ -12,11 +12,11 @@
 
 import { useState, useEffect, useRef, ImgHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
-import { 
-  optimizeImageUrl, 
-  generateSrcSet, 
+import {
+  optimizeImageUrl,
+  generateSrcSet,
   generateSizes,
-  preloadImage
+  preloadImage,
 } from '@/lib/imageOptimization';
 
 interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'> {
@@ -51,11 +51,11 @@ export function LazyImage({
   const imgRef = useRef<HTMLImageElement>(null);
 
   // تحسين URL الصورة
-  const optimizedSrc = optimizeImageUrl(src, { 
+  const optimizedSrc = optimizeImageUrl(src, {
     quality,
     width: width as number | undefined,
     height: height as number | undefined,
-    format: 'webp'
+    format: 'webp',
   });
 
   // إنشاء srcset للصور التفاعلية
@@ -80,9 +80,9 @@ export function LazyImage({
           observer.disconnect();
         }
       },
-      { 
+      {
         threshold,
-        rootMargin 
+        rootMargin,
       }
     );
 

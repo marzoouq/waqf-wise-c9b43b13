@@ -3,11 +3,11 @@
  * يجلب ويحدث إعدادات الإشعارات للمستخدم
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { NotificationSettings } from "@/types/notifications";
-import { NotificationSettingsService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { NotificationSettings } from '@/types/notifications';
+import { NotificationSettingsService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useNotificationSettingsData() {
   const { toast } = useToast();
@@ -28,15 +28,15 @@ export function useNotificationSettingsData() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATION_SETTINGS });
       toast({
-        title: "تم التحديث",
-        description: "تم تحديث إعدادات الإشعارات بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تحديث إعدادات الإشعارات بنجاح',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

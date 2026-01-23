@@ -1,11 +1,11 @@
-import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Home } from "lucide-react";
-import { getUnitTypeLabel } from "@/lib/constants";
+import { usePropertyUnits } from '@/hooks/property/usePropertyUnits';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { Home } from 'lucide-react';
+import { getUnitTypeLabel } from '@/lib/constants';
 
 export function PropertyUnitsGrid() {
   const { units, isLoading, error, refetch } = usePropertyUnits();
@@ -15,7 +15,7 @@ export function PropertyUnitsGrid() {
   if (error) {
     return <ErrorState title="خطأ في تحميل الوحدات" message={error.message} onRetry={refetch} />;
   }
-  
+
   if (!units || units.length === 0) {
     return <EmptyState icon={Home} title="لا توجد وحدات" description="لم يتم تسجيل أي وحدات بعد" />;
   }
@@ -47,7 +47,9 @@ export function PropertyUnitsGrid() {
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-muted-foreground">الإيجار:</span>
-              <span className="font-bold text-primary">{unit.annual_rent?.toLocaleString() || 0} ر.س/سنة</span>
+              <span className="font-bold text-primary">
+                {unit.annual_rent?.toLocaleString() || 0} ر.س/سنة
+              </span>
             </div>
           </CardContent>
         </Card>

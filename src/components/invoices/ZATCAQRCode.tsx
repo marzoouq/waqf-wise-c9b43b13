@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import QRCode from "qrcode";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, Copy, CheckCircle } from "lucide-react";
-import { generateZATCAQRData, type ZATCAInvoiceData } from "@/lib/zatca";
-import { toast } from "sonner";
+import { useEffect, useRef, useState } from 'react';
+import QRCode from 'qrcode';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, Copy, CheckCircle } from 'lucide-react';
+import { generateZATCAQRData, type ZATCAInvoiceData } from '@/lib/zatca';
+import { toast } from 'sonner';
 
 interface ZATCAQRCodeProps {
   data: ZATCAInvoiceData;
@@ -14,7 +14,7 @@ interface ZATCAQRCodeProps {
 
 export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [qrData, setQrData] = useState<string>("");
+  const [qrData, setQrData] = useState<string>('');
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -29,13 +29,13 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
           width: size,
           margin: 2,
           color: {
-            dark: "#000000",
-            light: "#FFFFFF",
+            dark: '#000000',
+            light: '#FFFFFF',
           },
         },
         (error) => {
           if (error) {
-            toast.error("فشل في إنشاء رمز QR");
+            toast.error('فشل في إنشاء رمز QR');
           }
         }
       );
@@ -49,13 +49,13 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
       if (!blob) return;
 
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.download = `zatca-qr-${Date.now()}.png`;
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);
 
-      toast.success("تم تحميل رمز QR بنجاح");
+      toast.success('تم تحميل رمز QR بنجاح');
     });
   };
 
@@ -63,11 +63,11 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
     try {
       await navigator.clipboard.writeText(qrData);
       setCopied(true);
-      toast.success("تم نسخ البيانات إلى الحافظة");
-      
+      toast.success('تم نسخ البيانات إلى الحافظة');
+
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("فشل في النسخ إلى الحافظة");
+      toast.error('فشل في النسخ إلى الحافظة');
     }
   };
 
@@ -75,16 +75,14 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Coat_of_arms_of_Saudi_Arabia.svg/120px-Coat_of_arms_of_Saudi_Arabia.svg.png" 
-            alt="شعار هيئة الزكاة والضريبة والجمارك" 
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Coat_of_arms_of_Saudi_Arabia.svg/120px-Coat_of_arms_of_Saudi_Arabia.svg.png"
+            alt="شعار هيئة الزكاة والضريبة والجمارك"
             className="w-8 h-8"
           />
           رمز QR للفاتورة الإلكترونية
         </CardTitle>
-        <CardDescription>
-          متوافق مع معايير هيئة الزكاة والضريبة والجمارك (ZATCA)
-        </CardDescription>
+        <CardDescription>متوافق مع معايير هيئة الزكاة والضريبة والجمارك (ZATCA)</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <div className="p-4 bg-background rounded-lg border-2 border-border">
@@ -92,19 +90,11 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
         </div>
 
         <div className="flex gap-2 w-full">
-          <Button
-            variant="outline"
-            onClick={handleDownload}
-            className="flex-1"
-          >
+          <Button variant="outline" onClick={handleDownload} className="flex-1">
             <Download className="w-4 h-4 ms-2" />
             تحميل
           </Button>
-          <Button
-            variant="outline"
-            onClick={handleCopy}
-            className="flex-1"
-          >
+          <Button variant="outline" onClick={handleCopy} className="flex-1">
             {copied ? (
               <>
                 <CheckCircle className="w-4 h-4 ms-2" />

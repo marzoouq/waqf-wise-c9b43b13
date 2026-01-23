@@ -8,56 +8,56 @@ export interface FiscalYearClosing {
   fiscal_year_id: string;
   closing_date: string;
   closing_type: 'manual' | 'automatic';
-  
+
   // الإيرادات
   total_revenues: number;
   rental_revenues: number;
   other_revenues: number;
-  
+
   // المصروفات
   total_expenses: number;
   administrative_expenses: number;
   maintenance_expenses: number;
   development_expenses: number;
   other_expenses: number;
-  
+
   // الحصص والاستقطاعات
   nazer_percentage: number;
   nazer_share: number;
   waqif_percentage: number;
   waqif_share: number;
-  
+
   // توزيعات المستفيدين
   total_beneficiary_distributions: number;
   heirs_count: number;
-  
+
   // الضرائب والزكاة
   total_vat_collected: number;
   total_vat_paid: number;
   net_vat: number;
   zakat_amount: number;
-  
+
   // رقبة الوقف
   net_income: number;
   waqf_corpus: number;
-  
+
   // الأرصدة
   opening_balance: number;
   closing_balance: number;
-  
+
   // قيد الإقفال
   closing_journal_entry_id: string | null;
-  
+
   // البيانات التفصيلية
   heir_distributions: HeirDistribution[] | null;
   expense_breakdown: ExpenseBreakdown | null;
   revenue_breakdown: RevenueBreakdown | null;
-  
+
   // معلومات الإقفال
   closed_by: string | null;
   closed_by_name: string | null;
   notes: string | null;
-  
+
   created_at: string;
   updated_at: string;
 }

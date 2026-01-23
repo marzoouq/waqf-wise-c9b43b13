@@ -1,10 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UIService, type Activity } from "@/services/ui.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { TOAST_MESSAGES } from "@/lib/constants";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { UIService, type Activity } from '@/services/ui.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { TOAST_MESSAGES } from '@/lib/constants';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { Activity };
 
@@ -19,7 +19,7 @@ export function useActivities() {
   });
 
   const addActivity = useMutation({
-    mutationFn: (activity: Omit<Activity, "id" | "created_at" | "timestamp">) =>
+    mutationFn: (activity: Omit<Activity, 'id' | 'created_at' | 'timestamp'>) =>
       UIService.addActivity(activity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVITIES });

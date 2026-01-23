@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -27,13 +27,18 @@ serve(async (req) => {
         const parsed = JSON.parse(bodyClone);
         if (parsed.ping || parsed.healthCheck || parsed.testMode) {
           console.log('[send-slack-alert] Health check received');
-          return new Response(JSON.stringify({
-            status: 'healthy',
-            function: 'send-slack-alert',
-            timestamp: new Date().toISOString()
-          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+          return new Response(
+            JSON.stringify({
+              status: 'healthy',
+              function: 'send-slack-alert',
+              timestamp: new Date().toISOString(),
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // 🔐 التحقق من المصادقة - يدعم طريقتين:
@@ -58,7 +63,10 @@ serve(async (req) => {
       );
 
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser(token);
 
       if (!authError && user) {
         // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
@@ -78,42 +86,49 @@ serve(async (req) => {
     // رفض الاستدعاء غير المصرح
     if (!isAuthorized) {
       console.error('[send-slack-alert] ❌ Unauthorized access attempt');
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'غير مصرح - يجب تسجيل الدخول كمسؤول'
-      }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'غير مصرح - يجب تسجيل الدخول كمسؤول',
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
-    
+
     if (!slackWebhookUrl) {
       console.log('[SLACK-ALERT] No webhook URL configured');
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Slack webhook URL not configured'
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Slack webhook URL not configured',
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    const { title, message, severity, fields, actionUrl, actionLabel }: SlackMessage = await req.json();
+    const { title, message, severity, fields, actionUrl, actionLabel }: SlackMessage =
+      await req.json();
 
     // تحديد اللون حسب الخطورة
     const colorMap: Record<string, string> = {
       critical: '#FF0000',
       warning: '#FFA500',
       info: '#0000FF',
-      success: '#00FF00'
+      success: '#00FF00',
     };
 
     const emojiMap: Record<string, string> = {
       critical: '🚨',
       warning: '⚠️',
       info: 'ℹ️',
-      success: '✅'
+      success: '✅',
     };
 
     // بناء رسالة Slack
@@ -123,26 +138,26 @@ serve(async (req) => {
         text: {
           type: 'plain_text',
           text: `${emojiMap[severity]} ${title}`,
-          emoji: true
-        }
+          emoji: true,
+        },
       },
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: message
-        }
-      }
+          text: message,
+        },
+      },
     ];
 
     // إضافة الحقول إن وجدت
     if (fields && fields.length > 0) {
       blocks.push({
         type: 'section',
-        fields: fields.map(f => ({
+        fields: fields.map((f) => ({
           type: 'mrkdwn',
-          text: `*${f.label}:*\n${f.value}`
-        }))
+          text: `*${f.label}:*\n${f.value}`,
+        })),
       });
     }
 
@@ -156,12 +171,12 @@ serve(async (req) => {
             text: {
               type: 'plain_text',
               text: actionLabel || 'عرض التفاصيل',
-              emoji: true
+              emoji: true,
             },
             url: actionUrl,
-            style: severity === 'critical' ? 'danger' : 'primary'
-          }
-        ]
+            style: severity === 'critical' ? 'danger' : 'primary',
+          },
+        ],
       });
     }
 
@@ -173,9 +188,9 @@ serve(async (req) => {
         elements: [
           {
             type: 'mrkdwn',
-            text: `📅 ${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })} | نظام إدارة الوقف`
-          }
-        ]
+            text: `📅 ${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })} | نظام إدارة الوقف`,
+          },
+        ],
       }
     );
 
@@ -187,10 +202,10 @@ serve(async (req) => {
         attachments: [
           {
             color: colorMap[severity],
-            blocks
-          }
-        ]
-      })
+            blocks,
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
@@ -199,22 +214,27 @@ serve(async (req) => {
 
     console.log('[SLACK-ALERT] Message sent successfully');
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Slack notification sent'
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Slack notification sent',
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : 'Unknown error';
     console.error('[SLACK-ALERT] Error:', error);
-    return new Response(JSON.stringify({
-      success: false,
-      error: errMsg
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: errMsg,
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

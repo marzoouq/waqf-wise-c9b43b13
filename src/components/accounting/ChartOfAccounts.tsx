@@ -4,8 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Plus, FolderTree, ChevronLeft, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -72,9 +84,9 @@ export function ChartOfAccounts() {
   // بناء الشجرة الهرمية
   const buildTree = (parentId: string | null = null, level: number = 0): JSX.Element[] => {
     return accounts
-      .filter(acc => acc.parent_id === parentId)
-      .map(account => {
-        const children = accounts.filter(a => a.parent_id === account.id);
+      .filter((acc) => acc.parent_id === parentId)
+      .map((account) => {
+        const children = accounts.filter((a) => a.parent_id === account.id);
         const hasChildren = children.length > 0;
         const isExpanded = expandedAccounts.has(account.id);
 
@@ -116,9 +128,7 @@ export function ChartOfAccounts() {
               )}
             </div>
 
-            {isExpanded && hasChildren && (
-              <div>{buildTree(account.id, level + 1)}</div>
-            )}
+            {isExpanded && hasChildren && <div>{buildTree(account.id, level + 1)}</div>}
           </div>
         );
       });
@@ -241,8 +251,8 @@ export function ChartOfAccounts() {
                     <SelectContent>
                       <SelectItem value="none">بدون</SelectItem>
                       {accounts
-                        .filter(a => a.is_header)
-                        .map(acc => (
+                        .filter((a) => a.is_header)
+                        .map((acc) => (
                           <SelectItem key={acc.id} value={acc.id}>
                             {acc.code} - {acc.name_ar}
                           </SelectItem>
@@ -267,9 +277,7 @@ export function ChartOfAccounts() {
                   type="checkbox"
                   id="is_header"
                   checked={formData.is_header}
-                  onChange={(e) =>
-                    setFormData({ ...formData, is_header: e.target.checked })
-                  }
+                  onChange={(e) => setFormData({ ...formData, is_header: e.target.checked })}
                   className="rounded"
                 />
                 <Label htmlFor="is_header">حساب رئيسي (Header Account)</Label>

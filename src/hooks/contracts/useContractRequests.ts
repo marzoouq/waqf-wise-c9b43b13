@@ -47,7 +47,7 @@ export function useContractRequests(contractId?: string) {
     isLoading: isLoadingTermination,
     refetch: refetchTermination,
   } = useQuery({
-    queryKey: contractId 
+    queryKey: contractId
       ? PROPERTIES_KEYS.TERMINATION_REQUESTS_BY_CONTRACT(contractId)
       : PROPERTIES_KEYS.TERMINATION_REQUESTS,
     queryFn: async () => {
@@ -72,7 +72,7 @@ export function useContractRequests(contractId?: string) {
     isLoading: isLoadingRentAdjustment,
     refetch: refetchRentAdjustment,
   } = useQuery({
-    queryKey: contractId 
+    queryKey: contractId
       ? PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS_BY_CONTRACT(contractId)
       : PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS,
     queryFn: async () => {
@@ -133,7 +133,7 @@ export function useContractRequests(contractId?: string) {
       reason: string;
       effective_date: string;
     }) => {
-      const adjustment_percentage = 
+      const adjustment_percentage =
         ((request.requested_rent - request.current_rent) / request.current_rent) * 100;
 
       const { data, error } = await supabase
@@ -186,11 +186,7 @@ export function useContractRequests(contractId?: string) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.TERMINATION_REQUESTS });
-      toast.success(
-        data.status === 'approved'
-          ? 'تمت الموافقة على طلب الفسخ'
-          : 'تم رفض طلب الفسخ'
-      );
+      toast.success(data.status === 'approved' ? 'تمت الموافقة على طلب الفسخ' : 'تم رفض طلب الفسخ');
     },
     onError: (error) => {
       console.error('Error responding to termination request:', error);
@@ -228,13 +224,13 @@ export function useContractRequests(contractId?: string) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS });
-      
+
       const messages = {
         approved: 'تمت الموافقة على طلب تعديل الإيجار',
         rejected: 'تم رفض طلب تعديل الإيجار',
         negotiating: 'تم إرسال عرض التفاوض',
       };
-      
+
       toast.success(messages[data.status as keyof typeof messages]);
     },
     onError: (error) => {
@@ -253,10 +249,14 @@ export function useContractRequests(contractId?: string) {
     },
     rentAdjustmentRequests: {
       total: rentAdjustmentRequests?.length || 0,
-      pending: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'pending')).length || 0,
-      approved: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'approved')).length || 0,
-      rejected: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'rejected')).length || 0,
-      negotiating: rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'negotiating')).length || 0,
+      pending:
+        rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'pending')).length || 0,
+      approved:
+        rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'approved')).length || 0,
+      rejected:
+        rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'rejected')).length || 0,
+      negotiating:
+        rentAdjustmentRequests?.filter((r) => matchesStatus(r.status, 'negotiating')).length || 0,
     },
   };
 

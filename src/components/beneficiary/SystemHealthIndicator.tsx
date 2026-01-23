@@ -4,12 +4,7 @@
  */
 
 import { Badge } from '@/components/ui/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertTriangle, WifiOff, CheckCircle2, Database, Clock, RefreshCw } from 'lucide-react';
 import { useSystemHealthIndicator } from '@/hooks/system/useSystemHealthIndicator';
 
@@ -93,7 +88,11 @@ export function SystemHealthIndicator() {
               <Database className="h-3 w-3" />
               <span>قاعدة البيانات: </span>
               <span className={details.database === 'ok' ? 'text-success' : 'text-destructive'}>
-                {details.database === 'ok' ? 'متصل' : details.database === 'error' ? 'خطأ' : 'غير معروف'}
+                {details.database === 'ok'
+                  ? 'متصل'
+                  : details.database === 'error'
+                    ? 'خطأ'
+                    : 'غير معروف'}
               </span>
             </div>
 
@@ -102,13 +101,15 @@ export function SystemHealthIndicator() {
               <div className="flex items-center gap-2">
                 <Clock className="h-3 w-3" />
                 <span>وقت الاستجابة: </span>
-                <span className={
-                  details.responseTime < THRESHOLDS.SLOW_RESPONSE_MS 
-                    ? 'text-success' 
-                    : details.responseTime < THRESHOLDS.CRITICAL_RESPONSE_MS 
-                      ? 'text-warning' 
-                      : 'text-destructive'
-                }>
+                <span
+                  className={
+                    details.responseTime < THRESHOLDS.SLOW_RESPONSE_MS
+                      ? 'text-success'
+                      : details.responseTime < THRESHOLDS.CRITICAL_RESPONSE_MS
+                        ? 'text-warning'
+                        : 'text-destructive'
+                  }
+                >
                   {details.responseTime}ms
                 </span>
               </div>
@@ -123,9 +124,7 @@ export function SystemHealthIndicator() {
 
             {/* نصيحة */}
             {status === 'offline' && (
-              <p className="text-muted-foreground border-t pt-2 mt-2">
-                تحقق من اتصالك بالإنترنت
-              </p>
+              <p className="text-muted-foreground border-t pt-2 mt-2">تحقق من اتصالك بالإنترنت</p>
             )}
             {status === 'slow' && (
               <p className="text-muted-foreground border-t pt-2 mt-2">

@@ -36,7 +36,7 @@ export function initializeSupabaseInterceptor(): void {
         details: 'انتهت صلاحية الجلسة أو تم تسجيل الخروج',
       });
     }
-    
+
     if (event === 'TOKEN_REFRESHED') {
       connectionMonitor.logEvent({
         type: 'api',
@@ -48,8 +48,8 @@ export function initializeSupabaseInterceptor(): void {
 
   // اعتراض fetch الأصلي
   const originalFetch = window.fetch;
-  
-  window.fetch = async function(...args) {
+
+  window.fetch = async function (...args) {
     const [input, init] = args;
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     const startTime = Date.now();
@@ -83,7 +83,7 @@ export function initializeSupabaseInterceptor(): void {
       return response;
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       // في وضع الاختبار، تقليل تسجيل الأخطاء
       if (url.includes('supabase') && !testingMode) {
         // تحديد نوع الخطأ
@@ -107,7 +107,7 @@ export function initializeSupabaseInterceptor(): void {
           });
         }
       }
-      
+
       throw error;
     }
   };

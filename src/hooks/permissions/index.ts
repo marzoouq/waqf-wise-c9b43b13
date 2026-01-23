@@ -4,4 +4,7 @@
  */
 
 export { useRolePermissionsData } from './useRolePermissionsData';
-export { useUserPermissionsOverride, type UserPermissionOverride } from './useUserPermissionsOverride';
+export {
+  useUserPermissionsOverride,
+  type UserPermissionOverride,
+} from './useUserPermissionsOverride';

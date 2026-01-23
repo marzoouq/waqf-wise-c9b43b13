@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
 import {
   Form,
   FormControl,
@@ -11,15 +11,15 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2, FileText } from "lucide-react";
-import { useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Loader2, FileText } from 'lucide-react';
+import { useAnnualDisclosures } from '@/hooks/reports/useAnnualDisclosures';
 
 const disclosureSchema = z.object({
-  year: z.coerce.number().min(2020, "السنة يجب أن تكون 2020 أو أحدث").max(2100),
-  waqfName: z.string().min(1, "اسم الوقف مطلوب"),
+  year: z.coerce.number().min(2020, 'السنة يجب أن تكون 2020 أو أحدث').max(2100),
+  waqfName: z.string().min(1, 'اسم الوقف مطلوب'),
 });
 
 type DisclosureFormValues = z.infer<typeof disclosureSchema>;
@@ -29,10 +29,7 @@ interface GenerateDisclosureDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const GenerateDisclosureDialog = ({
-  open,
-  onOpenChange,
-}: GenerateDisclosureDialogProps) => {
+export const GenerateDisclosureDialog = ({ open, onOpenChange }: GenerateDisclosureDialogProps) => {
   const { generateDisclosure } = useAnnualDisclosures();
   const [generating, setGenerating] = useState(false);
 
@@ -40,7 +37,7 @@ export const GenerateDisclosureDialog = ({
     resolver: zodResolver(disclosureSchema),
     defaultValues: {
       year: new Date().getFullYear(),
-      waqfName: "",
+      waqfName: '',
     },
   });
 
@@ -74,16 +71,9 @@ export const GenerateDisclosureDialog = ({
               <FormItem>
                 <FormLabel>السنة المالية</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    min="2020"
-                    max="2100"
-                    {...field}
-                  />
+                  <Input type="number" min="2020" max="2100" {...field} />
                 </FormControl>
-                <FormDescription>
-                  اختر السنة المالية التي تريد إنشاء الإفصاح لها
-                </FormDescription>
+                <FormDescription>اختر السنة المالية التي تريد إنشاء الإفصاح لها</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -96,14 +86,9 @@ export const GenerateDisclosureDialog = ({
               <FormItem>
                 <FormLabel>اسم الوقف</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="مثال: وقف آل فلان الخيري"
-                    {...field}
-                  />
+                  <Input placeholder="مثال: وقف آل فلان الخيري" {...field} />
                 </FormControl>
-                <FormDescription>
-                  اسم الوقف كما سيظهر في الإفصاح السنوي
-                </FormDescription>
+                <FormDescription>اسم الوقف كما سيظهر في الإفصاح السنوي</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

@@ -17,24 +17,21 @@ const maybeDescribe = HAS_ENV ? describe : describe.skip;
 
 // Helper to call edge functions
 async function invokeFunction(
-  functionName: string, 
+  functionName: string,
   options: { body?: object; method?: string } = {}
 ): Promise<Response> {
   const { body, method = 'POST' } = options;
-  
-  const response = await fetch(
-    `${SUPABASE_URL}/functions/v1/${functionName}`,
-    {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'apikey': SUPABASE_ANON_KEY,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    }
-  );
-  
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${functionName}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
   return response;
 }
 
@@ -63,7 +60,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
   describe('Public Utility Functions', () => {
     it('chatbot should accept messages', async () => {
       const response = await invokeFunction('chatbot', {
-        body: { message: 'مرحبا', sessionId: 'test-session' }
+        body: { message: 'مرحبا', sessionId: 'test-session' },
       });
       // May require auth, so accept 401/403 as valid
       expect([200, 401, 403]).toContain(response.status);
@@ -72,7 +69,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
     it('intelligent-search should respond to queries', async () => {
       const response = await invokeFunction('intelligent-search', {
-        body: { query: 'test', limit: 5 }
+        body: { query: 'test', limit: 5 },
       });
       expect([200, 401, 403]).toContain(response.status);
       await response.text();
@@ -82,11 +79,11 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
   describe('Notification Functions', () => {
     it('send-notification should handle requests', async () => {
       const response = await invokeFunction('send-notification', {
-        body: { 
+        body: {
           type: 'test',
           userId: 'test-user',
-          message: 'Test notification'
-        }
+          message: 'Test notification',
+        },
       });
       expect([200, 400, 401, 403]).toContain(response.status);
       await response.text();
@@ -102,7 +99,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
   describe('Document Functions', () => {
     it('auto-classify-document should handle classification request', async () => {
       const response = await invokeFunction('auto-classify-document', {
-        body: { documentId: 'test-doc' }
+        body: { documentId: 'test-doc' },
       });
       expect([200, 400, 401, 403, 404]).toContain(response.status);
       await response.text();
@@ -110,7 +107,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
     it('ocr-document should respond', async () => {
       const response = await invokeFunction('ocr-document', {
-        body: { documentUrl: 'https://example.com/test.pdf' }
+        body: { documentUrl: 'https://example.com/test.pdf' },
       });
       expect([200, 400, 401, 403]).toContain(response.status);
       await response.text();
@@ -120,7 +117,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
   describe('Tenant Portal Functions', () => {
     it('tenant-portal should respond', async () => {
       const response = await invokeFunction('tenant-portal', {
-        body: { action: 'ping' }
+        body: { action: 'ping' },
       });
       expect([200, 400, 401, 403]).toContain(response.status);
       await response.text();
@@ -128,7 +125,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
     it('tenant-send-otp should handle OTP request', async () => {
       const response = await invokeFunction('tenant-send-otp', {
-        body: { phone: '+966500000000' }
+        body: { phone: '+966500000000' },
       });
       // May fail due to invalid phone, but should respond
       expect([200, 400, 401, 403]).toContain(response.status);
@@ -139,7 +136,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
   describe('AI Functions', () => {
     it('generate-ai-insights should respond', async () => {
       const response = await invokeFunction('generate-ai-insights', {
-        body: { type: 'dashboard' }
+        body: { type: 'dashboard' },
       });
       expect([200, 400, 401, 403]).toContain(response.status);
       await response.text();
@@ -147,7 +144,7 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
     it('property-ai-assistant should respond', async () => {
       const response = await invokeFunction('property-ai-assistant', {
-        body: { query: 'What properties are available?' }
+        body: { query: 'What properties are available?' },
       });
       expect([200, 400, 401, 403]).toContain(response.status);
       await response.text();
@@ -156,20 +153,16 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
   describe('CORS Handling', () => {
     it('should handle OPTIONS preflight for chatbot', async () => {
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/chatbot`,
-        { method: 'OPTIONS' }
-      );
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/chatbot`, { method: 'OPTIONS' });
       // Should not fail
       expect([200, 204, 400, 401, 403]).toContain(response.status);
       await response.text();
     });
 
     it('should handle OPTIONS preflight for intelligent-search', async () => {
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/intelligent-search`,
-        { method: 'OPTIONS' }
-      );
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/intelligent-search`, {
+        method: 'OPTIONS',
+      });
       expect([200, 204, 400, 401, 403]).toContain(response.status);
       await response.text();
     });
@@ -178,34 +171,28 @@ maybeDescribe('Edge Functions - Public Endpoints', () => {
 
 describe('Edge Functions - Error Handling', () => {
   it('should handle invalid function name gracefully', async () => {
-    const response = await fetch(
-      `${SUPABASE_URL}/functions/v1/non-existent-function-12345`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'apikey': SUPABASE_ANON_KEY,
-        },
-      }
-    );
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/non-existent-function-12345`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
+      },
+    });
     expect(response.status).toBe(404);
     await response.text();
   });
 
   it('should handle malformed JSON gracefully', async () => {
-    const response = await fetch(
-      `${SUPABASE_URL}/functions/v1/chatbot`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: 'not-valid-json{{{',
-      }
-    );
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/chatbot`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
+      },
+      body: 'not-valid-json{{{',
+    });
     // Should handle bad request
     expect([400, 401, 403, 500]).toContain(response.status);
     await response.text();

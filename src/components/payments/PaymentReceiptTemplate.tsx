@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/date";
+import { formatDate } from '@/lib/date';
 
 interface PaymentReceipt {
   payment_number: string;
@@ -105,26 +105,28 @@ export const PaymentReceiptTemplate = ({ payment }: PaymentReceiptTemplateProps)
           }
         }
       `}</style>
-      
+
       <div className="receipt-container">
         <div className="receipt-header">
           <div className="receipt-title">سند قبض</div>
           <p>رقم السند: {payment.payment_number}</p>
-          <p>التاريخ: {formatDate(payment.payment_date, "dd MMMM yyyy")}</p>
+          <p>التاريخ: {formatDate(payment.payment_date, 'dd MMMM yyyy')}</p>
         </div>
 
         <div className="receipt-body">
           <div className="receipt-row">
             <span className="receipt-label">استلمنا من السيد/ة:</span>
-            <span className="receipt-value">{payment.contracts?.tenant_name || "-"}</span>
+            <span className="receipt-value">{payment.contracts?.tenant_name || '-'}</span>
           </div>
           <div className="receipt-row">
             <span className="receipt-label">مقابل:</span>
-            <span className="receipt-value">إيجار عقار {payment.contracts?.properties?.name || "-"}</span>
+            <span className="receipt-value">
+              إيجار عقار {payment.contracts?.properties?.name || '-'}
+            </span>
           </div>
           <div className="receipt-row">
             <span className="receipt-label">رقم العقد:</span>
-            <span className="receipt-value">{payment.contracts?.contract_number || "-"}</span>
+            <span className="receipt-value">{payment.contracts?.contract_number || '-'}</span>
           </div>
           {payment.payment_method && (
             <div className="receipt-row">

@@ -3,9 +3,9 @@
  * @version 2.8.43
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { BeneficiaryService } from "@/services";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { BeneficiaryService } from '@/services';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export interface NazerBeneficiary {
   id: string;

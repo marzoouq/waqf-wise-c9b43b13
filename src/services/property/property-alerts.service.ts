@@ -50,9 +50,9 @@ export class PropertyAlertsService {
     try {
       const { error } = await supabase
         .from('property_alerts')
-        .update({ 
-          is_resolved: true, 
-          resolved_at: new Date().toISOString() 
+        .update({
+          is_resolved: true,
+          resolved_at: new Date().toISOString(),
         })
         .eq('id', alertId);
 
@@ -77,9 +77,8 @@ export class PropertyAlertsService {
     metadata?: Json;
   }): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('property_alerts')
-        .insert([{
+      const { error } = await supabase.from('property_alerts').insert([
+        {
           property_id: alert.property_id || null,
           contract_id: alert.contract_id || null,
           alert_type: alert.alert_type,
@@ -87,8 +86,9 @@ export class PropertyAlertsService {
           title: alert.title,
           message: alert.message,
           action_url: alert.action_url,
-          metadata: alert.metadata || {}
-        }]);
+          metadata: alert.metadata || {},
+        },
+      ]);
 
       if (error) throw error;
     } catch (error) {
@@ -103,7 +103,7 @@ export class PropertyAlertsService {
   static async generateSmartAlerts(): Promise<{ success: boolean; alerts_generated: number }> {
     try {
       const { data, error } = await supabase.functions.invoke('generate-smart-alerts', {
-        body: { source: 'manual' }
+        body: { source: 'manual' },
       });
 
       if (error) throw error;

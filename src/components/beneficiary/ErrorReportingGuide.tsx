@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Zap, Bell, TrendingUp, Activity, Eye, Lightbulb } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Zap, Bell, TrendingUp, Activity, Eye, Lightbulb } from 'lucide-react';
 
 export function ErrorReportingGuide() {
   return (
@@ -29,9 +29,7 @@ export function ErrorReportingGuide() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Activity className="h-5 w-5 text-info mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                مراقبة الأداء المستمرة
-              </p>
+              <p className="font-semibold text-sm text-foreground">مراقبة الأداء المستمرة</p>
               <p className="text-xs text-muted-foreground mt-1">
                 يتم رصد أي بطء في النظام أو استهلاك غير طبيعي للموارد تلقائياً
               </p>
@@ -41,9 +39,7 @@ export function ErrorReportingGuide() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Eye className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                فحص صحة النظام الدوري
-              </p>
+              <p className="font-semibold text-sm text-foreground">فحص صحة النظام الدوري</p>
               <p className="text-xs text-muted-foreground mt-1">
                 يتم فحص جميع الخدمات كل 5 دقائق للتأكد من سلامة عملها
               </p>
@@ -53,9 +49,7 @@ export function ErrorReportingGuide() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Bell className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                إشعارات فورية للدعم الفني
-              </p>
+              <p className="font-semibold text-sm text-foreground">إشعارات فورية للدعم الفني</p>
               <p className="text-xs text-muted-foreground mt-1">
                 عند حدوث خطأ، يتم إشعار فريق الدعم فوراً مع تفاصيل كاملة
               </p>
@@ -65,9 +59,7 @@ export function ErrorReportingGuide() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <TrendingUp className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                تحليل الأخطاء المتكررة
-              </p>
+              <p className="font-semibold text-sm text-foreground">تحليل الأخطاء المتكررة</p>
               <p className="text-xs text-muted-foreground mt-1">
                 يتم رصد الأخطاء المتكررة تلقائياً ورفع أولويتها للمعالجة
               </p>
@@ -80,18 +72,28 @@ export function ErrorReportingGuide() {
             📋 أمثلة على إبلاغات فعالة:
           </p>
           <ul className="text-xs text-success-foreground/80 space-y-1">
-            <li>• <strong>Error Boundary:</strong> التقاط أخطاء واجهة المستخدم</li>
-            <li>• <strong>Global Handler:</strong> التقاط جميع الأخطاء غير المتوقعة</li>
-            <li>• <strong>Network Monitor:</strong> مراقبة أخطاء الشبكة والاتصالات</li>
-            <li>• <strong>Performance Monitor:</strong> رصد مشاكل الأداء</li>
-            <li>• <strong>Health Checks:</strong> فحص صحة النظام الدوري</li>
+            <li>
+              • <strong>Error Boundary:</strong> التقاط أخطاء واجهة المستخدم
+            </li>
+            <li>
+              • <strong>Global Handler:</strong> التقاط جميع الأخطاء غير المتوقعة
+            </li>
+            <li>
+              • <strong>Network Monitor:</strong> مراقبة أخطاء الشبكة والاتصالات
+            </li>
+            <li>
+              • <strong>Performance Monitor:</strong> رصد مشاكل الأداء
+            </li>
+            <li>
+              • <strong>Health Checks:</strong> فحص صحة النظام الدوري
+            </li>
           </ul>
         </div>
 
         <div className="pt-2 border-t border-success">
           <p className="text-xs text-success-foreground/80">
-            <span className="font-semibold">ملاحظة:</span> جميع الأخطاء يتم تسجيلها في قاعدة بيانات آمنة
-            مع تفاصيل كاملة (نوع الخطأ، الوقت، الصفحة، المتصفح) لتسهيل المعالجة السريعة.
+            <span className="font-semibold">ملاحظة:</span> جميع الأخطاء يتم تسجيلها في قاعدة بيانات
+            آمنة مع تفاصيل كاملة (نوع الخطأ، الوقت، الصفحة، المتصفح) لتسهيل المعالجة السريعة.
           </p>
         </div>
       </CardContent>

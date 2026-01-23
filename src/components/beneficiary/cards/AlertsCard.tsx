@@ -3,21 +3,15 @@
  * بطاقة التنبيهات الهامة
  */
 
-import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Bell, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  ArrowLeft
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Bell, AlertTriangle, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AlertsCardProps {
   beneficiaryId: string;
@@ -53,30 +47,30 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
           .select('*', { count: 'exact', head: true })
           .eq('user_id', beneficiaryData.user_id)
           .eq('is_read', false);
-        
+
         unreadNotifications = count || 0;
       }
 
       return {
         pendingRequests: pendingRequests || [],
-        unreadNotifications
+        unreadNotifications,
       };
     },
     staleTime: 30000,
-    enabled: !!beneficiaryId
+    enabled: !!beneficiaryId,
   });
 
   const alertItems = useMemo(() => {
     const items = [];
-    
+
     if (alerts?.pendingRequests && alerts.pendingRequests.length > 0) {
       items.push({
         id: 'pending-requests',
         icon: Clock,
         title: `${alerts.pendingRequests.length} طلب قيد المراجعة`,
-        description: "طلباتك قيد المراجعة من الإدارة",
+        description: 'طلباتك قيد المراجعة من الإدارة',
         type: 'warning' as const,
-        action: () => navigate('/beneficiary-portal?tab=requests')
+        action: () => navigate('/beneficiary-portal?tab=requests'),
       });
     }
 
@@ -85,9 +79,9 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
         id: 'unread-notifications',
         icon: Bell,
         title: `${alerts.unreadNotifications} إشعار غير مقروء`,
-        description: "لديك إشعارات جديدة",
+        description: 'لديك إشعارات جديدة',
         type: 'info' as const,
-        action: () => navigate('/notifications')
+        action: () => navigate('/notifications'),
       });
     }
 
@@ -159,21 +153,26 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className={`
                   p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md
-                  ${alert.type === 'warning' 
-                    ? 'bg-warning/5 border-warning/20 hover:border-warning/40' 
-                    : 'bg-info/5 border-info/20 hover:border-info/40'
+                  ${
+                    alert.type === 'warning'
+                      ? 'bg-warning/5 border-warning/20 hover:border-warning/40'
+                      : 'bg-info/5 border-info/20 hover:border-info/40'
                   }
                 `}
                 onClick={alert.action}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      alert.type === 'warning' ? 'bg-warning/10' : 'bg-info/10'
-                    }`}>
-                      <AlertIcon className={`h-5 w-5 ${
-                        alert.type === 'warning' ? 'text-warning' : 'text-info'
-                      }`} />
+                    <div
+                      className={`p-2 rounded-lg ${
+                        alert.type === 'warning' ? 'bg-warning/10' : 'bg-info/10'
+                      }`}
+                    >
+                      <AlertIcon
+                        className={`h-5 w-5 ${
+                          alert.type === 'warning' ? 'text-warning' : 'text-info'
+                        }`}
+                      />
                     </div>
                     <div>
                       <h4 className="font-semibold text-sm">{alert.title}</h4>

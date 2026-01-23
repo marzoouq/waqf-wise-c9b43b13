@@ -45,7 +45,7 @@ export function POSStatsCards({ stats, pendingStats }: POSStatsCardsProps) {
           title="صافي الحركة"
           value={`${netAmount.toLocaleString('ar-SA')} ر.س`}
           icon={TrendingUp}
-          variant={netAmount >= 0 ? "success" : "destructive"}
+          variant={netAmount >= 0 ? 'success' : 'destructive'}
         />
         <UnifiedKPICard
           title="عدد العمليات"

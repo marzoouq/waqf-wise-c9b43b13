@@ -30,7 +30,9 @@ export class BankReconciliationService {
   /**
    * جلب كشف حساب بنكي
    */
-  static async getBankStatement(bankAccountId: string): Promise<Database['public']['Tables']['bank_statements']['Row'][]> {
+  static async getBankStatement(
+    bankAccountId: string
+  ): Promise<Database['public']['Tables']['bank_statements']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('bank_statements')
@@ -53,7 +55,9 @@ export class BankReconciliationService {
     try {
       const { data, error } = await supabase
         .from('bank_matching_rules')
-        .select('id, rule_name, description, conditions, account_mapping, priority, is_active, match_count, last_matched_at, created_at, updated_at')
+        .select(
+          'id, rule_name, description, conditions, account_mapping, priority, is_active, match_count, last_matched_at, created_at, updated_at'
+        )
         .eq('is_active', true)
         .order('priority', { ascending: false });
 
@@ -72,7 +76,9 @@ export class BankReconciliationService {
     try {
       const { data, error } = await supabase
         .from('bank_reconciliation_matches')
-        .select('id, bank_transaction_id, journal_entry_id, match_type, confidence_score, matching_rule_id, matched_at, matched_by, notes')
+        .select(
+          'id, bank_transaction_id, journal_entry_id, match_type, confidence_score, matching_rule_id, matched_at, matched_by, notes'
+        )
         .order('matched_at', { ascending: false });
 
       if (error) throw error;
@@ -90,7 +96,9 @@ export class BankReconciliationService {
     try {
       const { data, error } = await supabase
         .from('bank_transactions')
-        .select('id, statement_id, transaction_date, amount, description, transaction_type, reference_number, is_matched, journal_entry_id, created_at')
+        .select(
+          'id, statement_id, transaction_date, amount, description, transaction_type, reference_number, is_matched, journal_entry_id, created_at'
+        )
         .eq('statement_id', statementId)
         .eq('is_matched', false);
 
@@ -109,13 +117,15 @@ export class BankReconciliationService {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
-        .select(`
+        .select(
+          `
           *, 
           journal_entry_lines(
             *, 
             accounts(id, code, name_ar, account_type)
           )
-        `)
+        `
+        )
         .eq('status', 'posted');
 
       if (error) throw error;
@@ -187,7 +197,6 @@ export class BankReconciliationService {
         .from('bank_transactions')
         .update({ is_matched: false, journal_entry_id: null })
         .eq('id', match.bank_transaction_id);
-
     } catch (error) {
       productionLogger.error('Error deleting bank match', error);
       throw error;
@@ -211,7 +220,9 @@ export class BankReconciliationService {
   /**
    * إنشاء عملية بنكية
    */
-  static async createBankTransaction(transaction: Database['public']['Tables']['bank_transactions']['Insert']) {
+  static async createBankTransaction(
+    transaction: Database['public']['Tables']['bank_transactions']['Insert']
+  ) {
     const { data, error } = await supabase
       .from('bank_transactions')
       .insert(transaction)
@@ -229,9 +240,9 @@ export class BankReconciliationService {
   static async updateReconciliationStatus(statementId: string) {
     const { error } = await supabase
       .from('bank_statements')
-      .update({ 
+      .update({
         status: 'reconciled',
-        reconciled_at: new Date().toISOString()
+        reconciled_at: new Date().toISOString(),
       })
       .eq('id', statementId);
 

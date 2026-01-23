@@ -1,17 +1,17 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 import {
   checkRateLimit,
   createRateLimitResponse,
   getClientIdentifier,
-  RATE_LIMITS
+  RATE_LIMITS,
 } from '../_shared/rate-limiter.ts';
 
 // 🔐 SECURITY: Generate secure random password
@@ -19,7 +19,11 @@ function generateSecurePassword(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
-  return Array.from(array).map(x => chars[x % chars.length]).join('') + '@Waqf';
+  return (
+    Array.from(array)
+      .map((x) => chars[x % chars.length])
+      .join('') + '@Waqf'
+  );
 }
 
 serve(async (req) => {
@@ -38,16 +42,18 @@ serve(async (req) => {
             status: 'healthy',
             function: 'create-beneficiary-accounts',
             timestamp: new Date().toISOString(),
-            testMode: parsed.testMode || false
+            testMode: parsed.testMode || false,
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
     // 🔒 Rate Limiting - 5 محاولات كل 15 دقيقة
     const clientId = getClientIdentifier(req);
     const rateLimitResult = checkRateLimit(clientId, {
       ...RATE_LIMITS.SENSITIVE,
-      keyPrefix: 'create-beneficiary-accounts'
+      keyPrefix: 'create-beneficiary-accounts',
     });
 
     if (!rateLimitResult.allowed) {
@@ -68,14 +74,17 @@ serve(async (req) => {
       {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
+          persistSession: false,
+        },
       }
     );
 
     // 🔐 SECURITY: Extract and verify JWT token
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
@@ -93,10 +102,10 @@ serve(async (req) => {
       return errorResponse('خطأ في التحقق من الصلاحيات', 500, undefined, req);
     }
 
-    const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+    const hasPermission = roles?.some((r) => ['admin', 'nazer'].includes(r.role));
     if (!hasPermission) {
       console.error('❌ User lacks required permissions:', { userId: user.id, roles });
-      
+
       // 📝 Audit log: Unauthorized access attempt
       await supabaseAdmin.from('audit_logs').insert({
         user_id: user.id,
@@ -106,14 +115,14 @@ serve(async (req) => {
         severity: 'warning',
         description: 'محاولة غير مصرح بها لإنشاء حسابات مستفيدين',
         ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
-        user_agent: req.headers.get('User-Agent')
+        user_agent: req.headers.get('User-Agent'),
       });
 
       return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية', req);
     }
 
-    console.log('✅ Authorized user creating beneficiary accounts:', { 
-      userId: user.id
+    console.log('✅ Authorized user creating beneficiary accounts:', {
+      userId: user.id,
     });
 
     // استلام قائمة IDs المحددة من الطلب
@@ -158,10 +167,13 @@ serve(async (req) => {
 
         if (authError) {
           // إذا كان الحساب موجوداً، نحاول تحديث كلمة المرور
-          if (authError.message.includes('already registered') || authError.message.includes('User already registered')) {
+          if (
+            authError.message.includes('already registered') ||
+            authError.message.includes('User already registered')
+          ) {
             const { data: users } = await supabaseAdmin.auth.admin.listUsers();
-            const existingUser = users.users.find(u => u.email === internalEmail);
-            
+            const existingUser = users.users.find((u) => u.email === internalEmail);
+
             if (existingUser) {
               // تحديث كلمة المرور بكلمة مرور آمنة جديدة
               await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
@@ -189,7 +201,7 @@ serve(async (req) => {
                 record_id: beneficiary.id,
                 severity: 'info',
                 description: `تم تحديث حساب المستفيد: ${beneficiary.full_name}`,
-                new_values: { beneficiary_id: beneficiary.id, user_id: existingUser.id }
+                new_values: { beneficiary_id: beneficiary.id, user_id: existingUser.id },
               });
 
               results.push({
@@ -230,7 +242,7 @@ serve(async (req) => {
             await supabaseAdmin.from('profiles').insert({
               user_id: authData.user!.id,
               full_name: beneficiary.full_name,
-              email: internalEmail
+              email: internalEmail,
             });
           }
 
@@ -243,7 +255,7 @@ serve(async (req) => {
           if (!existingRole) {
             await supabaseAdmin.from('user_roles').insert({
               user_id: authData.user!.id,
-              role: 'beneficiary'
+              role: 'beneficiary',
             });
           }
         } catch (roleError) {
@@ -259,7 +271,7 @@ serve(async (req) => {
           record_id: beneficiary.id,
           severity: 'info',
           description: `تم إنشاء حساب للمستفيد: ${beneficiary.full_name}`,
-          new_values: { beneficiary_id: beneficiary.id, user_id: authData.user?.id }
+          new_values: { beneficiary_id: beneficiary.id, user_id: authData.user?.id },
         });
 
         results.push({
@@ -278,14 +290,18 @@ serve(async (req) => {
       }
     }
 
-    return jsonResponse({
-      success: true,
-      total: beneficiaries?.length || 0,
-      created: results.length,
-      failed: errors.length,
-      results,
-      errors,
-    }, 200, req);
+    return jsonResponse(
+      {
+        success: true,
+        total: beneficiaries?.length || 0,
+        created: results.length,
+        failed: errors.length,
+        results,
+        errors,
+      },
+      200,
+      req
+    );
   } catch (error) {
     console.error('❌ Error in create-beneficiary-accounts:', error);
     return errorResponse(

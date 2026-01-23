@@ -1,32 +1,46 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
-import { RequestWithBeneficiary, StatusConfigMap } from "@/types/approvals";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { useRequestApprovals } from "@/hooks/approvals";
-import { useDialogState } from "@/hooks/ui/useDialogState";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useState } from 'react';
+import { RequestWithBeneficiary, StatusConfigMap } from '@/types/approvals';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useRequestApprovals } from '@/hooks/approvals';
+import { useDialogState } from '@/hooks/ui/useDialogState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function RequestApprovalsTab() {
   const approveDialog = useDialogState<RequestWithBeneficiary>();
   const rejectDialog = useDialogState<RequestWithBeneficiary>();
-  const [notes, setNotes] = useState("");
-  const [rejectionReason, setRejectionReason] = useState("");
+  const [notes, setNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
 
-  const { data: requests, isLoading, error, refetch, approveMutation, rejectMutation } = useRequestApprovals();
+  const {
+    data: requests,
+    isLoading,
+    error,
+    refetch,
+    approveMutation,
+    rejectMutation,
+  } = useRequestApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: StatusConfigMap = {
-      "قيد المراجعة": { label: "قيد المراجعة", variant: "secondary", icon: Clock },
-      "موافق عليه": { label: "موافق عليه", variant: "default", icon: CheckCircle },
-      "مرفوض": { label: "مرفوض", variant: "destructive", icon: XCircle },
+      'قيد المراجعة': { label: 'قيد المراجعة', variant: 'secondary', icon: Clock },
+      'موافق عليه': { label: 'موافق عليه', variant: 'default', icon: CheckCircle },
+      مرفوض: { label: 'مرفوض', variant: 'destructive', icon: XCircle },
     };
-    const c = config[status] || config["قيد المراجعة"];
+    const c = config[status] || config['قيد المراجعة'];
     const Icon = c.icon;
     return (
       <Badge variant={c.variant} className="flex items-center gap-1 w-fit">
@@ -45,13 +59,15 @@ export function RequestApprovalsTab() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل موافقات الطلبات" onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في التحميل" message="فشل تحميل موافقات الطلبات" onRetry={refetch} />
+    );
   }
 
   return (
     <div className="space-y-4">
       {requests?.map((request) => (
-        <Card 
+        <Card
           key={request.id}
           className="overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300"
         >
@@ -79,7 +95,7 @@ export function RequestApprovalsTab() {
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">تاريخ الطلب</p>
                 <p className="text-base">
-                  {format(new Date(request.submitted_at), "dd MMM yyyy", { locale: ar })}
+                  {format(new Date(request.submitted_at), 'dd MMM yyyy', { locale: ar })}
                 </p>
               </div>
               <div className="flex items-end gap-2">
@@ -118,8 +134,12 @@ export function RequestApprovalsTab() {
             <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <Clock className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-lg font-medium text-muted-foreground">لا توجد طلبات بحاجة للموافقة</p>
-            <p className="text-sm text-muted-foreground/70 mt-1">ستظهر الطلبات المعلقة هنا عند إضافتها</p>
+            <p className="text-lg font-medium text-muted-foreground">
+              لا توجد طلبات بحاجة للموافقة
+            </p>
+            <p className="text-sm text-muted-foreground/70 mt-1">
+              ستظهر الطلبات المعلقة هنا عند إضافتها
+            </p>
           </CardContent>
         </Card>
       )}
@@ -148,20 +168,23 @@ export function RequestApprovalsTab() {
             <Button variant="outline" onClick={() => approveDialog.close()}>
               إلغاء
             </Button>
-            <Button 
+            <Button
               onClick={() => {
                 if (approveDialog.data) {
-                  approveMutation.mutate({ requestId: approveDialog.data.id, notes }, {
-                    onSuccess: () => {
-                      approveDialog.close();
-                      setNotes("");
+                  approveMutation.mutate(
+                    { requestId: approveDialog.data.id, notes },
+                    {
+                      onSuccess: () => {
+                        approveDialog.close();
+                        setNotes('');
+                      },
                     }
-                  });
+                  );
                 }
-              }} 
+              }}
               disabled={approveMutation.isPending}
             >
-              {approveMutation.isPending ? "جاري المعالجة..." : "تأكيد الموافقة"}
+              {approveMutation.isPending ? 'جاري المعالجة...' : 'تأكيد الموافقة'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -196,17 +219,20 @@ export function RequestApprovalsTab() {
               variant="destructive"
               onClick={() => {
                 if (rejectDialog.data) {
-                  rejectMutation.mutate({ requestId: rejectDialog.data.id, reason: rejectionReason }, {
-                    onSuccess: () => {
-                      rejectDialog.close();
-                      setRejectionReason("");
+                  rejectMutation.mutate(
+                    { requestId: rejectDialog.data.id, reason: rejectionReason },
+                    {
+                      onSuccess: () => {
+                        rejectDialog.close();
+                        setRejectionReason('');
+                      },
                     }
-                  });
+                  );
                 }
               }}
               disabled={!rejectionReason || rejectMutation.isPending}
             >
-              {rejectMutation.isPending ? "جاري المعالجة..." : "تأكيد الرفض"}
+              {rejectMutation.isPending ? 'جاري المعالجة...' : 'تأكيد الرفض'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,13 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { useEffect } from "react";
-import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errors";
-import type { InvoiceWithLines } from "@/types/invoices";
-import { InvoiceService } from "@/services/invoice.service";
-import { RealtimeService } from "@/services/realtime.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useJournalEntries } from '@/hooks/accounting/useJournalEntries';
+import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
+import { createMutationErrorHandler } from '@/lib/errors';
+import type { InvoiceWithLines } from '@/types/invoices';
+import { InvoiceService } from '@/services/invoice.service';
+import { RealtimeService } from '@/services/realtime.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 export interface Invoice {
   id: string;
   invoice_number: string;
@@ -63,7 +63,12 @@ export function useInvoices() {
     };
   }, [queryClient]);
 
-  const { data: invoices = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: invoices = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.INVOICES,
     queryFn: () => InvoiceService.getAll(),
     staleTime: 3 * 60 * 1000,
@@ -73,17 +78,17 @@ export function useInvoices() {
     mutationFn: async (invoiceData: InvoiceWithLines) => {
       const invoiceRecord = await InvoiceService.create(
         invoiceData.invoice,
-        invoiceData.lines?.map(line => ({
+        invoiceData.lines?.map((line) => ({
           ...line,
           invoice_id: '', // سيتم تحديثه في الخدمة
         }))
       );
 
       // إنشاء قيد محاسبي تلقائي عند إصدار الفاتورة
-      if (invoiceRecord.status === "sent" || invoiceRecord.status === "paid") {
+      if (invoiceRecord.status === 'sent' || invoiceRecord.status === 'paid') {
         try {
           await createAutoEntry(
-            "invoice_issued",
+            'invoice_issued',
             invoiceRecord.id,
             invoiceRecord.total_amount,
             `فاتورة رقم ${invoiceRecord.invoice_number} - ${invoiceRecord.customer_name}`,
@@ -100,8 +105,8 @@ export function useInvoices() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم إنشاء الفاتورة بنجاح",
-        description: "تم إنشاء الفاتورة والقيد المحاسبي",
+        title: 'تم إنشاء الفاتورة بنجاح',
+        description: 'تم إنشاء الفاتورة والقيد المحاسبي',
       });
     },
     onError: createMutationErrorHandler({
@@ -111,54 +116,62 @@ export function useInvoices() {
   });
 
   const updateInvoice = useMutation({
-    mutationFn: async ({ 
-      id, 
-      invoice, 
-      lines 
-    }: { 
-      id: string; 
+    mutationFn: async ({
+      id,
+      invoice,
+      lines,
+    }: {
+      id: string;
       invoice: Partial<Invoice>;
       lines?: InvoiceLine[];
     }) => {
       const oldInvoice = await InvoiceService.getById(id);
       const invoiceData = await InvoiceService.update(
-        id, 
-        invoice, 
-        lines?.map(line => ({
+        id,
+        invoice,
+        lines?.map((line) => ({
           ...line,
           invoice_id: id,
         }))
       );
 
       // إنشاء قيد محاسبي عند تحويل من مسودة إلى مرسلة
-      if (oldInvoice?.status === "draft" && 
-          (invoiceData.status === "sent" || invoiceData.status === "paid") &&
-          !invoiceData.journal_entry_id) {
+      if (
+        oldInvoice?.status === 'draft' &&
+        (invoiceData.status === 'sent' || invoiceData.status === 'paid') &&
+        !invoiceData.journal_entry_id
+      ) {
         try {
           await createAutoEntry(
-            "invoice_issued",
+            'invoice_issued',
             invoiceData.id,
             invoiceData.total_amount,
             `فاتورة رقم ${invoiceData.invoice_number} - ${invoiceData.customer_name}`,
             invoiceData.invoice_date
           );
         } catch (journalError) {
-          logger.error(journalError, { context: 'update_invoice_journal_entry', severity: 'medium' });
+          logger.error(journalError, {
+            context: 'update_invoice_journal_entry',
+            severity: 'medium',
+          });
         }
       }
 
       // إنشاء قيد تحصيل عند تحويل إلى مدفوعة
-      if (oldInvoice?.status !== "paid" && invoiceData.status === "paid") {
+      if (oldInvoice?.status !== 'paid' && invoiceData.status === 'paid') {
         try {
           await createAutoEntry(
-            "invoice_paid",
+            'invoice_paid',
             invoiceData.id,
             invoiceData.total_amount,
             `تحصيل فاتورة رقم ${invoiceData.invoice_number} - ${invoiceData.customer_name}`,
             new Date().toISOString().split('T')[0]
           );
         } catch (journalError) {
-          logger.error(journalError, { context: 'invoice_payment_journal_entry', severity: 'medium' });
+          logger.error(journalError, {
+            context: 'invoice_payment_journal_entry',
+            severity: 'medium',
+          });
         }
       }
 
@@ -168,8 +181,8 @@ export function useInvoices() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث الفاتورة بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث الفاتورة بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -184,17 +197,17 @@ export function useInvoices() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم حذف الفاتورة بنجاح",
-        description: "تم حذف الفاتورة والقيد المحاسبي المرتبط بها",
+        title: 'تم حذف الفاتورة بنجاح',
+        description: 'تم حذف الفاتورة والقيد المحاسبي المرتبط بها',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في الحذف",
+        variant: 'destructive',
+        title: 'خطأ في الحذف',
         description: error.message,
       });
-    }
+    },
   });
 
   return {

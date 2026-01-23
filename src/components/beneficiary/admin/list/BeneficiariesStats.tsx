@@ -1,7 +1,7 @@
-import { memo } from "react";
-import { Users, UserCheck, UserX, Home } from "lucide-react";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { memo } from 'react';
+import { Users, UserCheck, UserX, Home } from 'lucide-react';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 interface BeneficiariesStatsProps {
   total: number;
@@ -10,7 +10,12 @@ interface BeneficiariesStatsProps {
   families: number;
 }
 
-export const BeneficiariesStats = memo(function BeneficiariesStats({ total, active, suspended, families }: BeneficiariesStatsProps) {
+export const BeneficiariesStats = memo(function BeneficiariesStats({
+  total,
+  active,
+  suspended,
+  families,
+}: BeneficiariesStatsProps) {
   return (
     <UnifiedStatsGrid columns={{ sm: 2, md: 4 }}>
       <UnifiedKPICard
@@ -20,7 +25,7 @@ export const BeneficiariesStats = memo(function BeneficiariesStats({ total, acti
         subtitle="جميع الحسابات"
         variant="default"
       />
-      
+
       <UnifiedKPICard
         title="المستفيدين النشطين"
         value={active.toString()}
@@ -28,7 +33,7 @@ export const BeneficiariesStats = memo(function BeneficiariesStats({ total, acti
         subtitle="حسابات نشطة"
         variant="success"
       />
-      
+
       <UnifiedKPICard
         title="المعلقين"
         value={suspended.toString()}
@@ -36,7 +41,7 @@ export const BeneficiariesStats = memo(function BeneficiariesStats({ total, acti
         subtitle="حسابات معلقة"
         variant="warning"
       />
-      
+
       <UnifiedKPICard
         title="العائلات"
         value={families.toString()}

@@ -90,22 +90,26 @@ export function useRegulationsSearch() {
       return regulationsParts;
     }
 
-    const matchedPartIds = new Set(searchResults.map(r => r.partId));
-    return regulationsParts.filter(part => matchedPartIds.has(part.id));
+    const matchedPartIds = new Set(searchResults.map((r) => r.partId));
+    return regulationsParts.filter((part) => matchedPartIds.has(part.id));
   }, [searchQuery, searchResults]);
 
-  const highlightText = useCallback((text: string): string => {
-    if (!searchQuery.trim() || searchQuery.length < 2) return text;
-    
-    const regex = new RegExp(`(${searchQuery})`, 'gi');
-    return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded">$1</mark>');
-  }, [searchQuery]);
+  const highlightText = useCallback(
+    (text: string): string => {
+      if (!searchQuery.trim() || searchQuery.length < 2) return text;
+
+      const regex = new RegExp(`(${searchQuery})`, 'gi');
+      return text.replace(
+        regex,
+        '<mark class="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded">$1</mark>'
+      );
+    },
+    [searchQuery]
+  );
 
   const goToResult = useCallback((result: SearchResult) => {
-    setExpandedParts(prev => 
-      prev.includes(result.partId) ? prev : [...prev, result.partId]
-    );
-    
+    setExpandedParts((prev) => (prev.includes(result.partId) ? prev : [...prev, result.partId]));
+
     // Scroll to the part
     setTimeout(() => {
       const element = document.querySelector(`[data-part-id="${result.partId}"]`);

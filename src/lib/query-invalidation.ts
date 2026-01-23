@@ -1,11 +1,11 @@
 /**
  * Query Invalidation Helper - مساعد إبطال الاستعلامات
  * @version 1.0.0
- * 
+ *
  * توحيد إبطال الكاش بدلاً من استدعاءات متعددة
  */
 
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient } from '@tanstack/react-query';
 
 /**
  * إبطال مجموعات الاستعلامات المتعلقة
@@ -13,14 +13,30 @@ import { QueryClient } from "@tanstack/react-query";
  */
 export function invalidateQueryGroups(
   queryClient: QueryClient,
-  groups: ('accounting' | 'beneficiaries' | 'properties' | 'payments' | 'approvals' | 'dashboard' | 'fiscal')[]
+  groups: (
+    | 'accounting'
+    | 'beneficiaries'
+    | 'properties'
+    | 'payments'
+    | 'approvals'
+    | 'dashboard'
+    | 'fiscal'
+  )[]
 ) {
   const patterns: string[] = [];
 
-  groups.forEach(group => {
+  groups.forEach((group) => {
     switch (group) {
       case 'accounting':
-        patterns.push('journal', 'accounts', 'trial-balance', 'balance-sheet', 'income-statement', 'cash-flow', 'budgets');
+        patterns.push(
+          'journal',
+          'accounts',
+          'trial-balance',
+          'balance-sheet',
+          'income-statement',
+          'cash-flow',
+          'budgets'
+        );
         break;
       case 'beneficiaries':
         patterns.push('beneficiar', 'heir', 'family', 'families');
@@ -48,8 +64,8 @@ export function invalidateQueryGroups(
     predicate: (query) => {
       const key = query.queryKey[0];
       if (typeof key !== 'string') return false;
-      return patterns.some(pattern => key.toLowerCase().includes(pattern));
-    }
+      return patterns.some((pattern) => key.toLowerCase().includes(pattern));
+    },
   });
 }
 
@@ -82,12 +98,14 @@ export function invalidateDistributionQueries(queryClient: QueryClient) {
     predicate: (query) => {
       const key = query.queryKey[0];
       if (typeof key !== 'string') return false;
-      return key.includes('distribution') || 
-             key.includes('heir') || 
-             key.includes('beneficiar') ||
-             key.includes('kpi') ||
-             key.includes('fiscal');
-    }
+      return (
+        key.includes('distribution') ||
+        key.includes('heir') ||
+        key.includes('beneficiar') ||
+        key.includes('kpi') ||
+        key.includes('fiscal')
+      );
+    },
   });
 }
 
@@ -99,11 +117,13 @@ export function invalidateLoanQueries(queryClient: QueryClient) {
     predicate: (query) => {
       const key = query.queryKey[0];
       if (typeof key !== 'string') return false;
-      return key.includes('loan') || 
-             key.includes('emergency') ||
-             key.includes('approval') ||
-             key.includes('beneficiar');
-    }
+      return (
+        key.includes('loan') ||
+        key.includes('emergency') ||
+        key.includes('approval') ||
+        key.includes('beneficiar')
+      );
+    },
   });
 }
 
@@ -115,10 +135,8 @@ export function invalidateSettingsQueries(queryClient: QueryClient) {
     predicate: (query) => {
       const key = query.queryKey[0];
       if (typeof key !== 'string') return false;
-      return key.includes('setting') || 
-             key.includes('config') ||
-             key.includes('template');
-    }
+      return key.includes('setting') || key.includes('config') || key.includes('template');
+    },
   });
 }
 
@@ -130,10 +148,12 @@ export function invalidateUserQueries(queryClient: QueryClient) {
     predicate: (query) => {
       const key = query.queryKey[0];
       if (typeof key !== 'string') return false;
-      return key.includes('user') || 
-             key.includes('profile') ||
-             key.includes('role') ||
-             key.includes('permission');
-    }
+      return (
+        key.includes('user') ||
+        key.includes('profile') ||
+        key.includes('role') ||
+        key.includes('permission')
+      );
+    },
   });
 }

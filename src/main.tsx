@@ -1,18 +1,18 @@
-import { createRoot } from "react-dom/client";
+import { createRoot } from 'react-dom/client';
 
 // ✅ تحميل الخطوط بشكل متزامن مع font-display: swap (لا تحظر FCP + تمنع CLS)
-import "@fontsource/cairo/400.css";
-import "@fontsource/cairo/600.css";
-import "@fontsource/cairo/700.css";
+import '@fontsource/cairo/400.css';
+import '@fontsource/cairo/600.css';
+import '@fontsource/cairo/700.css';
 
-import App from "./App.tsx";
-import "./index.css";
-import { checkAndUpdateVersion, registerChunkErrorHandlers } from "./lib/versionCheck";
+import App from './App.tsx';
+import './index.css';
+import { checkAndUpdateVersion, registerChunkErrorHandlers } from './lib/versionCheck';
 
-const rootElement = document.getElementById("root")!;
+const rootElement = document.getElementById('root')!;
 
 // إزالة شاشة التحميل الأولية
-const loadingElement = document.getElementById("app-loading");
+const loadingElement = document.getElementById('app-loading');
 if (loadingElement) {
   loadingElement.remove();
 }

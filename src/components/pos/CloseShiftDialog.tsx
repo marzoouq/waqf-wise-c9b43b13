@@ -21,7 +21,13 @@ interface CloseShiftDialogProps {
   isLoading?: boolean;
 }
 
-export function CloseShiftDialog({ open, onOpenChange, shift, onConfirm, isLoading }: CloseShiftDialogProps) {
+export function CloseShiftDialog({
+  open,
+  onOpenChange,
+  shift,
+  onConfirm,
+  isLoading,
+}: CloseShiftDialogProps) {
   const [notes, setNotes] = useState('');
 
   if (!shift) return null;
@@ -60,7 +66,7 @@ export function CloseShiftDialog({ open, onOpenChange, shift, onConfirm, isLoadi
                   + {shift.total_collections.toLocaleString('ar-SA')} ر.س
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-status-error">
                   <ArrowUpCircle className="h-4 w-4" />
@@ -70,7 +76,7 @@ export function CloseShiftDialog({ open, onOpenChange, shift, onConfirm, isLoadi
                   - {shift.total_payments.toLocaleString('ar-SA')} ر.س
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Receipt className="h-4 w-4" />
@@ -78,11 +84,14 @@ export function CloseShiftDialog({ open, onOpenChange, shift, onConfirm, isLoadi
                 </div>
                 <span className="font-medium">{shift.transactions_count} عملية</span>
               </div>
-              
+
               <div className="border-t pt-3 flex justify-between items-center">
                 <span className="font-medium">صافي الحركة:</span>
-                <span className={`font-bold text-lg ${netAmount >= 0 ? 'text-status-success' : 'text-status-error'}`}>
-                  {netAmount >= 0 ? '+' : ''}{netAmount.toLocaleString('ar-SA')} ر.س
+                <span
+                  className={`font-bold text-lg ${netAmount >= 0 ? 'text-status-success' : 'text-status-error'}`}
+                >
+                  {netAmount >= 0 ? '+' : ''}
+                  {netAmount.toLocaleString('ar-SA')} ر.س
                 </span>
               </div>
             </CardContent>

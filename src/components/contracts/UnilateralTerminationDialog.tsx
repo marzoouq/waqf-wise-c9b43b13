@@ -34,13 +34,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Loader2, 
-  AlertTriangle,
-  Calendar,
-  FileWarning,
-  Scale
-} from 'lucide-react';
+import { Loader2, AlertTriangle, Calendar, FileWarning, Scale } from 'lucide-react';
 import { useContractRequests } from '@/hooks/contracts/useContractRequests';
 import { type Contract } from '@/hooks/property/useContracts';
 import { formatCurrency } from '@/lib/utils';
@@ -88,18 +82,21 @@ export function UnilateralTerminationDialog({
     const requestedBy = data.requested_by === 'المؤجر' ? 'landlord' : 'tenant';
     const terminationType = data.termination_type === 'فسخ بالتراضي' ? 'mutual' : 'unilateral';
 
-    createTerminationRequest.mutate({
-      contract_id: contract.id,
-      requested_by: requestedBy,
-      termination_type: terminationType,
-      requested_date: data.requested_date,
-      reason: data.reason + (data.legal_basis ? ` | الأساس النظامي: ${data.legal_basis}` : ''),
-    }, {
-      onSuccess: () => {
-        onOpenChange(false);
-        form.reset();
+    createTerminationRequest.mutate(
+      {
+        contract_id: contract.id,
+        requested_by: requestedBy,
+        termination_type: terminationType,
+        requested_date: data.requested_date,
+        reason: data.reason + (data.legal_basis ? ` | الأساس النظامي: ${data.legal_basis}` : ''),
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+        },
       }
-    });
+    );
   };
 
   if (!contract) return null;
@@ -112,9 +109,7 @@ export function UnilateralTerminationDialog({
             <FileWarning className="h-5 w-5" />
             طلب فسخ العقد
           </DialogTitle>
-          <DialogDescription>
-            تقديم طلب رسمي لفسخ العقد
-          </DialogDescription>
+          <DialogDescription>تقديم طلب رسمي لفسخ العقد</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -251,7 +246,8 @@ export function UnilateralTerminationDialog({
             <Alert variant="destructive" className="bg-warning/10 border-warning">
               <AlertTriangle className="h-4 w-4 text-warning" />
               <AlertDescription className="text-warning">
-                فسخ العقد من طرف واحد قد يترتب عليه غرامات أو تعويضات حسب شروط العقد والأنظمة المعمول بها.
+                فسخ العقد من طرف واحد قد يترتب عليه غرامات أو تعويضات حسب شروط العقد والأنظمة
+                المعمول بها.
               </AlertDescription>
             </Alert>
 
@@ -259,8 +255,8 @@ export function UnilateralTerminationDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 variant="destructive"
                 disabled={createTerminationRequest.isPending}
               >

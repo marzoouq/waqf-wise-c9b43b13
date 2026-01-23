@@ -1,13 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { SystemService } from "@/services/system.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { SystemService } from '@/services/system.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export function useBackup() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: backupLogs, isLoading, error, refetch } = useQuery({
+  const {
+    data: backupLogs,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.BACKUP_LOGS,
     queryFn: () => SystemService.getBackupLogs(),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
@@ -25,9 +30,9 @@ export function useBackup() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        const blob = new Blob([data.content], { type: "application/json" });
+        const blob = new Blob([data.content], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
         a.download = data.fileName;
         document.body.appendChild(a);
@@ -36,7 +41,7 @@ export function useBackup() {
         document.body.removeChild(a);
 
         toast({
-          title: "تم إنشاء النسخة الاحتياطية",
+          title: 'تم إنشاء النسخة الاحتياطية',
           description: `تم تصدير ${data.totalRecords} سجل من ${data.totalTables} جدول`,
         });
 
@@ -45,21 +50,24 @@ export function useBackup() {
     },
     onError: (error: Error) => {
       toast({
-        title: "فشل إنشاء النسخة الاحتياطية",
-        description: error.message || "حدث خطأ أثناء النسخ الاحتياطي",
-        variant: "destructive",
+        title: 'فشل إنشاء النسخة الاحتياطية',
+        description: error.message || 'حدث خطأ أثناء النسخ الاحتياطي',
+        variant: 'destructive',
       });
     },
   });
 
   const restoreBackup = useMutation({
-    mutationFn: async (options: { backupData: Record<string, unknown>; mode?: "replace" | "merge" }) => {
+    mutationFn: async (options: {
+      backupData: Record<string, unknown>;
+      mode?: 'replace' | 'merge';
+    }) => {
       return SystemService.restoreBackup(options.backupData, options.mode);
     },
     onSuccess: (data) => {
       if (data.success) {
         toast({
-          title: "تمت الاستعادة بنجاح",
+          title: 'تمت الاستعادة بنجاح',
           description: data.message,
         });
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BACKUP_LOGS });
@@ -70,9 +78,9 @@ export function useBackup() {
     },
     onError: (error: Error) => {
       toast({
-        title: "فشلت الاستعادة",
-        description: error.message || "حدث خطأ أثناء استعادة البيانات",
-        variant: "destructive",
+        title: 'فشلت الاستعادة',
+        description: error.message || 'حدث خطأ أثناء استعادة البيانات',
+        variant: 'destructive',
       });
     },
   });

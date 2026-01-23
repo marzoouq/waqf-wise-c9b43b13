@@ -2,9 +2,9 @@
  * بطاقات إحصائيات الإقفال
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, TrendingDown, DollarSign, Percent } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface FiscalYearClosingStatsProps {
   totalRevenues: number;
@@ -25,46 +25,46 @@ export function FiscalYearClosingStats({
 }: FiscalYearClosingStatsProps) {
   const stats = [
     {
-      title: "إجمالي الإيرادات",
+      title: 'إجمالي الإيرادات',
       value: formatCurrency(totalRevenues),
       icon: TrendingUp,
-      color: "text-success",
-      bgColor: "bg-success/10",
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
-      title: "إجمالي المصروفات",
+      title: 'إجمالي المصروفات',
       value: formatCurrency(totalExpenses),
       icon: TrendingDown,
-      color: "text-destructive",
-      bgColor: "bg-destructive/10",
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
     },
     {
-      title: "صافي الدخل",
+      title: 'صافي الدخل',
       value: formatCurrency(netIncome),
       icon: DollarSign,
-      color: "text-info",
-      bgColor: "bg-info/10",
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
-      title: "رقبة الوقف",
+      title: 'رقبة الوقف',
       value: formatCurrency(waqfCorpus),
       icon: DollarSign,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
-      title: "حصة الناظر",
+      title: 'حصة الناظر',
       value: formatCurrency(nazerShare),
       icon: Percent,
-      color: "text-warning",
-      bgColor: "bg-warning/10",
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
-      title: "حصة الواقف",
+      title: 'حصة الواقف',
       value: formatCurrency(waqifShare),
       icon: Percent,
-      color: "text-accent-foreground",
-      bgColor: "bg-accent/10",
+      color: 'text-accent-foreground',
+      bgColor: 'bg-accent/10',
     },
   ];
 

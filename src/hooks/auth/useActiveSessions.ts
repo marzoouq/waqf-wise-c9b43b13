@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserService } from "@/services/user.service";
-import { AuthService } from "@/services/auth.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { UserService } from '@/services/user.service';
+import { AuthService } from '@/services/auth.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface ActiveSession {
   id: string;
@@ -26,7 +26,12 @@ export function useActiveSessions() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: sessions = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: sessions = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.ACTIVE_SESSIONS(user?.id),
     queryFn: async () => {
       if (!user?.id) return [];
@@ -39,44 +44,44 @@ export function useActiveSessions() {
 
   const endSession = useMutation({
     mutationFn: async (sessionId: string) => {
-      if (!user?.id) throw new Error("User not authenticated");
+      if (!user?.id) throw new Error('User not authenticated');
       await UserService.endSession(sessionId, user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_SESSIONS() });
       toast({
-        title: "تم إنهاء الجلسة",
-        description: "تم إنهاء الجلسة بنجاح",
+        title: 'تم إنهاء الجلسة',
+        description: 'تم إنهاء الجلسة بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
-        description: error.message || "فشل في إنهاء الجلسة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: error.message || 'فشل في إنهاء الجلسة',
+        variant: 'destructive',
       });
     },
   });
 
   const endAllOtherSessions = useMutation({
     mutationFn: async () => {
-      if (!user?.id) throw new Error("User not authenticated");
+      if (!user?.id) throw new Error('User not authenticated');
       const session = await AuthService.getSession();
-      const currentSessionToken = session?.access_token || "";
+      const currentSessionToken = session?.access_token || '';
       await UserService.endAllOtherSessions(user.id, currentSessionToken);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_SESSIONS() });
       toast({
-        title: "تم إنهاء الجلسات",
-        description: "تم إنهاء جميع الجلسات الأخرى بنجاح",
+        title: 'تم إنهاء الجلسات',
+        description: 'تم إنهاء جميع الجلسات الأخرى بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
-        description: error.message || "فشل في إنهاء الجلسات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: error.message || 'فشل في إنهاء الجلسات',
+        variant: 'destructive',
       });
     },
   });

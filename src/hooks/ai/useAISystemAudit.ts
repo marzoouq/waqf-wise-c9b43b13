@@ -4,10 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  AISystemAuditService,
-  AUDIT_CATEGORIES
-} from '@/services/ai-system-audit.service';
+import { AISystemAuditService, AUDIT_CATEGORIES } from '@/services/ai-system-audit.service';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
 
 export function useAISystemAudit() {
@@ -16,65 +13,65 @@ export function useAISystemAudit() {
   const [auditProgress, setAuditProgress] = useState(0);
 
   // جلب تقارير الفحص
-  const { 
-    data: audits = [], 
+  const {
+    data: audits = [],
     isLoading: isLoadingAudits,
-    refetch: refetchAudits 
+    refetch: refetchAudits,
   } = useQuery({
     queryKey: ['ai-system-audits'],
     queryFn: () => AISystemAuditService.getAudits(20),
-    staleTime: 30000
+    staleTime: 30000,
   });
 
   // جلب الإصلاحات المعلقة
-  const { 
-    data: pendingFixes = [], 
+  const {
+    data: pendingFixes = [],
     isLoading: isLoadingFixes,
-    refetch: refetchFixes 
+    refetch: refetchFixes,
   } = useQuery({
     queryKey: ['pending-system-fixes'],
     queryFn: () => AISystemAuditService.getPendingFixes(),
-    staleTime: 30000
+    staleTime: 30000,
   });
 
   // تشغيل فحص جديد
-  const runAudit = useCallback(async (
-    auditType: 'full' | 'category' = 'full',
-    categories?: string[]
-  ) => {
-    setIsAuditing(true);
-    setAuditProgress(0);
+  const runAudit = useCallback(
+    async (auditType: 'full' | 'category' = 'full', categories?: string[]) => {
+      setIsAuditing(true);
+      setAuditProgress(0);
 
-    // محاكاة التقدم
-    const progressInterval = setInterval(() => {
-      setAuditProgress(prev => Math.min(prev + 10, 90));
-    }, 500);
+      // محاكاة التقدم
+      const progressInterval = setInterval(() => {
+        setAuditProgress((prev) => Math.min(prev + 10, 90));
+      }, 500);
 
-    try {
-      const result = await AISystemAuditService.runAudit(auditType, categories);
-      
-      clearInterval(progressInterval);
-      setAuditProgress(100);
+      try {
+        const result = await AISystemAuditService.runAudit(auditType, categories);
 
-      if (result.success) {
-        toastSuccess('تم إكمال الفحص الذكي بنجاح');
-        await refetchAudits();
-        await refetchFixes();
-      } else {
-        toastError(result.error || 'فشل في تشغيل الفحص');
+        clearInterval(progressInterval);
+        setAuditProgress(100);
+
+        if (result.success) {
+          toastSuccess('تم إكمال الفحص الذكي بنجاح');
+          await refetchAudits();
+          await refetchFixes();
+        } else {
+          toastError(result.error || 'فشل في تشغيل الفحص');
+        }
+
+        return result;
+      } catch (error: unknown) {
+        clearInterval(progressInterval);
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        toastError(message);
+        return { success: false, error: message };
+      } finally {
+        setIsAuditing(false);
+        setTimeout(() => setAuditProgress(0), 1000);
       }
-
-      return result;
-    } catch (error: unknown) {
-      clearInterval(progressInterval);
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      toastError(message);
-      return { success: false, error: message };
-    } finally {
-      setIsAuditing(false);
-      setTimeout(() => setAuditProgress(0), 1000);
-    }
-  }, [refetchAudits, refetchFixes]);
+    },
+    [refetchAudits, refetchFixes]
+  );
 
   // الموافقة على إصلاح
   const approveFix = useMutation({
@@ -87,7 +84,7 @@ export function useAISystemAudit() {
       } else {
         toastError(result.error || 'فشل في تطبيق الإصلاح');
       }
-    }
+    },
   });
 
   // رفض إصلاح
@@ -100,7 +97,7 @@ export function useAISystemAudit() {
       } else {
         toastError(result.error || 'فشل في رفض الإصلاح');
       }
-    }
+    },
   });
 
   // التراجع عن إصلاح
@@ -114,7 +111,7 @@ export function useAISystemAudit() {
       } else {
         toastError(result.error || 'فشل في التراجع عن الإصلاح');
       }
-    }
+    },
   });
 
   // حذف تقرير فحص
@@ -127,7 +124,7 @@ export function useAISystemAudit() {
       } else {
         toastError(result.error || 'فشل في حذف التقرير');
       }
-    }
+    },
   });
 
   // إحصائيات الفحوصات
@@ -135,7 +132,7 @@ export function useAISystemAudit() {
     totalAudits: audits.length,
     lastAudit: audits[0] || null,
     pendingFixesCount: pendingFixes.length,
-    criticalIssues: pendingFixes.filter(f => f.severity === 'critical').length
+    criticalIssues: pendingFixes.filter((f) => f.severity === 'critical').length,
   };
 
   return {
@@ -144,13 +141,13 @@ export function useAISystemAudit() {
     pendingFixes,
     auditStats,
     categories: AUDIT_CATEGORIES,
-    
+
     // الحالة
     isAuditing,
     auditProgress,
     isLoadingAudits,
     isLoadingFixes,
-    
+
     // الإجراءات
     runAudit,
     approveFix: approveFix.mutate,
@@ -159,12 +156,12 @@ export function useAISystemAudit() {
     deleteAudit: deleteAudit.mutate,
     refetchAudits,
     refetchFixes,
-    
+
     // حالة التحميل
     isApproving: approveFix.isPending,
     isRejecting: rejectFix.isPending,
     isRollingBack: rollbackFix.isPending,
-    isDeleting: deleteAudit.isPending
+    isDeleting: deleteAudit.isPending,
   };
 }
 

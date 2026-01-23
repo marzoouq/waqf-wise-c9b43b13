@@ -8,25 +8,21 @@ import { productionLogger } from '@/lib/logger/production-logger';
 import { logger } from '@/lib/logger';
 import { safeJsonParse } from '@/lib/utils/safeJson';
 import { ErrorReport } from './types';
-import { 
-  DEFAULT_CONFIG, 
-  DB_SETTING_KEYS, 
+import {
+  DEFAULT_CONFIG,
+  DB_SETTING_KEYS,
   type TrackerConfig,
-  type DBSettingKey 
+  type DBSettingKey,
 } from './tracker-config';
-import { 
-  shouldIgnoreError, 
-  cleanUrl, 
+import {
+  shouldIgnoreError,
+  cleanUrl,
   cleanErrorMessage,
   sanitizeAdditionalData,
   createErrorKey,
-  isAuthRelatedUrl 
+  isAuthRelatedUrl,
 } from './tracker-utils';
-import type { 
-  DeduplicationEntry, 
-  DeduplicationStats, 
-  TrackerStats 
-} from './tracker-types';
+import type { DeduplicationEntry, DeduplicationStats, TrackerStats } from './tracker-types';
 
 class ErrorTracker {
   private static instance: ErrorTracker;
@@ -40,7 +36,7 @@ class ErrorTracker {
   private errorCounts = new Map<string, number>();
   private consecutiveErrors = 0;
   private errorDeduplication = new Map<string, DeduplicationEntry>();
-  
+
   // وضع الاختبار - يؤجل إرسال الأخطاء
   private testingMode = false;
   private testingModeBuffer: ErrorReport[] = [];
@@ -62,7 +58,7 @@ class ErrorTracker {
     if (!enabled && this.testingModeBuffer.length > 0) {
       // إرسال الأخطاء المجمعة عند إنهاء وضع الاختبار
       logger.info(`[ErrorTracker] Flushing ${this.testingModeBuffer.length} buffered errors`);
-      this.testingModeBuffer.forEach(report => {
+      this.testingModeBuffer.forEach((report) => {
         this.errorQueue.push(report);
       });
       this.testingModeBuffer = [];
@@ -83,10 +79,10 @@ class ErrorTracker {
         .in('setting_key', [...DB_SETTING_KEYS]);
 
       if (settings && settings.length > 0) {
-        settings.forEach(setting => {
+        settings.forEach((setting) => {
           const value = Number(setting.setting_value);
           const key = setting.setting_key as DBSettingKey;
-          
+
           switch (key) {
             case 'error_tracker_dedup_window_minutes':
               this.config.deduplicationWindow = value * 60 * 1000;
@@ -131,7 +127,7 @@ class ErrorTracker {
 
       const errors = safeJsonParse<ErrorReport[]>(pending, [], this.config.localStorageKey);
       if (errors.length === 0) return;
-      const cleanedErrors = errors.filter(error => {
+      const cleanedErrors = errors.filter((error) => {
         if (error.additional_data?.request_url) {
           const url = String(error.additional_data.request_url);
           if (url.includes('/auth/v1/')) return false;
@@ -139,7 +135,7 @@ class ErrorTracker {
         if (error.error_message === 'Failed to fetch') return false;
         return true;
       });
-      
+
       if (cleanedErrors.length !== errors.length) {
         if (cleanedErrors.length > 0) {
           localStorage.setItem(this.config.localStorageKey, JSON.stringify(cleanedErrors));
@@ -160,7 +156,7 @@ class ErrorTracker {
 
       const errors = safeJsonParse<ErrorReport[]>(pending, [], this.config.localStorageKey);
       if (errors.length === 0) return;
-      const filteredErrors = errors.filter(error => {
+      const filteredErrors = errors.filter((error) => {
         if (error.additional_data?.request_url) {
           const url = String(error.additional_data.request_url);
           if (url.includes('/auth/v1/')) return false;
@@ -168,7 +164,7 @@ class ErrorTracker {
         if (error.error_message === 'Failed to fetch') return false;
         return true;
       });
-      
+
       if (filteredErrors.length > 0) {
         this.errorQueue.push(...filteredErrors);
         logger.info(`Loaded ${filteredErrors.length} pending errors`);
@@ -203,14 +199,14 @@ class ErrorTracker {
           this.processQueue();
         }
       }
-      
+
       if ('requestIdleCallback' in window) {
         requestIdleCallback(() => setTimeout(checkCircuitBreaker, 30000));
       } else {
         setTimeout(checkCircuitBreaker, 30000);
       }
     };
-    
+
     checkCircuitBreaker();
   }
 
@@ -221,9 +217,9 @@ class ErrorTracker {
       if (event.filename) additionalData.filename = event.filename;
       if (event.lineno) additionalData.lineno = event.lineno;
       if (event.colno) additionalData.colno = event.colno;
-      
+
       if (shouldIgnoreError(event.message, additionalData)) return;
-      
+
       this.trackError({
         error_type: 'uncaught_error',
         error_message: event.message || 'Unknown error',
@@ -242,7 +238,7 @@ class ErrorTracker {
         reason: event.reason,
         stack: event.reason?.stack,
       };
-      
+
       if (shouldIgnoreError(message, additionalData)) return;
 
       this.trackError({
@@ -268,7 +264,7 @@ class ErrorTracker {
   private handleServerError(response: Response, requestUrl: string): void {
     const errorKey = `${response.status}-${requestUrl}`;
     const lastError = this.recentErrors.get(errorKey);
-    
+
     if (!lastError || Date.now() - lastError > 30 * 1000) {
       this.recentErrors.set(errorKey, Date.now());
       this.trackError({
@@ -285,12 +281,12 @@ class ErrorTracker {
   private handleFetchError(error: unknown, requestUrl: string): void {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const additionalData = { request_url: requestUrl, error: errorMessage };
-    
+
     if (shouldIgnoreError(errorMessage, additionalData)) return;
 
     const errorKey = `fetch-error-${requestUrl}`;
     const lastError = this.recentErrors.get(errorKey);
-    
+
     if (!lastError || Date.now() - lastError > 30 * 1000) {
       this.recentErrors.set(errorKey, Date.now());
       this.trackError({
@@ -307,12 +303,12 @@ class ErrorTracker {
   async trackError(report: ErrorReport): Promise<void> {
     // تنظيف رسالة الخطأ
     const cleanMessage = cleanErrorMessage(report.error_message);
-    
+
     // تجاهل رسائل "[object Object]"
     if (cleanMessage === '[object Object]') return;
-    
+
     report.error_message = cleanMessage;
-    
+
     if (shouldIgnoreError(report.error_message, report.additional_data)) return;
 
     // في وضع الاختبار، تجميع الأخطاء بدلاً من إرسالها فوراً
@@ -330,14 +326,14 @@ class ErrorTracker {
     const errorKey = createErrorKey(report.error_type, report.error_message);
     const now = Date.now();
     const dedupEntry = this.errorDeduplication.get(errorKey);
-    
+
     if (dedupEntry) {
       if (dedupEntry.resolved) return;
-      
+
       if (now - dedupEntry.lastSeen < this.config.deduplicationWindow) {
         dedupEntry.count++;
         dedupEntry.lastSeen = now;
-        
+
         if (dedupEntry.count >= this.config.maxSameErrorCount) {
           dedupEntry.resolved = true;
           this.autoResolveError(errorKey);
@@ -348,9 +344,9 @@ class ErrorTracker {
         return;
       }
     }
-    
+
     this.errorDeduplication.set(errorKey, { count: 1, lastSeen: now, resolved: false });
-    
+
     if (this.consecutiveErrors >= this.config.maxConsecutiveErrors) {
       productionLogger.warn('Circuit breaker opened - too many consecutive errors');
       return;
@@ -358,12 +354,14 @@ class ErrorTracker {
 
     const count = this.errorCounts.get(errorKey) || 0;
     if (count >= this.config.maxSameErrorCount) return;
-    
+
     this.errorCounts.set(errorKey, count + 1);
     setTimeout(() => this.errorCounts.delete(errorKey), 60 * 1000);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) report.user_id = session.user.id;
     } catch {
       // تجاهل - المستخدم ليس مسجل دخول
@@ -386,71 +384,72 @@ class ErrorTracker {
 
     this.isProcessing = true;
     const batchSize = Math.min(this.config.batchSize, this.errorQueue.length);
-    
+
     for (let i = 0; i < batchSize; i++) {
       const report = this.errorQueue.shift();
       if (!report) break;
-      
+
       const cleanMessage = cleanErrorMessage(report.error_message);
       if (cleanMessage === '[object Object]' || cleanMessage.includes('[object Object]')) {
         continue;
       }
-      
+
       const cleanAdditionalData = sanitizeAdditionalData(report.additional_data);
-      
+
       const cleanReport: ErrorReport = {
         error_type: report.error_type || 'unknown_error',
         error_message: (cleanMessage || 'No message').substring(0, 2000),
         severity: report.severity || 'medium',
         url: cleanUrl(report.url || window.location.href) || 'unknown',
-        user_agent: ((report.user_agent || navigator.userAgent) || 'unknown').substring(0, 500),
+        user_agent: (report.user_agent || navigator.userAgent || 'unknown').substring(0, 500),
       };
-      
+
       if (report.error_stack) cleanReport.error_stack = report.error_stack.substring(0, 10000);
       if (report.user_id) cleanReport.user_id = report.user_id;
       if (cleanAdditionalData) cleanReport.additional_data = cleanAdditionalData;
-      
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (!session) {
           productionLogger.warn('No session available for error tracking');
           this.errorQueue.unshift(report);
           break;
         }
 
-        const timeoutPromise = new Promise<never>((_, reject) => 
+        const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Request timeout')), this.config.requestTimeout)
         );
-        
+
         // إرسال object مباشرة - Supabase client يقوم بالـ serialization تلقائياً
         const invokePromise = supabase.functions.invoke('log-error', {
           body: cleanReport,
           headers: {
             Authorization: `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
-        
+
         const result = await Promise.race([invokePromise, timeoutPromise]);
-        
+
         if (result.error) throw result.error;
-        
+
         this.failedAttempts = 0;
         this.consecutiveErrors = 0;
         this.config.backoffDelay = DEFAULT_CONFIG.backoffDelay;
-        
+
         if (report.severity === 'critical' || report.severity === 'high') {
           await this.createSystemAlert(report);
         }
-        
       } catch (error) {
         productionLogger.warn('Failed to send error report (will retry)', error);
-        
+
         this.failedAttempts++;
         this.consecutiveErrors++;
         this.errorQueue.unshift(report);
-        
+
         if (this.failedAttempts >= this.config.maxFailedAttempts) {
           this.circuitBreakerOpen = true;
           this.circuitBreakerResetTime = Date.now() + this.config.circuitBreakerTimeout;
@@ -460,11 +459,11 @@ class ErrorTracker {
           this.config.backoffDelay = Math.min(this.config.backoffDelay * 2, 30000);
           setTimeout(() => this.processQueue(), this.config.backoffDelay);
         }
-        
+
         break;
       }
     }
-    
+
     this.savePendingErrors();
     this.isProcessing = false;
   }
@@ -472,7 +471,9 @@ class ErrorTracker {
   private async createSystemAlert(report: ErrorReport): Promise<void> {
     try {
       // التحقق من وجود جلسة مصادقة قبل إنشاء التنبيه
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         productionLogger.warn('Skipping system alert creation - no auth session');
         return;
@@ -490,9 +491,9 @@ class ErrorTracker {
         // ⬆️ زيادة العداد فقط بدل إنشاء تنبيه جديد
         const { error: updateError } = await supabase
           .from('system_alerts')
-          .update({ 
+          .update({
             occurrence_count: (existingAlert.occurrence_count || 1) + 1,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
           .eq('id', existingAlert.id);
 
@@ -501,21 +502,25 @@ class ErrorTracker {
       }
 
       // إنشاء تنبيه جديد فقط إذا لم يوجد مشابه
-      const { error } = await supabase.from('system_alerts').insert([{
-        alert_type: report.error_type,
-        severity: report.severity,
-        title: `خطأ ${report.severity === 'critical' ? 'حرج' : 'عالي'}: ${report.error_type}`,
-        description: report.error_message,
-        status: 'active',
-        occurrence_count: 1,
-        metadata: JSON.parse(JSON.stringify({
-          url: report.url,
-          user_agent: report.user_agent,
-          user_id: report.user_id,
-          stack: report.error_stack,
-          additional_data: report.additional_data,
-        })),
-      }]);
+      const { error } = await supabase.from('system_alerts').insert([
+        {
+          alert_type: report.error_type,
+          severity: report.severity,
+          title: `خطأ ${report.severity === 'critical' ? 'حرج' : 'عالي'}: ${report.error_type}`,
+          description: report.error_message,
+          status: 'active',
+          occurrence_count: 1,
+          metadata: JSON.parse(
+            JSON.stringify({
+              url: report.url,
+              user_agent: report.user_agent,
+              user_id: report.user_id,
+              stack: report.error_stack,
+              additional_data: report.additional_data,
+            })
+          ),
+        },
+      ]);
 
       if (error) productionLogger.error('Failed to create system alert', error);
     } catch (error) {
@@ -527,13 +532,13 @@ class ErrorTracker {
     try {
       const { error } = await supabase
         .from('system_error_logs')
-        .update({ 
+        .update({
           status: 'resolved',
-          resolved_at: new Date().toISOString()
+          resolved_at: new Date().toISOString(),
         })
         .eq('error_type', errorKey.split('-')[0])
         .eq('status', 'new');
-      
+
       if (error) productionLogger.error('Failed to auto-resolve error', error);
     } catch (error) {
       productionLogger.error('Error auto-resolving', error);
@@ -551,18 +556,23 @@ class ErrorTracker {
       severity,
       url: cleanUrl(window.location.href),
       user_agent: navigator.userAgent,
-      additional_data: additionalData && Object.keys(additionalData).length > 0 ? additionalData : undefined,
+      additional_data:
+        additionalData && Object.keys(additionalData).length > 0 ? additionalData : undefined,
     });
   }
 
   getDeduplicationStats(): DeduplicationStats {
-    const stats: DeduplicationStats = { total: this.errorDeduplication.size, resolved: 0, active: 0 };
-    
-    this.errorDeduplication.forEach(entry => {
+    const stats: DeduplicationStats = {
+      total: this.errorDeduplication.size,
+      resolved: 0,
+      active: 0,
+    };
+
+    this.errorDeduplication.forEach((entry) => {
       if (entry.resolved) stats.resolved++;
       else stats.active++;
     });
-    
+
     return stats;
   }
 
@@ -604,7 +614,7 @@ export function getErrorTracker(): ErrorTracker {
 // ✅ تصدير للتوافق الخلفي - لكن بتأجيل
 export const errorTracker = {
   trackError: (report: ErrorReport) => getErrorTracker().trackError(report),
-  logError: (message: string, severity?: ErrorReport['severity'], data?: Record<string, unknown>) => 
+  logError: (message: string, severity?: ErrorReport['severity'], data?: Record<string, unknown>) =>
     getErrorTracker().logError(message, severity, data),
   resetCircuitBreaker: () => getErrorTracker().resetCircuitBreaker(),
   getStats: () => getErrorTracker().getStats(),
@@ -616,7 +626,7 @@ export const errorTracker = {
 // تصدير للاستخدام المباشر
 export const trackError = (report: ErrorReport) => getErrorTracker().trackError(report);
 export const logError = (
-  message: string, 
-  severity?: ErrorReport['severity'], 
+  message: string,
+  severity?: ErrorReport['severity'],
   data?: Record<string, unknown>
 ) => getErrorTracker().logError(message, severity, data);

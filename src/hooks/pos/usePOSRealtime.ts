@@ -11,7 +11,7 @@ export function usePOSRealtime() {
     const unsubShifts = realtimeManager.subscribe('cashier_shifts', () => {
       queryInvalidationManager.invalidateMultiple([
         ['pos', 'current-shift'],
-        ['pos', 'shifts']
+        ['pos', 'shifts'],
       ]);
     });
 

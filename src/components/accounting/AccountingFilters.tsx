@@ -1,14 +1,14 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search, Calendar } from "lucide-react";
-import { useDebouncedSearch } from "@/hooks/ui/useDebouncedSearch";
+} from '@/components/ui/select';
+import { Search, Calendar } from 'lucide-react';
+import { useDebouncedSearch } from '@/hooks/ui/useDebouncedSearch';
 
 interface AccountingFiltersProps {
   searchQuery: string;
@@ -27,17 +27,17 @@ interface AccountingFiltersProps {
 export function AccountingFilters({
   searchQuery,
   onSearchChange,
-  statusFilter = "all",
+  statusFilter = 'all',
   onStatusChange,
-  dateFrom = "",
+  dateFrom = '',
   onDateFromChange,
-  dateTo = "",
+  dateTo = '',
   onDateToChange,
   statusOptions = [
-    { value: "all", label: "الكل" },
-    { value: "draft", label: "مسودة" },
-    { value: "posted", label: "مرحّل" },
-    { value: "cancelled", label: "ملغي" },
+    { value: 'all', label: 'الكل' },
+    { value: 'draft', label: 'مسودة' },
+    { value: 'posted', label: 'مرحّل' },
+    { value: 'cancelled', label: 'ملغي' },
   ],
   showStatus = true,
   showDate = true,

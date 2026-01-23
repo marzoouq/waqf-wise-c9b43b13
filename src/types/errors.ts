@@ -32,11 +32,11 @@ export interface BusinessLogicError {
 }
 
 // نوع موحد محسّن للأخطاء
-export type AppError = 
-  | Error 
-  | DatabaseError 
-  | ValidationError 
-  | NetworkError 
+export type AppError =
+  | Error
+  | DatabaseError
+  | ValidationError
+  | NetworkError
   | AuthenticationError
   | BusinessLogicError;
 

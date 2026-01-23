@@ -14,7 +14,7 @@ interface BaseSkeletonProps {
  */
 export function ShimmerSkeleton({ className }: BaseSkeletonProps) {
   return (
-    <div 
+    <div
       className={cn(
         'relative overflow-hidden bg-muted rounded-md',
         'before:absolute before:inset-0',
@@ -38,18 +38,16 @@ interface CardSkeletonProps {
 /**
  * Skeleton لبطاقة عامة
  */
-export function CardSkeleton({ 
-  lines = 3, 
+export function CardSkeleton({
+  lines = 3,
   showImage = false,
   showHeader = true,
-  className 
+  className,
 }: CardSkeletonProps) {
   return (
     <Card className={cn('p-4 space-y-4', className)}>
-      {showImage && (
-        <Skeleton className="h-40 w-full rounded-md" />
-      )}
-      
+      {showImage && <Skeleton className="h-40 w-full rounded-md" />}
+
       {showHeader && (
         <div className="flex items-center gap-3">
           <Skeleton className="h-10 w-10 rounded-full" />
@@ -59,16 +57,10 @@ export function CardSkeleton({
           </div>
         </div>
       )}
-      
+
       <div className="space-y-2">
         {Array.from({ length: lines }).map((_, i) => (
-          <Skeleton 
-            key={i} 
-            className={cn(
-              'h-4',
-              i === lines - 1 ? 'w-2/3' : 'w-full'
-            )} 
-          />
+          <Skeleton key={i} className={cn('h-4', i === lines - 1 ? 'w-2/3' : 'w-full')} />
         ))}
       </div>
     </Card>
@@ -86,11 +78,7 @@ interface TableRowSkeletonProps {
 /**
  * Skeleton لصفوف الجدول
  */
-export function TableRowSkeleton({ 
-  columns = 5, 
-  rows = 5,
-  className 
-}: TableRowSkeletonProps) {
+export function TableRowSkeleton({ columns = 5, rows = 5, className }: TableRowSkeletonProps) {
   return (
     <div className={cn('space-y-2', className)}>
       {/* Header */}
@@ -99,20 +87,14 @@ export function TableRowSkeleton({
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
       </div>
-      
+
       {/* Rows */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div 
-          key={rowIndex} 
-          className="flex gap-4 p-3 border-b last:border-b-0"
-        >
+        <div key={rowIndex} className="flex gap-4 p-3 border-b last:border-b-0">
           {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton 
-              key={colIndex} 
-              className={cn(
-                'h-4 flex-1',
-                colIndex === 0 && 'w-12 flex-none'
-              )} 
+            <Skeleton
+              key={colIndex}
+              className={cn('h-4 flex-1', colIndex === 0 && 'w-12 flex-none')}
             />
           ))}
         </div>
@@ -133,29 +115,29 @@ interface KPISkeletonProps {
 /**
  * Skeleton لبطاقات KPI
  */
-export function KPISkeleton({ 
+export function KPISkeleton({
   variant = 'default',
   showIcon = true,
   showTrend = true,
-  className 
+  className,
 }: KPISkeletonProps) {
   const sizes = {
     default: { card: 'p-4', title: 'h-4 w-24', value: 'h-8 w-32', trend: 'h-3 w-16' },
     compact: { card: 'p-3', title: 'h-3 w-20', value: 'h-6 w-24', trend: 'h-2 w-12' },
     large: { card: 'p-6', title: 'h-5 w-28', value: 'h-10 w-40', trend: 'h-4 w-20' },
   };
-  
+
   const size = sizes[variant];
-  
+
   return (
     <Card className={cn(size.card, 'space-y-3', className)}>
       <div className="flex items-center justify-between">
         <Skeleton className={size.title} />
         {showIcon && <Skeleton className="h-8 w-8 rounded-md" />}
       </div>
-      
+
       <Skeleton className={size.value} />
-      
+
       {showTrend && (
         <div className="flex items-center gap-2">
           <Skeleton className="h-4 w-4 rounded-full" />
@@ -176,10 +158,7 @@ interface ChartSkeletonProps {
 /**
  * Skeleton للرسوم البيانية
  */
-export function ChartSkeleton({ 
-  type = 'bar',
-  className 
-}: ChartSkeletonProps) {
+export function ChartSkeleton({ type = 'bar', className }: ChartSkeletonProps) {
   if (type === 'pie') {
     return (
       <div className={cn('flex items-center justify-center p-8', className)}>
@@ -187,7 +166,7 @@ export function ChartSkeleton({
       </div>
     );
   }
-  
+
   return (
     <div className={cn('p-4 space-y-4', className)}>
       {/* Chart header */}
@@ -195,21 +174,17 @@ export function ChartSkeleton({
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-8 w-24 rounded-md" />
       </div>
-      
+
       {/* Chart area */}
       <div className="h-64 flex items-end gap-2 pt-4">
         {type === 'bar' && (
           <>
             {[60, 80, 45, 90, 70, 85, 55, 75].map((height, i) => (
-              <Skeleton 
-                key={i} 
-                className="flex-1 rounded-t-md" 
-                style={{ height: `${height}%` }}
-              />
+              <Skeleton key={i} className="flex-1 rounded-t-md" style={{ height: `${height}%` }} />
             ))}
           </>
         )}
-        
+
         {(type === 'line' || type === 'area') && (
           <div className="w-full h-full relative">
             <Skeleton className="absolute inset-0 rounded-md" />
@@ -217,7 +192,7 @@ export function ChartSkeleton({
           </div>
         )}
       </div>
-      
+
       {/* X-axis labels */}
       <div className="flex justify-between">
         {Array.from({ length: 8 }).map((_, i) => (
@@ -240,28 +215,23 @@ interface ListSkeletonProps {
 /**
  * Skeleton للقوائم
  */
-export function ListSkeleton({ 
+export function ListSkeleton({
   items = 5,
   showAvatar = true,
   showActions = false,
-  className 
+  className,
 }: ListSkeletonProps) {
   return (
     <div className={cn('space-y-3', className)}>
       {Array.from({ length: items }).map((_, i) => (
-        <div 
-          key={i} 
-          className="flex items-center gap-3 p-3 rounded-lg border"
-        >
-          {showAvatar && (
-            <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-          )}
-          
+        <div key={i} className="flex items-center gap-3 p-3 rounded-lg border">
+          {showAvatar && <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />}
+
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>
-          
+
           {showActions && (
             <div className="flex gap-2">
               <Skeleton className="h-8 w-8 rounded-md" />
@@ -285,11 +255,7 @@ interface FormSkeletonProps {
 /**
  * Skeleton للنماذج
  */
-export function FormSkeleton({ 
-  fields = 4,
-  showButtons = true,
-  className 
-}: FormSkeletonProps) {
+export function FormSkeleton({ fields = 4, showButtons = true, className }: FormSkeletonProps) {
   return (
     <div className={cn('space-y-6', className)}>
       {Array.from({ length: fields }).map((_, i) => (
@@ -298,7 +264,7 @@ export function FormSkeleton({
           <Skeleton className="h-10 w-full rounded-md" />
         </div>
       ))}
-      
+
       {showButtons && (
         <div className="flex gap-3 pt-4">
           <Skeleton className="h-10 w-24 rounded-md" />
@@ -320,27 +286,25 @@ interface ProfileSkeletonProps {
 /**
  * Skeleton للملف الشخصي
  */
-export function ProfileSkeleton({ 
+export function ProfileSkeleton({
   showCover = true,
   showStats = true,
-  className 
+  className,
 }: ProfileSkeletonProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      {showCover && (
-        <Skeleton className="h-32 w-full rounded-lg" />
-      )}
-      
+      {showCover && <Skeleton className="h-32 w-full rounded-lg" />}
+
       <div className="flex items-start gap-4 px-4">
         <Skeleton className="h-20 w-20 rounded-full -mt-10 border-4 border-background flex-shrink-0" />
-        
+
         <div className="flex-1 space-y-2 pt-2">
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-48" />
         </div>
       </div>
-      
+
       {showStats && (
         <div className="grid grid-cols-3 gap-4 px-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -373,7 +337,7 @@ export function DashboardSkeleton({ className }: DashboardSkeletonProps) {
           <KPISkeleton key={i} />
         ))}
       </div>
-      
+
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="p-4">
@@ -383,7 +347,7 @@ export function DashboardSkeleton({ className }: DashboardSkeletonProps) {
           <ChartSkeleton type="line" />
         </Card>
       </div>
-      
+
       {/* Table */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
@@ -406,19 +370,16 @@ interface MobileCardSkeletonProps {
 /**
  * Skeleton لبطاقة الجوال
  */
-export function MobileCardSkeleton({ 
-  showBadge = false,
-  className 
-}: MobileCardSkeletonProps) {
+export function MobileCardSkeleton({ showBadge = false, className }: MobileCardSkeletonProps) {
   return (
     <Card className={cn('p-3 space-y-2', className)}>
       <div className="flex items-center justify-between">
         <Skeleton className="h-4 w-24" />
         {showBadge && <Skeleton className="h-5 w-16 rounded-full" />}
       </div>
-      
+
       <Skeleton className="h-6 w-32" />
-      
+
       <div className="flex items-center justify-between">
         <Skeleton className="h-3 w-20" />
         <Skeleton className="h-3 w-16" />

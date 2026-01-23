@@ -1,7 +1,7 @@
-import { forwardRef } from "react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { Separator } from "@/components/ui/separator";
+import { forwardRef } from 'react';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { Separator } from '@/components/ui/separator';
 
 interface POSReceiptProps {
   transaction: {
@@ -42,7 +42,7 @@ export const POSReceipt = forwardRef<HTMLDivElement, POSReceiptProps>(
           <div className="flex justify-between">
             <span className="text-muted-foreground">التاريخ:</span>
             <span>
-              {format(new Date(transaction.created_at), "yyyy/MM/dd HH:mm", {
+              {format(new Date(transaction.created_at), 'yyyy/MM/dd HH:mm', {
                 locale: ar,
               })}
             </span>
@@ -72,9 +72,7 @@ export const POSReceipt = forwardRef<HTMLDivElement, POSReceiptProps>(
         {/* Amount */}
         <div className="text-center py-3 bg-muted rounded-lg">
           <p className="text-muted-foreground text-xs mb-1">المبلغ</p>
-          <p className="text-2xl font-bold">
-            {transaction.amount.toLocaleString("ar-SA")} ريال
-          </p>
+          <p className="text-2xl font-bold">{transaction.amount.toLocaleString('ar-SA')} ريال</p>
         </div>
 
         <Separator className="my-3" />
@@ -105,4 +103,4 @@ export const POSReceipt = forwardRef<HTMLDivElement, POSReceiptProps>(
   }
 );
 
-POSReceipt.displayName = "POSReceipt";
+POSReceipt.displayName = 'POSReceipt';

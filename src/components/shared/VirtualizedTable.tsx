@@ -63,11 +63,7 @@ export function VirtualizedTable<T>({
   const totalSize = virtualizer.getTotalSize();
 
   if (data.length === 0) {
-    return (
-      <div className="text-center py-10 text-muted-foreground">
-        {emptyMessage}
-      </div>
-    );
+    return <div className="text-center py-10 text-muted-foreground">{emptyMessage}</div>;
   }
 
   return (
@@ -88,11 +84,7 @@ export function VirtualizedTable<T>({
         </TableHeader>
       </Table>
 
-      <ScrollArea
-        ref={parentRef}
-        className="overflow-auto"
-        style={{ maxHeight }}
-      >
+      <ScrollArea ref={parentRef} className="overflow-auto" style={{ maxHeight }}>
         <div
           style={{
             height: `${totalSize}px`,

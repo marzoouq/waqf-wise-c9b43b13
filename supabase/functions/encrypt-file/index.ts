@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 // ============ Rate Limiting - 20 ملف/دقيقة لكل مستخدم ============
@@ -16,16 +16,16 @@ const RATE_WINDOW = 60 * 1000; // 1 minute
 function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetIn: number } {
   const now = Date.now();
   const record = rateLimitMap.get(userId);
-  
+
   if (!record || now > record.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_WINDOW });
     return { allowed: true, remaining: RATE_LIMIT - 1, resetIn: RATE_WINDOW };
   }
-  
+
   if (record.count >= RATE_LIMIT) {
     return { allowed: false, remaining: 0, resetIn: record.resetTime - now };
   }
-  
+
   record.count++;
   return { allowed: true, remaining: RATE_LIMIT - record.count, resetIn: record.resetTime - now };
 }
@@ -34,14 +34,21 @@ function checkRateLimit(userId: string): { allowed: boolean; remaining: number; 
 function validateFileSize(size: number): { valid: boolean; error?: string } {
   const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
   if (size > MAX_FILE_SIZE) {
-    return { valid: false, error: `حجم الملف يتجاوز الحد المسموح (${MAX_FILE_SIZE / (1024 * 1024)} MB)` };
+    return {
+      valid: false,
+      error: `حجم الملف يتجاوز الحد المسموح (${MAX_FILE_SIZE / (1024 * 1024)} MB)`,
+    };
   }
   return { valid: true };
 }
 
-function validateExpiresInDays(value: string | null): { valid: boolean; value: number; error?: string } {
+function validateExpiresInDays(value: string | null): {
+  valid: boolean;
+  value: number;
+  error?: string;
+} {
   if (!value) return { valid: true, value: 0 };
-  
+
   const numValue = parseInt(value, 10);
   if (isNaN(numValue)) {
     return { valid: false, value: 0, error: 'expiresInDays يجب أن يكون رقماً' };
@@ -58,7 +65,7 @@ function validateExpiresInDays(value: string | null): { valid: boolean; value: n
 /**
  * Edge Function لتشفير الملفات قبل تخزينها
  * يستخدم AES-256-GCM للتشفير
- * 
+ *
  * ✅ محمي بـ: JWT + Role Check + Rate Limiting + Input Validation
  */
 serve(async (req) => {
@@ -78,7 +85,7 @@ serve(async (req) => {
             status: 'healthy',
             function: 'encrypt-file',
             timestamp: new Date().toISOString(),
-            version: '2.1.0'
+            version: '2.1.0',
           });
         }
       } catch {
@@ -94,14 +101,17 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    
+
     const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAuth.auth.getUser(token);
+
     if (authError || !user) {
       console.warn('[encrypt-file] ❌ Invalid token:', authError?.message);
       return unauthorizedResponse('فشل التحقق من الهوية - يرجى إعادة تسجيل الدخول');
@@ -123,12 +133,14 @@ serve(async (req) => {
       return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
-    const userRoles = roles?.map(r => r.role) || [];
+    const userRoles = roles?.map((r) => r.role) || [];
     const allowedRoles = ['admin', 'nazer', 'accountant', 'staff'];
-    const hasPermission = userRoles.some(role => allowedRoles.includes(role));
+    const hasPermission = userRoles.some((role) => allowedRoles.includes(role));
 
     if (!hasPermission) {
-      console.warn(`[encrypt-file] ❌ Forbidden - User ${user.id} lacks required role (has: ${userRoles.join(', ') || 'none'})`);
+      console.warn(
+        `[encrypt-file] ❌ Forbidden - User ${user.id} lacks required role (has: ${userRoles.join(', ') || 'none'})`
+      );
       return forbiddenResponse('ليس لديك صلاحية لتشفير الملفات');
     }
 
@@ -136,15 +148,20 @@ serve(async (req) => {
     const rateLimitResult = checkRateLimit(user.id);
     if (!rateLimitResult.allowed) {
       console.warn(`[encrypt-file] Rate limit exceeded for user: ${user.id}`);
-      return errorResponse(`تجاوزت الحد المسموح (${RATE_LIMIT} ملف/دقيقة). يرجى الانتظار ${Math.ceil(rateLimitResult.resetIn / 1000)} ثانية.`, 429);
+      return errorResponse(
+        `تجاوزت الحد المسموح (${RATE_LIMIT} ملف/دقيقة). يرجى الانتظار ${Math.ceil(rateLimitResult.resetIn / 1000)} ثانية.`,
+        429
+      );
     }
 
-    console.log(`[encrypt-file] ✅ Authorized - User: ${user.id}, Roles: ${userRoles.join(', ')}, Remaining: ${rateLimitResult.remaining}`);
+    console.log(
+      `[encrypt-file] ✅ Authorized - User: ${user.id}, Roles: ${userRoles.join(', ')}, Remaining: ${rateLimitResult.remaining}`
+    );
 
     // ============ قراءة ومعالجة الملف ============
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const fileCategory = formData.get('category') as string || 'general';
+    const fileCategory = (formData.get('category') as string) || 'general';
     const expiresInDaysRaw = formData.get('expiresInDays') as string;
 
     if (!file) {
@@ -170,30 +187,25 @@ serve(async (req) => {
     const fileData = new Uint8Array(fileBuffer);
 
     // توليد مفتاح تشفير و IV
-    const key = await crypto.subtle.generateKey(
-      { name: "AES-GCM", length: 256 },
-      true,
-      ["encrypt", "decrypt"]
-    );
+    const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, [
+      'encrypt',
+      'decrypt',
+    ]);
 
     const iv = crypto.getRandomValues(new Uint8Array(12));
 
     // تشفير البيانات
-    const encryptedData = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      key,
-      fileData
-    );
+    const encryptedData = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, fileData);
 
     // تصدير المفتاح
-    const exportedKey = await crypto.subtle.exportKey("raw", key);
+    const exportedKey = await crypto.subtle.exportKey('raw', key);
     const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
     const ivBase64 = btoa(String.fromCharCode(...iv));
 
     // حساب checksum
-    const checksumBuffer = await crypto.subtle.digest("SHA-256", fileData);
+    const checksumBuffer = await crypto.subtle.digest('SHA-256', fileData);
     const checksumArray = Array.from(new Uint8Array(checksumBuffer));
-    const checksum = checksumArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const checksum = checksumArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
     // تحويل البيانات المشفرة إلى Base64 للتخزين
     const encryptedArray = new Uint8Array(encryptedData);
@@ -205,7 +217,7 @@ serve(async (req) => {
       .from('encrypted-files')
       .upload(encryptedFileName, encryptedBase64, {
         contentType: 'application/octet-stream',
-        upsert: false
+        upsert: false,
       });
 
     if (uploadError) {
@@ -213,9 +225,10 @@ serve(async (req) => {
     }
 
     // حفظ metadata التشفير في قاعدة البيانات
-    const expiresAt = expiresInDays > 0 
-      ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
-      : null;
+    const expiresAt =
+      expiresInDays > 0
+        ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
+        : null;
 
     // أولاً: إنشاء مفتاح التشفير في encryption_keys
     const { data: keyData, error: keyError } = await supabase
@@ -226,7 +239,7 @@ serve(async (req) => {
         key_purpose: 'file_encryption',
         is_active: true,
         created_by: user.id,
-        metadata: { key_base64: keyBase64 }
+        metadata: { key_base64: keyBase64 },
       })
       .select()
       .maybeSingle();
@@ -252,8 +265,8 @@ serve(async (req) => {
         metadata: {
           original_size: file.size,
           encrypted_size: encryptedArray.length,
-          category: fileCategory
-        }
+          category: fileCategory,
+        },
       })
       .select()
       .maybeSingle();
@@ -273,7 +286,7 @@ serve(async (req) => {
       record_id: fileRecord.id,
       access_type: 'encrypt',
       access_reason: `تشفير ملف: ${file.name}`,
-      was_granted: true
+      was_granted: true,
     });
 
     // تسجيل في audit_logs
@@ -287,8 +300,8 @@ serve(async (req) => {
         file_name: file.name,
         file_size: file.size,
         category: fileCategory,
-        expires_at: expiresAt
-      }
+        expires_at: expiresAt,
+      },
     });
 
     console.log(`[encrypt-file] ✅ تم تشفير الملف بنجاح: ${fileRecord.id}`);
@@ -301,22 +314,22 @@ serve(async (req) => {
         original_name: file.name,
         encrypted_path: uploadData.path,
         checksum: checksum,
-        expires_at: expiresAt
-      }
+        expires_at: expiresAt,
+      },
     });
   } catch (error) {
     console.error('[encrypt-file] ❌ خطأ في تشفير الملف:', error);
-    
+
     // تسجيل تفاصيل كاملة للمطورين
     console.error('[encrypt-file] Full error details:', {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     // رسالة آمنة للعميل
     let safeMessage = 'حدث خطأ أثناء تشفير الملف';
-    
+
     if (error instanceof Error) {
       if (error.message.includes('غير مصرح') || error.message.includes('unauthorized')) {
         safeMessage = 'غير مصرح بالوصول';
@@ -326,7 +339,7 @@ serve(async (req) => {
         safeMessage = 'فشل رفع الملف، يرجى المحاولة مرة أخرى';
       }
     }
-    
+
     return errorResponse(safeMessage, 500);
   }
 });

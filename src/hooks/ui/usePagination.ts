@@ -2,7 +2,7 @@
  * usePagination Hook - التصفح بالصفحات
  * @version 2.9.9
  */
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from 'react';
 
 export interface PaginationState {
   currentPage: number;
@@ -21,18 +21,18 @@ export interface UsePaginationReturn<T> {
   // البيانات
   paginatedData: T[];
   pagination: PaginationState;
-  
+
   // التنقل
   goToPage: (page: number) => void;
   nextPage: () => void;
   prevPage: () => void;
   firstPage: () => void;
   lastPage: () => void;
-  
+
   // الإعدادات
   setPageSize: (size: number) => void;
   pageSizeOptions: number[];
-  
+
   // الحالة
   canGoNext: boolean;
   canGoPrev: boolean;
@@ -79,10 +79,13 @@ export function usePagination<T>(
   const endIndex = Math.min(validCurrentPage * pageSize, totalItems);
 
   // التنقل
-  const goToPage = useCallback((page: number) => {
-    const targetPage = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(targetPage);
-  }, [totalPages]);
+  const goToPage = useCallback(
+    (page: number) => {
+      const targetPage = Math.max(1, Math.min(page, totalPages));
+      setCurrentPage(targetPage);
+    },
+    [totalPages]
+  );
 
   const nextPage = useCallback(() => {
     if (validCurrentPage < totalPages) {
@@ -158,10 +161,13 @@ export function useServerPagination(options: UseServerPaginationOptions) {
   const startIndex = totalItems > 0 ? offset + 1 : 0;
   const endIndex = Math.min(offset + pageSize, totalItems);
 
-  const goToPage = useCallback((page: number) => {
-    const targetPage = Math.max(1, Math.min(page, totalPages || 1));
-    setCurrentPage(targetPage);
-  }, [totalPages]);
+  const goToPage = useCallback(
+    (page: number) => {
+      const targetPage = Math.max(1, Math.min(page, totalPages || 1));
+      setCurrentPage(targetPage);
+    },
+    [totalPages]
+  );
 
   const nextPage = useCallback(() => {
     if (currentPage < totalPages) {

@@ -3,22 +3,33 @@ import { Button } from '@/components/ui/button';
 import { Download, TrendingUp } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { useToast } from '@/hooks/ui/use-toast';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
 import { useDistributionAnalysisReport } from '@/hooks/reports/useDistributionAnalysisReport';
 
 export function DistributionAnalysisReport() {
   const { toast } = useToast();
-  const { 
-    distributionTrends, 
-    statusStats, 
-    totals, 
-    isLoading, 
-    isRefetching, 
-    lastUpdated, 
+  const {
+    distributionTrends,
+    statusStats,
+    totals,
+    isLoading,
+    isRefetching,
+    lastUpdated,
     handleRefresh,
-    error 
+    error,
   } = useDistributionAnalysisReport();
 
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
@@ -27,15 +38,15 @@ export function DistributionAnalysisReport() {
 
     const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['الشهر', 'المبلغ الإجمالي', 'عدد المستفيدين', 'المتوسط للمستفيد'];
-    const data = distributionTrends.map(d => [
+    const data = distributionTrends.map((d) => [
       d.month,
       `${d.totalAmount.toLocaleString('ar-SA')} ريال`,
       d.beneficiariesCount,
-      `${d.avgPerBeneficiary.toLocaleString('ar-SA')} ريال`
+      `${d.avgPerBeneficiary.toLocaleString('ar-SA')} ريال`,
     ]);
 
     exportToPDF('تحليل التوزيعات', headers, data, 'distribution_analysis');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تحليل التوزيعات بنجاح',
@@ -47,16 +58,16 @@ export function DistributionAnalysisReport() {
     if (!distributionTrends) return;
 
     const { exportToExcel } = await import('@/lib/exportHelpers');
-    const data = distributionTrends.map(d => ({
-      'الشهر': d.month,
+    const data = distributionTrends.map((d) => ({
+      الشهر: d.month,
       'المبلغ الإجمالي': d.totalAmount,
       'عدد المستفيدين': d.beneficiariesCount,
       'عدد التوزيعات': d.distributionsCount,
-      'المتوسط للمستفيد': d.avgPerBeneficiary
+      'المتوسط للمستفيد': d.avgPerBeneficiary,
     }));
 
     exportToExcel(data, 'distribution_analysis', 'تحليل التوزيعات');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تحليل التوزيعات بنجاح',
@@ -68,7 +79,13 @@ export function DistributionAnalysisReport() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل تحليل التوزيعات" message={(error as Error).message} onRetry={handleRefresh} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل تحليل التوزيعات"
+        message={(error as Error).message}
+        onRetry={handleRefresh}
+      />
+    );
   }
 
   return (
@@ -102,9 +119,7 @@ export function DistributionAnalysisReport() {
             <CardTitle className="text-sm font-medium">عدد الأشهر</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {totals.totalMonths}
-            </div>
+            <div className="text-2xl font-bold">{totals.totalMonths}</div>
           </CardContent>
         </Card>
 
@@ -170,7 +185,12 @@ export function DistributionAnalysisReport() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="beneficiariesCount" stroke="hsl(var(--status-success))" name="عدد المستفيدين" />
+                  <Line
+                    type="monotone"
+                    dataKey="beneficiariesCount"
+                    stroke="hsl(var(--status-success))"
+                    name="عدد المستفيدين"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -185,7 +205,12 @@ export function DistributionAnalysisReport() {
                   <YAxis />
                   <Tooltip formatter={(value: number) => `${value.toLocaleString('ar-SA')} ريال`} />
                   <Legend />
-                  <Line type="monotone" dataKey="avgPerBeneficiary" stroke="hsl(var(--status-warning))" name="متوسط النصيب" />
+                  <Line
+                    type="monotone"
+                    dataKey="avgPerBeneficiary"
+                    stroke="hsl(var(--status-warning))"
+                    name="متوسط النصيب"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>

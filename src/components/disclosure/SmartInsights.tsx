@@ -4,9 +4,16 @@
  * @version 2.8.66
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Lightbulb, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Info } from "lucide-react";
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Lightbulb,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+} from 'lucide-react';
+import { AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
 
 interface SmartInsightsProps {
   currentYear: AnnualDisclosure;
@@ -22,8 +29,8 @@ interface Insight {
 }
 
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("ar-SA", {
-    style: "decimal",
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -163,9 +170,7 @@ export function SmartInsights({ currentYear, previousYear }: SmartInsightsProps)
               key={insight.id}
               className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${getInsightStyles(insight.type)}`}
             >
-              <div className="flex-shrink-0 mt-0.5">
-                {insight.icon}
-              </div>
+              <div className="flex-shrink-0 mt-0.5">{insight.icon}</div>
               <div className="space-y-0.5 min-w-0">
                 <p className="font-medium text-xs sm:text-sm">{insight.title}</p>
                 <p className="text-[10px] sm:text-xs opacity-80">{insight.description}</p>

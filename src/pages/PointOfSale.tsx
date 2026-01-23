@@ -64,7 +64,11 @@ export default function PointOfSale() {
     setShowCloseShift(false);
   };
 
-  const handleCollect = async (data: { amount: number; paymentMethod: 'نقدي' | 'شبكة' | 'تحويل' | 'شيك'; referenceNumber?: string }) => {
+  const handleCollect = async (data: {
+    amount: number;
+    paymentMethod: 'نقدي' | 'شبكة' | 'تحويل' | 'شيك';
+    referenceNumber?: string;
+  }) => {
     if (!selectedRental || !currentShift) return;
 
     await collect({
@@ -102,105 +106,112 @@ export default function PointOfSale() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات مركز التحصيل" onRetry={refetch} fullScreen />;
+    return (
+      <ErrorState
+        title="خطأ في التحميل"
+        message="فشل تحميل بيانات مركز التحصيل"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   return (
     <PageErrorBoundary pageName="مركز التحصيل والصرف">
       <div className="space-y-6 p-6 w-full max-w-full overflow-x-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Briefcase className="h-6 w-6 text-primary" />
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Briefcase className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">مركز التحصيل والصرف</h1>
+              <p className="text-sm text-muted-foreground">إدارة عمليات التحصيل والصرف العقاري</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">مركز التحصيل والصرف</h1>
-            <p className="text-sm text-muted-foreground">إدارة عمليات التحصيل والصرف العقاري</p>
-          </div>
+
+          {hasOpenShift && (
+            <Button variant="destructive" onClick={() => setShowPayment(true)}>
+              <ArrowUpCircle className="h-4 w-4 ms-2" />
+              صرف مبلغ
+            </Button>
+          )}
         </div>
 
+        {/* Shift Status Bar */}
+        <ShiftStatusBar
+          shift={currentShift}
+          onOpenShift={() => setShowOpenShift(true)}
+          onCloseShift={() => setShowCloseShift(true)}
+          isOpeningShift={isOpeningShift}
+        />
+
+        {/* Main Content */}
         {hasOpenShift && (
-          <Button variant="destructive" onClick={() => setShowPayment(true)}>
-            <ArrowUpCircle className="h-4 w-4 ms-2" />
-            صرف مبلغ
-          </Button>
+          <>
+            {/* Stats Cards */}
+            <POSStatsCards stats={stats} pendingStats={pendingStats} />
+
+            {/* Tabs */}
+            <Tabs defaultValue="pending" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="pending" className="gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  الإيجارات المستحقة
+                </TabsTrigger>
+                <TabsTrigger value="transactions" className="gap-2">
+                  <Receipt className="h-4 w-4" />
+                  عمليات الجلسة
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="pending">
+                <PendingRentalsTable
+                  rentals={pendingRentals}
+                  isLoading={isLoadingRentals}
+                  onCollect={(rental) => setSelectedRental(rental)}
+                  disabled={!hasOpenShift}
+                />
+              </TabsContent>
+
+              <TabsContent value="transactions">
+                <TransactionsTable transactions={transactions} />
+              </TabsContent>
+            </Tabs>
+          </>
         )}
-      </div>
 
-      {/* Shift Status Bar */}
-      <ShiftStatusBar
-        shift={currentShift}
-        onOpenShift={() => setShowOpenShift(true)}
-        onCloseShift={() => setShowCloseShift(true)}
-        isOpeningShift={isOpeningShift}
-      />
+        {/* Dialogs */}
+        <OpenShiftDialog
+          open={showOpenShift}
+          onOpenChange={setShowOpenShift}
+          onConfirm={handleOpenShift}
+          isLoading={isOpeningShift}
+        />
 
-      {/* Main Content */}
-      {hasOpenShift && (
-        <>
-          {/* Stats Cards */}
-          <POSStatsCards stats={stats} pendingStats={pendingStats} />
+        <CloseShiftDialog
+          open={showCloseShift}
+          onOpenChange={setShowCloseShift}
+          shift={currentShift}
+          onConfirm={handleCloseShift}
+          isLoading={isClosingShift}
+        />
 
-          {/* Tabs */}
-          <Tabs defaultValue="pending" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="pending" className="gap-2">
-                <DollarSign className="h-4 w-4" />
-                الإيجارات المستحقة
-              </TabsTrigger>
-              <TabsTrigger value="transactions" className="gap-2">
-                <Receipt className="h-4 w-4" />
-                عمليات الجلسة
-              </TabsTrigger>
-            </TabsList>
+        <QuickCollectionDialog
+          open={!!selectedRental}
+          onOpenChange={(open) => !open && setSelectedRental(null)}
+          rental={selectedRental}
+          onConfirm={handleCollect}
+          isLoading={isCollecting}
+        />
 
-            <TabsContent value="pending">
-              <PendingRentalsTable
-                rentals={pendingRentals}
-                isLoading={isLoadingRentals}
-                onCollect={(rental) => setSelectedRental(rental)}
-                disabled={!hasOpenShift}
-              />
-            </TabsContent>
-
-            <TabsContent value="transactions">
-              <TransactionsTable transactions={transactions} />
-            </TabsContent>
-          </Tabs>
-        </>
-      )}
-
-      {/* Dialogs */}
-      <OpenShiftDialog
-        open={showOpenShift}
-        onOpenChange={setShowOpenShift}
-        onConfirm={handleOpenShift}
-        isLoading={isOpeningShift}
-      />
-
-      <CloseShiftDialog
-        open={showCloseShift}
-        onOpenChange={setShowCloseShift}
-        shift={currentShift}
-        onConfirm={handleCloseShift}
-        isLoading={isClosingShift}
-      />
-
-      <QuickCollectionDialog
-        open={!!selectedRental}
-        onOpenChange={(open) => !open && setSelectedRental(null)}
-        rental={selectedRental}
-        onConfirm={handleCollect}
-        isLoading={isCollecting}
-      />
-
-      <QuickPaymentDialog
-        open={showPayment}
-        onOpenChange={setShowPayment}
-        onConfirm={handlePayment}
-        isLoading={isPaying}
-      />
+        <QuickPaymentDialog
+          open={showPayment}
+          onOpenChange={setShowPayment}
+          onConfirm={handlePayment}
+          isLoading={isPaying}
+        />
       </div>
     </PageErrorBoundary>
   );

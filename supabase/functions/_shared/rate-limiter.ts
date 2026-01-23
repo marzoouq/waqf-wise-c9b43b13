@@ -12,9 +12,9 @@ interface RateLimitEntry {
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 export interface RateLimitConfig {
-  maxRequests: number;      // الحد الأقصى للطلبات
-  windowMs: number;         // النافذة الزمنية بالميلي ثانية
-  keyPrefix?: string;       // بادئة المفتاح
+  maxRequests: number; // الحد الأقصى للطلبات
+  windowMs: number; // النافذة الزمنية بالميلي ثانية
+  keyPrefix?: string; // بادئة المفتاح
 }
 
 export interface RateLimitResult {
@@ -27,49 +27,46 @@ export interface RateLimitResult {
 /**
  * فحص Rate Limit
  */
-export function checkRateLimit(
-  identifier: string, 
-  config: RateLimitConfig
-): RateLimitResult {
+export function checkRateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
   const now = Date.now();
   const key = config.keyPrefix ? `${config.keyPrefix}:${identifier}` : identifier;
-  
+
   // تنظيف الإدخالات المنتهية
   cleanupExpiredEntries(now);
-  
+
   const entry = rateLimitStore.get(key);
-  
+
   if (!entry || entry.resetAt < now) {
     // إدخال جديد أو منتهي الصلاحية
     const newEntry: RateLimitEntry = {
       count: 1,
-      resetAt: now + config.windowMs
+      resetAt: now + config.windowMs,
     };
     rateLimitStore.set(key, newEntry);
-    
+
     return {
       allowed: true,
       remaining: config.maxRequests - 1,
-      resetAt: newEntry.resetAt
+      resetAt: newEntry.resetAt,
     };
   }
-  
+
   // تحديث الإدخال الموجود
   entry.count++;
-  
+
   if (entry.count > config.maxRequests) {
     return {
       allowed: false,
       remaining: 0,
       resetAt: entry.resetAt,
-      retryAfter: Math.ceil((entry.resetAt - now) / 1000)
+      retryAfter: Math.ceil((entry.resetAt - now) / 1000),
     };
   }
-  
+
   return {
     allowed: true,
     remaining: config.maxRequests - entry.count,
-    resetAt: entry.resetAt
+    resetAt: entry.resetAt,
   };
 }
 
@@ -93,7 +90,7 @@ export function createRateLimitResponse(result: RateLimitResult): Response {
       success: false,
       error: 'تجاوزت الحد المسموح من الطلبات',
       message: `يرجى الانتظار ${result.retryAfter} ثانية قبل المحاولة مرة أخرى`,
-      retryAfter: result.retryAfter
+      retryAfter: result.retryAfter,
     }),
     {
       status: 429,
@@ -104,7 +101,7 @@ export function createRateLimitResponse(result: RateLimitResult): Response {
         'Retry-After': (result.retryAfter || 60).toString(),
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      }
+      },
     }
   );
 }
@@ -117,20 +114,20 @@ export function getClientIdentifier(req: Request): string {
   const forwarded = req.headers.get('X-Forwarded-For');
   const realIp = req.headers.get('X-Real-IP');
   const authHeader = req.headers.get('Authorization');
-  
+
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
-  
+
   if (realIp) {
     return realIp;
   }
-  
+
   if (authHeader) {
     // استخدام hash من التوكن بدلاً من التوكن نفسه
     return `auth:${authHeader.slice(-16)}`;
   }
-  
+
   return `ua:${req.headers.get('User-Agent')?.slice(0, 50) || 'unknown'}`;
 }
 
@@ -139,16 +136,16 @@ export const RATE_LIMITS = {
   // العمليات الحساسة: 5 طلبات كل 15 دقيقة
   SENSITIVE: {
     maxRequests: 5,
-    windowMs: 15 * 60 * 1000 // 15 دقيقة
+    windowMs: 15 * 60 * 1000, // 15 دقيقة
   },
   // العمليات العادية: 30 طلب في الدقيقة
   NORMAL: {
     maxRequests: 30,
-    windowMs: 60 * 1000 // دقيقة واحدة
+    windowMs: 60 * 1000, // دقيقة واحدة
   },
   // العمليات المتكررة: 100 طلب في الدقيقة
   HIGH: {
     maxRequests: 100,
-    windowMs: 60 * 1000 // دقيقة واحدة
-  }
+    windowMs: 60 * 1000, // دقيقة واحدة
+  },
 } as const;

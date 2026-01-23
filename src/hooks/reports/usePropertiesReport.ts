@@ -3,12 +3,12 @@
  * @version 2.8.86
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { ReportService, type PropertyWithContracts } from "@/services/report.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { ReportService, type PropertyWithContracts } from '@/services/report.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { PropertyWithContracts };
 
@@ -33,20 +33,12 @@ export function usePropertiesReport() {
   useEffect(() => {
     const channel = supabase
       .channel('properties-report-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'properties' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'contracts' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
+      })
       .subscribe();
 
     return () => {

@@ -22,7 +22,7 @@ export interface ContractNotification {
   created_at: string;
 }
 
-export type NotificationType = 
+export type NotificationType =
   | 'تجديد'
   | 'إنهاء'
   | 'تعديل_إيجار'
@@ -45,7 +45,7 @@ export function useContractNotifications(contractId?: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: contractId 
+    queryKey: contractId
       ? PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS_BY_CONTRACT(contractId)
       : PROPERTIES_KEYS.CONTRACT_NOTIFICATIONS,
     queryFn: async () => {
@@ -124,15 +124,9 @@ export function useContractNotifications(contractId?: string) {
 
   // تحديث حالة الإشعار
   const updateNotificationStatus = useMutation({
-    mutationFn: async ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: NotificationStatus;
-    }) => {
+    mutationFn: async ({ id, status }: { id: string; status: NotificationStatus }) => {
       const updates: Partial<ContractNotification> = { status };
-      
+
       if (status === 'read') {
         updates.read_at = new Date().toISOString();
       }
@@ -159,10 +153,7 @@ export function useContractNotifications(contractId?: string) {
   // حذف إشعار
   const deleteNotification = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('contract_notifications')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('contract_notifications').delete().eq('id', id);
 
       if (error) throw error;
     },

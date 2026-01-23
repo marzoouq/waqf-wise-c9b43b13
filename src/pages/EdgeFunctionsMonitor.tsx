@@ -1,18 +1,43 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { useEdgeFunctionsHealth, CATEGORY_LABELS, CATEGORY_ICONS } from '@/hooks/system/useEdgeFunctionsHealth';
-import { CheckType, EdgeFunctionInfo, EdgeFunctionHealth } from '@/services/edge-functions-health.service';
-import { 
-  Activity, RefreshCw, CheckCircle, XCircle, AlertTriangle,
-  Clock, Zap, Server, FileJson, Upload, Radio, Shield, Info
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  useEdgeFunctionsHealth,
+  CATEGORY_LABELS,
+  CATEGORY_ICONS,
+} from '@/hooks/system/useEdgeFunctionsHealth';
+import {
+  CheckType,
+  EdgeFunctionInfo,
+  EdgeFunctionHealth,
+} from '@/services/edge-functions-health.service';
+import {
+  Activity,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  Zap,
+  Server,
+  FileJson,
+  Upload,
+  Radio,
+  Shield,
+  Info,
 } from 'lucide-react';
 
 const statusConfig = {
@@ -20,38 +45,45 @@ const statusConfig = {
   degraded: { color: 'bg-yellow-500', label: 'بطيئة', icon: AlertTriangle },
   unhealthy: { color: 'bg-destructive', label: 'معطلة', icon: XCircle },
   protected: { color: 'bg-purple-500', label: 'محمية 🔒', icon: Shield },
-  unknown: { color: 'bg-muted', label: 'غير معروف', icon: Clock }
+  unknown: { color: 'bg-muted', label: 'غير معروف', icon: Clock },
 };
 
-const checkTypeConfig: Record<CheckType, { color: string; label: string; icon: React.ElementType; labelAr: string }> = {
-  ping: { 
-    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', 
-    label: 'Ping', 
+const checkTypeConfig: Record<
+  CheckType,
+  { color: string; label: string; icon: React.ElementType; labelAr: string }
+> = {
+  ping: {
+    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    label: 'Ping',
     icon: Radio,
-    labelAr: 'فحص سريع'
+    labelAr: 'فحص سريع',
   },
-  'json-required': { 
-    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', 
-    label: 'JSON', 
+  'json-required': {
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    label: 'JSON',
     icon: FileJson,
-    labelAr: 'يحتاج بيانات'
+    labelAr: 'يحتاج بيانات',
   },
-  formdata: { 
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', 
-    label: 'FormData', 
+  formdata: {
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    label: 'FormData',
     icon: Upload,
-    labelAr: 'ملفات'
-  }
+    labelAr: 'ملفات',
+  },
 };
 
 export default function EdgeFunctionsMonitor() {
   const {
-    functions = [], 
-    functionsByCategory = {}, 
-    functionsByCheckType = {}, 
-    healthStatuses = [], 
+    functions = [],
+    functionsByCategory = {},
+    functionsByCheckType = {},
+    healthStatuses = [],
     healthSummary,
-    isChecking, checkProgress, checkAllFunctions, checkCategory, checkSingleFunction
+    isChecking,
+    checkProgress,
+    checkAllFunctions,
+    checkCategory,
+    checkSingleFunction,
   } = useEdgeFunctionsHealth();
 
   const [activeCategory, setActiveCategory] = useState<EdgeFunctionInfo['category'] | 'all'>('all');
@@ -59,18 +91,19 @@ export default function EdgeFunctionsMonitor() {
   const [selectedFunction, setSelectedFunction] = useState<EdgeFunctionInfo | null>(null);
 
   const getHealthStatus = (funcName: string): EdgeFunctionHealth | undefined => {
-    return healthStatuses.find(h => h.name === funcName);
+    return healthStatuses.find((h) => h.name === funcName);
   };
 
   // حماية من القيم الفارغة
   const safeCategory = functionsByCategory || {};
-  let displayFunctions = activeCategory === 'all' 
-    ? functions 
-    : safeCategory[activeCategory as keyof typeof safeCategory] || [];
+  let displayFunctions =
+    activeCategory === 'all'
+      ? functions
+      : safeCategory[activeCategory as keyof typeof safeCategory] || [];
 
   // تطبيق فلتر نوع الفحص
   if (checkTypeFilter !== 'all') {
-    displayFunctions = displayFunctions.filter(f => f.checkType === checkTypeFilter);
+    displayFunctions = displayFunctions.filter((f) => f.checkType === checkTypeFilter);
   }
 
   const selectedHealth = selectedFunction ? getHealthStatus(selectedFunction.name) : null;
@@ -86,7 +119,11 @@ export default function EdgeFunctionsMonitor() {
           <p className="text-muted-foreground mt-1">{functions.length} وظيفة خادم</p>
         </div>
         <Button onClick={checkAllFunctions} disabled={isChecking} size="lg">
-          {isChecking ? <RefreshCw className="ms-2 h-5 w-5 animate-spin" /> : <Zap className="ms-2 h-5 w-5" />}
+          {isChecking ? (
+            <RefreshCw className="ms-2 h-5 w-5 animate-spin" />
+          ) : (
+            <Zap className="ms-2 h-5 w-5" />
+          )}
           {isChecking ? 'جاري الفحص...' : 'فحص الكل'}
         </Button>
       </div>
@@ -107,9 +144,7 @@ export default function EdgeFunctionsMonitor() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <h3 className="font-medium text-lg flex items-center gap-2">
-              🎯 تصنيف حسب نوع الفحص
-            </h3>
+            <h3 className="font-medium text-lg flex items-center gap-2">🎯 تصنيف حسب نوع الفحص</h3>
             <div className="flex gap-2 flex-wrap">
               {Object.entries(functionsByCheckType || {}).map(([type, funcs]) => {
                 const config = checkTypeConfig[type as CheckType];
@@ -117,10 +152,12 @@ export default function EdgeFunctionsMonitor() {
                 const Icon = config.icon;
                 const funcArray = Array.isArray(funcs) ? funcs : [];
                 return (
-                  <Badge 
-                    key={type} 
+                  <Badge
+                    key={type}
                     className={`${config.color} cursor-pointer hover:opacity-80 transition-opacity`}
-                    onClick={() => setCheckTypeFilter(checkTypeFilter === type ? 'all' : type as CheckType)}
+                    onClick={() =>
+                      setCheckTypeFilter(checkTypeFilter === type ? 'all' : (type as CheckType))
+                    }
                   >
                     <Icon className="h-3 w-3 ms-1" />
                     {config.labelAr} ({funcArray.length})
@@ -177,7 +214,7 @@ export default function EdgeFunctionsMonitor() {
 
       {/* فلتر نوع الفحص */}
       <div className="flex gap-2 flex-wrap">
-        <Button 
+        <Button
           variant={checkTypeFilter === 'all' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setCheckTypeFilter('all')}
@@ -190,7 +227,7 @@ export default function EdgeFunctionsMonitor() {
           const Icon = config.icon;
           const funcArray = Array.isArray(funcs) ? funcs : [];
           return (
-            <Button 
+            <Button
               key={type}
               variant={checkTypeFilter === type ? 'default' : 'outline'}
               size="sm"
@@ -205,14 +242,18 @@ export default function EdgeFunctionsMonitor() {
       </div>
 
       {/* فلتر الفئات */}
-      <Tabs value={activeCategory} onValueChange={(v) => setActiveCategory(v as typeof activeCategory)}>
+      <Tabs
+        value={activeCategory}
+        onValueChange={(v) => setActiveCategory(v as typeof activeCategory)}
+      >
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="all">الكل ({functions.length})</TabsTrigger>
           {Object.entries(functionsByCategory || {}).map(([cat, funcs]) => {
             const funcArray = Array.isArray(funcs) ? funcs : [];
             return (
               <TabsTrigger key={cat} value={cat}>
-                {CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]} {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]} ({funcArray.length})
+                {CATEGORY_ICONS[cat as keyof typeof CATEGORY_ICONS]}{' '}
+                {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]} ({funcArray.length})
               </TabsTrigger>
             );
           })}
@@ -223,8 +264,8 @@ export default function EdgeFunctionsMonitor() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>الوظائف ({displayFunctions.length})</CardTitle>
               {activeCategory !== 'all' && (
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={() => checkCategory(activeCategory)}
                   disabled={isChecking}
@@ -237,7 +278,7 @@ export default function EdgeFunctionsMonitor() {
             <CardContent>
               <ScrollArea className="h-[400px]">
                 <div className="space-y-2">
-                  {displayFunctions.map(func => {
+                  {displayFunctions.map((func) => {
                     const health = getHealthStatus(func.name);
                     const config = health ? statusConfig[health.status] : statusConfig.unknown;
                     const Icon = config.icon;
@@ -245,7 +286,7 @@ export default function EdgeFunctionsMonitor() {
                     const CheckIcon = checkConfig.icon;
 
                     return (
-                      <div 
+                      <div
                         key={func.name}
                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
@@ -261,7 +302,10 @@ export default function EdgeFunctionsMonitor() {
                               </Badge>
                               {/* Badge JWT للوظائف المحمية */}
                               {func.requiresAuth && (
-                                <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                                >
                                   <Shield className="h-3 w-3 ms-1" />
                                   JWT
                                 </Badge>
@@ -286,16 +330,16 @@ export default function EdgeFunctionsMonitor() {
                             {config.label}
                           </Badge>
                           {/* زر التفاصيل */}
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="ghost"
                             onClick={() => setSelectedFunction(func)}
                             title="عرض التفاصيل"
                           >
                             <Info className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="ghost"
                             onClick={() => checkSingleFunction(func.name)}
                             disabled={isChecking}
@@ -322,34 +366,40 @@ export default function EdgeFunctionsMonitor() {
               تقرير: {selectedFunction?.name}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             {/* الحالة */}
             <div className="flex items-center gap-2">
               <span className="font-medium">الحالة:</span>
-              <Badge className={`${statusConfig[selectedHealth?.status || 'unknown'].color} text-white`}>
-                {React.createElement(statusConfig[selectedHealth?.status || 'unknown'].icon, { className: 'h-3 w-3 ms-1' })}
+              <Badge
+                className={`${statusConfig[selectedHealth?.status || 'unknown'].color} text-white`}
+              >
+                {React.createElement(statusConfig[selectedHealth?.status || 'unknown'].icon, {
+                  className: 'h-3 w-3 ms-1',
+                })}
                 {statusConfig[selectedHealth?.status || 'unknown'].label}
               </Badge>
             </div>
-            
+
             {/* زمن الاستجابة */}
             <div className="flex items-center gap-2">
               <span className="font-medium">زمن الاستجابة:</span>
               <Badge variant="outline">{selectedHealth?.responseTime || 0}ms</Badge>
             </div>
-            
+
             {/* نوع الفحص */}
             {selectedFunction && (
               <div className="flex items-center gap-2">
                 <span className="font-medium">نوع الفحص:</span>
                 <Badge className={checkTypeConfig[selectedFunction.checkType].color}>
-                  {React.createElement(checkTypeConfig[selectedFunction.checkType].icon, { className: 'h-3 w-3 ms-1' })}
+                  {React.createElement(checkTypeConfig[selectedFunction.checkType].icon, {
+                    className: 'h-3 w-3 ms-1',
+                  })}
                   {checkTypeConfig[selectedFunction.checkType].labelAr}
                 </Badge>
               </div>
             )}
-            
+
             {/* تتطلب مصادقة؟ */}
             <div className="flex items-center gap-2">
               <span className="font-medium">المصادقة:</span>
@@ -368,7 +418,7 @@ export default function EdgeFunctionsMonitor() {
               <span className="font-medium">الوصف:</span>
               <span className="text-muted-foreground">{selectedFunction?.description}</span>
             </div>
-            
+
             {/* سبب الحالة */}
             <div className="bg-muted p-3 rounded-lg">
               <p className="font-medium mb-1 flex items-center gap-1">
@@ -379,7 +429,7 @@ export default function EdgeFunctionsMonitor() {
                 {selectedHealth?.statusReason || 'لم يتم الفحص بعد'}
               </p>
             </div>
-            
+
             {/* التوصية */}
             <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg border border-green-200 dark:border-green-800">
               <p className="font-medium mb-1 flex items-center gap-1 text-green-800 dark:text-green-200">
@@ -390,12 +440,15 @@ export default function EdgeFunctionsMonitor() {
                 {selectedHealth?.recommendation || 'اضغط على زر الفحص للتحقق من حالة الوظيفة'}
               </p>
             </div>
-            
+
             {/* آخر فحص */}
             <div className="text-xs text-muted-foreground">
-              آخر فحص: {selectedHealth?.lastChecked ? new Date(selectedHealth.lastChecked).toLocaleString('ar-SA') : 'لم يتم الفحص'}
+              آخر فحص:{' '}
+              {selectedHealth?.lastChecked
+                ? new Date(selectedHealth.lastChecked).toLocaleString('ar-SA')
+                : 'لم يتم الفحص'}
             </div>
-            
+
             {/* الخطأ إن وجد */}
             {selectedHealth?.lastError && (
               <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/30">
@@ -404,16 +457,19 @@ export default function EdgeFunctionsMonitor() {
               </div>
             )}
           </div>
-          
+
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setSelectedFunction(null)}>
               إغلاق
             </Button>
-            <Button onClick={() => {
-              if (selectedFunction) {
-                checkSingleFunction(selectedFunction.name);
-              }
-            }} disabled={isChecking}>
+            <Button
+              onClick={() => {
+                if (selectedFunction) {
+                  checkSingleFunction(selectedFunction.name);
+                }
+              }}
+              disabled={isChecking}
+            >
               <RefreshCw className={`h-4 w-4 ms-1 ${isChecking ? 'animate-spin' : ''}`} />
               إعادة الفحص
             </Button>

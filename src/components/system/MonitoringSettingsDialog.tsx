@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,38 +6,35 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Settings, Save } from "lucide-react";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { Settings, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface MonitoringSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function MonitoringSettingsDialog({
-  open,
-  onOpenChange,
-}: MonitoringSettingsDialogProps) {
+export function MonitoringSettingsDialog({ open, onOpenChange }: MonitoringSettingsDialogProps) {
   const [settings, setSettings] = useState({
-    autoRefreshInterval: "30",
+    autoRefreshInterval: '30',
     enableAutoFix: true,
-    maxRetries: "3",
-    alertThreshold: "critical",
+    maxRetries: '3',
+    alertThreshold: 'critical',
     enableSlackNotifications: false,
     enableEmailNotifications: true,
-    retentionDays: "30",
+    retentionDays: '30',
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -45,12 +42,12 @@ export function MonitoringSettingsDialog({
     setIsSaving(true);
     try {
       // Save settings to localStorage for now
-      localStorage.setItem("monitoring_settings", JSON.stringify(settings));
-      toast.success("تم حفظ إعدادات المراقبة");
+      localStorage.setItem('monitoring_settings', JSON.stringify(settings));
+      toast.success('تم حفظ إعدادات المراقبة');
       onOpenChange(false);
     } catch (error) {
-      console.error("Error saving monitoring settings:", error);
-      toast.error("فشل في حفظ الإعدادات");
+      console.error('Error saving monitoring settings:', error);
+      toast.error('فشل في حفظ الإعدادات');
     } finally {
       setIsSaving(false);
     }
@@ -64,9 +61,7 @@ export function MonitoringSettingsDialog({
             <Settings className="h-5 w-5" />
             إعدادات المراقبة
           </DialogTitle>
-          <DialogDescription>
-            تكوين إعدادات نظام المراقبة والتنبيهات
-          </DialogDescription>
+          <DialogDescription>تكوين إعدادات نظام المراقبة والتنبيهات</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto">
@@ -76,9 +71,7 @@ export function MonitoringSettingsDialog({
             <Input
               type="number"
               value={settings.autoRefreshInterval}
-              onChange={(e) =>
-                setSettings({ ...settings, autoRefreshInterval: e.target.value })
-              }
+              onChange={(e) => setSettings({ ...settings, autoRefreshInterval: e.target.value })}
               min={5}
               max={300}
             />
@@ -88,15 +81,11 @@ export function MonitoringSettingsDialog({
           <div className="flex items-center justify-between p-3 border rounded-lg">
             <div>
               <Label>الإصلاح التلقائي</Label>
-              <p className="text-sm text-muted-foreground">
-                محاولة إصلاح الأخطاء تلقائياً
-              </p>
+              <p className="text-sm text-muted-foreground">محاولة إصلاح الأخطاء تلقائياً</p>
             </div>
             <Switch
               checked={settings.enableAutoFix}
-              onCheckedChange={(checked) =>
-                setSettings({ ...settings, enableAutoFix: checked })
-              }
+              onCheckedChange={(checked) => setSettings({ ...settings, enableAutoFix: checked })}
             />
           </div>
 
@@ -117,9 +106,7 @@ export function MonitoringSettingsDialog({
             <Label>عتبة التنبيهات</Label>
             <Select
               value={settings.alertThreshold}
-              onValueChange={(value) =>
-                setSettings({ ...settings, alertThreshold: value })
-              }
+              onValueChange={(value) => setSettings({ ...settings, alertThreshold: value })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -136,7 +123,7 @@ export function MonitoringSettingsDialog({
           {/* Notifications */}
           <div className="space-y-3">
             <Label>قنوات الإشعارات</Label>
-            
+
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <span>إشعارات البريد الإلكتروني</span>
               <Switch
@@ -164,9 +151,7 @@ export function MonitoringSettingsDialog({
             <Input
               type="number"
               value={settings.retentionDays}
-              onChange={(e) =>
-                setSettings({ ...settings, retentionDays: e.target.value })
-              }
+              onChange={(e) => setSettings({ ...settings, retentionDays: e.target.value })}
               min={7}
               max={365}
             />
@@ -179,7 +164,7 @@ export function MonitoringSettingsDialog({
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             <Save className="h-4 w-4 ms-2" />
-            {isSaving ? "جاري الحفظ..." : "حفظ الإعدادات"}
+            {isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
           </Button>
         </DialogFooter>
       </DialogContent>

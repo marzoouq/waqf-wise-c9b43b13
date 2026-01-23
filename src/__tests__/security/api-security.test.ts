@@ -7,10 +7,7 @@ import { describe, it, expect } from 'vitest';
 
 describe('Edge Functions Security', () => {
   describe('Authentication Requirements', () => {
-    const publicFunctions = [
-      'health-check',
-      'db-health-check',
-    ];
+    const publicFunctions = ['health-check', 'db-health-check'];
 
     const protectedFunctions = [
       'distribute-revenue',
@@ -26,7 +23,7 @@ describe('Edge Functions Security', () => {
         requiresAuth: false,
         isPublic: true,
       };
-      
+
       expect(functionConfig.isPublic).toBe(true);
     });
 
@@ -36,7 +33,7 @@ describe('Edge Functions Security', () => {
         requiresAuth: true,
         validateToken: true,
       };
-      
+
       expect(functionConfig.requiresAuth).toBe(true);
       expect(functionConfig.validateToken).toBe(true);
     });
@@ -90,7 +87,7 @@ describe('Edge Functions Security', () => {
 
       const error = new Error('Database connection failed: password=secret123');
       const sanitized = sanitizeError(error);
-      
+
       expect(sanitized.message).not.toContain('password');
       expect(sanitized.message).not.toContain('secret');
     });
@@ -112,8 +109,11 @@ describe('Edge Functions Security', () => {
 describe('API Input Validation', () => {
   describe('Request Body Validation', () => {
     it('should validate required fields', () => {
-      const validateRequest = (body: Record<string, unknown>, requiredFields: string[]): boolean => {
-        return requiredFields.every(field => body[field] !== undefined && body[field] !== null);
+      const validateRequest = (
+        body: Record<string, unknown>,
+        requiredFields: string[]
+      ): boolean => {
+        return requiredFields.every((field) => body[field] !== undefined && body[field] !== null);
       };
 
       expect(validateRequest({ name: 'Test', amount: 100 }, ['name', 'amount'])).toBe(true);
@@ -121,7 +121,10 @@ describe('API Input Validation', () => {
     });
 
     it('should validate field types', () => {
-      const validateTypes = (body: Record<string, unknown>, schema: Record<string, string>): boolean => {
+      const validateTypes = (
+        body: Record<string, unknown>,
+        schema: Record<string, string>
+      ): boolean => {
         return Object.entries(schema).every(([field, type]) => {
           const value = body[field];
           if (value === undefined) return true;
@@ -129,8 +132,12 @@ describe('API Input Validation', () => {
         });
       };
 
-      expect(validateTypes({ name: 'Test', amount: 100 }, { name: 'string', amount: 'number' })).toBe(true);
-      expect(validateTypes({ name: 'Test', amount: '100' }, { name: 'string', amount: 'number' })).toBe(false);
+      expect(
+        validateTypes({ name: 'Test', amount: 100 }, { name: 'string', amount: 'number' })
+      ).toBe(true);
+      expect(
+        validateTypes({ name: 'Test', amount: '100' }, { name: 'string', amount: 'number' })
+      ).toBe(false);
     });
   });
 
@@ -146,10 +153,13 @@ describe('API Input Validation', () => {
     });
 
     it('should validate pagination parameters', () => {
-      const validatePagination = (page: number, limit: number): { valid: boolean; page: number; limit: number } => {
+      const validatePagination = (
+        page: number,
+        limit: number
+      ): { valid: boolean; page: number; limit: number } => {
         const validPage = Math.max(1, Math.floor(page));
         const validLimit = Math.min(100, Math.max(1, Math.floor(limit)));
-        
+
         return {
           valid: true,
           page: validPage,
@@ -169,19 +179,19 @@ describe('Sensitive Data Protection', () => {
       const maskSensitiveData = (data: Record<string, unknown>): Record<string, unknown> => {
         const sensitiveFields = ['password', 'secret', 'token', 'api_key', 'national_id', 'iban'];
         const masked = { ...data };
-        
-        sensitiveFields.forEach(field => {
+
+        sensitiveFields.forEach((field) => {
           if (masked[field]) {
             masked[field] = '****';
           }
         });
-        
+
         return masked;
       };
 
       const data = { name: 'Test', password: 'secret123', national_id: '1234567890' };
       const masked = maskSensitiveData(data);
-      
+
       expect(masked.password).toBe('****');
       expect(masked.national_id).toBe('****');
       expect(masked.name).toBe('Test');
@@ -190,16 +200,10 @@ describe('Sensitive Data Protection', () => {
 
   describe('Logging Security', () => {
     it('should not log sensitive data', () => {
-      const sensitivePatterns = [
-        /password/i,
-        /secret/i,
-        /token/i,
-        /api_key/i,
-        /authorization/i,
-      ];
+      const sensitivePatterns = [/password/i, /secret/i, /token/i, /api_key/i, /authorization/i];
 
       const isSensitive = (key: string): boolean => {
-        return sensitivePatterns.some(pattern => pattern.test(key));
+        return sensitivePatterns.some((pattern) => pattern.test(key));
       };
 
       expect(isSensitive('password')).toBe(true);

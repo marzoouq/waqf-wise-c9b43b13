@@ -1,6 +1,6 @@
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useDebouncedSearch } from "@/hooks/ui/useDebouncedSearch";
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useDebouncedSearch } from '@/hooks/ui/useDebouncedSearch';
 
 interface PaymentsFiltersProps {
   searchQuery: string;

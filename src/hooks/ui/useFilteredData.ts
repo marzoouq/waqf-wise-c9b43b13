@@ -3,7 +3,7 @@
  * Hook موحد للتصفية والبحث في البيانات
  */
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from 'react';
 
 export interface FilterConfig<T> {
   /** الحقول التي يتم البحث فيها */
@@ -38,31 +38,31 @@ export interface UseFilteredDataReturn<T> {
  * @param data البيانات الأصلية
  * @param config إعدادات التصفية
  */
-export function useFilteredData<T>(
-  data: T[],
-  config: FilterConfig<T>
-): UseFilteredDataReturn<T> {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterValue, setFilterValue] = useState(config.defaultFilter || "all");
+export function useFilteredData<T>(data: T[], config: FilterConfig<T>): UseFilteredDataReturn<T> {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterValue, setFilterValue] = useState(config.defaultFilter || 'all');
 
   const filteredData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
     return data.filter((item) => {
       // البحث النصي
-      const matchesSearch = searchTerm === "" || config.searchFields.some((field) => {
-        const value = item[field];
-        if (typeof value === "string") {
-          return value.toLowerCase().includes(searchTerm.toLowerCase());
-        }
-        if (typeof value === "number") {
-          return value.toString().includes(searchTerm);
-        }
-        return false;
-      });
+      const matchesSearch =
+        searchTerm === '' ||
+        config.searchFields.some((field) => {
+          const value = item[field];
+          if (typeof value === 'string') {
+            return value.toLowerCase().includes(searchTerm.toLowerCase());
+          }
+          if (typeof value === 'number') {
+            return value.toString().includes(searchTerm);
+          }
+          return false;
+        });
 
       // الفلتر المخصص
-      const matchesFilter = filterValue === "all" || 
+      const matchesFilter =
+        filterValue === 'all' ||
         (config.customFilter ? config.customFilter(item, filterValue) : true);
 
       return matchesSearch && matchesFilter;
@@ -70,11 +70,11 @@ export function useFilteredData<T>(
   }, [data, searchTerm, filterValue, config]);
 
   const clearFilters = useCallback(() => {
-    setSearchTerm("");
-    setFilterValue(config.defaultFilter || "all");
+    setSearchTerm('');
+    setFilterValue(config.defaultFilter || 'all');
   }, [config.defaultFilter]);
 
-  const hasActiveFilters = searchTerm !== "" || filterValue !== (config.defaultFilter || "all");
+  const hasActiveFilters = searchTerm !== '' || filterValue !== (config.defaultFilter || 'all');
 
   return {
     filteredData,
@@ -100,15 +100,15 @@ export function useSearchFilter<T>(
   setSearchTerm: (term: string) => void;
   resultCount: number;
 } {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const filteredData = useMemo(() => {
-    if (!data || searchTerm === "") return data || [];
+    if (!data || searchTerm === '') return data || [];
 
     return data.filter((item) =>
       searchFields.some((field) => {
         const value = item[field];
-        if (typeof value === "string") {
+        if (typeof value === 'string') {
           return value.toLowerCase().includes(searchTerm.toLowerCase());
         }
         return false;
@@ -131,10 +131,10 @@ export function useRoleFilter<T extends { user_roles?: Array<{ role: string }> }
   data: T[]
 ): UseFilteredDataReturn<T> {
   return useFilteredData(data, {
-    searchFields: ["full_name" as keyof T, "email" as keyof T],
-    defaultFilter: "all",
+    searchFields: ['full_name' as keyof T, 'email' as keyof T],
+    defaultFilter: 'all',
     customFilter: (item, filterValue) => {
-      if (filterValue === "all") return true;
+      if (filterValue === 'all') return true;
       return item.user_roles?.some((r) => r.role === filterValue) ?? false;
     },
   });

@@ -3,10 +3,10 @@
  * يجلب ويحدث إعدادات الصفحة الترحيبية
  */
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { SettingsService } from "@/services";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { SettingsService } from '@/services';
 
 export function useLandingPageSettings() {
   const queryClient = useQueryClient();
@@ -31,11 +31,11 @@ export function useLandingPageSettings() {
     },
     onError: () => {
       toast.error('فشل حفظ الإعدادات');
-    }
+    },
   });
 
   const handleChange = (key: string, value: string) => {
-    setEditedSettings(prev => ({ ...prev, [key]: value }));
+    setEditedSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = (key: string) => {
@@ -50,7 +50,7 @@ export function useLandingPageSettings() {
     if (editedSettings[key] !== undefined) {
       return editedSettings[key];
     }
-    const setting = settings?.find(s => s.setting_key === key);
+    const setting = settings?.find((s) => s.setting_key === key);
     if (!setting) return '';
     try {
       return JSON.parse(setting.setting_value as string);

@@ -1,16 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Users, Shield, Database, Settings } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Users, Shield, Database, Settings } from 'lucide-react';
 
 export function SettingsQuickActions() {
   const navigate = useNavigate();
 
   const actions = [
-    { label: "إدارة المستخدمين", icon: Users, path: "/users" },
-    { label: "لوحة الأمان", icon: Shield, path: "/security" },
-    { label: "مراقبة الأداء", icon: Database, path: "/performance" },
-    { label: "سجلات النظام", icon: Settings, path: "/audit-logs" },
+    { label: 'إدارة المستخدمين', icon: Users, path: '/users' },
+    { label: 'لوحة الأمان', icon: Shield, path: '/security' },
+    { label: 'مراقبة الأداء', icon: Database, path: '/performance' },
+    { label: 'سجلات النظام', icon: Settings, path: '/audit-logs' },
   ];
 
   return (

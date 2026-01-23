@@ -16,16 +16,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-      
+
       - name: Run unit tests
         run: npm test
-      
+
       - name: Generate coverage report
         run: npm run test:coverage
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -42,18 +42,18 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-      
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-      
+
       - name: Run E2E tests
         run: npm run e2e
         env:
           CI: true
-      
+
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()

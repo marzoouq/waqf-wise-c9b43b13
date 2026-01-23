@@ -3,12 +3,19 @@
  * Duplicate Indexes Table
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Layers, AlertTriangle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { DuplicateIndex } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Layers, AlertTriangle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { DuplicateIndex } from '@/services/monitoring/db-health.service';
 
 interface DuplicateIndexesTableProps {
   indexes: DuplicateIndex[];
@@ -64,9 +71,7 @@ export function DuplicateIndexesTable({ indexes, isLoading }: DuplicateIndexesTa
           الفهارس المكررة
           <Badge variant="secondary">{indexes.length}</Badge>
         </CardTitle>
-        <CardDescription>
-          هذه الفهارس مكررة ويمكن حذف أحدها لتحسين الأداء
-        </CardDescription>
+        <CardDescription>هذه الفهارس مكررة ويمكن حذف أحدها لتحسين الأداء</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="rounded-lg border overflow-x-auto">
@@ -85,14 +90,10 @@ export function DuplicateIndexesTable({ indexes, isLoading }: DuplicateIndexesTa
                 <TableRow key={i}>
                   <TableCell className="font-medium">{idx.table_name}</TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      {idx.index1}
-                    </code>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded">{idx.index1}</code>
                   </TableCell>
                   <TableCell>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      {idx.index2}
-                    </code>
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded">{idx.index2}</code>
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate" title={idx.column_definition}>
                     {idx.column_definition}

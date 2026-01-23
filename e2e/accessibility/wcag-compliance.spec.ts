@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 /**
  * WCAG 2.1 AA Compliance Tests
  * اختبارات التوافق مع معايير WCAG للإتاحة
- * 
+ *
  * Uses axe-core for automated accessibility testing
  */
 
@@ -24,9 +24,7 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
         await browserPage.goto(page.path);
         await browserPage.waitForLoadState('networkidle');
 
-        const results = await new AxeBuilder({ page: browserPage })
-          .withTags(WCAG_TAGS)
-          .analyze();
+        const results = await new AxeBuilder({ page: browserPage }).withTags(WCAG_TAGS).analyze();
 
         // Log violations for debugging
         if (results.violations.length > 0) {
@@ -177,9 +175,7 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       await page.goto('/login');
 
       // Look for any dialog triggers
-      const dialogTrigger = page
-        .locator('[aria-haspopup="dialog"], [data-state="closed"]')
-        .first();
+      const dialogTrigger = page.locator('[aria-haspopup="dialog"], [data-state="closed"]').first();
 
       if ((await dialogTrigger.count()) > 0 && (await dialogTrigger.isVisible())) {
         await dialogTrigger.click();
@@ -269,11 +265,14 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
 
       // Check for error messages with proper ARIA
       const errorMessages = await page
-        .locator('[role="alert"], [aria-live="polite"], [aria-live="assertive"], [aria-invalid="true"]')
+        .locator(
+          '[role="alert"], [aria-live="polite"], [aria-live="assertive"], [aria-invalid="true"]'
+        )
         .all();
 
       // Form should either have HTML5 validation or custom error messages
-      const hasValidation = errorMessages.length > 0 || (await page.locator(':invalid').count()) > 0;
+      const hasValidation =
+        errorMessages.length > 0 || (await page.locator(':invalid').count()) > 0;
 
       expect(hasValidation).toBeTruthy();
     });
@@ -284,7 +283,9 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/login');
 
-      const interactiveElements = await page.locator('button:visible, a:visible, input:visible').all();
+      const interactiveElements = await page
+        .locator('button:visible, a:visible, input:visible')
+        .all();
 
       for (const element of interactiveElements.slice(0, 5)) {
         const box = await element.boundingBox();
@@ -361,9 +362,7 @@ test.describe('WCAG 2.1 AA - Full Page Audit @accessibility', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const results = await new AxeBuilder({ page })
-      .withTags(WCAG_TAGS)
-      .analyze();
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 
     // Generate report
     console.log('\n📊 Accessibility Audit Report - Homepage');
@@ -391,9 +390,7 @@ test.describe('WCAG 2.1 AA - Full Page Audit @accessibility', () => {
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
 
-    const results = await new AxeBuilder({ page })
-      .withTags(WCAG_TAGS)
-      .analyze();
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 
     console.log('\n📊 Accessibility Audit Report - Login Page');
     console.log('==========================================');

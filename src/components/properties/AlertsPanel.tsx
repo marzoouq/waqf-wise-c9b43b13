@@ -1,29 +1,29 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, Clock, CheckCircle2, XCircle, Brain, RefreshCw, Loader2 } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { AIAssistantDialog } from "./AIAssistantDialog";
-import { useSystemAlerts } from "@/hooks/property/useSystemAlerts";
-import { PropertyService } from "@/services/property.service";
-import { toast } from "sonner";
-import type { SeverityConfig } from "@/types/alerts";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertCircle, Clock, CheckCircle2, XCircle, Brain, RefreshCw, Loader2 } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { AIAssistantDialog } from './AIAssistantDialog';
+import { useSystemAlerts } from '@/hooks/property/useSystemAlerts';
+import { PropertyService } from '@/services/property.service';
+import { toast } from 'sonner';
+import type { SeverityConfig } from '@/types/alerts';
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // استخدام hook موحد بدلاً من useQuery مباشرة
   const { alerts, criticalAlerts, isLoading, resolveAlert } = useSystemAlerts();
 
   const getSeverityConfig = (severity: string): SeverityConfig => {
     const configs: Record<string, SeverityConfig> = {
-      critical: { icon: XCircle, variant: "destructive", color: "text-destructive" },
-      high: { icon: AlertCircle, variant: "destructive", color: "text-destructive" },
-      medium: { icon: Clock, variant: "secondary", color: "text-warning" },
-      low: { icon: CheckCircle2, variant: "outline", color: "text-muted-foreground" }
+      critical: { icon: XCircle, variant: 'destructive', color: 'text-destructive' },
+      high: { icon: AlertCircle, variant: 'destructive', color: 'text-destructive' },
+      medium: { icon: Clock, variant: 'secondary', color: 'text-warning' },
+      low: { icon: CheckCircle2, variant: 'outline', color: 'text-muted-foreground' },
     };
     return configs[severity] || configs.medium;
   };
@@ -59,7 +59,7 @@ export function AlertsPanel() {
 
   return (
     <>
-      <Card className={criticalAlerts.length > 0 ? "border-destructive" : ""}>
+      <Card className={criticalAlerts.length > 0 ? 'border-destructive' : ''}>
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
@@ -73,13 +73,13 @@ export function AlertsPanel() {
                     {criticalAlerts.length} تنبيه حرج يتطلب اهتماماً فورياً
                   </span>
                 ) : (
-                  "لا توجد تنبيهات حرجة"
+                  'لا توجد تنبيهات حرجة'
                 )}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleGenerateAlerts}
                 disabled={isGenerating}
@@ -91,11 +91,7 @@ export function AlertsPanel() {
                 )}
                 توليد التنبيهات
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setAiDialogOpen(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setAiDialogOpen(true)}>
                 <Brain className="h-4 w-4 ms-2" />
                 تحليل ذكي
               </Button>
@@ -116,9 +112,13 @@ export function AlertsPanel() {
                 alerts.map((alert) => {
                   const config = getSeverityConfig(alert.severity);
                   const Icon = config.icon;
-                  
+
                   return (
-                    <Card key={alert.id} className="border-s-4" style={{ borderInlineStartColor: `var(--${alert.severity})` }}>
+                    <Card
+                      key={alert.id}
+                      className="border-s-4"
+                      style={{ borderInlineStartColor: `var(--${alert.severity})` }}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
@@ -129,19 +129,17 @@ export function AlertsPanel() {
                                 {alert.severity}
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-2">{alert.description || alert.title}</p>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {alert.description || alert.title}
+                            </p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
                               <span>
-                                {format(new Date(alert.created_at), "dd MMMM yyyy", { locale: ar })}
+                                {format(new Date(alert.created_at), 'dd MMMM yyyy', { locale: ar })}
                               </span>
                             </div>
                           </div>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => handleResolve(alert.id)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => handleResolve(alert.id)}>
                             حل
                           </Button>
                         </div>

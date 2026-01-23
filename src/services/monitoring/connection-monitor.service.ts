@@ -41,7 +41,7 @@ class ConnectionMonitorService {
   private lastOnlineTime: Date = new Date();
   private totalDowntime: number = 0;
   private disconnectionCount: number = 0;
-  
+
   // وضع الاختبار - يُخفف المراقبة
   private testingMode: boolean = false;
   private performanceObserver: PerformanceObserver | null = null;
@@ -76,7 +76,7 @@ class ConnectionMonitorService {
       const downtime = this.isOnline ? 0 : Date.now() - this.lastOnlineTime.getTime();
       this.totalDowntime += downtime;
       this.isOnline = true;
-      
+
       this.logEvent({
         type: 'network',
         status: 'reconnected',
@@ -90,7 +90,7 @@ class ConnectionMonitorService {
       this.isOnline = false;
       this.lastOnlineTime = new Date();
       this.disconnectionCount++;
-      
+
       this.logEvent({
         type: 'network',
         status: 'disconnected',
@@ -123,11 +123,11 @@ class ConnectionMonitorService {
         this.performanceObserver = new PerformanceObserver((list) => {
           // تجاهل المراقبة في وضع الاختبار
           if (this.testingMode) return;
-          
+
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'resource') {
               const resourceEntry = entry as PerformanceResourceTiming;
-              
+
               // تحقق من الطلبات الفاشلة أو البطيئة (رفع الحد إلى 15 ثانية)
               if (resourceEntry.duration > 15000) {
                 this.logEvent({
@@ -142,7 +142,7 @@ class ConnectionMonitorService {
             }
           }
         });
-        
+
         this.performanceObserver.observe({ entryTypes: ['resource'] });
       } catch {
         // PerformanceObserver غير مدعوم
@@ -157,7 +157,7 @@ class ConnectionMonitorService {
       // تقليل تسجيل الأخطاء في وضع الاختبار
       if (eventData.status === 'error' && this.events.length > 20) return;
     }
-    
+
     const event: ConnectionEvent = {
       ...eventData,
       id: crypto.randomUUID(),
@@ -165,7 +165,7 @@ class ConnectionMonitorService {
     };
 
     this.events.unshift(event);
-    
+
     // الاحتفاظ بآخر 100 حدث فقط (50 في وضع الاختبار)
     const maxEvents = this.testingMode ? 50 : 100;
     if (this.events.length > maxEvents) {
@@ -174,7 +174,7 @@ class ConnectionMonitorService {
 
     // إشعار المستمعين (تقليل في وضع الاختبار)
     if (!this.testingMode || this.events.length % 5 === 0) {
-      this.listeners.forEach(listener => listener(event));
+      this.listeners.forEach((listener) => listener(event));
       this.notifyStatsListeners();
     }
   }
@@ -238,18 +238,24 @@ class ConnectionMonitorService {
 
   getStats(): ConnectionStats {
     const eventsByType: Record<string, number> = {};
-    this.events.forEach(event => {
+    this.events.forEach((event) => {
       eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
     });
 
-    const disconnections = this.events.filter(e => e.status === 'disconnected' || e.status === 'error');
+    const disconnections = this.events.filter(
+      (e) => e.status === 'disconnected' || e.status === 'error'
+    );
 
     return {
       totalDisconnections: disconnections.length,
       lastDisconnection: disconnections[0]?.timestamp || null,
-      averageDowntime: this.disconnectionCount > 0 ? this.totalDowntime / this.disconnectionCount : 0,
-      currentStatus: !this.isOnline ? 'offline' : 
-                     this.events.some(e => e.status === 'slow' && Date.now() - e.timestamp.getTime() < 60000) ? 'degraded' : 'online',
+      averageDowntime:
+        this.disconnectionCount > 0 ? this.totalDowntime / this.disconnectionCount : 0,
+      currentStatus: !this.isOnline
+        ? 'offline'
+        : this.events.some((e) => e.status === 'slow' && Date.now() - e.timestamp.getTime() < 60000)
+          ? 'degraded'
+          : 'online',
       eventsByType,
     };
   }
@@ -266,7 +272,7 @@ class ConnectionMonitorService {
 
   private notifyStatsListeners(): void {
     const stats = this.getStats();
-    this.statsListeners.forEach(listener => listener(stats));
+    this.statsListeners.forEach((listener) => listener(stats));
   }
 
   clearEvents(): void {

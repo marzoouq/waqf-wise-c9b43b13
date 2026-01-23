@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useUserRole } from "@/hooks/auth/useUserRole";
-import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
+import { useEffect } from 'react';
+import { useUserRole } from '@/hooks/auth/useUserRole';
+import { useErrorNotifications } from '@/hooks/developer/useErrorNotifications';
 
 /**
  * مكون عام لمراقبة الأداء والأخطاء على كامل التطبيق

@@ -1,7 +1,7 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -18,34 +18,34 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
-import { Building2, Loader2 } from "lucide-react";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useOrganizationSettings } from '@/hooks/governance/useOrganizationSettings';
+import { Building2, Loader2 } from 'lucide-react';
 
 const organizationSchema = z.object({
-  organization_name_ar: z.string().min(1, "اسم المنشأة بالعربية مطلوب"),
+  organization_name_ar: z.string().min(1, 'اسم المنشأة بالعربية مطلوب'),
   organization_name_en: z.string().optional(),
   vat_registration_number: z
     .string()
-    .regex(/^3\d{14}$/, "الرقم الضريبي يجب أن يتكون من 15 رقم ويبدأ بـ 3"),
-  commercial_registration_number: z.string().min(1, "رقم السجل التجاري مطلوب"),
-  address_ar: z.string().min(1, "العنوان بالعربية مطلوب"),
+    .regex(/^3\d{14}$/, 'الرقم الضريبي يجب أن يتكون من 15 رقم ويبدأ بـ 3'),
+  commercial_registration_number: z.string().min(1, 'رقم السجل التجاري مطلوب'),
+  address_ar: z.string().min(1, 'العنوان بالعربية مطلوب'),
   address_en: z.string().optional(),
-  city: z.string().min(1, "المدينة مطلوبة"),
+  city: z.string().min(1, 'المدينة مطلوبة'),
   postal_code: z.string().optional(),
-  country: z.string().default("المملكة العربية السعودية"),
+  country: z.string().default('المملكة العربية السعودية'),
   phone: z.string().optional(),
-  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
+  email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
   logo_url: z.string().optional(),
-  
+
   governance_type: z.enum(['nazer_only', 'nazer_with_board']).default('nazer_only'),
   nazer_name: z.string().optional(),
   nazer_title: z.string().optional(),
   nazer_appointment_date: z.string().optional(),
   nazer_contact_phone: z.string().optional(),
-  nazer_contact_email: z.string().email().optional().or(z.literal("")),
+  nazer_contact_email: z.string().email().optional().or(z.literal('')),
   waqf_type: z.enum(['ذري', 'خيري', 'مشترك']).optional(),
   waqf_establishment_date: z.string().optional(),
   waqf_registration_number: z.string().optional(),
@@ -68,33 +68,33 @@ export default function OrganizationSettingsDialog({
   const form = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
     defaultValues: {
-      organization_name_ar: settings?.organization_name_ar || "",
-      organization_name_en: settings?.organization_name_en || "",
-      vat_registration_number: settings?.vat_registration_number || "",
-      commercial_registration_number: settings?.commercial_registration_number || "",
-      address_ar: settings?.address_ar || "",
-      address_en: settings?.address_en || "",
-      city: settings?.city || "",
-      postal_code: settings?.postal_code || "",
-      country: settings?.country || "المملكة العربية السعودية",
-      phone: settings?.phone || "",
-      email: settings?.email || "",
-      logo_url: settings?.logo_url || "",
+      organization_name_ar: settings?.organization_name_ar || '',
+      organization_name_en: settings?.organization_name_en || '',
+      vat_registration_number: settings?.vat_registration_number || '',
+      commercial_registration_number: settings?.commercial_registration_number || '',
+      address_ar: settings?.address_ar || '',
+      address_en: settings?.address_en || '',
+      city: settings?.city || '',
+      postal_code: settings?.postal_code || '',
+      country: settings?.country || 'المملكة العربية السعودية',
+      phone: settings?.phone || '',
+      email: settings?.email || '',
+      logo_url: settings?.logo_url || '',
     },
     values: settings
       ? {
           organization_name_ar: settings.organization_name_ar,
-          organization_name_en: settings.organization_name_en || "",
+          organization_name_en: settings.organization_name_en || '',
           vat_registration_number: settings.vat_registration_number,
           commercial_registration_number: settings.commercial_registration_number,
           address_ar: settings.address_ar,
-          address_en: settings.address_en || "",
+          address_en: settings.address_en || '',
           city: settings.city,
-          postal_code: settings.postal_code || "",
+          postal_code: settings.postal_code || '',
           country: settings.country,
-          phone: settings.phone || "",
-          email: settings.email || "",
-          logo_url: settings.logo_url || "",
+          phone: settings.phone || '',
+          email: settings.email || '',
+          logo_url: settings.logo_url || '',
         }
       : undefined,
   });
@@ -126,9 +126,7 @@ export default function OrganizationSettingsDialog({
             <Building2 className="h-5 w-5" />
             إعدادات المنشأة
           </DialogTitle>
-          <DialogDescription>
-            أدخل معلومات المنشأة للظهور في الفواتير الضريبية
-          </DialogDescription>
+          <DialogDescription>أدخل معلومات المنشأة للظهور في الفواتير الضريبية</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -172,11 +170,7 @@ export default function OrganizationSettingsDialog({
                   <FormItem>
                     <FormLabel>الرقم الضريبي *</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="300000000000003"
-                        maxLength={15}
-                      />
+                      <Input {...field} placeholder="300000000000003" maxLength={15} />
                     </FormControl>
                     <FormDescription>15 رقم يبدأ بـ 3</FormDescription>
                     <FormMessage />
@@ -268,11 +262,7 @@ export default function OrganizationSettingsDialog({
                 <FormItem>
                   <FormLabel>العنوان (عربي) *</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="شارع الملك فهد، حي العليا"
-                      rows={2}
-                    />
+                    <Textarea {...field} placeholder="شارع الملك فهد، حي العليا" rows={2} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -287,11 +277,7 @@ export default function OrganizationSettingsDialog({
                 <FormItem>
                   <FormLabel>العنوان (إنجليزي)</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="King Fahd Road, Al Olaya District"
-                      rows={2}
-                    />
+                    <Textarea {...field} placeholder="King Fahd Road, Al Olaya District" rows={2} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -299,11 +285,7 @@ export default function OrganizationSettingsDialog({
             />
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
               <Button type="submit" disabled={isSaving}>

@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PaymentService, RealtimeService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useEffect } from "react";
-import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
-import { createMutationErrorHandler } from "@/lib/errors";
-import type { Database } from "@/integrations/supabase/types";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { PaymentService, RealtimeService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useEffect } from 'react';
+import { paymentRequiresApproval } from '@/lib/supabase-wrappers';
+import { createMutationErrorHandler } from '@/lib/errors';
+import type { Database } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
 type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
@@ -30,16 +30,16 @@ export function usePayments() {
   });
 
   const addPayment = useMutation({
-    mutationFn: async (payment: Omit<PaymentInsert, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (payment: Omit<PaymentInsert, 'id' | 'created_at' | 'updated_at'>) => {
       // التحقق من حاجة المدفوعة للموافقة
       const result = await paymentRequiresApproval(payment.amount || 0);
       const requiresApproval = result.data || false;
 
       const paymentStatus = requiresApproval ? 'pending' : 'completed';
-      
-      const data = await PaymentService.create({ 
-        ...payment, 
-        status: paymentStatus 
+
+      const data = await PaymentService.create({
+        ...payment,
+        status: paymentStatus,
       });
 
       // إذا كانت تحتاج موافقة، إنشاء موافقات
@@ -53,8 +53,8 @@ export function usePayments() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة السند وإنشاء القيد المحاسبي",
+        title: 'تمت الإضافة بنجاح',
+        description: 'تم إضافة السند وإنشاء القيد المحاسبي',
       });
     },
     onError: createMutationErrorHandler({
@@ -70,8 +70,8 @@ export function usePayments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث بيانات السند بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث بيانات السند بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -87,8 +87,8 @@ export function usePayments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف السند بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف السند بنجاح',
       });
     },
     onError: createMutationErrorHandler({

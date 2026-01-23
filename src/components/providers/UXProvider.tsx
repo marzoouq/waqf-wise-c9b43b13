@@ -1,7 +1,7 @@
 /**
  * UX Provider - مزود سياق UX الموحد
  * يوفر الوصول لجميع أنظمة UX عبر التطبيق
- * 
+ *
  * @version 1.0.0
  */
 
@@ -30,12 +30,12 @@ export function useUX(): UseUXIntegrationReturn {
 
 export interface UXProviderProps {
   children: React.ReactNode;
-  
+
   // Features toggles
   enableSkipLinks?: boolean;
   enableKeyboardShortcuts?: boolean;
   enablePerformanceMonitoring?: boolean;
-  
+
   // Callbacks
   onError?: (error: Error) => void;
   onPerformanceIssue?: (issue: string) => void;
@@ -53,7 +53,7 @@ export function UXProvider({
 }: UXProviderProps) {
   const uxIntegration = useUXIntegration();
   const [showShortcutsHelp, setShowShortcutsHelp] = React.useState(false);
-  
+
   // Keyboard shortcuts
   useKeyboardShortcuts(
     enableKeyboardShortcuts
@@ -67,63 +67,63 @@ export function UXProvider({
         ]
       : []
   );
-  
+
   // Performance monitoring
   useEffect(() => {
     if (!enablePerformanceMonitoring) return;
-    
+
     const checkPerformance = () => {
       const { metrics } = uxIntegration;
-      
+
       if (metrics.largestContentfulPaint && metrics.largestContentfulPaint > 2500) {
         onPerformanceIssue?.('LCP is above 2.5s threshold');
       }
-      
+
       if (metrics.timeToInteractive && metrics.timeToInteractive > 3000) {
         onPerformanceIssue?.('TTI is above 3s threshold');
       }
     };
-    
+
     // Check after initial load
     const timer = setTimeout(checkPerformance, 5000);
     return () => clearTimeout(timer);
   }, [enablePerformanceMonitoring, uxIntegration, onPerformanceIssue]);
-  
+
   // Error boundary integration
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
       onError?.(new Error(event.message));
     };
-    
+
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       onError?.(new Error(String(event.reason)));
     };
-    
+
     window.addEventListener('error', handleError);
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
-    
+
     return () => {
       window.removeEventListener('error', handleError);
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }, [onError]);
-  
+
   // Apply body classes based on capabilities
   useEffect(() => {
     const { capabilities, isOnline } = uxIntegration;
     const body = document.body;
-    
+
     // Device type
     body.classList.toggle('touch-device', capabilities.hasTouchScreen);
     body.classList.toggle('pointer-device', capabilities.hasPointer);
-    
+
     // Preferences
     body.classList.toggle('reduced-motion', capabilities.prefersReducedMotion);
     body.classList.toggle('high-contrast', capabilities.prefersHighContrast);
-    
+
     // Network
     body.classList.toggle('offline', !isOnline);
-    
+
     return () => {
       body.classList.remove(
         'touch-device',
@@ -134,22 +134,17 @@ export function UXProvider({
       );
     };
   }, [uxIntegration]);
-  
+
   const contextValue = useMemo(() => uxIntegration, [uxIntegration]);
-  
+
   return (
     <UXContext.Provider value={contextValue}>
       {enableSkipLinks && <SkipLinks />}
-      
-      <MainContent>
-        {children}
-      </MainContent>
-      
+
+      <MainContent>{children}</MainContent>
+
       {enableKeyboardShortcuts && (
-        <KeyboardShortcutsHelp
-          open={showShortcutsHelp}
-          onOpenChange={setShowShortcutsHelp}
-        />
+        <KeyboardShortcutsHelp open={showShortcutsHelp} onOpenChange={setShowShortcutsHelp} />
       )}
     </UXContext.Provider>
   );
@@ -167,9 +162,9 @@ export function withUX<P extends object>(
     const ux = useUX();
     return <Component {...props} ux={ux} />;
   };
-  
+
   WrappedComponent.displayName = `withUX(${Component.displayName || Component.name || 'Component'})`;
-  
+
   return WrappedComponent;
 }
 
@@ -214,10 +209,10 @@ export function OfflineOnly({ children }: { children: React.ReactNode }) {
 /**
  * مكون يخفي الحركة إذا كان المستخدم يفضل ذلك
  */
-export function MotionSafe({ 
-  children, 
-  fallback 
-}: { 
+export function MotionSafe({
+  children,
+  fallback,
+}: {
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {

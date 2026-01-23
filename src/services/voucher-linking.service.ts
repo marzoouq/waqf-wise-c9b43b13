@@ -6,7 +6,7 @@
  * تتبع نمط Component → Hook → Service → Supabase
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface LinkVoucherResult {
   success: boolean;
@@ -18,9 +18,12 @@ export const VoucherLinkingService = {
   /**
    * ربط سند بقيد محاسبي
    */
-  async linkVoucherToJournal(voucherId: string, createJournal: boolean = true): Promise<LinkVoucherResult> {
+  async linkVoucherToJournal(
+    voucherId: string,
+    createJournal: boolean = true
+  ): Promise<LinkVoucherResult> {
     const { data, error } = await supabase.functions.invoke('link-voucher-journal', {
-      body: { voucher_id: voucherId, create_journal: createJournal }
+      body: { voucher_id: voucherId, create_journal: createJournal },
     });
 
     if (error) {

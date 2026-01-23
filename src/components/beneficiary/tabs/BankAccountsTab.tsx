@@ -1,14 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Landmark } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useBeneficiaryBankAccounts } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Landmark } from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useBeneficiaryBankAccounts } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function BankAccountsTab() {
   const { settings } = useVisibilitySettings();
-  const { data: bankAccounts, isLoading, error, refetch } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
+  const {
+    data: bankAccounts,
+    isLoading,
+    error,
+    refetch,
+  } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
 
   if (!settings?.show_bank_accounts) {
     return (
@@ -31,7 +36,9 @@ export function BankAccountsTab() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الحسابات البنكية" message={error.message} onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في تحميل الحسابات البنكية" message={error.message} onRetry={refetch} />
+    );
   }
 
   return (
@@ -45,8 +52,8 @@ export function BankAccountsTab() {
                   <Landmark className="h-5 w-5" />
                   <CardTitle className="text-lg">{account.bank_name}</CardTitle>
                 </div>
-                <Badge variant={account.is_active ? "default" : "secondary"}>
-                  {account.is_active ? "نشط" : "غير نشط"}
+                <Badge variant={account.is_active ? 'default' : 'secondary'}>
+                  {account.is_active ? 'نشط' : 'غير نشط'}
                 </Badge>
               </div>
             </CardHeader>
@@ -80,10 +87,11 @@ export function BankAccountsTab() {
                   <label className="text-sm font-medium text-muted-foreground">الرصيد الحالي</label>
                   <p className="text-2xl font-bold mt-1 text-success">
                     <MaskedValue
-                      value={account.current_balance.toLocaleString("ar-SA")}
+                      value={account.current_balance.toLocaleString('ar-SA')}
                       type="amount"
                       masked={settings?.mask_exact_amounts || false}
-                    /> ريال
+                    />{' '}
+                    ريال
                   </p>
                 </div>
               )}

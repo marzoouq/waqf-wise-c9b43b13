@@ -3,9 +3,9 @@
  * Archivist Dashboard Data Hook - يستخدم Service Layer
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { ArchiveService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { ArchiveService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface ArchivistStats {
   totalFolders: number;
@@ -68,6 +68,6 @@ export function useArchivistDashboard(category: string = 'all', searchTerm: stri
     refetch: () => {
       statsQuery.refetch();
       documentsQuery.refetch();
-    }
+    },
   };
 }

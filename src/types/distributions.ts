@@ -1,7 +1,7 @@
 /**
  * Types for Distributions Module - Unified
  * أنواع وحدة التوزيعات - موحدة
- * 
+ *
  * هذا الملف يجمع جميع أنواع التوزيعات في مكان واحد
  */
 
@@ -17,7 +17,14 @@ export type DistributionFrequency = 'شهري' | 'ربع_سنوي' | 'نصف_س�
 
 export type DistributionRule = 'شرعي' | 'متساوي' | 'مخصص';
 
-export type BeneficiaryDistributionType = 'واقف' | 'ولد' | 'بنت' | 'زوجة' | 'حفيد' | 'ناظر' | 'أخرى';
+export type BeneficiaryDistributionType =
+  | 'واقف'
+  | 'ولد'
+  | 'بنت'
+  | 'زوجة'
+  | 'حفيد'
+  | 'ناظر'
+  | 'أخرى';
 
 export type PaymentStatus = 'معلق' | 'مدفوع' | 'ملغي';
 

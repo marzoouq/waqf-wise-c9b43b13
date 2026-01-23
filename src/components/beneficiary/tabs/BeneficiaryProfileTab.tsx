@@ -3,18 +3,18 @@
  * مع دعم التعديل والتصميم المحسن
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Edit, 
-  Phone, 
-  Mail, 
-  MapPin, 
-  CreditCard, 
-  Users, 
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import {
+  Edit,
+  Phone,
+  Mail,
+  MapPin,
+  CreditCard,
+  Users,
   Calendar,
   User,
   Shield,
@@ -24,15 +24,18 @@ import {
   Clock,
   AlertCircle,
   Building2,
-} from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import type { Database } from "@/integrations/supabase/types";
-import { useVisibilitySettings, type VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { EditProfileDialog } from "../dialogs/EditProfileDialog";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { matchesStatus } from "@/lib/constants";
+} from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import type { Database } from '@/integrations/supabase/types';
+import {
+  useVisibilitySettings,
+  type VisibilitySettings,
+} from '@/hooks/governance/useVisibilitySettings';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { EditProfileDialog } from '../dialogs/EditProfileDialog';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
 
@@ -41,15 +44,15 @@ interface BeneficiaryProfileTabProps {
 }
 
 // مكون عنصر المعلومات
-function InfoItem({ 
-  icon: Icon, 
-  label, 
-  value, 
+function InfoItem({
+  icon: Icon,
+  label,
+  value,
   masked = false,
   maskType,
   settings,
-  className = "",
-}: { 
+  className = '',
+}: {
   icon?: React.ComponentType<{ className?: string }>;
   label: string;
   value: React.ReactNode;
@@ -58,18 +61,24 @@ function InfoItem({
   settings?: VisibilitySettings;
   className?: string;
 }) {
-  const displayValue = masked && maskType && settings ? (
-    <MaskedValue
-      value={String(value || "—")}
-      type={maskType}
-      masked={
-        maskType === 'phone' ? settings.mask_phone_numbers :
-        maskType === 'national_id' ? settings.mask_national_ids :
-        maskType === 'iban' ? settings.mask_iban :
-        false
-      }
-    />
-  ) : value || "—";
+  const displayValue =
+    masked && maskType && settings ? (
+      <MaskedValue
+        value={String(value || '—')}
+        type={maskType}
+        masked={
+          maskType === 'phone'
+            ? settings.mask_phone_numbers
+            : maskType === 'national_id'
+              ? settings.mask_national_ids
+              : maskType === 'iban'
+                ? settings.mask_iban
+                : false
+        }
+      />
+    ) : (
+      value || '—'
+    );
 
   return (
     <div className={`flex items-start gap-3 ${className}`}>
@@ -87,12 +96,12 @@ function InfoItem({
 }
 
 // مكون بطاقة القسم
-function SectionCard({ 
-  title, 
-  icon: Icon, 
+function SectionCard({
+  title,
+  icon: Icon,
   children,
   action,
-}: { 
+}: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
   children: React.ReactNode;
@@ -120,7 +129,9 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
   const queryClient = useQueryClient();
 
   // التحقق من إمكانية التعديل
-  const canEdit = (settings as VisibilitySettings & { allow_profile_edit?: boolean })?.allow_profile_edit !== false;
+  const canEdit =
+    (settings as VisibilitySettings & { allow_profile_edit?: boolean })?.allow_profile_edit !==
+    false;
 
   const handleEditSuccess = () => {
     // إعادة تحميل بيانات المستفيد
@@ -176,7 +187,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
                   {verificationStatus.label}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
                 {beneficiary.beneficiary_number && (
                   <span className="flex items-center gap-1">
@@ -185,16 +196,14 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
                   </span>
                 )}
                 <Badge variant="secondary">{beneficiary.category}</Badge>
-                {age && (
-                  <span>{age} سنة</span>
-                )}
+                {age && <span>{age} سنة</span>}
               </div>
             </div>
 
             {/* زر التعديل */}
             {canEdit && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setEditDialogOpen(true)}
                 className="shrink-0"
@@ -212,11 +221,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
         {/* المعلومات الشخصية */}
         <SectionCard title="المعلومات الشخصية" icon={User}>
           <div className="grid gap-4">
-            <InfoItem
-              icon={User}
-              label="الاسم الكامل"
-              value={beneficiary.full_name}
-            />
+            <InfoItem icon={User} label="الاسم الكامل" value={beneficiary.full_name} />
             <InfoItem
               icon={Shield}
               label="رقم الهوية"
@@ -228,19 +233,24 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <div className="grid grid-cols-2 gap-4">
               <InfoItem
                 label="الجنس"
-                value={beneficiary.gender === 'male' ? 'ذكر' : beneficiary.gender === 'female' ? 'أنثى' : undefined}
+                value={
+                  beneficiary.gender === 'male'
+                    ? 'ذكر'
+                    : beneficiary.gender === 'female'
+                      ? 'أنثى'
+                      : undefined
+                }
               />
-              <InfoItem
-                label="الجنسية"
-                value={beneficiary.nationality}
-              />
+              <InfoItem label="الجنسية" value={beneficiary.nationality} />
             </div>
             <InfoItem
               icon={Calendar}
               label="تاريخ الميلاد"
-              value={beneficiary.date_of_birth 
-                ? format(new Date(beneficiary.date_of_birth), "dd MMMM yyyy", { locale: ar })
-                : undefined}
+              value={
+                beneficiary.date_of_birth
+                  ? format(new Date(beneficiary.date_of_birth), 'dd MMMM yyyy', { locale: ar })
+                  : undefined
+              }
             />
           </div>
         </SectionCard>
@@ -256,32 +266,16 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
               maskType="phone"
               settings={settings}
             />
-            <InfoItem
-              icon={Mail}
-              label="البريد الإلكتروني"
-              value={beneficiary.email}
-            />
-            <InfoItem
-              icon={MapPin}
-              label="المدينة"
-              value={beneficiary.city}
-            />
-            <InfoItem
-              icon={MapPin}
-              label="العنوان"
-              value={beneficiary.address}
-            />
+            <InfoItem icon={Mail} label="البريد الإلكتروني" value={beneficiary.email} />
+            <InfoItem icon={MapPin} label="المدينة" value={beneficiary.city} />
+            <InfoItem icon={MapPin} label="العنوان" value={beneficiary.address} />
           </div>
         </SectionCard>
 
         {/* المعلومات البنكية */}
         <SectionCard title="المعلومات البنكية" icon={CreditCard}>
           <div className="grid gap-4">
-            <InfoItem
-              icon={Building2}
-              label="اسم البنك"
-              value={beneficiary.bank_name}
-            />
+            <InfoItem icon={Building2} label="اسم البنك" value={beneficiary.bank_name} />
             <InfoItem
               icon={CreditCard}
               label="رقم الحساب"
@@ -294,7 +288,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
               <p className="text-sm text-muted-foreground mb-1">رقم الآيبان (IBAN)</p>
               <p className="font-mono text-sm">
                 <MaskedValue
-                  value={beneficiary.iban || "—"}
+                  value={beneficiary.iban || '—'}
                   type="iban"
                   masked={settings?.mask_iban || false}
                 />
@@ -307,30 +301,29 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
         <SectionCard title="المعلومات العائلية" icon={Users}>
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem
-                label="الحالة الاجتماعية"
-                value={beneficiary.marital_status}
-              />
-              <InfoItem
-                icon={Users}
-                label="حجم الأسرة"
-                value={beneficiary.family_size}
-              />
+              <InfoItem label="الحالة الاجتماعية" value={beneficiary.marital_status} />
+              <InfoItem icon={Users} label="حجم الأسرة" value={beneficiary.family_size} />
             </div>
-            
+
             <Separator />
-            
+
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-3 rounded-lg bg-heir-son/10 border border-heir-son/20">
-                <p className="text-2xl font-bold text-heir-son">{beneficiary.number_of_sons || 0}</p>
+                <p className="text-2xl font-bold text-heir-son">
+                  {beneficiary.number_of_sons || 0}
+                </p>
                 <p className="text-xs text-muted-foreground">أبناء</p>
               </div>
               <div className="p-3 rounded-lg bg-heir-daughter/10 border border-heir-daughter/20">
-                <p className="text-2xl font-bold text-heir-daughter">{beneficiary.number_of_daughters || 0}</p>
+                <p className="text-2xl font-bold text-heir-daughter">
+                  {beneficiary.number_of_daughters || 0}
+                </p>
                 <p className="text-xs text-muted-foreground">بنات</p>
               </div>
               <div className="p-3 rounded-lg bg-heir-wife/10 border border-heir-wife/20">
-                <p className="text-2xl font-bold text-heir-wife">{beneficiary.number_of_wives || 0}</p>
+                <p className="text-2xl font-bold text-heir-wife">
+                  {beneficiary.number_of_wives || 0}
+                </p>
                 <p className="text-xs text-muted-foreground">زوجات</p>
               </div>
             </div>
@@ -346,11 +339,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
                 label="الحالة الوظيفية"
                 value={beneficiary.employment_status}
               />
-              <InfoItem
-                icon={Home}
-                label="نوع السكن"
-                value={beneficiary.housing_type}
-              />
+              <InfoItem icon={Home} label="نوع السكن" value={beneficiary.housing_type} />
             </div>
             {beneficiary.notes && (
               <>
@@ -370,7 +359,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-sm text-muted-foreground">حالة الحساب</p>
-                <Badge 
+                <Badge
                   variant={matchesStatus(beneficiary.status, 'active') ? 'default' : 'secondary'}
                   className="mt-1"
                 >
@@ -379,10 +368,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-sm text-muted-foreground">تسجيل الدخول</p>
-                <Badge 
-                  variant={beneficiary.can_login ? 'default' : 'secondary'}
-                  className="mt-1"
-                >
+                <Badge variant={beneficiary.can_login ? 'default' : 'secondary'} className="mt-1">
                   {beneficiary.can_login ? 'مفعل' : 'غير مفعل'}
                 </Badge>
               </div>
@@ -390,11 +376,11 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">تاريخ الإنشاء</p>
-                <p>{format(new Date(beneficiary.created_at), "dd/MM/yyyy", { locale: ar })}</p>
+                <p>{format(new Date(beneficiary.created_at), 'dd/MM/yyyy', { locale: ar })}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">آخر تحديث</p>
-                <p>{format(new Date(beneficiary.updated_at), "dd/MM/yyyy", { locale: ar })}</p>
+                <p>{format(new Date(beneficiary.updated_at), 'dd/MM/yyyy', { locale: ar })}</p>
               </div>
             </div>
           </div>

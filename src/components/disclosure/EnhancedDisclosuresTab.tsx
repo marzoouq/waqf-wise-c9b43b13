@@ -4,37 +4,37 @@
  * @version 2.9.0
  */
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { matchesStatus } from "@/lib/constants";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Download, 
-  Eye, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { matchesStatus } from '@/lib/constants';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Download,
+  Eye,
+  TrendingUp,
+  TrendingDown,
+  Users,
   Calendar,
   FileText,
   ChevronLeft,
-  Loader2
-} from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useDisclosures } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
-import { toast } from "sonner";
+  Loader2,
+} from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useDisclosures } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { ViewDisclosureDialog } from '@/components/distributions/ViewDisclosureDialog';
+import { AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
+import { toast } from 'sonner';
 
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("ar-SA", {
-    style: "decimal",
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -43,7 +43,12 @@ const formatCurrency = (amount: number): string => {
 export function EnhancedDisclosuresTab() {
   const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
-  const { data: disclosures, isLoading, error, refetch } = useDisclosures(settings?.show_disclosures || false);
+  const {
+    data: disclosures,
+    isLoading,
+    error,
+    refetch,
+  } = useDisclosures(settings?.show_disclosures || false);
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState<string | null>(null);
@@ -83,7 +88,13 @@ export function EnhancedDisclosuresTab() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الإفصاحات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الإفصاحات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   const handleViewDetails = (disclosure: AnnualDisclosure) => {
@@ -95,14 +106,17 @@ export function EnhancedDisclosuresTab() {
     navigate(`/beneficiary-portal?tab=disclosure-details&id=${disclosure.id}`);
   };
 
-  const handleDownloadPDF = async (disclosure: AnnualDisclosure, previousYear?: AnnualDisclosure | null) => {
+  const handleDownloadPDF = async (
+    disclosure: AnnualDisclosure,
+    previousYear?: AnnualDisclosure | null
+  ) => {
     setIsExporting(disclosure.id);
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
-      toast.success("تم تحميل ملف PDF بنجاح");
+      toast.success('تم تحميل ملف PDF بنجاح');
     } catch {
-      toast.error("فشل تحميل ملف PDF");
+      toast.error('فشل تحميل ملف PDF');
     } finally {
       setIsExporting(null);
     }
@@ -113,15 +127,14 @@ export function EnhancedDisclosuresTab() {
       <div className="space-y-4">
         {disclosures?.map((disclosure, index) => {
           const previousYear = disclosures[index + 1] || null;
-          const revenueChange = previousYear 
-            ? ((disclosure.total_revenues - previousYear.total_revenues) / previousYear.total_revenues) * 100 
+          const revenueChange = previousYear
+            ? ((disclosure.total_revenues - previousYear.total_revenues) /
+                previousYear.total_revenues) *
+              100
             : null;
 
           return (
-            <Card 
-              key={disclosure.id} 
-              className="overflow-hidden hover:shadow-md transition-shadow"
-            >
+            <Card key={disclosure.id} className="overflow-hidden hover:shadow-md transition-shadow">
               <CardHeader className="pb-3 bg-gradient-to-l from-primary/5 to-transparent">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center gap-3">
@@ -139,11 +152,11 @@ export function EnhancedDisclosuresTab() {
                   </div>
                   <div className="flex items-center gap-2">
                     {revenueChange !== null && (
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`text-[10px] sm:text-xs ${
-                          revenueChange > 0 
-                            ? 'text-success border-success/30 bg-success/10' 
+                          revenueChange > 0
+                            ? 'text-success border-success/30 bg-success/10'
                             : 'text-destructive border-destructive/30 bg-destructive/10'
                         }`}
                       >
@@ -155,20 +168,26 @@ export function EnhancedDisclosuresTab() {
                         {Math.abs(revenueChange).toFixed(0)}%
                       </Badge>
                     )}
-                    <Badge variant={matchesStatus(disclosure.status, 'published') ? "default" : "secondary"}>
-                      {matchesStatus(disclosure.status, 'published') ? "منشور" : "مسودة"}
+                    <Badge
+                      variant={
+                        matchesStatus(disclosure.status, 'published') ? 'default' : 'secondary'
+                      }
+                    >
+                      {matchesStatus(disclosure.status, 'published') ? 'منشور' : 'مسودة'}
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="pt-4 space-y-4">
                 {/* البطاقات المالية الرئيسية */}
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   <div className="p-3 sm:p-4 bg-success/10 rounded-lg text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
-                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">الإيرادات</span>
+                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                        الإيرادات
+                      </span>
                     </div>
                     <p className="text-sm sm:text-xl font-bold text-success">
                       <MaskedValue
@@ -182,7 +201,9 @@ export function EnhancedDisclosuresTab() {
                   <div className="p-3 sm:p-4 bg-destructive/10 rounded-lg text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
-                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">المصروفات</span>
+                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                        المصروفات
+                      </span>
                     </div>
                     <p className="text-sm sm:text-xl font-bold text-destructive">
                       <MaskedValue
@@ -196,7 +217,9 @@ export function EnhancedDisclosuresTab() {
                   <div className="p-3 sm:p-4 bg-primary/10 rounded-lg text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Users className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">الصافي</span>
+                      <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                        الصافي
+                      </span>
                     </div>
                     <p className="text-sm sm:text-xl font-bold text-primary">
                       <MaskedValue
@@ -235,8 +258,8 @@ export function EnhancedDisclosuresTab() {
 
                 {/* أزرار الإجراءات */}
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    variant="default" 
+                  <Button
+                    variant="default"
                     className="flex-1"
                     onClick={() => handleViewFullPage(disclosure as AnnualDisclosure)}
                   >
@@ -244,21 +267,26 @@ export function EnhancedDisclosuresTab() {
                     عرض التفاصيل الكاملة
                     <ChevronLeft className="h-4 w-4 me-2" />
                   </Button>
-                  
-                  <Button 
-                    variant="ghost" 
+
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => handleViewDetails(disclosure as AnnualDisclosure)}
                   >
                     <Eye className="h-4 w-4 ms-2" />
                     معاينة سريعة
                   </Button>
-                  
+
                   {settings?.allow_export_pdf && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="flex-1 sm:flex-initial"
-                      onClick={() => handleDownloadPDF(disclosure as AnnualDisclosure, previousYear as AnnualDisclosure | null)}
+                      onClick={() =>
+                        handleDownloadPDF(
+                          disclosure as AnnualDisclosure,
+                          previousYear as AnnualDisclosure | null
+                        )
+                      }
                       disabled={isExporting === disclosure.id}
                     >
                       {isExporting === disclosure.id ? (
@@ -266,7 +294,7 @@ export function EnhancedDisclosuresTab() {
                       ) : (
                         <Download className="h-4 w-4 ms-2" />
                       )}
-                      {isExporting === disclosure.id ? "جاري التحميل..." : "تحميل PDF"}
+                      {isExporting === disclosure.id ? 'جاري التحميل...' : 'تحميل PDF'}
                     </Button>
                   )}
                 </div>

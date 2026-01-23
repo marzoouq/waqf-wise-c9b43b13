@@ -1,18 +1,11 @@
 /**
  * PullToRefresh - مكون السحب للتحديث
  * يوفر تجربة سحب طبيعية للتحديث على الجوال
- * 
+ *
  * @version 1.0.0
  */
 
-import React, { 
-  ReactNode, 
-  useRef, 
-  useState, 
-  useCallback, 
-  useEffect,
-  memo 
-} from 'react';
+import React, { ReactNode, useRef, useState, useCallback, useEffect, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { RefreshCw, ArrowDown, Check } from 'lucide-react';
 import { hapticFeedback } from '@/lib/mobile-ux';
@@ -83,63 +76,69 @@ export const PullToRefresh = memo(function PullToRefresh({
   }, [checkScrollPosition]);
 
   // معالجة بداية اللمس
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (disabled || state === 'refreshing' || !isAtTop) return;
-    
-    startY.current = e.touches[0].clientY;
-    currentY.current = startY.current;
-  }, [disabled, state, isAtTop]);
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || state === 'refreshing' || !isAtTop) return;
+
+      startY.current = e.touches[0].clientY;
+      currentY.current = startY.current;
+    },
+    [disabled, state, isAtTop]
+  );
 
   // معالجة حركة اللمس
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (disabled || state === 'refreshing' || !isAtTop) return;
-    
-    currentY.current = e.touches[0].clientY;
-    const diff = currentY.current - startY.current;
-    
-    // لا نسحب إلا إذا كنا نسحب للأسفل
-    if (diff <= 0) {
-      setPullDistance(0);
-      setState('idle');
-      return;
-    }
-    
-    // تطبيق المقاومة للحصول على تأثير طبيعي
-    const resistance = 1 - Math.min(diff / MAX_PULL_DISTANCE, 1) * RESISTANCE_FACTOR;
-    const adjustedDistance = Math.min(diff * resistance, MAX_PULL_DISTANCE);
-    
-    setPullDistance(adjustedDistance);
-    
-    // تغيير الحالة
-    if (adjustedDistance >= threshold) {
-      if (state !== 'ready') {
-        setState('ready');
-        hapticFeedback('medium');
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || state === 'refreshing' || !isAtTop) return;
+
+      currentY.current = e.touches[0].clientY;
+      const diff = currentY.current - startY.current;
+
+      // لا نسحب إلا إذا كنا نسحب للأسفل
+      if (diff <= 0) {
+        setPullDistance(0);
+        setState('idle');
+        return;
       }
-    } else {
-      setState('pulling');
-    }
-    
-    // منع التمرير الافتراضي عند السحب
-    if (adjustedDistance > 0) {
-      e.preventDefault();
-    }
-  }, [disabled, state, isAtTop, threshold]);
+
+      // تطبيق المقاومة للحصول على تأثير طبيعي
+      const resistance = 1 - Math.min(diff / MAX_PULL_DISTANCE, 1) * RESISTANCE_FACTOR;
+      const adjustedDistance = Math.min(diff * resistance, MAX_PULL_DISTANCE);
+
+      setPullDistance(adjustedDistance);
+
+      // تغيير الحالة
+      if (adjustedDistance >= threshold) {
+        if (state !== 'ready') {
+          setState('ready');
+          hapticFeedback('medium');
+        }
+      } else {
+        setState('pulling');
+      }
+
+      // منع التمرير الافتراضي عند السحب
+      if (adjustedDistance > 0) {
+        e.preventDefault();
+      }
+    },
+    [disabled, state, isAtTop, threshold]
+  );
 
   // معالجة نهاية اللمس
   const handleTouchEnd = useCallback(async () => {
     if (disabled || state === 'refreshing') return;
-    
+
     if (state === 'ready' && pullDistance >= threshold) {
       // بدء التحديث
       setState('refreshing');
       hapticFeedback('heavy');
-      
+
       try {
         await onRefresh();
         setState('success');
         hapticFeedback('success');
-        
+
         // إظهار رسالة النجاح لفترة قصيرة
         setTimeout(() => {
           setState('idle');
@@ -156,17 +155,17 @@ export const PullToRefresh = memo(function PullToRefresh({
       setState('idle');
       setPullDistance(0);
     }
-    
+
     startY.current = 0;
     currentY.current = 0;
   }, [disabled, state, pullDistance, threshold, onRefresh]);
 
   // حساب النسبة المئوية للسحب
   const pullProgress = Math.min(pullDistance / threshold, 1);
-  
+
   // حساب دوران الأيقونة
   const iconRotation = pullProgress * 180;
-  
+
   // حساب الشفافية
   const indicatorOpacity = Math.min(pullProgress * 1.5, 1);
 
@@ -175,7 +174,9 @@ export const PullToRefresh = memo(function PullToRefresh({
     switch (state) {
       case 'pulling':
         return {
-          icon: <ArrowDown className="h-5 w-5" style={{ transform: `rotate(${iconRotation}deg)` }} />,
+          icon: (
+            <ArrowDown className="h-5 w-5" style={{ transform: `rotate(${iconRotation}deg)` }} />
+          ),
           text: pullText,
         };
       case 'ready':
@@ -216,22 +217,19 @@ export const PullToRefresh = memo(function PullToRefresh({
           height: Math.max(pullDistance, state === 'refreshing' ? threshold : 0),
           opacity: indicatorOpacity,
         }}
+      >
+        <div
+          className={cn('flex flex-col items-center gap-2 py-2', 'text-muted-foreground')}
+          style={{
+            transition: state === 'idle' ? `all ${DURATIONS.fast}ms ${EASING.easeOut}` : 'none',
+          }}
         >
-          <div
-            className={cn(
-              'flex flex-col items-center gap-2 py-2',
-              'text-muted-foreground'
-            )}
-            style={{
-              transition: state === 'idle' ? `all ${DURATIONS.fast}ms ${EASING.easeOut}` : 'none',
-            }}
-          >
           <div
             className={cn(
               'w-10 h-10 rounded-full flex items-center justify-center',
               'bg-muted/50 backdrop-blur-sm',
               state === 'ready' && 'bg-primary/20',
-              state === 'success' && 'bg-green-500/20',
+              state === 'success' && 'bg-green-500/20'
             )}
           >
             {icon}
@@ -246,9 +244,10 @@ export const PullToRefresh = memo(function PullToRefresh({
         className="h-full overflow-y-auto overscroll-contain"
         style={{
           transform: `translateY(${state === 'refreshing' ? threshold : pullDistance}px)`,
-          transition: state === 'idle' || state === 'success' 
-            ? `transform ${DURATIONS.normal}ms ${EASING.spring}` 
-            : 'none',
+          transition:
+            state === 'idle' || state === 'success'
+              ? `transform ${DURATIONS.normal}ms ${EASING.spring}`
+              : 'none',
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -283,14 +282,12 @@ export function usePullToRefresh(options: UsePullToRefreshOptions = {}) {
     if (customRefresh) {
       await customRefresh();
     }
-    
+
     // تحديث جميع الاستعلامات المحددة
     if (queryKeys.length > 0) {
-      await Promise.all(
-        queryKeys.map(key => queryClient.invalidateQueries({ queryKey: key }))
-      );
+      await Promise.all(queryKeys.map((key) => queryClient.invalidateQueries({ queryKey: key })));
     }
-    
+
     // إذا لم تُحدد استعلامات، نحدث جميع الاستعلامات النشطة
     if (queryKeys.length === 0 && !customRefresh) {
       await queryClient.invalidateQueries();

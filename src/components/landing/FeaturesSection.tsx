@@ -1,54 +1,41 @@
-import {
-  Users,
-  Building2,
-  Calculator,
-  PieChart,
-  FolderArchive,
-  BarChart3,
-} from "lucide-react";
+import { Users, Building2, Calculator, PieChart, FolderArchive, BarChart3 } from 'lucide-react';
 
 const features = [
   {
     icon: Users,
-    title: "إدارة المستفيدين",
-    description:
-      "نظام شامل لإدارة بيانات المستفيدين والعائلات مع متابعة كاملة للتوزيعات والطلبات",
-    color: "from-blue-500 to-blue-600",
+    title: 'إدارة المستفيدين',
+    description: 'نظام شامل لإدارة بيانات المستفيدين والعائلات مع متابعة كاملة للتوزيعات والطلبات',
+    color: 'from-blue-500 to-blue-600',
   },
   {
     icon: Building2,
-    title: "إدارة العقارات",
-    description:
-      "تتبع العقارات والأصول الوقفية، إدارة العقود والإيجارات مع تقارير العوائد",
-    color: "from-emerald-500 to-emerald-600",
+    title: 'إدارة العقارات',
+    description: 'تتبع العقارات والأصول الوقفية، إدارة العقود والإيجارات مع تقارير العوائد',
+    color: 'from-emerald-500 to-emerald-600',
   },
   {
     icon: Calculator,
-    title: "المحاسبة المتكاملة",
-    description:
-      "نظام محاسبي متكامل يشمل شجرة الحسابات والقيود اليومية والتقارير المالية",
-    color: "from-violet-500 to-violet-600",
+    title: 'المحاسبة المتكاملة',
+    description: 'نظام محاسبي متكامل يشمل شجرة الحسابات والقيود اليومية والتقارير المالية',
+    color: 'from-violet-500 to-violet-600',
   },
   {
     icon: PieChart,
-    title: "توزيع الغلة",
-    description:
-      "توزيع عوائد الوقف وفق شروط الواقف مع محاكاة ومسار موافقات متعدد المستويات",
-    color: "from-amber-500 to-amber-600",
+    title: 'توزيع الغلة',
+    description: 'توزيع عوائد الوقف وفق شروط الواقف مع محاكاة ومسار موافقات متعدد المستويات',
+    color: 'from-amber-500 to-amber-600',
   },
   {
     icon: FolderArchive,
-    title: "الأرشفة الإلكترونية",
-    description:
-      "أرشفة ذكية للمستندات مع البحث المتقدم والتصنيف التلقائي وسياسات الاحتفاظ",
-    color: "from-rose-500 to-rose-600",
+    title: 'الأرشفة الإلكترونية',
+    description: 'أرشفة ذكية للمستندات مع البحث المتقدم والتصنيف التلقائي وسياسات الاحتفاظ',
+    color: 'from-rose-500 to-rose-600',
   },
   {
     icon: BarChart3,
-    title: "التقارير الذكية",
-    description:
-      "لوحات تحكم تفاعلية وتقارير مخصصة مع تحليلات ذكية ومؤشرات أداء",
-    color: "from-cyan-500 to-cyan-600",
+    title: 'التقارير الذكية',
+    description: 'لوحات تحكم تفاعلية وتقارير مخصصة مع تحليلات ذكية ومؤشرات أداء',
+    color: 'from-cyan-500 to-cyan-600',
   },
 ];
 
@@ -80,7 +67,10 @@ export function FeaturesSection() {
               <div
                 className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br ${feature.color} shadow-lg mb-3 sm:mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300`}
               >
-                <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary-foreground" aria-hidden="true" />
+                <feature.icon
+                  className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary-foreground"
+                  aria-hidden="true"
+                />
               </div>
 
               {/* Content */}

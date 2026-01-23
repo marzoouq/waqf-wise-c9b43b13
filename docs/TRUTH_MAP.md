@@ -1,4 +1,5 @@
 # Truth Map - خريطة مصادر الحقيقة
+
 > آخر تحديث: 2026-01-19 | الإصدار: 3.3.0
 
 ## 📊 مصادر البيانات الموحدة
@@ -10,70 +11,77 @@
 ## 1. مؤشرات الأداء الرئيسية (KPIs)
 
 ### 1.1 المستفيدين النشطين
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Nazer, Beneficiaries |
-| **الجدول** | `beneficiaries` |
-| **الفلتر** | `status = 'نشط' OR status = 'active'` |
-| **الخدمة** | `KPIService.getUnifiedKPIs()` |
-| **Hook** | `useUnifiedKPIs` |
-| **الثابت** | `matchesStatus(status, 'active')` |
+
+| العنصر      | القيمة                                |
+| ----------- | ------------------------------------- |
+| **اللوحات** | Admin, Nazer, Beneficiaries           |
+| **الجدول**  | `beneficiaries`                       |
+| **الفلتر**  | `status = 'نشط' OR status = 'active'` |
+| **الخدمة**  | `KPIService.getUnifiedKPIs()`         |
+| **Hook**    | `useUnifiedKPIs`                      |
+| **الثابت**  | `matchesStatus(status, 'active')`     |
 
 ### 1.2 إجمالي التحصيل
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Nazer, Properties |
-| **الجدول** | `payment_vouchers` |
-| **الفلتر** | `type = 'قبض' OR type = 'receipt', status = 'paid'` |
-| **الخدمة** | `PropertyStatsService.getCollectionStats()` |
-| **Hook** | `useCollectionStats` |
-| **الثابت** | `COLLECTION_SOURCE` |
+
+| العنصر      | القيمة                                              |
+| ----------- | --------------------------------------------------- |
+| **اللوحات** | Admin, Nazer, Properties                            |
+| **الجدول**  | `payment_vouchers`                                  |
+| **الفلتر**  | `type = 'قبض' OR type = 'receipt', status = 'paid'` |
+| **الخدمة**  | `PropertyStatsService.getCollectionStats()`         |
+| **Hook**    | `useCollectionStats`                                |
+| **الثابت**  | `COLLECTION_SOURCE`                                 |
 
 ### 1.3 طلبات الصيانة المفتوحة
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Properties |
-| **الجدول** | `maintenance_requests` |
-| **الفلتر** | `status IN ('جديد', 'قيد التنفيذ', 'في الانتظار', 'تحت المراجعة')` |
-| **الخدمة** | `MaintenanceService.getStats()` |
-| **Hook** | `useMaintenanceStats` |
-| **الثابت** | `MAINTENANCE_OPEN_STATUSES` |
+
+| العنصر      | القيمة                                                             |
+| ----------- | ------------------------------------------------------------------ |
+| **اللوحات** | Admin, Properties                                                  |
+| **الجدول**  | `maintenance_requests`                                             |
+| **الفلتر**  | `status IN ('جديد', 'قيد التنفيذ', 'في الانتظار', 'تحت المراجعة')` |
+| **الخدمة**  | `MaintenanceService.getStats()`                                    |
+| **Hook**    | `useMaintenanceStats`                                              |
+| **الثابت**  | `MAINTENANCE_OPEN_STATUSES`                                        |
 
 ### 1.4 العقود النشطة
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Nazer, Properties |
-| **الجدول** | `contracts` |
-| **الفلتر** | `status = 'نشط' OR status = 'active'` |
-| **الخدمة** | `KPIService.getUnifiedKPIs()` |
-| **Hook** | `useUnifiedKPIs` |
-| **الثابت** | `matchesStatus(status, 'active')` |
+
+| العنصر      | القيمة                                |
+| ----------- | ------------------------------------- |
+| **اللوحات** | Admin, Nazer, Properties              |
+| **الجدول**  | `contracts`                           |
+| **الفلتر**  | `status = 'نشط' OR status = 'active'` |
+| **الخدمة**  | `KPIService.getUnifiedKPIs()`         |
+| **Hook**    | `useUnifiedKPIs`                      |
+| **الثابت**  | `matchesStatus(status, 'active')`     |
 
 ### 1.5 المستأجرين النشطين
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Properties, Tenants |
-| **الجدول** | `tenants` |
-| **الفلتر** | `status = 'نشط' OR status = 'active'` |
-| **الخدمة** | `TenantService.getStats()` |
-| **Hook** | `useTenants` |
-| **الثابت** | `matchesStatus(status, 'active')` |
+
+| العنصر      | القيمة                                |
+| ----------- | ------------------------------------- |
+| **اللوحات** | Admin, Properties, Tenants            |
+| **الجدول**  | `tenants`                             |
+| **الفلتر**  | `status = 'نشط' OR status = 'active'` |
+| **الخدمة**  | `TenantService.getStats()`            |
+| **Hook**    | `useTenants`                          |
+| **الثابت**  | `matchesStatus(status, 'active')`     |
 
 ### 1.6 العقارات
-| العنصر | القيمة |
-|--------|--------|
-| **اللوحات** | Admin, Properties |
-| **الجدول** | `properties` |
-| **الفلتر** | `status = 'مؤجر' OR status = 'rented'` |
-| **الخدمة** | `PropertyStatsService.getBasicStats()` |
-| **Hook** | `usePropertiesStats` |
-| **الثابت** | `matchesStatus(status, 'rented')` |
+
+| العنصر      | القيمة                                 |
+| ----------- | -------------------------------------- |
+| **اللوحات** | Admin, Properties                      |
+| **الجدول**  | `properties`                           |
+| **الفلتر**  | `status = 'مؤجر' OR status = 'rented'` |
+| **الخدمة**  | `PropertyStatsService.getBasicStats()` |
+| **Hook**    | `usePropertiesStats`                   |
+| **الثابت**  | `matchesStatus(status, 'rented')`      |
 
 ---
 
 ## 2. الثوابت المستخدمة
 
 ### 2.1 حالات المستفيدين (`BENEFICIARY_STATUS`)
+
 ```typescript
 ACTIVE: 'نشط',
 INACTIVE: 'غير نشط',
@@ -83,6 +91,7 @@ DECEASED: 'متوفى'
 ```
 
 ### 2.2 حالات العقود (`CONTRACT_STATUS`)
+
 ```typescript
 ACTIVE: 'نشط',
 EXPIRED: 'منتهي',
@@ -92,6 +101,7 @@ DRAFT: 'مسودة'
 ```
 
 ### 2.3 حالات المستأجرين (`TENANT_STATUS`)
+
 ```typescript
 ACTIVE: 'نشط',
 ACTIVE_EN: 'active',
@@ -102,12 +112,14 @@ SUSPENDED_EN: 'suspended'
 ```
 
 ### 2.4 حالات الصيانة
+
 ```typescript
-MAINTENANCE_OPEN_STATUSES: ['جديد', 'قيد التنفيذ', 'في الانتظار', 'تحت المراجعة']
-MAINTENANCE_CLOSED_STATUSES: ['مكتمل', 'ملغي', 'مرفوض']
+MAINTENANCE_OPEN_STATUSES: ['جديد', 'قيد التنفيذ', 'في الانتظار', 'تحت المراجعة'];
+MAINTENANCE_CLOSED_STATUSES: ['مكتمل', 'ملغي', 'مرفوض'];
 ```
 
 ### 2.5 حالات السندات (`VOUCHER_STATUS`)
+
 ```typescript
 DRAFT: 'draft',
 PENDING: 'pending',
@@ -117,6 +129,7 @@ CONFIRMED: 'confirmed'
 ```
 
 ### 2.6 حالات سير عمل الموافقات (`APPROVAL_WORKFLOW_STATUS`)
+
 ```typescript
 PENDING: 'pending',
 IN_PROGRESS: 'in_progress',
@@ -148,35 +161,36 @@ ESCALATED: 'escalated'
 
 ## 4. الخدمات الموحدة
 
-| الخدمة | الوظيفة | withRetry | matchesStatus |
-|--------|---------|:---------:|:-------------:|
-| `KPIService` | المؤشرات الموحدة | ✅ | ✅ |
-| `PropertyStatsService` | إحصائيات العقارات | ✅ | ✅ |
-| `TenantService` | إحصائيات المستأجرين | ✅ | ✅ |
-| `MaintenanceService` | إحصائيات الصيانة | ✅ | ✅ |
-| `BeneficiaryCoreService` | إحصائيات المستفيدين | ✅ | ✅ |
-| `LoansService` | إحصائيات القروض | ✅ | ✅ |
+| الخدمة                   | الوظيفة             | withRetry | matchesStatus |
+| ------------------------ | ------------------- | :-------: | :-----------: |
+| `KPIService`             | المؤشرات الموحدة    |    ✅     |      ✅       |
+| `PropertyStatsService`   | إحصائيات العقارات   |    ✅     |      ✅       |
+| `TenantService`          | إحصائيات المستأجرين |    ✅     |      ✅       |
+| `MaintenanceService`     | إحصائيات الصيانة    |    ✅     |      ✅       |
+| `BeneficiaryCoreService` | إحصائيات المستفيدين |    ✅     |      ✅       |
+| `LoansService`           | إحصائيات القروض     |    ✅     |      ✅       |
 
 ---
 
 ## 5. اللوحات ومصادرها
 
-| اللوحة | Hook الرئيسي | البيانات |
-|--------|-------------|----------|
-| AdminDashboard | `useUnifiedKPIs` | KPIs + Charts |
-| NazerDashboard | `useUnifiedKPIs` | KPIs + Distribution + Activity |
-| AccountantDashboard | `useAccountantKPIs` | Journal + Approvals |
-| CashierDashboard | `useCashierStats` | POS + Shifts |
-| BeneficiaryPortal | `useBeneficiaryData` | Personal Data |
-| TenantPortal | `useTenantData` | Contracts + Payments |
-| ArchivistDashboard | `useArchiveStats` | Documents + Folders |
-| DeveloperDashboard | `useSystemHealth` | Monitoring + Logs |
+| اللوحة              | Hook الرئيسي         | البيانات                       |
+| ------------------- | -------------------- | ------------------------------ |
+| AdminDashboard      | `useUnifiedKPIs`     | KPIs + Charts                  |
+| NazerDashboard      | `useUnifiedKPIs`     | KPIs + Distribution + Activity |
+| AccountantDashboard | `useAccountantKPIs`  | Journal + Approvals            |
+| CashierDashboard    | `useCashierStats`    | POS + Shifts                   |
+| BeneficiaryPortal   | `useBeneficiaryData` | Personal Data                  |
+| TenantPortal        | `useTenantData`      | Contracts + Payments           |
+| ArchivistDashboard  | `useArchiveStats`    | Documents + Folders            |
+| DeveloperDashboard  | `useSystemHealth`    | Monitoring + Logs              |
 
 ---
 
 ## 6. قواعد التحقق من الحالات
 
 ### استخدام `matchesStatus()`
+
 ```typescript
 import { matchesStatus } from '@/lib/constants';
 
@@ -201,74 +215,75 @@ const isActive = tenant.status === 'نشط';
 
 ## 8. التحديثات
 
-| التاريخ | التغيير |
-|---------|---------|
-| 2026-01-17 | إنشاء الملف الأولي |
-| 2026-01-17 | إضافة `withRetry` للخدمات الحرجة |
-| 2026-01-17 | توحيد حالات المستأجرين (عربي/إنجليزي) |
-| 2026-01-17 | إضافة `VOUCHER_STATUS` و `APPROVAL_WORKFLOW_STATUS` |
-| 2026-01-17 | فحص شامل لـ 56 Edge Function - سليمة |
-| 2026-01-17 | فحص RLS - 10 سياسات مفتوحة (مقبولة) |
-| 2026-01-17 | تطبيق `matchesStatus` على 20+ ملف |
-| 2026-01-17 | تحديث ContractService و TrialBalanceService بـ withRetry |
-| 2026-01-17 | تحديث FamiliesStats, RentalPaymentDialog, CreateDistributionDialog, ReportsMenu |
-| 2026-01-18 | تقليل limits في `useAuditLogsEnhanced`: 10000→500, 5000→200 |
-| 2026-01-18 | **إنشاء [قرارات التصميم المعمارية](./ARCHITECTURE_DECISIONS.md)** - 6 ADRs |
-| 2026-01-17 | **إكمال المرحلة 1**: تحديث 12 ملف إضافي لاستخدام `matchesStatus()` |
-| 2026-01-17 | إضافة حالات النظام إلى STATUS_MAPPINGS: healthy, acknowledged, stopped, standby, resolved |
-| 2026-01-17 | الملفات المحدثة: PropertiesListView, BeneficiariesTable, FamilyMembersDialog, TenantContracts |
-| 2026-01-17 | الملفات المحدثة: CreateMaintenanceRequestDialog, AdminAlertsPanel, SelfHealingToolsPanel |
-| 2026-01-17 | الملفات المحدثة: useAdminAlerts, useBeneficiariesFilters |
-| 2026-01-17 | **إكمال الفحص النهائي للمرحلة 1**: WaqfUnitDetailsDialog, system.service, monitoring.service |
-| 2026-01-17 | **المرحلة 2 مكتملة**: فحص 8 لوحات تحكم - جميعها تستخدم useUnifiedKPIs و Realtime hooks |
-| 2026-01-17 | **المرحلة 3 مكتملة**: فحص الصفحات الداخلية - تم تحديث 8 صفحات: |
-| 2026-01-17 | → EmergencyAidManagement, AllTransactions, Loans, Support |
-| 2026-01-17 | → GovernanceDecisions, Invoices + إضافة حالات الحوكمة للثوابت |
-| 2026-01-17 | **المرحلة 4 مكتملة**: فحص الخدمات - تم تحديث 7 خدمات: |
-| 2026-01-17 | → unified-financial, invoice, maintenance, voucher, payment, approval, analysis |
-| 2026-01-17 | **المرحلة 5 مكتملة**: فحص الـ Hooks - تم تحديث 14 Hook: |
-| 2026-01-17 | → useSystemMonitoring, useDistributionApprovals, useContractRequests, useContractNotifications |
-| 2026-01-17 | → useRequestApprovals, useBeneficiaryPersonalReportsData, useSystemErrorLogsData, useLoanApprovals |
-| 2026-01-17 | → useMyBeneficiaryRequests, useCollectionStats, useTransferStatusTracker, usePaymentVouchersData, useBatchPayments |
-| 2026-01-17 | **المرحلة 6 مكتملة**: فحص الثوابت - تم إضافة وتحديث: |
-| 2026-01-17 | → ثوابت جديدة: OCCUPANCY_STATUS, TICKET_STATUS, TRANSFER_STATUS, DISTRIBUTION_STATUS |
-| 2026-01-17 | → ثوابت جديدة: DISCLOSURE_STATUS, ZATCA_CHECK_STATUS |
-| 2026-01-17 | → تحديث STATUS_MAPPINGS: إضافة occupied/vacant/published/posted/موافق |
-| 2026-01-17 | → المكونات المحدثة: PropertyAccordionView, ViewJournalEntryDialog, AccountingKPIs |
-| 2026-01-17 | → المكونات المحدثة: PaymentApprovalsTab, DistributionApprovalsTab, EnhancedDisclosuresTab |
-| 2026-01-19 | **التوحيد البصري مكتمل**: جميع بطاقات الإحصائيات تستخدم `UnifiedKPICard` + `UnifiedStatsGrid` |
-| 2026-01-19 | → الصفحات الموحدة: PaymentVouchers, WaqfUnits, SystemMonitoring, EdgeFunctionsMonitor, TenantPortal |
-| 2026-01-19 | → الصفحات الموحدة: Loans, AllTransactions, BeneficiaryRequests, ConnectionDiagnostics |
+| التاريخ    | التغيير                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 2026-01-17 | إنشاء الملف الأولي                                                                                                       |
+| 2026-01-17 | إضافة `withRetry` للخدمات الحرجة                                                                                         |
+| 2026-01-17 | توحيد حالات المستأجرين (عربي/إنجليزي)                                                                                    |
+| 2026-01-17 | إضافة `VOUCHER_STATUS` و `APPROVAL_WORKFLOW_STATUS`                                                                      |
+| 2026-01-17 | فحص شامل لـ 56 Edge Function - سليمة                                                                                     |
+| 2026-01-17 | فحص RLS - 10 سياسات مفتوحة (مقبولة)                                                                                      |
+| 2026-01-17 | تطبيق `matchesStatus` على 20+ ملف                                                                                        |
+| 2026-01-17 | تحديث ContractService و TrialBalanceService بـ withRetry                                                                 |
+| 2026-01-17 | تحديث FamiliesStats, RentalPaymentDialog, CreateDistributionDialog, ReportsMenu                                          |
+| 2026-01-18 | تقليل limits في `useAuditLogsEnhanced`: 10000→500, 5000→200                                                              |
+| 2026-01-18 | **إنشاء [قرارات التصميم المعمارية](./ARCHITECTURE_DECISIONS.md)** - 6 ADRs                                               |
+| 2026-01-17 | **إكمال المرحلة 1**: تحديث 12 ملف إضافي لاستخدام `matchesStatus()`                                                       |
+| 2026-01-17 | إضافة حالات النظام إلى STATUS_MAPPINGS: healthy, acknowledged, stopped, standby, resolved                                |
+| 2026-01-17 | الملفات المحدثة: PropertiesListView, BeneficiariesTable, FamilyMembersDialog, TenantContracts                            |
+| 2026-01-17 | الملفات المحدثة: CreateMaintenanceRequestDialog, AdminAlertsPanel, SelfHealingToolsPanel                                 |
+| 2026-01-17 | الملفات المحدثة: useAdminAlerts, useBeneficiariesFilters                                                                 |
+| 2026-01-17 | **إكمال الفحص النهائي للمرحلة 1**: WaqfUnitDetailsDialog, system.service, monitoring.service                             |
+| 2026-01-17 | **المرحلة 2 مكتملة**: فحص 8 لوحات تحكم - جميعها تستخدم useUnifiedKPIs و Realtime hooks                                   |
+| 2026-01-17 | **المرحلة 3 مكتملة**: فحص الصفحات الداخلية - تم تحديث 8 صفحات:                                                           |
+| 2026-01-17 | → EmergencyAidManagement, AllTransactions, Loans, Support                                                                |
+| 2026-01-17 | → GovernanceDecisions, Invoices + إضافة حالات الحوكمة للثوابت                                                            |
+| 2026-01-17 | **المرحلة 4 مكتملة**: فحص الخدمات - تم تحديث 7 خدمات:                                                                    |
+| 2026-01-17 | → unified-financial, invoice, maintenance, voucher, payment, approval, analysis                                          |
+| 2026-01-17 | **المرحلة 5 مكتملة**: فحص الـ Hooks - تم تحديث 14 Hook:                                                                  |
+| 2026-01-17 | → useSystemMonitoring, useDistributionApprovals, useContractRequests, useContractNotifications                           |
+| 2026-01-17 | → useRequestApprovals, useBeneficiaryPersonalReportsData, useSystemErrorLogsData, useLoanApprovals                       |
+| 2026-01-17 | → useMyBeneficiaryRequests, useCollectionStats, useTransferStatusTracker, usePaymentVouchersData, useBatchPayments       |
+| 2026-01-17 | **المرحلة 6 مكتملة**: فحص الثوابت - تم إضافة وتحديث:                                                                     |
+| 2026-01-17 | → ثوابت جديدة: OCCUPANCY_STATUS, TICKET_STATUS, TRANSFER_STATUS, DISTRIBUTION_STATUS                                     |
+| 2026-01-17 | → ثوابت جديدة: DISCLOSURE_STATUS, ZATCA_CHECK_STATUS                                                                     |
+| 2026-01-17 | → تحديث STATUS_MAPPINGS: إضافة occupied/vacant/published/posted/موافق                                                    |
+| 2026-01-17 | → المكونات المحدثة: PropertyAccordionView, ViewJournalEntryDialog, AccountingKPIs                                        |
+| 2026-01-17 | → المكونات المحدثة: PaymentApprovalsTab, DistributionApprovalsTab, EnhancedDisclosuresTab                                |
+| 2026-01-19 | **التوحيد البصري مكتمل**: جميع بطاقات الإحصائيات تستخدم `UnifiedKPICard` + `UnifiedStatsGrid`                            |
+| 2026-01-19 | → الصفحات الموحدة: PaymentVouchers, WaqfUnits, SystemMonitoring, EdgeFunctionsMonitor, TenantPortal                      |
+| 2026-01-19 | → الصفحات الموحدة: Loans, AllTransactions, BeneficiaryRequests, ConnectionDiagnostics                                    |
 | 2026-01-19 | → المكونات الموحدة: WaqfSummaryTab, BeneficiaryPropertiesTab, OverviewTab, MaintenanceCostReport, FundsPerformanceReport |
-| 2026-01-19 | → حذف المكونات القديمة: DashboardStats.tsx, StatsCardSkeleton.tsx |
-| 2026-01-19 | → توثيق Canonical Pattern في COMPONENT_GUIDELINES.md |
-| 2026-01-19 | **إضافة صفحات الحوكمة الجديدة** (v3.3.0): |
-| 2026-01-19 | → صفحة مجالس الحوكمة `/governance/boards` مع CRUD كامل |
-| 2026-01-19 | → صفحة سياسات الحوكمة `/governance/policies` مع إدارة السياسات |
-| 2026-01-19 | → خدمات جديدة: GovernanceBoardsService, GovernancePoliciesService |
-| 2026-01-19 | → Hooks جديدة: useGovernanceBoards, useGovernancePolicies |
-| 2026-01-19 | → زر Dark Mode toggle في الـ Header (Mobile & Desktop) |
-| 2026-01-19 | → تحديث AppSidebar: إضافة روابط مجالس الحوكمة والسياسات |
-| 2026-01-19 | → تحديث التوجيه: lazyPages.ts, coreRoutes.tsx |
+| 2026-01-19 | → حذف المكونات القديمة: DashboardStats.tsx, StatsCardSkeleton.tsx                                                        |
+| 2026-01-19 | → توثيق Canonical Pattern في COMPONENT_GUIDELINES.md                                                                     |
+| 2026-01-19 | **إضافة صفحات الحوكمة الجديدة** (v3.3.0):                                                                                |
+| 2026-01-19 | → صفحة مجالس الحوكمة `/governance/boards` مع CRUD كامل                                                                   |
+| 2026-01-19 | → صفحة سياسات الحوكمة `/governance/policies` مع إدارة السياسات                                                           |
+| 2026-01-19 | → خدمات جديدة: GovernanceBoardsService, GovernancePoliciesService                                                        |
+| 2026-01-19 | → Hooks جديدة: useGovernanceBoards, useGovernancePolicies                                                                |
+| 2026-01-19 | → زر Dark Mode toggle في الـ Header (Mobile & Desktop)                                                                   |
+| 2026-01-19 | → تحديث AppSidebar: إضافة روابط مجالس الحوكمة والسياسات                                                                  |
+| 2026-01-19 | → تحديث التوجيه: lazyPages.ts, coreRoutes.tsx                                                                            |
+
 ---
 
 ## 9. إحصائيات النظام الحالية
 
-| المقياس | القيمة | الحالة |
-|---------|--------|--------|
-| العقارات | 1 | ✅ سليم |
-| الوحدات | 1 | ✅ سليم |
-| العقود النشطة | 1 | ✅ سليم (ينتهي نوفمبر 2026) |
-| المستأجرين | 2 | ✅ سليم |
-| المستفيدين النشطين | 14 | ✅ سليم |
-| العائلات | 1 | ✅ سليم |
-| طلبات الصيانة المفتوحة | 2 | ✅ سليم |
-| إجمالي التحصيل | 1,300 ر.س | ✅ سليم |
-| Edge Functions | 56 | ✅ سليمة |
-| أخطاء النظام (7 أيام) | 0 | ✅ لا توجد |
-| الصفحات | 85 | ✅ سليمة (+2 حوكمة) |
-| الخدمات | 53+ | ✅ مع withRetry (+2 حوكمة) |
-| الـ Hooks | 202+ | ✅ مع staleTime (+2 حوكمة) |
+| المقياس                | القيمة    | الحالة                      |
+| ---------------------- | --------- | --------------------------- |
+| العقارات               | 1         | ✅ سليم                     |
+| الوحدات                | 1         | ✅ سليم                     |
+| العقود النشطة          | 1         | ✅ سليم (ينتهي نوفمبر 2026) |
+| المستأجرين             | 2         | ✅ سليم                     |
+| المستفيدين النشطين     | 14        | ✅ سليم                     |
+| العائلات               | 1         | ✅ سليم                     |
+| طلبات الصيانة المفتوحة | 2         | ✅ سليم                     |
+| إجمالي التحصيل         | 1,300 ر.س | ✅ سليم                     |
+| Edge Functions         | 56        | ✅ سليمة                    |
+| أخطاء النظام (7 أيام)  | 0         | ✅ لا توجد                  |
+| الصفحات                | 85        | ✅ سليمة (+2 حوكمة)         |
+| الخدمات                | 53+       | ✅ مع withRetry (+2 حوكمة)  |
+| الـ Hooks              | 202+      | ✅ مع staleTime (+2 حوكمة)  |
 
 ---
 
@@ -276,47 +291,49 @@ const isActive = tenant.status === 'نشط';
 
 ### 10.1 الحالات الفعلية في قاعدة البيانات
 
-| الجدول | الحقل | القيمة الفعلية | اللغة | ملاحظات |
-|--------|-------|---------------|-------|---------|
-| `tenants` | `status` | `نشط` | عربي ✅ | 2 سجلات |
-| `contracts` | `status` | `نشط` | عربي ✅ | 1 سجل |
-| `beneficiaries` | `status` | `نشط` | عربي ✅ | 14 سجل |
-| `maintenance_requests` | `status` | `جديد` | عربي ✅ | 2 سجلات |
-| `payment_vouchers` | `status` | `paid` | إنجليزي ⚠️ | 1 سجل |
-| `properties` | `status` | `مؤجر` | عربي ✅ | 1 سجل |
-| `property_units` | `occupancy_status` | `مشغول` | عربي ✅ | 1 سجل |
-| `journal_entries` | `status` | `posted` | إنجليزي ⚠️ | 1 سجل |
-| `fiscal_years` | `is_active/is_closed` | boolean | - | 2 سجلات |
+| الجدول                 | الحقل                 | القيمة الفعلية | اللغة      | ملاحظات |
+| ---------------------- | --------------------- | -------------- | ---------- | ------- |
+| `tenants`              | `status`              | `نشط`          | عربي ✅    | 2 سجلات |
+| `contracts`            | `status`              | `نشط`          | عربي ✅    | 1 سجل   |
+| `beneficiaries`        | `status`              | `نشط`          | عربي ✅    | 14 سجل  |
+| `maintenance_requests` | `status`              | `جديد`         | عربي ✅    | 2 سجلات |
+| `payment_vouchers`     | `status`              | `paid`         | إنجليزي ⚠️ | 1 سجل   |
+| `properties`           | `status`              | `مؤجر`         | عربي ✅    | 1 سجل   |
+| `property_units`       | `occupancy_status`    | `مشغول`        | عربي ✅    | 1 سجل   |
+| `journal_entries`      | `status`              | `posted`       | إنجليزي ⚠️ | 1 سجل   |
+| `fiscal_years`         | `is_active/is_closed` | boolean        | -          | 2 سجلات |
 
 ### 10.2 سلامة العلاقات
 
-| الفحص | النتيجة |
-|-------|---------|
-| عقود بدون مستأجرين | 0 ✅ |
-| عقود بدون وحدات | 0 ✅ |
-| سندات بدون عقود | 0 ✅ |
-| مستفيدين بدون عائلات | 0 ✅ |
-| سطور قيود يتيمة | 0 ✅ |
+| الفحص                | النتيجة |
+| -------------------- | ------- |
+| عقود بدون مستأجرين   | 0 ✅    |
+| عقود بدون وحدات      | 0 ✅    |
+| سندات بدون عقود      | 0 ✅    |
+| مستفيدين بدون عائلات | 0 ✅    |
+| سطور قيود يتيمة      | 0 ✅    |
 
 ### 10.3 ملخص الاكتشافات
 
 **✅ إيجابي:**
+
 - جميع البيانات تستخدم الحالات العربية (`نشط`, `جديد`, `مشغول`, `مؤجر`)
 - لا توجد سجلات يتيمة (orphaned records)
 - العلاقات سليمة 100%
 - البيانات متسقة
 
 **⚠️ ملاحظات:**
+
 - `payment_vouchers.status` = `paid` (إنجليزي) - مقبول لأن `matchesStatus()` يدعمها
 - `journal_entries.status` = `posted` (إنجليزي) - مقبول لأن `matchesStatus()` يدعمها
 - `fiscal_years` تستخدم `is_active/is_closed` بدلاً من `status` - تصميم مختلف
 
 ### 10.4 السنوات المالية
 
-| المعرف | الاسم | نشطة | مغلقة |
-|--------|-------|------|-------|
-| `e255...` | Test Update | ❌ | ✅ |
-| `a519...` | السنة المالية 2025-2026 | ✅ | ❌ |
+| المعرف    | الاسم                   | نشطة | مغلقة |
+| --------- | ----------------------- | ---- | ----- |
+| `e255...` | Test Update             | ❌   | ✅    |
+| `a519...` | السنة المالية 2025-2026 | ✅   | ❌    |
 
 ---
 
@@ -324,67 +341,70 @@ const isActive = tenant.status === 'نشط';
 
 ### 11.1 توزيع الأدوار في النظام
 
-| الدور | عدد المستخدمين | عدد الصلاحيات | الفئات |
-|-------|----------------|---------------|--------|
-| `nazer` | 2 | 201 | 8 |
-| `admin` | 3 | 201 | 8 |
-| `accountant` | 1 | 87 | 4 |
-| `waqf_heir` | 14 | 36 | 7 |
-| `archivist` | 1 | 25 | 3 |
-| `cashier` | 1 | 15 | 6 |
-| `beneficiary` | 2 | 9 | 3 |
-| `user` | 3 | 6 | 2 |
-| **الإجمالي** | **27** | - | - |
+| الدور         | عدد المستخدمين | عدد الصلاحيات | الفئات |
+| ------------- | -------------- | ------------- | ------ |
+| `nazer`       | 2              | 201           | 8      |
+| `admin`       | 3              | 201           | 8      |
+| `accountant`  | 1              | 87            | 4      |
+| `waqf_heir`   | 14             | 36            | 7      |
+| `archivist`   | 1              | 25            | 3      |
+| `cashier`     | 1              | 15            | 6      |
+| `beneficiary` | 2              | 9             | 3      |
+| `user`        | 3              | 6             | 2      |
+| **الإجمالي**  | **27**         | -             | -      |
 
 ### 11.2 حماية المسارات
 
-| نوع الحماية | التنفيذ | الحالة |
-|-------------|---------|--------|
-| `ProtectedRoute` | جميع المسارات الحساسة | ✅ |
-| `requiredRole` | اللوحات الخاصة بالأدوار | ✅ |
-| `requiredRoles` | الصفحات متعددة الأدوار | ✅ |
-| `requiredPermission` | غير مستخدم حالياً | ⚠️ |
-| `PermissionGate` | موجود لكن غير مستخدم | ⚠️ |
+| نوع الحماية          | التنفيذ                 | الحالة |
+| -------------------- | ----------------------- | ------ |
+| `ProtectedRoute`     | جميع المسارات الحساسة   | ✅     |
+| `requiredRole`       | اللوحات الخاصة بالأدوار | ✅     |
+| `requiredRoles`      | الصفحات متعددة الأدوار  | ✅     |
+| `requiredPermission` | غير مستخدم حالياً       | ⚠️     |
+| `PermissionGate`     | موجود لكن غير مستخدم    | ⚠️     |
 
 ### 11.3 توجيه اللوحات
 
-| الدور | المسار | الحماية |
-|-------|--------|---------|
-| `nazer` | `/nazer-dashboard` | `requiredRole="nazer"` ✅ |
-| `admin` | `/admin-dashboard` | `requiredRole="admin"` ✅ |
-| `accountant` | `/accountant-dashboard` | `requiredRole="accountant"` ✅ |
-| `cashier` | `/cashier-dashboard` | `requiredRole="cashier"` ✅ |
-| `archivist` | `/archivist-dashboard` | `requiredRole="archivist"` ✅ |
-| `beneficiary` | `/beneficiary-portal` | `requiredRoles` ✅ |
-| `waqf_heir` | `/beneficiary-portal` | `requiredRoles` ✅ |
+| الدور         | المسار                  | الحماية                        |
+| ------------- | ----------------------- | ------------------------------ |
+| `nazer`       | `/nazer-dashboard`      | `requiredRole="nazer"` ✅      |
+| `admin`       | `/admin-dashboard`      | `requiredRole="admin"` ✅      |
+| `accountant`  | `/accountant-dashboard` | `requiredRole="accountant"` ✅ |
+| `cashier`     | `/cashier-dashboard`    | `requiredRole="cashier"` ✅    |
+| `archivist`   | `/archivist-dashboard`  | `requiredRole="archivist"` ✅  |
+| `beneficiary` | `/beneficiary-portal`   | `requiredRoles` ✅             |
+| `waqf_heir`   | `/beneficiary-portal`   | `requiredRoles` ✅             |
 
 ### 11.4 الصفحات الحساسة وحمايتها
 
-| الصفحة | المسار | الأدوار المسموحة |
-|--------|--------|-----------------|
-| المستخدمين | `/users` | admin, nazer |
-| الأدوار | `/settings/roles` | admin, nazer |
-| الصلاحيات | `/settings/permissions` | admin, nazer |
-| سجلات التدقيق | `/audit-logs` | admin, nazer |
-| المستفيدين | `/beneficiaries` | admin, nazer, accountant |
-| المحاسبة | `/accounting` | admin, nazer, accountant |
-| العقارات | `/properties` | admin, nazer, accountant |
-| المستأجرين | `/tenants` | admin, nazer, accountant, cashier |
-| نقطة البيع | `/pos` | nazer, accountant, cashier |
+| الصفحة        | المسار                  | الأدوار المسموحة                  |
+| ------------- | ----------------------- | --------------------------------- |
+| المستخدمين    | `/users`                | admin, nazer                      |
+| الأدوار       | `/settings/roles`       | admin, nazer                      |
+| الصلاحيات     | `/settings/permissions` | admin, nazer                      |
+| سجلات التدقيق | `/audit-logs`           | admin, nazer                      |
+| المستفيدين    | `/beneficiaries`        | admin, nazer, accountant          |
+| المحاسبة      | `/accounting`           | admin, nazer, accountant          |
+| العقارات      | `/properties`           | admin, nazer, accountant          |
+| المستأجرين    | `/tenants`              | admin, nazer, accountant, cashier |
+| نقطة البيع    | `/pos`                  | nazer, accountant, cashier        |
 
 ### 11.5 ملخص الصلاحيات
 
 **✅ إيجابي:**
+
 - جميع المسارات الحساسة محمية بـ `ProtectedRoute`
 - الأدوار مفصولة في جدول منفصل (`user_roles`)
 - لا توجد صلاحيات في localStorage (أمان)
 - نظام timeout للتحميل (3 ثواني)
 
 **⚠️ ملاحظات:**
+
 - `PermissionGate` غير مستخدم في المكونات (يمكن استخدامه للأزرار الحساسة)
 - `requiredPermission` غير مستخدم (يعتمد على الأدوار فقط)
 
 **💡 توصيات:**
+
 - استخدام `PermissionGate` للأزرار الحساسة (حذف، تعديل)
 - إضافة فحص صلاحيات دقيقة باستخدام `requiredPermission`
 
@@ -394,70 +414,73 @@ const isActive = tenant.status === 'نشط';
 
 ### 12.1 ملخص الوظائف
 
-| الفئة | العدد | verify_jwt = true | verify_jwt = false |
-|-------|-------|-------------------|-------------------|
-| الذكاء الاصطناعي | 5 | 4 | 1 |
-| المالية | 6 | 5 | 1 |
-| الإشعارات | 6 | 4 | 2 |
-| النسخ/الاستعادة | 3 | 2 | 1 |
-| الصيانة | 5 | 0 | 5 |
-| المستندات | 4 | 3 | 1 |
-| المستأجرين | 3 | 0 | 3 |
-| الأخرى | 24 | 15 | 9 |
-| **الإجمالي** | **56** | **33** | **23** |
+| الفئة            | العدد  | verify_jwt = true | verify_jwt = false |
+| ---------------- | ------ | ----------------- | ------------------ |
+| الذكاء الاصطناعي | 5      | 4                 | 1                  |
+| المالية          | 6      | 5                 | 1                  |
+| الإشعارات        | 6      | 4                 | 2                  |
+| النسخ/الاستعادة  | 3      | 2                 | 1                  |
+| الصيانة          | 5      | 0                 | 5                  |
+| المستندات        | 4      | 3                 | 1                  |
+| المستأجرين       | 3      | 0                 | 3                  |
+| الأخرى           | 24     | 15                | 9                  |
+| **الإجمالي**     | **56** | **33**            | **23**             |
 
 ### 12.2 وظائف الذكاء الاصطناعي
 
-| الوظيفة | الوصف | JWT | Health Check |
-|---------|-------|-----|--------------|
-| `chatbot` | المساعد الذكي | ✅ | ✅ |
-| `generate-ai-insights` | الرؤى الذكية | ✅ | ✅ |
-| `ai-system-audit` | تدقيق النظام | ✅ | ✅ |
-| `intelligent-search` | البحث الذكي | ✅ | ✅ |
-| `property-ai-assistant` | مساعد العقارات | ✅ | ✅ |
+| الوظيفة                 | الوصف          | JWT | Health Check |
+| ----------------------- | -------------- | --- | ------------ |
+| `chatbot`               | المساعد الذكي  | ✅  | ✅           |
+| `generate-ai-insights`  | الرؤى الذكية   | ✅  | ✅           |
+| `ai-system-audit`       | تدقيق النظام   | ✅  | ✅           |
+| `intelligent-search`    | البحث الذكي    | ✅  | ✅           |
+| `property-ai-assistant` | مساعد العقارات | ✅  | ✅           |
 
 ### 12.3 وظائف المالية
 
-| الوظيفة | الوصف | JWT | Rate Limit |
-|---------|-------|-----|------------|
-| `distribute-revenue` | توزيع الإيرادات | ✅ | 3/ساعة |
-| `simulate-distribution` | محاكاة التوزيع | ✅ | - |
-| `auto-create-journal` | القيد الآلي | ✅ | ✅ |
-| `publish-fiscal-year` | نشر السنة المالية | ✅ | ✅ |
-| `auto-close-fiscal-year` | إقفال السنة المالية | ✅ | ✅ |
-| `zatca-submit` | إرسال ZATCA | ✅ | ✅ |
+| الوظيفة                  | الوصف               | JWT | Rate Limit |
+| ------------------------ | ------------------- | --- | ---------- |
+| `distribute-revenue`     | توزيع الإيرادات     | ✅  | 3/ساعة     |
+| `simulate-distribution`  | محاكاة التوزيع      | ✅  | -          |
+| `auto-create-journal`    | القيد الآلي         | ✅  | ✅         |
+| `publish-fiscal-year`    | نشر السنة المالية   | ✅  | ✅         |
+| `auto-close-fiscal-year` | إقفال السنة المالية | ✅  | ✅         |
+| `zatca-submit`           | إرسال ZATCA         | ✅  | ✅         |
 
 ### 12.4 وظائف الصيانة (scheduled)
 
-| الوظيفة | الوصف | JWT | CRON |
-|---------|-------|-----|------|
-| `backup-database` | النسخ الاحتياطي | ✅ | - |
-| `weekly-maintenance` | الصيانة الأسبوعية | ❌ | ✅ |
-| `scheduled-cleanup` | التنظيف المجدول | ❌ | ✅ |
-| `run-vacuum` | تنظيف قاعدة البيانات | ❌ | ✅ |
-| `db-health-check` | فحص صحة DB | ❌ | ✅ |
+| الوظيفة              | الوصف                | JWT | CRON |
+| -------------------- | -------------------- | --- | ---- |
+| `backup-database`    | النسخ الاحتياطي      | ✅  | -    |
+| `weekly-maintenance` | الصيانة الأسبوعية    | ❌  | ✅   |
+| `scheduled-cleanup`  | التنظيف المجدول      | ❌  | ✅   |
+| `run-vacuum`         | تنظيف قاعدة البيانات | ❌  | ✅   |
+| `db-health-check`    | فحص صحة DB           | ❌  | ✅   |
 
 ### 12.5 وظائف بوابة المستأجرين
 
-| الوظيفة | الوصف | JWT | Session Token |
-|---------|-------|-----|---------------|
-| `tenant-portal` | API بوابة المستأجر | ❌ | `x-tenant-session` |
-| `tenant-send-otp` | إرسال OTP | ❌ | - |
-| `tenant-verify-otp` | التحقق من OTP | ❌ | - |
+| الوظيفة             | الوصف              | JWT | Session Token      |
+| ------------------- | ------------------ | --- | ------------------ |
+| `tenant-portal`     | API بوابة المستأجر | ❌  | `x-tenant-session` |
+| `tenant-send-otp`   | إرسال OTP          | ❌  | -                  |
+| `tenant-verify-otp` | التحقق من OTP      | ❌  | -                  |
 
 ### 12.6 الأمان والحماية
 
 **✅ إيجابي:**
+
 - 51/56 وظيفة لديها Health Check endpoint
 - Rate Limiting مفعل على الوظائف الحساسة
 - CORS headers موحدة عبر `_shared/cors.ts`
 - فحص الأدوار (`admin`/`nazer`) للوظائف الحساسة
 
 **⚠️ ملاحظات:**
+
 - 5 وظائف بدون Health Check (ناقصة)
 - بعض الوظائف تستخدم `verify_jwt = false` لأنها تفحص JWT يدوياً
 
 **📝 الوظائف المضافة للتكوين:**
+
 - `tenant-portal` (verify_jwt = false)
 - `tenant-send-otp` (verify_jwt = false)
 - `tenant-verify-otp` (verify_jwt = false)
@@ -470,33 +493,35 @@ const isActive = tenant.status === 'نشط';
 
 ### 13.1 إعدادات Cache (staleTime)
 
-| الفئة | staleTime | refetchInterval | الاستخدام |
-|-------|-----------|-----------------|-----------|
-| `DEFAULT` | 2 دقائق | - | الاستعلامات العامة |
-| `REALTIME` | 30 ثانية | - | البيانات الحية |
-| `STATIC` | 30 دقيقة | - | البيانات الثابتة |
-| `DASHBOARD_KPIS` | 2 دقائق | 5 دقائق | مؤشرات الأداء |
-| `REPORTS` | 2 دقائق | ❌ يدوي | التقارير |
-| `CHARTS` | 1 ساعة | ❌ | الرسوم البيانية |
-| `LOANS` | 1 ساعة | ❌ | القروض |
+| الفئة            | staleTime | refetchInterval | الاستخدام          |
+| ---------------- | --------- | --------------- | ------------------ |
+| `DEFAULT`        | 2 دقائق   | -               | الاستعلامات العامة |
+| `REALTIME`       | 30 ثانية  | -               | البيانات الحية     |
+| `STATIC`         | 30 دقيقة  | -               | البيانات الثابتة   |
+| `DASHBOARD_KPIS` | 2 دقائق   | 5 دقائق         | مؤشرات الأداء      |
+| `REPORTS`        | 2 دقائق   | ❌ يدوي         | التقارير           |
+| `CHARTS`         | 1 ساعة    | ❌              | الرسوم البيانية    |
+| `LOANS`          | 1 ساعة    | ❌              | القروض             |
 
 **✅ إيجابي:**
+
 - إعدادات موحدة عبر `src/infrastructure/react-query/queryConfig.ts`
 - 86 ملف يستخدم staleTime بشكل صحيح
 - gcTime محدد لمنع تراكم الذاكرة
 
 ### 13.2 آلية Retry
 
-| الخدمة | withRetry | المحاولات | التأخير |
-|--------|-----------|-----------|---------|
-| `kpi.service.ts` | ✅ | 3 | 500ms-5s |
-| `property-stats.service.ts` | ✅ | 3 | 500ms-5s |
-| `maintenance.service.ts` | ✅ | 3 | 500ms-5s |
-| `contract.service.ts` | ✅ | 3 | 500ms-5s |
-| `beneficiary/core.service.ts` | ✅ | 3 | 500ms-5s |
-| `trial-balance.service.ts` | ✅ | 3 | 500ms-5s |
+| الخدمة                        | withRetry | المحاولات | التأخير  |
+| ----------------------------- | --------- | --------- | -------- |
+| `kpi.service.ts`              | ✅        | 3         | 500ms-5s |
+| `property-stats.service.ts`   | ✅        | 3         | 500ms-5s |
+| `maintenance.service.ts`      | ✅        | 3         | 500ms-5s |
+| `contract.service.ts`         | ✅        | 3         | 500ms-5s |
+| `beneficiary/core.service.ts` | ✅        | 3         | 500ms-5s |
+| `trial-balance.service.ts`    | ✅        | 3         | 500ms-5s |
 
 **الإعدادات (`SUPABASE_RETRY_OPTIONS`):**
+
 ```typescript
 {
   maxRetries: 3,
@@ -512,56 +537,59 @@ const isActive = tenant.status === 'نشط';
 
 ### 13.3 Pagination
 
-| الصفحة | Pagination | PageSize | التقييم |
-|--------|------------|----------|---------|
-| `GovernanceDecisions` | ✅ | 15 | ممتاز |
-| `AllTransactions` | ✅ | متغير | ممتاز |
-| `AuditLogs` | ✅ | 50-100 | جيد |
-| `Beneficiaries` | ✅ | عبر filters | جيد |
-| `Contracts` | ✅ | getPaginated | ممتاز |
+| الصفحة                | Pagination | PageSize     | التقييم |
+| --------------------- | ---------- | ------------ | ------- |
+| `GovernanceDecisions` | ✅         | 15           | ممتاز   |
+| `AllTransactions`     | ✅         | متغير        | ممتاز   |
+| `AuditLogs`           | ✅         | 50-100       | جيد     |
+| `Beneficiaries`       | ✅         | عبر filters  | جيد     |
+| `Contracts`           | ✅         | getPaginated | ممتاز   |
 
 **إعدادات Pagination:**
+
 - `DEFAULT_PAGE_SIZE`: 15
 - `PAGE_SIZE_OPTIONS`: [10, 15, 25, 50, 100]
 
 ### 13.4 أحجام الجداول الكبيرة
 
-| الجدول | الحجم | السجلات | ملاحظات |
-|--------|-------|---------|---------|
-| `audit_logs_archive` | 7.3 MB | 1,256 | ⚠️ يحتاج أرشفة دورية |
-| `audit_logs` | 5.7 MB | 2,904 | ⚠️ يحتاج تنظيف |
-| `beneficiary_activity_log` | 2.5 MB | 1,384 | طبيعي |
-| `system_alerts` | 1.9 MB | 31 | طبيعي |
-| `notifications` | 440 KB | 686 | طبيعي |
+| الجدول                     | الحجم  | السجلات | ملاحظات              |
+| -------------------------- | ------ | ------- | -------------------- |
+| `audit_logs_archive`       | 7.3 MB | 1,256   | ⚠️ يحتاج أرشفة دورية |
+| `audit_logs`               | 5.7 MB | 2,904   | ⚠️ يحتاج تنظيف       |
+| `beneficiary_activity_log` | 2.5 MB | 1,384   | طبيعي                |
+| `system_alerts`            | 1.9 MB | 31      | طبيعي                |
+| `notifications`            | 440 KB | 686     | طبيعي                |
 
 ### 13.5 أخطاء قاعدة البيانات الأخيرة
 
-| الخطأ | النوع | التوصية |
-|-------|-------|---------|
-| `column "status" does not exist` | ERROR | فحص الاستعلام |
+| الخطأ                                                 | النوع | التوصية       |
+| ----------------------------------------------------- | ----- | ------------- |
+| `column "status" does not exist`                      | ERROR | فحص الاستعلام |
 | `UNION types text and entry_status cannot be matched` | ERROR | توحيد الأنواع |
 
 ### 13.6 ميزانية الأداء (performance-budget.json)
 
-| المقياس | الهدف | الحالة |
-|---------|-------|--------|
-| JavaScript Initial | 250KB | ✅ |
-| CSS Total | 100KB | ✅ |
-| FCP | 1.5s | ✅ |
-| LCP | 2.5s | ✅ |
-| TTI | 3s | ✅ |
-| Max API Calls | 10 | ✅ |
-| Max Rerenders | 3 | ✅ |
+| المقياس            | الهدف | الحالة |
+| ------------------ | ----- | ------ |
+| JavaScript Initial | 250KB | ✅     |
+| CSS Total          | 100KB | ✅     |
+| FCP                | 1.5s  | ✅     |
+| LCP                | 2.5s  | ✅     |
+| TTI                | 3s    | ✅     |
+| Max API Calls      | 10    | ✅     |
+| Max Rerenders      | 3     | ✅     |
 
 ### 13.7 توصيات التحسين
 
 **✅ مطبق:**
+
 - withRetry على الخدمات الحرجة
 - staleTime موحد عبر QUERY_CONFIG
 - Pagination في القوائم الكبيرة
 - Lazy loading للصفحات (lazyWithRetry)
 
 **✅ تم تطبيقها:**
+
 1. ✅ إضافة فهارس لجدول `audit_logs` على `created_at` + `action_type` + `table_name` + `user_id`
 2. ✅ إنشاء دالة `archive_old_audit_logs(months_old)` للأرشفة التلقائية
 3. ✅ تفعيل `refetchOnWindowFocus: false` للصفحات غير الحساسة
@@ -575,50 +603,50 @@ const isActive = tenant.status === 'نشط';
 
 ### 14.1 الحالة العامة للنظام
 
-| المقياس | القيمة | الحالة |
-|---------|--------|--------|
-| نسبة Cache Hit | 99.98% | ✅ ممتاز |
-| العقود المنتهية خلال 30 يوم | 0 | ✅ |
-| طلبات الصيانة المتأخرة (>7 أيام) | 0 | ✅ |
-| التنبيهات النشطة | 0 | ✅ |
-| عقود بدون مستأجر | 0 | ✅ |
-| مستفيدين بدون عائلة | 0 | ✅ |
-| وحدات بدون عقار | 0 | ✅ |
+| المقياس                          | القيمة | الحالة   |
+| -------------------------------- | ------ | -------- |
+| نسبة Cache Hit                   | 99.98% | ✅ ممتاز |
+| العقود المنتهية خلال 30 يوم      | 0      | ✅       |
+| طلبات الصيانة المتأخرة (>7 أيام) | 0      | ✅       |
+| التنبيهات النشطة                 | 0      | ✅       |
+| عقود بدون مستأجر                 | 0      | ✅       |
+| مستفيدين بدون عائلة              | 0      | ✅       |
+| وحدات بدون عقار                  | 0      | ✅       |
 
 ### 14.2 أحجام الجداول الكبيرة
 
-| الجدول | الحجم | ملاحظات |
-|--------|-------|---------|
-| `audit_logs_archive` | 7.3 MB | ⚠️ يحتاج أرشفة دورية |
-| `audit_logs` | 5.8 MB | ⚠️ تشغيل `archive_old_audit_logs(3)` |
-| `beneficiary_activity_log` | 2.6 MB | طبيعي |
-| `system_alerts` | 1.9 MB | طبيعي |
-| `system_health_checks` | 1.7 MB | طبيعي |
-| `system_error_logs` | 856 KB | طبيعي |
+| الجدول                     | الحجم  | ملاحظات                              |
+| -------------------------- | ------ | ------------------------------------ |
+| `audit_logs_archive`       | 7.3 MB | ⚠️ يحتاج أرشفة دورية                 |
+| `audit_logs`               | 5.8 MB | ⚠️ تشغيل `archive_old_audit_logs(3)` |
+| `beneficiary_activity_log` | 2.6 MB | طبيعي                                |
+| `system_alerts`            | 1.9 MB | طبيعي                                |
+| `system_health_checks`     | 1.7 MB | طبيعي                                |
+| `system_error_logs`        | 856 KB | طبيعي                                |
 
 ### 14.3 الأخطاء الأخيرة (7 أيام)
 
-| الخطورة | العدد | آخر حدوث |
-|---------|-------|----------|
-| `high` | 13 | 2026-01-17 14:01 |
-| `medium` | 2 | 2026-01-16 00:57 |
+| الخطورة  | العدد | آخر حدوث         |
+| -------- | ----- | ---------------- |
+| `high`   | 13    | 2026-01-17 14:01 |
+| `medium` | 2     | 2026-01-16 00:57 |
 
 ### 14.4 نشاط التدقيق (24 ساعة)
 
-| نوع العملية | العدد |
-|-------------|-------|
-| `UPDATE` | 41 |
-| `db_health_check` | 29 |
-| `PASSWORD_RESET` | 1 |
+| نوع العملية       | العدد |
+| ----------------- | ----- |
+| `UPDATE`          | 41    |
+| `db_health_check` | 29    |
+| `PASSWORD_RESET`  | 1     |
 
 ### 14.5 الفهارس غير المستخدمة
 
-| الجدول | الفهرس | الحجم | ملاحظات |
-|--------|--------|-------|---------|
-| `audit_logs` | `audit_logs_pkey` | 144 KB | طبيعي - مفتاح أساسي |
-| `audit_logs` | `idx_audit_logs_user_created` | 104 KB | ✅ جديد - سيُستخدم |
-| `beneficiary_activity_log` | `idx_beneficiary_activity_beneficiary` | 72 KB | ✅ جديد |
-| `notifications` | `idx_notifications_user_unread` | 56 KB | ✅ جديد |
+| الجدول                     | الفهرس                                 | الحجم  | ملاحظات             |
+| -------------------------- | -------------------------------------- | ------ | ------------------- |
+| `audit_logs`               | `audit_logs_pkey`                      | 144 KB | طبيعي - مفتاح أساسي |
+| `audit_logs`               | `idx_audit_logs_user_created`          | 104 KB | ✅ جديد - سيُستخدم  |
+| `beneficiary_activity_log` | `idx_beneficiary_activity_beneficiary` | 72 KB  | ✅ جديد             |
+| `notifications`            | `idx_notifications_user_unread`        | 56 KB  | ✅ جديد             |
 
 ### 14.6 Edge Function لفحص الصحة
 
@@ -638,20 +666,20 @@ SELECT archive_old_audit_logs(3);
 
 ## ✅ ملخص المراحل المكتملة
 
-| المرحلة | الوصف | الحالة |
-|---------|-------|--------|
-| 1 | إصلاح المشاكل الحرجة | ✅ مكتمل |
-| 2 | فحص لوحات التحكم | ✅ مكتمل |
-| 3 | فحص الصفحات | ✅ مكتمل |
-| 4 | فحص الخدمات | ✅ مكتمل |
-| 5 | فحص الـ Hooks | ✅ مكتمل |
-| 6 | فحص الثوابت | ✅ مكتمل |
-| 7 | فحص قاعدة البيانات | ✅ مكتمل |
-| 8 | فحص الصلاحيات | ✅ مكتمل (95%) |
-| 9 | فحص Edge Functions | ✅ مكتمل |
-| 10 | فحص الأداء | ✅ مكتمل - التوصيات مُطبقة |
-| 11 | فحص صحة النظام | ✅ مكتمل |
-| 12 | التوثيق النهائي | ✅ مكتمل |
+| المرحلة | الوصف                | الحالة                     |
+| ------- | -------------------- | -------------------------- |
+| 1       | إصلاح المشاكل الحرجة | ✅ مكتمل                   |
+| 2       | فحص لوحات التحكم     | ✅ مكتمل                   |
+| 3       | فحص الصفحات          | ✅ مكتمل                   |
+| 4       | فحص الخدمات          | ✅ مكتمل                   |
+| 5       | فحص الـ Hooks        | ✅ مكتمل                   |
+| 6       | فحص الثوابت          | ✅ مكتمل                   |
+| 7       | فحص قاعدة البيانات   | ✅ مكتمل                   |
+| 8       | فحص الصلاحيات        | ✅ مكتمل (95%)             |
+| 9       | فحص Edge Functions   | ✅ مكتمل                   |
+| 10      | فحص الأداء           | ✅ مكتمل - التوصيات مُطبقة |
+| 11      | فحص صحة النظام       | ✅ مكتمل                   |
+| 12      | التوثيق النهائي      | ✅ مكتمل                   |
 
 ---
 
@@ -659,39 +687,39 @@ SELECT archive_old_audit_logs(3);
 
 ### 15.1 الملفات المنشأة
 
-| الملف | الوصف | الغرض |
-|-------|-------|-------|
-| `docs/TRUTH_MAP.md` | خريطة مصادر الحقيقة | توثيق جميع مصادر البيانات |
-| `docs/MONTHLY_CHECKLIST.md` | قائمة الفحص الشهري | فحص دوري للنظام |
-| `docs/SYSTEM_HEALTH_QUERIES.md` | استعلامات SQL للفحص | فحص صحة قاعدة البيانات |
-| `docs/SYSTEM_HEALTH_CHECKLIST.md` | قائمة فحص صحة النظام | فحص شامل للنظام |
+| الملف                             | الوصف                | الغرض                     |
+| --------------------------------- | -------------------- | ------------------------- |
+| `docs/TRUTH_MAP.md`               | خريطة مصادر الحقيقة  | توثيق جميع مصادر البيانات |
+| `docs/MONTHLY_CHECKLIST.md`       | قائمة الفحص الشهري   | فحص دوري للنظام           |
+| `docs/SYSTEM_HEALTH_QUERIES.md`   | استعلامات SQL للفحص  | فحص صحة قاعدة البيانات    |
+| `docs/SYSTEM_HEALTH_CHECKLIST.md` | قائمة فحص صحة النظام | فحص شامل للنظام           |
 
 ### 15.2 ملخص الإنجازات النهائية
 
-| البند | قبل | بعد |
-|-------|-----|-----|
-| ملفات تستخدم `matchesStatus()` | 0 | 82+ |
-| خدمات تستخدم `withRetry` | 0 | 7+ |
-| ثوابت الحالات | 4 | 12+ |
-| فهارس `audit_logs` | 1 | 5 |
-| سجلات مؤرشفة | 0 | 1,626 |
-| تحذيرات RLS | 14 | 10 (مقبولة) |
-| Edge Functions محمية | 33 | 33 |
-| الأدوار النشطة | 8 | 8 |
-| المستخدمين | 27 | 27 |
+| البند                          | قبل | بعد         |
+| ------------------------------ | --- | ----------- |
+| ملفات تستخدم `matchesStatus()` | 0   | 82+         |
+| خدمات تستخدم `withRetry`       | 0   | 7+          |
+| ثوابت الحالات                  | 4   | 12+         |
+| فهارس `audit_logs`             | 1   | 5           |
+| سجلات مؤرشفة                   | 0   | 1,626       |
+| تحذيرات RLS                    | 14  | 10 (مقبولة) |
+| Edge Functions محمية           | 33  | 33          |
+| الأدوار النشطة                 | 8   | 8           |
+| المستخدمين                     | 27  | 27          |
 
 ### 15.3 الثوابت المضافة
 
 ```typescript
 // ثوابت جديدة تمت إضافتها
-VOUCHER_STATUS          // حالات السندات
-APPROVAL_WORKFLOW_STATUS // حالات سير عمل الموافقات
-OCCUPANCY_STATUS        // حالات الإشغال
-TICKET_STATUS           // حالات التذاكر
-TRANSFER_STATUS         // حالات التحويلات
-DISTRIBUTION_STATUS     // حالات التوزيعات
-DISCLOSURE_STATUS       // حالات الإفصاحات
-ZATCA_CHECK_STATUS      // حالات فحص زاتكا
+VOUCHER_STATUS; // حالات السندات
+APPROVAL_WORKFLOW_STATUS; // حالات سير عمل الموافقات
+OCCUPANCY_STATUS; // حالات الإشغال
+TICKET_STATUS; // حالات التذاكر
+TRANSFER_STATUS; // حالات التحويلات
+DISTRIBUTION_STATUS; // حالات التوزيعات
+DISCLOSURE_STATUS; // حالات الإفصاحات
+ZATCA_CHECK_STATUS; // حالات فحص زاتكا
 ```
 
 ### 15.4 التحسينات التقنية
@@ -715,12 +743,12 @@ QUERY_CONFIG = {
 
 ### 15.5 توصيات مستقبلية
 
-| التوصية | الأولوية | الحالة |
-|---------|----------|--------|
-| تفعيل `PermissionGate` للأزرار الحساسة | منخفضة | ⏳ اختياري |
-| أرشفة `audit_logs` شهرياً | متوسطة | 📅 جدولة |
-| مراجعة سياسات RLS المفتوحة | منخفضة | ✅ مراجعة - مقبولة |
-| إضافة مراقبة أداء الصفحات | منخفضة | ⏳ اختياري |
+| التوصية                                | الأولوية | الحالة             |
+| -------------------------------------- | -------- | ------------------ |
+| تفعيل `PermissionGate` للأزرار الحساسة | منخفضة   | ⏳ اختياري         |
+| أرشفة `audit_logs` شهرياً              | متوسطة   | 📅 جدولة           |
+| مراجعة سياسات RLS المفتوحة             | منخفضة   | ✅ مراجعة - مقبولة |
+| إضافة مراقبة أداء الصفحات              | منخفضة   | ⏳ اختياري         |
 
 ---
 
@@ -730,6 +758,7 @@ QUERY_CONFIG = {
 
 **الخلاصة:**
 تم إنجاز خطة الفحص والتفتيش الشاملة بنجاح (12/12 مرحلة = 100%).
+
 - ✅ جميع المشاكل الحرجة تم إصلاحها
 - ✅ مصادر البيانات موحدة ومتسقة
 - ✅ الثوابت مُركزية ومُوثقة
@@ -738,6 +767,7 @@ QUERY_CONFIG = {
 - ✅ التوثيق مكتمل
 
 **الملفات المرجعية:**
+
 - `docs/TRUTH_MAP.md` - خريطة مصادر الحقيقة
 - `docs/MONTHLY_CHECKLIST.md` - قائمة الفحص الشهري
 - `docs/SYSTEM_HEALTH_QUERIES.md` - استعلامات فحص الصحة
@@ -751,42 +781,42 @@ QUERY_CONFIG = {
 
 ### 16.1 ملخص التنظيف
 
-| العنصر | قبل | بعد | الحالة |
-|--------|-----|-----|--------|
-| Console.log غير محمية | 5 | 0 | ✅ تم التنظيف |
-| `as any` موثقة | ❌ | ✅ | ✅ تم التوثيق |
-| الكود المُهمل | غير موثق | موثق | ✅ تم التوثيق |
-| سجل المكونات | ❌ | ✅ | ✅ تم الإنشاء |
-| سجل الخدمات | ❌ | ✅ | ✅ تم الإنشاء |
-| سجل الـ Hooks | ❌ | ✅ | ✅ تم الإنشاء |
+| العنصر                | قبل      | بعد  | الحالة        |
+| --------------------- | -------- | ---- | ------------- |
+| Console.log غير محمية | 5        | 0    | ✅ تم التنظيف |
+| `as any` موثقة        | ❌       | ✅   | ✅ تم التوثيق |
+| الكود المُهمل         | غير موثق | موثق | ✅ تم التوثيق |
+| سجل المكونات          | ❌       | ✅   | ✅ تم الإنشاء |
+| سجل الخدمات           | ❌       | ✅   | ✅ تم الإنشاء |
+| سجل الـ Hooks         | ❌       | ✅   | ✅ تم الإنشاء |
 
 ### 16.2 الملفات المُعدّلة
 
-| الملف | التعديل |
-|-------|---------|
-| `src/services/voucher.service.ts` | تحويل 2 console.log → productionLogger |
+| الملف                                             | التعديل                                |
+| ------------------------------------------------- | -------------------------------------- |
+| `src/services/voucher.service.ts`                 | تحويل 2 console.log → productionLogger |
 | `src/components/archive/UploadDocumentDialog.tsx` | تحويل 3 console.log → productionLogger |
 
 ### 16.3 الملفات الجديدة
 
-| الملف | الوصف |
-|-------|-------|
+| الملف                        | الوصف                    |
+| ---------------------------- | ------------------------ |
 | `docs/TYPE_SAFETY_REPORT.md` | تقرير استخدامات `as any` |
-| `docs/DEPRECATED_CODE.md` | الكود المُهمل وبدائله |
-| `docs/COMPONENT_REGISTRY.md` | سجل 400+ مكون |
-| `docs/SERVICE_REGISTRY.md` | سجل ~65 خدمة |
-| `docs/HOOK_REGISTRY.md` | سجل 300+ Hook |
+| `docs/DEPRECATED_CODE.md`    | الكود المُهمل وبدائله    |
+| `docs/COMPONENT_REGISTRY.md` | سجل 400+ مكون            |
+| `docs/SERVICE_REGISTRY.md`   | سجل ~65 خدمة             |
+| `docs/HOOK_REGISTRY.md`      | سجل 300+ Hook            |
 
 ### 16.4 التقييم النهائي
 
-| المعيار | النتيجة |
-|---------|---------|
-| **Console.log غير محمية** | 0 ✅ |
-| **RLS مفعّل** | 100% ✅ |
-| **أخطاء DB** | 0 ✅ |
-| **أخطاء Network** | 0 ✅ |
-| **التوثيق** | مكتمل ✅ |
-| **جاهزية الإنتاج** | 100% ✅ |
+| المعيار                   | النتيجة  |
+| ------------------------- | -------- |
+| **Console.log غير محمية** | 0 ✅     |
+| **RLS مفعّل**             | 100% ✅  |
+| **أخطاء DB**              | 0 ✅     |
+| **أخطاء Network**         | 0 ✅     |
+| **التوثيق**               | مكتمل ✅ |
+| **جاهزية الإنتاج**        | 100% ✅  |
 
 **التقييم: 100/100 - جاهز للنشر** 🚀
 
@@ -796,45 +826,45 @@ QUERY_CONFIG = {
 
 ### 17.1 نطاق الفحص
 
-| اللوحة | الملف | المكونات | النتيجة |
-|--------|-------|----------|---------|
-| الناظر | NazerDashboard.tsx | 19 | ✅ 100/100 |
-| المشرف | AdminDashboard.tsx | 12 | ✅ 100/100 |
-| المستفيد | BeneficiaryPortal.tsx | 15 | ✅ 100/100 |
-| المحاسب | AccountantDashboard.tsx | 10 | ✅ 100/100 |
-| الأرشيف | ArchivistDashboard.tsx | 8 | ✅ 100/100 |
+| اللوحة   | الملف                   | المكونات | النتيجة    |
+| -------- | ----------------------- | -------- | ---------- |
+| الناظر   | NazerDashboard.tsx      | 19       | ✅ 100/100 |
+| المشرف   | AdminDashboard.tsx      | 12       | ✅ 100/100 |
+| المستفيد | BeneficiaryPortal.tsx   | 15       | ✅ 100/100 |
+| المحاسب  | AccountantDashboard.tsx | 10       | ✅ 100/100 |
+| الأرشيف  | ArchivistDashboard.tsx  | 8        | ✅ 100/100 |
 
 ### 17.2 الأدلة الجنائية
 
-| النوع | النتيجة | الملف |
-|-------|---------|-------|
-| Console Errors | 0 | FORENSIC_SUMMARY.md |
-| Network Errors | 0 | FORENSIC_SUMMARY.md |
-| DB Errors | 0 | FORENSIC_SUMMARY.md |
-| أزرار ميتة | 0 | FORENSIC_BUTTON_AUDIT.md |
-| بيانات وهمية | 0 | FORENSIC_DATA_AUDIT.md |
+| النوع          | النتيجة | الملف                    |
+| -------------- | ------- | ------------------------ |
+| Console Errors | 0       | FORENSIC_SUMMARY.md      |
+| Network Errors | 0       | FORENSIC_SUMMARY.md      |
+| DB Errors      | 0       | FORENSIC_SUMMARY.md      |
+| أزرار ميتة     | 0       | FORENSIC_BUTTON_AUDIT.md |
+| بيانات وهمية   | 0       | FORENSIC_DATA_AUDIT.md   |
 
 ### 17.3 البيانات الحقيقية
 
-| المقياس | القيمة | المصدر |
-|---------|--------|--------|
-| المستفيدين النشطين | 14 | beneficiaries |
-| العقارات | 1 | properties |
-| العقود النشطة | 1 | contracts |
-| التحصيل | 1,300 ر.س | payment_vouchers |
-| التوزيعات | 995,000 ر.س | heir_distributions |
-| المستخدمين | 27 | profiles |
-| سجلات التدقيق | 3,162 | audit_logs |
+| المقياس            | القيمة      | المصدر             |
+| ------------------ | ----------- | ------------------ |
+| المستفيدين النشطين | 14          | beneficiaries      |
+| العقارات           | 1           | properties         |
+| العقود النشطة      | 1           | contracts          |
+| التحصيل            | 1,300 ر.س   | payment_vouchers   |
+| التوزيعات          | 995,000 ر.س | heir_distributions |
+| المستخدمين         | 27          | profiles           |
+| سجلات التدقيق      | 3,162       | audit_logs         |
 
 ### 17.4 ملفات الفحص الجنائي
 
-| الملف | الوصف |
-|-------|-------|
+| الملف                              | الوصف             |
+| ---------------------------------- | ----------------- |
 | `docs/FORENSIC_NAZER_DASHBOARD.md` | تقرير لوحة الناظر |
 | `docs/FORENSIC_ADMIN_DASHBOARD.md` | تقرير لوحة المشرف |
-| `docs/FORENSIC_BUTTON_AUDIT.md` | فحص الأزرار |
-| `docs/FORENSIC_DATA_AUDIT.md` | فحص البيانات |
-| `docs/FORENSIC_SUMMARY.md` | ملخص الفحص |
+| `docs/FORENSIC_BUTTON_AUDIT.md`    | فحص الأزرار       |
+| `docs/FORENSIC_DATA_AUDIT.md`      | فحص البيانات      |
+| `docs/FORENSIC_SUMMARY.md`         | ملخص الفحص        |
 
 ### 17.5 التوقيع
 

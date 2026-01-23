@@ -2,16 +2,24 @@
  * رسم بياني لنمو المستندات بمرور الوقت
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { ArchiveService } from "@/services/archive.service";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { TrendingUp } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ArchiveService } from '@/services/archive.service';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function DocumentsGrowthChart() {
   const { data: growthData, isLoading } = useQuery({
-    queryKey: ["documents-growth-chart"],
+    queryKey: ['documents-growth-chart'],
     queryFn: () => ArchiveService.getDocumentsGrowth(),
     staleTime: 5 * 60 * 1000,
   });
@@ -45,24 +53,15 @@ export function DocumentsGrowthChart() {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={growthData || []}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="month" 
-                tick={{ fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis 
-                tick={{ fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-              />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
                 }}
-                labelStyle={{ color: "hsl(var(--foreground))" }}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
               <Area
                 type="monotone"

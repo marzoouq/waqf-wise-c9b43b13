@@ -4,12 +4,12 @@
  * @version 2.9.11
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { MaintenanceService } from "@/services/maintenance.service";
-import type { PaginatedResult } from "@/lib/pagination.types";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { MaintenanceService } from '@/services/maintenance.service';
+import type { PaginatedResult } from '@/lib/pagination.types';
+import type { Database } from '@/integrations/supabase/types';
 
 type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['Row'] & {
   properties?: { name: string; location: string } | null;
@@ -28,33 +28,35 @@ interface UseMaintenanceRequestsPaginatedOptions {
   filters?: MaintenanceFilters;
 }
 
-export function useMaintenanceRequestsPaginated(options: UseMaintenanceRequestsPaginatedOptions = {}) {
+export function useMaintenanceRequestsPaginated(
+  options: UseMaintenanceRequestsPaginatedOptions = {}
+) {
   const { initialPage = 1, initialPageSize = 15, filters } = options;
-  
+
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const query = useQuery({
-    queryKey: [...QUERY_KEYS.MAINTENANCE_REQUESTS, "paginated", page, pageSize, filters],
+    queryKey: [...QUERY_KEYS.MAINTENANCE_REQUESTS, 'paginated', page, pageSize, filters],
     queryFn: async (): Promise<PaginatedResult<MaintenanceRequest>> => {
       const allRequests = await MaintenanceService.getRequestsWithProperties();
-      
+
       // تطبيق الفلاتر
       let filteredRequests = allRequests as MaintenanceRequest[];
-      
+
       if (filters?.status) {
-        filteredRequests = filteredRequests.filter(r => r.status === filters.status);
+        filteredRequests = filteredRequests.filter((r) => r.status === filters.status);
       }
       if (filters?.priority) {
-        filteredRequests = filteredRequests.filter(r => r.priority === filters.priority);
+        filteredRequests = filteredRequests.filter((r) => r.priority === filters.priority);
       }
       if (filters?.category) {
-        filteredRequests = filteredRequests.filter(r => r.category === filters.category);
+        filteredRequests = filteredRequests.filter((r) => r.category === filters.category);
       }
       if (filters?.propertyId) {
-        filteredRequests = filteredRequests.filter(r => r.property_id === filters.propertyId);
+        filteredRequests = filteredRequests.filter((r) => r.property_id === filters.propertyId);
       }
-      
+
       const totalItems = filteredRequests.length;
       const totalPages = Math.ceil(totalItems / pageSize);
       const startIndex = (page - 1) * pageSize;

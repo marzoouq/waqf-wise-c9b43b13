@@ -58,11 +58,7 @@ export function safeSort<T>(
 /**
  * Slice آمن يتحقق من وجود المصفوفة أولاً
  */
-export function safeSlice<T>(
-  array: T[] | undefined | null,
-  start?: number,
-  end?: number
-): T[] {
+export function safeSlice<T>(array: T[] | undefined | null, start?: number, end?: number): T[] {
   if (!Array.isArray(array)) {
     return [];
   }

@@ -13,19 +13,24 @@ interface ProtectedRouteProps {
   requiredRoles?: AppRole[];
 }
 
-export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  children,
+  requiredPermission,
+  requiredRole,
+  requiredRoles,
+}: ProtectedRouteProps) {
   const { user, isLoading: authLoading, roles, rolesLoading } = useAuth();
   const [loadingTooLong, setLoadingTooLong] = useState(false);
   const lastLoggedDecision = useRef<string>('');
 
   // ✅ Log الحالة عند التغيير فقط
   useEffect(() => {
-    debugLog('ProtectedRoute', 'تحديث الحالة', { 
-      authLoading, 
-      rolesLoading, 
-      hasUser: !!user, 
+    debugLog('ProtectedRoute', 'تحديث الحالة', {
+      authLoading,
+      rolesLoading,
+      hasUser: !!user,
       roles,
-      path: window.location.pathname 
+      path: window.location.pathname,
     });
   }, [authLoading, rolesLoading, user, roles]);
 
@@ -33,7 +38,7 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
   useEffect(() => {
     // لا حاجة للـ timer إذا انتهى التحميل
     if (!authLoading && !rolesLoading) return;
-    
+
     const timer = setTimeout(() => {
       debugLog('ProtectedRoute', '⏰ Timeout - تجاوز وقت التحميل');
       setLoadingTooLong(true);
@@ -56,7 +61,7 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
   // ✅ إصلاح: إذا الصفحة تتطلب دور معين، ننتظر حتى تنتهي rolesLoading
   const requiresRoleCheck = requiredRole || (requiredRoles && requiredRoles.length > 0);
   const isStillLoadingRoles = requiresRoleCheck && rolesLoading && !loadingTooLong;
-  
+
   // ✅ إذا استمر التحميل لأكثر من المدة المحددة، تجاوز التحميل
   if ((isLoading || isStillLoadingRoles) && !loadingTooLong) {
     logDecision('عرض Loader');
@@ -72,13 +77,13 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
     logDecision('توجيه للدخول - لا يوجد مستخدم');
     return <Navigate to="/login" replace />;
   }
-  
+
   // ✅ إذا لا يزال التحميل جاري ولكن تجاوزنا الـ timeout
   if (!user && authLoading && loadingTooLong) {
     logDecision('توجيه للدخول - timeout');
     return <Navigate to="/login" replace />;
   }
-  
+
   logDecision('السماح');
 
   // ✅ استخدام الأدوار من السياق فقط (بدون localStorage)
@@ -99,7 +104,7 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
 
   // التحقق من أي دور من الأدوار المطلوبة
   if (requiredRoles && requiredRoles.length > 0) {
-    const hasAnyRole = requiredRoles.some(role => effectiveRoles.includes(role));
+    const hasAnyRole = requiredRoles.some((role) => effectiveRoles.includes(role));
     if (!hasAnyRole) {
       return <Navigate to="/unauthorized" replace />;
     }

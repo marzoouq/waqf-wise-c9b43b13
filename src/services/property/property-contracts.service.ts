@@ -11,7 +11,9 @@ export class PropertyContractsService {
   /**
    * جلب العقود للعقار
    */
-  static async getContracts(propertyId: string): Promise<Database['public']['Tables']['contracts']['Row'][]> {
+  static async getContracts(
+    propertyId: string
+  ): Promise<Database['public']['Tables']['contracts']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('contracts')
@@ -30,7 +32,9 @@ export class PropertyContractsService {
   /**
    * جلب مدفوعات العقد
    */
-  static async getPayments(contractId: string): Promise<Database['public']['Tables']['rental_payments']['Row'][]> {
+  static async getPayments(
+    contractId: string
+  ): Promise<Database['public']['Tables']['rental_payments']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('rental_payments')
@@ -49,24 +53,28 @@ export class PropertyContractsService {
   /**
    * جلب المدفوعات مع نوع الدفع من العقود
    */
-  static async getRentalPaymentsWithFrequency(): Promise<{
-    amount_paid: number | null;
-    tax_amount: number | null;
-    contracts: {
-      payment_frequency: string | null;
-    } | null;
-  }[]> {
+  static async getRentalPaymentsWithFrequency(): Promise<
+    {
+      amount_paid: number | null;
+      tax_amount: number | null;
+      contracts: {
+        payment_frequency: string | null;
+      } | null;
+    }[]
+  > {
     try {
       const { data, error } = await supabase
-        .from("rental_payments")
-        .select(`
+        .from('rental_payments')
+        .select(
+          `
           amount_paid,
           tax_amount,
           contracts!inner (
             payment_frequency
           )
-        `)
-        .eq("status", "مدفوع");
+        `
+        )
+        .eq('status', 'مدفوع');
 
       if (error) throw error;
       return data || [];

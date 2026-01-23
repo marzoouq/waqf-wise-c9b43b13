@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MaintenanceService } from "@/services/maintenance.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { Database } from "@/integrations/supabase/types";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { MaintenanceService } from '@/services/maintenance.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { Database } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 type MaintenanceSchedule = Database['public']['Tables']['maintenance_schedules']['Row'];
 type MaintenanceScheduleInsert = Database['public']['Tables']['maintenance_schedules']['Insert'];
@@ -12,7 +12,12 @@ export const useMaintenanceSchedules = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: schedules = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: schedules = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES,
     queryFn: () => MaintenanceService.getSchedules(),
   });
@@ -22,15 +27,15 @@ export const useMaintenanceSchedules = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
-        title: "تم بنجاح",
-        description: "تم إضافة جدول الصيانة بنجاح",
+        title: 'تم بنجاح',
+        description: 'تم إضافة جدول الصيانة بنجاح',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
-        description: "فشل إضافة جدول الصيانة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل إضافة جدول الصيانة',
+        variant: 'destructive',
       });
       productionLogger.error('Error adding schedule:', error);
     },
@@ -42,15 +47,15 @@ export const useMaintenanceSchedules = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
-        title: "تم بنجاح",
-        description: "تم تحديث جدول الصيانة",
+        title: 'تم بنجاح',
+        description: 'تم تحديث جدول الصيانة',
       });
     },
     onError: () => {
       toast({
-        title: "خطأ",
-        description: "فشل تحديث جدول الصيانة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تحديث جدول الصيانة',
+        variant: 'destructive',
       });
     },
   });
@@ -60,15 +65,15 @@ export const useMaintenanceSchedules = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
-        title: "تم بنجاح",
-        description: "تم حذف جدول الصيانة",
+        title: 'تم بنجاح',
+        description: 'تم حذف جدول الصيانة',
       });
     },
     onError: () => {
       toast({
-        title: "خطأ",
-        description: "فشل حذف جدول الصيانة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل حذف جدول الصيانة',
+        variant: 'destructive',
       });
     },
   });

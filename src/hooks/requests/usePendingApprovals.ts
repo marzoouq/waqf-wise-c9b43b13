@@ -2,10 +2,10 @@
  * usePendingApprovals Hook - الموافقات المعلقة
  * يستخدم ApprovalService
  */
-import { useQuery } from "@tanstack/react-query";
-import { ApprovalService } from "@/services";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { ApprovalService } from '@/services';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface PendingApproval {
   id: string;

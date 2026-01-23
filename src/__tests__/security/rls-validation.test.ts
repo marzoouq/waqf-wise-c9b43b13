@@ -38,7 +38,7 @@ describe('RLS Policy Validation', () => {
         requiresAuth: true,
         condition: 'auth.uid() IS NOT NULL',
       };
-      
+
       expect(policy.requiresAuth).toBe(true);
       expect(policy.condition).toContain('auth.uid()');
     });
@@ -50,7 +50,7 @@ describe('RLS Policy Validation', () => {
         requiresAuth: true,
         condition: 'auth.uid() IS NOT NULL',
       };
-      
+
       expect(policy.requiresAuth).toBe(true);
     });
 
@@ -60,7 +60,7 @@ describe('RLS Policy Validation', () => {
         operation: 'ALL',
         requiresAuth: true,
       };
-      
+
       expect(policy.requiresAuth).toBe(true);
     });
   });
@@ -78,7 +78,7 @@ describe('RLS Policy Validation', () => {
         archivist: ['manage_documents', 'view_archive'],
       };
 
-      roles.forEach(role => {
+      roles.forEach((role) => {
         expect(rolePermissions[role]).toBeDefined();
         expect(rolePermissions[role].length).toBeGreaterThan(0);
       });

@@ -3,10 +3,10 @@
  * يجلب سندات الدفع والقبض مع الفلترة والبحث
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { VoucherService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { matchesStatus } from "@/lib/constants";
+import { useQuery } from '@tanstack/react-query';
+import { VoucherService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface PaymentVoucherWithDetails {
   id: string;
@@ -49,9 +49,9 @@ export function usePaymentVouchersData(searchTerm: string, selectedStatus: strin
 
   const stats: VoucherStats = {
     total: vouchers?.length || 0,
-    draft: vouchers?.filter(v => matchesStatus(v.status, 'draft')).length || 0,
-    approved: vouchers?.filter(v => matchesStatus(v.status, 'approved')).length || 0,
-    paid: vouchers?.filter(v => matchesStatus(v.status, 'paid')).length || 0,
+    draft: vouchers?.filter((v) => matchesStatus(v.status, 'draft')).length || 0,
+    approved: vouchers?.filter((v) => matchesStatus(v.status, 'approved')).length || 0,
+    paid: vouchers?.filter((v) => matchesStatus(v.status, 'paid')).length || 0,
     totalAmount: vouchers?.reduce((sum, v) => sum + v.amount, 0) || 0,
   };
 

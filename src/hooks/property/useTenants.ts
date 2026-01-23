@@ -6,13 +6,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/ui/use-toast';
 import { TenantService } from '@/services';
 import type { Tenant, TenantInsert, TenantWithBalance } from '@/types/tenants';
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useTenants() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: tenants = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: tenants = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.TENANTS,
     queryFn: (): Promise<TenantWithBalance[]> => TenantService.getTenantsWithBalance(),
   });
@@ -33,7 +38,7 @@ export function useTenants() {
   });
 
   const updateTenant = useMutation({
-    mutationFn: ({ id, ...data }: Partial<Tenant> & { id: string }) => 
+    mutationFn: ({ id, ...data }: Partial<Tenant> & { id: string }) =>
       TenantService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
@@ -80,7 +85,7 @@ export function useTenants() {
 export function useTenant(tenantId: string | undefined) {
   return useQuery({
     queryKey: QUERY_KEYS.TENANT(tenantId || ''),
-    queryFn: () => tenantId ? TenantService.getById(tenantId) : null,
+    queryFn: () => (tenantId ? TenantService.getById(tenantId) : null),
     enabled: !!tenantId,
   });
 }

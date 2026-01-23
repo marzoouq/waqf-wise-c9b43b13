@@ -1,4 +1,5 @@
 # قواعد الهيكل المعماري الصارمة
+
 # Strict Architecture Rules
 
 > **الإصدار**: 3.1.0  
@@ -13,16 +14,17 @@
 ```typescript
 // ❌ ممنوع - FORBIDDEN
 const data: any = fetchData();
-function process(item: any): any { }
-Promise<any>
+function process(item: any): any {}
+Promise<any>;
 
 // ✅ صحيح - CORRECT
 const data: UserData = fetchData();
-function process(item: BeneficiaryItem): ProcessedResult { }
-Promise<UserData>
+function process(item: BeneficiaryItem): ProcessedResult {}
+Promise<UserData>;
 ```
 
 **الاستثناءات المسموحة فقط**:
+
 - `eslint-disable-next-line @typescript-eslint/no-explicit-any` مع تبرير واضح
 - استخدام `unknown` بدلاً من `any` عند الضرورة
 
@@ -34,11 +36,11 @@ Promise<UserData>
 Component (UI) → Hook (State) → Service (Data) → Supabase
 ```
 
-| الطبقة | المسؤولية | ممنوع |
-|--------|-----------|-------|
-| **Component** | عرض UI فقط | ❌ استدعاء Supabase مباشرة |
-| **Hook** | إدارة الحالة + React Query | ❌ استدعاء Supabase (إلا Realtime) |
-| **Service** | استعلامات قاعدة البيانات | ❌ استخدام React hooks |
+| الطبقة        | المسؤولية                  | ممنوع                              |
+| ------------- | -------------------------- | ---------------------------------- |
+| **Component** | عرض UI فقط                 | ❌ استدعاء Supabase مباشرة         |
+| **Hook**      | إدارة الحالة + React Query | ❌ استدعاء Supabase (إلا Realtime) |
+| **Service**   | استعلامات قاعدة البيانات   | ❌ استخدام React hooks             |
 
 ---
 
@@ -53,6 +55,7 @@ const { data } = await supabase.from('users').select('*').eq('id', id).maybeSing
 ```
 
 **متى يُسمح بـ `.single()`**:
+
 - مع `insert().select().single()` - آمن (الـ insert يُرجع دائماً صف)
 - مع `update().eq().select().single()` - آمن نسبياً
 
@@ -126,18 +129,18 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 
 ## 📊 الإحصائيات الحالية
 
-| المقياس | العدد | الحالة |
-|---------|-------|--------|
-| استخدامات `any` في الخدمات | 0 | ✅ |
-| Components تستدعي Supabase | 0 | ✅ |
-| Pages تستدعي Supabase | 0 | ✅ |
-| Hooks تستخدم Services | 300+ | ✅ |
-| الخدمات الإجمالية | 60+ | ✅ |
-| استخدام `.maybeSingle()` | 474+ | ✅ |
-| QUERY_KEYS موحد | 350+ في 8 ملفات | ✅ |
-| RLS Policies | 675 | ✅ |
-| Database Triggers | 200 | ✅ |
-| Database Tables | 231 | ✅ |
+| المقياس                    | العدد           | الحالة |
+| -------------------------- | --------------- | ------ |
+| استخدامات `any` في الخدمات | 0               | ✅     |
+| Components تستدعي Supabase | 0               | ✅     |
+| Pages تستدعي Supabase      | 0               | ✅     |
+| Hooks تستخدم Services      | 300+            | ✅     |
+| الخدمات الإجمالية          | 60+             | ✅     |
+| استخدام `.maybeSingle()`   | 474+            | ✅     |
+| QUERY_KEYS موحد            | 350+ في 8 ملفات | ✅     |
+| RLS Policies               | 675             | ✅     |
+| Database Triggers          | 200             | ✅     |
+| Database Tables            | 231             | ✅     |
 
 ---
 
@@ -147,10 +150,10 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 // ✅ CORRECT - Use centralized keys
-useQuery({ 
-  queryKey: QUERY_KEYS.BENEFICIARIES, 
+useQuery({
+  queryKey: QUERY_KEYS.BENEFICIARIES,
   queryFn: () => BeneficiaryService.getAll(),
-  ...QUERY_CONFIG.DEFAULT
+  ...QUERY_CONFIG.DEFAULT,
 });
 
 // Available configs:
@@ -176,6 +179,7 @@ npx vitest run --coverage
 ```
 
 ### Test Setup
+
 - `src/test/setup.ts` - Global mocks (Supabase, sonner, matchMedia)
 - `src/__tests__/utils/test-utils.tsx` - Render with providers
 - Use `setMockTableData('tableName', rows)` to mock Supabase data
@@ -187,6 +191,7 @@ npx vitest run --coverage
 ### القواعد الإلزامية للفحص:
 
 #### 1. تحديد النطاق بدقة
+
 ```
 ✅ يُفحص (Production):
    - src/components/ (باستثناء developer/)
@@ -202,6 +207,7 @@ npx vitest run --coverage
 ```
 
 #### 2. التحقق متعدد الطبقات
+
 ```
 المستوى 1: البحث الأولي
    └── grep/search للنمط المطلوب
@@ -217,31 +223,33 @@ npx vitest run --coverage
 ```
 
 #### 3. التوثيق الدقيق
-| العنصر | مطلوب |
-|--------|-------|
-| اسم الملف | ✅ |
-| رقم السطر | ✅ |
-| السياق | ✅ |
-| التصنيف | إنتاج/تطوير/اختبار |
-| الإجراء | إصلاح/مقبول/تجاهل |
+
+| العنصر    | مطلوب              |
+| --------- | ------------------ |
+| اسم الملف | ✅                 |
+| رقم السطر | ✅                 |
+| السياق    | ✅                 |
+| التصنيف   | إنتاج/تطوير/اختبار |
+| الإجراء   | إصلاح/مقبول/تجاهل  |
 
 #### 4. فحص الألوان (Color Audit)
+
 ```typescript
 // ❌ ألوان مباشرة ممنوعة في الإنتاج
-bg-red-500, text-green-600, border-blue-400
+(bg - red - 500, text - green - 600, border - blue - 400);
 
 // ✅ استخدام semantic tokens
-bg-status-error, text-status-success, border-primary
-bg-heir-wife, text-heir-son, bg-heir-daughter
+(bg - status - error, text - status - success, border - primary);
+(bg - heir - wife, text - heir - son, bg - heir - daughter);
 ```
 
 ### 📊 إحصائيات الألوان الحالية:
 
-| النوع | العدد | الحالة |
-|-------|-------|--------|
-| Semantic Tokens مستخدمة | 601+ | ✅ |
-| ألوان مباشرة في developer/ | ~300 | ⚪ (غير إنتاجي) |
-| ألوان مباشرة في الإنتاج | ~15 | 🟡 (مقبول - أيقونات) |
+| النوع                      | العدد | الحالة               |
+| -------------------------- | ----- | -------------------- |
+| Semantic Tokens مستخدمة    | 601+  | ✅                   |
+| ألوان مباشرة في developer/ | ~300  | ⚪ (غير إنتاجي)      |
+| ألوان مباشرة في الإنتاج    | ~15   | 🟡 (مقبول - أيقونات) |
 
 ---
 

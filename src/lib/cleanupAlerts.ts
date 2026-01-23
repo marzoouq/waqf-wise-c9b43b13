@@ -107,14 +107,14 @@ export function cleanupLocalStorageErrors(): number {
   try {
     const errorLogsKey = 'error_logs';
     const errorLogs = localStorage.getItem(errorLogsKey);
-    
+
     if (!errorLogs) return 0;
 
     const logs = safeJsonParse<LocalErrorLog[]>(errorLogs, [], errorLogsKey);
     if (logs.length === 0) return 0;
-    
+
     const cutoffTime = Date.now() - 24 * 60 * 60 * 1000; // 24 ساعة
-    
+
     const recentLogs = logs.filter((log) => {
       const logTime = new Date(log.timestamp).getTime();
       return logTime > cutoffTime;
@@ -122,9 +122,9 @@ export function cleanupLocalStorageErrors(): number {
 
     // الاحتفاظ بآخر 50 خطأ فقط
     const trimmedLogs = recentLogs.slice(-50);
-    
+
     localStorage.setItem(errorLogsKey, JSON.stringify(trimmedLogs));
-    
+
     return logs.length - trimmedLogs.length;
   } catch (error) {
     productionLogger.error('Error cleaning localStorage', error);

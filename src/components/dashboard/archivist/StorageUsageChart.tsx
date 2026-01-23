@@ -2,25 +2,30 @@
  * رسم بياني لاستخدام المساحة حسب التصنيف
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { HardDrive } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { ArchiveService } from "@/services/archive.service";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { HardDrive } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ArchiveService } from '@/services/archive.service';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 const COLORS = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
 ];
 
 export function StorageUsageChart() {
-  const { data: storageData, isLoading, error, refetch } = useQuery({
-    queryKey: ["storage-usage-chart"],
+  const {
+    data: storageData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['storage-usage-chart'],
     queryFn: () => ArchiveService.getStorageUsageByCategory(),
     staleTime: 5 * 60 * 1000,
   });
@@ -44,7 +49,13 @@ export function StorageUsageChart() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل بيانات المساحة" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل بيانات المساحة"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -81,9 +92,9 @@ export function StorageUsageChart() {
                 <Tooltip
                   formatter={(value: number) => `${value} MB`}
                   contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
                   }}
                 />
                 <Legend />

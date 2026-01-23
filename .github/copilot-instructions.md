@@ -13,10 +13,11 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 **NEVER** call Supabase directly from components or pages. All data access flows through this layered architecture.
 
 ### Technology Stack
+
 - **Frontend:** React 18.3 + TypeScript 5.5+ + Vite + Tailwind CSS + shadcn/ui
 - **Backend:** Supabase (PostgreSQL 15 + Edge Functions + Row Level Security + Realtime)
 - **State:** React Query (TanStack Query) + AuthContext
-- **Testing:** Vitest (11,000+ tests in src/__tests__/) + Playwright (E2E in e2e/)
+- **Testing:** Vitest (11,000+ tests in src/**tests**/) + Playwright (E2E in e2e/)
 
 ## Directory Structure
 
@@ -48,6 +49,7 @@ supabase/
 ## Critical Rules
 
 ### 1. TypeScript Strictness
+
 ```typescript
 // ❌ FORBIDDEN - any type
 const data: any = fetchData();
@@ -57,6 +59,7 @@ const data: UserData = fetchData();
 ```
 
 ### 2. Supabase Query Safety
+
 ```typescript
 // ❌ DANGEROUS - throws if not found
 const { data } = await supabase.from('users').select('*').eq('id', id).single();
@@ -66,6 +69,7 @@ const { data } = await supabase.from('users').select('*').eq('id', id).maybeSing
 ```
 
 ### 3. Query Keys & Config (ALWAYS use centralized)
+
 ```typescript
 import { QUERY_KEYS, QUERY_CONFIG, CACHE_TIMES } from '@/infrastructure/react-query';
 
@@ -73,9 +77,9 @@ import { QUERY_KEYS, QUERY_CONFIG, CACHE_TIMES } from '@/infrastructure/react-qu
 // accounting.keys.ts, beneficiary.keys.ts, dashboard.keys.ts, payments.keys.ts,
 // properties.keys.ts, support.keys.ts, system.keys.ts, users.keys.ts
 useQuery({
-  queryKey: QUERY_KEYS.BENEFICIARIES, 
+  queryKey: QUERY_KEYS.BENEFICIARIES,
   queryFn: () => BeneficiaryService.getAll(),
-  ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus: false
+  ...QUERY_CONFIG.DEFAULT, // 2min stale, refetchOnWindowFocus: false
 });
 
 // Available configs (src/infrastructure/react-query/queryConfig.ts):
@@ -92,6 +96,7 @@ useQuery({
 **NEVER** create QUERY_CONFIG or CACHE_TIMES in other files. Always import from `@/infrastructure/react-query`.
 
 ### 4. Service Pattern (Facade for Large Services)
+
 ```typescript
 // Simple service (single file)
 import { BeneficiaryService } from '@/services';
@@ -115,7 +120,7 @@ export class BeneficiaryService {
       .from('beneficiaries')
       .select('*')
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -123,6 +128,7 @@ export class BeneficiaryService {
 ```
 
 ### 5. Cache Invalidation (BATCHED)
+
 ```typescript
 // ❌ WRONG - multiple individual calls
 queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
@@ -141,6 +147,7 @@ invalidateAccountingQueries(queryClient); // Invalidates all related queries in 
 ```
 
 ### 6. Realtime Subscriptions (Exception to service rule)
+
 ```typescript
 // Realtime acceptable in hooks via useEffect (requires lifecycle)
 useEffect(() => {
@@ -157,6 +164,7 @@ import { useNazerDashboardRealtime } from '@/hooks/nazer/useNazerDashboardRealti
 ```
 
 ### 7. Error Handling
+
 ```typescript
 import { handleError, showSuccess, createMutationErrorHandler } from '@/lib/errors';
 
@@ -164,20 +172,20 @@ import { handleError, showSuccess, createMutationErrorHandler } from '@/lib/erro
 useMutation({
   mutationFn: () => BeneficiaryService.create(data),
   onSuccess: () => showSuccess('تم الإنشاء بنجاح'),
-  onError: createMutationErrorHandler({ 
+  onError: createMutationErrorHandler({
     context: 'create-beneficiary',
-    severity: 'high'
-  })
+    severity: 'high',
+  }),
 });
 
 // Custom error handling
 try {
   await service.operation();
 } catch (error) {
-  handleError(error, { 
+  handleError(error, {
     context: { operation: 'create', component: 'BeneficiaryForm' },
     showToast: true,
-    severity: 'medium'
+    severity: 'medium',
   });
 }
 ```
@@ -187,36 +195,39 @@ Available severities: `'low' | 'medium' | 'high' | 'critical'`
 ## Design System
 
 ### Colors - Use Semantic Tokens ONLY
+
 ```typescript
 // ❌ FORBIDDEN - direct colors
-className="text-white bg-blue-500"
+className = 'text-white bg-blue-500';
 
 // ✅ REQUIRED - semantic tokens from index.css
-className="text-foreground bg-primary"
+className = 'text-foreground bg-primary';
 ```
 
 Key tokens: `--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--heir-wife`, `--heir-son`, `--heir-daughter`, `--status-success`, `--status-warning`, `--status-error`
 
 ### RTL Support
+
 All components must support Arabic RTL layout. Use `start/end` instead of `left/right`.
 
 ## Role-Based Access
 
-| Role | Arabic | Access Level |
-|------|--------|--------------|
-| nazer | الناظر | Full system control, approvals, visibility settings |
-| admin | المدير | System settings, users management |
-| accountant | المحاسب | Accounting, reports, financial operations |
-| cashier | أمين الصندوق | Payments, POS, collection center |
-| archivist | الأرشيفي | Documents, archive management |
-| beneficiary | المستفيد | Personal portal only (own data) |
-| waqf_heir | وريث الوقف | Full transparency view (all waqf data) |
+| Role        | Arabic       | Access Level                                        |
+| ----------- | ------------ | --------------------------------------------------- |
+| nazer       | الناظر       | Full system control, approvals, visibility settings |
+| admin       | المدير       | System settings, users management                   |
+| accountant  | المحاسب      | Accounting, reports, financial operations           |
+| cashier     | أمين الصندوق | Payments, POS, collection center                    |
+| archivist   | الأرشيفي     | Documents, archive management                       |
+| beneficiary | المستفيد     | Personal portal only (own data)                     |
+| waqf_heir   | وريث الوقف   | Full transparency view (all waqf data)              |
 
 Check `src/hooks/auth/usePermissions.ts` for permission patterns.
 
 ## Performance Patterns
 
 ### Parallel Queries (MANDATORY for dashboards)
+
 ```typescript
 // ❌ SLOW - sequential
 const beneficiaries = await BeneficiaryService.getAll();
@@ -231,6 +242,7 @@ const [beneficiaries, properties, payments] = await Promise.all([
 ```
 
 ### Lazy Tab Loading
+
 ```typescript
 // Use LazyTabContent for dashboard tabs
 <LazyTabContent isActive={activeTab === 'reports'}>
@@ -241,6 +253,7 @@ const [beneficiaries, properties, payments] = await Promise.all([
 ## Testing
 
 ### Commands
+
 ```bash
 npx vitest run          # Run all tests (11,000+ tests)
 npx vitest              # Interactive watch mode
@@ -251,6 +264,7 @@ npm run test:watch      # Alias for vitest watch
 ```
 
 ### Test Structure
+
 ```
 src/__tests__/
 ├── unit/
@@ -269,6 +283,7 @@ e2e/
 ```
 
 ### Test Utilities
+
 ```typescript
 import { render, screen } from '@/__tests__/utils/test-utils';
 import { setMockTableData } from '@/test/setup';
@@ -285,7 +300,7 @@ const createWrapper = () => ({ children }) => (
 
 - `docs/ARCHITECTURE_RULES.md` - Strict coding rules
 - `docs/ARCHITECTURE_DECISIONS.md` - All ADRs (Architecture Decision Records)
-- `src/services/README.md` - Service layer documentation  
+- `src/services/README.md` - Service layer documentation
 - `src/hooks/README.md` - Hooks organization
 - `src/routes/README.md` - Routing structure
 - `src/lib/query-keys/` - All query keys (400+ in 9 files)
@@ -300,6 +315,7 @@ const createWrapper = () => ({ children }) => (
 ### Before Modifying Protected Files
 
 Any file with `🔒 PROTECTED FILE` comment requires:
+
 1. Read the associated ADR in `docs/ARCHITECTURE_DECISIONS.md`
 2. Ensure changes comply with existing decisions
 3. If breaking an ADR, propose a new ADR first
@@ -308,24 +324,26 @@ Any file with `🔒 PROTECTED FILE` comment requires:
 ### ADR References in Code
 
 When you see these comments, understand their meaning:
+
 - `// ADR-001` - Tenant table closure (USING false)
 - `// ADR-004` - Limit restrictions (max 500 without pagination)
 - `// ADR-005` - Service Role usage in Edge Functions
 
 ### Protected File List
 
-| File | Protection Level | Reason |
-|------|-----------------|--------|
-| `supabase/functions/*` | 🔴 Critical | Backend security |
-| `src/lib/constants.ts` | 🟠 High | System-wide impact |
-| `src/hooks/dashboard/*` | 🟡 Medium | KPI accuracy |
-| `docs/ARCHITECTURE_DECISIONS.md` | 🔴 Critical | Governance |
+| File                             | Protection Level | Reason             |
+| -------------------------------- | ---------------- | ------------------ |
+| `supabase/functions/*`           | 🔴 Critical      | Backend security   |
+| `src/lib/constants.ts`           | 🟠 High          | System-wide impact |
+| `src/hooks/dashboard/*`          | 🟡 Medium        | KPI accuracy       |
+| `docs/ARCHITECTURE_DECISIONS.md` | 🔴 Critical      | Governance         |
 
 ### Golden Rule
 
 > ❗ **No ADR = No architectural change**
 
 If you need to break an existing ADR, you MUST:
+
 1. Document why in a new ADR
 2. Get explicit approval
 3. Update all affected files
@@ -335,6 +353,7 @@ If you need to break an existing ADR, you MUST:
 ## Development Workflow
 
 ### Build & Run
+
 ```bash
 npm run dev              # Start dev server (Vite)
 npm run build            # Production build
@@ -343,6 +362,7 @@ npm run lint             # ESLint check
 ```
 
 ### Edge Functions (Supabase)
+
 ```bash
 # In supabase/ directory
 supabase functions serve  # Local development
@@ -352,6 +372,7 @@ supabase functions deploy <function-name>  # Deploy
 **Important:** All Edge Functions use `SERVICE_ROLE_KEY` for secure database access (ADR-005).
 
 ### Database Migrations
+
 ```bash
 # NEVER use VACUUM in migrations (ADR-002)
 # Transactions don't allow VACUUM in Supabase migrations

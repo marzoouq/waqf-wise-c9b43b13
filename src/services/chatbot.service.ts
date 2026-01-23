@@ -2,7 +2,7 @@
  * Chatbot Service - خدمة المحادثات الآلية
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ChatMessage {
   id: string;
@@ -29,10 +29,10 @@ export class ChatbotService {
    */
   static async getConversations(userId: string) {
     const { data, error } = await supabase
-      .from("chatbot_conversations")
-      .select("id, message, message_type, created_at, quick_reply_id")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: true })
+      .from('chatbot_conversations')
+      .select('id, message, message_type, created_at, quick_reply_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
       .limit(100);
 
     if (error) throw error;
@@ -44,10 +44,10 @@ export class ChatbotService {
    */
   static async getQuickReplies() {
     const { data, error } = await supabase
-      .from("chatbot_quick_replies")
-      .select("id, text, icon, prompt, category, order_index, created_at, is_active")
-      .eq("is_active", true)
-      .order("order_index");
+      .from('chatbot_quick_replies')
+      .select('id, text, icon, prompt, category, order_index, created_at, is_active')
+      .eq('is_active', true)
+      .order('order_index');
 
     if (error) throw error;
     return data || [];
@@ -58,16 +58,16 @@ export class ChatbotService {
    */
   static async sendMessage(userId: string, message: string, quickReplyId?: string) {
     const { data, error } = await supabase.functions.invoke('chatbot', {
-      body: { 
-        message, 
+      body: {
+        message,
         userId,
-        quickReplyId 
-      }
+        quickReplyId,
+      },
     });
 
     if (error) throw error;
     if (!data.success) throw new Error(data.error || 'فشل في الحصول على الرد');
-    
+
     return data;
   }
 
@@ -76,13 +76,13 @@ export class ChatbotService {
    */
   static async clearConversations(userId: string) {
     const { error } = await supabase
-      .from("chatbot_conversations")
+      .from('chatbot_conversations')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: userId,
-        deletion_reason: 'مسح بواسطة المستخدم'
+        deletion_reason: 'مسح بواسطة المستخدم',
       })
-      .eq("user_id", userId);
+      .eq('user_id', userId);
 
     if (error) throw error;
   }

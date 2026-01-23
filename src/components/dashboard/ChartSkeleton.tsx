@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface ChartSkeletonProps {
   title?: string;
@@ -8,28 +8,26 @@ interface ChartSkeletonProps {
   showLegend?: boolean;
 }
 
-export function ChartSkeleton({ 
-  title, 
-  height = "h-[350px]",
-  showLegend = true 
+export function ChartSkeleton({
+  title,
+  height = 'h-[350px]',
+  showLegend = true,
 }: ChartSkeletonProps) {
   return (
     <Card>
       <CardHeader className="space-y-2">
-        {title && (
-          <Skeleton className="h-5 w-32" />
-        )}
+        {title && <Skeleton className="h-5 w-32" />}
         <Skeleton className="h-3 w-48" />
       </CardHeader>
       <CardContent>
-        <div className={cn("flex items-end justify-between gap-2", height)}>
+        <div className={cn('flex items-end justify-between gap-2', height)}>
           {[...Array(8)].map((_, i) => (
-            <Skeleton 
+            <Skeleton
               key={i}
               className="w-full animate-pulse"
-              style={{ 
+              style={{
                 height: `${Math.random() * 60 + 40}%`,
-                animationDelay: `${i * 100}ms`
+                animationDelay: `${i * 100}ms`,
               }}
             />
           ))}

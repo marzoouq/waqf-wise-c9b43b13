@@ -3,11 +3,11 @@
  * Hook لحساب التدفقات النقدية
  */
 
-import { useState } from "react";
-import { FiscalYearService } from "@/services/fiscal-year.service";
-import { useCashFlows } from "./useCashFlows";
-import { toast } from "sonner";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useState } from 'react';
+import { FiscalYearService } from '@/services/fiscal-year.service';
+import { useCashFlows } from './useCashFlows';
+import { toast } from 'sonner';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export function useCashFlowCalculation() {
   const { cashFlows, isLoading, calculateCashFlow } = useCashFlows();
@@ -19,7 +19,7 @@ export function useCashFlowCalculation() {
       const fiscalYear = await FiscalYearService.getActive();
 
       if (!fiscalYear) {
-        toast.error("لا توجد سنة مالية نشطة");
+        toast.error('لا توجد سنة مالية نشطة');
         return;
       }
 
@@ -29,11 +29,11 @@ export function useCashFlowCalculation() {
         periodEnd: fiscalYear.end_date,
       });
     } catch (error) {
-      productionLogger.error("Error calculating cash flow", error, {
+      productionLogger.error('Error calculating cash flow', error, {
         context: 'CashFlowCalculation',
         severity: 'medium',
       });
-      toast.error("حدث خطأ أثناء حساب التدفقات النقدية");
+      toast.error('حدث خطأ أثناء حساب التدفقات النقدية');
     } finally {
       setIsCalculating(false);
     }

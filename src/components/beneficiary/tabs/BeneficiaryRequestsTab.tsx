@@ -7,20 +7,20 @@
  * - زر عائم للجوال
  */
 
-import { useState, useMemo, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, FileText, RefreshCw } from "lucide-react";
-import { RequestSubmissionDialog } from "../RequestSubmissionDialog";
-import { RequestDetailsDialog } from "../RequestDetailsDialog";
-import { useBeneficiaryRequestsTab } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { useState, useMemo, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Search, FileText, RefreshCw } from 'lucide-react';
+import { RequestSubmissionDialog } from '../RequestSubmissionDialog';
+import { RequestDetailsDialog } from '../RequestDetailsDialog';
+import { useBeneficiaryRequestsTab } from '@/hooks/beneficiary/useBeneficiaryTabsData';
 import {
   BeneficiaryRequestsStatsCards,
   BeneficiaryRequestMobileCard,
   BeneficiaryRequestsDesktopTable,
   FloatingActionButton,
-} from "./requests";
+} from './requests';
 
 interface BeneficiaryRequestsTabProps {
   beneficiaryId: string;
@@ -48,11 +48,11 @@ interface BeneficiaryRequest {
 export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
 
   const { data: rawRequests = [], isLoading, refetch } = useBeneficiaryRequestsTab(beneficiaryId);
-  
+
   // تحويل البيانات للنوع المتوقع
   const requests = useMemo(() => {
     return rawRequests.map((r) => ({
@@ -63,11 +63,11 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
 
   // حساب الإحصائيات
   const stats = useMemo(() => {
-    const pending = requests.filter((r) => 
-      r.status === "معلق" || r.status === "قيد المراجعة"
+    const pending = requests.filter(
+      (r) => r.status === 'معلق' || r.status === 'قيد المراجعة'
     ).length;
-    const approved = requests.filter((r) => r.status === "معتمد").length;
-    const rejected = requests.filter((r) => r.status === "مرفوض").length;
+    const approved = requests.filter((r) => r.status === 'معتمد').length;
+    const rejected = requests.filter((r) => r.status === 'مرفوض').length;
     const overdue = requests.filter((r) => r.is_overdue).length;
 
     return {
@@ -85,18 +85,16 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
 
     // فلترة حسب الحالة
     switch (activeFilter) {
-      case "pending":
-        result = result.filter((r) => 
-          r.status === "معلق" || r.status === "قيد المراجعة"
-        );
+      case 'pending':
+        result = result.filter((r) => r.status === 'معلق' || r.status === 'قيد المراجعة');
         break;
-      case "approved":
-        result = result.filter((r) => r.status === "معتمد");
+      case 'approved':
+        result = result.filter((r) => r.status === 'معتمد');
         break;
-      case "rejected":
-        result = result.filter((r) => r.status === "مرفوض");
+      case 'rejected':
+        result = result.filter((r) => r.status === 'مرفوض');
         break;
-      case "overdue":
+      case 'overdue':
         result = result.filter((r) => r.is_overdue);
         break;
     }
@@ -104,10 +102,11 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
     // فلترة حسب البحث
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter((r) =>
-        (r.request_number?.toLowerCase().includes(query)) ||
-        (r.description?.toLowerCase().includes(query)) ||
-        (r.request_types?.name_ar?.toLowerCase().includes(query))
+      result = result.filter(
+        (r) =>
+          r.request_number?.toLowerCase().includes(query) ||
+          r.description?.toLowerCase().includes(query) ||
+          r.request_types?.name_ar?.toLowerCase().includes(query)
       );
     }
 
@@ -149,15 +148,10 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
                 جميع الطلبات المقدمة مع حالتها الحالية
               </CardDescription>
             </div>
-            
+
             {/* أزرار الإجراءات - مخفية على الجوال */}
             <div className="hidden md:flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                disabled={isLoading}
-              >
+              <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 ms-1 ${isLoading ? 'animate-spin' : ''}`} />
                 تحديث
               </Button>
@@ -194,16 +188,12 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
               <div className="text-center py-12">
                 <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
                 <p className="text-muted-foreground">
-                  {searchQuery || activeFilter !== "all"
-                    ? "لا توجد طلبات تطابق معايير البحث"
-                    : "لا توجد طلبات مقدمة بعد"}
+                  {searchQuery || activeFilter !== 'all'
+                    ? 'لا توجد طلبات تطابق معايير البحث'
+                    : 'لا توجد طلبات مقدمة بعد'}
                 </p>
-                {!searchQuery && activeFilter === "all" && (
-                  <Button
-                    variant="link"
-                    onClick={() => setIsDialogOpen(true)}
-                    className="mt-2"
-                  >
+                {!searchQuery && activeFilter === 'all' && (
+                  <Button variant="link" onClick={() => setIsDialogOpen(true)} className="mt-2">
                     قدم طلبك الأول
                   </Button>
                 )}
@@ -232,7 +222,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
       <FloatingActionButton onClick={() => setIsDialogOpen(true)} />
 
       {/* مربعات الحوار */}
-      <RequestSubmissionDialog 
+      <RequestSubmissionDialog
         beneficiaryId={beneficiaryId}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

@@ -11,7 +11,9 @@ export class PropertyMaintenanceService {
   /**
    * جلب طلبات الصيانة للعقار
    */
-  static async getMaintenanceRequests(propertyId: string): Promise<Database['public']['Tables']['maintenance_requests']['Row'][]> {
+  static async getMaintenanceRequests(
+    propertyId: string
+  ): Promise<Database['public']['Tables']['maintenance_requests']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('maintenance_requests')
@@ -30,7 +32,9 @@ export class PropertyMaintenanceService {
   /**
    * جلب مزودي الصيانة
    */
-  static async getMaintenanceProviders(): Promise<Database['public']['Tables']['maintenance_providers']['Row'][]> {
+  static async getMaintenanceProviders(): Promise<
+    Database['public']['Tables']['maintenance_providers']['Row'][]
+  > {
     try {
       const { data, error } = await supabase
         .from('maintenance_providers')
@@ -49,7 +53,9 @@ export class PropertyMaintenanceService {
   /**
    * إضافة مزود صيانة
    */
-  static async addMaintenanceProvider(provider: Omit<Database['public']['Tables']['maintenance_providers']['Insert'], 'id'>): Promise<Database['public']['Tables']['maintenance_providers']['Row']> {
+  static async addMaintenanceProvider(
+    provider: Omit<Database['public']['Tables']['maintenance_providers']['Insert'], 'id'>
+  ): Promise<Database['public']['Tables']['maintenance_providers']['Row']> {
     try {
       const { data, error } = await supabase
         .from('maintenance_providers')

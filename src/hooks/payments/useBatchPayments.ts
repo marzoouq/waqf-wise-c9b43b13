@@ -80,12 +80,7 @@ export function useBatchPayments(distributionId?: string) {
 
   // إنشاء عدة جداول مجدولة (تقسيم توزيع إلى دفعات)
   const createBatchSchedules = useCallback(
-    async (
-      distId: string,
-      totalAmount: number,
-      numberOfBatches: number,
-      startDate: Date
-    ) => {
+    async (distId: string, totalAmount: number, numberOfBatches: number, startDate: Date) => {
       const amountPerBatch = totalAmount / numberOfBatches;
       const schedulesToCreate = [];
 

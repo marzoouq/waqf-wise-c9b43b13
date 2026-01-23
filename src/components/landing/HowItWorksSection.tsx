@@ -1,29 +1,29 @@
-import { UserPlus, Settings, PieChart, CheckCircle } from "lucide-react";
+import { UserPlus, Settings, PieChart, CheckCircle } from 'lucide-react';
 
 const steps = [
   {
     icon: UserPlus,
-    title: "إنشاء حساب",
-    description: "سجل حساباً جديداً وأدخل بيانات الوقف الأساسية",
-    step: "01",
+    title: 'إنشاء حساب',
+    description: 'سجل حساباً جديداً وأدخل بيانات الوقف الأساسية',
+    step: '01',
   },
   {
     icon: Settings,
-    title: "إعداد النظام",
-    description: "أضف المستفيدين والعقارات وقواعد التوزيع",
-    step: "02",
+    title: 'إعداد النظام',
+    description: 'أضف المستفيدين والعقارات وقواعد التوزيع',
+    step: '02',
   },
   {
     icon: PieChart,
-    title: "إدارة الغلة",
-    description: "سجل الإيرادات وقم بتوزيعها على المستفيدين",
-    step: "03",
+    title: 'إدارة الغلة',
+    description: 'سجل الإيرادات وقم بتوزيعها على المستفيدين',
+    step: '03',
   },
   {
     icon: CheckCircle,
-    title: "متابعة النتائج",
-    description: "راقب التقارير وتتبع أداء الوقف بشفافية",
-    step: "04",
+    title: 'متابعة النتائج',
+    description: 'راقب التقارير وتتبع أداء الوقف بشفافية',
+    step: '04',
   },
 ];
 

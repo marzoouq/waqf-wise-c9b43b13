@@ -82,9 +82,7 @@ export function useAbortableEdgeFunction<T = unknown>(
             error: 'انتهت مهلة الطلب',
           }));
           onTimeout?.();
-          productionLogger.warn(
-            `Edge function ${functionName} timed out after ${timeout}ms`
-          );
+          productionLogger.warn(`Edge function ${functionName} timed out after ${timeout}ms`);
         }
       }, timeout);
 
@@ -128,8 +126,7 @@ export function useAbortableEdgeFunction<T = unknown>(
         }
 
         if (mountedRef.current && requestId === currentRequestRef.current) {
-          const errorMessage =
-            err instanceof Error ? err.message : 'حدث خطأ غير متوقع';
+          const errorMessage = err instanceof Error ? err.message : 'حدث خطأ غير متوقع';
           setState((prev) => ({ ...prev, isLoading: false, error: errorMessage }));
           onError?.(err instanceof Error ? err : new Error(errorMessage));
         }
@@ -142,7 +139,7 @@ export function useAbortableEdgeFunction<T = unknown>(
   const cancel = useCallback(() => {
     // إلغاء بزيادة request ID
     currentRequestRef.current++;
-    
+
     // تنظيف timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);

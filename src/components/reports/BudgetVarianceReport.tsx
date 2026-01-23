@@ -1,6 +1,19 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { TrendingUp, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -8,14 +21,14 @@ import { Progress } from '@/components/ui/progress';
 import { useBudgetVarianceReport } from '@/hooks/reports/useBudgetVarianceReport';
 
 export function BudgetVarianceReport() {
-  const { 
-    fiscalYears, 
-    budgets, 
-    summary, 
-    selectedFiscalYear, 
-    setSelectedFiscalYear, 
+  const {
+    fiscalYears,
+    budgets,
+    summary,
+    selectedFiscalYear,
+    setSelectedFiscalYear,
     getVarianceStatus,
-    isLoading 
+    isLoading,
   } = useBudgetVarianceReport();
 
   const getVarianceBadge = (variance: number) => {
@@ -61,9 +74,7 @@ export function BudgetVarianceReport() {
               <Card>
                 <CardContent className="pt-4">
                   <div className="text-sm text-muted-foreground">إجمالي المخطط</div>
-                  <div className="text-2xl font-bold">
-                    {formatCurrency(summary.totalBudgeted)}
-                  </div>
+                  <div className="text-2xl font-bold">{formatCurrency(summary.totalBudgeted)}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -77,7 +88,9 @@ export function BudgetVarianceReport() {
               <Card>
                 <CardContent className="pt-4">
                   <div className="text-sm text-muted-foreground">إجمالي الانحراف</div>
-                  <div className={`text-2xl font-bold ${summary.totalVariance >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  <div
+                    className={`text-2xl font-bold ${summary.totalVariance >= 0 ? 'text-success' : 'text-destructive'}`}
+                  >
                     {formatCurrency(Math.abs(summary.totalVariance))}
                   </div>
                 </CardContent>
@@ -119,9 +132,10 @@ export function BudgetVarianceReport() {
                   ) : (
                     budgets.map((budget) => {
                       const variance = budget.variance_amount || 0;
-                      const utilization = budget.budgeted_amount > 0
-                        ? ((budget.actual_amount || 0) / budget.budgeted_amount) * 100
-                        : 0;
+                      const utilization =
+                        budget.budgeted_amount > 0
+                          ? ((budget.actual_amount || 0) / budget.budgeted_amount) * 100
+                          : 0;
                       const status = getVarianceStatus(variance, budget.budgeted_amount);
 
                       return (
@@ -133,7 +147,9 @@ export function BudgetVarianceReport() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {budget.period_type === 'annual' ? 'سنوي' : `الفترة ${budget.period_number}`}
+                            {budget.period_type === 'annual'
+                              ? 'سنوي'
+                              : `الفترة ${budget.period_number}`}
                           </TableCell>
                           <TableCell className="text-end font-mono">
                             {formatCurrency(budget.budgeted_amount)}
@@ -143,7 +159,8 @@ export function BudgetVarianceReport() {
                           </TableCell>
                           <TableCell className="text-end font-mono">
                             <span className={variance >= 0 ? 'text-success' : 'text-destructive'}>
-                              {variance >= 0 ? '+' : ''}{formatCurrency(Math.abs(variance))}
+                              {variance >= 0 ? '+' : ''}
+                              {formatCurrency(Math.abs(variance))}
                             </span>
                           </TableCell>
                           <TableCell>

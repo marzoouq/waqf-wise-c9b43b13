@@ -7,7 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AdvancedFiltersDialog, FilterConfig, FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
+import {
+  AdvancedFiltersDialog,
+  FilterConfig,
+  FiltersRecord,
+} from '@/components/shared/AdvancedFiltersDialog';
 import { STATUS_OPTIONS, PRIORITY_OPTIONS } from '@/lib/request-constants';
 import { useQuery } from '@tanstack/react-query';
 import { RequestService } from '@/services/request.service';
@@ -77,10 +81,10 @@ export function RequestsFilters({
           autoComplete="off"
         />
       </div>
-      
+
       {/* فلتر الحالة */}
       <Select value={statusFilter} onValueChange={onStatusChange} name="status-filter">
-        <SelectTrigger 
+        <SelectTrigger
           id="status-filter"
           className="w-full sm:w-[160px] text-sm"
           aria-label="تصفية حسب الحالة"
@@ -89,7 +93,7 @@ export function RequestsFilters({
           <SelectValue placeholder="الحالة" />
         </SelectTrigger>
         <SelectContent>
-          {STATUS_OPTIONS.map(option => (
+          {STATUS_OPTIONS.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
@@ -98,8 +102,12 @@ export function RequestsFilters({
       </Select>
 
       {/* فلتر نوع الطلب */}
-      <Select value={requestTypeFilter} onValueChange={onRequestTypeChange} name="request-type-filter">
-        <SelectTrigger 
+      <Select
+        value={requestTypeFilter}
+        onValueChange={onRequestTypeChange}
+        name="request-type-filter"
+      >
+        <SelectTrigger
           id="request-type-filter"
           className="w-full sm:w-[180px] text-sm"
           aria-label="تصفية حسب نوع الطلب"
@@ -108,7 +116,7 @@ export function RequestsFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">جميع الأنواع</SelectItem>
-          {requestTypes.map(type => (
+          {requestTypes.map((type) => (
             <SelectItem key={type.id} value={type.id}>
               {type.name_ar}
             </SelectItem>

@@ -25,26 +25,32 @@ src/components/
 ## 🎯 مبادئ التصميم
 
 ### 1. المكونات الصغيرة والمركزة
+
 كل مكون يجب أن يكون مسؤولاً عن وظيفة واحدة فقط.
 
 ### 2. إعادة الاستخدام
+
 استخدم مكونات `ui/` الأساسية وأنشئ مكونات مركبة.
 
 ### 3. التجاوب (Responsive)
+
 كل مكون يجب أن يعمل على جميع أحجام الشاشات.
 
 ### 4. RTL Support
+
 جميع المكونات تدعم اللغة العربية والاتجاه من اليمين لليسار.
 
 ## 📋 أمثلة الاستيراد
 
 ### من مجلد فرعي مع barrel export
+
 ```typescript
 import { RequestsStatsCards, RequestsFilters } from '@/components/requests';
 import { FamiliesStatsCards, FamiliesFilters } from '@/components/families';
 ```
 
 ### من الملف مباشرة
+
 ```typescript
 import { BeneficiaryCard } from '@/components/beneficiary/BeneficiaryCard';
 ```
@@ -67,13 +73,13 @@ interface ComponentProps {
 export function ComponentName({ title, onAction }: ComponentProps) {
   // 3.1 State
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // 3.2 Handlers
   const handleClick = () => {
     setIsOpen(true);
     onAction?.();
   };
-  
+
   // 3.3 Render
   return (
     <Card>
@@ -87,6 +93,7 @@ export function ComponentName({ title, onAction }: ComponentProps) {
 ## 📱 المكونات المتجاوبة
 
 ### مكونات الموبايل
+
 - `MobileCard` - بطاقة للموبايل
 - `MobileStatementCard` - كشف حساب موبايل
 - `MobileDistributionCard` - توزيع موبايل
@@ -95,12 +102,13 @@ export function ComponentName({ title, onAction }: ComponentProps) {
 - `FamilyMobileCard` - عائلة موبايل
 
 ### استخدام useIsMobile
+
 ```typescript
 import { useIsMobile } from '@/hooks/use-mobile';
 
 function MyComponent() {
   const isMobile = useIsMobile();
-  
+
   return isMobile ? <MobileView /> : <DesktopView />;
 }
 ```
@@ -108,6 +116,7 @@ function MyComponent() {
 ## 🎨 التنسيق
 
 ### استخدام Design Tokens
+
 ```typescript
 // ✅ صحيح - استخدام tokens
 <div className="bg-background text-foreground border-border">
@@ -117,6 +126,7 @@ function MyComponent() {
 ```
 
 ### التجاوب
+
 ```typescript
 // Mobile-first approach
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

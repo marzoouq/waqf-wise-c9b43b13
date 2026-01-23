@@ -7,20 +7,21 @@
 
 ## 1. ملخص الفحص
 
-| اللوحة | عدد الأزرار | تعمل | لا تعمل |
-|--------|------------|------|---------|
-| الناظر | 4 | 4 | 0 |
-| المشرف | 3 | 3 | 0 |
-| المستفيد | 3 | 3 | 0 |
-| المحاسب | 2 | 2 | 0 |
-| الأرشيف | 2 | 2 | 0 |
-| **الإجمالي** | **14** | **14** | **0** |
+| اللوحة       | عدد الأزرار | تعمل   | لا تعمل |
+| ------------ | ----------- | ------ | ------- |
+| الناظر       | 4           | 4      | 0       |
+| المشرف       | 3           | 3      | 0       |
+| المستفيد     | 3           | 3      | 0       |
+| المحاسب      | 2           | 2      | 0       |
+| الأرشيف      | 2           | 2      | 0       |
+| **الإجمالي** | **14**      | **14** | **0**   |
 
 ---
 
 ## 2. أزرار لوحة الناظر (NazerDashboard)
 
 ### 2.1 زر توزيع الغلة
+
 ```yaml
 الموقع: NazerDashboard.tsx → تبويب التحكم
 المكون: DistributeRevenueDialog
@@ -35,6 +36,7 @@ onClick: () => setDistributeDialogOpen(true)
 ```
 
 ### 2.2 زر نشر السنة المالية
+
 ```yaml
 الموقع: NazerDashboard.tsx → تبويب التحكم
 المكون: PublishFiscalYearDialog
@@ -48,6 +50,7 @@ onClick: () => setPublishDialogOpen(true)
 ```
 
 ### 2.3 زر إرسال رسالة
+
 ```yaml
 الموقع: NazerDashboard.tsx → شريط الإجراءات
 المكون: SendMessageDialog
@@ -63,6 +66,7 @@ onClick: () => setMessageDialogOpen(true)
 ```
 
 ### 2.4 زر إشعار المستفيدين
+
 ```yaml
 الموقع: NazerDashboard.tsx → شريط الإجراءات
 المكون: NotifyBeneficiariesDialog
@@ -81,6 +85,7 @@ onClick: Dialog trigger
 ## 3. أزرار لوحة المشرف (AdminDashboard)
 
 ### 3.1 زر إرسال رسالة
+
 ```yaml
 الموقع: AdminDashboard.tsx → شريط الإجراءات
 المكون: SendMessageDialog
@@ -91,6 +96,7 @@ onClick: () => setMessageDialogOpen(true)
 ```
 
 ### 3.2 زر عرض جميع المستخدمين
+
 ```yaml
 الموقع: UserManagementSection.tsx
 onClick: () => navigate('/users')
@@ -100,6 +106,7 @@ onClick: () => navigate('/users')
 ```
 
 ### 3.3 زر عرض جميع سجلات التدقيق
+
 ```yaml
 الموقع: AuditLogsPreview.tsx
 onClick: () => navigate('/audit-logs')
@@ -113,6 +120,7 @@ onClick: () => navigate('/audit-logs')
 ## 4. أزرار بوابة المستفيد (BeneficiaryPortal)
 
 ### 4.1 زر طلب جديد
+
 ```yaml
 الموقع: BeneficiaryRequestsTab.tsx
 المكون: RequestSubmissionDialog
@@ -128,6 +136,7 @@ onClick: () => setRequestDialogOpen(true)
 ```
 
 ### 4.2 زر تحديث البيانات
+
 ```yaml
 الموقع: OverviewSection.tsx → QuickActionsGrid
 onClick: () => navigate('/beneficiary-portal?tab=profile')
@@ -137,6 +146,7 @@ onClick: () => navigate('/beneficiary-portal?tab=profile')
 ```
 
 ### 4.3 زر التحديث (Refresh)
+
 ```yaml
 الموقع: BeneficiaryPortal.tsx
 onClick: () => refetch()
@@ -150,6 +160,7 @@ onClick: () => refetch()
 ## 5. أزرار لوحة المحاسب (AccountantDashboard)
 
 ### 5.1 زر اعتماد القيد
+
 ```yaml
 الموقع: PendingApprovalsList.tsx
 المكون: ApproveJournalDialog
@@ -160,6 +171,7 @@ onClick: () => setApproveDialogOpen(true)
 ```
 
 ### 5.2 زر رفض القيد
+
 ```yaml
 الموقع: PendingApprovalsList.tsx
 المكون: RejectJournalDialog
@@ -174,6 +186,7 @@ onClick: () => setRejectDialogOpen(true)
 ## 6. أزرار لوحة الأرشيف (ArchivistDashboard)
 
 ### 6.1 زر رفع مستند
+
 ```yaml
 الموقع: ArchivistDashboard.tsx
 المكون: UploadDocumentDialog
@@ -184,6 +197,7 @@ onClick: () => setUploadDialogOpen(true)
 ```
 
 ### 6.2 زر إنشاء مجلد
+
 ```yaml
 الموقع: ArchivistDashboard.tsx
 المكون: CreateFolderDialog
@@ -198,18 +212,21 @@ onClick: () => setFolderDialogOpen(true)
 ## 7. التحقق من الأزرار الميتة
 
 ### 7.1 بحث onClick={undefined}
+
 ```bash
 البحث في: src/pages/, src/components/
 النتيجة: 0 نتائج
 ```
 
 ### 7.2 بحث onClick={() => {}}
+
 ```bash
 البحث في: src/pages/, src/components/
 النتيجة: 0 نتائج
 ```
 
 ### 7.3 بحث onClick={null}
+
 ```bash
 البحث في: src/pages/, src/components/
 النتيجة: 0 نتائج
@@ -219,12 +236,12 @@ onClick: () => setFolderDialogOpen(true)
 
 ## 8. الخلاصة
 
-| المعيار | النتيجة |
-|---------|---------|
-| أزرار بدون onClick | 0 ❌ |
-| أزرار بـ onClick فارغ | 0 ❌ |
-| أزرار لا تستجيب | 0 ❌ |
-| أزرار بدون إجراء | 0 ❌ |
+| المعيار               | النتيجة  |
+| --------------------- | -------- |
+| أزرار بدون onClick    | 0 ❌     |
+| أزرار بـ onClick فارغ | 0 ❌     |
+| أزرار لا تستجيب       | 0 ❌     |
+| أزرار بدون إجراء      | 0 ❌     |
 | **جميع الأزرار تعمل** | ✅ 14/14 |
 
 ---

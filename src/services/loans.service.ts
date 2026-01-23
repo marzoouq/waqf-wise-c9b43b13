@@ -1,13 +1,13 @@
 /**
  * Loans Service - خدمة القروض
- * 
+ *
  * إدارة القروض والأقساط والسداد
  * @version 1.1.0 - مع دعم matchesStatus
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import { matchesStatus } from "@/lib/constants";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import { matchesStatus } from '@/lib/constants';
 
 type Loan = Database['public']['Tables']['loans']['Row'];
 type LoanInsert = Database['public']['Tables']['loans']['Insert'];
@@ -37,11 +37,11 @@ export class LoansService {
       .select('*')
       .is('deleted_at', null) // استبعاد المحذوفة
       .order('created_at', { ascending: false });
-    
+
     if (status) {
       query = query.eq('status', status);
     }
-    
+
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
@@ -53,14 +53,16 @@ export class LoansService {
   static async getById(id: string): Promise<LoanWithInstallments | null> {
     const { data: loan, error } = await supabase
       .from('loans')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries(full_name, national_id),
         loan_installments(*)
-      `)
+      `
+      )
       .eq('id', id)
       .maybeSingle();
-    
+
     if (error) throw error;
     return loan as LoanWithInstallments | null;
   }
@@ -69,12 +71,8 @@ export class LoansService {
    * إنشاء قرض جديد
    */
   static async create(loan: LoanInsert): Promise<Loan> {
-    const { data, error } = await supabase
-      .from('loans')
-      .insert(loan)
-      .select()
-      .maybeSingle();
-    
+    const { data, error } = await supabase.from('loans').insert(loan).select().maybeSingle();
+
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء القرض');
     return data;
@@ -90,7 +88,7 @@ export class LoansService {
       .eq('id', id)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) throw new Error('القرض غير موجود');
     return data;
@@ -105,7 +103,7 @@ export class LoansService {
       .select('*')
       .eq('beneficiary_id', beneficiaryId)
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -115,14 +113,14 @@ export class LoansService {
    */
   static async getOverdueInstallments(): Promise<LoanInstallment[]> {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const { data, error } = await supabase
       .from('loan_installments')
       .select('*')
       .eq('status', 'معلق')
       .lt('due_date', today)
       .order('due_date', { ascending: true });
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -133,7 +131,9 @@ export class LoansService {
   static async getInstallments(loanId?: string): Promise<LoanInstallment[]> {
     let query = supabase
       .from('loan_installments')
-      .select('id, loan_id, installment_number, due_date, principal_amount, interest_amount, total_amount, paid_amount, remaining_amount, status, paid_at, created_at')
+      .select(
+        'id, loan_id, installment_number, due_date, principal_amount, interest_amount, total_amount, paid_amount, remaining_amount, status, paid_at, created_at'
+      )
       .order('installment_number', { ascending: true });
 
     if (loanId) {
@@ -150,7 +150,12 @@ export class LoansService {
    */
   static async updateInstallment(
     id: string,
-    updates: { paid_amount: number; remaining_amount: number; status: string; paid_at?: string | null }
+    updates: {
+      paid_amount: number;
+      remaining_amount: number;
+      status: string;
+      paid_at?: string | null;
+    }
   ): Promise<LoanInstallment> {
     const { data, error } = await supabase
       .from('loan_installments')
@@ -158,7 +163,7 @@ export class LoansService {
       .eq('id', id)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) throw new Error('القسط غير موجود');
     return data;
@@ -168,8 +173,8 @@ export class LoansService {
    * تسجيل سداد قسط
    */
   static async payInstallment(
-    installmentId: string, 
-    amount: number, 
+    installmentId: string,
+    amount: number,
     paymentMethod: string
   ): Promise<LoanInstallment> {
     const { data, error } = await supabase
@@ -183,7 +188,7 @@ export class LoansService {
       .eq('id', installmentId)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) throw new Error('القسط غير موجود');
     return data;
@@ -200,13 +205,13 @@ export class LoansService {
 
     const loans = loansRes.data || [];
     const installments = installmentsRes.data || [];
-    
+
     const today = new Date().toISOString().split('T')[0];
-    const overdueInstallments = installments.filter(i => 
-      i.status === 'معلق' && i.due_date < today
+    const overdueInstallments = installments.filter(
+      (i) => i.status === 'معلق' && i.due_date < today
     ).length;
 
-    const activeLoans = loans.filter(l => matchesStatus(l.status, 'active')).length;
+    const activeLoans = loans.filter((l) => matchesStatus(l.status, 'active')).length;
     const totalAmount = loans.reduce((sum, l) => sum + (l.loan_amount || 0), 0);
 
     return {
@@ -227,7 +232,7 @@ export class LoansService {
       .from('emergency_aid')
       .select(`*, beneficiaries (full_name, national_id, phone)`)
       .order('requested_date', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -248,7 +253,7 @@ export class LoansService {
       .insert([aid])
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء الفزعة');
     return data;
@@ -257,21 +262,24 @@ export class LoansService {
   /**
    * تحديث فزعة طارئة
    */
-  static async updateEmergencyAid(id: string, updates: {
-    status?: string;
-    notes?: string;
-    approved_by?: string;
-    approved_date?: string;
-    disbursed_by?: string;
-    disbursed_date?: string;
-  }) {
+  static async updateEmergencyAid(
+    id: string,
+    updates: {
+      status?: string;
+      notes?: string;
+      approved_by?: string;
+      approved_date?: string;
+      disbursed_by?: string;
+      disbursed_date?: string;
+    }
+  ) {
     const { data, error } = await supabase
       .from('emergency_aid')
       .update(updates)
       .eq('id', id)
       .select()
       .maybeSingle();
-    
+
     if (error) throw error;
     if (!data) throw new Error('الفزعة غير موجودة');
     return data;
@@ -281,17 +289,19 @@ export class LoansService {
    * حذف فزعة طارئة (Soft Delete)
    */
   static async deleteEmergencyAid(id: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('emergency_aid')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id,
-        deletion_reason: 'حذف بواسطة المستخدم'
+        deletion_reason: 'حذف بواسطة المستخدم',
       })
       .eq('id', id);
-    
+
     if (error) throw error;
   }
 
@@ -301,18 +311,20 @@ export class LoansService {
   static async getAllWithBeneficiary() {
     const { data, error } = await supabase
       .from('loans')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries (
           full_name,
           national_id
         )
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    
-    return (data || []).map(loan => ({
+
+    return (data || []).map((loan) => ({
       ...loan,
       beneficiary: loan.beneficiaries,
     }));
@@ -324,7 +336,9 @@ export class LoansService {
   static async getLoanPayments(loanId?: string) {
     let query = supabase
       .from('loan_payments')
-      .select('id, loan_id, installment_id, payment_number, payment_amount, payment_date, payment_method, journal_entry_id, notes, created_at')
+      .select(
+        'id, loan_id, installment_id, payment_number, payment_amount, payment_date, payment_method, journal_entry_id, notes, created_at'
+      )
       .order('created_at', { ascending: false });
 
     if (loanId) {
@@ -390,11 +404,13 @@ export class LoansService {
   static async getLoansWithApprovals() {
     const { data, error } = await supabase
       .from('loans')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries(full_name, national_id),
         loan_approvals(*)
-      `)
+      `
+      )
       .in('status', ['pending', 'active'])
       .order('created_at', { ascending: false });
 
@@ -406,18 +422,15 @@ export class LoansService {
    * تحديث موافقة قرض
    */
   static async updateLoanApproval(
-    approvalId: string, 
-    updates: { 
-      status: string; 
-      notes: string; 
-      approved_at: string; 
-      approver_id?: string 
+    approvalId: string,
+    updates: {
+      status: string;
+      notes: string;
+      approved_at: string;
+      approver_id?: string;
     }
   ) {
-    const { error } = await supabase
-      .from('loan_approvals')
-      .update(updates)
-      .eq('id', approvalId);
+    const { error } = await supabase.from('loan_approvals').update(updates).eq('id', approvalId);
 
     if (error) throw error;
   }
@@ -455,41 +468,45 @@ export class LoansService {
   static async getAgingReport() {
     const { data: loans, error } = await supabase
       .from('loans')
-      .select(`
+      .select(
+        `
         id,
         loan_number,
         loan_amount,
         start_date,
         status,
         beneficiaries!inner(full_name)
-      `)
+      `
+      )
       .in('status', ['active', 'defaulted']);
-    
+
     if (error) throw error;
 
-    return (loans || []).map((loan) => {
-      const totalPaid = 0;
-      const remainingBalance = Number(loan.loan_amount) - totalPaid;
-      const daysOverdue = 0;
-      
-      let agingCategory = 'حديث (0-30 يوم)';
-      if (daysOverdue > 90) agingCategory = 'خطير (90+ يوم)';
-      else if (daysOverdue > 60) agingCategory = 'متأخر جداً (60-90 يوم)';
-      else if (daysOverdue > 30) agingCategory = 'متأخر (30-60 يوم)';
+    return (loans || [])
+      .map((loan) => {
+        const totalPaid = 0;
+        const remainingBalance = Number(loan.loan_amount) - totalPaid;
+        const daysOverdue = 0;
 
-      const beneficiaryData = loan.beneficiaries as unknown as { full_name: string };
+        let agingCategory = 'حديث (0-30 يوم)';
+        if (daysOverdue > 90) agingCategory = 'خطير (90+ يوم)';
+        else if (daysOverdue > 60) agingCategory = 'متأخر جداً (60-90 يوم)';
+        else if (daysOverdue > 30) agingCategory = 'متأخر (30-60 يوم)';
 
-      return {
-        loan_id: loan.id,
-        loan_number: loan.loan_number,
-        beneficiary_name: beneficiaryData?.full_name || 'غير محدد',
-        principal_amount: Number(loan.loan_amount),
-        total_paid: totalPaid,
-        remaining_balance: remainingBalance,
-        days_overdue: daysOverdue,
-        aging_category: agingCategory,
-      };
-    }).sort((a, b) => b.days_overdue - a.days_overdue);
+        const beneficiaryData = loan.beneficiaries as unknown as { full_name: string };
+
+        return {
+          loan_id: loan.id,
+          loan_number: loan.loan_number,
+          beneficiary_name: beneficiaryData?.full_name || 'غير محدد',
+          principal_amount: Number(loan.loan_amount),
+          total_paid: totalPaid,
+          remaining_balance: remainingBalance,
+          days_overdue: daysOverdue,
+          aging_category: agingCategory,
+        };
+      })
+      .sort((a, b) => b.days_overdue - a.days_overdue);
   }
 
   // =====================
@@ -502,13 +519,15 @@ export class LoansService {
   static async getPendingEmergencyRequests() {
     const { data, error } = await supabase
       .from('emergency_aid_requests')
-      .select(`
+      .select(
+        `
         *,
         beneficiaries!inner(
           full_name,
           national_id
         )
-      `)
+      `
+      )
       .eq('status', 'معلق')
       .order('sla_due_at', { ascending: true });
 
@@ -519,11 +538,7 @@ export class LoansService {
   /**
    * الموافقة على طلب فزعة
    */
-  static async approveEmergencyRequest(
-    id: string, 
-    amount: number, 
-    notes?: string
-  ): Promise<void> {
+  static async approveEmergencyRequest(id: string, amount: number, notes?: string): Promise<void> {
     const { error } = await supabase
       .from('emergency_aid_requests')
       .update({

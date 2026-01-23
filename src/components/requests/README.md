@@ -15,12 +15,13 @@ src/components/requests/
 ## 📋 المكونات
 
 ### RequestsDesktopView
+
 عرض الطلبات لشاشات سطح المكتب مع جدول تفصيلي.
 
 ```typescript
 import { RequestsDesktopView } from '@/components/requests';
 
-<RequestsDesktopView 
+<RequestsDesktopView
   requests={requests}
   onView={handleView}
   onApprove={handleApprove}
@@ -29,12 +30,13 @@ import { RequestsDesktopView } from '@/components/requests';
 ```
 
 ### RequestsMobileView
+
 عرض الطلبات للجوال باستخدام بطاقات.
 
 ```typescript
 import { RequestsMobileView } from '@/components/requests';
 
-<RequestsMobileView 
+<RequestsMobileView
   requests={requests}
   onView={handleView}
   onApprove={handleApprove}
@@ -42,12 +44,13 @@ import { RequestsMobileView } from '@/components/requests';
 ```
 
 ### RequestsDialogs
+
 حوارات إنشاء وتعديل وعرض الطلبات.
 
 ```typescript
 import { RequestsDialogs } from '@/components/requests';
 
-<RequestsDialogs 
+<RequestsDialogs
   isOpen={isOpen}
   onClose={onClose}
   request={selectedRequest}

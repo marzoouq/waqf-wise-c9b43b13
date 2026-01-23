@@ -15,7 +15,12 @@ export interface TestRun {
   pass_rate: number;
   avg_duration: number;
   categories_summary: Record<string, { passed: number; failed: number; total: number }>;
-  failed_tests_details: Array<{ testId: string; testName: string; category: string; message: string }>;
+  failed_tests_details: Array<{
+    testId: string;
+    testName: string;
+    category: string;
+    message: string;
+  }>;
   triggered_by: string;
   run_duration_seconds: number;
   created_by: string | null;
@@ -36,7 +41,11 @@ export function useTestHistory() {
   const queryClient = useQueryClient();
 
   // جلب آخر 30 تشغيل
-  const { data: history = [], isLoading, refetch } = useQuery({
+  const {
+    data: history = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['test-runs-history'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -61,17 +70,19 @@ export function useTestHistory() {
       notes?: string;
     }) => {
       const { results, totalTests, runDurationSeconds, triggeredBy = 'manual', notes } = params;
-      
-      const passed = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
+
+      const passed = results.filter((r) => r.success).length;
+      const failed = results.filter((r) => !r.success).length;
       const passRate = results.length > 0 ? (passed / results.length) * 100 : 0;
-      const avgDuration = results.length > 0 
-        ? Math.round(results.reduce((sum, r) => sum + r.duration, 0) / results.length)
-        : 0;
+      const avgDuration =
+        results.length > 0
+          ? Math.round(results.reduce((sum, r) => sum + r.duration, 0) / results.length)
+          : 0;
 
       // تجميع الفئات
-      const categoriesSummary: Record<string, { passed: number; failed: number; total: number }> = {};
-      results.forEach(r => {
+      const categoriesSummary: Record<string, { passed: number; failed: number; total: number }> =
+        {};
+      results.forEach((r) => {
         if (!categoriesSummary[r.category]) {
           categoriesSummary[r.category] = { passed: 0, failed: 0, total: 0 };
         }
@@ -85,12 +96,12 @@ export function useTestHistory() {
 
       // تفاصيل الاختبارات الفاشلة
       const failedDetails = results
-        .filter(r => !r.success)
-        .map(r => ({
+        .filter((r) => !r.success)
+        .map((r) => ({
           testId: r.testId,
           testName: r.testName,
           category: r.category,
-          message: r.message || 'فشل بدون رسالة'
+          message: r.message || 'فشل بدون رسالة',
         }));
 
       const { data: userData } = await supabase.auth.getUser();
@@ -108,7 +119,7 @@ export function useTestHistory() {
           triggered_by: triggeredBy,
           run_duration_seconds: runDurationSeconds,
           created_by: userData?.user?.id || null,
-          notes
+          notes,
         })
         .select()
         .maybeSingle();
@@ -124,16 +135,13 @@ export function useTestHistory() {
     onError: (error: Error) => {
       console.error('Error saving test run:', error);
       toastError('فشل حفظ النتيجة: ' + error.message);
-    }
+    },
   });
 
   // حذف سجل
   const deleteRunMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('test_runs')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('test_runs').delete().eq('id', id);
 
       if (error) throw error;
     },
@@ -143,21 +151,32 @@ export function useTestHistory() {
     },
     onError: (error: Error) => {
       toastError('فشل الحذف: ' + error.message);
-    }
+    },
   });
 
   // حساب الإحصائيات
   const stats = {
     totalRuns: history.length,
-    avgPassRate: history.length > 0 
-      ? Number((history.reduce((sum, r) => sum + Number(r.pass_rate), 0) / history.length).toFixed(1))
-      : 0,
-    bestRun: history.length > 0 
-      ? history.reduce((best, r) => Number(r.pass_rate) > Number(best.pass_rate) ? r : best, history[0])
-      : null,
-    worstRun: history.length > 0
-      ? history.reduce((worst, r) => Number(r.pass_rate) < Number(worst.pass_rate) ? r : worst, history[0])
-      : null,
+    avgPassRate:
+      history.length > 0
+        ? Number(
+            (history.reduce((sum, r) => sum + Number(r.pass_rate), 0) / history.length).toFixed(1)
+          )
+        : 0,
+    bestRun:
+      history.length > 0
+        ? history.reduce(
+            (best, r) => (Number(r.pass_rate) > Number(best.pass_rate) ? r : best),
+            history[0]
+          )
+        : null,
+    worstRun:
+      history.length > 0
+        ? history.reduce(
+            (worst, r) => (Number(r.pass_rate) < Number(worst.pass_rate) ? r : worst),
+            history[0]
+          )
+        : null,
     trend: calculateTrend(history),
     recentFailures: getRecentFailures(history),
   };
@@ -196,9 +215,9 @@ function calculateTrend(history: TestRun[]): 'improving' | 'declining' | 'stable
 function getRecentFailures(history: TestRun[]): Array<{ testName: string; count: number }> {
   const failureCounts: Record<string, number> = {};
 
-  history.slice(0, 10).forEach(run => {
+  history.slice(0, 10).forEach((run) => {
     const details = run.failed_tests_details as Array<{ testName: string }>;
-    details?.forEach(f => {
+    details?.forEach((f) => {
       failureCounts[f.testName] = (failureCounts[f.testName] || 0) + 1;
     });
   });

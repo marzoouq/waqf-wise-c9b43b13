@@ -1,48 +1,55 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Building2, Home, MapPin, Calendar, EyeOff } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
-import { MobilePropertyCard } from "../cards/MobilePropertyCard";
-import { MobileContractCard } from "../cards/MobileContractCard";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useBeneficiaryProperties } from "@/hooks/beneficiary/useBeneficiaryProperties";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Building2, Home, MapPin, Calendar, EyeOff } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useFiscalYearPublishInfo } from '@/hooks/fiscal-years';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
+import { MobilePropertyCard } from '../cards/MobilePropertyCard';
+import { MobileContractCard } from '../cards/MobileContractCard';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useBeneficiaryProperties } from '@/hooks/beneficiary/useBeneficiaryProperties';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   const isMobile = useIsMobile();
-  
+
   const { properties, contracts, isLoading } = useBeneficiaryProperties(
     isCurrentYearPublished,
     publishStatusLoading
   );
 
   const getPropertyTypeBadge = (type: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "outline" }> = {
-      "سكني": { variant: "default" },
-      "تجاري": { variant: "secondary" },
-      "زراعي": { variant: "outline" },
+    const config: Record<string, { variant: 'default' | 'secondary' | 'outline' }> = {
+      سكني: { variant: 'default' },
+      تجاري: { variant: 'secondary' },
+      زراعي: { variant: 'outline' },
     };
 
-    return <Badge variant={config[type]?.variant || "secondary"}>{type}</Badge>;
+    return <Badge variant={config[type]?.variant || 'secondary'}>{type}</Badge>;
   };
 
   const getContractStatusBadge = (status: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
-      "نشط": { variant: "default" },
-      "منتهي": { variant: "destructive" },
-      "معلق": { variant: "secondary" },
+    const config: Record<string, { variant: 'default' | 'secondary' | 'destructive' }> = {
+      نشط: { variant: 'default' },
+      منتهي: { variant: 'destructive' },
+      معلق: { variant: 'secondary' },
     };
 
-    return <Badge variant={config[status]?.variant || "secondary"}>{status}</Badge>;
+    return <Badge variant={config[status]?.variant || 'secondary'}>{status}</Badge>;
   };
 
   return (
@@ -85,10 +92,13 @@ export function BeneficiaryPropertiesTab() {
             ) : settings?.show_property_revenues ? (
               <>
                 <MaskedValue
-                  value={contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")}
+                  value={contracts
+                    .reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0)
+                    .toLocaleString('ar-SA')}
                   type="amount"
                   masked={settings?.mask_exact_amounts || false}
-                /> ريال
+                />{' '}
+                ريال
               </>
             ) : (
               <span className="text-sm text-muted-foreground">غير مصرح</span>
@@ -110,9 +120,7 @@ export function BeneficiaryPropertiesTab() {
           {isLoading ? (
             <div className="text-center py-8">جاري التحميل...</div>
           ) : properties.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">
-              لا توجد عقارات مسجلة
-            </div>
+            <div className="text-center text-muted-foreground py-8">لا توجد عقارات مسجلة</div>
           ) : isMobile ? (
             // عرض البطاقات على الجوال
             <div className="grid gap-4">
@@ -141,14 +149,14 @@ export function BeneficiaryPropertiesTab() {
                           <Building2 className="h-4 w-4 text-muted-foreground" />
                           {property.name}
                         </TableCell>
-                        <TableCell>{getPropertyTypeBadge(property.type || "سكني")}</TableCell>
+                        <TableCell>{getPropertyTypeBadge(property.type || 'سكني')}</TableCell>
                         <TableCell className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                           {property.location}
                         </TableCell>
                         <TableCell>—</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{property.status || "نشط"}</Badge>
+                          <Badge variant="outline">{property.status || 'نشط'}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -174,84 +182,87 @@ export function BeneficiaryPropertiesTab() {
             </Alert>
           )}
           <Card>
-          <CardHeader>
-            <CardTitle>عقود الإيجار النشطة</CardTitle>
-            <CardDescription>العقود الحالية مع المستأجرين</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="text-center py-8">جاري التحميل...</div>
-            ) : contracts.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">
-                لا توجد عقود نشطة حالياً
-              </div>
-            ) : isMobile ? (
-              // عرض البطاقات على الجوال
-              <div className="grid gap-4">
-                {contracts.map((contract) => (
-                  <MobileContractCard
-                    key={contract.id}
-                    contract={contract}
-                    masked={settings?.mask_exact_amounts || false}
-                    showRevenue={settings?.show_property_revenues || false}
-                    maskTenant={settings?.mask_tenant_info || false}
-                  />
-                ))}
-              </div>
-            ) : (
-              // عرض الجدول على الديسكتوب
-              <ScrollArea className="w-full">
-                <div className="rounded-md border">
-                  <Table className="min-w-max">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-right">رقم العقد</TableHead>
-                        <TableHead className="text-right">العقار</TableHead>
-                        <TableHead className="text-right">المستأجر</TableHead>
-                        <TableHead className="text-right">الإيجار الشهري</TableHead>
-                        <TableHead className="text-right">تاريخ البداية</TableHead>
-                        <TableHead className="text-right">تاريخ الانتهاء</TableHead>
-                        <TableHead className="text-right">الحالة</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {contracts.map((contract) => (
-                        <TableRow key={contract.id}>
-                          <TableCell className="font-medium">{contract.contract_number}</TableCell>
-                          <TableCell>
-                            {contract.properties?.name || "—"}
-                          </TableCell>
-                          <TableCell>
-                            {settings?.mask_tenant_info ? "مستأجر" : contract.tenant_name}
-                          </TableCell>
-                          <TableCell className="font-semibold">
-                            {settings?.show_property_revenues ? (
-                              <>
-                                <MaskedValue
-                                  value={Number(contract.monthly_rent).toLocaleString("ar-SA")}
-                                  type="amount"
-                                  masked={settings?.mask_exact_amounts || false}
-                                /> ريال
-                              </>
-                            ) : "—"}
-                          </TableCell>
-                          <TableCell>
-                            {format(new Date(contract.start_date), "dd/MM/yyyy", { locale: ar })}
-                          </TableCell>
-                          <TableCell>
-                            {format(new Date(contract.end_date), "dd/MM/yyyy", { locale: ar })}
-                          </TableCell>
-                          <TableCell>{getContractStatusBadge(contract.status)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+            <CardHeader>
+              <CardTitle>عقود الإيجار النشطة</CardTitle>
+              <CardDescription>العقود الحالية مع المستأجرين</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="text-center py-8">جاري التحميل...</div>
+              ) : contracts.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  لا توجد عقود نشطة حالياً
                 </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
+              ) : isMobile ? (
+                // عرض البطاقات على الجوال
+                <div className="grid gap-4">
+                  {contracts.map((contract) => (
+                    <MobileContractCard
+                      key={contract.id}
+                      contract={contract}
+                      masked={settings?.mask_exact_amounts || false}
+                      showRevenue={settings?.show_property_revenues || false}
+                      maskTenant={settings?.mask_tenant_info || false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                // عرض الجدول على الديسكتوب
+                <ScrollArea className="w-full">
+                  <div className="rounded-md border">
+                    <Table className="min-w-max">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-right">رقم العقد</TableHead>
+                          <TableHead className="text-right">العقار</TableHead>
+                          <TableHead className="text-right">المستأجر</TableHead>
+                          <TableHead className="text-right">الإيجار الشهري</TableHead>
+                          <TableHead className="text-right">تاريخ البداية</TableHead>
+                          <TableHead className="text-right">تاريخ الانتهاء</TableHead>
+                          <TableHead className="text-right">الحالة</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {contracts.map((contract) => (
+                          <TableRow key={contract.id}>
+                            <TableCell className="font-medium">
+                              {contract.contract_number}
+                            </TableCell>
+                            <TableCell>{contract.properties?.name || '—'}</TableCell>
+                            <TableCell>
+                              {settings?.mask_tenant_info ? 'مستأجر' : contract.tenant_name}
+                            </TableCell>
+                            <TableCell className="font-semibold">
+                              {settings?.show_property_revenues ? (
+                                <>
+                                  <MaskedValue
+                                    value={Number(contract.monthly_rent).toLocaleString('ar-SA')}
+                                    type="amount"
+                                    masked={settings?.mask_exact_amounts || false}
+                                  />{' '}
+                                  ريال
+                                </>
+                              ) : (
+                                '—'
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {format(new Date(contract.start_date), 'dd/MM/yyyy', { locale: ar })}
+                            </TableCell>
+                            <TableCell>
+                              {format(new Date(contract.end_date), 'dd/MM/yyyy', { locale: ar })}
+                            </TableCell>
+                            <TableCell>{getContractStatusBadge(contract.status)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

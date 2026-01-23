@@ -14,7 +14,7 @@ export const DASHBOARD_KEYS = {
   CASHIER_STATS: ['cashier-stats'] as const,
   KPIS: (category?: string) => ['kpis', category] as const,
   DASHBOARD_KPIS: ['dashboard-kpis'] as const,
-  
+
   // Dashboard Data
   DASHBOARD_BENEFICIARIES: (timeRange?: string) => ['dashboard-beneficiaries', timeRange] as const,
   DASHBOARD_PAYMENTS: (timeRange?: string) => ['dashboard-payments', timeRange] as const,
@@ -34,7 +34,7 @@ export const DASHBOARD_KEYS = {
   AI_INSIGHTS: ['ai-insights'] as const,
   SMART_ALERTS: ['smart-alerts'] as const,
   ADMIN_ALERTS: ['admin-alerts'] as const,
-  
+
   // Performance
   PERFORMANCE_METRICS_DATA: ['performance-metrics-data'] as const,
 } as const;

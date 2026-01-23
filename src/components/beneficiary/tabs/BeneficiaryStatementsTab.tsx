@@ -3,22 +3,38 @@
  * يركز على: الرصيد الافتتاحي، الإيداعات، السحوبات، الرصيد الختامي
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Download, FileText, Wallet, ArrowDownToLine, ArrowUpFromLine, Scale, TrendingUp, TrendingDown } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { toast } from "sonner";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
-import { formatCurrency } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import {
+  Download,
+  FileText,
+  Wallet,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Scale,
+  TrendingUp,
+  TrendingDown,
+} from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useBeneficiaryStatements } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { useBeneficiaryDistributions } from '@/hooks/beneficiary/useBeneficiaryDistributions';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { toast } from 'sonner';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { useBeneficiaryExport } from '@/hooks/beneficiary/useBeneficiaryExport';
+import { formatCurrency } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -38,7 +54,8 @@ interface Transaction {
 export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatementsTabProps) {
   const { settings } = useVisibilitySettings();
   const { isLoading: paymentsLoading } = useBeneficiaryStatements(beneficiaryId);
-  const { distributions, isLoading: distributionsLoading } = useBeneficiaryDistributions(beneficiaryId);
+  const { distributions, isLoading: distributionsLoading } =
+    useBeneficiaryDistributions(beneficiaryId);
   const { exportJournalEntries } = useBeneficiaryExport();
   const isMobile = useIsMobile();
 
@@ -50,7 +67,7 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
     const previousTotal = distributions
       .slice(index + 1)
       .reduce((sum, d) => sum + (d.share_amount || 0), 0);
-    
+
     return {
       id: dist.id,
       date: dist.distribution_date,
@@ -64,8 +81,12 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
   });
 
   // حساب الإحصائيات
-  const totalCredits = transactions.filter(t => t.type === 'credit').reduce((sum, t) => sum + t.amount, 0);
-  const totalDebits = transactions.filter(t => t.type === 'debit').reduce((sum, t) => sum + t.amount, 0);
+  const totalCredits = transactions
+    .filter((t) => t.type === 'credit')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalDebits = transactions
+    .filter((t) => t.type === 'debit')
+    .reduce((sum, t) => sum + t.amount, 0);
   const currentBalance = totalCredits - totalDebits;
 
   const handleExport = async () => {
@@ -79,13 +100,15 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
 
       // تصدير المعاملات
       const headers = ['التاريخ', 'الوصف', 'النوع', 'المبلغ', 'الرصيد'];
-      const rows = transactions.map(t => [
-        format(new Date(t.date), "dd/MM/yyyy", { locale: ar }),
-        t.description,
-        t.type === 'credit' ? 'إيداع' : 'سحب',
-        t.amount.toFixed(2),
-        t.balance.toFixed(2),
-      ].join(','));
+      const rows = transactions.map((t) =>
+        [
+          format(new Date(t.date), 'dd/MM/yyyy', { locale: ar }),
+          t.description,
+          t.type === 'credit' ? 'إيداع' : 'سحب',
+          t.amount.toFixed(2),
+          t.balance.toFixed(2),
+        ].join(',')
+      );
 
       const csv = [headers.join(','), ...rows].join('\n');
       const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -224,7 +247,7 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                         <div>
                           <p className="text-sm font-medium">{transaction.description}</p>
                           <p className="text-xs text-muted-foreground">
-                            {format(new Date(transaction.date), "dd/MM/yyyy", { locale: ar })}
+                            {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ar })}
                           </p>
                         </div>
                       </div>
@@ -234,7 +257,9 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t">
                       <span className="text-sm text-muted-foreground">المبلغ</span>
-                      <span className={`font-bold ${transaction.type === 'credit' ? 'text-success' : 'text-destructive'}`}>
+                      <span
+                        className={`font-bold ${transaction.type === 'credit' ? 'text-success' : 'text-destructive'}`}
+                      >
                         {transaction.type === 'credit' ? '+' : '-'}
                         {masked ? (
                           <MaskedValue value={String(transaction.amount)} type="amount" masked />
@@ -264,7 +289,7 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                     {transactions.map((transaction) => (
                       <TableRow key={transaction.id}>
                         <TableCell className="text-sm">
-                          {format(new Date(transaction.date), "dd/MM/yyyy", { locale: ar })}
+                          {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ar })}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -277,7 +302,10 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={transaction.type === 'credit' ? 'default' : 'destructive'} className="gap-1">
+                          <Badge
+                            variant={transaction.type === 'credit' ? 'default' : 'destructive'}
+                            className="gap-1"
+                          >
                             {transaction.type === 'credit' ? (
                               <>
                                 <ArrowDownToLine className="h-3 w-3" />
@@ -291,7 +319,9 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                             )}
                           </Badge>
                         </TableCell>
-                        <TableCell className={`font-semibold ${transaction.type === 'credit' ? 'text-success' : 'text-destructive'}`}>
+                        <TableCell
+                          className={`font-semibold ${transaction.type === 'credit' ? 'text-success' : 'text-destructive'}`}
+                        >
                           {transaction.type === 'credit' ? '+' : '-'}
                           {masked ? (
                             <MaskedValue value={String(transaction.amount)} type="amount" masked />

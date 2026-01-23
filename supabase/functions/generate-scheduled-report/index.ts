@@ -1,10 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse 
-} from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -22,27 +18,31 @@ serve(async (req) => {
           return jsonResponse({
             status: 'healthy',
             function: 'generate-scheduled-report',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-      } catch { /* not JSON, continue */ }
+      } catch {
+        /* not JSON, continue */
+      }
     }
 
     // ✅ CRON_SECRET Authentication Support (for scheduled jobs)
-    const cronSecret = Deno.env.get("CRON_SECRET");
-    const providedSecret = requestBody.cron_secret || req.headers.get("x-cron-secret");
-    const authHeader = req.headers.get("authorization");
-    
+    const cronSecret = Deno.env.get('CRON_SECRET');
+    const providedSecret = requestBody.cron_secret || req.headers.get('x-cron-secret');
+    const authHeader = req.headers.get('authorization');
+
     // السماح بالوصول إذا كان هناك JWT صالح أو CRON_SECRET صحيح
     const hasValidCronSecret = cronSecret && providedSecret === cronSecret;
-    const hasAuthHeader = authHeader && authHeader.startsWith("Bearer ");
-    
+    const hasAuthHeader = authHeader && authHeader.startsWith('Bearer ');
+
     if (!hasValidCronSecret && !hasAuthHeader) {
       console.log('[generate-scheduled-report] Unauthorized: No valid JWT or CRON_SECRET');
-      return errorResponse("Unauthorized: يتطلب JWT أو CRON_SECRET صالح", 401);
+      return errorResponse('Unauthorized: يتطلب JWT أو CRON_SECRET صالح', 401);
     }
 
-    console.log(`[generate-scheduled-report] Authenticated via ${hasValidCronSecret ? 'CRON_SECRET' : 'JWT'}`);
+    console.log(
+      `[generate-scheduled-report] Authenticated via ${hasValidCronSecret ? 'CRON_SECRET' : 'JWT'}`
+    );
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -54,10 +54,12 @@ serve(async (req) => {
     // الحصول على التقارير المجدولة النشطة التي حان وقت تشغيلها
     const { data: jobs, error: jobsError } = await supabaseClient
       .from('scheduled_report_jobs')
-      .select(`
+      .select(
+        `
         *,
         report_template:report_template_id(*)
-      `)
+      `
+      )
       .eq('is_active', true)
       .lte('next_run_at', new Date().toISOString());
 
@@ -83,7 +85,7 @@ serve(async (req) => {
             total?: number;
           };
         }
-        
+
         let reportData: ReportData = { summary: {} };
         const template = job.report_template;
 
@@ -94,28 +96,26 @@ serve(async (req) => {
             .select('*')
             .gte('entry_date', template.configuration.date_from)
             .lte('entry_date', template.configuration.date_to);
-          
+
           reportData = { transactions, summary: { count: transactions?.length || 0 } };
         } else if (template.report_type === 'beneficiary') {
           // تقرير مستفيدين
-          const { data: beneficiaries } = await supabaseClient
-            .from('beneficiaries')
-            .select('*');
-          
+          const { data: beneficiaries } = await supabaseClient.from('beneficiaries').select('*');
+
           reportData = { beneficiaries, summary: { total: beneficiaries?.length || 0 } };
         } else if (template.report_type === 'property') {
           // تقرير عقارات
           const { data: properties } = await supabaseClient
             .from('properties')
             .select('*, contracts(*)');
-          
+
           reportData = { properties, summary: { total: properties?.length || 0 } };
         }
 
         // حفظ التقرير في الأرشيف
-        const reportFile = {
+        const _reportFile = {
           name: `${template.name}_${new Date().toISOString()}.json`,
-          content: JSON.stringify(reportData, null, 2)
+          content: JSON.stringify(reportData, null, 2),
         };
 
         // إرسال التقرير للمستلمين
@@ -124,7 +124,7 @@ serve(async (req) => {
           email: string;
           name?: string;
         }
-        
+
         const recipients = (job.recipients || []) as Recipient[];
         for (const recipient of recipients) {
           if (job.delivery_method === 'email' || job.delivery_method === 'both') {
@@ -139,7 +139,7 @@ serve(async (req) => {
             message: `تم إنشاء التقرير: ${template.name}`,
             type: 'info',
             reference_type: 'report',
-            reference_id: job.id
+            reference_id: job.id,
           });
         }
 
@@ -149,12 +149,11 @@ serve(async (req) => {
           .from('scheduled_report_jobs')
           .update({
             last_run_at: new Date().toISOString(),
-            next_run_at: nextRun
+            next_run_at: nextRun,
           })
           .eq('id', job.id);
 
         results.push({ job_id: job.id, success: true });
-
       } catch (error) {
         console.error(`Error processing job ${job.id}:`, error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -165,21 +164,17 @@ serve(async (req) => {
     return jsonResponse({
       success: true,
       message: `Processed ${results.length} jobs`,
-      results
+      results,
     });
-
   } catch (error) {
     console.error('Error in generate-scheduled-report:', error);
-    return errorResponse(
-      error instanceof Error ? error.message : 'Unknown error',
-      500
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error', 500);
   }
 });
 
-function calculateNextRun(scheduleType: string, cronExpression?: string): string {
+function calculateNextRun(scheduleType: string, _cronExpression?: string): string {
   const now = new Date();
-  
+
   switch (scheduleType) {
     case 'daily':
       now.setDate(now.getDate() + 1);
@@ -193,6 +188,6 @@ function calculateNextRun(scheduleType: string, cronExpression?: string): string
     default:
       now.setDate(now.getDate() + 1);
   }
-  
+
   return now.toISOString();
 }

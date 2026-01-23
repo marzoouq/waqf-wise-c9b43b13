@@ -1,29 +1,38 @@
 /**
  * Unified Export Hook - خطاف تصدير موحد
- * 
+ *
  * يجمع جميع أدوات التصدير في مكان واحد:
  * - تصدير PDF (مع دعم الخطوط العربية)
  * - تصدير Excel
  * - تصدير CSV
  * - تصدير متعدد الصفحات
  * - تنسيق البيانات
- * 
+ *
  * @version 2.9.74
  */
 
-import { useCallback } from "react";
-import { toast } from "sonner";
-import { useToast } from "@/hooks/ui/use-toast";
-import { logger } from "@/lib/logger";
-import { getErrorMessage } from "@/types/errors";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData } from "@/lib/pdf/arabic-pdf-utils";
-import type { 
-  PDFTableData, 
-  ExcelRowData, 
+import { useCallback } from 'react';
+import { toast } from 'sonner';
+import { useToast } from '@/hooks/ui/use-toast';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/types/errors';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  getDefaultTableStyles,
+  WAQF_COLORS,
+  processArabicText,
+  processArabicHeaders,
+  processArabicTableData,
+} from '@/lib/pdf/arabic-pdf-utils';
+import type {
+  PDFTableData,
+  ExcelRowData,
   BeneficiaryExport,
   PaymentExport,
-  InvoiceExport 
-} from "@/types/export";
+  InvoiceExport,
+} from '@/types/export';
 
 // ==================== Types ====================
 
@@ -53,9 +62,9 @@ export interface MultiSheetExcelConfig {
 export interface FinancialStatementConfig {
   title: string;
   filename: string;
-  sections: { 
-    title: string; 
-    items: { label: string; amount: number }[] 
+  sections: {
+    title: string;
+    items: { label: string; amount: number }[];
   }[];
   totals: { label: string; amount: number }[];
 }
@@ -72,14 +81,14 @@ export function useUnifiedExport() {
     try {
       const [jsPDFModule, autoTableModule] = await Promise.all([
         import('jspdf'),
-        import('jspdf-autotable')
+        import('jspdf-autotable'),
       ]);
-      
+
       const jsPDF = jsPDFModule.default;
       const autoTable = autoTableModule.default;
-      
+
       const doc = new jsPDF();
-      
+
       // تحميل الخط العربي باستخدام النظام الموحد
       const fontName = await loadArabicFontToPDF(doc);
 
@@ -108,12 +117,12 @@ export function useUnifiedExport() {
 
       doc.save(`${config.filename}.pdf`);
 
-      toast.success("تم التصدير بنجاح", {
+      toast.success('تم التصدير بنجاح', {
         description: `تم تصدير البيانات إلى ${config.filename}.pdf`,
       });
     } catch (error) {
       logger.error(error, { context: 'export_pdf', severity: 'low' });
-      toast.error("فشل التصدير", {
+      toast.error('فشل التصدير', {
         description: getErrorMessage(error),
       });
     }
@@ -124,16 +133,16 @@ export function useUnifiedExport() {
    */
   const exportToExcel = useCallback(async (config: ExcelExportConfig) => {
     try {
-      const { exportToExcel: excelExport } = await import("@/lib/excel-helper");
-      
-      await excelExport(config.data, config.filename, config.sheetName || "Sheet1");
+      const { exportToExcel: excelExport } = await import('@/lib/excel-helper');
 
-      toast.success("تم التصدير بنجاح", {
+      await excelExport(config.data, config.filename, config.sheetName || 'Sheet1');
+
+      toast.success('تم التصدير بنجاح', {
         description: `تم تصدير البيانات إلى ${config.filename}.xlsx`,
       });
     } catch (error) {
       logger.error(error, { context: 'export_excel', severity: 'low' });
-      toast.error("فشل التصدير", {
+      toast.error('فشل التصدير', {
         description: getErrorMessage(error),
       });
     }
@@ -144,16 +153,16 @@ export function useUnifiedExport() {
    */
   const exportToMultiSheetExcel = useCallback(async (config: MultiSheetExcelConfig) => {
     try {
-      const { exportToExcelMultiSheet } = await import("@/lib/excel-helper");
-      
+      const { exportToExcelMultiSheet } = await import('@/lib/excel-helper');
+
       await exportToExcelMultiSheet(config.sheets, config.filename);
 
-      toast.success("تم التصدير بنجاح", {
+      toast.success('تم التصدير بنجاح', {
         description: `تم تصدير البيانات إلى ${config.filename}`,
       });
     } catch (error) {
       logger.error(error, { context: 'export_multi_sheet_excel', severity: 'low' });
-      toast.error("فشل التصدير", {
+      toast.error('فشل التصدير', {
         description: getErrorMessage(error),
       });
     }
@@ -165,9 +174,9 @@ export function useUnifiedExport() {
   const exportFinancialStatement = useCallback(async (config: FinancialStatementConfig) => {
     try {
       const { default: jsPDF } = await import('jspdf');
-      
+
       const doc = new jsPDF();
-      
+
       // تحميل الخط العربي باستخدام النظام الموحد
       const fontName = await loadArabicFontToPDF(doc);
 
@@ -177,16 +186,16 @@ export function useUnifiedExport() {
       // Sections
       doc.setFontSize(11);
       config.sections.forEach((section) => {
-        doc.setFont(fontName, "bold");
+        doc.setFont(fontName, 'bold');
         doc.text(processArabicText(section.title), 20, yPosition);
         yPosition += 7;
 
-        doc.setFont(fontName, "normal");
+        doc.setFont(fontName, 'normal');
         section.items.forEach((item) => {
           const amountText = processArabicText(item.amount.toFixed(2));
           doc.text(processArabicText(item.label), 30, yPosition);
           doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
-            align: "right",
+            align: 'right',
           });
           yPosition += 6;
         });
@@ -205,12 +214,12 @@ export function useUnifiedExport() {
       doc.line(20, yPosition, doc.internal.pageSize.width - 20, yPosition);
       yPosition += 7;
 
-      doc.setFont(fontName, "bold");
+      doc.setFont(fontName, 'bold');
       config.totals.forEach((total) => {
         const amountText = processArabicText(total.amount.toFixed(2));
         doc.text(processArabicText(total.label), 20, yPosition);
         doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
-          align: "right",
+          align: 'right',
         });
         yPosition += 7;
       });
@@ -220,12 +229,12 @@ export function useUnifiedExport() {
 
       doc.save(`${config.filename}.pdf`);
 
-      toast.success("تم التصدير بنجاح", {
+      toast.success('تم التصدير بنجاح', {
         description: `تم تصدير القائمة المالية إلى ${config.filename}.pdf`,
       });
     } catch (error) {
       logger.error(error, { context: 'export_financial_statement', severity: 'low' });
-      toast.error("فشل التصدير", {
+      toast.error('فشل التصدير', {
         description: getErrorMessage(error),
       });
     }
@@ -234,36 +243,39 @@ export function useUnifiedExport() {
   /**
    * تصدير إلى CSV مع دعم اللغة العربية
    */
-  const exportToCSV = useCallback((config: {
-    headers: string[];
-    rows: (string | number | null | undefined)[][];
-    filename: string;
-  }) => {
-    try {
-      const csvContent = [
-        config.headers.join(','),
-        ...config.rows.map(row => row.map(cell => `"${cell ?? ''}"`).join(','))
-      ].join('\n');
-      
-      const BOM = '\uFEFF';
-      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${config.filename}.csv`;
-      link.click();
-      URL.revokeObjectURL(link.href);
+  const exportToCSV = useCallback(
+    (config: {
+      headers: string[];
+      rows: (string | number | null | undefined)[][];
+      filename: string;
+    }) => {
+      try {
+        const csvContent = [
+          config.headers.join(','),
+          ...config.rows.map((row) => row.map((cell) => `"${cell ?? ''}"`).join(',')),
+        ].join('\n');
 
-      toast.success("تم التصدير بنجاح", {
-        description: `تم تصدير البيانات إلى ${config.filename}.csv`,
-      });
-    } catch (error) {
-      logger.error(error, { context: 'export_csv', severity: 'low' });
-      toast.error("فشل التصدير", {
-        description: getErrorMessage(error),
-      });
-    }
-  }, []);
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${config.filename}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        toast.success('تم التصدير بنجاح', {
+          description: `تم تصدير البيانات إلى ${config.filename}.csv`,
+        });
+      } catch (error) {
+        logger.error(error, { context: 'export_csv', severity: 'low' });
+        toast.error('فشل التصدير', {
+          description: getErrorMessage(error),
+        });
+      }
+    },
+    []
+  );
 
   return {
     exportToPDF,
@@ -281,13 +293,13 @@ export function useUnifiedExport() {
  */
 export function formatBeneficiariesForExport(beneficiaries: BeneficiaryExport[]): ExcelRowData[] {
   return beneficiaries.map((b) => ({
-    "الاسم الكامل": b.full_name,
-    "رقم الهوية": b.national_id,
-    "الهاتف": b.phone,
-    "البريد الإلكتروني": b.email || "-",
-    "الفئة": b.category,
-    "الحالة": b.status,
-    "ملاحظات": b.notes || "-",
+    'الاسم الكامل': b.full_name,
+    'رقم الهوية': b.national_id,
+    الهاتف: b.phone,
+    'البريد الإلكتروني': b.email || '-',
+    الفئة: b.category,
+    الحالة: b.status,
+    ملاحظات: b.notes || '-',
   }));
 }
 
@@ -296,13 +308,13 @@ export function formatBeneficiariesForExport(beneficiaries: BeneficiaryExport[])
  */
 export function formatPaymentsForExport(payments: PaymentExport[]): ExcelRowData[] {
   return payments.map((p) => ({
-    "رقم السند": p.payment_number,
-    "التاريخ": p.payment_date,
-    "المبلغ": p.amount,
-    "طريقة الدفع": p.payment_method || "-",
-    "اسم المستفيد": p.beneficiary_name || "-",
-    "البيان": p.description || "-",
-    "الحالة": p.status,
+    'رقم السند': p.payment_number,
+    التاريخ: p.payment_date,
+    المبلغ: p.amount,
+    'طريقة الدفع': p.payment_method || '-',
+    'اسم المستفيد': p.beneficiary_name || '-',
+    البيان: p.description || '-',
+    الحالة: p.status,
   }));
 }
 
@@ -311,13 +323,13 @@ export function formatPaymentsForExport(payments: PaymentExport[]): ExcelRowData
  */
 export function formatInvoicesForExport(invoices: InvoiceExport[]): ExcelRowData[] {
   return invoices.map((i) => ({
-    "رقم الفاتورة": i.invoice_number,
-    "التاريخ": i.invoice_date,
-    "العميل": i.customer_name,
-    "المبلغ الإجمالي": i.total_amount,
-    "الضريبة": i.tax_amount,
-    "الصافي": i.subtotal,
-    "الحالة": i.status,
+    'رقم الفاتورة': i.invoice_number,
+    التاريخ: i.invoice_date,
+    العميل: i.customer_name,
+    'المبلغ الإجمالي': i.total_amount,
+    الضريبة: i.tax_amount,
+    الصافي: i.subtotal,
+    الحالة: i.status,
   }));
 }
 
@@ -360,53 +372,57 @@ export function formatDisclosureForExport(disclosure: {
     'عدد البنات': disclosure.daughters_count || 0,
     'عدد الزوجات': disclosure.wives_count || 0,
     'تاريخ الإفصاح': disclosure.disclosure_date,
-    'الحالة': disclosure.status,
+    الحالة: disclosure.status,
   };
 }
 
 /**
  * تنسيق بيانات العقارات للتصدير
  */
-export function formatPropertiesForExport(properties: {
-  name: string;
-  type: string;
-  address: string | null;
-  status: string;
-  total_units?: number;
-  occupied_units?: number;
-  monthly_revenue?: number;
-}[]): ExcelRowData[] {
+export function formatPropertiesForExport(
+  properties: {
+    name: string;
+    type: string;
+    address: string | null;
+    status: string;
+    total_units?: number;
+    occupied_units?: number;
+    monthly_revenue?: number;
+  }[]
+): ExcelRowData[] {
   return properties.map((p) => ({
-    "اسم العقار": p.name,
-    "النوع": p.type,
-    "العنوان": p.address || "-",
-    "الحالة": p.status,
-    "عدد الوحدات": p.total_units || 0,
-    "الوحدات المؤجرة": p.occupied_units || 0,
-    "الإيراد الشهري من العقد": p.monthly_revenue || 0,
+    'اسم العقار': p.name,
+    النوع: p.type,
+    العنوان: p.address || '-',
+    الحالة: p.status,
+    'عدد الوحدات': p.total_units || 0,
+    'الوحدات المؤجرة': p.occupied_units || 0,
+    'الإيراد الشهري من العقد': p.monthly_revenue || 0,
   }));
 }
 
 /**
  * تنسيق بيانات العقود للتصدير
  */
-export function formatContractsForExport(contracts: {
-  contract_number: string;
-  tenant_name: string;
-  start_date: string;
-  end_date: string;
-  monthly_rent: number;
-  status: string;
-  property_name?: string;
-}[]): ExcelRowData[] {
+export function formatContractsForExport(
+  contracts: {
+    contract_number: string;
+    tenant_name: string;
+    start_date: string;
+    end_date: string;
+    monthly_rent: number;
+    status: string;
+    property_name?: string;
+  }[]
+): ExcelRowData[] {
   return contracts.map((c) => ({
-    "رقم العقد": c.contract_number,
-    "المستأجر": c.tenant_name,
-    "تاريخ البداية": c.start_date,
-    "تاريخ النهاية": c.end_date,
-    "الإيجار الشهري": c.monthly_rent,
-    "العقار": c.property_name || "-",
-    "الحالة": c.status,
+    'رقم العقد': c.contract_number,
+    المستأجر: c.tenant_name,
+    'تاريخ البداية': c.start_date,
+    'تاريخ النهاية': c.end_date,
+    'الإيجار الشهري': c.monthly_rent,
+    العقار: c.property_name || '-',
+    الحالة: c.status,
   }));
 }
 

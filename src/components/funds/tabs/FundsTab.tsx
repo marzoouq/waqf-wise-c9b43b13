@@ -1,13 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { Wallet } from "lucide-react";
-import { Fund } from "@/hooks/distributions/useFunds";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { Wallet } from 'lucide-react';
+import { Fund } from '@/hooks/distributions/useFunds';
 
 interface FundsTabProps {
   funds: Fund[];
@@ -21,11 +28,7 @@ export function FundsTab({ funds, isLoading }: FundsTabProps) {
 
   if (funds.length === 0) {
     return (
-      <EmptyState
-        icon={Wallet}
-        title="لا توجد أقلام وقف"
-        description="ابدأ بإضافة قلم وقف جديد"
-      />
+      <EmptyState icon={Wallet} title="لا توجد أقلام وقف" description="ابدأ بإضافة قلم وقف جديد" />
     );
   }
 
@@ -58,7 +61,8 @@ export function FundsTab({ funds, isLoading }: FundsTabProps) {
             <TableBody>
               {funds.map((fund) => {
                 const remaining = Number(fund.allocated_amount) - Number(fund.spent_amount);
-                const percentage = (Number(fund.spent_amount) / Number(fund.allocated_amount)) * 100;
+                const percentage =
+                  (Number(fund.spent_amount) / Number(fund.allocated_amount)) * 100;
 
                 return (
                   <TableRow key={fund.id}>
@@ -72,7 +76,9 @@ export function FundsTab({ funds, isLoading }: FundsTabProps) {
                     <TableCell className="whitespace-nowrap">
                       {remaining.toLocaleString()} ر.س
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">{fund.beneficiaries_count}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      {fund.beneficiaries_count}
+                    </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <div className="flex items-center gap-2">
                         <Progress value={percentage} className="w-20" />

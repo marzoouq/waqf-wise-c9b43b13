@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { APP_VERSION, APP_VERSION_DATE } from "@/lib/version";
+import { memo } from 'react';
+import { APP_VERSION, APP_VERSION_DATE } from '@/lib/version';
 
 const AppVersionFooter = memo(function AppVersionFooter() {
   return (

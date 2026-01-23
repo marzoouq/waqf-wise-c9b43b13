@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { BeneficiaryService } from "@/services/beneficiary.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { Info, Key, Mail, User } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { logger } from "@/lib/logger";
-import { nationalIdToEmail, generateSecurePassword } from "@/lib/beneficiaryAuth";
-import { ResetPasswordDialog } from "./ResetPasswordDialog";
-import { useLeakedPassword } from "@/hooks/auth/useLeakedPassword";
+import { useState, useEffect } from 'react';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BeneficiaryService } from '@/services/beneficiary.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { Info, Key, Mail, User } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { logger } from '@/lib/logger';
+import { nationalIdToEmail, generateSecurePassword } from '@/lib/beneficiaryAuth';
+import { ResetPasswordDialog } from './ResetPasswordDialog';
+import { useLeakedPassword } from '@/hooks/auth/useLeakedPassword';
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -27,17 +27,22 @@ interface EnableLoginDialogProps {
   onSuccess?: () => void;
 }
 
-export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }: EnableLoginDialogProps) {
+export function EnableLoginDialog({
+  open,
+  onOpenChange,
+  beneficiary,
+  onSuccess,
+}: EnableLoginDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [hasExistingAuth, setHasExistingAuth] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const { checkPasswordQuick } = useLeakedPassword();
-  
+
   // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
   const autoEmail = nationalIdToEmail(beneficiary.national_id);
   const tempPassword = generateSecurePassword();
-  
+
   const [formData, setFormData] = useState({
     username: beneficiary.username || beneficiary.national_id,
     email: beneficiary.email || autoEmail,
@@ -57,7 +62,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       await BeneficiaryService.toggleLogin(beneficiary.id, true);
 
       toast({
-        title: "تم التفعيل بنجاح",
+        title: 'تم التفعيل بنجاح',
         description: `تم تفعيل حساب ${beneficiary.full_name}`,
       });
 
@@ -67,9 +72,9 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       logger.error(error, { context: 'enable_existing_account', severity: 'high' });
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء التفعيل';
       toast({
-        title: "خطأ في التفعيل",
+        title: 'خطأ في التفعيل',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -79,30 +84,30 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   // إنشاء حساب جديد (user_id غير موجود)
   const handleCreateNew = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.username || !formData.email || !formData.password) {
       toast({
-        title: "خطأ في البيانات",
-        description: "يرجى ملء جميع الحقول المطلوبة",
-        variant: "destructive",
+        title: 'خطأ في البيانات',
+        description: 'يرجى ملء جميع الحقول المطلوبة',
+        variant: 'destructive',
       });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "خطأ في كلمة المرور",
-        description: "كلمات المرور غير متطابقة",
-        variant: "destructive",
+        title: 'خطأ في كلمة المرور',
+        description: 'كلمات المرور غير متطابقة',
+        variant: 'destructive',
       });
       return;
     }
 
     if (formData.password.length < 6) {
       toast({
-        title: "خطأ في كلمة المرور",
-        description: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-        variant: "destructive",
+        title: 'خطأ في كلمة المرور',
+        description: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        variant: 'destructive',
       });
       return;
     }
@@ -114,9 +119,9 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       const isLeaked = await checkPasswordQuick(formData.password);
       if (isLeaked) {
         toast({
-          title: "كلمة مرور غير آمنة",
-          description: "هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.",
-          variant: "destructive",
+          title: 'كلمة مرور غير آمنة',
+          description: 'هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.',
+          variant: 'destructive',
         });
         setLoading(false);
         return;
@@ -131,7 +136,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       await BeneficiaryService.update(beneficiary.id, { username: formData.username });
 
       toast({
-        title: "تم التفعيل بنجاح",
+        title: 'تم التفعيل بنجاح',
         description: `تم إنشاء حساب ${beneficiary.full_name} بنجاح`,
       });
 
@@ -141,9 +146,9 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       logger.error(error, { context: 'create_beneficiary_account', severity: 'high' });
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحساب';
       toast({
-        title: "خطأ في الإنشاء",
+        title: 'خطأ في الإنشاء',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -156,8 +161,8 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       await BeneficiaryService.toggleLogin(beneficiary.id, false);
 
       toast({
-        title: "تم التعطيل",
-        description: "تم تعطيل حساب المستفيد",
+        title: 'تم التعطيل',
+        description: 'تم تعطيل حساب المستفيد',
       });
 
       onSuccess?.();
@@ -165,9 +170,9 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'فشل تفعيل تسجيل الدخول';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -176,10 +181,10 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
   return (
     <>
-      <ResponsiveDialog 
-        open={open} 
+      <ResponsiveDialog
+        open={open}
         onOpenChange={onOpenChange}
-        title={beneficiary.can_login ? "إدارة حساب المستفيد" : "تفعيل حساب المستفيد"}
+        title={beneficiary.can_login ? 'إدارة حساب المستفيد' : 'تفعيل حساب المستفيد'}
         size="md"
       >
         {beneficiary.can_login ? (
@@ -189,20 +194,31 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
                 هذا المستفيد لديه حساب نشط. يمكنك إعادة تعيين كلمة المرور أو تعطيل الحساب.
               </AlertDescription>
             </Alert>
-            
+
             <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}</p>
-              <p className="text-sm"><strong>رقم الهوية:</strong> {beneficiary.national_id}</p>
+              <p className="text-sm">
+                <strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}
+              </p>
+              <p className="text-sm">
+                <strong>رقم الهوية:</strong> {beneficiary.national_id}
+              </p>
               {beneficiary.email && (
-                <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+                <p className="text-sm">
+                  <strong>البريد الإلكتروني:</strong> {beneficiary.email}
+                </p>
               )}
             </div>
-            
+
             <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="w-full sm:w-auto"
+              >
                 إلغاء
               </Button>
-              <Button 
+              <Button
                 type="button"
                 variant="secondary"
                 onClick={() => {
@@ -214,137 +230,145 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
                 <Key className="ms-2 h-4 w-4" />
                 إعادة تعيين كلمة المرور
               </Button>
-              <Button 
+              <Button
                 type="button"
-                variant="destructive" 
-                onClick={handleDisable} 
+                variant="destructive"
+                onClick={handleDisable}
                 disabled={loading}
                 className="w-full sm:w-auto"
               >
-                {loading ? "جاري التعطيل..." : "تعطيل الحساب"}
+                {loading ? 'جاري التعطيل...' : 'تعطيل الحساب'}
               </Button>
             </DialogFooter>
           </div>
-      ) : hasExistingAuth ? (
-        // حساب معطل لكن user_id موجود
-        <div className="space-y-4">
-          <Alert className="bg-warning-light border-warning">
-            <Info className="h-4 w-4 text-warning" />
-            <AlertDescription className="text-warning-foreground">
-              هذا الحساب معطل مؤقتاً. البيانات والمعلومات محفوظة ويمكن تفعيله مباشرة.
-            </AlertDescription>
-          </Alert>
-          
-          <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
-            <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}</p>
-            <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email || 'غير محدد'}</p>
+        ) : hasExistingAuth ? (
+          // حساب معطل لكن user_id موجود
+          <div className="space-y-4">
+            <Alert className="bg-warning-light border-warning">
+              <Info className="h-4 w-4 text-warning" />
+              <AlertDescription className="text-warning-foreground">
+                هذا الحساب معطل مؤقتاً. البيانات والمعلومات محفوظة ويمكن تفعيله مباشرة.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm">
+                <strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}
+              </p>
+              <p className="text-sm">
+                <strong>البريد الإلكتروني:</strong> {beneficiary.email || 'غير محدد'}
+              </p>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                إلغاء
+              </Button>
+              <Button type="button" onClick={handleEnableExisting} disabled={loading}>
+                {loading ? 'جاري التفعيل...' : 'تفعيل الحساب'}
+              </Button>
+            </DialogFooter>
           </div>
+        ) : (
+          // إنشاء حساب جديد
+          <form onSubmit={handleCreateNew} className="space-y-4">
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>سيتم إنشاء حساب جديد باستخدام المعلومات التالية</AlertDescription>
+            </Alert>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              إلغاء
-            </Button>
-            <Button 
-              type="button"
-              onClick={handleEnableExisting} 
-              disabled={loading}
-            >
-              {loading ? "جاري التفعيل..." : "تفعيل الحساب"}
-            </Button>
-          </DialogFooter>
-        </div>
-      ) : (
-        // إنشاء حساب جديد
-        <form onSubmit={handleCreateNew} className="space-y-4">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              سيتم إنشاء حساب جديد باستخدام المعلومات التالية
-            </AlertDescription>
-          </Alert>
-          
-          <Alert className="bg-primary/5 border-primary/20">
-            <AlertDescription className="space-y-1">
-              <p className="font-semibold">معلومات الدخول المؤقتة:</p>
-              <p className="text-sm">• رقم الهوية: <code className="bg-background px-2 py-0.5 rounded">{beneficiary.national_id}</code></p>
-              <p className="text-sm">• كلمة المرور: <code className="bg-background px-2 py-0.5 rounded">{tempPassword}</code></p>
-              <p className="text-xs text-muted-foreground mt-2">سيُطلب من المستفيد تغيير كلمة المرور عند أول دخول</p>
-            </AlertDescription>
-          </Alert>
+            <Alert className="bg-primary/5 border-primary/20">
+              <AlertDescription className="space-y-1">
+                <p className="font-semibold">معلومات الدخول المؤقتة:</p>
+                <p className="text-sm">
+                  • رقم الهوية:{' '}
+                  <code className="bg-background px-2 py-0.5 rounded">
+                    {beneficiary.national_id}
+                  </code>
+                </p>
+                <p className="text-sm">
+                  • كلمة المرور:{' '}
+                  <code className="bg-background px-2 py-0.5 rounded">{tempPassword}</code>
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  سيُطلب من المستفيد تغيير كلمة المرور عند أول دخول
+                </p>
+              </AlertDescription>
+            </Alert>
 
-          <div className="space-y-2">
-            <Label htmlFor="username">
-              <User className="inline h-4 w-4 ms-1" />
-              اسم المستخدم *
-            </Label>
-            <Input
-              id="username"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              placeholder="أدخل اسم المستخدم"
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="username">
+                <User className="inline h-4 w-4 ms-1" />
+                اسم المستخدم *
+              </Label>
+              <Input
+                id="username"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                placeholder="أدخل اسم المستخدم"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">
-              <Mail className="inline h-4 w-4 ms-1" />
-              البريد الإلكتروني *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="أدخل البريد الإلكتروني"
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">
+                <Mail className="inline h-4 w-4 ms-1" />
+                البريد الإلكتروني *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="أدخل البريد الإلكتروني"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">
-              <Key className="inline h-4 w-4 ms-1" />
-              كلمة المرور *
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
-              required
-              minLength={6}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                <Key className="inline h-4 w-4 ms-1" />
+                كلمة المرور *
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
+                required
+                minLength={6}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">
-              <Key className="inline h-4 w-4 ms-1" />
-              تأكيد كلمة المرور *
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              placeholder="أعد إدخال كلمة المرور"
-              required
-              minLength={6}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">
+                <Key className="inline h-4 w-4 ms-1" />
+                تأكيد كلمة المرور *
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                placeholder="أعد إدخال كلمة المرور"
+                required
+                minLength={6}
+              />
+            </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              إلغاء
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "جاري الإنشاء..." : "إنشاء الحساب"}
-            </Button>
-          </DialogFooter>
-        </form>
-      )}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                إلغاء
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'جاري الإنشاء...' : 'إنشاء الحساب'}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </ResponsiveDialog>
-      
+
       <ResetPasswordDialog
         open={showResetPassword}
         onOpenChange={setShowResetPassword}

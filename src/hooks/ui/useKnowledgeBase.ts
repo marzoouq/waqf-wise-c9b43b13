@@ -84,10 +84,10 @@ export function useArticle(id: string) {
     queryFn: async () => {
       const data = await KnowledgeService.getKBArticleById(id);
       if (!data) throw new Error('المقالة غير موجودة');
-      
+
       // زيادة عدد المشاهدات
       await KnowledgeService.incrementKBArticleViews(id);
-      
+
       return data;
     },
     enabled: !!id,

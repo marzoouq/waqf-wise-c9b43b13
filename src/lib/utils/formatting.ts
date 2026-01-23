@@ -46,12 +46,12 @@ export function formatPercentage(value: number, decimals: number = 1): string {
 export function formatPhoneNumber(phone: string): string {
   // إزالة جميع الأحرف غير الرقمية
   const cleaned = phone.replace(/\D/g, '');
-  
+
   // التنسيق: 05XX XXX XXXX
   if (cleaned.length === 10 && cleaned.startsWith('05')) {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   }
-  
+
   return phone;
 }
 
@@ -60,11 +60,11 @@ export function formatPhoneNumber(phone: string): string {
  */
 export function formatNationalId(id: string): string {
   const cleaned = id.replace(/\D/g, '');
-  
+
   if (cleaned.length === 10) {
     return `${cleaned.slice(0, 1)} ${cleaned.slice(1, 5)} ${cleaned.slice(5)}`;
   }
-  
+
   return id;
 }
 
@@ -81,10 +81,10 @@ export function truncate(text: string, maxLength: number): string {
  */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 بايت';
-  
+
   const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت', 'تيرابايت'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  
+
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 }
 

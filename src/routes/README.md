@@ -18,24 +18,27 @@ src/routes/
 ## 📋 المحتويات
 
 ### 📄 lazyPages.ts
+
 جميع الصفحات معرّفة هنا باستخدام `lazy()` للتحميل الكسول:
 
 ```typescript
 // الصفحات العامة
-export const LandingPage = lazyWithRetry(() => import("@/pages/LandingPage"));
-export const Login = lazyWithRetry(() => import("@/pages/Login"));
+export const LandingPage = lazyWithRetry(() => import('@/pages/LandingPage'));
+export const Login = lazyWithRetry(() => import('@/pages/Login'));
 
 // لوحات التحكم
-export const Dashboard = lazyWithRetry(() => import("@/pages/Dashboard"));
-export const NazerDashboard = lazyWithRetry(() => import("@/pages/NazerDashboard"));
+export const Dashboard = lazyWithRetry(() => import('@/pages/Dashboard'));
+export const NazerDashboard = lazyWithRetry(() => import('@/pages/NazerDashboard'));
 
 // المحاسبة
-export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
+export const Accounting = lazyWithRetry(() => import('@/pages/Accounting'));
 // ... 70+ صفحة أخرى
 ```
 
 ### 🌐 publicRoutes.tsx
+
 المسارات التي لا تتطلب مصادقة:
+
 - `/` - الصفحة الرئيسية
 - `/login` - تسجيل الدخول
 - `/register` - إنشاء حساب
@@ -45,7 +48,9 @@ export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
 - `/about` - عن المنصة
 
 ### 👥 beneficiaryRoutes.tsx
+
 مسارات بوابة المستفيدين:
+
 - `/beneficiary-dashboard` - لوحة تحكم المستفيد
 - `/beneficiary-profile` - الملف الشخصي
 - `/beneficiary-submit-request` - تقديم طلب
@@ -55,7 +60,9 @@ export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
 - `/beneficiary-support` - الدعم
 
 ### 📊 dashboardRoutes.tsx
+
 لوحات التحكم المتخصصة:
+
 - `/dashboard` - لوحة التحكم الرئيسية
 - `/nazer-dashboard` - لوحة الناظر
 - `/admin-dashboard` - لوحة المدير
@@ -65,7 +72,9 @@ export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
 - `/employee-dashboard` - لوحة الموظف
 
 ### ⚙️ adminRoutes.tsx
+
 مسارات الإدارة والنظام:
+
 - `/settings` - الإعدادات
 - `/users` - إدارة المستخدمين
 - `/roles-permissions` - الأدوار والصلاحيات
@@ -76,7 +85,9 @@ export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
 - `/api-keys` - مفاتيح API
 
 ### 🏠 coreRoutes.tsx
+
 المسارات الأساسية للتطبيق:
+
 - `/beneficiaries` - المستفيدين
 - `/properties` - العقارات
 - `/contracts` - العقود
@@ -90,10 +101,11 @@ export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
 ## 🔄 طريقة الاستخدام
 
 ### في App.tsx
+
 ```typescript
-import { 
-  publicRoutes, 
-  beneficiaryStandaloneRoutes, 
+import {
+  publicRoutes,
+  beneficiaryStandaloneRoutes,
   dashboardRoutes,
   adminRoutes,
   coreRoutes,
@@ -118,20 +130,22 @@ import {
 ### إضافة مسار جديد
 
 1. أضف الصفحة في `lazyPages.ts`:
+
 ```typescript
-export const NewPage = lazyWithRetry(() => import("@/pages/NewPage"));
+export const NewPage = lazyWithRetry(() => import('@/pages/NewPage'));
 ```
 
 2. أضف المسار في الملف المناسب:
+
 ```typescript
 // في coreRoutes.tsx
-<Route 
-  path="/new-page" 
+<Route
+  path="/new-page"
   element={
     <ProtectedRoute allowedRoles={['admin']}>
       <NewPage />
     </ProtectedRoute>
-  } 
+  }
 />
 ```
 

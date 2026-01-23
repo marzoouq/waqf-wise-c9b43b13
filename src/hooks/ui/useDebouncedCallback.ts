@@ -3,7 +3,7 @@ import { useCallback, useRef, useEffect } from 'react';
 /**
  * Hook لتأخير تنفيذ دالة (Debouncing)
  * مفيد للبحث والفلترة
- * 
+ *
  * @example
  * const debouncedSearch = useDebouncedCallback(
  *   (value: string) => performSearch(value),

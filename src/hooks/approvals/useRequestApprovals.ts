@@ -3,14 +3,14 @@
  * Hook لموافقات الطلبات
  * @version 2.9.3
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApprovalService } from "@/services/approval.service";
-import { RequestService } from "@/services";
-import { RequestWithBeneficiary } from "@/types/approvals";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { invalidateQueryGroups } from "@/lib/query-invalidation";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ApprovalService } from '@/services/approval.service';
+import { RequestService } from '@/services';
+import { RequestWithBeneficiary } from '@/types/approvals';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { invalidateQueryGroups } from '@/lib/query-invalidation';
 
 export function useRequestApprovals() {
   const { toast } = useToast();
@@ -31,15 +31,15 @@ export function useRequestApprovals() {
     onSuccess: () => {
       invalidateQueryGroups(queryClient, ['approvals', 'beneficiaries']);
       toast({
-        title: "تمت الموافقة",
-        description: "تمت الموافقة على الطلب بنجاح",
+        title: 'تمت الموافقة',
+        description: 'تمت الموافقة على الطلب بنجاح',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ في الموافقة",
-        description: error instanceof Error ? error.message : "حدث خطأ",
-        variant: "destructive",
+        title: 'خطأ في الموافقة',
+        description: error instanceof Error ? error.message : 'حدث خطأ',
+        variant: 'destructive',
       });
     },
   });
@@ -53,15 +53,15 @@ export function useRequestApprovals() {
     onSuccess: () => {
       invalidateQueryGroups(queryClient, ['approvals', 'beneficiaries']);
       toast({
-        title: "تم الرفض",
-        description: "تم رفض الطلب",
+        title: 'تم الرفض',
+        description: 'تم رفض الطلب',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ في الرفض",
-        description: error instanceof Error ? error.message : "حدث خطأ",
-        variant: "destructive",
+        title: 'خطأ في الرفض',
+        description: error instanceof Error ? error.message : 'حدث خطأ',
+        variant: 'destructive',
       });
     },
   });

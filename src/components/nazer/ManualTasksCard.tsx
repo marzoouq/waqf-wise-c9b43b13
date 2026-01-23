@@ -3,21 +3,21 @@
  * بطاقة تشغيل المهام اليدوية للناظر
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Bell, 
-  FileText, 
-  AlertTriangle, 
-  Loader2, 
-  CheckCircle2, 
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Bell,
+  FileText,
+  AlertTriangle,
+  Loader2,
+  CheckCircle2,
   XCircle,
-  RefreshCw
-} from "lucide-react";
-import { toast } from "sonner";
-import { EdgeFunctionService } from "@/services/edge-function.service";
+  RefreshCw,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { EdgeFunctionService } from '@/services/edge-function.service';
 
 interface TaskStatus {
   running: boolean;
@@ -37,12 +37,12 @@ export function ManualTasksCard() {
       const result = await EdgeFunctionService.invoke('daily-notifications', {});
       if (result.success) {
         setDailyNotifications({ running: false, success: true, lastRun: new Date() });
-        toast.success("تم تشغيل نظام الإشعارات اليومية بنجاح");
+        toast.success('تم تشغيل نظام الإشعارات اليومية بنجاح');
       } else {
-        throw new Error(result.error || "فشل في التشغيل");
+        throw new Error(result.error || 'فشل في التشغيل');
       }
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
+      const errorMsg = error instanceof Error ? error.message : 'خطأ غير معروف';
       setDailyNotifications({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في تشغيل الإشعارات: ${errorMsg}`);
     }
@@ -54,12 +54,12 @@ export function ManualTasksCard() {
       const result = await EdgeFunctionService.invoke('weekly-report', {});
       if (result.success) {
         setWeeklyReport({ running: false, success: true, lastRun: new Date() });
-        toast.success("تم إنشاء التقرير الأسبوعي بنجاح");
+        toast.success('تم إنشاء التقرير الأسبوعي بنجاح');
       } else {
-        throw new Error(result.error || "فشل في التشغيل");
+        throw new Error(result.error || 'فشل في التشغيل');
       }
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
+      const errorMsg = error instanceof Error ? error.message : 'خطأ غير معروف';
       setWeeklyReport({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في إنشاء التقرير: ${errorMsg}`);
     }
@@ -71,12 +71,12 @@ export function ManualTasksCard() {
       const result = await EdgeFunctionService.invoke('generate-smart-alerts', {});
       if (result.success) {
         setSmartAlerts({ running: false, success: true, lastRun: new Date() });
-        toast.success("تم توليد التنبيهات الذكية بنجاح");
+        toast.success('تم توليد التنبيهات الذكية بنجاح');
       } else {
-        throw new Error(result.error || "فشل في التشغيل");
+        throw new Error(result.error || 'فشل في التشغيل');
       }
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
+      const errorMsg = error instanceof Error ? error.message : 'خطأ غير معروف';
       setSmartAlerts({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في توليد التنبيهات: ${errorMsg}`);
     }
@@ -84,13 +84,28 @@ export function ManualTasksCard() {
 
   const renderStatus = (status: TaskStatus) => {
     if (status.running) {
-      return <Badge variant="secondary" className="gap-1"><Loader2 className="h-3 w-3 animate-spin" />قيد التشغيل</Badge>;
+      return (
+        <Badge variant="secondary" className="gap-1">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          قيد التشغيل
+        </Badge>
+      );
     }
     if (status.success === true) {
-      return <Badge variant="default" className="gap-1 bg-status-success"><CheckCircle2 className="h-3 w-3" />نجح</Badge>;
+      return (
+        <Badge variant="default" className="gap-1 bg-status-success">
+          <CheckCircle2 className="h-3 w-3" />
+          نجح
+        </Badge>
+      );
     }
     if (status.success === false) {
-      return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />فشل</Badge>;
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <XCircle className="h-3 w-3" />
+          فشل
+        </Badge>
+      );
     }
     return <Badge variant="outline">لم يُشغّل</Badge>;
   };
@@ -123,7 +138,7 @@ export function ManualTasksCard() {
               onClick={handleRunDailyNotifications}
               disabled={dailyNotifications.running}
             >
-              {dailyNotifications.running ? <Loader2 className="h-4 w-4 animate-spin" /> : "تشغيل"}
+              {dailyNotifications.running ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تشغيل'}
             </Button>
           </div>
         </div>
@@ -147,7 +162,7 @@ export function ManualTasksCard() {
               onClick={handleRunWeeklyReport}
               disabled={weeklyReport.running}
             >
-              {weeklyReport.running ? <Loader2 className="h-4 w-4 animate-spin" /> : "تشغيل"}
+              {weeklyReport.running ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تشغيل'}
             </Button>
           </div>
         </div>
@@ -171,7 +186,7 @@ export function ManualTasksCard() {
               onClick={handleRunSmartAlerts}
               disabled={smartAlerts.running}
             >
-              {smartAlerts.running ? <Loader2 className="h-4 w-4 animate-spin" /> : "تشغيل"}
+              {smartAlerts.running ? <Loader2 className="h-4 w-4 animate-spin" /> : 'تشغيل'}
             </Button>
           </div>
         </div>

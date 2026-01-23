@@ -78,7 +78,7 @@ export function useDocumentVersions(documentId: string | undefined) {
   return {
     versions,
     isLoading,
-    currentVersion: versions?.find(v => v.is_current),
+    currentVersion: versions?.find((v) => v.is_current),
     createVersion: createVersionMutation.mutate,
     isCreating: createVersionMutation.isPending,
     restoreVersion: restoreVersionMutation.mutate,

@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 
 export function CTASection() {
   return (
@@ -23,8 +23,7 @@ export function CTASection() {
 
           {/* Description */}
           <p className="text-primary-foreground/80 text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
-            انضم إلى مئات الأوقاف التي تستخدم منصتنا لتحقيق أهدافها وخدمة
-            مستفيديها بشكل أفضل
+            انضم إلى مئات الأوقاف التي تستخدم منصتنا لتحقيق أهدافها وخدمة مستفيديها بشكل أفضل
           </p>
 
           {/* CTA Button */}

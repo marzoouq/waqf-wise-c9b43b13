@@ -3,12 +3,12 @@
  * إدارة طلبات المستفيد الخاصة به (من بوابة المستفيد)
  */
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { RequestService, BeneficiaryService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { matchesStatus } from "@/lib/constants";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { RequestService, BeneficiaryService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface BeneficiaryRequest {
   id: string;
@@ -29,9 +29,9 @@ export interface RequestFormData {
 }
 
 const initialFormData: RequestFormData = {
-  request_type: "فزعة",
-  amount: "",
-  description: "",
+  request_type: 'فزعة',
+  amount: '',
+  description: '',
 };
 
 export function useMyBeneficiaryRequests(userId?: string) {
@@ -50,7 +50,12 @@ export function useMyBeneficiaryRequests(userId?: string) {
   });
 
   // جلب الطلبات باستخدام الخدمة
-  const { data: requests = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: requests = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || ''),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
@@ -62,7 +67,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
   // إنشاء طلب جديد باستخدام الخدمة
   const createRequest = useMutation({
     mutationFn: async (requestData: RequestFormData) => {
-      if (!beneficiary?.id) throw new Error("لم يتم العثور على حساب المستفيد");
+      if (!beneficiary?.id) throw new Error('لم يتم العثور على حساب المستفيد');
 
       // الحصول على نوع طلب افتراضي
       const requestTypes = await RequestService.getRequestTypes();
@@ -70,7 +75,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
 
       const result = await RequestService.create({
         beneficiary_id: beneficiary.id,
-        request_type_id: defaultType?.id || "",
+        request_type_id: defaultType?.id || '',
         description: requestData.description,
         amount: requestData.amount ? parseFloat(requestData.amount) : undefined,
       });
@@ -79,22 +84,30 @@ export function useMyBeneficiaryRequests(userId?: string) {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || '') });
-      toast.success("تم تقديم الطلب بنجاح");
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || ''),
+      });
+      toast.success('تم تقديم الطلب بنجاح');
       setIsDialogOpen(false);
       setFormData(initialFormData);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "فشل تقديم الطلب");
+      toast.error(error.message || 'فشل تقديم الطلب');
     },
   });
 
   // حساب الإحصائيات
   const stats = {
     total: requests.length,
-    pending: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'pending', 'قيد المراجعة')).length,
-    approved: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'approved', 'موافق عليه')).length,
-    rejected: requests.filter((r: BeneficiaryRequest) => matchesStatus(r.status, 'rejected', 'مرفوض')).length,
+    pending: requests.filter((r: BeneficiaryRequest) =>
+      matchesStatus(r.status, 'pending', 'قيد المراجعة')
+    ).length,
+    approved: requests.filter((r: BeneficiaryRequest) =>
+      matchesStatus(r.status, 'approved', 'موافق عليه')
+    ).length,
+    rejected: requests.filter((r: BeneficiaryRequest) =>
+      matchesStatus(r.status, 'rejected', 'مرفوض')
+    ).length,
   };
 
   // دوال مساعدة

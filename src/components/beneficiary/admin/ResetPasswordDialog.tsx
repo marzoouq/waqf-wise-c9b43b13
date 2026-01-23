@@ -63,8 +63,8 @@ export function ResetPasswordDialog({
           <div className="space-y-4 py-4">
             <Alert>
               <AlertDescription className="text-sm">
-                سيتم إعادة تعيين كلمة المرور مباشرة دون إرسال بريد إلكتروني.
-                قم بإعطاء كلمة المرور الجديدة للمستفيد.
+                سيتم إعادة تعيين كلمة المرور مباشرة دون إرسال بريد إلكتروني. قم بإعطاء كلمة المرور
+                الجديدة للمستفيد.
               </AlertDescription>
             </Alert>
 
@@ -89,11 +89,7 @@ export function ResetPasswordDialog({
                     className="absolute left-0 top-0 h-full px-3 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
                 <Button
@@ -131,7 +127,7 @@ export function ResetPasswordDialog({
 
             <div className="space-y-3 p-4 bg-muted rounded-lg">
               <h4 className="font-semibold text-sm">معلومات تسجيل الدخول:</h4>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">رقم الهوية:</span>
@@ -155,11 +151,7 @@ export function ResetPasswordDialog({
                     <code className="text-sm font-mono bg-background px-2 py-1 rounded" dir="ltr">
                       {newPassword}
                     </code>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(newPassword)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(newPassword)}>
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
@@ -178,12 +170,7 @@ export function ResetPasswordDialog({
         <DialogFooter>
           {!isSuccess ? (
             <>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
                 إلغاء
               </Button>
               <Button

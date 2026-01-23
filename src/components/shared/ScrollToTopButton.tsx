@@ -4,20 +4,17 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowUp } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { ArrowUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ScrollToTopButtonProps {
   threshold?: number;
   className?: string;
 }
 
-export function ScrollToTopButton({ 
-  threshold = 300, 
-  className = "" 
-}: ScrollToTopButtonProps) {
+export function ScrollToTopButton({ threshold = 300, className = '' }: ScrollToTopButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -25,14 +22,14 @@ export function ScrollToTopButton({
       setIsVisible(window.scrollY > threshold);
     };
 
-    window.addEventListener("scroll", toggleVisibility, { passive: true });
-    return () => window.removeEventListener("scroll", toggleVisibility);
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    return () => window.removeEventListener('scroll', toggleVisibility);
   }, [threshold]);
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 

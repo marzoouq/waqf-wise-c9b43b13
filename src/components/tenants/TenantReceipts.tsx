@@ -49,7 +49,12 @@ interface ReceiptRecord {
 export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
 
-  const { data: receipts, isLoading, error, refetch } = useQuery({
+  const {
+    data: receipts,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['tenant-receipts', tenantId],
     queryFn: async () => {
       // جلب السندات من rental_payments المرتبطة بعقود المستأجر
@@ -64,11 +69,12 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
         return [];
       }
 
-      const contractIds = contracts.map(c => c.id);
+      const contractIds = contracts.map((c) => c.id);
 
       const { data, error: paymentsError } = await supabase
         .from('rental_payments')
-        .select(`
+        .select(
+          `
           id,
           payment_number,
           payment_date,
@@ -83,7 +89,8 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
               name
             )
           )
-        `)
+        `
+        )
         .in('contract_id', contractIds)
         .eq('status', 'مدفوع')
         .order('payment_date', { ascending: false });
@@ -97,7 +104,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
     setIsGenerating(receipt.id);
     try {
       const orgSettings = await RentalPaymentService.getOrganizationSettings();
-      
+
       const receiptData = {
         id: receipt.id,
         payment_number: receipt.payment_number,
@@ -109,7 +116,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
       };
 
       const doc = await generateReceiptPDF(receiptData, orgSettings);
-      
+
       // فتح في نافذة جديدة
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -128,7 +135,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
     setIsGenerating(receipt.id);
     try {
       const orgSettings = await RentalPaymentService.getOrganizationSettings();
-      
+
       const receiptData = {
         id: receipt.id,
         payment_number: receipt.payment_number,
@@ -161,7 +168,13 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل السندات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل السندات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!receipts || receipts.length === 0) {
@@ -199,9 +212,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
             <TableBody>
               {receipts.map((receipt) => (
                 <TableRow key={receipt.id}>
-                  <TableCell className="font-mono text-sm">
-                    {receipt.payment_number}
-                  </TableCell>
+                  <TableCell className="font-mono text-sm">{receipt.payment_number}</TableCell>
                   <TableCell>{formatDate(receipt.payment_date)}</TableCell>
                   <TableCell className="font-medium text-success">
                     {formatCurrency(receipt.amount_paid)}

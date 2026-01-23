@@ -3,8 +3,8 @@
  * إدارة صلاحيات الأدوار
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { AppRole } from "@/types/roles";
+import { supabase } from '@/integrations/supabase/client';
+import type { AppRole } from '@/types/roles';
 
 export interface Permission {
   id: string;
@@ -27,10 +27,10 @@ export class PermissionsService {
    */
   static async getAllPermissions(): Promise<Permission[]> {
     const { data, error } = await supabase
-      .from("permissions")
-      .select("*")
-      .order("category", { ascending: true })
-      .order("name", { ascending: true });
+      .from('permissions')
+      .select('*')
+      .order('category', { ascending: true })
+      .order('name', { ascending: true });
 
     if (error) throw error;
     return data || [];
@@ -40,10 +40,7 @@ export class PermissionsService {
    * جلب صلاحيات دور معين
    */
   static async getRolePermissions(role: AppRole): Promise<RolePermission[]> {
-    const { data, error } = await supabase
-      .from("role_permissions")
-      .select("*")
-      .eq("role", role);
+    const { data, error } = await supabase.from('role_permissions').select('*').eq('role', role);
 
     if (error) throw error;
     return data || [];
@@ -53,18 +50,18 @@ export class PermissionsService {
    * تحديث صلاحية لدور
    */
   static async updateRolePermission(
-    role: AppRole, 
-    permissionId: string, 
+    role: AppRole,
+    permissionId: string,
     granted: boolean
   ): Promise<void> {
-    const { error } = await supabase.from("role_permissions").upsert(
+    const { error } = await supabase.from('role_permissions').upsert(
       {
         role,
         permission_id: permissionId,
         granted,
       },
       {
-        onConflict: "role,permission_id",
+        onConflict: 'role,permission_id',
       }
     );
 
@@ -78,10 +75,10 @@ export class PermissionsService {
     if (roles.length === 0) return [];
 
     const { data, error } = await supabase
-      .from("role_permissions")
-      .select("*")
-      .in("role", roles)
-      .eq("granted", true);
+      .from('role_permissions')
+      .select('*')
+      .in('role', roles)
+      .eq('granted', true);
 
     if (error) throw error;
     return data || [];
@@ -92,14 +89,16 @@ export class PermissionsService {
    */
   static async hasPermission(role: AppRole, permissionName: string): Promise<boolean> {
     const { data, error } = await supabase
-      .from("role_permissions")
-      .select(`
+      .from('role_permissions')
+      .select(
+        `
         granted,
         permissions!inner(name)
-      `)
-      .eq("role", role)
-      .eq("permissions.name", permissionName)
-      .eq("granted", true)
+      `
+      )
+      .eq('role', role)
+      .eq('permissions.name', permissionName)
+      .eq('granted', true)
       .maybeSingle();
 
     if (error) return false;
@@ -111,10 +110,10 @@ export class PermissionsService {
    */
   static async getPermissionsByCategory(category: string): Promise<Permission[]> {
     const { data, error } = await supabase
-      .from("permissions")
-      .select("*")
-      .eq("category", category)
-      .order("name", { ascending: true });
+      .from('permissions')
+      .select('*')
+      .eq('category', category)
+      .order('name', { ascending: true });
 
     if (error) throw error;
     return data || [];
@@ -125,13 +124,13 @@ export class PermissionsService {
    */
   static async getCategories(): Promise<string[]> {
     const { data, error } = await supabase
-      .from("permissions")
-      .select("category")
-      .order("category", { ascending: true });
+      .from('permissions')
+      .select('category')
+      .order('category', { ascending: true });
 
     if (error) throw error;
-    
-    const categories = new Set((data || []).map(p => p.category));
+
+    const categories = new Set((data || []).map((p) => p.category));
     return Array.from(categories);
   }
 }

@@ -7,10 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Loader2, CheckCircle, XCircle, 
-  Zap, Timer, TestTube
-} from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Zap, Timer, TestTube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RecentResult {
@@ -27,13 +24,13 @@ interface TestProgressLiveProps {
   recentResults: RecentResult[];
 }
 
-export function TestProgressLive({ 
-  currentTest, 
-  completed, 
-  total, 
-  passed, 
+export function TestProgressLive({
+  currentTest,
+  completed,
+  total,
+  passed,
   failed,
-  recentResults 
+  recentResults,
 }: TestProgressLiveProps) {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startTime] = useState(Date.now());
@@ -55,13 +52,10 @@ export function TestProgressLive({
     }
   }, [recentResults.length]);
 
-  const percentComplete = total > 0 
-    ? Math.round((completed / total) * 100) 
-    : 0;
+  const percentComplete = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-  const estimatedRemaining = completed > 0
-    ? Math.round((elapsedTime / completed) * (total - completed))
-    : 0;
+  const estimatedRemaining =
+    completed > 0 ? Math.round((elapsedTime / completed) * (total - completed)) : 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -129,9 +123,7 @@ export function TestProgressLive({
           <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
             <Zap className="h-4 w-4 text-yellow-500 animate-pulse" />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium truncate">
-                {currentTest}
-              </div>
+              <div className="text-sm font-medium truncate">{currentTest}</div>
             </div>
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
           </div>
@@ -147,10 +139,10 @@ export function TestProgressLive({
                   <div
                     key={`${result.name}-${index}`}
                     className={cn(
-                      "flex items-center gap-2 p-2 rounded text-sm",
-                      result.success 
-                        ? "bg-green-500/10 text-green-700 dark:text-green-400"
-                        : "bg-red-500/10 text-red-700 dark:text-red-400"
+                      'flex items-center gap-2 p-2 rounded text-sm',
+                      result.success
+                        ? 'bg-green-500/10 text-green-700 dark:text-green-400'
+                        : 'bg-red-500/10 text-red-700 dark:text-red-400'
                     )}
                   >
                     {result.success ? (

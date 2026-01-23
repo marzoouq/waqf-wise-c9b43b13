@@ -1,4 +1,4 @@
-import { validateVATNumber } from "./zatca";
+import { validateVATNumber } from './zatca';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -27,35 +27,35 @@ export const validateZATCAInvoice = (data: InvoiceValidationData): ValidationRes
   const warnings: string[] = [];
 
   // التحقق من رقم الفاتورة
-  if (!data.invoice_number || data.invoice_number.trim() === "") {
-    errors.push("رقم الفاتورة مطلوب");
+  if (!data.invoice_number || data.invoice_number.trim() === '') {
+    errors.push('رقم الفاتورة مطلوب');
   }
 
   // التحقق من التاريخ
   if (!data.invoice_date) {
-    errors.push("تاريخ الفاتورة مطلوب");
+    errors.push('تاريخ الفاتورة مطلوب');
   }
 
   // التحقق من الرقم الضريبي للبائع
   if (!data.seller_vat_number) {
-    errors.push("الرقم الضريبي للبائع مطلوب");
+    errors.push('الرقم الضريبي للبائع مطلوب');
   } else if (!validateVATNumber(data.seller_vat_number)) {
-    errors.push("الرقم الضريبي للبائع غير صحيح (يجب أن يكون 15 رقم ويبدأ بـ 3)");
+    errors.push('الرقم الضريبي للبائع غير صحيح (يجب أن يكون 15 رقم ويبدأ بـ 3)');
   }
 
   // التحقق من اسم العميل
-  if (!data.customer_name || data.customer_name.trim() === "") {
-    errors.push("اسم العميل مطلوب");
+  if (!data.customer_name || data.customer_name.trim() === '') {
+    errors.push('اسم العميل مطلوب');
   }
 
   // التحقق من وجود بنود
   if (!data.lines || data.lines.length === 0) {
-    errors.push("يجب إضافة بند واحد على الأقل");
+    errors.push('يجب إضافة بند واحد على الأقل');
   }
 
   // التحقق من صحة البنود
   data.lines.forEach((line, index) => {
-    if (!line.description || line.description.trim() === "") {
+    if (!line.description || line.description.trim() === '') {
       errors.push(`البند ${index + 1}: الوصف مطلوب`);
     }
     if (line.quantity <= 0) {
@@ -109,14 +109,12 @@ export const validateZATCAInvoice = (data: InvoiceValidationData): ValidationRes
 
   // تحذيرات
   if (data.total_amount > 100000) {
-    warnings.push("الفاتورة تحتوي على مبلغ كبير (أكثر من 100,000 ريال)");
+    warnings.push('الفاتورة تحتوي على مبلغ كبير (أكثر من 100,000 ريال)');
   }
 
   data.lines.forEach((line, index) => {
     if (line.tax_rate !== 15) {
-      warnings.push(
-        `البند ${index + 1}: نسبة الضريبة ${line.tax_rate}% (المعدل القياسي 15%)`
-      );
+      warnings.push(`البند ${index + 1}: نسبة الضريبة ${line.tax_rate}% (المعدل القياسي 15%)`);
     }
   });
 
@@ -129,16 +127,16 @@ export const validateZATCAInvoice = (data: InvoiceValidationData): ValidationRes
 
 export const formatValidationErrors = (result: ValidationResult): string => {
   if (result.isValid) {
-    return "الفاتورة صحيحة ومتوافقة مع متطلبات ZATCA ✅";
+    return 'الفاتورة صحيحة ومتوافقة مع متطلبات ZATCA ✅';
   }
 
-  let message = "أخطاء التحقق:\n";
+  let message = 'أخطاء التحقق:\n';
   result.errors.forEach((error, index) => {
     message += `${index + 1}. ${error}\n`;
   });
 
   if (result.warnings.length > 0) {
-    message += "\nتحذيرات:\n";
+    message += '\nتحذيرات:\n';
     result.warnings.forEach((warning, index) => {
       message += `${index + 1}. ${warning}\n`;
     });
@@ -151,7 +149,9 @@ export const formatValidationErrors = (result: ValidationResult): string => {
  * التحقق السريع من البيانات المستخرجة بـ OCR
  * يستخدم للتحقق من جودة البيانات قبل حفظها
  */
-export const validateOCRExtractedData = (data: Partial<InvoiceValidationData>): {
+export const validateOCRExtractedData = (
+  data: Partial<InvoiceValidationData>
+): {
   isComplete: boolean;
   missingFields: string[];
   suggestions: string[];
@@ -160,30 +160,30 @@ export const validateOCRExtractedData = (data: Partial<InvoiceValidationData>): 
   const suggestions: string[] = [];
 
   // التحقق من الحقول الأساسية
-  if (!data.invoice_number?.trim()) missingFields.push("رقم الفاتورة");
-  if (!data.invoice_date) missingFields.push("تاريخ الفاتورة");
-  if (!data.customer_name?.trim()) missingFields.push("اسم العميل");
-  if (!data.lines || data.lines.length === 0) missingFields.push("بنود الفاتورة");
+  if (!data.invoice_number?.trim()) missingFields.push('رقم الفاتورة');
+  if (!data.invoice_date) missingFields.push('تاريخ الفاتورة');
+  if (!data.customer_name?.trim()) missingFields.push('اسم العميل');
+  if (!data.lines || data.lines.length === 0) missingFields.push('بنود الفاتورة');
 
   // اقتراحات للتحسين
   if (data.seller_vat_number && !validateVATNumber(data.seller_vat_number)) {
-    suggestions.push("الرقم الضريبي للبائع قد يكون غير صحيح - يرجى المراجعة");
+    suggestions.push('الرقم الضريبي للبائع قد يكون غير صحيح - يرجى المراجعة');
   }
 
   if (data.lines && data.lines.length > 0) {
-    const hasZeroQuantity = data.lines.some(line => line.quantity === 0);
+    const hasZeroQuantity = data.lines.some((line) => line.quantity === 0);
     if (hasZeroQuantity) {
-      suggestions.push("بعض البنود بكمية صفر - يرجى المراجعة");
+      suggestions.push('بعض البنود بكمية صفر - يرجى المراجعة');
     }
 
-    const hasZeroPrice = data.lines.some(line => line.unit_price === 0);
+    const hasZeroPrice = data.lines.some((line) => line.unit_price === 0);
     if (hasZeroPrice) {
-      suggestions.push("بعض البنود بسعر صفر - يرجى المراجعة");
+      suggestions.push('بعض البنود بسعر صفر - يرجى المراجعة');
     }
   }
 
   if (data.total_amount && data.total_amount < 0) {
-    suggestions.push("المبلغ الإجمالي سالب - يرجى المراجعة");
+    suggestions.push('المبلغ الإجمالي سالب - يرجى المراجعة');
   }
 
   return {

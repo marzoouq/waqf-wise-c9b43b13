@@ -1,14 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Clock } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { useApprovalsLog } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { format, arLocale as ar } from "@/lib/date";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { useApprovalsLog } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { format, arLocale as ar } from '@/lib/date';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function ApprovalsLogTab() {
   const { settings } = useVisibilitySettings();
-  const { data: approvals, isLoading, error, refetch } = useApprovalsLog(settings?.show_approvals_log || false);
+  const {
+    data: approvals,
+    isLoading,
+    error,
+    refetch,
+  } = useApprovalsLog(settings?.show_approvals_log || false);
 
   if (!settings?.show_approvals_log) {
     return (
@@ -31,16 +36,18 @@ export function ApprovalsLogTab() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل سجل الموافقات" message={error.message} onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في تحميل سجل الموافقات" message={error.message} onRetry={refetch} />
+    );
   }
 
   const getActionIcon = (action: string) => {
     switch (action) {
-      case "موافق":
-      case "approved":
+      case 'موافق':
+      case 'approved':
         return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case "مرفوض":
-      case "rejected":
+      case 'مرفوض':
+      case 'rejected':
         return <XCircle className="h-5 w-5 text-destructive" />;
       default:
         return <Clock className="h-5 w-5 text-warning" />;
@@ -49,11 +56,11 @@ export function ApprovalsLogTab() {
 
   const getActionBadge = (action: string) => {
     switch (action) {
-      case "موافق":
-      case "approved":
+      case 'موافق':
+      case 'approved':
         return <Badge className="bg-success">موافق</Badge>;
-      case "مرفوض":
-      case "rejected":
+      case 'مرفوض':
+      case 'rejected':
         return <Badge variant="destructive">مرفوض</Badge>;
       default:
         return <Badge variant="secondary">{action}</Badge>;
@@ -71,7 +78,7 @@ export function ApprovalsLogTab() {
                 <div>
                   <CardTitle className="text-base">{approval.approval_type}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {format(new Date(approval.created_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
+                    {format(new Date(approval.created_at), 'dd MMMM yyyy - HH:mm', { locale: ar })}
                   </p>
                 </div>
               </div>

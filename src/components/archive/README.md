@@ -15,12 +15,13 @@ src/components/archive/
 ## 📋 المكونات
 
 ### ArchiveFoldersTab
+
 إدارة شجرة المجلدات في الأرشيف.
 
 ```typescript
 import { ArchiveFoldersTab } from '@/components/archive';
 
-<ArchiveFoldersTab 
+<ArchiveFoldersTab
   folders={folders}
   onSelect={handleSelect}
   onCreateFolder={handleCreate}
@@ -29,12 +30,13 @@ import { ArchiveFoldersTab } from '@/components/archive';
 ```
 
 ### ArchiveDocumentsTab
+
 عرض وإدارة المستندات داخل المجلدات.
 
 ```typescript
 import { ArchiveDocumentsTab } from '@/components/archive';
 
-<ArchiveDocumentsTab 
+<ArchiveDocumentsTab
   documents={documents}
   selectedFolder={folderId}
   onUpload={handleUpload}
@@ -44,12 +46,13 @@ import { ArchiveDocumentsTab } from '@/components/archive';
 ```
 
 ### ArchiveDialogs
+
 حوارات رفع المستندات وإنشاء المجلدات.
 
 ```typescript
 import { ArchiveDialogs } from '@/components/archive';
 
-<ArchiveDialogs 
+<ArchiveDialogs
   isOpen={isOpen}
   onClose={onClose}
   mode="upload" // "upload" | "folder" | "view"

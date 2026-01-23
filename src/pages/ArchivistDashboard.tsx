@@ -1,32 +1,58 @@
-import { useState, lazy, Suspense } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Archive, FolderOpen, FileText, Upload, Search, Clock, Mail, RefreshCw } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { format, arLocale as ar } from "@/lib/date";
-import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { SectionSkeleton } from "@/components/dashboard";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { useArchivistDashboard } from "@/hooks/archive";
-import { useArchivistDashboardRealtime, useArchivistDashboardRefresh } from "@/hooks/archive/useArchivistDashboardRealtime";
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
-import { CurrentFiscalYearCard } from "@/components/dashboard/shared/CurrentFiscalYearCard";
-import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState, lazy, Suspense } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Archive,
+  FolderOpen,
+  FileText,
+  Upload,
+  Search,
+  Clock,
+  Mail,
+  RefreshCw,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { format, arLocale as ar } from '@/lib/date';
+import { UnifiedDashboardLayout } from '@/components/dashboard/UnifiedDashboardLayout';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { SectionSkeleton } from '@/components/dashboard';
+import { AdminSendMessageDialog } from '@/components/messages/AdminSendMessageDialog';
+import { useArchivistDashboard } from '@/hooks/archive';
+import {
+  useArchivistDashboardRealtime,
+  useArchivistDashboardRefresh,
+} from '@/hooks/archive/useArchivistDashboardRealtime';
+import { BankBalanceCard } from '@/components/shared/BankBalanceCard';
+import { WaqfCorpusCard } from '@/components/shared/WaqfCorpusCard';
+import { CurrentFiscalYearCard } from '@/components/dashboard/shared/CurrentFiscalYearCard';
+import { LastSyncIndicator } from '@/components/nazer/LastSyncIndicator';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load charts
-const DocumentsGrowthChart = lazy(() => import("@/components/dashboard/archivist/DocumentsGrowthChart").then(m => ({ default: m.DocumentsGrowthChart })));
-const StorageUsageChart = lazy(() => import("@/components/dashboard/archivist/StorageUsageChart").then(m => ({ default: m.StorageUsageChart })));
+const DocumentsGrowthChart = lazy(() =>
+  import('@/components/dashboard/archivist/DocumentsGrowthChart').then((m) => ({
+    default: m.DocumentsGrowthChart,
+  }))
+);
+const StorageUsageChart = lazy(() =>
+  import('@/components/dashboard/archivist/StorageUsageChart').then((m) => ({
+    default: m.StorageUsageChart,
+  }))
+);
 
 export default function ArchivistDashboard() {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
@@ -204,27 +230,15 @@ export default function ArchivistDashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3">
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/archive')}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate('/archive')}>
               <Upload className="h-4 w-4 ms-2" />
               رفع مستند
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/archive')}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate('/archive')}>
               <FolderOpen className="h-4 w-4 ms-2" />
               إنشاء مجلد
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/archive')}
-            >
+            <Button variant="outline" className="w-full" onClick={() => navigate('/archive')}>
               <Search className="h-4 w-4 ms-2" />
               البحث المتقدم
             </Button>
@@ -232,10 +246,7 @@ export default function ArchivistDashboard() {
         </CardContent>
       </Card>
 
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
+      <AdminSendMessageDialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} />
     </UnifiedDashboardLayout>
   );
 }

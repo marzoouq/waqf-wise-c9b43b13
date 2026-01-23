@@ -2,7 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2, Save, Calculator } from 'lucide-react';
 import { useJournalEntryForm } from '@/hooks/accounting/useJournalEntryForm';
@@ -83,7 +89,10 @@ export function JournalEntryForm() {
 
           <div className="space-y-2">
             {lines.map((line, index) => (
-              <div key={`line-${index}-${line.account_id || 'new'}`} className="grid grid-cols-12 gap-2 items-end">
+              <div
+                key={`line-${index}-${line.account_id || 'new'}`}
+                className="grid grid-cols-12 gap-2 items-end"
+              >
                 <div className="col-span-4 space-y-1">
                   <Label className="text-xs">الحساب</Label>
                   <Select
@@ -178,8 +187,12 @@ export function JournalEntryForm() {
               }`}
             >
               <p className="text-xs text-muted-foreground mb-1">الفرق</p>
-              <p className={`text-lg font-bold font-mono ${isBalanced ? 'text-success' : 'text-destructive'}`}>
-                {Math.abs(totalDebit - totalCredit).toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
+              <p
+                className={`text-lg font-bold font-mono ${isBalanced ? 'text-success' : 'text-destructive'}`}
+              >
+                {Math.abs(totalDebit - totalCredit).toLocaleString('ar-SA', {
+                  minimumFractionDigits: 2,
+                })}
               </p>
             </div>
           </div>

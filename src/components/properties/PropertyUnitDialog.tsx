@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -16,40 +16,40 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
-import { PropertyService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import type { Database } from "@/integrations/supabase/types";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Loader2 } from 'lucide-react';
+import { PropertyService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import type { Database } from '@/integrations/supabase/types';
 
 type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
 const formSchema = z.object({
-  unit_number: z.string().min(1, "رقم الوحدة مطلوب"),
+  unit_number: z.string().min(1, 'رقم الوحدة مطلوب'),
   unit_name: z.string().optional(),
-  unit_type: z.string().min(1, "نوع الوحدة مطلوب"),
+  unit_type: z.string().min(1, 'نوع الوحدة مطلوب'),
   floor_number: z.coerce.number().optional(),
   area: z.coerce.number().optional(),
-  rooms: z.coerce.number().min(0, "عدد الغرف يجب أن يكون رقماً موجباً"),
-  bathrooms: z.coerce.number().min(0, "عدد دورات المياه يجب أن يكون رقماً موجباً"),
+  rooms: z.coerce.number().min(0, 'عدد الغرف يجب أن يكون رقماً موجباً'),
+  bathrooms: z.coerce.number().min(0, 'عدد دورات المياه يجب أن يكون رقماً موجباً'),
   has_kitchen: z.boolean().default(true),
   has_parking: z.boolean().default(false),
   parking_spaces: z.coerce.number().min(0).default(0),
   monthly_rent: z.coerce.number().optional(),
-  status: z.string().default("متاح"),
-  occupancy_status: z.string().default("شاغر"),
+  status: z.string().default('متاح'),
+  occupancy_status: z.string().default('شاغر'),
   description: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -82,16 +82,16 @@ export function PropertyUnitDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      unit_number: "",
-      unit_name: "",
-      unit_type: "شقة",
+      unit_number: '',
+      unit_name: '',
+      unit_type: 'شقة',
       rooms: 2,
       bathrooms: 1,
       has_kitchen: true,
       has_parking: false,
       parking_spaces: 0,
-      status: "متاح",
-      occupancy_status: "شاغر",
+      status: 'متاح',
+      occupancy_status: 'شاغر',
     },
   });
 
@@ -100,7 +100,7 @@ export function PropertyUnitDialog({
     if (unit) {
       form.reset({
         unit_number: unit.unit_number,
-        unit_name: unit.unit_name || "",
+        unit_name: unit.unit_name || '',
         unit_type: unit.unit_type,
         floor_number: unit.floor_number || undefined,
         area: unit.area || undefined,
@@ -112,21 +112,21 @@ export function PropertyUnitDialog({
         monthly_rent: unit.monthly_rent || undefined,
         status: unit.status,
         occupancy_status: unit.occupancy_status,
-        description: unit.description || "",
-        notes: unit.notes || "",
+        description: unit.description || '',
+        notes: unit.notes || '',
       });
     } else if (nextUnitNumber) {
       form.reset({
         unit_number: nextUnitNumber,
-        unit_name: "",
-        unit_type: "شقة",
+        unit_name: '',
+        unit_type: 'شقة',
         rooms: 2,
         bathrooms: 1,
         has_kitchen: true,
         has_parking: false,
         parking_spaces: 0,
-        status: "متاح",
-        occupancy_status: "شاغر",
+        status: 'متاح',
+        occupancy_status: 'شاغر',
       });
     }
   }, [form, nextUnitNumber, unit]);
@@ -156,25 +156,25 @@ export function PropertyUnitDialog({
       if (unit) {
         await PropertyService.updateUnit(unit.id, data);
         toast({
-          title: "تم التحديث بنجاح",
-          description: "تم تحديث بيانات الوحدة",
+          title: 'تم التحديث بنجاح',
+          description: 'تم تحديث بيانات الوحدة',
         });
       } else {
         await PropertyService.createUnit(data);
         toast({
-          title: "تمت الإضافة بنجاح",
-          description: "تم إضافة الوحدة الجديدة",
+          title: 'تمت الإضافة بنجاح',
+          description: 'تم إضافة الوحدة الجديدة',
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["property-units", propertyId] });
+      queryClient.invalidateQueries({ queryKey: ['property-units', propertyId] });
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ غير متوقع";
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
       toast({
-        variant: "destructive",
-        title: "حدث خطأ",
+        variant: 'destructive',
+        title: 'حدث خطأ',
         description: errorMessage,
       });
     } finally {
@@ -186,11 +186,9 @@ export function PropertyUnitDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {unit ? "تعديل وحدة" : "إضافة وحدة جديدة"}
-          </DialogTitle>
+          <DialogTitle>{unit ? 'تعديل وحدة' : 'إضافة وحدة جديدة'}</DialogTitle>
           <DialogDescription>
-            {unit ? "تعديل بيانات الوحدة العقارية" : "إضافة وحدة عقارية جديدة إلى العقار"}
+            {unit ? 'تعديل بيانات الوحدة العقارية' : 'إضافة وحدة عقارية جديدة إلى العقار'}
           </DialogDescription>
         </DialogHeader>
 
@@ -205,9 +203,9 @@ export function PropertyUnitDialog({
                     <FormLabel>رقم الوحدة *</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input 
-                          placeholder="101" 
-                          {...field} 
+                        <Input
+                          placeholder="101"
+                          {...field}
                           disabled={isLoadingNextNumber && !unit}
                         />
                         {isLoadingNextNumber && !unit && (
@@ -390,10 +388,7 @@ export function PropertyUnitDialog({
                       <FormLabel>يوجد مطبخ</FormLabel>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -408,16 +403,13 @@ export function PropertyUnitDialog({
                       <FormLabel>يوجد موقف</FormLabel>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
               />
 
-              {form.watch("has_parking") && (
+              {form.watch('has_parking') && (
                 <FormField
                   control={form.control}
                   name="parking_spaces"
@@ -459,11 +451,7 @@ export function PropertyUnitDialog({
                 <FormItem>
                   <FormLabel>ملاحظات</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="ملاحظات إضافية..."
-                      className="resize-none"
-                      {...field}
-                    />
+                    <Textarea placeholder="ملاحظات إضافية..." className="resize-none" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -480,7 +468,7 @@ export function PropertyUnitDialog({
                 إلغاء
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "جاري الحفظ..." : unit ? "تحديث" : "إضافة"}
+                {isSubmitting ? 'جاري الحفظ...' : unit ? 'تحديث' : 'إضافة'}
               </Button>
             </div>
           </form>

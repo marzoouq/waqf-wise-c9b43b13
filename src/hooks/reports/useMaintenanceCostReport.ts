@@ -23,7 +23,11 @@ export interface MaintenanceTypeData {
 }
 
 export function useMaintenanceCostReport() {
-  const { data: maintenanceData, isLoading, error } = useQuery<MaintenanceCostData[]>({
+  const {
+    data: maintenanceData,
+    isLoading,
+    error,
+  } = useQuery<MaintenanceCostData[]>({
     queryKey: QUERY_KEYS.MAINTENANCE_COST_ANALYSIS,
     queryFn: () => MaintenanceService.getCostAnalysis(),
   });
@@ -33,11 +37,13 @@ export function useMaintenanceCostReport() {
     queryFn: () => MaintenanceService.getTypeAnalysis(),
   });
 
-  const totals = maintenanceData ? {
-    totalCost: maintenanceData.reduce((sum, m) => sum + m.total_cost, 0),
-    totalCompleted: maintenanceData.reduce((sum, m) => sum + m.completed_count, 0),
-    totalPending: maintenanceData.reduce((sum, m) => sum + m.pending_count, 0),
-  } : { totalCost: 0, totalCompleted: 0, totalPending: 0 };
+  const totals = maintenanceData
+    ? {
+        totalCost: maintenanceData.reduce((sum, m) => sum + m.total_cost, 0),
+        totalCompleted: maintenanceData.reduce((sum, m) => sum + m.completed_count, 0),
+        totalPending: maintenanceData.reduce((sum, m) => sum + m.pending_count, 0),
+      }
+    : { totalCost: 0, totalCompleted: 0, totalPending: 0 };
 
   return {
     maintenanceData,

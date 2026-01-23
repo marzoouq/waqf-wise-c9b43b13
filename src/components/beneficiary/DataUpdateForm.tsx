@@ -1,23 +1,36 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserCog } from "lucide-react";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserCog } from 'lucide-react';
 
 const dataUpdateSchema = z.object({
-  update_type: z.string().min(1, "نوع التحديث مطلوب"),
+  update_type: z.string().min(1, 'نوع التحديث مطلوب'),
   phone: z.string().optional(),
-  email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
+  email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
   address: z.string().optional(),
   bank_name: z.string().optional(),
   bank_account_number: z.string().optional(),
   iban: z.string().optional(),
-  description: z.string().min(10, "يجب إضافة وصف للتغييرات المطلوبة"),
+  description: z.string().min(10, 'يجب إضافة وصف للتغييرات المطلوبة'),
 });
 
 type DataUpdateFormValues = z.infer<typeof dataUpdateSchema>;
@@ -39,18 +52,18 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
   const form = useForm<DataUpdateFormValues>({
     resolver: zodResolver(dataUpdateSchema),
     defaultValues: {
-      update_type: "",
-      phone: currentData?.phone || "",
-      email: currentData?.email || "",
-      address: currentData?.address || "",
-      bank_name: currentData?.bank_name || "",
-      bank_account_number: currentData?.bank_account_number || "",
-      iban: currentData?.iban || "",
-      description: "",
+      update_type: '',
+      phone: currentData?.phone || '',
+      email: currentData?.email || '',
+      address: currentData?.address || '',
+      bank_name: currentData?.bank_name || '',
+      bank_account_number: currentData?.bank_account_number || '',
+      iban: currentData?.iban || '',
+      description: '',
     },
   });
 
-  const updateType = form.watch("update_type");
+  const updateType = form.watch('update_type');
 
   return (
     <Card>
@@ -59,9 +72,7 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
           <UserCog className="h-5 w-5 text-accent" />
           طلب تحديث البيانات
         </CardTitle>
-        <CardDescription>
-          قدم طلب لتحديث بياناتك الشخصية أو البنكية
-        </CardDescription>
+        <CardDescription>قدم طلب لتحديث بياناتك الشخصية أو البنكية</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -90,7 +101,7 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
               )}
             />
 
-            {(updateType === "معلومات_شخصية" || updateType === "متعدد") && (
+            {(updateType === 'معلومات_شخصية' || updateType === 'متعدد') && (
               <>
                 <FormField
                   control={form.control}
@@ -122,7 +133,7 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
               </>
             )}
 
-            {(updateType === "عنوان" || updateType === "متعدد") && (
+            {(updateType === 'عنوان' || updateType === 'متعدد') && (
               <FormField
                 control={form.control}
                 name="address"
@@ -138,7 +149,7 @@ export function DataUpdateForm({ onSubmit, isLoading, currentData }: DataUpdateF
               />
             )}
 
-            {(updateType === "معلومات_بنكية" || updateType === "متعدد") && (
+            {(updateType === 'معلومات_بنكية' || updateType === 'متعدد') && (
               <>
                 <FormField
                   control={form.control}

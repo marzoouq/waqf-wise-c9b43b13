@@ -1,15 +1,15 @@
 /**
  * Error Boundary للتبويبات
  * Tab-level Error Boundary
- * 
+ *
  * يوفر عزل الأخطاء لكل تبويب بحيث لا يؤثر خطأ في تبويب على باقي التطبيق
  */
 
-import { Component, ErrorInfo, ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw } from "lucide-react";
-import { logger } from "@/lib/logger";
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -34,8 +34,8 @@ export class TabErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error(error, {
-      context: `tab_error_boundary_${this.props.tabName || "unknown"}`,
-      severity: "medium",
+      context: `tab_error_boundary_${this.props.tabName || 'unknown'}`,
+      severity: 'medium',
       metadata: { errorInfo, tabName: this.props.tabName },
     });
   }
@@ -55,7 +55,7 @@ export class TabErrorBoundary extends Component<Props, State> {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-destructive text-base">
               <AlertTriangle className="h-5 w-5" />
-              خطأ في تحميل {this.props.tabName || "التبويب"}
+              خطأ في تحميل {this.props.tabName || 'التبويب'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -65,9 +65,7 @@ export class TabErrorBoundary extends Component<Props, State> {
 
             {import.meta.env.DEV && this.state.error && (
               <details className="text-xs bg-muted p-2 rounded">
-                <summary className="cursor-pointer font-medium">
-                  تفاصيل الخطأ (Development)
-                </summary>
+                <summary className="cursor-pointer font-medium">تفاصيل الخطأ (Development)</summary>
                 <pre className="mt-2 overflow-auto whitespace-pre-wrap text-destructive">
                   {this.state.error.message}
                 </pre>

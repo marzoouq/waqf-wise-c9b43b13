@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
+import {
   prefersReducedMotion as checkReducedMotion,
   onReducedMotionChange,
   prefersHighContrast as checkHighContrast,
@@ -128,21 +128,24 @@ export function useColorScheme(): UseColorSchemeReturn {
 
   const resolvedColorScheme = colorScheme === 'system' ? systemScheme : colorScheme;
 
-  const setColorScheme = useCallback((scheme: ColorScheme) => {
-    setColorSchemeState(scheme);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('color-scheme', scheme);
-      
-      // تحديث الـ DOM
-      const root = document.documentElement;
-      root.classList.remove('light', 'dark');
-      if (scheme === 'system') {
-        root.classList.add(systemScheme);
-      } else {
-        root.classList.add(scheme);
+  const setColorScheme = useCallback(
+    (scheme: ColorScheme) => {
+      setColorSchemeState(scheme);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('color-scheme', scheme);
+
+        // تحديث الـ DOM
+        const root = document.documentElement;
+        root.classList.remove('light', 'dark');
+        if (scheme === 'system') {
+          root.classList.add(systemScheme);
+        } else {
+          root.classList.add(scheme);
+        }
       }
-    }
-  }, [systemScheme]);
+    },
+    [systemScheme]
+  );
 
   const toggleColorScheme = useCallback(() => {
     const schemes: ColorScheme[] = ['light', 'dark', 'system'];
@@ -198,7 +201,9 @@ export function useSafeAnimation({
         transitionDelay: `${safeDelay}ms`,
         animationDuration: prefersReducedMotion ? '0s' : `${duration}ms`,
       },
-      className: prefersReducedMotion ? 'motion-reduce:transform-none motion-reduce:animate-none' : '',
+      className: prefersReducedMotion
+        ? 'motion-reduce:transform-none motion-reduce:animate-none'
+        : '',
     },
     canAnimate: !prefersReducedMotion,
   };

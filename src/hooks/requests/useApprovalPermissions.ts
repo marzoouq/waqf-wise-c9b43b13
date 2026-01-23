@@ -1,7 +1,7 @@
-import { useAuth } from "@/hooks/auth";
-import { useQuery } from "@tanstack/react-query";
-import { ApprovalService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useAuth } from '@/hooks/auth';
+import { useQuery } from '@tanstack/react-query';
+import { ApprovalService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type ApprovalLevel = 1 | 2 | 3;
 
@@ -13,7 +13,7 @@ export interface ApprovalPermissions {
 
 /**
  * Hook للتحقق من صلاحيات الموافقة حسب الدور
- * 
+ *
  * المستوى 1: المشرف (admin)
  * المستوى 2: المحاسب (accountant)
  * المستوى 3: الناظر (nazer)
@@ -32,17 +32,17 @@ export function useApprovalPermissions(): ApprovalPermissions {
     if (!userRole) return false;
 
     // الناظر يمكنه الموافقة على كل المستويات
-    if (userRole === "nazer") {
+    if (userRole === 'nazer') {
       return true;
     }
 
     // Admin (المشرف) يمكنه الموافقة على المستوى 1
-    if (level === 1 && userRole === "admin") {
+    if (level === 1 && userRole === 'admin') {
       return true;
     }
 
     // المحاسب يمكنه الموافقة على المستوى 1 و 2
-    if (level <= 2 && userRole === "accountant") {
+    if (level <= 2 && userRole === 'accountant') {
       return true;
     }
 

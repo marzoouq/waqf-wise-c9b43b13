@@ -32,28 +32,28 @@ describe('QuickStatsRow Component', () => {
 
   it('should render all stats', () => {
     render(<QuickStatsRow stats={mockStats} />);
-    
+
     expect(screen.getByText('إجمالي المستفيدين')).toBeInTheDocument();
     expect(screen.getByText('150')).toBeInTheDocument();
-    
+
     expect(screen.getByText('إجمالي الإيرادات')).toBeInTheDocument();
     expect(screen.getByText('1,500,000 ر.س')).toBeInTheDocument();
-    
+
     expect(screen.getByText('معدل النمو')).toBeInTheDocument();
     expect(screen.getByText('12%')).toBeInTheDocument();
   });
 
   it('should render stat labels', () => {
     render(<QuickStatsRow stats={mockStats} />);
-    
-    mockStats.forEach(stat => {
+
+    mockStats.forEach((stat) => {
       expect(screen.getByText(stat.label)).toBeInTheDocument();
     });
   });
 
   it('should render stat values', () => {
     render(<QuickStatsRow stats={mockStats} />);
-    
+
     expect(screen.getByText('150')).toBeInTheDocument();
     expect(screen.getByText('1,500,000 ر.س')).toBeInTheDocument();
     expect(screen.getByText('12%')).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe('QuickStatsRow Component', () => {
 
   it('should render icons for each stat', () => {
     const { container } = render(<QuickStatsRow stats={mockStats} />);
-    
+
     // Check for SVG icons (lucide-react renders as svg)
     const icons = container.querySelectorAll('svg');
     expect(icons.length).toBe(mockStats.length);
@@ -70,23 +70,21 @@ describe('QuickStatsRow Component', () => {
   it('should render with single stat', () => {
     const singleStat = [mockStats[0]];
     render(<QuickStatsRow stats={singleStat} />);
-    
+
     expect(screen.getByText('إجمالي المستفيدين')).toBeInTheDocument();
     expect(screen.getByText('150')).toBeInTheDocument();
   });
 
   it('should render with empty stats array', () => {
     const { container } = render(<QuickStatsRow stats={[]} />);
-    
+
     // Should render the container
     expect(container.firstChild).toBeInTheDocument();
   });
 
   it('should apply custom className', () => {
-    const { container } = render(
-      <QuickStatsRow stats={mockStats} className="custom-class" />
-    );
-    
+    const { container } = render(<QuickStatsRow stats={mockStats} className="custom-class" />);
+
     expect(container.firstChild).toHaveClass('custom-class');
   });
 
@@ -98,7 +96,7 @@ describe('QuickStatsRow Component', () => {
         icon: Users,
       },
     ];
-    
+
     render(<QuickStatsRow stats={numericStats} />);
     expect(screen.getByText('100')).toBeInTheDocument();
   });
@@ -111,7 +109,7 @@ describe('QuickStatsRow Component', () => {
         icon: TrendingUp,
       },
     ];
-    
+
     render(<QuickStatsRow stats={stringStats} />);
     expect(screen.getByText('25.5%')).toBeInTheDocument();
   });
@@ -124,7 +122,7 @@ describe('QuickStatsRow Component', () => {
         icon: Users,
       },
     ];
-    
+
     render(<QuickStatsRow stats={statsWithoutColor} />);
     expect(screen.getByText('اختبار')).toBeInTheDocument();
   });
@@ -137,10 +135,10 @@ describe('QuickStatsRow Component', () => {
       { label: 'خطر', value: '4', icon: Users, color: 'danger' as const },
       { label: 'معلومة', value: '5', icon: Users, color: 'info' as const },
     ];
-    
+
     render(<QuickStatsRow stats={coloredStats} />);
-    
-    coloredStats.forEach(stat => {
+
+    coloredStats.forEach((stat) => {
       expect(screen.getByText(stat.label)).toBeInTheDocument();
     });
   });

@@ -4,11 +4,15 @@
  * @version 2.9.11
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { RentalPaymentService, type RentalPayment, type RentalPaymentFilters } from "@/services/rental-payment.service";
-import type { PaginatedResult } from "@/lib/pagination.types";
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import {
+  RentalPaymentService,
+  type RentalPayment,
+  type RentalPaymentFilters,
+} from '@/services/rental-payment.service';
+import type { PaginatedResult } from '@/lib/pagination.types';
 
 interface UseRentalPaymentsPaginatedOptions {
   initialPage?: number;
@@ -18,15 +22,15 @@ interface UseRentalPaymentsPaginatedOptions {
 
 export function useRentalPaymentsPaginated(options: UseRentalPaymentsPaginatedOptions = {}) {
   const { initialPage = 1, initialPageSize = 15, filters } = options;
-  
+
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const query = useQuery({
-    queryKey: [...QUERY_KEYS.RENTAL_PAYMENTS, "paginated", page, pageSize, filters],
+    queryKey: [...QUERY_KEYS.RENTAL_PAYMENTS, 'paginated', page, pageSize, filters],
     queryFn: async (): Promise<PaginatedResult<RentalPayment>> => {
       const allPayments = await RentalPaymentService.getAll(filters);
-      
+
       const totalItems = allPayments.length;
       const totalPages = Math.ceil(totalItems / pageSize);
       const startIndex = (page - 1) * pageSize;

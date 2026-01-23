@@ -43,10 +43,7 @@ export function HistoricalRentalDetailDialog({
   monthDate,
   monthlySummary,
 }: HistoricalRentalDetailDialogProps) {
-  const { data: details, isLoading } = useHistoricalRentalByMonth(
-    fiscalYearClosingId,
-    monthDate
-  );
+  const { data: details, isLoading } = useHistoricalRentalByMonth(fiscalYearClosingId, monthDate);
 
   const formatMonthLabel = (dateStr: string) => {
     try {
@@ -94,7 +91,9 @@ export function HistoricalRentalDetailDialog({
           </DialogTitle>
           {monthlySummary && (
             <DialogDescription className="flex flex-wrap items-center gap-2 sm:gap-4 pt-2">
-              <Badge variant="outline" className="text-xs">{monthlySummary.total_units} وحدة</Badge>
+              <Badge variant="outline" className="text-xs">
+                {monthlySummary.total_units} وحدة
+              </Badge>
               <span className="flex items-center gap-1 text-success text-xs sm:text-sm">
                 <CheckCircle className="h-3 w-3" />
                 {monthlySummary.paid_count} مدفوع
@@ -136,7 +135,9 @@ export function HistoricalRentalDetailDialog({
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-muted-foreground">الوحدة:</span>
-                        <Badge variant="outline" className="me-1">{detail.unit_number || '-'}</Badge>
+                        <Badge variant="outline" className="me-1">
+                          {detail.unit_number || '-'}
+                        </Badge>
                       </div>
                       <div>
                         <span className="text-muted-foreground">الدور:</span>
@@ -146,7 +147,9 @@ export function HistoricalRentalDetailDialog({
                     <div className="flex items-center justify-between text-sm pt-2 border-t">
                       <span className="text-muted-foreground">الدفعة الشهرية</span>
                       <span className="font-bold text-success">
-                        {detail.payment_status === 'vacant' ? '-' : formatCurrency(detail.monthly_payment)}
+                        {detail.payment_status === 'vacant'
+                          ? '-'
+                          : formatCurrency(detail.monthly_payment)}
                       </span>
                     </div>
                   </div>
@@ -173,13 +176,11 @@ export function HistoricalRentalDetailDialog({
                         <TableCell className="text-center">
                           <Badge variant="outline">{detail.unit_number || '-'}</Badge>
                         </TableCell>
-                        <TableCell className="text-center">
-                          {detail.floor_number || '-'}
-                        </TableCell>
+                        <TableCell className="text-center">{detail.floor_number || '-'}</TableCell>
                         <TableCell className="font-medium">{detail.tenant_name}</TableCell>
                         <TableCell className="text-left font-semibold">
-                          {detail.payment_status === 'vacant' 
-                            ? '-' 
+                          {detail.payment_status === 'vacant'
+                            ? '-'
                             : formatCurrency(detail.monthly_payment)}
                         </TableCell>
                         <TableCell className="text-center">
@@ -189,7 +190,7 @@ export function HistoricalRentalDetailDialog({
                           {detail.contract_number || '-'}
                         </TableCell>
                         <TableCell className="text-left text-xs hidden lg:table-cell">
-                          {detail.annual_contract_value 
+                          {detail.annual_contract_value
                             ? formatCurrency(detail.annual_contract_value)
                             : '-'}
                         </TableCell>
@@ -200,9 +201,7 @@ export function HistoricalRentalDetailDialog({
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              لا توجد بيانات لهذا الشهر
-            </div>
+            <div className="text-center py-12 text-muted-foreground">لا توجد بيانات لهذا الشهر</div>
           )}
         </ScrollArea>
       </DialogContent>

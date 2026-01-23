@@ -54,7 +54,7 @@ export function BatchPaymentProcessor({
     if (isPaused) return false;
 
     // تحديث حالة الدفعة
-    setBatches(prev => {
+    setBatches((prev) => {
       const updated = [...prev];
       updated[batchIndex].status = 'processing';
       return updated;
@@ -63,20 +63,20 @@ export function BatchPaymentProcessor({
     try {
       // محاكاة معالجة الدفعة (في الواقع، هنا سيتم استدعاء API)
       const batch = batches[batchIndex];
-      
+
       for (let i = 0; i < batch.total; i++) {
         if (isPaused) {
           throw new Error('تم إيقاف المعالجة مؤقتاً');
         }
 
         // محاكاة معالجة كل عنصر في الدفعة
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // محاكاة نسبة نجاح 95%
         const success = Math.random() > 0.05;
-        
+
         if (!success) {
-          setBatches(prev => {
+          setBatches((prev) => {
             const updated = [...prev];
             updated[batchIndex].errors.push(`فشل معالجة العنصر ${i + 1}`);
             return updated;
@@ -84,7 +84,7 @@ export function BatchPaymentProcessor({
         }
 
         // تحديث التقدم
-        setBatches(prev => {
+        setBatches((prev) => {
           const updated = [...prev];
           updated[batchIndex].processed = i + 1;
           return updated;
@@ -92,7 +92,7 @@ export function BatchPaymentProcessor({
       }
 
       // نجاح الدفعة
-      setBatches(prev => {
+      setBatches((prev) => {
         const updated = [...prev];
         updated[batchIndex].status = 'completed';
         return updated;
@@ -101,12 +101,10 @@ export function BatchPaymentProcessor({
       return true;
     } catch (error) {
       // فشل الدفعة
-      setBatches(prev => {
+      setBatches((prev) => {
         const updated = [...prev];
         updated[batchIndex].status = 'failed';
-        updated[batchIndex].errors.push(
-          error instanceof Error ? error.message : 'خطأ غير متوقع'
-        );
+        updated[batchIndex].errors.push(error instanceof Error ? error.message : 'خطأ غير متوقع');
         return updated;
       });
 
@@ -129,10 +127,10 @@ export function BatchPaymentProcessor({
       }
 
       const success = await processBatch(i);
-      
+
       if (!success && batches[i].errors.length > 0) {
         // إعادة المحاولة مرة واحدة للدفعات الفاشلة
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         await processBatch(i);
       }
 
@@ -141,9 +139,9 @@ export function BatchPaymentProcessor({
 
     if (!isPaused) {
       setIsProcessing(false);
-      
-      const failedBatches = batches.filter(b => b.status === 'failed');
-      
+
+      const failedBatches = batches.filter((b) => b.status === 'failed');
+
       if (failedBatches.length === 0) {
         toast({
           title: 'اكتملت المعالجة',
@@ -176,7 +174,7 @@ export function BatchPaymentProcessor({
   const retryFailedBatches = async () => {
     const failedIndices = batches
       .map((b, i) => (b.status === 'failed' ? i : -1))
-      .filter(i => i !== -1);
+      .filter((i) => i !== -1);
 
     setIsProcessing(true);
     setIsPaused(false);
@@ -190,8 +188,8 @@ export function BatchPaymentProcessor({
 
   const totalProcessed = batches.reduce((sum, b) => sum + b.processed, 0);
   const overallProgress = (totalProcessed / totalBeneficiaries) * 100;
-  const completedBatches = batches.filter(b => b.status === 'completed').length;
-  const failedBatches = batches.filter(b => b.status === 'failed').length;
+  const completedBatches = batches.filter((b) => b.status === 'completed').length;
+  const failedBatches = batches.filter((b) => b.status === 'failed').length;
 
   return (
     <Card>
@@ -237,21 +235,21 @@ export function BatchPaymentProcessor({
               بدء المعالجة
             </Button>
           )}
-          
+
           {isProcessing && !isPaused && (
             <Button onClick={pauseProcessing} variant="outline" className="flex-1">
               <Pause className="h-4 w-4 ms-2" />
               إيقاف مؤقت
             </Button>
           )}
-          
+
           {isPaused && (
             <Button onClick={resumeProcessing} className="flex-1">
               <Play className="h-4 w-4 ms-2" />
               استئناف
             </Button>
           )}
-          
+
           {failedBatches > 0 && !isProcessing && (
             <Button onClick={retryFailedBatches} variant="destructive" className="flex-1">
               <AlertCircle className="h-4 w-4 ms-2" />
@@ -267,22 +265,33 @@ export function BatchPaymentProcessor({
             <ScrollArea className="h-[300px]">
               <div className="space-y-2">
                 {batches.map((batch) => (
-                  <Card key={batch.batchNumber} className={
-                    batch.status === 'completed' ? 'border-success' :
-                    batch.status === 'failed' ? 'border-destructive' :
-                    batch.status === 'processing' ? 'border-info' :
-                    ''
-                  }>
+                  <Card
+                    key={batch.batchNumber}
+                    className={
+                      batch.status === 'completed'
+                        ? 'border-success'
+                        : batch.status === 'failed'
+                          ? 'border-destructive'
+                          : batch.status === 'processing'
+                            ? 'border-info'
+                            : ''
+                    }
+                  >
                     <CardContent className="p-3">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">الدفعة #{batch.batchNumber}</span>
-                          <Badge variant={
-                            batch.status === 'completed' ? 'default' :
-                            batch.status === 'failed' ? 'destructive' :
-                            batch.status === 'processing' ? 'secondary' :
-                            'outline'
-                          }>
+                          <Badge
+                            variant={
+                              batch.status === 'completed'
+                                ? 'default'
+                                : batch.status === 'failed'
+                                  ? 'destructive'
+                                  : batch.status === 'processing'
+                                    ? 'secondary'
+                                    : 'outline'
+                            }
+                          >
                             {batch.status === 'pending' && 'معلق'}
                             {batch.status === 'processing' && 'جاري المعالجة'}
                             {batch.status === 'completed' && 'مكتمل'}
@@ -290,21 +299,26 @@ export function BatchPaymentProcessor({
                           </Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          {batch.status === 'completed' && <CheckCircle className="h-4 w-4 text-success" />}
-                          {batch.status === 'failed' && <XCircle className="h-4 w-4 text-destructive" />}
-                          {batch.status === 'processing' && <Loader2 className="h-4 w-4 animate-spin text-info" />}
+                          {batch.status === 'completed' && (
+                            <CheckCircle className="h-4 w-4 text-success" />
+                          )}
+                          {batch.status === 'failed' && (
+                            <XCircle className="h-4 w-4 text-destructive" />
+                          )}
+                          {batch.status === 'processing' && (
+                            <Loader2 className="h-4 w-4 animate-spin text-info" />
+                          )}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>التقدم:</span>
-                          <span>{batch.processed} / {batch.total}</span>
+                          <span>
+                            {batch.processed} / {batch.total}
+                          </span>
                         </div>
-                        <Progress 
-                          value={(batch.processed / batch.total) * 100} 
-                          className="h-1.5"
-                        />
+                        <Progress value={(batch.processed / batch.total) * 100} className="h-1.5" />
                       </div>
 
                       {batch.errors.length > 0 && (

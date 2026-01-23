@@ -114,8 +114,7 @@ describe('Circuit Breaker', () => {
     }
 
     // Next call should be rejected immediately
-    await expect(circuitBreaker.execute(failingFn))
-      .rejects.toThrow('Circuit breaker is OPEN');
+    await expect(circuitBreaker.execute(failingFn)).rejects.toThrow('Circuit breaker is OPEN');
   });
 
   it('should reset to CLOSED after successful execution in HALF_OPEN', async () => {
@@ -143,7 +142,7 @@ describe('Circuit Breaker', () => {
 
     // Execute successful call
     const result = await circuitBreaker.execute(successFn);
-    
+
     expect(result).toBe('Success');
     expect(circuitBreaker.getState()).toBe('CLOSED');
   });

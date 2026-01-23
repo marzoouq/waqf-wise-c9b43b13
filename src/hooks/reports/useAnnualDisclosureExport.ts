@@ -2,7 +2,7 @@
  * Hook لتصدير الإفصاح السنوي
  * @version 2.8.65
  */
-import { DisclosureService } from "@/services/disclosure.service";
+import { DisclosureService } from '@/services/disclosure.service';
 
 export function useAnnualDisclosureExport() {
   const fetchLatestDisclosure = async () => {

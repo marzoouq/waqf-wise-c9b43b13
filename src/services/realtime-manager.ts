@@ -4,8 +4,8 @@
  * @version 1.0.0
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { supabase } from '@/integrations/supabase/client';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type ListenerCallback = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void;
 
@@ -24,7 +24,6 @@ class RealtimeManager {
 
   private readonly MAX_CHANNELS = 20;
   private readonly CHANNEL_IDLE_TTL_MS = 60_000; // 60s قبل إزالة القناة بعد آخر مستمع
-
 
   private constructor() {
     // Singleton
@@ -52,7 +51,9 @@ class RealtimeManager {
 
     // التحقق من الحد الأقصى للقنوات
     if (this.channels.size >= this.MAX_CHANNELS && !this.channels.has(channelName)) {
-      console.warn(`[RealtimeManager] Max channels (${this.MAX_CHANNELS}) reached. Cleaning up oldest.`);
+      console.warn(
+        `[RealtimeManager] Max channels (${this.MAX_CHANNELS}) reached. Cleaning up oldest.`
+      );
       this.cleanupOldestChannel();
     }
 
@@ -66,7 +67,9 @@ class RealtimeManager {
     channelInfo.listeners.add(callback);
 
     if (import.meta.env.DEV) {
-      console.log(`[RealtimeManager] Added listener to ${table}. Total listeners: ${channelInfo.listeners.size}`);
+      console.log(
+        `[RealtimeManager] Added listener to ${table}. Total listeners: ${channelInfo.listeners.size}`
+      );
     }
 
     // إرجاع دالة إلغاء الاشتراك
@@ -77,8 +80,8 @@ class RealtimeManager {
    * الاشتراك في عدة جداول دفعة واحدة
    */
   subscribeToMultiple(tables: string[], callback: ListenerCallback): () => void {
-    const unsubscribers = tables.map(table => this.subscribe(table, callback));
-    return () => unsubscribers.forEach(unsub => unsub());
+    const unsubscribers = tables.map((table) => this.subscribe(table, callback));
+    return () => unsubscribers.forEach((unsub) => unsub());
   }
 
   /**
@@ -87,23 +90,19 @@ class RealtimeManager {
   private createChannel(table: string, channelName: string): void {
     const channel = supabase
       .channel(channelName)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table },
-        (payload) => {
-          // توزيع الحدث لجميع المستمعين
-          const channelInfo = this.channels.get(channelName);
-          if (channelInfo) {
-            channelInfo.listeners.forEach(cb => {
-              try {
-                cb(payload);
-              } catch (error) {
-                console.error(`[RealtimeManager] Listener error for ${table}:`, error);
-              }
-            });
-          }
+      .on('postgres_changes', { event: '*', schema: 'public', table }, (payload) => {
+        // توزيع الحدث لجميع المستمعين
+        const channelInfo = this.channels.get(channelName);
+        if (channelInfo) {
+          channelInfo.listeners.forEach((cb) => {
+            try {
+              cb(payload);
+            } catch (error) {
+              console.error(`[RealtimeManager] Listener error for ${table}:`, error);
+            }
+          });
         }
-      )
+      })
       .subscribe((status) => {
         if (import.meta.env.DEV) {
           console.log(`[RealtimeManager] Channel ${channelName} status: ${status}`);
@@ -117,7 +116,9 @@ class RealtimeManager {
     });
 
     if (import.meta.env.DEV) {
-      console.log(`[RealtimeManager] Created channel for ${table}. Total channels: ${this.channels.size}`);
+      console.log(
+        `[RealtimeManager] Created channel for ${table}. Total channels: ${this.channels.size}`
+      );
     }
   }
 
@@ -133,7 +134,9 @@ class RealtimeManager {
     channelInfo.listeners.delete(callback);
 
     if (import.meta.env.DEV) {
-      console.log(`[RealtimeManager] Removed listener from ${table}. Remaining: ${channelInfo.listeners.size}`);
+      console.log(
+        `[RealtimeManager] Removed listener from ${table}. Remaining: ${channelInfo.listeners.size}`
+      );
     }
 
     // إذا لم يتبق مستمعين، إزالة القناة (بشكل مؤجل لتجنب thrashing)
@@ -169,7 +172,9 @@ class RealtimeManager {
       this.channels.delete(channelName);
 
       if (import.meta.env.DEV) {
-        console.log(`[RealtimeManager] Removed channel ${channelName}. Remaining: ${this.channels.size}`);
+        console.log(
+          `[RealtimeManager] Removed channel ${channelName}. Remaining: ${this.channels.size}`
+        );
       }
     }
   }
@@ -223,7 +228,7 @@ class RealtimeManager {
    */
   getTotalListenersCount(): number {
     let count = 0;
-    this.channels.forEach(info => {
+    this.channels.forEach((info) => {
       count += info.listeners.size;
     });
     return count;
@@ -237,7 +242,7 @@ class RealtimeManager {
     this.channels.forEach((_, name) => {
       tables.push(name.replace('unified-', ''));
     });
-    
+
     return {
       channels: this.channels.size,
       listeners: this.getTotalListenersCount(),

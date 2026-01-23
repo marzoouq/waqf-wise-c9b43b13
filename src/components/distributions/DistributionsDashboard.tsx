@@ -1,13 +1,36 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { TrendingUp, DollarSign, Users, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 import { DistributionService } from '@/services';
 import { productionLogger } from '@/lib/logger/production-logger';
-import { Distribution, MonthlyDistributionData, PatternDistributionData } from '@/types/distributions';
+import {
+  Distribution,
+  MonthlyDistributionData,
+  PatternDistributionData,
+} from '@/types/distributions';
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+];
 
 export function DistributionsDashboard() {
   const [distributions, setDistributions] = useState<Distribution[]>([]);
@@ -31,49 +54,75 @@ export function DistributionsDashboard() {
   // حساب الإحصائيات
   const stats = {
     total: distributions.length,
-    thisMonth: distributions.filter(d => {
+    thisMonth: distributions.filter((d) => {
       const date = new Date(d.created_at);
       const now = new Date();
       return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
     }).length,
     totalAmount: distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0),
     avgAmount: 0,
-    completed: distributions.filter(d => d.status === 'completed' || d.status === 'مكتمل').length,
-    pending: distributions.filter(d => d.status === 'pending' || d.status === 'draft' || d.status === 'معلق' || d.status === 'مسودة').length,
+    completed: distributions.filter((d) => d.status === 'completed' || d.status === 'مكتمل').length,
+    pending: distributions.filter(
+      (d) =>
+        d.status === 'pending' ||
+        d.status === 'draft' ||
+        d.status === 'معلق' ||
+        d.status === 'مسودة'
+    ).length,
   };
 
   stats.avgAmount = stats.total > 0 ? stats.totalAmount / stats.total : 0;
 
   // تحليل حسب الشهر
-  const monthlyData = distributions.reduce((acc, d) => {
-    const monthKey = d.month || new Date(d.created_at).toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' });
-    if (!acc[monthKey]) {
-      acc[monthKey] = { month: monthKey, count: 0, amount: 0 };
-    }
-    acc[monthKey].count++;
-    acc[monthKey].amount += d.total_amount || 0;
-    return acc;
-  }, {} as Record<string, MonthlyDistributionData>);
+  const monthlyData = distributions.reduce(
+    (acc, d) => {
+      const monthKey =
+        d.month ||
+        new Date(d.created_at).toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' });
+      if (!acc[monthKey]) {
+        acc[monthKey] = { month: monthKey, count: 0, amount: 0 };
+      }
+      acc[monthKey].count++;
+      acc[monthKey].amount += d.total_amount || 0;
+      return acc;
+    },
+    {} as Record<string, MonthlyDistributionData>
+  );
 
   const monthlyChartData = Object.values(monthlyData).slice(-6);
 
   // تحليل حسب الحالة
   const statusData = [
-    { name: 'مكتمل', value: distributions.filter(d => d.status === 'completed' || d.status === 'مكتمل').length },
-    { name: 'قيد المراجعة', value: distributions.filter(d => d.status === 'pending' || d.status === 'معلق').length },
-    { name: 'مسودة', value: distributions.filter(d => d.status === 'draft' || d.status === 'مسودة').length },
-    { name: 'ملغي', value: distributions.filter(d => d.status === 'cancelled' || d.status === 'ملغي').length },
-  ].filter(s => s.value > 0);
+    {
+      name: 'مكتمل',
+      value: distributions.filter((d) => d.status === 'completed' || d.status === 'مكتمل').length,
+    },
+    {
+      name: 'قيد المراجعة',
+      value: distributions.filter((d) => d.status === 'pending' || d.status === 'معلق').length,
+    },
+    {
+      name: 'مسودة',
+      value: distributions.filter((d) => d.status === 'draft' || d.status === 'مسودة').length,
+    },
+    {
+      name: 'ملغي',
+      value: distributions.filter((d) => d.status === 'cancelled' || d.status === 'ملغي').length,
+    },
+  ].filter((s) => s.value > 0);
 
   // تحليل حسب النوع
-  const typeData = distributions.reduce((acc, d) => {
-    const type = d.distribution_type || 'غير محدد';
-    if (!acc[type]) {
-      acc[type] = { name: type, count: 0 };
-    }
-    acc[type].count++;
-    return acc;
-  }, {} as Record<string, PatternDistributionData>);
+  const typeData = distributions.reduce(
+    (acc, d) => {
+      const type = d.distribution_type || 'غير محدد';
+      if (!acc[type]) {
+        acc[type] = { name: type, count: 0 };
+      }
+      acc[type].count++;
+      return acc;
+    },
+    {} as Record<string, PatternDistributionData>
+  );
 
   const typeChartData = Object.values(typeData);
 
@@ -241,7 +290,10 @@ export function DistributionsDashboard() {
             <Card className="p-4">
               <div className="text-sm text-muted-foreground mb-1">التوزيعات الملغاة</div>
               <div className="text-2xl font-bold text-destructive">
-                {distributions.filter(d => d.status === 'cancelled' || d.status === 'ملغي').length}
+                {
+                  distributions.filter((d) => d.status === 'cancelled' || d.status === 'ملغي')
+                    .length
+                }
               </div>
             </Card>
           </div>
@@ -252,7 +304,8 @@ export function DistributionsDashboard() {
               <p className="flex items-start gap-2">
                 <span className="text-success mt-1">✓</span>
                 <span>
-                  أداء ممتاز: معدل الإكمال مرتفع ({((stats.completed / stats.total) * 100).toFixed(1)}%)
+                  أداء ممتاز: معدل الإكمال مرتفع (
+                  {((stats.completed / stats.total) * 100).toFixed(1)}%)
                 </span>
               </p>
               <p className="flex items-start gap-2">

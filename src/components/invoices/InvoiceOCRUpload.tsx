@@ -82,9 +82,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                   <p className="mb-2 text-sm text-muted-foreground">
                     <span className="font-semibold">اضغط لرفع الصورة</span> أو اسحب وأفلت
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    JPG, PNG أو PDF (حتى 10MB)
-                  </p>
+                  <p className="text-xs text-muted-foreground">JPG, PNG أو PDF (حتى 10MB)</p>
                 </div>
                 <input
                   type="file"
@@ -104,13 +102,9 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                     />
                   </div>
                 )}
-                
+
                 <div className="flex gap-2">
-                  <Button
-                    onClick={handleProcess}
-                    disabled={isProcessing}
-                    className="flex-1"
-                  >
+                  <Button onClick={handleProcess} disabled={isProcessing} className="flex-1">
                     {isProcessing ? (
                       <>
                         <Loader2 className="me-2 h-4 w-4 animate-spin" />
@@ -123,11 +117,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                       </>
                     )}
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleReset}
-                    disabled={isProcessing}
-                  >
+                  <Button variant="outline" onClick={handleReset} disabled={isProcessing}>
                     تغيير الصورة
                   </Button>
                 </div>
@@ -154,7 +144,8 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                 تم استخراج البيانات بنجاح
               </CardTitle>
               <CardDescription>
-                نسبة الثقة الإجمالية: <strong className="text-primary">{extractedData.overall_confidence}%</strong>
+                نسبة الثقة الإجمالية:{' '}
+                <strong className="text-primary">{extractedData.overall_confidence}%</strong>
                 <br />
                 يرجى مراجعة البيانات وتصحيحها إن لزم قبل الاستخدام
               </CardDescription>
@@ -163,11 +154,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
               {/* مؤشرات الثقة */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(extractedData.confidence_scores).map(([field, confidence]) => (
-                  <OCRConfidenceIndicator
-                    key={field}
-                    fieldName={field}
-                    confidence={confidence}
-                  />
+                  <OCRConfidenceIndicator key={field} fieldName={field} confidence={confidence} />
                 ))}
               </div>
 
@@ -176,20 +163,28 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                 <div>
                   <h4 className="font-semibold mb-2">معلومات الفاتورة</h4>
                   <div className="space-y-1 text-sm">
-                    <p><strong>الرقم:</strong> {extractedData.invoice_number || 'غير متوفر'}</p>
-                    <p><strong>التاريخ:</strong> {extractedData.invoice_date || 'غير متوفر'}</p>
+                    <p>
+                      <strong>الرقم:</strong> {extractedData.invoice_number || 'غير متوفر'}
+                    </p>
+                    <p>
+                      <strong>التاريخ:</strong> {extractedData.invoice_date || 'غير متوفر'}
+                    </p>
                   </div>
                 </div>
 
                 <div>
                   <h4 className="font-semibold mb-2">بيانات العميل</h4>
                   <div className="space-y-1 text-sm">
-                    <p><strong>الاسم:</strong> {extractedData.customer_name || 'غير متوفر'}</p>
                     <p>
-                      <strong>الرقم الضريبي:</strong> {extractedData.customer_vat_number || 'غير متوفر'}
-                      {extractedData.customer_vat_number && !validateVATNumber(extractedData.customer_vat_number) && (
-                        <span className="text-destructive text-xs me-2">⚠️ رقم غير صحيح</span>
-                      )}
+                      <strong>الاسم:</strong> {extractedData.customer_name || 'غير متوفر'}
+                    </p>
+                    <p>
+                      <strong>الرقم الضريبي:</strong>{' '}
+                      {extractedData.customer_vat_number || 'غير متوفر'}
+                      {extractedData.customer_vat_number &&
+                        !validateVATNumber(extractedData.customer_vat_number) && (
+                          <span className="text-destructive text-xs me-2">⚠️ رقم غير صحيح</span>
+                        )}
                     </p>
                   </div>
                 </div>
@@ -198,9 +193,16 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                   <h4 className="font-semibold mb-2">البنود ({extractedData.items.length})</h4>
                   <div className="space-y-2">
                     {extractedData.items.map((item, index) => (
-                      <div key={`item-${index}-${item.description}`} className="p-2 bg-background rounded text-sm">
-                        <p><strong>{item.description}</strong></p>
-                        <p>الكمية: {item.quantity} × {item.unit_price} ريال = {item.total} ريال</p>
+                      <div
+                        key={`item-${index}-${item.description}`}
+                        className="p-2 bg-background rounded text-sm"
+                      >
+                        <p>
+                          <strong>{item.description}</strong>
+                        </p>
+                        <p>
+                          الكمية: {item.quantity} × {item.unit_price} ريال = {item.total} ريال
+                        </p>
                       </div>
                     ))}
                   </div>

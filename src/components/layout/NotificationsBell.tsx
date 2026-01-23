@@ -1,59 +1,56 @@
-import { Bell, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Bell, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { NotificationItem } from "@/components/notifications/NotificationItem";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { useNavigate } from "react-router-dom";
-import { memo, useCallback, useState } from "react";
-import { RealtimeNotification } from "@/types/notifications";
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useNotifications } from '@/hooks/notifications/useNotifications';
+import { NotificationItem } from '@/components/notifications/NotificationItem';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { useNavigate } from 'react-router-dom';
+import { memo, useCallback, useState } from 'react';
+import { RealtimeNotification } from '@/types/notifications';
 
 export const NotificationsBell = memo(function NotificationsBell() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  
-  // useNotifications already handles Realtime subscriptions internally
-  const { 
-    notifications, 
-    isLoading, 
-    unreadCount, 
-    markAsRead, 
-    markAllAsRead,
-    isMarkingAllAsRead 
-  } = useNotifications();
 
-  const handleNotificationClick = useCallback((notification: RealtimeNotification) => {
-    if (notification.action_url) {
-      navigate(notification.action_url);
-      setIsOpen(false);
-    }
-  }, [navigate]);
+  // useNotifications already handles Realtime subscriptions internally
+  const { notifications, isLoading, unreadCount, markAsRead, markAllAsRead, isMarkingAllAsRead } =
+    useNotifications();
+
+  const handleNotificationClick = useCallback(
+    (notification: RealtimeNotification) => {
+      if (notification.action_url) {
+        navigate(notification.action_url);
+        setIsOpen(false);
+      }
+    },
+    [navigate]
+  );
 
   const handleViewAll = useCallback(() => {
-    navigate("/notifications");
+    navigate('/notifications');
     setIsOpen(false);
   }, [navigate]);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="relative"
           aria-label={`الإشعارات${unreadCount > 0 ? ` - ${unreadCount} غير مقروءة` : ''}`}
         >
           <Bell className="h-5 w-5" aria-hidden="true" />
           {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -61,8 +58,8 @@ export const NotificationsBell = memo(function NotificationsBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align="end" 
+      <DropdownMenuContent
+        align="end"
         className="w-80 sm:w-96 max-w-[calc(100vw-1rem)] p-0"
         sideOffset={8}
       >
@@ -82,7 +79,7 @@ export const NotificationsBell = memo(function NotificationsBell() {
             </Button>
           )}
         </div>
-        
+
         {isLoading ? (
           <div className="p-4">
             <LoadingState message="جاري تحميل الإشعارات..." />
@@ -109,11 +106,7 @@ export const NotificationsBell = memo(function NotificationsBell() {
           <>
             <DropdownMenuSeparator />
             <div className="p-2">
-              <Button
-                variant="ghost"
-                className="w-full text-sm"
-                onClick={handleViewAll}
-              >
+              <Button variant="ghost" className="w-full text-sm" onClick={handleViewAll}>
                 عرض جميع الإشعارات
               </Button>
             </div>

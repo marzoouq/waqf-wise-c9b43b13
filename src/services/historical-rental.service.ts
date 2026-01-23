@@ -131,7 +131,10 @@ export const HistoricalRentalService = {
   /**
    * تحديث سجل
    */
-  async update(id: string, updates: Partial<CreateHistoricalRentalInput>): Promise<HistoricalRentalDetail> {
+  async update(
+    id: string,
+    updates: Partial<CreateHistoricalRentalInput>
+  ): Promise<HistoricalRentalDetail> {
     const { data, error } = await supabase
       .from('historical_rental_details')
       .update(updates)
@@ -149,8 +152,10 @@ export const HistoricalRentalService = {
    * ⚠️ الحذف الفيزيائي ممنوع شرعاً
    */
   async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('historical_rental_details')
       .update({
@@ -166,9 +171,15 @@ export const HistoricalRentalService = {
   /**
    * حذف جميع سجلات شهر محدد (Soft Delete)
    */
-  async deleteByMonth(closingId: string, monthDate: string, reason: string = 'أرشفة الشهر'): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+  async deleteByMonth(
+    closingId: string,
+    monthDate: string,
+    reason: string = 'أرشفة الشهر'
+  ): Promise<void> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('historical_rental_details')
       .update({
@@ -208,5 +219,5 @@ export const HistoricalRentalService = {
 
     if (error) throw error;
     return data?.id || null;
-  }
+  },
 };

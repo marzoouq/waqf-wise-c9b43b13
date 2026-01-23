@@ -2,11 +2,11 @@
  * أنواع صفوف الجداول للاستخدام في UnifiedDataTable
  */
 
-import type { EmergencyAid } from "./loans";
-import type { Loan } from "@/hooks/payments/useLoans";
+import type { EmergencyAid } from './loans';
+import type { Loan } from '@/hooks/payments/useLoans';
 
 // Badge variants type
-export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 // Badge variants mapping type
 export type BadgeVariantMap = Record<string, BadgeVariant>;

@@ -1,9 +1,9 @@
 /**
  * Hook for approval workflow management
  */
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface ApprovalStep {
   level: number;
@@ -27,7 +27,12 @@ export interface ApprovalStatus {
 }
 
 export function useApprovalWorkflow() {
-  const { data: pendingApprovals = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: pendingApprovals = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.PENDING_APPROVALS,
     queryFn: async () => {
       const data = await AccountingService.getApprovalWorkflowStatus();

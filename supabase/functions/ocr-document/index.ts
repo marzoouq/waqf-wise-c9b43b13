@@ -1,11 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { 
-  handleCors, 
-  jsonResponse, 
-  errorResponse, 
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  handleCors,
+  jsonResponse,
+  errorResponse,
   unauthorizedResponse,
-  forbiddenResponse 
+  forbiddenResponse,
 } from '../_shared/cors.ts';
 
 serve(async (req) => {
@@ -45,20 +45,20 @@ serve(async (req) => {
     );
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return unauthorizedResponse('Invalid or expired token');
     }
 
     // التحقق من الصلاحيات - يجب أن يكون أرشيفي أو مسؤول
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
+    const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-    const hasAccess = roles?.some(r => ['admin', 'nazer', 'archivist'].includes(r.role));
-    
+    const hasAccess = roles?.some((r) => ['admin', 'nazer', 'archivist'].includes(r.role));
+
     if (!hasAccess) {
       return forbiddenResponse('Unauthorized - Archivist or Admin access required');
     }
@@ -96,7 +96,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+        Authorization: `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
@@ -106,16 +106,16 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: 'استخرج كل النص من هذه الصورة/المستند بدقة عالية. قدم النص فقط بدون أي تعليقات إضافية.'
+                text: 'استخرج كل النص من هذه الصورة/المستند بدقة عالية. قدم النص فقط بدون أي تعليقات إضافية.',
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: `data:${fileBlob.type};base64,${fileBase64}`
-                }
-              }
-            ]
-          }
+                  url: `data:${fileBlob.type};base64,${fileBase64}`,
+                },
+              },
+            ],
+          },
         ],
         max_tokens: 4000,
       }),
@@ -143,7 +143,11 @@ serve(async (req) => {
 
     // حفظ النص في المستند أو المرفق
     if (documentId) {
-      const { data: docData } = await supabase.from('documents').select('description').eq('id', documentId).maybeSingle();
+      const { data: docData } = await supabase
+        .from('documents')
+        .select('description')
+        .eq('id', documentId)
+        .maybeSingle();
       await supabase
         .from('documents')
         .update({ description: (docData?.description || '') + '\n\n[نص مستخرج]: ' + extractedText })
@@ -158,17 +162,17 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('OCR Error:', error);
-    
+
     // تسجيل تفاصيل كاملة للمطورين
     console.error('Full error details:', {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     // رسالة آمنة للعميل
     let safeMessage = 'حدث خطأ أثناء معالجة المستند';
-    
+
     if (error instanceof Error) {
       if (error.message.includes('authorization') || error.message.includes('Unauthorized')) {
         safeMessage = 'غير مصرح بالوصول - يتطلب دور أرشيفي أو مسؤول';
@@ -178,7 +182,7 @@ serve(async (req) => {
         safeMessage = 'فشلت معالجة استخراج النص، يرجى المحاولة مرة أخرى';
       }
     }
-    
+
     return errorResponse(safeMessage, 500);
   }
 });

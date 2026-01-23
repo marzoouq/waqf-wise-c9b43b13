@@ -4,13 +4,13 @@
  */
 
 import { useEffect, useCallback } from 'react';
-import { 
-  isChunkLoadError, 
-  getChunkErrorInfo, 
+import {
+  isChunkLoadError,
+  getChunkErrorInfo,
   logChunkError,
   getChunkErrorLogs,
   clearChunkErrorLogs,
-  type ChunkErrorInfo 
+  type ChunkErrorInfo,
 } from '@/lib/errors/chunk-error-handler';
 
 const FAILURE_THRESHOLD = 3;
@@ -56,15 +56,15 @@ export function useChunkErrorTracking() {
   const getErrorStats = useCallback((): ChunkErrorStats => {
     const logs = getChunkErrorLogs();
     const now = Date.now();
-    
+
     // Filter to recent errors only
-    const recentLogs = logs.filter(log => {
+    const recentLogs = logs.filter((log) => {
       const logTime = new Date(log.timestamp).getTime();
       return now - logTime < FAILURE_WINDOW_MS;
     });
 
     const errorTypes: Record<string, number> = {};
-    recentLogs.forEach(log => {
+    recentLogs.forEach((log) => {
       errorTypes[log.type] = (errorTypes[log.type] || 0) + 1;
     });
 
@@ -72,22 +72,22 @@ export function useChunkErrorTracking() {
       totalErrors: recentLogs.length,
       lastError: recentLogs[recentLogs.length - 1]?.timestamp || null,
       errorTypes,
-      shouldEscalate: recentLogs.length >= FAILURE_THRESHOLD
+      shouldEscalate: recentLogs.length >= FAILURE_THRESHOLD,
     };
   }, []);
 
   /**
    * تسجيل خطأ يدوياً
    */
-  const trackError = useCallback((
-    error: unknown,
-    context?: { component?: string; attempt?: number }
-  ): ChunkErrorInfo | null => {
-    if (!isChunkLoadError(error)) return null;
-    
-    logChunkError(error, { ...context, action: 'initial' });
-    return getChunkErrorInfo(error);
-  }, []);
+  const trackError = useCallback(
+    (error: unknown, context?: { component?: string; attempt?: number }): ChunkErrorInfo | null => {
+      if (!isChunkLoadError(error)) return null;
+
+      logChunkError(error, { ...context, action: 'initial' });
+      return getChunkErrorInfo(error);
+    },
+    []
+  );
 
   /**
    * فحص إذا كان يجب التصعيد للدعم الفني
@@ -109,7 +109,7 @@ export function useChunkErrorTracking() {
     shouldEscalate,
     clearErrors,
     isChunkLoadError,
-    getChunkErrorInfo
+    getChunkErrorInfo,
   };
 }
 

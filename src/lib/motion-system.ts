@@ -21,17 +21,17 @@ export const EASING = {
   easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
   easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
   easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  
+
   // Material Design easings
   standard: 'cubic-bezier(0.2, 0, 0, 1)',
   decelerate: 'cubic-bezier(0, 0, 0, 1)',
   accelerate: 'cubic-bezier(0.3, 0, 1, 1)',
-  
+
   // Spring-like easings
   spring: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
   elastic: 'cubic-bezier(0.68, -0.6, 0.32, 1.6)',
-  
+
   // Custom
   snappy: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
   smooth: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
@@ -44,49 +44,49 @@ export const TRANSITIONS = {
     duration: DURATIONS.medium,
     easing: EASING.standard,
   },
-  
+
   // Dialog/Modal
   dialog: {
     duration: DURATIONS.normal,
     easing: EASING.spring,
   },
-  
+
   // Dropdown/Popover
   dropdown: {
     duration: DURATIONS.fast,
     easing: EASING.easeOut,
   },
-  
+
   // Card hover/press
   card: {
     duration: DURATIONS.fast,
     easing: EASING.easeOut,
   },
-  
+
   // Button press
   button: {
     duration: DURATIONS.instant,
     easing: EASING.easeOut,
   },
-  
+
   // Fade
   fade: {
     duration: DURATIONS.normal,
     easing: EASING.easeInOut,
   },
-  
+
   // Slide
   slide: {
     duration: DURATIONS.medium,
     easing: EASING.decelerate,
   },
-  
+
   // Scale
   scale: {
     duration: DURATIONS.fast,
     easing: EASING.spring,
   },
-  
+
   // Skeleton shimmer
   skeleton: {
     duration: 1500,
@@ -150,7 +150,10 @@ export const KEYFRAMES = {
     to: { transform: 'rotate(360deg)' },
   },
   bounce: {
-    '0%, 100%': { transform: 'translateY(-25%)', animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)' },
+    '0%, 100%': {
+      transform: 'translateY(-25%)',
+      animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)',
+    },
     '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)' },
   },
   shake: {
@@ -169,7 +172,7 @@ export const framerVariants = {
     exit: { opacity: 0, y: -10 },
     transition: { duration: TRANSITIONS.page.duration / 1000, ease: [0.2, 0, 0, 1] },
   },
-  
+
   // Fade
   fade: {
     initial: { opacity: 0 },
@@ -177,7 +180,7 @@ export const framerVariants = {
     exit: { opacity: 0 },
     transition: { duration: TRANSITIONS.fade.duration / 1000 },
   },
-  
+
   // Slide up
   slideUp: {
     initial: { opacity: 0, y: 20 },
@@ -185,7 +188,7 @@ export const framerVariants = {
     exit: { opacity: 0, y: 20 },
     transition: { duration: TRANSITIONS.slide.duration / 1000, ease: [0, 0, 0, 1] },
   },
-  
+
   // Slide from right (for RTL: slide from left)
   slideRight: {
     initial: { opacity: 0, x: 20 },
@@ -193,7 +196,7 @@ export const framerVariants = {
     exit: { opacity: 0, x: 20 },
     transition: { duration: TRANSITIONS.slide.duration / 1000 },
   },
-  
+
   // Scale
   scale: {
     initial: { opacity: 0, scale: 0.95 },
@@ -201,7 +204,7 @@ export const framerVariants = {
     exit: { opacity: 0, scale: 0.95 },
     transition: { duration: TRANSITIONS.scale.duration / 1000, ease: [0.175, 0.885, 0.32, 1.275] },
   },
-  
+
   // Dialog
   dialog: {
     initial: { opacity: 0, scale: 0.95, y: 10 },
@@ -209,7 +212,7 @@ export const framerVariants = {
     exit: { opacity: 0, scale: 0.95, y: 10 },
     transition: { duration: TRANSITIONS.dialog.duration / 1000, ease: [0.175, 0.885, 0.32, 1.275] },
   },
-  
+
   // Dropdown
   dropdown: {
     initial: { opacity: 0, y: -8, scale: 0.96 },
@@ -217,7 +220,7 @@ export const framerVariants = {
     exit: { opacity: 0, y: -8, scale: 0.96 },
     transition: { duration: TRANSITIONS.dropdown.duration / 1000 },
   },
-  
+
   // List items (staggered)
   listContainer: {
     initial: {},
@@ -233,14 +236,14 @@ export const framerVariants = {
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.2 },
   },
-  
+
   // Card hover
   card: {
     rest: { scale: 1 },
     hover: { scale: 1.02 },
     tap: { scale: 0.98 },
   },
-  
+
   // Button press
   button: {
     rest: { scale: 1 },
@@ -253,7 +256,7 @@ export const ANIMATION_CLASSES = {
   // Fade
   fadeIn: 'animate-in fade-in',
   fadeOut: 'animate-out fade-out',
-  
+
   // Slide
   slideInUp: 'animate-in slide-in-from-bottom-2',
   slideInDown: 'animate-in slide-in-from-top-2',
@@ -261,21 +264,21 @@ export const ANIMATION_CLASSES = {
   slideInRight: 'animate-in slide-in-from-right-2',
   slideOutUp: 'animate-out slide-out-to-top-2',
   slideOutDown: 'animate-out slide-out-to-bottom-2',
-  
+
   // Zoom
   zoomIn: 'animate-in zoom-in-95',
   zoomOut: 'animate-out zoom-out-95',
-  
+
   // Combined
   fadeInSlideUp: 'animate-in fade-in slide-in-from-bottom-2',
   fadeInScale: 'animate-in fade-in zoom-in-95',
-  
+
   // Duration modifiers
   durationFast: 'duration-100',
   durationNormal: 'duration-200',
   durationMedium: 'duration-300',
   durationSlow: 'duration-500',
-  
+
   // Fill mode
   fillForwards: 'fill-mode-forwards',
   fillBackwards: 'fill-mode-backwards',
@@ -295,7 +298,7 @@ export function createTransition(
 ): string {
   const props = Array.isArray(properties) ? properties : [properties];
   return props
-    .map(prop => `${prop} ${duration}ms ${easing}${delay ? ` ${delay}ms` : ''}`)
+    .map((prop) => `${prop} ${duration}ms ${easing}${delay ? ` ${delay}ms` : ''}`)
     .join(', ');
 }
 

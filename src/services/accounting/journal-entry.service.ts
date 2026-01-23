@@ -50,14 +50,16 @@ export class JournalEntryService {
       return await withRetry(async () => {
         const { data, error } = await supabase
           .from('journal_entries')
-          .select(`
+          .select(
+            `
             *,
             journal_entry_lines (
               *,
               accounts (code, name_ar, account_type)
             )
-          `)
-          .is('deleted_at', null)  // فلتر الحذف الناعم
+          `
+          )
+          .is('deleted_at', null) // فلتر الحذف الناعم
           .order('entry_date', { ascending: false });
 
         if (error) throw error;
@@ -79,10 +81,7 @@ export class JournalEntryService {
   }): Promise<JournalEntryRow[]> {
     try {
       return await withRetry(async () => {
-        let query = supabase
-          .from('journal_entries')
-          .select('*')
-          .is('deleted_at', null);  // فلتر الحذف الناعم
+        let query = supabase.from('journal_entries').select('*').is('deleted_at', null); // فلتر الحذف الناعم
 
         if (filters?.status && filters.status !== 'all') {
           query = query.eq('status', filters.status as JournalEntryRow['status']);
@@ -131,7 +130,12 @@ export class JournalEntryService {
    */
   static async createJournalEntry(
     entry: Omit<JournalEntryInsert, 'id' | 'created_at' | 'updated_at'>,
-    lines: Array<{ account_id: string; debit_amount: number; credit_amount: number; description?: string }>
+    lines: Array<{
+      account_id: string;
+      debit_amount: number;
+      credit_amount: number;
+      description?: string;
+    }>
   ): Promise<JournalEntryRow> {
     try {
       // التحقق من توازن القيد
@@ -159,9 +163,7 @@ export class JournalEntryService {
         line_number: index + 1,
       }));
 
-      const { error: linesError } = await supabase
-        .from('journal_entry_lines')
-        .insert(entryLines);
+      const { error: linesError } = await supabase.from('journal_entry_lines').insert(entryLines);
 
       if (linesError) throw linesError;
 
@@ -263,7 +265,11 @@ export class JournalEntryService {
   /**
    * الموافقة على قيد محاسبي
    */
-  static async approveJournalEntry(id: string, action: 'approve' | 'reject', notes?: string): Promise<JournalEntryRow | null> {
+  static async approveJournalEntry(
+    id: string,
+    action: 'approve' | 'reject',
+    notes?: string
+  ): Promise<JournalEntryRow | null> {
     try {
       const status = action === 'approve' ? 'posted' : 'cancelled';
       const { data, error } = await supabase
@@ -316,11 +322,11 @@ export class JournalEntryService {
   static async getRecentJournalEntries(limit: number = 5): Promise<JournalEntryRow[]> {
     try {
       const { data, error } = await supabase
-        .from("journal_entries")
-        .select("id, entry_number, description, status, entry_date")
-        .order("created_at", { ascending: false })
+        .from('journal_entries')
+        .select('id, entry_number, description, status, entry_date')
+        .order('created_at', { ascending: false })
         .limit(limit);
-      
+
       if (error) throw error;
       return (data || []) as JournalEntryRow[];
     } catch (error) {
@@ -334,13 +340,15 @@ export class JournalEntryService {
    */
   static async getJournalEntryLinesWithAccount(entryId: string) {
     const { data, error } = await supabase
-      .from("journal_entry_lines")
-      .select(`
+      .from('journal_entry_lines')
+      .select(
+        `
         *,
         account:accounts(code, name_ar)
-      `)
-      .eq("journal_entry_id", entryId)
-      .order("line_number");
+      `
+      )
+      .eq('journal_entry_id', entryId)
+      .order('line_number');
 
     if (error) throw error;
     return data || [];
@@ -351,9 +359,9 @@ export class JournalEntryService {
    */
   static async postJournalEntryById(entryId: string) {
     const { error } = await supabase
-      .from("journal_entries")
-      .update({ status: "posted", posted_at: new Date().toISOString() })
-      .eq("id", entryId);
+      .from('journal_entries')
+      .update({ status: 'posted', posted_at: new Date().toISOString() })
+      .eq('id', entryId);
 
     if (error) throw error;
   }
@@ -376,24 +384,30 @@ export class JournalEntryService {
   /**
    * جلب سطور القيود حسب الحساب
    */
-  static async getJournalEntryLinesByAccount(accountId: string, options?: {
-    startDate?: string;
-    endDate?: string;
-  }): Promise<{
-    id: string;
-    debit_amount: number;
-    credit_amount: number;
-    description?: string;
-    journal_entries: {
-      entry_number: string;
-      entry_date: string;
-      description: string;
-      status: string;
-    };
-  }[]> {
+  static async getJournalEntryLinesByAccount(
+    accountId: string,
+    options?: {
+      startDate?: string;
+      endDate?: string;
+    }
+  ): Promise<
+    {
+      id: string;
+      debit_amount: number;
+      credit_amount: number;
+      description?: string;
+      journal_entries: {
+        entry_number: string;
+        entry_date: string;
+        description: string;
+        status: string;
+      };
+    }[]
+  > {
     let query = supabase
       .from('journal_entry_lines')
-      .select(`
+      .select(
+        `
         *,
         journal_entries(
           entry_number,
@@ -401,7 +415,8 @@ export class JournalEntryService {
           description,
           status
         )
-      `)
+      `
+      )
       .eq('account_id', accountId)
       .order('created_at', { ascending: true });
 

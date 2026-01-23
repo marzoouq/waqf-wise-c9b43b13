@@ -1,13 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DistributionService, RealtimeService, EdgeFunctionService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/hooks/auth/useAuth";
-import { useEffect } from "react";
-import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import type { Distribution } from "@/types/distributions";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { DistributionService, RealtimeService, EdgeFunctionService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useActivities } from '@/hooks/ui/useActivities';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import type { Distribution } from '@/types/distributions';
 
 export type { Distribution };
 
@@ -33,24 +33,24 @@ export function useDistributions() {
   });
 
   const addDistribution = useMutation({
-    mutationFn: async (distribution: Omit<Distribution, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (distribution: Omit<Distribution, 'id' | 'created_at' | 'updated_at'>) => {
       return DistributionService.create(distribution);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
-      
+
       addActivity({
         action: `تم إنشاء توزيع جديد لشهر ${data.month} بمبلغ ${data.total_amount} ريال`,
         user_name: user?.email || 'النظام',
       }).catch((error) => {
         logger.error(error, { context: 'add_distribution_activity', severity: 'low' });
       });
-      
+
       toast({
-        title: "تم إنشاء التوزيع بنجاح",
-        description: "تم إنشاء التوزيع وإنشاء القيد المحاسبي",
+        title: 'تم إنشاء التوزيع بنجاح',
+        description: 'تم إنشاء التوزيع وإنشاء القيد المحاسبي',
       });
     },
     onError: createMutationErrorHandler({
@@ -66,10 +66,10 @@ export function useDistributions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
-      
+
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث التوزيع بنجاح",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث التوزيع بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -86,10 +86,10 @@ export function useDistributions() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
-      
+
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف التوزيع بنجاح",
+        title: 'تم الحذف بنجاح',
+        description: 'تم حذف التوزيع بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -98,38 +98,42 @@ export function useDistributions() {
     }),
   });
 
-  const generateDistribution = async (periodStart: string, periodEnd: string, waqfCorpusPercentage: number = 0) => {
+  const generateDistribution = async (
+    periodStart: string,
+    periodEnd: string,
+    waqfCorpusPercentage: number = 0
+  ) => {
     try {
       const result = await EdgeFunctionService.invoke<{
         summary: {
           distributable_amount: number;
           beneficiaries_count: number;
         };
-      }>("generate-distribution-summary", {
+      }>('generate-distribution-summary', {
         period_start: periodStart,
         period_end: periodEnd,
         distribution_type: 'شهري',
         waqf_corpus_percentage: waqfCorpusPercentage,
       });
-      
+
       if (!result.success) throw new Error(result.error);
-      
+
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.HEIR_DISTRIBUTIONS });
-      
+
       const summary = result.data?.summary || { distributable_amount: 0, beneficiaries_count: 0 };
       toast({
-        title: "تم إنشاء التوزيع بنجاح",
+        title: 'تم إنشاء التوزيع بنجاح',
         description: `تم توزيع ${summary.distributable_amount || 0} ريال على ${summary.beneficiaries_count || 0} مستفيد`,
       });
 
       return result.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء التوزيع";
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء التوزيع';
       toast({
-        title: "خطأ في إنشاء التوزيع",
+        title: 'خطأ في إنشاء التوزيع',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
       throw error;
     }

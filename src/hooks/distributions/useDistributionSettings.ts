@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { WaqfDistributionSettings } from "@/types/distributions";
-import { FundService } from "@/services/fund.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { WaqfDistributionSettings } from '@/types/distributions';
+import { FundService } from '@/services/fund.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useDistributionSettings() {
   const { toast } = useToast();
@@ -14,20 +14,20 @@ export function useDistributionSettings() {
   });
 
   const updateSettings = useMutation({
-    mutationFn: (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) => 
+    mutationFn: (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) =>
       FundService.updateDistributionSettings(settings?.id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_SETTINGS });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث إعدادات التوزيع",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث إعدادات التوزيع',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ في التحديث",
+        title: 'خطأ في التحديث',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

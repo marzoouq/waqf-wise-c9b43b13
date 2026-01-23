@@ -3,8 +3,8 @@
  * @version 2.8.25
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { matchesStatus } from "@/lib/constants";
+import { supabase } from '@/integrations/supabase/client';
+import { matchesStatus } from '@/lib/constants';
 
 export interface SystemSetting {
   id: string;
@@ -83,10 +83,7 @@ export class SystemService {
    * جلب جميع إعدادات النظام
    */
   static async getSettings(): Promise<SystemSetting[]> {
-    const { data, error } = await supabase
-      .from("system_settings")
-      .select("*")
-      .order("setting_key");
+    const { data, error } = await supabase.from('system_settings').select('*').order('setting_key');
 
     if (error) throw error;
     return (data || []) as unknown as SystemSetting[];
@@ -97,9 +94,9 @@ export class SystemService {
    */
   static async updateSetting(key: string, value: string): Promise<void> {
     const { error } = await supabase
-      .from("system_settings")
+      .from('system_settings')
       .update({ setting_value: value, updated_at: new Date().toISOString() })
-      .eq("setting_key", key);
+      .eq('setting_key', key);
 
     if (error) throw error;
   }
@@ -109,14 +106,14 @@ export class SystemService {
    */
   static async getSystemHealth(): Promise<SystemHealth> {
     const startTime = Date.now();
-    
+
     const [dbTestResult, storageResult, healthChecksResult] = await Promise.all([
-      supabase.from("activities").select("id").limit(1),
-      supabase.from("beneficiary_attachments").select("file_size"),
+      supabase.from('activities').select('id').limit(1),
+      supabase.from('beneficiary_attachments').select('file_size'),
       supabase
-        .from("system_health_checks")
-        .select("*")
-        .order("created_at", { ascending: false })
+        .from('system_health_checks')
+        .select('*')
+        .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
     ]);
@@ -128,7 +125,9 @@ export class SystemService {
 
     const totalUsed = storageData?.reduce((sum, file) => sum + (file.file_size || 0), 0) || 0;
 
-    let uptimeDays = 0, uptimeHours = 0, uptimeMinutes = 0;
+    let uptimeDays = 0,
+      uptimeHours = 0,
+      uptimeMinutes = 0;
     if (healthCheck?.created_at) {
       const firstCheckTime = new Date(healthCheck.created_at);
       const now = new Date();
@@ -167,19 +166,24 @@ export class SystemService {
    */
   static async getSecurityAlerts(): Promise<SecurityAlert[]> {
     const { data, error } = await supabase
-      .from("audit_logs")
-      .select("id, action_type, severity, description, table_name, user_email, ip_address, created_at")
-      .in("severity", ["error", "warn"])
-      .order("created_at", { ascending: false })
+      .from('audit_logs')
+      .select(
+        'id, action_type, severity, description, table_name, user_email, ip_address, created_at'
+      )
+      .in('severity', ['error', 'warn'])
+      .order('created_at', { ascending: false })
       .limit(15);
 
     if (error) throw error;
 
-    return (data || []).map(log => ({
+    return (data || []).map((log) => ({
       id: log.id,
-      type: log.action_type.includes('login') ? 'failed_login' as const : 
-            log.action_type.includes('permission') ? 'permission_change' as const : 'suspicious_activity' as const,
-      severity: log.severity === 'error' ? 'high' as const : 'medium' as const,
+      type: log.action_type.includes('login')
+        ? ('failed_login' as const)
+        : log.action_type.includes('permission')
+          ? ('permission_change' as const)
+          : ('suspicious_activity' as const),
+      severity: log.severity === 'error' ? ('high' as const) : ('medium' as const),
       message: log.description || `${log.action_type} في ${log.table_name || 'النظام'}`,
       user_email: log.user_email || undefined,
       ip_address: log.ip_address || undefined,
@@ -193,9 +197,11 @@ export class SystemService {
    */
   static async getBackupLogs(): Promise<BackupLog[]> {
     const { data, error } = await supabase
-      .from("backup_logs")
-      .select("id, backup_type, status, file_path, file_size, tables_included, started_at, completed_at, error_message, created_at")
-      .order("created_at", { ascending: false })
+      .from('backup_logs')
+      .select(
+        'id, backup_type, status, file_path, file_size, tables_included, started_at, completed_at, error_message, created_at'
+      )
+      .order('created_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
@@ -207,9 +213,11 @@ export class SystemService {
    */
   static async getBackupSchedules(): Promise<BackupSchedule[]> {
     const { data, error } = await supabase
-      .from("backup_schedules")
-      .select("id, schedule_name, backup_type, frequency, tables_included, retention_days, is_active, include_storage, last_backup_at, next_backup_at, created_at, updated_at")
-      .eq("is_active", true);
+      .from('backup_schedules')
+      .select(
+        'id, schedule_name, backup_type, frequency, tables_included, retention_days, is_active, include_storage, last_backup_at, next_backup_at, created_at, updated_at'
+      )
+      .eq('is_active', true);
 
     if (error) throw error;
     return data || [];
@@ -218,18 +226,18 @@ export class SystemService {
   /**
    * إنشاء نسخة احتياطية
    */
-  static async createBackup(tablesIncluded?: string[]): Promise<{ 
-    success: boolean; 
-    message?: string; 
-    filePath?: string; 
-    content?: string; 
-    fileName?: string; 
-    totalRecords?: number; 
-    totalTables?: number; 
+  static async createBackup(tablesIncluded?: string[]): Promise<{
+    success: boolean;
+    message?: string;
+    filePath?: string;
+    content?: string;
+    fileName?: string;
+    totalRecords?: number;
+    totalTables?: number;
   }> {
-    const { data, error } = await supabase.functions.invoke("backup-database", {
+    const { data, error } = await supabase.functions.invoke('backup-database', {
       body: {
-        backupType: "manual",
+        backupType: 'manual',
         tablesIncluded: tablesIncluded || [],
       },
     });
@@ -241,12 +249,15 @@ export class SystemService {
   /**
    * استعادة نسخة احتياطية
    */
-  static async restoreBackup(backupData: Record<string, unknown>, mode: "replace" | "merge" = "replace"): Promise<{ 
-    success: boolean; 
-    message?: string; 
-    restoredTables?: string[]; 
+  static async restoreBackup(
+    backupData: Record<string, unknown>,
+    mode: 'replace' | 'merge' = 'replace'
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    restoredTables?: string[];
   }> {
-    const { data, error } = await supabase.functions.invoke("restore-database", {
+    const { data, error } = await supabase.functions.invoke('restore-database', {
       body: {
         backupData,
         mode,
@@ -262,20 +273,20 @@ export class SystemService {
    */
   static async getSystemErrors(severityFilter: string, statusFilter: string) {
     let query = supabase
-      .from("system_error_logs")
-      .select("*")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false })
+      .from('system_error_logs')
+      .select('*')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
       .limit(50);
-    
-    if (severityFilter !== "all") {
-      query = query.eq("severity", severityFilter);
+
+    if (severityFilter !== 'all') {
+      query = query.eq('severity', severityFilter);
     }
-    
-    if (statusFilter !== "all") {
-      query = query.eq("status", statusFilter);
+
+    if (statusFilter !== 'all') {
+      query = query.eq('status', statusFilter);
     }
-    
+
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
@@ -287,15 +298,15 @@ export class SystemService {
   static async deleteResolvedErrors() {
     const { data: user } = await supabase.auth.getUser();
     const { error } = await supabase
-      .from("system_error_logs")
+      .from('system_error_logs')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.user?.id || null,
-        deletion_reason: 'أرشفة تلقائية للأخطاء المحلولة'
+        deletion_reason: 'أرشفة تلقائية للأخطاء المحلولة',
       })
-      .eq("status", "resolved")
-      .is("deleted_at", null);
-    
+      .eq('status', 'resolved')
+      .is('deleted_at', null);
+
     if (error) throw error;
   }
 
@@ -303,11 +314,8 @@ export class SystemService {
    * تحديث حالة الخطأ
    */
   static async updateErrorStatus(id: string, status: string) {
-    const { error } = await supabase
-      .from("system_error_logs")
-      .update({ status })
-      .eq("id", id);
-    
+    const { error } = await supabase.from('system_error_logs').update({ status }).eq('id', id);
+
     if (error) throw error;
   }
 
@@ -317,14 +325,14 @@ export class SystemService {
   static async deleteAllErrors() {
     const { data: user } = await supabase.auth.getUser();
     const { error } = await supabase
-      .from("system_error_logs")
+      .from('system_error_logs')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.user?.id || null,
-        deletion_reason: 'أرشفة شاملة بأمر إداري'
+        deletion_reason: 'أرشفة شاملة بأمر إداري',
       })
-      .is("deleted_at", null);
-    
+      .is('deleted_at', null);
+
     if (error) throw error;
   }
 
@@ -337,44 +345,53 @@ export class SystemService {
 
     const [errorsResult, alertsResult] = await Promise.all([
       supabase
-        .from("system_error_logs")
-        .select("id, severity, status, created_at", { count: "exact" })
-        .is("deleted_at", null)
-        .gte("created_at", last7d),
+        .from('system_error_logs')
+        .select('id, severity, status, created_at', { count: 'exact' })
+        .is('deleted_at', null)
+        .gte('created_at', last7d),
       supabase
-        .from("system_alerts")
-        .select("id, severity, status, created_at", { count: "exact" })
-        .is("deleted_at", null)
-        .gte("created_at", last7d),
+        .from('system_alerts')
+        .select('id, severity, status, created_at', { count: 'exact' })
+        .is('deleted_at', null)
+        .gte('created_at', last7d),
     ]);
 
     const errors = errorsResult.data || [];
     const alerts = alertsResult.data || [];
 
-    const resolvedCount = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved").length;
-    const resolvedAlerts = alerts.filter(a => matchesStatus(a.status, 'resolved')).length;
+    const resolvedCount = errors.filter(
+      (e) => e.status === 'resolved' || e.status === 'auto_resolved'
+    ).length;
+    const resolvedAlerts = alerts.filter((a) => matchesStatus(a.status, 'resolved')).length;
     const totalErrors = errorsResult.count || 0;
-    
-    const resolutionRate = totalErrors > 0 
-      ? Math.round((resolvedCount / totalErrors) * 100) 
-      : 100;
-    
-    const criticalErrors = errors.filter(e => e.severity === "critical" && matchesStatus(e.status, 'new')).length;
-    const highErrors = errors.filter(e => e.severity === "high" && matchesStatus(e.status, 'new')).length;
-    const activeAlerts = alerts.filter(a => matchesStatus(a.status, 'active')).length;
-    const criticalAlerts = alerts.filter(a => a.severity === "critical" && matchesStatus(a.status, 'active')).length;
-    const highAlerts = alerts.filter(a => a.severity === "high" && matchesStatus(a.status, 'active')).length;
-    
-    const totalResolvable = errors.filter(e => !matchesStatus(e.status, 'new')).length;
+
+    const resolutionRate = totalErrors > 0 ? Math.round((resolvedCount / totalErrors) * 100) : 100;
+
+    const criticalErrors = errors.filter(
+      (e) => e.severity === 'critical' && matchesStatus(e.status, 'new')
+    ).length;
+    const highErrors = errors.filter(
+      (e) => e.severity === 'high' && matchesStatus(e.status, 'new')
+    ).length;
+    const activeAlerts = alerts.filter((a) => matchesStatus(a.status, 'active')).length;
+    const criticalAlerts = alerts.filter(
+      (a) => a.severity === 'critical' && matchesStatus(a.status, 'active')
+    ).length;
+    const highAlerts = alerts.filter(
+      (a) => a.severity === 'high' && matchesStatus(a.status, 'active')
+    ).length;
+
+    const totalResolvable = errors.filter((e) => !matchesStatus(e.status, 'new')).length;
     const successfulFixes = resolvedCount;
     const failedFixes = Math.max(0, totalResolvable - resolvedCount);
-    const fixSuccessRate = totalResolvable > 0 ? Math.round((successfulFixes / totalResolvable) * 100) : 100;
-    
-    const healthScore = Math.max(0, 100 - (criticalErrors * 20) - (highErrors * 10) - (activeAlerts * 5));
+    const fixSuccessRate =
+      totalResolvable > 0 ? Math.round((successfulFixes / totalResolvable) * 100) : 100;
+
+    const healthScore = Math.max(0, 100 - criticalErrors * 20 - highErrors * 10 - activeAlerts * 5);
 
     return {
       totalErrors,
-      newErrors: errors.filter(e => e.status === "new").length,
+      newErrors: errors.filter((e) => e.status === 'new').length,
       criticalErrors,
       highErrors,
       resolvedErrors: resolvedCount,
@@ -396,8 +413,9 @@ export class SystemService {
    */
   static async getBeneficiaryActivitySessions() {
     const { data, error } = await supabase
-      .from("beneficiary_sessions")
-      .select(`
+      .from('beneficiary_sessions')
+      .select(
+        `
         id,
         beneficiary_id,
         current_page,
@@ -410,15 +428,18 @@ export class SystemService {
           phone,
           category
         )
-      `)
-      .order("last_activity", { ascending: false })
+      `
+      )
+      .order('last_activity', { ascending: false })
       .limit(20);
 
     if (error) throw error;
-    
-    return (data || []).map(session => ({
+
+    return (data || []).map((session) => ({
       ...session,
-      beneficiary: session.beneficiaries as { full_name: string; phone: string; category: string } | undefined
+      beneficiary: session.beneficiaries as
+        | { full_name: string; phone: string; category: string }
+        | undefined,
     }));
   }
 
@@ -428,7 +449,9 @@ export class SystemService {
   static async getAdminAlerts() {
     const { data, error } = await supabase
       .from('system_alerts')
-      .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
+      .select(
+        'id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at'
+      )
       .in('status', ['active', 'acknowledged'])
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
@@ -477,7 +500,7 @@ export class SystemService {
    */
   static async testNotificationSystem(): Promise<void> {
     const { data: user } = await supabase.auth.getUser();
-    
+
     if (!user.user) {
       throw new Error('User not authenticated');
     }
@@ -511,7 +534,7 @@ export class SystemService {
       .select()
       .maybeSingle();
 
-    if (!errorLog) throw new Error("Failed to create error log");
+    if (!errorLog) throw new Error('Failed to create error log');
 
     const { error: updateError } = await supabase
       .from('system_error_logs')
@@ -529,12 +552,12 @@ export class SystemService {
    */
   static async bulkResolveOldAlerts(): Promise<void> {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    
+
     const { error } = await supabase
       .from('system_alerts')
-      .update({ 
-        status: 'resolved', 
-        resolved_at: new Date().toISOString() 
+      .update({
+        status: 'resolved',
+        resolved_at: new Date().toISOString(),
       })
       .eq('status', 'active')
       .lt('created_at', oneDayAgo);
@@ -547,13 +570,13 @@ export class SystemService {
    */
   static async cleanupResolvedErrors(): Promise<void> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any)
       .from('system_error_logs')
       .update({
         deleted_at: new Date().toISOString(),
-        deletion_reason: 'أرشفة تلقائية للأخطاء القديمة المحلولة'
+        deletion_reason: 'أرشفة تلقائية للأخطاء القديمة المحلولة',
       })
       .in('status', ['resolved', 'auto_resolved'])
       .lt('resolved_at', oneWeekAgo)

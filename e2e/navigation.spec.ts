@@ -18,7 +18,9 @@ test.describe('Navigation', () => {
 
   test('should navigate to login from landing', async ({ page }) => {
     await page.goto('/');
-    const loginBtn = page.locator('a[href*="login"], button:has-text("تسجيل"), button:has-text("Login")');
+    const loginBtn = page.locator(
+      'a[href*="login"], button:has-text("تسجيل"), button:has-text("Login")'
+    );
     if (await loginBtn.first().isVisible()) {
       await loginBtn.first().click();
       await expect(page).toHaveURL(/login/);

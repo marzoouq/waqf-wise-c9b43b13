@@ -20,11 +20,11 @@ export function safeJsonParse<T>(
   }
 
   const trimmed = value.trim();
-  
+
   // التحقق من أن القيمة تبدأ بـ [ أو { (JSON صالح)
   if (!trimmed.startsWith('[') && !trimmed.startsWith('{')) {
     console.warn(`[safeJsonParse] Invalid JSON value detected${key ? ` for key: ${key}` : ''}`);
-    
+
     // مسح البيانات التالفة من localStorage
     if (key) {
       try {
@@ -34,7 +34,7 @@ export function safeJsonParse<T>(
         // تجاهل خطأ الحذف
       }
     }
-    
+
     return defaultValue;
   }
 
@@ -42,7 +42,7 @@ export function safeJsonParse<T>(
     return JSON.parse(trimmed) as T;
   } catch (error) {
     console.warn(`[safeJsonParse] JSON parse failed${key ? ` for key: ${key}` : ''}:`, error);
-    
+
     // مسح البيانات التالفة من localStorage
     if (key) {
       try {
@@ -52,7 +52,7 @@ export function safeJsonParse<T>(
         // تجاهل خطأ الحذف
       }
     }
-    
+
     return defaultValue;
   }
 }

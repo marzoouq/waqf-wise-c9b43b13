@@ -1,14 +1,14 @@
 /**
  * Unified Logger - نظام Logging موحد
  * يختار تلقائياً الـ Logger المناسب حسب البيئة
- * 
+ *
  * @example
  * ```typescript
  * import { logger, debugLog } from '@/lib/logger';
- * 
+ *
  * // النمط الجديد
  * logger.error('Error message', error, { context: 'test' });
- * 
+ *
  * // Debug logging (يظهر في التطوير فقط)
  * debugLog('ProtectedRoute', 'حالة:', { authLoading: true });
  * ```
@@ -36,11 +36,7 @@ type ComponentName = keyof typeof COMPONENT_ICONS;
  * Debug Logger - يظهر فقط في بيئة التطوير
  * مركزي ومحمي - لا يظهر في الإنتاج
  */
-export const debugLog = (
-  component: ComponentName,
-  message: string,
-  data?: unknown
-): void => {
+export const debugLog = (component: ComponentName, message: string, data?: unknown): void => {
   if (IS_DEV) {
     const icon = COMPONENT_ICONS[component];
     if (data !== undefined) {

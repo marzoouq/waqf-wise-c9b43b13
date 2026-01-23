@@ -2,8 +2,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { FileText, Printer, FileDown, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useDetailedGeneralLedger } from '@/hooks/reports/useDetailedGeneralLedger';
@@ -33,9 +46,7 @@ export function DetailedGeneralLedger() {
               <FileText className="h-5 w-5 text-primary" />
               دفتر الأستاذ التفصيلي
             </CardTitle>
-            <CardDescription>
-              عرض جميع الحركات المالية لحساب معين مع الرصيد الجاري
-            </CardDescription>
+            <CardDescription>عرض جميع الحركات المالية لحساب معين مع الرصيد الجاري</CardDescription>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => window.print()}>
@@ -70,19 +81,11 @@ export function DetailedGeneralLedger() {
             </div>
             <div className="space-y-2">
               <Label>من تاريخ</Label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label>إلى تاريخ</Label>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
           </div>
 
@@ -93,9 +96,7 @@ export function DetailedGeneralLedger() {
               <p>اختر حساباً لعرض دفتر الأستاذ</p>
             </div>
           ) : isLoading ? (
-            <div className="text-center py-12 text-muted-foreground">
-              جاري التحميل...
-            </div>
+            <div className="text-center py-12 text-muted-foreground">جاري التحميل...</div>
           ) : (
             <>
               <div className="rounded-lg border overflow-x-auto">
@@ -150,9 +151,7 @@ export function DetailedGeneralLedger() {
                         <TableCell className="text-right text-destructive">
                           {formatCurrency(totalCredit)}
                         </TableCell>
-                        <TableCell className="text-right">
-                          {formatCurrency(finalBalance)}
-                        </TableCell>
+                        <TableCell className="text-right">{formatCurrency(finalBalance)}</TableCell>
                       </TableRow>
                     )}
                   </TableBody>

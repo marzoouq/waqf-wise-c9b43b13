@@ -200,7 +200,15 @@ jobs:
   security-report:
     name: 📊 Security Report
     runs-on: ubuntu-latest
-    needs: [dependency-audit, typescript-check, eslint-security, security-tests, secrets-scan, code-analysis]
+    needs:
+      [
+        dependency-audit,
+        typescript-check,
+        eslint-security,
+        security-tests,
+        secrets-scan,
+        code-analysis,
+      ]
     if: always()
     steps:
       - name: Security Summary

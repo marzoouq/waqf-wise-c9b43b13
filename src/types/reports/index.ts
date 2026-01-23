@@ -3,7 +3,7 @@
  * يجمع بين report.ts و reports.ts و reports.types.ts
  */
 
-import type { Json } from "@/integrations/supabase/types";
+import type { Json } from '@/integrations/supabase/types';
 
 // ====================
 // أنواع بيانات التقارير (من reports.types.ts)
@@ -84,7 +84,14 @@ export interface SavedSearchData {
 // أنواع الفلاتر
 // ====================
 
-export type ReportFilterValue = string | number | boolean | Date | [number, number] | [Date, Date] | null;
+export type ReportFilterValue =
+  | string
+  | number
+  | boolean
+  | Date
+  | [number, number]
+  | [Date, Date]
+  | null;
 
 export type ReportFilterOperator = 'equals' | 'contains' | 'greater_than' | 'less_than' | 'between';
 

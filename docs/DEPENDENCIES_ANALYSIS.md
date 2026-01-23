@@ -9,38 +9,38 @@
 
 ### الحزم المُزالة (18 حزمة)
 
-| الحزمة | السبب |
-|--------|-------|
-| `@sentry/react` | غير مستخدمة، لا ملفات config |
-| `@vitejs/plugin-react` | المشروع يستخدم `@vitejs/plugin-react-swc` |
-| `bidi-js` | Type definitions فقط، لا استخدام فعلي |
-| `embla-carousel-react` | لا يوجد carousel في المشروع |
-| `input-otp` | تنفيذ مخصص موجود في `src/components/ui/input-otp.tsx` |
-| `otpauth` | غير مستخدمة |
-| `react-hotkeys-hook` | غير مستخدمة |
-| `react-is` | غير مستخدمة في React 18 |
-| `react-resizable-panels` | غير مستخدمة |
-| `vite-plugin-pwa` | غير مفعّل في vite.config |
-| `web-vitals` | غير مستخدمة |
-| `workbox-window` | نصوص تنظيف فقط |
-| `@radix-ui/react-aspect-ratio` | غير مستخدمة |
-| `@radix-ui/react-context-menu` | غير مستخدمة |
-| `@radix-ui/react-hover-card` | غير مستخدمة |
-| `@radix-ui/react-menubar` | غير مستخدمة |
-| `@radix-ui/react-navigation-menu` | غير مستخدمة |
-| `@radix-ui/react-toggle-group` | غير مستخدمة |
+| الحزمة                            | السبب                                                 |
+| --------------------------------- | ----------------------------------------------------- |
+| `@sentry/react`                   | غير مستخدمة، لا ملفات config                          |
+| `@vitejs/plugin-react`            | المشروع يستخدم `@vitejs/plugin-react-swc`             |
+| `bidi-js`                         | Type definitions فقط، لا استخدام فعلي                 |
+| `embla-carousel-react`            | لا يوجد carousel في المشروع                           |
+| `input-otp`                       | تنفيذ مخصص موجود في `src/components/ui/input-otp.tsx` |
+| `otpauth`                         | غير مستخدمة                                           |
+| `react-hotkeys-hook`              | غير مستخدمة                                           |
+| `react-is`                        | غير مستخدمة في React 18                               |
+| `react-resizable-panels`          | غير مستخدمة                                           |
+| `vite-plugin-pwa`                 | غير مفعّل في vite.config                              |
+| `web-vitals`                      | غير مستخدمة                                           |
+| `workbox-window`                  | نصوص تنظيف فقط                                        |
+| `@radix-ui/react-aspect-ratio`    | غير مستخدمة                                           |
+| `@radix-ui/react-context-menu`    | غير مستخدمة                                           |
+| `@radix-ui/react-hover-card`      | غير مستخدمة                                           |
+| `@radix-ui/react-menubar`         | غير مستخدمة                                           |
+| `@radix-ui/react-navigation-menu` | غير مستخدمة                                           |
+| `@radix-ui/react-toggle-group`    | غير مستخدمة                                           |
 
 ### الملفات المحذوفة (7 ملفات)
 
-| الملف | السبب |
-|-------|-------|
-| `src/components/ui/hover-card.tsx` | 0 استيرادات |
-| `src/components/ui/aspect-ratio.tsx` | 0 استيرادات |
-| `src/components/ui/context-menu.tsx` | 0 استيرادات |
-| `src/components/ui/menubar.tsx` | 0 استيرادات |
-| `src/components/ui/toggle-group.tsx` | 0 استيرادات |
-| `src/components/ui/navigation-menu.tsx` | 0 استيرادات |
-| `src/types/bidi-js.d.ts` | الحزمة أُزيلت |
+| الملف                                   | السبب         |
+| --------------------------------------- | ------------- |
+| `src/components/ui/hover-card.tsx`      | 0 استيرادات   |
+| `src/components/ui/aspect-ratio.tsx`    | 0 استيرادات   |
+| `src/components/ui/context-menu.tsx`    | 0 استيرادات   |
+| `src/components/ui/menubar.tsx`         | 0 استيرادات   |
+| `src/components/ui/toggle-group.tsx`    | 0 استيرادات   |
+| `src/components/ui/navigation-menu.tsx` | 0 استيرادات   |
+| `src/types/bidi-js.d.ts`                | الحزمة أُزيلت |
 
 ---
 
@@ -48,75 +48,75 @@
 
 ### إطار العمل الأساسي
 
-| الحزمة | الاستخدام | ملاحظات |
-|--------|----------|---------|
-| `react` | إطار UI الأساسي | v18.3.1 |
-| `react-dom` | React DOM renderer | v18.3.1 |
-| `react-router-dom` | التنقل والمسارات | v7.6.1 |
+| الحزمة                  | الاستخدام                 | ملاحظات |
+| ----------------------- | ------------------------- | ------- |
+| `react`                 | إطار UI الأساسي           | v18.3.1 |
+| `react-dom`             | React DOM renderer        | v18.3.1 |
+| `react-router-dom`      | التنقل والمسارات          | v7.6.1  |
 | `@tanstack/react-query` | إدارة الحالة والـ caching | v5.90.9 |
 
 ### واجهة المستخدم (UI)
 
-| الحزمة | الاستخدام | ملاحظات |
-|--------|----------|---------|
-| `tailwindcss` | التنسيق | مع `tailwind-merge` |
-| `class-variance-authority` | Variants للمكونات | مستخدم بكثافة |
-| `lucide-react` | الأيقونات | v0.553.0 |
-| `framer-motion` | الحركات والانتقالات | v12.23.24 |
-| `sonner` | إشعارات Toast | v1.7.4 |
+| الحزمة                     | الاستخدام           | ملاحظات             |
+| -------------------------- | ------------------- | ------------------- |
+| `tailwindcss`              | التنسيق             | مع `tailwind-merge` |
+| `class-variance-authority` | Variants للمكونات   | مستخدم بكثافة       |
+| `lucide-react`             | الأيقونات           | v0.553.0            |
+| `framer-motion`            | الحركات والانتقالات | v12.23.24           |
+| `sonner`                   | إشعارات Toast       | v1.7.4              |
 
 ### Radix UI (المستخدمة)
 
-| الحزمة | الاستخدام |
-|--------|----------|
-| `@radix-ui/react-dialog` | النوافذ المنبثقة |
-| `@radix-ui/react-dropdown-menu` | القوائم المنسدلة |
-| `@radix-ui/react-popover` | Popovers |
-| `@radix-ui/react-select` | قوائم الاختيار |
-| `@radix-ui/react-tabs` | التبويبات |
-| `@radix-ui/react-toast` | إشعارات |
-| `@radix-ui/react-tooltip` | تلميحات |
-| `@radix-ui/react-accordion` | Accordions |
-| `@radix-ui/react-avatar` | صور المستخدمين |
-| `@radix-ui/react-checkbox` | مربعات الاختيار |
-| `@radix-ui/react-label` | Labels |
-| `@radix-ui/react-progress` | شريط التقدم |
-| `@radix-ui/react-radio-group` | Radio buttons |
-| `@radix-ui/react-scroll-area` | مناطق التمرير |
-| `@radix-ui/react-separator` | الفواصل |
-| `@radix-ui/react-slider` | شريط التمرير |
-| `@radix-ui/react-switch` | المفاتيح |
-| `@radix-ui/react-toggle` | Toggle buttons |
-| `@radix-ui/react-collapsible` | المناطق القابلة للطي |
-| `@radix-ui/react-alert-dialog` | تنبيهات |
-| `@radix-ui/react-slot` | Slot pattern |
-| `@radix-ui/react-visually-hidden` | Accessibility |
+| الحزمة                            | الاستخدام            |
+| --------------------------------- | -------------------- |
+| `@radix-ui/react-dialog`          | النوافذ المنبثقة     |
+| `@radix-ui/react-dropdown-menu`   | القوائم المنسدلة     |
+| `@radix-ui/react-popover`         | Popovers             |
+| `@radix-ui/react-select`          | قوائم الاختيار       |
+| `@radix-ui/react-tabs`            | التبويبات            |
+| `@radix-ui/react-toast`           | إشعارات              |
+| `@radix-ui/react-tooltip`         | تلميحات              |
+| `@radix-ui/react-accordion`       | Accordions           |
+| `@radix-ui/react-avatar`          | صور المستخدمين       |
+| `@radix-ui/react-checkbox`        | مربعات الاختيار      |
+| `@radix-ui/react-label`           | Labels               |
+| `@radix-ui/react-progress`        | شريط التقدم          |
+| `@radix-ui/react-radio-group`     | Radio buttons        |
+| `@radix-ui/react-scroll-area`     | مناطق التمرير        |
+| `@radix-ui/react-separator`       | الفواصل              |
+| `@radix-ui/react-slider`          | شريط التمرير         |
+| `@radix-ui/react-switch`          | المفاتيح             |
+| `@radix-ui/react-toggle`          | Toggle buttons       |
+| `@radix-ui/react-collapsible`     | المناطق القابلة للطي |
+| `@radix-ui/react-alert-dialog`    | تنبيهات              |
+| `@radix-ui/react-slot`            | Slot pattern         |
+| `@radix-ui/react-visually-hidden` | Accessibility        |
 
 ### التقارير والملفات
 
-| الحزمة | الاستخدام |
-|--------|----------|
-| `jspdf` | إنشاء PDF |
-| `jspdf-autotable` | جداول PDF |
-| `exceljs` | ملفات Excel |
-| `qrcode` | رموز QR |
+| الحزمة            | الاستخدام   |
+| ----------------- | ----------- |
+| `jspdf`           | إنشاء PDF   |
+| `jspdf-autotable` | جداول PDF   |
+| `exceljs`         | ملفات Excel |
+| `qrcode`          | رموز QR     |
 
 ### أدوات أخرى
 
-| الحزمة | الاستخدام |
-|--------|----------|
-| `date-fns` | معالجة التواريخ |
-| `zod` | التحقق من البيانات |
-| `react-hook-form` | إدارة النماذج |
-| `dompurify` | تنظيف HTML |
-| `react-markdown` | عرض Markdown |
-| `cmdk` | البحث الشامل (Command palette) |
-| `recharts` | الرسوم البيانية |
+| الحزمة            | الاستخدام                      |
+| ----------------- | ------------------------------ |
+| `date-fns`        | معالجة التواريخ                |
+| `zod`             | التحقق من البيانات             |
+| `react-hook-form` | إدارة النماذج                  |
+| `dompurify`       | تنظيف HTML                     |
+| `react-markdown`  | عرض Markdown                   |
+| `cmdk`            | البحث الشامل (Command palette) |
+| `recharts`        | الرسوم البيانية                |
 
 ### Supabase
 
-| الحزمة | الاستخدام |
-|--------|----------|
+| الحزمة                  | الاستخدام               |
+| ----------------------- | ----------------------- |
 | `@supabase/supabase-js` | الاتصال بقاعدة البيانات |
 
 ---
@@ -158,6 +158,6 @@
 
 ## سجل التحديثات
 
-| التاريخ | التغيير |
-|---------|---------|
+| التاريخ    | التغيير                                |
+| ---------- | -------------------------------------- |
 | 2026-01-17 | إزالة 18 حزمة غير مستخدمة، حذف 7 ملفات |

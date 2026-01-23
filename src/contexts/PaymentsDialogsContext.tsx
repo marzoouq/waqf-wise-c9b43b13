@@ -19,14 +19,14 @@ interface PaymentsDialogsContextValue {
   paymentDialog: DialogState<Payment>;
   deleteDialog: DialogState<Payment>;
   printPayment: Payment | null;
-  
+
   // Dialog Actions
   openPaymentDialog: (payment?: Payment) => void;
   closePaymentDialog: () => void;
   openDeleteDialog: (payment: Payment) => void;
   closeDeleteDialog: () => void;
   setPrintPayment: (payment: Payment | null) => void;
-  
+
   // Selected Payment
   selectedPayment: Payment | null;
 }
@@ -41,11 +41,11 @@ export function PaymentsDialogsProvider({ children }: PaymentsDialogsProviderPro
   // Payment Dialog State
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  
+
   // Delete Dialog State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
-  
+
   // Print State
   const [printPayment, setPrintPayment] = useState<Payment | null>(null);
 
@@ -91,9 +91,7 @@ export function PaymentsDialogsProvider({ children }: PaymentsDialogsProviderPro
   };
 
   return (
-    <PaymentsDialogsContext.Provider value={value}>
-      {children}
-    </PaymentsDialogsContext.Provider>
+    <PaymentsDialogsContext.Provider value={value}>{children}</PaymentsDialogsContext.Provider>
   );
 }
 
