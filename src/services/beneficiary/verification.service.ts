@@ -55,7 +55,9 @@ export class BeneficiaryVerificationService {
   static async getEligibilityAssessments(beneficiaryId: string) {
     const { data, error } = await supabase
       .from('eligibility_assessments')
-      .select('id, beneficiary_id, assessment_date, total_score, eligibility_status, criteria_scores, recommendations, assessed_by, created_at')
+      .select(
+        'id, beneficiary_id, assessment_date, total_score, eligibility_status, criteria_scores, recommendations, assessed_by, created_at'
+      )
       .eq('beneficiary_id', beneficiaryId)
       .order('assessment_date', { ascending: false });
 
@@ -87,8 +89,10 @@ export class BeneficiaryVerificationService {
       notes: string;
     }
   ): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     await supabase.from('identity_verifications').insert({
       beneficiary_id: beneficiaryId,
       ...formData,
@@ -96,11 +100,14 @@ export class BeneficiaryVerificationService {
       verified_at: new Date().toISOString(),
     });
 
-    await supabase.from('beneficiaries').update({
-      verification_status: formData.verification_status,
-      verification_method: formData.verification_method,
-      last_verification_date: new Date().toISOString(),
-      verification_notes: formData.notes,
-    }).eq('id', beneficiaryId);
+    await supabase
+      .from('beneficiaries')
+      .update({
+        verification_status: formData.verification_status,
+        verification_method: formData.verification_method,
+        last_verification_date: new Date().toISOString(),
+        verification_notes: formData.notes,
+      })
+      .eq('id', beneficiaryId);
   }
 }

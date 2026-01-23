@@ -2,10 +2,10 @@
  * Knowledge Articles Tab Component
  * تبويب المقالات في قاعدة المعرفة
  */
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
-import { KnowledgeArticle } from "@/hooks/ui/useKnowledgeArticles";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
+import { KnowledgeArticle } from '@/hooks/ui/useKnowledgeArticles';
 
 interface KnowledgeArticlesTabProps {
   articles: KnowledgeArticle[];
@@ -27,9 +27,7 @@ export function KnowledgeArticlesTab({ articles }: KnowledgeArticlesTabProps) {
             <CardDescription>{article.description}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {article.content}
-            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{article.content}</p>
             <Button variant="link" className="mt-2 p-0">
               اقرأ المزيد ←
             </Button>

@@ -3,14 +3,14 @@
  * Query Errors Log
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
-import type { QueryError } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatDistanceToNow } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import type { QueryError } from '@/services/monitoring/db-health.service';
 
 interface QueryErrorsLogProps {
   errors: QueryError[];
@@ -78,16 +78,14 @@ export function QueryErrorsLog({ errors, isLoading }: QueryErrorsLogProps) {
           أخطاء الاستعلامات
           <Badge variant="destructive">{errors.length}</Badge>
         </CardTitle>
-        <CardDescription>
-          أخطاء الاستعلامات المسجلة مؤخراً
-        </CardDescription>
+        <CardDescription>أخطاء الاستعلامات المسجلة مؤخراً</CardDescription>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px]">
           <div className="space-y-3">
             {errors.map((error) => (
-              <div 
-                key={error.id} 
+              <div
+                key={error.id}
                 className="p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -97,12 +95,13 @@ export function QueryErrorsLog({ errors, isLoading }: QueryErrorsLogProps) {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(error.created_at), { addSuffix: true, locale: ar })}
+                    {formatDistanceToNow(new Date(error.created_at), {
+                      addSuffix: true,
+                      locale: ar,
+                    })}
                   </div>
                 </div>
-                <p className="text-sm font-medium text-destructive mb-1">
-                  {error.error_message}
-                </p>
+                <p className="text-sm font-medium text-destructive mb-1">{error.error_message}</p>
                 {error.error_stack && (
                   <details className="mt-2">
                     <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">

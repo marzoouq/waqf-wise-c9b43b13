@@ -76,17 +76,13 @@ export function UnitHandoverPrintTemplate({
           <h1 className="text-2xl font-bold text-primary">
             نموذج {handover.handover_type} الوحدة العقارية
           </h1>
-          <p className="text-muted-foreground mt-1">
-            وفق نظام الإيجار السعودي
-          </p>
+          <p className="text-muted-foreground mt-1">وفق نظام الإيجار السعودي</p>
         </div>
 
         {/* بيانات العقد والأطراف */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-              بيانات العقد
-            </h3>
+            <h3 className="font-semibold text-primary border-b pb-2 mb-3">بيانات العقد</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">رقم العقد:</span>
@@ -108,9 +104,7 @@ export function UnitHandoverPrintTemplate({
           </div>
 
           <div className="border rounded-lg p-4">
-            <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-              بيانات المستأجر
-            </h3>
+            <h3 className="font-semibold text-primary border-b pb-2 mb-3">بيانات المستأجر</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">الاسم:</span>
@@ -136,9 +130,7 @@ export function UnitHandoverPrintTemplate({
 
         {/* قراءات العدادات */}
         <div className="border rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-            قراءات العدادات
-          </h3>
+          <h3 className="font-semibold text-primary border-b pb-2 mb-3">قراءات العدادات</h3>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="bg-yellow-50 rounded-lg p-3">
               <div className="text-yellow-600 font-semibold">⚡ الكهرباء</div>
@@ -163,9 +155,7 @@ export function UnitHandoverPrintTemplate({
 
         {/* المسلمات */}
         <div className="border rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-            المسلمات والمفاتيح
-          </h3>
+          <h3 className="font-semibold text-primary border-b pb-2 mb-3">المسلمات والمفاتيح</h3>
           <div className="grid grid-cols-4 gap-4 text-center">
             <div className="border rounded p-3">
               <div className="text-muted-foreground text-sm">🔑 المفاتيح</div>
@@ -188,9 +178,7 @@ export function UnitHandoverPrintTemplate({
 
         {/* حالة الوحدة */}
         <div className="border rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-            حالة الوحدة
-          </h3>
+          <h3 className="font-semibold text-primary border-b pb-2 mb-3">حالة الوحدة</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">الحالة العامة:</span>
@@ -212,9 +200,7 @@ export function UnitHandoverPrintTemplate({
         {/* ملاحظات عامة */}
         {handover.notes && (
           <div className="border rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-primary border-b pb-2 mb-3">
-              ملاحظات عامة
-            </h3>
+            <h3 className="font-semibold text-primary border-b pb-2 mb-3">ملاحظات عامة</h3>
             <p className="text-sm">{handover.notes}</p>
           </div>
         )}
@@ -245,7 +231,10 @@ export function UnitHandoverPrintTemplate({
 
         {/* التذييل */}
         <div className="text-center text-xs text-muted-foreground mt-8 pt-4 border-t">
-          <p>تم إنشاء هذا النموذج بتاريخ {format(new Date(handover.created_at), 'dd/MM/yyyy HH:mm', { locale: ar })}</p>
+          <p>
+            تم إنشاء هذا النموذج بتاريخ{' '}
+            {format(new Date(handover.created_at), 'dd/MM/yyyy HH:mm', { locale: ar })}
+          </p>
           <p className="mt-1">نظام إدارة الأوقاف - جميع الحقوق محفوظة</p>
         </div>
       </div>

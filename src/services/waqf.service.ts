@@ -3,7 +3,7 @@
  * @version 2.8.47
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface WaqfProperty {
   id: string;
@@ -35,9 +35,9 @@ export const WaqfService = {
    */
   async getUnlinkedProperties(): Promise<UnlinkedProperty[]> {
     const { data, error } = await supabase
-      .from("properties")
-      .select("id, name, location, type, waqf_unit_id")
-      .is("waqf_unit_id", null);
+      .from('properties')
+      .select('id, name, location, type, waqf_unit_id')
+      .is('waqf_unit_id', null);
 
     if (error) throw error;
     return data || [];
@@ -48,9 +48,9 @@ export const WaqfService = {
    */
   async linkProperty(propertyId: string, waqfUnitId: string): Promise<void> {
     const { error } = await supabase
-      .from("properties")
+      .from('properties')
       .update({ waqf_unit_id: waqfUnitId })
-      .eq("id", propertyId);
+      .eq('id', propertyId);
 
     if (error) throw error;
   },
@@ -60,16 +60,18 @@ export const WaqfService = {
    */
   async getWaqfUnitProperties(waqfUnitId: string): Promise<WaqfProperty[]> {
     const { data, error } = await supabase
-      .from("properties")
-      .select(`
+      .from('properties')
+      .select(
+        `
         id, name, type, location, units, occupied, monthly_revenue, status,
         contracts!contracts_property_id_fkey(
           monthly_rent, 
           payment_frequency, 
           status
         )
-      `)
-      .eq("waqf_unit_id", waqfUnitId);
+      `
+      )
+      .eq('waqf_unit_id', waqfUnitId);
 
     if (error) throw error;
     return (data || []) as WaqfProperty[];
@@ -80,9 +82,9 @@ export const WaqfService = {
    */
   async unlinkProperty(propertyId: string): Promise<void> {
     const { error } = await supabase
-      .from("properties")
+      .from('properties')
       .update({ waqf_unit_id: null })
-      .eq("id", propertyId);
+      .eq('id', propertyId);
 
     if (error) throw error;
   },

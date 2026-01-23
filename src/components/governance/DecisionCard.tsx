@@ -1,18 +1,11 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { 
-  Calendar, 
-  Users, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Minus,
-  ChevronLeft
-} from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useNavigate } from "react-router-dom";
-import type { GovernanceDecision } from "@/types/governance";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Calendar, Users, ThumbsUp, ThumbsDown, Minus, ChevronLeft } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useNavigate } from 'react-router-dom';
+import type { GovernanceDecision } from '@/types/governance';
 
 interface DecisionCardProps {
   decision: GovernanceDecision;
@@ -20,28 +13,28 @@ interface DecisionCardProps {
 
 const statusColors: Record<string, string> = {
   'قيد التصويت': 'bg-info-light text-info border-info/20',
-  'معتمد': 'bg-success-light text-success border-success/20',
-  'مرفوض': 'bg-destructive-light text-destructive border-destructive/20',
+  معتمد: 'bg-success-light text-success border-success/20',
+  مرفوض: 'bg-destructive-light text-destructive border-destructive/20',
   'قيد التنفيذ': 'bg-warning-light text-warning border-warning/20',
-  'منفذ': 'bg-success-light text-success border-success/20',
-  'ملغي': 'bg-muted text-muted-foreground border-border',
+  منفذ: 'bg-success-light text-success border-success/20',
+  ملغي: 'bg-muted text-muted-foreground border-border',
 };
 
 const votingTypeLabels: Record<string, string> = {
-  'board_only': 'أعضاء المجلس',
-  'first_class_beneficiaries': 'المستفيدين - الفئة الأولى',
-  'board_and_beneficiaries': 'المجلس + المستفيدين',
-  'custom': 'اختيار مخصص',
-  'nazer_only': 'الناظر فقط',
+  board_only: 'أعضاء المجلس',
+  first_class_beneficiaries: 'المستفيدين - الفئة الأولى',
+  board_and_beneficiaries: 'المجلس + المستفيدين',
+  custom: 'اختيار مخصص',
+  nazer_only: 'الناظر فقط',
 };
 
 export function DecisionCard({ decision }: DecisionCardProps) {
   const navigate = useNavigate();
 
   const totalVotes = decision.total_votes || 0;
-  const forPercentage = totalVotes > 0 ? (decision.votes_for / totalVotes * 100) : 0;
-  const againstPercentage = totalVotes > 0 ? (decision.votes_against / totalVotes * 100) : 0;
-  const abstainPercentage = totalVotes > 0 ? (decision.votes_abstain / totalVotes * 100) : 0;
+  const forPercentage = totalVotes > 0 ? (decision.votes_for / totalVotes) * 100 : 0;
+  const againstPercentage = totalVotes > 0 ? (decision.votes_against / totalVotes) * 100 : 0;
+  const abstainPercentage = totalVotes > 0 ? (decision.votes_abstain / totalVotes) * 100 : 0;
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -56,12 +49,8 @@ export function DecisionCard({ decision }: DecisionCardProps) {
                 {decision.decision_status}
               </Badge>
             </div>
-            <h3 className="font-bold text-lg mb-1 line-clamp-2">
-              {decision.decision_title}
-            </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {decision.decision_text}
-            </p>
+            <h3 className="font-bold text-lg mb-1 line-clamp-2">{decision.decision_title}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">{decision.decision_text}</p>
           </div>
         </div>
       </CardHeader>
@@ -94,7 +83,9 @@ export function DecisionCard({ decision }: DecisionCardProps) {
                   <ThumbsUp className="h-3 w-3 text-success" />
                   موافق
                 </span>
-                <span className="font-semibold">{decision.votes_for} ({forPercentage.toFixed(0)}%)</span>
+                <span className="font-semibold">
+                  {decision.votes_for} ({forPercentage.toFixed(0)}%)
+                </span>
               </div>
               <Progress value={forPercentage} className="h-1.5" />
             </div>
@@ -106,7 +97,9 @@ export function DecisionCard({ decision }: DecisionCardProps) {
                   <ThumbsDown className="h-3 w-3 text-destructive" />
                   معارض
                 </span>
-                <span className="font-semibold">{decision.votes_against} ({againstPercentage.toFixed(0)}%)</span>
+                <span className="font-semibold">
+                  {decision.votes_against} ({againstPercentage.toFixed(0)}%)
+                </span>
               </div>
               <Progress value={againstPercentage} className="h-1.5" />
             </div>
@@ -119,7 +112,9 @@ export function DecisionCard({ decision }: DecisionCardProps) {
                     <Minus className="h-3 w-3 text-muted-foreground" />
                     ممتنع
                   </span>
-                  <span className="font-semibold">{decision.votes_abstain} ({abstainPercentage.toFixed(0)}%)</span>
+                  <span className="font-semibold">
+                    {decision.votes_abstain} ({abstainPercentage.toFixed(0)}%)
+                  </span>
                 </div>
                 <Progress value={abstainPercentage} className="h-1.5" />
               </div>
@@ -128,8 +123,8 @@ export function DecisionCard({ decision }: DecisionCardProps) {
         )}
 
         {/* زر التفاصيل */}
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="w-full"
           onClick={() => navigate(`/governance/decisions/${decision.id}`)}
         >

@@ -1,35 +1,53 @@
-import { useState, useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, Calculator, Users, Bell } from "lucide-react";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { useDistributions } from "@/hooks/distributions/useDistributions";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
-import { matchesStatus } from "@/lib/constants";
+import { useState, useMemo, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, Calculator, Users, Bell } from 'lucide-react';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { useDistributions } from '@/hooks/distributions/useDistributions';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useDistributionSettings } from '@/hooks/distributions/useDistributionSettings';
+import { matchesStatus } from '@/lib/constants';
 
 const distributionSchema = z.object({
-  period_start: z.string().min(1, "تاريخ البداية مطلوب"),
-  period_end: z.string().min(1, "تاريخ النهاية مطلوب"),
-  waqf_name: z.string().min(1, "اسم الوقف مطلوب"),
-  nazer_percentage: z.coerce.number().min(0).max(100, "النسبة لا يمكن أن تتجاوز 100%"),
-  charity_percentage: z.coerce.number().min(0).max(100, "النسبة لا يمكن أن تتجاوز 100%"),
-  waqf_corpus_percentage: z.coerce.number().min(0, "النسبة لا يمكن أن تكون سالبة").max(100, "النسبة لا يمكن أن تتجاوز 100%"),
+  period_start: z.string().min(1, 'تاريخ البداية مطلوب'),
+  period_end: z.string().min(1, 'تاريخ النهاية مطلوب'),
+  waqf_name: z.string().min(1, 'اسم الوقف مطلوب'),
+  nazer_percentage: z.coerce.number().min(0).max(100, 'النسبة لا يمكن أن تتجاوز 100%'),
+  charity_percentage: z.coerce.number().min(0).max(100, 'النسبة لا يمكن أن تتجاوز 100%'),
+  waqf_corpus_percentage: z.coerce
+    .number()
+    .min(0, 'النسبة لا يمكن أن تكون سالبة')
+    .max(100, 'النسبة لا يمكن أن تتجاوز 100%'),
   notes: z.string().optional(),
   notify_beneficiaries: z.boolean().default(true),
-  selected_beneficiaries: z.array(z.string()).min(1, "يجب اختيار مستفيد واحد على الأقل"),
+  selected_beneficiaries: z.array(z.string()).min(1, 'يجب اختيار مستفيد واحد على الأقل'),
 });
 
 type DistributionFormValues = z.infer<typeof distributionSchema>;
@@ -39,10 +57,7 @@ interface CreateDistributionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const CreateDistributionDialog = ({
-  open,
-  onOpenChange,
-}: CreateDistributionDialogProps) => {
+export const CreateDistributionDialog = ({ open, onOpenChange }: CreateDistributionDialogProps) => {
   const { toast } = useToast();
   const { beneficiaries, isLoading: loadingBeneficiaries } = useBeneficiaries();
   const { generateDistribution } = useDistributions();
@@ -53,26 +68,26 @@ export const CreateDistributionDialog = ({
   const form = useForm<DistributionFormValues>({
     resolver: zodResolver(distributionSchema),
     defaultValues: {
-      period_start: "",
-      period_end: "",
-      waqf_name: "",
+      period_start: '',
+      period_end: '',
+      waqf_name: '',
       nazer_percentage: 10,
       charity_percentage: 5,
       waqf_corpus_percentage: 0,
-      notes: "",
+      notes: '',
       notify_beneficiaries: true,
       selected_beneficiaries: [],
     },
   });
 
-  const selectedBeneficiaries = form.watch("selected_beneficiaries");
+  const selectedBeneficiaries = form.watch('selected_beneficiaries');
 
   // حساب النسب تلقائياً من الإعدادات
   useEffect(() => {
     if (settings && open) {
-      form.setValue("nazer_percentage", settings.nazer_percentage || 10);
-      form.setValue("charity_percentage", settings.waqif_charity_percentage || 5);
-      form.setValue("waqf_corpus_percentage", settings.waqf_corpus_percentage || 0);
+      form.setValue('nazer_percentage', settings.nazer_percentage || 10);
+      form.setValue('charity_percentage', settings.waqif_charity_percentage || 5);
+      form.setValue('waqf_corpus_percentage', settings.waqf_corpus_percentage || 0);
     }
   }, [settings, open, form]);
 
@@ -80,21 +95,21 @@ export const CreateDistributionDialog = ({
     setSelectAll(checked);
     if (checked) {
       form.setValue(
-        "selected_beneficiaries",
+        'selected_beneficiaries',
         beneficiaries.map((b) => b.id)
       );
     } else {
-      form.setValue("selected_beneficiaries", []);
+      form.setValue('selected_beneficiaries', []);
     }
   };
 
   const handleToggleBeneficiary = (beneficiaryId: string, checked: boolean) => {
-    const current = form.getValues("selected_beneficiaries");
+    const current = form.getValues('selected_beneficiaries');
     if (checked) {
-      form.setValue("selected_beneficiaries", [...current, beneficiaryId]);
+      form.setValue('selected_beneficiaries', [...current, beneficiaryId]);
     } else {
       form.setValue(
-        "selected_beneficiaries",
+        'selected_beneficiaries',
         current.filter((id) => id !== beneficiaryId)
       );
     }
@@ -103,22 +118,18 @@ export const CreateDistributionDialog = ({
   const handleSubmit = async (data: DistributionFormValues) => {
     setCreating(true);
     try {
-      await generateDistribution(
-        data.period_start,
-        data.period_end,
-        data.waqf_corpus_percentage
-      );
+      await generateDistribution(data.period_start, data.period_end, data.waqf_corpus_percentage);
 
       // إشعار المستفيدين المختارين
       if (data.notify_beneficiaries && data.selected_beneficiaries.length > 0) {
         toast({
-          title: "تم إنشاء التوزيع بنجاح",
+          title: 'تم إنشاء التوزيع بنجاح',
           description: `تم إشعار ${data.selected_beneficiaries.length} مستفيد بالتوزيع الجديد`,
         });
       } else {
         toast({
-          title: "تم إنشاء التوزيع بنجاح",
-          description: "تم إنشاء التوزيع بدون إرسال إشعارات",
+          title: 'تم إنشاء التوزيع بنجاح',
+          description: 'تم إنشاء التوزيع بدون إرسال إشعارات',
         });
       }
 
@@ -126,20 +137,20 @@ export const CreateDistributionDialog = ({
       onOpenChange(false);
     } catch {
       toast({
-        title: "خطأ في إنشاء التوزيع",
-        description: "حدث خطأ أثناء إنشاء التوزيع، يرجى المحاولة مرة أخرى",
-        variant: "destructive",
+        title: 'خطأ في إنشاء التوزيع',
+        description: 'حدث خطأ أثناء إنشاء التوزيع، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
       });
     } finally {
       setCreating(false);
     }
   };
 
-  const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
+  const activeBeneficiaries = beneficiaries.filter((b) => matchesStatus(b.status, 'active'));
 
   // حساب إحصائيات المستفيدين المحددين
   const selectedStats = useMemo(() => {
-    const selected = beneficiaries.filter(b => selectedBeneficiaries.includes(b.id));
+    const selected = beneficiaries.filter((b) => selectedBeneficiaries.includes(b.id));
     return {
       sons: selected.reduce((sum, b) => sum + (b.number_of_sons || 0), 0),
       daughters: selected.reduce((sum, b) => sum + (b.number_of_daughters || 0), 0),
@@ -204,10 +215,7 @@ export const CreateDistributionDialog = ({
                   <FormItem>
                     <FormLabel>اسم الوقف</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="مثال: وقف آل فلان الخيري"
-                        {...field}
-                      />
+                      <Input placeholder="مثال: وقف آل فلان الخيري" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,13 +230,7 @@ export const CreateDistributionDialog = ({
                     <FormItem>
                       <FormLabel>نسبة الناظر (%)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          {...field}
-                        />
+                        <Input type="number" min="0" max="100" step="0.1" {...field} />
                       </FormControl>
                       <FormDescription>حصة الناظر من الغلة</FormDescription>
                       <FormMessage />
@@ -243,13 +245,7 @@ export const CreateDistributionDialog = ({
                     <FormItem>
                       <FormLabel>نسبة صدقة الواقف (%)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          {...field}
-                        />
+                        <Input type="number" min="0" max="100" step="0.1" {...field} />
                       </FormControl>
                       <FormDescription>حصة الصدقة</FormDescription>
                       <FormMessage />
@@ -264,13 +260,7 @@ export const CreateDistributionDialog = ({
                     <FormItem>
                       <FormLabel>نسبة رأس مال الوقف (%)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          {...field}
-                        />
+                        <Input type="number" min="0" max="100" step="0.1" {...field} />
                       </FormControl>
                       <FormDescription>رقبة الوقف</FormDescription>
                       <FormMessage />
@@ -321,15 +311,8 @@ export const CreateDistributionDialog = ({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                <Checkbox
-                  checked={selectAll}
-                  onCheckedChange={handleSelectAll}
-                  id="select-all"
-                />
-                <label
-                  htmlFor="select-all"
-                  className="text-sm font-medium cursor-pointer"
-                >
+                <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} id="select-all" />
+                <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
                   تحديد جميع المستفيدين النشطين ({activeBeneficiaries.length})
                 </label>
               </div>
@@ -361,9 +344,7 @@ export const CreateDistributionDialog = ({
                               }
                             />
                           </TableCell>
-                          <TableCell className="font-medium">
-                            {beneficiary.full_name}
-                          </TableCell>
+                          <TableCell className="font-medium">{beneficiary.full_name}</TableCell>
                           <TableCell>{beneficiary.national_id}</TableCell>
                           <TableCell>
                             <Badge variant="outline">{beneficiary.category}</Badge>
@@ -406,17 +387,15 @@ export const CreateDistributionDialog = ({
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2 space-y-0">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="cursor-pointer">
                         إرسال إشعارات للمستفيدين المحددين
                       </FormLabel>
                       <FormDescription>
-                        سيتم إشعار المستفيدين المحددين بالتوزيع الجديد ويمكنهم الاطلاع عليه من حسابهم
+                        سيتم إشعار المستفيدين المحددين بالتوزيع الجديد ويمكنهم الاطلاع عليه من
+                        حسابهم
                       </FormDescription>
                     </div>
                   </FormItem>
@@ -441,7 +420,7 @@ export const CreateDistributionDialog = ({
                   جاري الإنشاء...
                 </>
               ) : (
-                "إنشاء التوزيع"
+                'إنشاء التوزيع'
               )}
             </Button>
           </div>

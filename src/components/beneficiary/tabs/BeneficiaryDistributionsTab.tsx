@@ -3,39 +3,57 @@
  * يركز على: نوع الوريث، نسبة الاستحقاق، المقارنة السنوية
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Wallet, Calendar, Archive, CircleDot, Users, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
-import { useYearlyComparison } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { useIsMobile } from "@/hooks/ui/use-mobile";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import {
+  Wallet,
+  Calendar,
+  Archive,
+  CircleDot,
+  Users,
+  ArrowUpRight,
+  ArrowDownRight,
+} from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { useBeneficiaryDistributions } from '@/hooks/beneficiary/useBeneficiaryDistributions';
+import { useYearlyComparison } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
 }
 
 const HEIR_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  "son": { label: "ابن", color: "bg-heir-son/10 text-heir-son border-heir-son/30" },
-  "daughter": { label: "بنت", color: "bg-heir-daughter/10 text-heir-daughter border-heir-daughter/30" },
-  "wife": { label: "زوجة", color: "bg-heir-wife/10 text-heir-wife border-heir-wife/30" },
-  "husband": { label: "زوج", color: "bg-primary/10 text-primary border-primary/30" },
-  "father": { label: "أب", color: "bg-primary/10 text-primary border-primary/30" },
-  "mother": { label: "أم", color: "bg-primary/10 text-primary border-primary/30" },
-  "ابن": { label: "ابن", color: "bg-heir-son/10 text-heir-son border-heir-son/30" },
-  "بنت": { label: "بنت", color: "bg-heir-daughter/10 text-heir-daughter border-heir-daughter/30" },
-  "زوجة": { label: "زوجة", color: "bg-heir-wife/10 text-heir-wife border-heir-wife/30" },
+  son: { label: 'ابن', color: 'bg-heir-son/10 text-heir-son border-heir-son/30' },
+  daughter: {
+    label: 'بنت',
+    color: 'bg-heir-daughter/10 text-heir-daughter border-heir-daughter/30',
+  },
+  wife: { label: 'زوجة', color: 'bg-heir-wife/10 text-heir-wife border-heir-wife/30' },
+  husband: { label: 'زوج', color: 'bg-primary/10 text-primary border-primary/30' },
+  father: { label: 'أب', color: 'bg-primary/10 text-primary border-primary/30' },
+  mother: { label: 'أم', color: 'bg-primary/10 text-primary border-primary/30' },
+  ابن: { label: 'ابن', color: 'bg-heir-son/10 text-heir-son border-heir-son/30' },
+  بنت: { label: 'بنت', color: 'bg-heir-daughter/10 text-heir-daughter border-heir-daughter/30' },
+  زوجة: { label: 'زوجة', color: 'bg-heir-wife/10 text-heir-wife border-heir-wife/30' },
 };
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
   const masked = settings?.mask_exact_amounts || false;
   const isMobile = useIsMobile();
-  
+
   const {
     distributions,
     currentDistributions,
@@ -60,7 +78,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   const yearlyChange = calculateYearlyChange();
 
   const getHeirConfig = (type: string) => {
-    return HEIR_TYPE_CONFIG[type] || { label: type, color: "bg-muted text-muted-foreground border-border" };
+    return (
+      HEIR_TYPE_CONFIG[type] || {
+        label: type,
+        color: 'bg-muted text-muted-foreground border-border',
+      }
+    );
   };
 
   return (
@@ -91,7 +114,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                   {masked ? (
                     <MaskedValue value={String(totalDistributed)} type="amount" masked={true} />
                   ) : (
-                    <>{totalDistributed.toLocaleString("ar-SA")} ر.س</>
+                    <>{totalDistributed.toLocaleString('ar-SA')} ر.س</>
                   )}
                 </p>
               </div>
@@ -106,9 +129,11 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
               <div className="text-center p-3 rounded-lg bg-background/80">
                 <p className="text-xs text-muted-foreground mb-1">مقارنة بالعام السابق</p>
                 {yearlyChange !== null ? (
-                  <div className={`flex items-center justify-center gap-1 font-bold ${
-                    yearlyChange >= 0 ? 'text-success' : 'text-destructive'
-                  }`}>
+                  <div
+                    className={`flex items-center justify-center gap-1 font-bold ${
+                      yearlyChange >= 0 ? 'text-success' : 'text-destructive'
+                    }`}
+                  >
                     {yearlyChange >= 0 ? (
                       <ArrowUpRight className="h-4 w-4" />
                     ) : (
@@ -140,10 +165,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                     {masked ? (
                       <MaskedValue value={String(currentTotal)} type="amount" masked={true} />
                     ) : (
-                      <>{currentTotal.toLocaleString("ar-SA")} ر.س</>
+                      <>{currentTotal.toLocaleString('ar-SA')} ر.س</>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">{currentDistributions.length} توزيع</p>
+                  <p className="text-xs text-muted-foreground">
+                    {currentDistributions.length} توزيع
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -161,10 +188,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                     {masked ? (
                       <MaskedValue value={String(historicalTotal)} type="amount" masked={true} />
                     ) : (
-                      <>{historicalTotal.toLocaleString("ar-SA")} ر.س</>
+                      <>{historicalTotal.toLocaleString('ar-SA')} ر.س</>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">{historicalDistributions.length} توزيع</p>
+                  <p className="text-xs text-muted-foreground">
+                    {historicalDistributions.length} توزيع
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -195,28 +224,38 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                 const isClosed = dist.fiscal_years?.is_closed || false;
                 const config = getHeirConfig(dist.heir_type);
                 return (
-                  <Card 
-                    key={dist.id} 
+                  <Card
+                    key={dist.id}
                     className={`${isClosed ? 'bg-muted/20' : 'bg-success-light/20 border-success/20'}`}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <Badge variant={isClosed ? "secondary" : "default"} className="gap-1">
-                          {isClosed ? <Archive className="h-3 w-3" /> : <CircleDot className="h-3 w-3" />}
-                          {dist.fiscal_years?.name || "—"}
+                        <Badge variant={isClosed ? 'secondary' : 'default'} className="gap-1">
+                          {isClosed ? (
+                            <Archive className="h-3 w-3" />
+                          ) : (
+                            <CircleDot className="h-3 w-3" />
+                          )}
+                          {dist.fiscal_years?.name || '—'}
                         </Badge>
                         <Badge className={`${config.color} border`}>{config.label}</Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                          {format(new Date(dist.distribution_date), 'dd/MM/yyyy', { locale: ar })}
                         </span>
-                        <span className={`font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}>
+                        <span
+                          className={`font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}
+                        >
                           {masked ? (
-                            <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
+                            <MaskedValue
+                              value={String(dist.share_amount || 0)}
+                              type="amount"
+                              masked={true}
+                            />
                           ) : (
-                            <>{(dist.share_amount || 0).toLocaleString("ar-SA")} ر.س</>
+                            <>{(dist.share_amount || 0).toLocaleString('ar-SA')} ر.س</>
                           )}
                         </span>
                       </div>
@@ -242,7 +281,10 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                       const isClosed = dist.fiscal_years?.is_closed || false;
                       const config = getHeirConfig(dist.heir_type);
                       return (
-                        <TableRow key={dist.id} className={isClosed ? 'bg-muted/20' : 'bg-success-light/10'}>
+                        <TableRow
+                          key={dist.id}
+                          className={isClosed ? 'bg-muted/20' : 'bg-success-light/10'}
+                        >
                           <TableCell>
                             <div className="flex items-center gap-2">
                               {isClosed ? (
@@ -250,20 +292,26 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                               ) : (
                                 <CircleDot className="h-4 w-4 text-success" />
                               )}
-                              <span className="font-medium">{dist.fiscal_years?.name || "—"}</span>
+                              <span className="font-medium">{dist.fiscal_years?.name || '—'}</span>
                             </div>
                           </TableCell>
                           <TableCell>
-                            {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                            {format(new Date(dist.distribution_date), 'dd/MM/yyyy', { locale: ar })}
                           </TableCell>
                           <TableCell>
                             <Badge className={`${config.color} border`}>{config.label}</Badge>
                           </TableCell>
-                          <TableCell className={`font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}>
+                          <TableCell
+                            className={`font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}
+                          >
                             {masked ? (
-                              <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
+                              <MaskedValue
+                                value={String(dist.share_amount || 0)}
+                                type="amount"
+                                masked={true}
+                              />
                             ) : (
-                              <>{(dist.share_amount || 0).toLocaleString("ar-SA")} ر.س</>
+                              <>{(dist.share_amount || 0).toLocaleString('ar-SA')} ر.س</>
                             )}
                           </TableCell>
                         </TableRow>
@@ -273,9 +321,13 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                       <TableCell colSpan={3}>الإجمالي</TableCell>
                       <TableCell className="text-primary">
                         {masked ? (
-                          <MaskedValue value={String(totalDistributed)} type="amount" masked={true} />
+                          <MaskedValue
+                            value={String(totalDistributed)}
+                            type="amount"
+                            masked={true}
+                          />
                         ) : (
-                          <>{totalDistributed.toLocaleString("ar-SA")} ر.س</>
+                          <>{totalDistributed.toLocaleString('ar-SA')} ر.س</>
                         )}
                       </TableCell>
                     </TableRow>

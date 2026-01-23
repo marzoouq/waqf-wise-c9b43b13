@@ -1,13 +1,13 @@
 /**
  * Unified Role Types - أنواع الأدوار الموحدة
- * 
+ *
  * المصدر الوحيد للحقيقة لجميع تعريفات الأدوار في النظام
  * مرتبط مع Database enum: app_role
- * 
+ *
  * @version 2.9.2
  */
 
-import type { Database } from "@/integrations/supabase/types";
+import type { Database } from '@/integrations/supabase/types';
 
 // ==================== نوع الدور الأساسي من قاعدة البيانات ====================
 /**
@@ -19,12 +19,7 @@ export type AppRole = Database['public']['Enums']['app_role'];
 /**
  * أدوار سير العمل والموافقات
  */
-export type WorkflowRole = 
-  | 'manager'
-  | 'finance'
-  | 'reviewer'
-  | 'financial_manager'
-  | 'executor';
+export type WorkflowRole = 'manager' | 'finance' | 'reviewer' | 'financial_manager' | 'executor';
 
 // ==================== جميع الأدوار ====================
 /**
@@ -46,7 +41,7 @@ export const ROLE_LABELS: Record<AllRole, string> = {
   beneficiary: 'مستفيد',
   waqf_heir: 'وارث الوقف',
   user: 'مستخدم',
-  
+
   // أدوار سير العمل (5 أدوار)
   manager: 'المدير',
   finance: 'الموظف المالي',
@@ -70,12 +65,13 @@ export const ROLE_COLORS: Record<AllRole, string> = {
   beneficiary: 'bg-role-beneficiary/10 text-role-beneficiary border-role-beneficiary/30',
   waqf_heir: 'bg-role-waqf-heir/10 text-role-waqf-heir border-role-waqf-heir/30',
   user: 'bg-role-user/10 text-role-user border-role-user/30',
-  
+
   // أدوار سير العمل
   manager: 'bg-role-manager/10 text-role-manager border-role-manager/30',
   finance: 'bg-role-finance/10 text-role-finance border-role-finance/30',
   reviewer: 'bg-role-reviewer/10 text-role-reviewer border-role-reviewer/30',
-  financial_manager: 'bg-role-financial-manager/10 text-role-financial-manager border-role-financial-manager/30',
+  financial_manager:
+    'bg-role-financial-manager/10 text-role-financial-manager border-role-financial-manager/30',
   executor: 'bg-role-executor/10 text-role-executor border-role-executor/30',
 } as const;
 

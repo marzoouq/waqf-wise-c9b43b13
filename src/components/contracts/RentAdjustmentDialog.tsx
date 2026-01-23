@@ -27,13 +27,7 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Loader2, 
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  ArrowRight
-} from 'lucide-react';
+import { Loader2, TrendingUp, TrendingDown, Calendar, ArrowRight } from 'lucide-react';
 import { useContractRequests } from '@/hooks/contracts/useContractRequests';
 import { type Contract } from '@/hooks/property/useContracts';
 import { formatCurrency } from '@/lib/utils';
@@ -80,8 +74,8 @@ export function RentAdjustmentDialog({
   useEffect(() => {
     if (open && contract) {
       // اقتراح تعديل 10%
-      const suggestedRent = isIncrease 
-        ? Math.round(currentRent * 1.1) 
+      const suggestedRent = isIncrease
+        ? Math.round(currentRent * 1.1)
         : Math.round(currentRent * 0.9);
       form.setValue('requested_rent', suggestedRent.toString());
     }
@@ -90,20 +84,23 @@ export function RentAdjustmentDialog({
   const onSubmit = (data: AdjustmentFormValues) => {
     if (!contract) return;
 
-    createRentAdjustmentRequest.mutate({
-      contract_id: contract.id,
-      requested_by: 'landlord',
-      adjustment_type: isIncrease ? 'increase' : 'decrease',
-      current_rent: currentRent,
-      requested_rent: parseFloat(data.requested_rent),
-      reason: data.reason,
-      effective_date: data.effective_date,
-    }, {
-      onSuccess: () => {
-        onOpenChange(false);
-        form.reset();
+    createRentAdjustmentRequest.mutate(
+      {
+        contract_id: contract.id,
+        requested_by: 'landlord',
+        adjustment_type: isIncrease ? 'increase' : 'decrease',
+        current_rent: currentRent,
+        requested_rent: parseFloat(data.requested_rent),
+        reason: data.reason,
+        effective_date: data.effective_date,
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          form.reset();
+        },
       }
-    });
+    );
   };
 
   if (!contract) return null;
@@ -120,9 +117,7 @@ export function RentAdjustmentDialog({
             )}
             طلب {isIncrease ? 'رفع' : 'خفض'} قيمة الإيجار
           </DialogTitle>
-          <DialogDescription>
-            العقد: {contract.contract_number}
-          </DialogDescription>
+          <DialogDescription>العقد: {contract.contract_number}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -146,12 +141,7 @@ export function RentAdjustmentDialog({
                   <FormLabel>الإيجار المطلوب</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        type="number" 
-                        placeholder="أدخل المبلغ"
-                        className="ps-16"
-                        {...field} 
-                      />
+                      <Input type="number" placeholder="أدخل المبلغ" className="ps-16" {...field} />
                       <span className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
                         ر.س
                       </span>
@@ -173,12 +163,16 @@ export function RentAdjustmentDialog({
                       <span className="font-bold">{formatCurrency(requestedRent)}</span>
                     </div>
                     <Badge variant={isIncrease ? 'default' : 'secondary'}>
-                      {isIncrease ? '+' : ''}{percentage}%
+                      {isIncrease ? '+' : ''}
+                      {percentage}%
                     </Badge>
                   </div>
                   <div className="text-center mt-2">
-                    <span className={`text-lg font-bold ${difference > 0 ? 'text-success' : 'text-warning'}`}>
-                      {difference > 0 ? '+' : ''}{formatCurrency(difference)}
+                    <span
+                      className={`text-lg font-bold ${difference > 0 ? 'text-success' : 'text-warning'}`}
+                    >
+                      {difference > 0 ? '+' : ''}
+                      {formatCurrency(difference)}
                     </span>
                     <span className="text-sm text-muted-foreground"> / شهرياً</span>
                   </div>
@@ -213,9 +207,10 @@ export function RentAdjustmentDialog({
                   <FormLabel>سبب الطلب</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={isIncrease 
-                        ? "مثال: ارتفاع أسعار السوق، تحسينات على العقار..." 
-                        : "مثال: ظروف اقتصادية، الحفاظ على المستأجر..."
+                      placeholder={
+                        isIncrease
+                          ? 'مثال: ارتفاع أسعار السوق، تحسينات على العقار...'
+                          : 'مثال: ظروف اقتصادية، الحفاظ على المستأجر...'
                       }
                       rows={3}
                       {...field}
@@ -230,8 +225,8 @@ export function RentAdjustmentDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={createRentAdjustmentRequest.isPending}
                 className={isIncrease ? 'bg-success hover:bg-success/90' : ''}
               >

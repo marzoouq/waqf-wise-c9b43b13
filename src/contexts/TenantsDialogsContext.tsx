@@ -16,13 +16,13 @@ interface TenantsDialogsContextValue {
   // Dialog States
   tenantDialog: DialogState<Tenant>;
   deleteDialog: DialogState<Tenant>;
-  
+
   // Dialog Actions
   openTenantDialog: (tenant?: Tenant) => void;
   closeTenantDialog: () => void;
   openDeleteDialog: (tenant: Tenant) => void;
   closeDeleteDialog: () => void;
-  
+
   // Selected Tenant
   selectedTenant: Tenant | null;
 }
@@ -37,7 +37,7 @@ export function TenantsDialogsProvider({ children }: TenantsDialogsProviderProps
   // Tenant Dialog State
   const [tenantDialogOpen, setTenantDialogOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
-  
+
   // Delete Dialog State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
@@ -80,11 +80,7 @@ export function TenantsDialogsProvider({ children }: TenantsDialogsProviderProps
     selectedTenant,
   };
 
-  return (
-    <TenantsDialogsContext.Provider value={value}>
-      {children}
-    </TenantsDialogsContext.Provider>
-  );
+  return <TenantsDialogsContext.Provider value={value}>{children}</TenantsDialogsContext.Provider>;
 }
 
 export function useTenantsDialogsContext(): TenantsDialogsContextValue {

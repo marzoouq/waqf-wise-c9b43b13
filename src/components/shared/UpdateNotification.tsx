@@ -42,9 +42,12 @@ export function UpdateNotification({ onDismiss }: UpdateNotificationProps) {
         });
 
         // فحص التحديثات كل 5 دقائق
-        const checkInterval = setInterval(() => {
-          registration.update().catch(console.error);
-        }, 5 * 60 * 1000);
+        const checkInterval = setInterval(
+          () => {
+            registration.update().catch(console.error);
+          },
+          5 * 60 * 1000
+        );
 
         return () => clearInterval(checkInterval);
       });
@@ -87,15 +90,13 @@ export function UpdateNotification({ onDismiss }: UpdateNotificationProps) {
               <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                 <Download className="w-5 h-5 text-primary" />
               </div>
-              
+
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-foreground mb-1">
-                  تحديث جديد متاح
-                </h4>
+                <h4 className="font-semibold text-foreground mb-1">تحديث جديد متاح</h4>
                 <p className="text-sm text-muted-foreground mb-3">
                   يتوفر إصدار جديد من التطبيق. حدّث الآن للحصول على أحدث الميزات.
                 </p>
-                
+
                 <div className="flex gap-2">
                   <Button
                     onClick={handleUpdate}
@@ -110,18 +111,13 @@ export function UpdateNotification({ onDismiss }: UpdateNotificationProps) {
                     )}
                     {isUpdating ? 'جاري التحديث...' : 'تحديث الآن'}
                   </Button>
-                  
-                  <Button
-                    onClick={handleDismiss}
-                    variant="ghost"
-                    size="sm"
-                    disabled={isUpdating}
-                  >
+
+                  <Button onClick={handleDismiss} variant="ghost" size="sm" disabled={isUpdating}>
                     لاحقاً
                   </Button>
                 </div>
               </div>
-              
+
               <Button
                 onClick={handleDismiss}
                 variant="ghost"

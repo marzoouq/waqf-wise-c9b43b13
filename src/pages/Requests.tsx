@@ -3,7 +3,7 @@
  * صفحة إدارة الطلبات - مُحسّنة ومقسّمة
  */
 import { memo } from 'react';
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/ui/use-mobile';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -71,13 +71,7 @@ const Requests = memo(() => {
     handleOpenCreateDialog,
   } = useRequestsPage();
 
-  const {
-    selectedCount,
-    isSelected,
-    isAllSelected,
-    toggleSelection,
-    toggleAll,
-  } = bulkSelection;
+  const { selectedCount, isSelected, isAllSelected, toggleSelection, toggleAll } = bulkSelection;
 
   if (isLoading) {
     return <LoadingState size="lg" />;
@@ -85,8 +79,8 @@ const Requests = memo(() => {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الطلبات" 
+      <ErrorState
+        title="فشل تحميل الطلبات"
         message="حدث خطأ أثناء تحميل طلبات المستفيدين"
         onRetry={refetch}
         fullScreen
@@ -100,32 +94,44 @@ const Requests = memo(() => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">إدارة الطلبات</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+              إدارة الطلبات
+            </h1>
             <p className="text-muted-foreground mt-1 sm:mt-2 text-xs sm:text-sm">
               عرض ومعالجة طلبات المستفيدين
             </p>
           </div>
           {filteredRequests.length > 0 && (
             <ExportButton
-              data={filteredRequests.map(r => ({
+              data={filteredRequests.map((r) => ({
                 'رقم الطلب': r.request_number,
-                'المستفيد': getBeneficiaryName(r),
+                المستفيد: getBeneficiaryName(r),
                 'نوع الطلب': getRequestTypeName(r),
-                'الوصف': r.description,
-                'المبلغ': r.amount ? `${r.amount.toLocaleString()} ر.س` : '-',
-                'الحالة': r.status,
-                'تاريخ التقديم': r.submitted_at ? format(new Date(r.submitted_at), 'yyyy/MM/dd', { locale: ar }) : '-',
+                الوصف: r.description,
+                المبلغ: r.amount ? `${r.amount.toLocaleString()} ر.س` : '-',
+                الحالة: r.status,
+                'تاريخ التقديم': r.submitted_at
+                  ? format(new Date(r.submitted_at), 'yyyy/MM/dd', { locale: ar })
+                  : '-',
               }))}
               filename="الطلبات"
               title="تقرير الطلبات"
-              headers={['رقم الطلب', 'المستفيد', 'نوع الطلب', 'الوصف', 'المبلغ', 'الحالة', 'تاريخ التقديم']}
+              headers={[
+                'رقم الطلب',
+                'المستفيد',
+                'نوع الطلب',
+                'الوصف',
+                'المبلغ',
+                'الحالة',
+                'تاريخ التقديم',
+              ]}
             />
           )}
         </div>
 
         {/* Stats Cards */}
-        <RequestsStatsCards 
-          stats={stats} 
+        <RequestsStatsCards
+          stats={stats}
           onFilterClick={setStatusFilter}
           activeFilter={statusFilter}
         />
@@ -134,7 +140,9 @@ const Requests = memo(() => {
         <Card>
           <CardHeader className="pb-2 sm:pb-4">
             <CardTitle className="text-base sm:text-lg">البحث والتصفية</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">ابحث عن طلب أو صفي حسب الحالة</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
+              ابحث عن طلب أو صفي حسب الحالة
+            </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-6">
             <RequestsFilters

@@ -3,17 +3,17 @@
  * @version 1.0.0
  */
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Building2, Users, Plus, UserPlus, Trash2 } from "lucide-react";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Building2, Users, Plus, UserPlus, Trash2 } from 'lucide-react';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,18 +40,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useGovernanceBoards, useBoardsStats, useCreateBoard, useDeleteBoard, useBoardMembers, useAddBoardMember, useRemoveBoardMember } from "@/hooks/governance/useGovernanceBoards";
-import type { Database } from "@/integrations/supabase/types";
+} from '@/components/ui/select';
+import {
+  useGovernanceBoards,
+  useBoardsStats,
+  useCreateBoard,
+  useDeleteBoard,
+  useBoardMembers,
+  useAddBoardMember,
+  useRemoveBoardMember,
+} from '@/hooks/governance/useGovernanceBoards';
+import type { Database } from '@/integrations/supabase/types';
 
 type BoardInsert = Database['public']['Tables']['governance_boards']['Insert'];
 type MemberInsert = Database['public']['Tables']['governance_board_members']['Insert'];
@@ -61,12 +69,12 @@ const GovernanceBoards = () => {
   const { data: stats, isLoading: statsLoading } = useBoardsStats();
   const createBoard = useCreateBoard();
   const deleteBoard = useDeleteBoard();
-  
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
-  
+
   const [newBoard, setNewBoard] = useState<Partial<BoardInsert>>({
     board_name_ar: '',
     board_type: 'رئيسي',
@@ -90,9 +98,9 @@ const GovernanceBoards = () => {
 
   const handleCreateBoard = async () => {
     if (!newBoard.board_name_ar || !newBoard.chairman_name) return;
-    
+
     const boardCode = `BOD-${Date.now().toString().slice(-6)}`;
-    
+
     await createBoard.mutateAsync({
       board_code: boardCode,
       board_name_ar: newBoard.board_name_ar,
@@ -102,7 +110,7 @@ const GovernanceBoards = () => {
       status: newBoard.status || 'نشط',
       established_date: new Date().toISOString().split('T')[0],
     });
-    
+
     setCreateDialogOpen(false);
     setNewBoard({
       board_name_ar: '',
@@ -115,7 +123,7 @@ const GovernanceBoards = () => {
 
   const handleAddMember = async () => {
     if (!selectedBoardId || !newMember.member_name || !newMember.position) return;
-    
+
     await addMember.mutateAsync({
       board_id: selectedBoardId,
       member_name: newMember.member_name,
@@ -126,7 +134,7 @@ const GovernanceBoards = () => {
       is_active: true,
       join_date: new Date().toISOString().split('T')[0],
     });
-    
+
     setAddMemberDialogOpen(false);
     setNewMember({
       member_name: '',
@@ -155,383 +163,179 @@ const GovernanceBoards = () => {
   return (
     <PageErrorBoundary pageName="مجالس الحوكمة">
       <MobileOptimizedLayout>
-        <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">مجالس الحوكمة</h1>
-            <p className="text-sm text-muted-foreground mt-1">إدارة مجالس الحوكمة وأعضائها</p>
-          </div>
-          
-          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="w-full sm:w-auto gap-2">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">إنشاء مجلس جديد</span>
-                <span className="sm:hidden">إنشاء مجلس</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>إنشاء مجلس حوكمة جديد</DialogTitle>
-                <DialogDescription>أدخل بيانات المجلس الجديد</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="board_name">اسم المجلس *</Label>
-                  <Input
-                    id="board_name"
-                    value={newBoard.board_name_ar || ''}
-                    onChange={(e) => setNewBoard({ ...newBoard, board_name_ar: e.target.value })}
-                    placeholder="مثال: مجلس إدارة الوقف"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="chairman">رئيس المجلس *</Label>
-                  <Input
-                    id="chairman"
-                    value={newBoard.chairman_name || ''}
-                    onChange={(e) => setNewBoard({ ...newBoard, chairman_name: e.target.value })}
-                    placeholder="اسم رئيس المجلس"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
+        >
+          {/* Header */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+            <div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+                مجالس الحوكمة
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">إدارة مجالس الحوكمة وأعضائها</p>
+            </div>
+
+            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="w-full sm:w-auto gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">إنشاء مجلس جديد</span>
+                  <span className="sm:hidden">إنشاء مجلس</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>إنشاء مجلس حوكمة جديد</DialogTitle>
+                  <DialogDescription>أدخل بيانات المجلس الجديد</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="type">نوع المجلس</Label>
-                    <Select
-                      value={newBoard.board_type || 'رئيسي'}
-                      onValueChange={(value) => setNewBoard({ ...newBoard, board_type: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="رئيسي">رئيسي</SelectItem>
-                        <SelectItem value="فرعي">فرعي</SelectItem>
-                        <SelectItem value="استشاري">استشاري</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="quorum">النصاب المطلوب</Label>
+                    <Label htmlFor="board_name">اسم المجلس *</Label>
                     <Input
-                      id="quorum"
-                      type="number"
-                      min={1}
-                      value={newBoard.quorum_requirement || 3}
-                      onChange={(e) => setNewBoard({ ...newBoard, quorum_requirement: parseInt(e.target.value) })}
+                      id="board_name"
+                      value={newBoard.board_name_ar || ''}
+                      onChange={(e) => setNewBoard({ ...newBoard, board_name_ar: e.target.value })}
+                      placeholder="مثال: مجلس إدارة الوقف"
                     />
                   </div>
-                </div>
-                <Button 
-                  onClick={handleCreateBoard} 
-                  className="w-full"
-                  disabled={!newBoard.board_name_ar || !newBoard.chairman_name || createBoard.isPending}
-                >
-                  {createBoard.isPending ? 'جاري الإنشاء...' : 'إنشاء المجلس'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Stats */}
-        <UnifiedStatsGrid>
-          <UnifiedKPICard
-            title="إجمالي المجالس"
-            value={statsLoading ? '-' : (stats?.totalBoards || 0)}
-            icon={Building2}
-          />
-          <UnifiedKPICard
-            title="المجالس النشطة"
-            value={statsLoading ? '-' : (stats?.activeBoards || 0)}
-            icon={Building2}
-            variant="success"
-          />
-          <UnifiedKPICard
-            title="إجمالي الأعضاء"
-            value={statsLoading ? '-' : (stats?.totalMembers || 0)}
-            icon={Users}
-            variant="info"
-          />
-        </UnifiedStatsGrid>
-
-        {/* Boards Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>قائمة المجالس</CardTitle>
-            <CardDescription>جميع مجالس الحوكمة المسجلة في النظام</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {boardsLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : boards && boards.length > 0 ? (
-              <>
-                {/* Mobile Card View */}
-                <div className="md:hidden space-y-3">
-                  {boards.map((board) => (
-                    <Card key={board.id} className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-semibold text-base">{board.board_name_ar}</h3>
-                          <p className="text-sm text-muted-foreground">{board.chairman_name}</p>
-                        </div>
-                        <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
-                          {board.status}
-                        </Badge>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge variant="outline">{board.board_type}</Badge>
-                        <Badge variant="secondary">{board.member_count} عضو</Badge>
-                        <Badge variant="outline">نصاب: {board.quorum_requirement}</Badge>
-                      </div>
-                      <div className="flex gap-2 pt-2 border-t">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 gap-1"
-                          onClick={() => openMembersDialog(board.id)}
-                        >
-                          <Users className="h-4 w-4" />
-                          الأعضاء
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع الأعضاء المرتبطين به.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteBoard(board.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                حذف
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>اسم المجلس</TableHead>
-                        <TableHead>النوع</TableHead>
-                        <TableHead className="hidden lg:table-cell">رئيس المجلس</TableHead>
-                        <TableHead>عدد الأعضاء</TableHead>
-                        <TableHead className="hidden lg:table-cell">النصاب</TableHead>
-                        <TableHead>الحالة</TableHead>
-                        <TableHead>الإجراءات</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {boards.map((board) => (
-                        <TableRow key={board.id}>
-                          <TableCell className="font-medium">{board.board_name_ar}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{board.board_type}</Badge>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">{board.chairman_name}</TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{board.member_count} عضو</Badge>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell">{board.quorum_requirement}</TableCell>
-                          <TableCell>
-                            <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
-                              {board.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openMembersDialog(board.id)}
-                                title="عرض الأعضاء"
-                              >
-                                <Users className="h-4 w-4" />
-                              </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" title="حذف">
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع الأعضاء المرتبطين به.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDeleteBoard(board.id)}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                      حذف
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>لا توجد مجالس مسجلة</p>
-                <Button variant="link" onClick={() => setCreateDialogOpen(true)}>
-                  إنشاء مجلس جديد
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Members Dialog */}
-        <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>أعضاء المجلس</DialogTitle>
-              <DialogDescription>قائمة أعضاء المجلس المحدد</DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <div className="flex justify-end mb-4">
-                <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="gap-2">
-                      <UserPlus className="h-4 w-4" />
-                      إضافة عضو
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>إضافة عضو جديد</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label>اسم العضو *</Label>
-                        <Input
-                          value={newMember.member_name || ''}
-                          onChange={(e) => setNewMember({ ...newMember, member_name: e.target.value })}
-                          placeholder="الاسم الكامل"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>المنصب *</Label>
-                        <Select
-                          value={newMember.position || ''}
-                          onValueChange={(value) => setNewMember({ ...newMember, position: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر المنصب" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="رئيس">رئيس</SelectItem>
-                            <SelectItem value="نائب">نائب الرئيس</SelectItem>
-                            <SelectItem value="عضو">عضو</SelectItem>
-                            <SelectItem value="أمين">أمين السر</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>المسمى الوظيفي</Label>
-                        <Input
-                          value={newMember.member_title || ''}
-                          onChange={(e) => setNewMember({ ...newMember, member_title: e.target.value })}
-                          placeholder="مثال: رئيس المجلس"
-                        />
-                      </div>
-                      <Button 
-                        onClick={handleAddMember} 
-                        className="w-full"
-                        disabled={!newMember.member_name || !newMember.position || addMember.isPending}
+                  <div className="space-y-2">
+                    <Label htmlFor="chairman">رئيس المجلس *</Label>
+                    <Input
+                      id="chairman"
+                      value={newBoard.chairman_name || ''}
+                      onChange={(e) => setNewBoard({ ...newBoard, chairman_name: e.target.value })}
+                      placeholder="اسم رئيس المجلس"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="type">نوع المجلس</Label>
+                      <Select
+                        value={newBoard.board_type || 'رئيسي'}
+                        onValueChange={(value) => setNewBoard({ ...newBoard, board_type: value })}
                       >
-                        {addMember.isPending ? 'جاري الإضافة...' : 'إضافة العضو'}
-                      </Button>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="رئيسي">رئيسي</SelectItem>
+                          <SelectItem value="فرعي">فرعي</SelectItem>
+                          <SelectItem value="استشاري">استشاري</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="quorum">النصاب المطلوب</Label>
+                      <Input
+                        id="quorum"
+                        type="number"
+                        min={1}
+                        value={newBoard.quorum_requirement || 3}
+                        onChange={(e) =>
+                          setNewBoard({ ...newBoard, quorum_requirement: parseInt(e.target.value) })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleCreateBoard}
+                    className="w-full"
+                    disabled={
+                      !newBoard.board_name_ar || !newBoard.chairman_name || createBoard.isPending
+                    }
+                  >
+                    {createBoard.isPending ? 'جاري الإنشاء...' : 'إنشاء المجلس'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-              {membersLoading ? (
-                <div className="space-y-2">
-                  {[1, 2].map((i) => (
-                    <Skeleton key={i} className="h-12 w-full" />
+          {/* Stats */}
+          <UnifiedStatsGrid>
+            <UnifiedKPICard
+              title="إجمالي المجالس"
+              value={statsLoading ? '-' : stats?.totalBoards || 0}
+              icon={Building2}
+            />
+            <UnifiedKPICard
+              title="المجالس النشطة"
+              value={statsLoading ? '-' : stats?.activeBoards || 0}
+              icon={Building2}
+              variant="success"
+            />
+            <UnifiedKPICard
+              title="إجمالي الأعضاء"
+              value={statsLoading ? '-' : stats?.totalMembers || 0}
+              icon={Users}
+              variant="info"
+            />
+          </UnifiedStatsGrid>
+
+          {/* Boards Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>قائمة المجالس</CardTitle>
+              <CardDescription>جميع مجالس الحوكمة المسجلة في النظام</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {boardsLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-16 w-full" />
                   ))}
                 </div>
-              ) : boardMembers && boardMembers.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>الاسم</TableHead>
-                      <TableHead>المنصب</TableHead>
-                      <TableHead>نوع العضوية</TableHead>
-                      <TableHead>حق التصويت</TableHead>
-                      <TableHead>الإجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {boardMembers.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell className="font-medium">{member.member_name}</TableCell>
-                        <TableCell>{member.position}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{member.membership_type}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={member.voting_rights ? 'default' : 'secondary'}>
-                            {member.voting_rights ? 'نعم' : 'لا'}
+              ) : boards && boards.length > 0 ? (
+                <>
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-3">
+                    {boards.map((board) => (
+                      <Card key={board.id} className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-semibold text-base">{board.board_name_ar}</h3>
+                            <p className="text-sm text-muted-foreground">{board.chairman_name}</p>
+                          </div>
+                          <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
+                            {board.status}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="outline">{board.board_type}</Badge>
+                          <Badge variant="secondary">{board.member_count} عضو</Badge>
+                          <Badge variant="outline">نصاب: {board.quorum_requirement}</Badge>
+                        </div>
+                        <div className="flex gap-2 pt-2 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 gap-1"
+                            onClick={() => openMembersDialog(board.id)}
+                          >
+                            <Users className="h-4 w-4" />
+                            الأعضاء
+                          </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4 text-destructive" />
+                              <Button variant="outline" size="sm" className="text-destructive">
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  هل أنت متأكد من حذف العضو "{member.member_name}"؟
+                                  هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف جميع
+                                  الأعضاء المرتبطين به.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>إلغاء</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => handleRemoveMember(member.id)}
+                                  onClick={() => handleDeleteBoard(board.id)}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
                                   حذف
@@ -539,21 +343,245 @@ const GovernanceBoards = () => {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        </TableCell>
-                      </TableRow>
+                        </div>
+                      </Card>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>اسم المجلس</TableHead>
+                          <TableHead>النوع</TableHead>
+                          <TableHead className="hidden lg:table-cell">رئيس المجلس</TableHead>
+                          <TableHead>عدد الأعضاء</TableHead>
+                          <TableHead className="hidden lg:table-cell">النصاب</TableHead>
+                          <TableHead>الحالة</TableHead>
+                          <TableHead>الإجراءات</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {boards.map((board) => (
+                          <TableRow key={board.id}>
+                            <TableCell className="font-medium">{board.board_name_ar}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{board.board_type}</Badge>
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell">
+                              {board.chairman_name}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{board.member_count} عضو</Badge>
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell">
+                              {board.quorum_requirement}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={board.status === 'نشط' ? 'default' : 'secondary'}>
+                                {board.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => openMembersDialog(board.id)}
+                                  title="عرض الأعضاء"
+                                >
+                                  <Users className="h-4 w-4" />
+                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" title="حذف">
+                                      <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        هل أنت متأكد من حذف المجلس "{board.board_name_ar}"؟ سيتم حذف
+                                        جميع الأعضاء المرتبطين به.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteBoard(board.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        حذف
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Users className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                  <p>لا يوجد أعضاء في هذا المجلس</p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>لا توجد مجالس مسجلة</p>
+                  <Button variant="link" onClick={() => setCreateDialogOpen(true)}>
+                    إنشاء مجلس جديد
+                  </Button>
                 </div>
               )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      </motion.div>
+            </CardContent>
+          </Card>
+
+          {/* Members Dialog */}
+          <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>أعضاء المجلس</DialogTitle>
+                <DialogDescription>قائمة أعضاء المجلس المحدد</DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <div className="flex justify-end mb-4">
+                  <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        إضافة عضو
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>إضافة عضو جديد</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label>اسم العضو *</Label>
+                          <Input
+                            value={newMember.member_name || ''}
+                            onChange={(e) =>
+                              setNewMember({ ...newMember, member_name: e.target.value })
+                            }
+                            placeholder="الاسم الكامل"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>المنصب *</Label>
+                          <Select
+                            value={newMember.position || ''}
+                            onValueChange={(value) =>
+                              setNewMember({ ...newMember, position: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر المنصب" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="رئيس">رئيس</SelectItem>
+                              <SelectItem value="نائب">نائب الرئيس</SelectItem>
+                              <SelectItem value="عضو">عضو</SelectItem>
+                              <SelectItem value="أمين">أمين السر</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>المسمى الوظيفي</Label>
+                          <Input
+                            value={newMember.member_title || ''}
+                            onChange={(e) =>
+                              setNewMember({ ...newMember, member_title: e.target.value })
+                            }
+                            placeholder="مثال: رئيس المجلس"
+                          />
+                        </div>
+                        <Button
+                          onClick={handleAddMember}
+                          className="w-full"
+                          disabled={
+                            !newMember.member_name || !newMember.position || addMember.isPending
+                          }
+                        >
+                          {addMember.isPending ? 'جاري الإضافة...' : 'إضافة العضو'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {membersLoading ? (
+                  <div className="space-y-2">
+                    {[1, 2].map((i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
+                    ))}
+                  </div>
+                ) : boardMembers && boardMembers.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الاسم</TableHead>
+                        <TableHead>المنصب</TableHead>
+                        <TableHead>نوع العضوية</TableHead>
+                        <TableHead>حق التصويت</TableHead>
+                        <TableHead>الإجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {boardMembers.map((member) => (
+                        <TableRow key={member.id}>
+                          <TableCell className="font-medium">{member.member_name}</TableCell>
+                          <TableCell>{member.position}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{member.membership_type}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={member.voting_rights ? 'default' : 'secondary'}>
+                              {member.voting_rights ? 'نعم' : 'لا'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    هل أنت متأكد من حذف العضو "{member.member_name}"؟
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleRemoveMember(member.id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    حذف
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                    <p>لا يوجد أعضاء في هذا المجلس</p>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </motion.div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

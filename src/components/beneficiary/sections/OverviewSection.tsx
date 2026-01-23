@@ -3,23 +3,23 @@
  * قسم نظرة عامة في لوحة الورثة - تصميم محسّن
  */
 
-import { Suspense, lazy } from "react";
-import type { Beneficiary } from "@/types/beneficiary";
+import { Suspense, lazy } from 'react';
+import type { Beneficiary } from '@/types/beneficiary';
 import {
   AnnualDisclosureCard,
   PropertyStatsCards,
   ActivityTimeline,
   YearlyComparison,
-} from "@/components/beneficiary";
-import { FinancialSummarySection } from "@/components/beneficiary/sections/FinancialSummarySection";
-import { QuickActionsGrid } from "@/components/beneficiary/sections/QuickActionsGrid";
-import { WelcomeCard } from "@/components/beneficiary/cards/WelcomeCard";
-import { AlertsCard } from "@/components/beneficiary/cards/AlertsCard";
-import { AnnualShareCard } from "@/components/beneficiary/cards/AnnualShareCard";
-import { motion } from "framer-motion";
+} from '@/components/beneficiary';
+import { FinancialSummarySection } from '@/components/beneficiary/sections/FinancialSummarySection';
+import { QuickActionsGrid } from '@/components/beneficiary/sections/QuickActionsGrid';
+import { WelcomeCard } from '@/components/beneficiary/cards/WelcomeCard';
+import { AlertsCard } from '@/components/beneficiary/cards/AlertsCard';
+import { AnnualShareCard } from '@/components/beneficiary/cards/AnnualShareCard';
+import { motion } from 'framer-motion';
 
-const LazyChatbotQuickCard = lazy(() => 
-  import("@/components/dashboard/ChatbotQuickCard").then(m => ({ default: m.ChatbotQuickCard }))
+const LazyChatbotQuickCard = lazy(() =>
+  import('@/components/dashboard/ChatbotQuickCard').then((m) => ({ default: m.ChatbotQuickCard }))
 );
 
 interface OverviewSectionProps {
@@ -78,7 +78,7 @@ export function OverviewSection({ beneficiary }: OverviewSectionProps) {
         className="space-y-6"
       >
         <AnnualDisclosureCard />
-        
+
         <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
           <LazyChatbotQuickCard />
         </Suspense>

@@ -16,7 +16,9 @@ export function ApprovalSettings({ values, onChange }: ApprovalSettingsProps) {
         <Label>مسار الموافقة</Label>
         <RadioGroup
           value={values.workflow}
-          onValueChange={(workflow) => onChange({ ...values, workflow: workflow as ApprovalWorkflowType })}
+          onValueChange={(workflow) =>
+            onChange({ ...values, workflow: workflow as ApprovalWorkflowType })
+          }
         >
           <Card className="p-4">
             <div className="flex items-start gap-3">
@@ -39,9 +41,7 @@ export function ApprovalSettings({ values, onChange }: ApprovalSettingsProps) {
                 <Label htmlFor="fast" className="cursor-pointer font-medium">
                   مسار سريع
                 </Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  ناظر → تنفيذ (مستويان فقط)
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">ناظر → تنفيذ (مستويان فقط)</p>
               </div>
             </div>
           </Card>

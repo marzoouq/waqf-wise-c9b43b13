@@ -3,11 +3,11 @@
  * جلب إحصائيات المستخدمين للوحة المشرف
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { UserService, UserStats } from "@/services/user.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { UserService, UserStats } from '@/services/user.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
-export { type UserStats } from "@/services/user.service";
+export { type UserStats } from '@/services/user.service';
 
 export function useUserStats() {
   return useQuery<UserStats>({

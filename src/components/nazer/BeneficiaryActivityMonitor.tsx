@@ -2,41 +2,32 @@
  * عرض نشاط المستفيدين المباشر للناظر
  * يظهر من متصل حالياً والقسم الذي يتصفحه
  */
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  useBeneficiaryActivitySessions, 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  useBeneficiaryActivitySessions,
   getPageName,
-  type BeneficiarySession 
-} from "@/hooks/nazer/useBeneficiaryActivitySessions";
-import { 
-  Users, Clock, MapPin, Wifi, WifiOff,
-  Eye, Calendar, Activity
-} from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+  type BeneficiarySession,
+} from '@/hooks/nazer/useBeneficiaryActivitySessions';
+import { Users, Clock, MapPin, Wifi, WifiOff, Eye, Calendar, Activity } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 function getTimeAgo(date: string): string {
   try {
     return formatDistanceToNow(new Date(date), { addSuffix: true, locale: ar });
   } catch {
-    return "غير معروف";
+    return 'غير معروف';
   }
 }
 
 export function BeneficiaryActivityMonitor() {
-  const { 
-    sessions, 
-    onlineSessions, 
-    offlineSessions, 
-    isLoading,
-    error,
-    refetch
-  } = useBeneficiaryActivitySessions();
+  const { sessions, onlineSessions, offlineSessions, isLoading, error, refetch } =
+    useBeneficiaryActivitySessions();
 
   if (isLoading) {
     return (
@@ -46,7 +37,7 @@ export function BeneficiaryActivityMonitor() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-16 w-full" />
             ))}
           </div>
@@ -139,18 +130,22 @@ interface SessionCardProps {
 
 function SessionCard({ session, isOnline }: SessionCardProps) {
   return (
-    <div className={cn(
-      "flex items-center justify-between p-3 rounded-lg border transition-colors",
-      isOnline ? "bg-status-success/5 border-status-success/20" : "bg-muted/30"
-    )}>
+    <div
+      className={cn(
+        'flex items-center justify-between p-3 rounded-lg border transition-colors',
+        isOnline ? 'bg-status-success/5 border-status-success/20' : 'bg-muted/30'
+      )}
+    >
       <div className="flex items-center gap-3">
         <div className="relative">
           <Avatar className="h-10 w-10">
-            <AvatarFallback className={cn(
-              "text-sm",
-              isOnline ? "bg-status-success/20 text-status-success" : "bg-muted"
-            )}>
-              {session.beneficiary?.full_name?.charAt(0) || "؟"}
+            <AvatarFallback
+              className={cn(
+                'text-sm',
+                isOnline ? 'bg-status-success/20 text-status-success' : 'bg-muted'
+              )}
+            >
+              {session.beneficiary?.full_name?.charAt(0) || '؟'}
             </AvatarFallback>
           </Avatar>
           {isOnline && (
@@ -159,7 +154,7 @@ function SessionCard({ session, isOnline }: SessionCardProps) {
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-medium text-sm">{session.beneficiary?.full_name || "مستفيد"}</p>
+            <p className="font-medium text-sm">{session.beneficiary?.full_name || 'مستفيد'}</p>
             {session.beneficiary?.category && (
               <Badge variant="outline" className="text-[10px] h-4">
                 {session.beneficiary.category}
@@ -187,7 +182,7 @@ function SessionCard({ session, isOnline }: SessionCardProps) {
         ) : (
           <Badge variant="outline" className="text-xs">
             <Calendar className="h-3 w-3 ms-1" />
-            {new Date(session.session_start).toLocaleDateString("ar-SA")}
+            {new Date(session.session_start).toLocaleDateString('ar-SA')}
           </Badge>
         )}
       </div>

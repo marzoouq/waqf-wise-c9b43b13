@@ -3,10 +3,10 @@
  * Database Health KPI Cards
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Layers, Shield, AlertTriangle, HardDrive, Zap } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { HealthSummary } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Database, Layers, Shield, AlertTriangle, HardDrive, Zap } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { HealthSummary } from '@/services/monitoring/db-health.service';
 
 interface HealthKPICardsProps {
   summary: HealthSummary | undefined;
@@ -89,27 +89,23 @@ export function HealthKPICards({ summary, alertsCount, isLoading }: HealthKPICar
         </div>
       )}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {kpis.map((kpi, index) => {
-        const Icon = kpi.icon;
-        return (
-          <Card key={index} className={kpi.bgColor}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Icon className={`h-4 w-4 ${kpi.color}`} />
-                {kpi.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${kpi.color}`}>
-                {kpi.value}
-              </div>
-              {kpi.subtitle && (
-                <p className="text-xs text-muted-foreground">{kpi.subtitle}</p>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+        {kpis.map((kpi, index) => {
+          const Icon = kpi.icon;
+          return (
+            <Card key={index} className={kpi.bgColor}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Icon className={`h-4 w-4 ${kpi.color}`} />
+                  {kpi.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}</div>
+                {kpi.subtitle && <p className="text-xs text-muted-foreground">{kpi.subtitle}</p>}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

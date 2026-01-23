@@ -1,5 +1,5 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface PaginationProps {
   currentPage: number;
@@ -24,7 +24,7 @@ export function Pagination({
       <div className="text-sm text-muted-foreground">
         عرض {startItem}-{endItem} من {totalItems} نتيجة
       </div>
-      
+
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -34,7 +34,7 @@ export function Pagination({
         >
           <ChevronsRight className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -43,7 +43,7 @@ export function Pagination({
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-        
+
         <div className="flex items-center gap-1">
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             let pageNum: number;
@@ -60,7 +60,7 @@ export function Pagination({
             return (
               <Button
                 key={pageNum}
-                variant={currentPage === pageNum ? "default" : "outline"}
+                variant={currentPage === pageNum ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onPageChange(pageNum)}
                 className="w-9"
@@ -70,7 +70,7 @@ export function Pagination({
             );
           })}
         </div>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -79,7 +79,7 @@ export function Pagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="sm"

@@ -30,13 +30,13 @@ export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {
       <Card className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium">إجمالي الاستقطاعات</span>
-          <span className={`text-2xl font-bold ${remaining < 0 ? 'text-destructive' : 'text-success'}`}>
+          <span
+            className={`text-2xl font-bold ${remaining < 0 ? 'text-destructive' : 'text-success'}`}
+          >
             {total}%
           </span>
         </div>
-        <div className="text-sm text-muted-foreground">
-          المتبقي للتوزيع: {remaining}%
-        </div>
+        <div className="text-sm text-muted-foreground">المتبقي للتوزيع: {remaining}%</div>
       </Card>
 
       <div className="space-y-4">

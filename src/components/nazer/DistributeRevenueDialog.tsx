@@ -10,25 +10,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Coins, CheckCircle2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2, Coins, CheckCircle2 } from 'lucide-react';
 import {
   DistributeInputSection,
   DistributePreviewSection,
   useDistributeRevenue,
-} from "./distribute";
+} from './distribute';
 
 interface DistributeRevenueDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function DistributeRevenueDialog({
-  open,
-  onOpenChange,
-}: DistributeRevenueDialogProps) {
+export function DistributeRevenueDialog({ open, onOpenChange }: DistributeRevenueDialogProps) {
   const {
     totalAmount,
     setTotalAmount,
@@ -90,11 +87,7 @@ export function DistributeRevenueDialog({
               <Button variant="outline" onClick={() => setIsPreviewMode(false)}>
                 تعديل
               </Button>
-              <Button
-                onClick={executeDistribution}
-                disabled={isExecuting}
-                className="gap-2"
-              >
+              <Button onClick={executeDistribution} disabled={isExecuting} className="gap-2">
                 {isExecuting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -108,10 +101,7 @@ export function DistributeRevenueDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 إلغاء
               </Button>
-              <Button
-                onClick={calculatePreview}
-                disabled={!totalAmount || !selectedFiscalYear}
-              >
+              <Button onClick={calculatePreview} disabled={!totalAmount || !selectedFiscalYear}>
                 معاينة التوزيع
               </Button>
             </>

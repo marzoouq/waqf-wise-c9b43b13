@@ -3,11 +3,11 @@
  * Cache Hit Ratio Gauge Chart
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 interface CacheHitChartProps {
   ratio: number;
@@ -30,23 +30,25 @@ export function CacheHitChart({ ratio, isLoading }: CacheHitChartProps) {
   }
 
   const getStatus = () => {
-    if (ratio >= 99) return { 
-      label: 'ممتاز', 
-      color: 'bg-success text-success-foreground',
-      icon: CheckCircle,
-      description: 'أداء ممتاز - معظم البيانات تُقرأ من الذاكرة'
-    };
-    if (ratio >= 95) return { 
-      label: 'جيد', 
-      color: 'bg-warning text-warning-foreground',
-      icon: AlertTriangle,
-      description: 'أداء جيد - يمكن تحسينه قليلاً'
-    };
-    return { 
-      label: 'يحتاج تحسين', 
+    if (ratio >= 99)
+      return {
+        label: 'ممتاز',
+        color: 'bg-success text-success-foreground',
+        icon: CheckCircle,
+        description: 'أداء ممتاز - معظم البيانات تُقرأ من الذاكرة',
+      };
+    if (ratio >= 95)
+      return {
+        label: 'جيد',
+        color: 'bg-warning text-warning-foreground',
+        icon: AlertTriangle,
+        description: 'أداء جيد - يمكن تحسينه قليلاً',
+      };
+    return {
+      label: 'يحتاج تحسين',
       color: 'bg-destructive text-destructive-foreground',
       icon: XCircle,
-      description: 'أداء ضعيف - راجع الاستعلامات والفهارس'
+      description: 'أداء ضعيف - راجع الاستعلامات والفهارس',
     };
   };
 
@@ -63,9 +65,7 @@ export function CacheHitChart({ ratio, isLoading }: CacheHitChartProps) {
             {status.label}
           </Badge>
         </CardTitle>
-        <CardDescription>
-          نسبة البيانات المقروءة من الذاكرة بدلاً من القرص
-        </CardDescription>
+        <CardDescription>نسبة البيانات المقروءة من الذاكرة بدلاً من القرص</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center py-8">
@@ -84,7 +84,13 @@ export function CacheHitChart({ ratio, isLoading }: CacheHitChartProps) {
                 cy="80"
                 r="70"
                 fill="none"
-                stroke={ratio >= 99 ? 'hsl(var(--success))' : ratio >= 95 ? 'hsl(var(--warning))' : 'hsl(var(--destructive))'}
+                stroke={
+                  ratio >= 99
+                    ? 'hsl(var(--success))'
+                    : ratio >= 95
+                      ? 'hsl(var(--warning))'
+                      : 'hsl(var(--destructive))'
+                }
                 strokeWidth="12"
                 strokeLinecap="round"
                 strokeDasharray={`${(ratio / 100) * 440} 440`}
@@ -104,9 +110,7 @@ export function CacheHitChart({ ratio, isLoading }: CacheHitChartProps) {
           <Progress value={95} className="h-2" />
         </div>
 
-        <p className="text-sm text-muted-foreground text-center">
-          {status.description}
-        </p>
+        <p className="text-sm text-muted-foreground text-center">{status.description}</p>
       </CardContent>
     </Card>
   );

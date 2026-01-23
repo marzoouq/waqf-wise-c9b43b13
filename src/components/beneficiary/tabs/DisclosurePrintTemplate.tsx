@@ -4,7 +4,7 @@
  * @version 2.0.0 - إضافة الرسوم البيانية والرؤى الذكية
  */
 
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
 
 interface DisclosurePrintData {
   disclosure: AnnualDisclosure;
@@ -35,34 +35,34 @@ interface BeneficiariesDetails {
 }
 
 const expenseNameTranslations: Record<string, string> = {
-  'audit_2024': 'تدقيق 2024',
-  'audit_2025': 'تدقيق 2025',
-  'cleaning_worker': 'عامل نظافة',
-  'ejar_platform': 'منصة إيجار',
-  'electrical_works': 'أعمال كهربائية',
-  'electricity_bills': 'فواتير الكهرباء',
-  'electricity_maintenance': 'صيانة كهربائية',
-  'gypsum_works': 'أعمال جبس',
-  'miscellaneous': 'مصروفات متنوعة',
-  'plumbing_maintenance': 'صيانة سباكة',
-  'plumbing_works': 'أعمال سباكة',
-  'rental_commission': 'عمولة إيجار',
-  'water_bills': 'فواتير المياه',
-  'zakat': 'الزكاة',
-  'maintenance': 'مصروفات الصيانة',
-  'administrative': 'مصروفات إدارية',
-  'development': 'مصروفات التطوير',
-  'other': 'مصروفات أخرى',
+  audit_2024: 'تدقيق 2024',
+  audit_2025: 'تدقيق 2025',
+  cleaning_worker: 'عامل نظافة',
+  ejar_platform: 'منصة إيجار',
+  electrical_works: 'أعمال كهربائية',
+  electricity_bills: 'فواتير الكهرباء',
+  electricity_maintenance: 'صيانة كهربائية',
+  gypsum_works: 'أعمال جبس',
+  miscellaneous: 'مصروفات متنوعة',
+  plumbing_maintenance: 'صيانة سباكة',
+  plumbing_works: 'أعمال سباكة',
+  rental_commission: 'عمولة إيجار',
+  water_bills: 'فواتير المياه',
+  zakat: 'الزكاة',
+  maintenance: 'مصروفات الصيانة',
+  administrative: 'مصروفات إدارية',
+  development: 'مصروفات التطوير',
+  other: 'مصروفات أخرى',
 };
 
 const revenueNameTranslations: Record<string, string> = {
-  'jeddah_properties': 'عقارات جدة',
-  'nahdi_rental': 'إيجار النهدي',
-  'remaining_2024': 'متبقي 2024',
-  'residential_monthly': 'الإيجارات السكنية الشهرية',
-  'rental_income': 'إيرادات الإيجار',
-  'investment_returns': 'عوائد الاستثمار',
-  'other_income': 'إيرادات أخرى',
+  jeddah_properties: 'عقارات جدة',
+  nahdi_rental: 'إيجار النهدي',
+  remaining_2024: 'متبقي 2024',
+  residential_monthly: 'الإيجارات السكنية الشهرية',
+  rental_income: 'إيرادات الإيجار',
+  investment_returns: 'عوائد الاستثمار',
+  other_income: 'إيرادات أخرى',
 };
 
 const translateExpenseName = (name: string): string => {
@@ -74,109 +74,115 @@ const translateRevenueName = (name: string): string => {
 };
 
 const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount === null || amount === undefined) return "0 ر.س";
-  return new Intl.NumberFormat("ar-SA", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount) + " ر.س";
+  if (amount === null || amount === undefined) return '0 ر.س';
+  return (
+    new Intl.NumberFormat('ar-SA', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount) + ' ر.س'
+  );
 };
 
 const formatPercent = (value: number | null | undefined): string => {
-  if (value === null || value === undefined) return "0%";
+  if (value === null || value === undefined) return '0%';
   return `${value.toFixed(1)}%`;
 };
 
 // حساب الرؤى الذكية
 function generateInsights(current: AnnualDisclosure, previous: AnnualDisclosure | null) {
-  const insights: { type: 'positive' | 'negative' | 'neutral'; title: string; description: string }[] = [];
-  
+  const insights: {
+    type: 'positive' | 'negative' | 'neutral';
+    title: string;
+    description: string;
+  }[] = [];
+
   const totalRevenues = current.total_revenues || 0;
   const totalExpenses = current.total_expenses || 0;
   const netIncome = current.net_income || 0;
-  
+
   // نسبة المصروفات للإيرادات
   const expenseRatio = totalRevenues > 0 ? (totalExpenses / totalRevenues) * 100 : 0;
-  
+
   if (expenseRatio < 30) {
     insights.push({
       type: 'positive',
       title: 'كفاءة عالية في المصروفات',
-      description: `المصروفات تمثل ${expenseRatio.toFixed(1)}% فقط من الإيرادات`
+      description: `المصروفات تمثل ${expenseRatio.toFixed(1)}% فقط من الإيرادات`,
     });
   } else if (expenseRatio > 50) {
     insights.push({
       type: 'negative',
       title: 'مصروفات مرتفعة',
-      description: `المصروفات تمثل ${expenseRatio.toFixed(1)}% من الإيرادات`
+      description: `المصروفات تمثل ${expenseRatio.toFixed(1)}% من الإيرادات`,
     });
   }
-  
+
   // مقارنة مع العام السابق
   if (previous) {
     const prevRevenues = previous.total_revenues || 0;
     const prevExpenses = previous.total_expenses || 0;
-    
+
     if (prevRevenues > 0) {
       const revenueGrowth = ((totalRevenues - prevRevenues) / prevRevenues) * 100;
       if (revenueGrowth > 5) {
         insights.push({
           type: 'positive',
           title: 'نمو في الإيرادات',
-          description: `زادت الإيرادات بنسبة ${revenueGrowth.toFixed(1)}% مقارنة بالعام السابق`
+          description: `زادت الإيرادات بنسبة ${revenueGrowth.toFixed(1)}% مقارنة بالعام السابق`,
         });
       } else if (revenueGrowth < -5) {
         insights.push({
           type: 'negative',
           title: 'انخفاض في الإيرادات',
-          description: `انخفضت الإيرادات بنسبة ${Math.abs(revenueGrowth).toFixed(1)}% مقارنة بالعام السابق`
+          description: `انخفضت الإيرادات بنسبة ${Math.abs(revenueGrowth).toFixed(1)}% مقارنة بالعام السابق`,
         });
       }
     }
-    
+
     if (prevExpenses > 0) {
       const expenseChange = ((totalExpenses - prevExpenses) / prevExpenses) * 100;
       if (expenseChange < -10) {
         insights.push({
           type: 'positive',
           title: 'ضبط المصروفات',
-          description: `انخفضت المصروفات بنسبة ${Math.abs(expenseChange).toFixed(1)}%`
+          description: `انخفضت المصروفات بنسبة ${Math.abs(expenseChange).toFixed(1)}%`,
         });
       } else if (expenseChange > 20) {
         insights.push({
           type: 'negative',
           title: 'ارتفاع في المصروفات',
-          description: `زادت المصروفات بنسبة ${expenseChange.toFixed(1)}%`
+          description: `زادت المصروفات بنسبة ${expenseChange.toFixed(1)}%`,
         });
       }
     }
   }
-  
+
   // صافي الدخل
   if (netIncome > 0) {
     insights.push({
       type: 'positive',
       title: 'صافي دخل إيجابي',
-      description: `تحقق صافي دخل بقيمة ${formatCurrency(netIncome)}`
+      description: `تحقق صافي دخل بقيمة ${formatCurrency(netIncome)}`,
     });
   }
-  
+
   // عدد المستفيدين
   if (current.total_beneficiaries > 0) {
     insights.push({
       type: 'neutral',
       title: 'توزيع على المستفيدين',
-      description: `تم التوزيع على ${current.total_beneficiaries} مستفيد`
+      description: `تم التوزيع على ${current.total_beneficiaries} مستفيد`,
     });
   }
-  
+
   return insights;
 }
 
 export function DisclosurePrintTemplate({ disclosure, previousYear }: DisclosurePrintData) {
   // Parse data
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
-  const expenseItems: ExpenseItem[] = expensesBreakdown 
+  const expenseItems: ExpenseItem[] = expensesBreakdown
     ? Object.entries(expensesBreakdown)
         .filter(([name]) => name.toLowerCase() !== 'total')
         .map(([name, amount]) => ({ name, amount: amount || 0 }))
@@ -406,7 +412,9 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
 
       {/* الرأس */}
       <div className="print-header">
-        <div className="print-title">الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}</div>
+        <div className="print-title">
+          الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}
+        </div>
         <div className="print-subtitle">{disclosure.waqf_name}</div>
         <div style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
           تاريخ الإصدار: {new Date(disclosure.disclosure_date).toLocaleDateString('ar-SA')}
@@ -442,12 +450,16 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
         <div className="flow-section">
           <div className="flow-item">
             <span>إجمالي الإيرادات</span>
-            <span style={{ color: '#16a34a', fontWeight: 'bold' }}>{formatCurrency(totalRevenues)}</span>
+            <span style={{ color: '#16a34a', fontWeight: 'bold' }}>
+              {formatCurrency(totalRevenues)}
+            </span>
           </div>
           <div className="flow-arrow">↓</div>
           <div className="flow-item">
             <span>(-) إجمالي المصروفات</span>
-            <span style={{ color: '#dc2626', fontWeight: 'bold' }}>({formatCurrency(totalExpenses)})</span>
+            <span style={{ color: '#dc2626', fontWeight: 'bold' }}>
+              ({formatCurrency(totalExpenses)})
+            </span>
           </div>
           <div className="flow-arrow">↓</div>
           <div className="flow-item">
@@ -477,7 +489,9 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
           <div className="flow-arrow">↓</div>
           <div className="flow-item highlight">
             <span style={{ fontWeight: 'bold' }}>رقبة الوقف (المتبقي)</span>
-            <span style={{ color: '#1a365d', fontWeight: 'bold', fontSize: '18px' }}>{formatCurrency(corpusShare)}</span>
+            <span style={{ color: '#1a365d', fontWeight: 'bold', fontSize: '18px' }}>
+              {formatCurrency(corpusShare)}
+            </span>
           </div>
         </div>
       </div>
@@ -492,12 +506,12 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
               <div key={idx} className="visual-bar">
                 <div className="visual-bar-label">{translateRevenueName(item.name)}</div>
                 <div className="visual-bar-track">
-                  <div 
-                    className="visual-bar-fill" 
-                    style={{ 
-                      width: `${Math.min(percentage, 100)}%`, 
-                      background: '#16a34a' 
-                    }} 
+                  <div
+                    className="visual-bar-fill"
+                    style={{
+                      width: `${Math.min(percentage, 100)}%`,
+                      background: '#16a34a',
+                    }}
                   />
                 </div>
                 <div className="visual-bar-value" style={{ color: '#16a34a' }}>
@@ -519,12 +533,12 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
               <div key={idx} className="visual-bar">
                 <div className="visual-bar-label">{translateExpenseName(item.name)}</div>
                 <div className="visual-bar-track">
-                  <div 
-                    className="visual-bar-fill" 
-                    style={{ 
-                      width: `${Math.min(percentage, 100)}%`, 
-                      background: '#dc2626' 
-                    }} 
+                  <div
+                    className="visual-bar-fill"
+                    style={{
+                      width: `${Math.min(percentage, 100)}%`,
+                      background: '#dc2626',
+                    }}
                   />
                 </div>
                 <div className="visual-bar-value" style={{ color: '#dc2626' }}>
@@ -553,7 +567,9 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
                 <tr key={idx}>
                   <td>{translateRevenueName(item.name)}</td>
                   <td style={{ color: '#16a34a' }}>{formatCurrency(item.amount)}</td>
-                  <td>{formatPercent(totalRevenues > 0 ? (item.amount / totalRevenues) * 100 : 0)}</td>
+                  <td>
+                    {formatPercent(totalRevenues > 0 ? (item.amount / totalRevenues) * 100 : 0)}
+                  </td>
                 </tr>
               ))}
               <tr className="total-row">
@@ -583,7 +599,9 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
                 <tr key={idx}>
                   <td>{translateExpenseName(item.name)}</td>
                   <td style={{ color: '#dc2626' }}>{formatCurrency(item.amount)}</td>
-                  <td>{formatPercent(totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0)}</td>
+                  <td>
+                    {formatPercent(totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0)}
+                  </td>
                 </tr>
               ))}
               <tr className="total-row">
@@ -603,26 +621,42 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
           <div className="heir-grid">
             {(distributions.sons_count ?? disclosure.sons_count ?? 0) > 0 && (
               <div className="heir-box">
-                <div className="summary-label">الأبناء ({distributions.sons_count ?? disclosure.sons_count})</div>
+                <div className="summary-label">
+                  الأبناء ({distributions.sons_count ?? disclosure.sons_count})
+                </div>
                 <div className="summary-value">{formatCurrency(distributions.sons_share)}</div>
               </div>
             )}
             {(distributions.daughters_count ?? disclosure.daughters_count ?? 0) > 0 && (
               <div className="heir-box">
-                <div className="summary-label">البنات ({distributions.daughters_count ?? disclosure.daughters_count})</div>
+                <div className="summary-label">
+                  البنات ({distributions.daughters_count ?? disclosure.daughters_count})
+                </div>
                 <div className="summary-value">{formatCurrency(distributions.daughters_share)}</div>
               </div>
             )}
             {(distributions.wives_count ?? disclosure.wives_count ?? 0) > 0 && (
               <div className="heir-box">
-                <div className="summary-label">الزوجات ({distributions.wives_count ?? disclosure.wives_count})</div>
+                <div className="summary-label">
+                  الزوجات ({distributions.wives_count ?? disclosure.wives_count})
+                </div>
                 <div className="summary-value">{formatCurrency(distributions.wives_share)}</div>
               </div>
             )}
           </div>
-          <div style={{ marginTop: '15px', textAlign: 'center', padding: '15px', background: '#e8f4f8', borderRadius: '8px' }}>
+          <div
+            style={{
+              marginTop: '15px',
+              textAlign: 'center',
+              padding: '15px',
+              background: '#e8f4f8',
+              borderRadius: '8px',
+            }}
+          >
             <div style={{ fontSize: '12px', color: '#666' }}>إجمالي التوزيعات</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>{formatCurrency(distributions.total)}</div>
+            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1a365d' }}>
+              {formatCurrency(distributions.total)}
+            </div>
           </div>
         </div>
       )}
@@ -632,10 +666,7 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
         <div className="print-section page-break">
           <div className="section-title">الرؤى والتحليلات الذكية</div>
           {insights.map((insight, idx) => (
-            <div 
-              key={idx} 
-              className={`insight-card insight-${insight.type}`}
-            >
+            <div key={idx} className={`insight-card insight-${insight.type}`}>
               <div className="insight-title">
                 {insight.type === 'positive' && '✓ '}
                 {insight.type === 'negative' && '⚠ '}
@@ -651,7 +682,9 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
       {/* المقارنة مع العام السابق */}
       {previousYear && (
         <div className="print-section">
-          <div className="section-title">المقارنة مع العام السابق ({previousYear.year - 1}-{previousYear.year})</div>
+          <div className="section-title">
+            المقارنة مع العام السابق ({previousYear.year - 1}-{previousYear.year})
+          </div>
           <table className="data-table">
             <thead>
               <tr>
@@ -667,40 +700,77 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
                 <td>إجمالي الإيرادات</td>
                 <td>{formatCurrency(totalRevenues)}</td>
                 <td>{formatCurrency(previousYear.total_revenues)}</td>
-                <td style={{ color: totalRevenues >= (previousYear.total_revenues || 0) ? '#16a34a' : '#dc2626' }}>
+                <td
+                  style={{
+                    color:
+                      totalRevenues >= (previousYear.total_revenues || 0) ? '#16a34a' : '#dc2626',
+                  }}
+                >
                   {formatCurrency(totalRevenues - (previousYear.total_revenues || 0))}
                 </td>
                 <td>
-                  {previousYear.total_revenues ? formatPercent(((totalRevenues - previousYear.total_revenues) / previousYear.total_revenues) * 100) : '-'}
+                  {previousYear.total_revenues
+                    ? formatPercent(
+                        ((totalRevenues - previousYear.total_revenues) /
+                          previousYear.total_revenues) *
+                          100
+                      )
+                    : '-'}
                 </td>
               </tr>
               <tr>
                 <td>إجمالي المصروفات</td>
                 <td>{formatCurrency(totalExpenses)}</td>
                 <td>{formatCurrency(previousYear.total_expenses)}</td>
-                <td style={{ color: totalExpenses <= (previousYear.total_expenses || 0) ? '#16a34a' : '#dc2626' }}>
+                <td
+                  style={{
+                    color:
+                      totalExpenses <= (previousYear.total_expenses || 0) ? '#16a34a' : '#dc2626',
+                  }}
+                >
                   {formatCurrency(totalExpenses - (previousYear.total_expenses || 0))}
                 </td>
                 <td>
-                  {previousYear.total_expenses ? formatPercent(((totalExpenses - previousYear.total_expenses) / previousYear.total_expenses) * 100) : '-'}
+                  {previousYear.total_expenses
+                    ? formatPercent(
+                        ((totalExpenses - previousYear.total_expenses) /
+                          previousYear.total_expenses) *
+                          100
+                      )
+                    : '-'}
                 </td>
               </tr>
               <tr>
                 <td>صافي الدخل</td>
                 <td>{formatCurrency(netIncome)}</td>
                 <td>{formatCurrency(previousYear.net_income)}</td>
-                <td style={{ color: netIncome >= (previousYear.net_income || 0) ? '#16a34a' : '#dc2626' }}>
+                <td
+                  style={{
+                    color: netIncome >= (previousYear.net_income || 0) ? '#16a34a' : '#dc2626',
+                  }}
+                >
                   {formatCurrency(netIncome - (previousYear.net_income || 0))}
                 </td>
                 <td>
-                  {previousYear.net_income ? formatPercent(((netIncome - previousYear.net_income) / previousYear.net_income) * 100) : '-'}
+                  {previousYear.net_income
+                    ? formatPercent(
+                        ((netIncome - previousYear.net_income) / previousYear.net_income) * 100
+                      )
+                    : '-'}
                 </td>
               </tr>
               <tr>
                 <td>عدد المستفيدين</td>
                 <td>{disclosure.total_beneficiaries}</td>
                 <td>{previousYear.total_beneficiaries}</td>
-                <td style={{ color: disclosure.total_beneficiaries >= previousYear.total_beneficiaries ? '#16a34a' : '#dc2626' }}>
+                <td
+                  style={{
+                    color:
+                      disclosure.total_beneficiaries >= previousYear.total_beneficiaries
+                        ? '#16a34a'
+                        : '#dc2626',
+                  }}
+                >
                   {disclosure.total_beneficiaries - previousYear.total_beneficiaries}
                 </td>
                 <td>-</td>
@@ -714,7 +784,14 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
       {!previousYear && (
         <div className="print-section">
           <div className="section-title">ملاحظة</div>
-          <div style={{ padding: '15px', background: '#f8fafc', borderRadius: '8px', textAlign: 'center' }}>
+          <div
+            style={{
+              padding: '15px',
+              background: '#f8fafc',
+              borderRadius: '8px',
+              textAlign: 'center',
+            }}
+          >
             هذا هو الإفصاح الأول - لا تتوفر بيانات للمقارنة مع سنوات سابقة
           </div>
         </div>
@@ -723,8 +800,13 @@ export function DisclosurePrintTemplate({ disclosure, previousYear }: Disclosure
       {/* التذييل */}
       <div className="footer">
         <div>تم إنشاء هذا التقرير بواسطة نظام إدارة الوقف</div>
-        <div>تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')} - {new Date().toLocaleTimeString('ar-SA')}</div>
-        <div style={{ marginTop: '5px' }}>صفحة الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}</div>
+        <div>
+          تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')} -{' '}
+          {new Date().toLocaleTimeString('ar-SA')}
+        </div>
+        <div style={{ marginTop: '5px' }}>
+          صفحة الإفصاح السنوي {disclosure.year - 1}-{disclosure.year}
+        </div>
       </div>
     </div>
   );

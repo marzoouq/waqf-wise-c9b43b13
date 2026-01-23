@@ -4,9 +4,9 @@
  * @version 2.9.11
  */
 
-import { format, arLocale as ar } from "@/lib/date";
-import { ROLE_LABELS, type AppRole } from "@/types/roles";
-import type { UserProfile } from "@/types/auth";
+import { format, arLocale as ar } from '@/lib/date';
+import { ROLE_LABELS, type AppRole } from '@/types/roles';
+import type { UserProfile } from '@/types/auth';
 
 interface ExportUsersOptions {
   users: UserProfile[];
@@ -18,35 +18,35 @@ interface ExportUsersOptions {
  */
 export function exportUsersToCSV({ users, filename }: ExportUsersOptions): void {
   const csvHeaders = [
-    "الاسم",
-    "البريد الإلكتروني",
-    "الهاتف",
-    "المنصب",
-    "الأدوار",
-    "الحالة",
-    "تاريخ الإنشاء",
+    'الاسم',
+    'البريد الإلكتروني',
+    'الهاتف',
+    'المنصب',
+    'الأدوار',
+    'الحالة',
+    'تاريخ الإنشاء',
   ];
 
   const csvData = users.map((user) => [
-    user.full_name || "-",
+    user.full_name || '-',
     user.email,
-    user.phone || "-",
-    user.position || "-",
-    user.user_roles?.map((r) => ROLE_LABELS[r.role as AppRole]).join(", ") || "-",
-    user.is_active ? "نشط" : "غير نشط",
-    format(new Date(user.created_at), "dd/MM/yyyy", { locale: ar }),
+    user.phone || '-',
+    user.position || '-',
+    user.user_roles?.map((r) => ROLE_LABELS[r.role as AppRole]).join(', ') || '-',
+    user.is_active ? 'نشط' : 'غير نشط',
+    format(new Date(user.created_at), 'dd/MM/yyyy', { locale: ar }),
   ]);
 
-  const csv = [csvHeaders, ...csvData].map((row) => row.join(",")).join("\n");
-  
+  const csv = [csvHeaders, ...csvData].map((row) => row.join(',')).join('\n');
+
   // إضافة BOM للدعم الصحيح للغة العربية
-  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-  
-  const link = document.createElement("a");
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+
+  const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = filename || `users_${format(new Date(), "yyyy-MM-dd")}.csv`;
+  link.download = filename || `users_${format(new Date(), 'yyyy-MM-dd')}.csv`;
   link.click();
-  
+
   // تنظيف
   URL.revokeObjectURL(link.href);
 }
@@ -66,13 +66,13 @@ export function exportUsersToJSON({ users, filename }: ExportUsersOptions): void
   }));
 
   const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
-    type: "application/json;charset=utf-8;",
+    type: 'application/json;charset=utf-8;',
   });
-  
-  const link = document.createElement("a");
+
+  const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = filename || `users_${format(new Date(), "yyyy-MM-dd")}.json`;
+  link.download = filename || `users_${format(new Date(), 'yyyy-MM-dd')}.json`;
   link.click();
-  
+
   URL.revokeObjectURL(link.href);
 }

@@ -1,14 +1,7 @@
-import { 
-  FileText, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  AlertTriangle,
-  Users
-} from "lucide-react";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { useAuditLogsStats } from "@/hooks/system/useAuditLogsEnhanced";
+import { FileText, Plus, Edit, Trash2, AlertTriangle, Users } from 'lucide-react';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { useAuditLogsStats } from '@/hooks/system/useAuditLogsEnhanced';
 
 interface AuditStatsCardsProps {
   dateRange?: { start: string; end: string };

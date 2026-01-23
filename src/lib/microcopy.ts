@@ -1,9 +1,9 @@
 /**
  * Microcopy System - نظام نصوص الواجهة الموحد
- * 
+ *
  * يوفر نصوصاً موحدة ومتسقة للواجهة عبر التطبيق
  * يدعم التخصيص حسب السياق
- * 
+ *
  * @version 1.0.0
  */
 
@@ -265,11 +265,11 @@ export const CONFIRMATION_MESSAGES = {
 export function getErrorMessage(type: string, subtype?: string): string {
   const category = ERROR_MESSAGES[type as keyof typeof ERROR_MESSAGES];
   if (!category) return ERROR_MESSAGES.general.unknown;
-  
+
   if (subtype && typeof category === 'object') {
     return (category as Record<string, string>)[subtype] || ERROR_MESSAGES.general.unknown;
   }
-  
+
   return ERROR_MESSAGES.general.unknown;
 }
 
@@ -279,11 +279,11 @@ export function getErrorMessage(type: string, subtype?: string): string {
 export function getSuccessMessage(type: string, subtype?: string): string {
   const category = SUCCESS_MESSAGES[type as keyof typeof SUCCESS_MESSAGES];
   if (!category) return SUCCESS_MESSAGES.crud.saved;
-  
+
   if (subtype && typeof category === 'object') {
     return (category as Record<string, string>)[subtype] || SUCCESS_MESSAGES.crud.saved;
   }
-  
+
   return SUCCESS_MESSAGES.crud.saved;
 }
 
@@ -299,15 +299,19 @@ export function getLoadingMessage(type?: keyof typeof LOADING_MESSAGES): string 
  */
 export function getEmptyMessage(type?: string): string {
   if (!type) return EMPTY_STATE_MESSAGES.general.no_data;
-  
-  const specific = EMPTY_STATE_MESSAGES.specific[type as keyof typeof EMPTY_STATE_MESSAGES.specific];
+
+  const specific =
+    EMPTY_STATE_MESSAGES.specific[type as keyof typeof EMPTY_STATE_MESSAGES.specific];
   return specific || EMPTY_STATE_MESSAGES.general.no_data;
 }
 
 /**
  * تخصيص رسالة مع متغيرات
  */
-export function interpolateMessage(template: string, variables: Record<string, string | number>): string {
+export function interpolateMessage(
+  template: string,
+  variables: Record<string, string | number>
+): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => String(variables[key] ?? `{${key}}`));
 }
 

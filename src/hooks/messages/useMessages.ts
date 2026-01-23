@@ -61,9 +61,7 @@ export function useMessages() {
     },
   });
 
-  const unreadCount = messages.filter(
-    (m) => m.receiver_id === user?.id && !m.is_read
-  ).length;
+  const unreadCount = messages.filter((m) => m.receiver_id === user?.id && !m.is_read).length;
 
   return {
     messages,

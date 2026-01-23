@@ -30,7 +30,10 @@ declare module 'jspdf' {
     bodyStyles?: AutoTableOptions['styles'];
     footStyles?: AutoTableOptions['styles'];
     alternateRowStyles?: AutoTableOptions['styles'];
-    columnStyles?: Record<string | number, AutoTableOptions['styles'] & { cellWidth?: number | 'auto' | 'wrap' }>;
+    columnStyles?: Record<
+      string | number,
+      AutoTableOptions['styles'] & { cellWidth?: number | 'auto' | 'wrap' }
+    >;
     margin?: number | { top?: number; right?: number; bottom?: number; left?: number };
     tableWidth?: number | 'auto' | 'wrap';
     theme?: 'striped' | 'grid' | 'plain';

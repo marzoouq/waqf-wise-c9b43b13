@@ -75,11 +75,9 @@ export function KeyboardShortcutsHelp({ open, onOpenChange }: KeyboardShortcutsH
             <Keyboard className="h-5 w-5" />
             اختصارات لوحة المفاتيح
           </DialogTitle>
-          <DialogDescription>
-            استخدم هذه الاختصارات للتنقل السريع في التطبيق
-          </DialogDescription>
+          <DialogDescription>استخدم هذه الاختصارات للتنقل السريع في التطبيق</DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-6 mt-4">
           {SHORTCUT_CATEGORIES.map((category) => (
             <motion.div
@@ -124,7 +122,11 @@ function ShortcutRow({ shortcut }: ShortcutRowProps) {
         {shortcut.ctrl && <KeyBadge>Ctrl</KeyBadge>}
         {shortcut.alt && <KeyBadge>Alt</KeyBadge>}
         {shortcut.shift && <KeyBadge>Shift</KeyBadge>}
-        {shortcut.meta && <KeyBadge><Command className="h-3 w-3" /></KeyBadge>}
+        {shortcut.meta && (
+          <KeyBadge>
+            <Command className="h-3 w-3" />
+          </KeyBadge>
+        )}
         {(shortcut.ctrl || shortcut.alt || shortcut.shift || shortcut.meta) && (
           <span className="text-muted-foreground mx-1">+</span>
         )}
@@ -169,9 +171,7 @@ interface ShortcutHintProps {
 export function ShortcutHint({ shortcut, description, className }: ShortcutHintProps) {
   return (
     <div className={cn('inline-flex items-center gap-2', className)}>
-      {description && (
-        <span className="text-xs text-muted-foreground">{description}</span>
-      )}
+      {description && <span className="text-xs text-muted-foreground">{description}</span>}
       <KeyBadge>{shortcut}</KeyBadge>
     </div>
   );

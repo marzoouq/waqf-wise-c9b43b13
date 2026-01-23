@@ -9,9 +9,20 @@ import { supabase } from '@/integrations/supabase/client';
  * الجداول المحمية من الحذف الفيزيائي
  */
 export const PROTECTED_FINANCIAL_TABLES: string[] = [
-  'payment_vouchers', 'journal_entries', 'distributions', 'contracts',
-  'loans', 'rental_payments', 'invoices', 'payments', 'bank_accounts',
-  'families', 'beneficiaries', 'tenants', 'properties', 'documents',
+  'payment_vouchers',
+  'journal_entries',
+  'distributions',
+  'contracts',
+  'loans',
+  'rental_payments',
+  'invoices',
+  'payments',
+  'bank_accounts',
+  'families',
+  'beneficiaries',
+  'tenants',
+  'properties',
+  'documents',
 ];
 
 export interface SoftDeleteResult {
@@ -35,7 +46,7 @@ export class SoftDeleteService {
     reason: string = 'حذف بواسطة المستخدم'
   ): Promise<void> {
     const deletedAt = new Date().toISOString();
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any)
       .from(tableName)

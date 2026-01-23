@@ -14,10 +14,10 @@ interface TransactionsTableProps {
 }
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  'نقدي': 'نقدي',
-  'شبكة': 'شبكة',
-  'تحويل': 'تحويل',
-  'شيك': 'شيك',
+  نقدي: 'نقدي',
+  شبكة: 'شبكة',
+  تحويل: 'تحويل',
+  شيك: 'شيك',
 };
 
 interface TransactionRow {
@@ -47,9 +47,7 @@ export function TransactionsTable({ transactions, isLoading }: TransactionsTable
     {
       key: 'transaction_number',
       label: 'رقم العملية',
-      render: (value) => (
-        <span className="font-mono text-sm">{String(value)}</span>
-      ),
+      render: (value) => <span className="font-mono text-sm">{String(value)}</span>,
     },
     {
       key: 'transaction_type',
@@ -84,16 +82,16 @@ export function TransactionsTable({ transactions, isLoading }: TransactionsTable
       key: 'payment_method',
       label: 'طريقة الدفع',
       render: (value) => (
-        <Badge variant="outline">
-          {PAYMENT_METHOD_LABELS[String(value)] || String(value)}
-        </Badge>
+        <Badge variant="outline">{PAYMENT_METHOD_LABELS[String(value)] || String(value)}</Badge>
       ),
     },
     {
       key: 'amount',
       label: 'المبلغ',
       render: (value, row) => (
-        <span className={`font-bold ${row.transaction_type === 'تحصيل' ? 'text-status-success' : 'text-status-error'}`}>
+        <span
+          className={`font-bold ${row.transaction_type === 'تحصيل' ? 'text-status-success' : 'text-status-error'}`}
+        >
           {row.transaction_type === 'تحصيل' ? '+' : '-'}
           {Number(value).toLocaleString('ar-SA')} ر.س
         </span>
@@ -112,7 +110,7 @@ export function TransactionsTable({ transactions, isLoading }: TransactionsTable
     },
   ];
 
-  const tableData: TransactionRow[] = transactions.map(t => ({
+  const tableData: TransactionRow[] = transactions.map((t) => ({
     id: t.id,
     transaction_number: t.transaction_number,
     transaction_type: t.transaction_type,
@@ -155,7 +153,9 @@ export function TransactionsTable({ transactions, isLoading }: TransactionsTable
         </p>
       )}
       <div className="text-left">
-        <span className={`font-bold text-lg ${row.transaction_type === 'تحصيل' ? 'text-status-success' : 'text-status-error'}`}>
+        <span
+          className={`font-bold text-lg ${row.transaction_type === 'تحصيل' ? 'text-status-success' : 'text-status-error'}`}
+        >
           {row.transaction_type === 'تحصيل' ? '+' : '-'}
           {row.amount.toLocaleString('ar-SA')} ر.س
         </span>

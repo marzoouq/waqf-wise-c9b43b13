@@ -2,21 +2,16 @@
  * PaginationControls Component - عناصر التحكم بالتصفح
  * @version 2.9.9
  */
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  ChevronsRight, 
-  ChevronsLeft 
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface PaginationControlsProps {
   currentPage: number;
@@ -65,9 +60,9 @@ export function PaginationControls({
 
   // حساب أرقام الصفحات للعرض
   const getVisiblePages = () => {
-    const pages: (number | "...")[] = [];
+    const pages: (number | '...')[] = [];
     const maxVisible = compact ? 3 : 5;
-    
+
     if (totalPages <= maxVisible + 2) {
       // عرض كل الصفحات
       for (let i = 1; i <= totalPages; i++) {
@@ -76,32 +71,32 @@ export function PaginationControls({
     } else {
       // عرض مع "..."
       pages.push(1);
-      
+
       if (currentPage > 3) {
-        pages.push("...");
+        pages.push('...');
       }
-      
+
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-      
+
       if (currentPage < totalPages - 2) {
-        pages.push("...");
+        pages.push('...');
       }
-      
+
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
   return (
-    <div 
+    <div
       className={cn(
-        "flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-4 border-t bg-muted/30",
+        'flex flex-col sm:flex-row items-center justify-between gap-3 p-3 sm:p-4 border-t bg-muted/30',
         className
       )}
     >
@@ -142,26 +137,23 @@ export function PaginationControls({
 
         {/* أرقام الصفحات */}
         <div className="flex items-center gap-1 mx-1">
-          {getVisiblePages().map((page, index) => (
-            page === "..." ? (
+          {getVisiblePages().map((page, index) =>
+            page === '...' ? (
               <span key={`dots-${index}`} className="px-2 text-muted-foreground">
                 ...
               </span>
             ) : (
               <Button
                 key={page}
-                variant={currentPage === page ? "default" : "outline"}
+                variant={currentPage === page ? 'default' : 'outline'}
                 size="icon"
                 onClick={() => onPageChange(page)}
-                className={cn(
-                  "h-8 w-8 text-xs",
-                  currentPage === page && "pointer-events-none"
-                )}
+                className={cn('h-8 w-8 text-xs', currentPage === page && 'pointer-events-none')}
               >
                 {page}
               </Button>
             )
-          ))}
+          )}
         </div>
 
         {/* زر السابق (RTL) */}
@@ -194,9 +186,7 @@ export function PaginationControls({
       {/* محدد عدد العناصر */}
       {showPageSizeSelector && (
         <div className="flex items-center gap-2 order-3">
-          <span className="text-sm text-muted-foreground hidden sm:inline">
-            عناصر لكل صفحة:
-          </span>
+          <span className="text-sm text-muted-foreground hidden sm:inline">عناصر لكل صفحة:</span>
           <Select
             value={String(pageSize)}
             onValueChange={(value) => onPageSizeChange(Number(value))}

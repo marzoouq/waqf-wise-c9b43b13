@@ -4,19 +4,22 @@
  * @version 1.0.0
  */
 
-import { Link } from "react-router-dom";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { useDeveloperDashboardData } from "@/hooks/developer/useDeveloperDashboardData";
-import { format, arLocale as ar } from "@/lib/date";
+import { Link } from 'react-router-dom';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { useDeveloperDashboardData } from '@/hooks/developer/useDeveloperDashboardData';
+import { format, arLocale as ar } from '@/lib/date';
 import {
   Shield,
   ShieldCheck,
@@ -38,7 +41,7 @@ import {
   FileCheck,
   GitBranch,
   TestTube,
-} from "lucide-react";
+} from 'lucide-react';
 
 export default function DeveloperDashboard() {
   const { data, isLoading, refetch } = useDeveloperDashboardData();
@@ -51,8 +54,10 @@ export default function DeveloperDashboard() {
 
   // تحديد حالة الأمان الإجمالية
   const getOverallSecurityStatus = () => {
-    if (security.criticalIssues > 0) return { status: 'critical', color: 'destructive', icon: ShieldAlert };
-    if (security.openSecurityIssues > 5) return { status: 'warning', color: 'default', icon: Shield };
+    if (security.criticalIssues > 0)
+      return { status: 'critical', color: 'destructive', icon: ShieldAlert };
+    if (security.openSecurityIssues > 5)
+      return { status: 'warning', color: 'default', icon: Shield };
     return { status: 'secure', color: 'secondary', icon: ShieldCheck };
   };
 
@@ -75,31 +80,41 @@ export default function DeveloperDashboard() {
 
         {/* الحالة الإجمالية */}
         <div className="mb-6">
-          <Card className={`border-2 ${
-            securityStatus.status === 'critical' ? 'border-destructive bg-destructive/5' :
-            securityStatus.status === 'warning' ? 'border-warning bg-warning/5' :
-            'border-success bg-success/5'
-          }`}>
+          <Card
+            className={`border-2 ${
+              securityStatus.status === 'critical'
+                ? 'border-destructive bg-destructive/5'
+                : securityStatus.status === 'warning'
+                  ? 'border-warning bg-warning/5'
+                  : 'border-success bg-success/5'
+            }`}
+          >
             <CardContent className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <securityStatus.icon className={`h-8 w-8 ${
-                    securityStatus.status === 'critical' ? 'text-destructive' :
-                    securityStatus.status === 'warning' ? 'text-warning' :
-                    'text-success'
-                  }`} />
+                  <securityStatus.icon
+                    className={`h-8 w-8 ${
+                      securityStatus.status === 'critical'
+                        ? 'text-destructive'
+                        : securityStatus.status === 'warning'
+                          ? 'text-warning'
+                          : 'text-success'
+                    }`}
+                  />
                   <div>
                     <h3 className="font-semibold text-lg">
-                      {securityStatus.status === 'critical' ? 'تحذير أمني حرج' :
-                       securityStatus.status === 'warning' ? 'يوجد تنبيهات أمنية' :
-                       'النظام آمن'}
+                      {securityStatus.status === 'critical'
+                        ? 'تحذير أمني حرج'
+                        : securityStatus.status === 'warning'
+                          ? 'يوجد تنبيهات أمنية'
+                          : 'النظام آمن'}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {security.criticalIssues > 0 
+                      {security.criticalIssues > 0
                         ? `${security.criticalIssues} مشكلة حرجة تتطلب اهتمام فوري`
                         : security.openSecurityIssues > 0
-                        ? `${security.openSecurityIssues} مشكلة أمنية مفتوحة`
-                        : 'جميع الفحوصات الأمنية ناجحة'}
+                          ? `${security.openSecurityIssues} مشكلة أمنية مفتوحة`
+                          : 'جميع الفحوصات الأمنية ناجحة'}
                     </p>
                   </div>
                 </div>
@@ -120,13 +135,25 @@ export default function DeveloperDashboard() {
             title={`تغطية RLS (${security.rlsEnabledTables}/${security.totalTables})`}
             value={`${security.rlsCoverage}%`}
             icon={Lock}
-            variant={security.rlsCoverage >= 90 ? 'success' : security.rlsCoverage >= 70 ? 'warning' : 'danger'}
+            variant={
+              security.rlsCoverage >= 90
+                ? 'success'
+                : security.rlsCoverage >= 70
+                  ? 'warning'
+                  : 'danger'
+            }
           />
           <UnifiedKPICard
             title="صحة النظام"
             value={`${systemHealth.healthPercentage}%`}
             icon={Activity}
-            variant={systemHealth.healthPercentage >= 90 ? 'success' : systemHealth.healthPercentage >= 70 ? 'warning' : 'danger'}
+            variant={
+              systemHealth.healthPercentage >= 90
+                ? 'success'
+                : systemHealth.healthPercentage >= 70
+                  ? 'warning'
+                  : 'danger'
+            }
           />
           <UnifiedKPICard
             title="الاختبارات"
@@ -136,9 +163,21 @@ export default function DeveloperDashboard() {
           />
           <UnifiedKPICard
             title="حالة البناء"
-            value={codeQuality.buildStatus === 'success' ? 'ناجح' : codeQuality.buildStatus === 'failed' ? 'فشل' : 'قيد التنفيذ'}
+            value={
+              codeQuality.buildStatus === 'success'
+                ? 'ناجح'
+                : codeQuality.buildStatus === 'failed'
+                  ? 'فشل'
+                  : 'قيد التنفيذ'
+            }
             icon={GitBranch}
-            variant={codeQuality.buildStatus === 'success' ? 'success' : codeQuality.buildStatus === 'failed' ? 'danger' : 'warning'}
+            variant={
+              codeQuality.buildStatus === 'success'
+                ? 'success'
+                : codeQuality.buildStatus === 'failed'
+                  ? 'danger'
+                  : 'warning'
+            }
           />
         </UnifiedStatsGrid>
 
@@ -191,7 +230,9 @@ export default function DeveloperDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Unlock className="h-4 w-4 text-destructive" />
-                      <span className="text-sm">{security.totalTables - security.rlsEnabledTables} غير محمي</span>
+                      <span className="text-sm">
+                        {security.totalTables - security.rlsEnabledTables} غير محمي
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -251,13 +292,22 @@ export default function DeveloperDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {recentSecurityEvents.map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={event.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex items-center gap-3">
-                          <Badge variant={
-                            event.severity === 'critical' ? 'destructive' :
-                            event.severity === 'error' ? 'destructive' :
-                            event.severity === 'warning' ? 'default' : 'secondary'
-                          }>
+                          <Badge
+                            variant={
+                              event.severity === 'critical'
+                                ? 'destructive'
+                                : event.severity === 'error'
+                                  ? 'destructive'
+                                  : event.severity === 'warning'
+                                    ? 'default'
+                                    : 'secondary'
+                            }
+                          >
                             {event.severity}
                           </Badge>
                           <span className="text-sm">{event.description || event.type}</span>
@@ -269,7 +319,8 @@ export default function DeveloperDashboard() {
                             <XCircle className="h-4 w-4 text-destructive" />
                           )}
                           <span className="text-xs text-muted-foreground">
-                            {event.created_at && format(new Date(event.created_at), 'dd/MM HH:mm', { locale: ar })}
+                            {event.created_at &&
+                              format(new Date(event.created_at), 'dd/MM HH:mm', { locale: ar })}
                           </span>
                         </div>
                       </div>
@@ -299,7 +350,9 @@ export default function DeveloperDashboard() {
                   <CardTitle className="text-sm font-medium">أخطاء حرجة</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-destructive">{systemHealth.criticalErrors}</div>
+                  <div className="text-2xl font-bold text-destructive">
+                    {systemHealth.criticalErrors}
+                  </div>
                   <p className="text-xs text-muted-foreground">تتطلب تدخل فوري</p>
                 </CardContent>
               </Card>
@@ -334,14 +387,21 @@ export default function DeveloperDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {recentErrors.map((error) => (
-                      <div key={error.id} className="flex items-start justify-between p-3 border rounded-lg">
+                      <div
+                        key={error.id}
+                        className="flex items-start justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant={
-                              error.severity === 'critical' ? 'destructive' :
-                              error.severity === 'high' ? 'destructive' :
-                              'secondary'
-                            }>
+                            <Badge
+                              variant={
+                                error.severity === 'critical'
+                                  ? 'destructive'
+                                  : error.severity === 'high'
+                                    ? 'destructive'
+                                    : 'secondary'
+                              }
+                            >
                               {error.severity}
                             </Badge>
                             <span className="text-sm font-medium">{error.error_type}</span>
@@ -373,17 +433,25 @@ export default function DeveloperDashboard() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>نسبة النجاح</span>
-                    <Badge variant={codeQuality.testsPassing === codeQuality.testsCount ? 'secondary' : 'destructive'}>
+                    <Badge
+                      variant={
+                        codeQuality.testsPassing === codeQuality.testsCount
+                          ? 'secondary'
+                          : 'destructive'
+                      }
+                    >
                       {Math.round((codeQuality.testsPassing / codeQuality.testsCount) * 100)}%
                     </Badge>
                   </div>
-                  <Progress 
-                    value={(codeQuality.testsPassing / codeQuality.testsCount) * 100} 
-                    className="h-3" 
+                  <Progress
+                    value={(codeQuality.testsPassing / codeQuality.testsCount) * 100}
+                    className="h-3"
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-success/10 rounded-lg text-center">
-                      <div className="text-xl font-bold text-success">{codeQuality.testsPassing}</div>
+                      <div className="text-xl font-bold text-success">
+                        {codeQuality.testsPassing}
+                      </div>
                       <div className="text-xs text-muted-foreground">ناجح</div>
                     </div>
                     <div className="p-3 bg-destructive/10 rounded-lg text-center">
@@ -446,9 +514,11 @@ export default function DeveloperDashboard() {
                   )}
                   <div>
                     <h4 className="font-semibold text-lg">
-                      {codeQuality.buildStatus === 'success' ? 'البناء ناجح' :
-                       codeQuality.buildStatus === 'failed' ? 'فشل البناء' :
-                       'قيد التنفيذ'}
+                      {codeQuality.buildStatus === 'success'
+                        ? 'البناء ناجح'
+                        : codeQuality.buildStatus === 'failed'
+                          ? 'فشل البناء'
+                          : 'قيد التنفيذ'}
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       جميع الفحوصات الأمنية والاختبارات مكتملة
@@ -469,7 +539,9 @@ export default function DeveloperDashboard() {
                       <Shield className="h-10 w-10 text-primary" />
                       <div>
                         <h4 className="font-semibold">لوحة الأمان</h4>
-                        <p className="text-sm text-muted-foreground">الأحداث الأمنية ومحاولات الدخول</p>
+                        <p className="text-sm text-muted-foreground">
+                          الأحداث الأمنية ومحاولات الدخول
+                        </p>
                       </div>
                     </div>
                   </CardContent>

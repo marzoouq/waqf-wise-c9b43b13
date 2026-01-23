@@ -1,13 +1,19 @@
-import { useState, useEffect } from "react";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRentalPayments, RentalPayment } from "@/hooks/property/useRentalPayments";
-import { useContracts } from "@/hooks/property/useContracts";
-import { matchesStatus } from "@/lib/constants";
+import { useState, useEffect } from 'react';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useRentalPayments, RentalPayment } from '@/hooks/property/useRentalPayments';
+import { useContracts } from '@/hooks/property/useContracts';
+import { matchesStatus } from '@/lib/constants';
 
 interface Props {
   open: boolean;
@@ -21,16 +27,16 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
   const { contracts } = useContracts();
 
   const [formData, setFormData] = useState({
-    contract_id: contractId || "",
-    due_date: "",
-    amount_due: "",
-    amount_paid: "",
-    payment_date: "",
-    payment_method: "",
-    status: "معلق",
-    discount: "",
-    receipt_number: "",
-    notes: "",
+    contract_id: contractId || '',
+    due_date: '',
+    amount_due: '',
+    amount_paid: '',
+    payment_date: '',
+    payment_method: '',
+    status: 'معلق',
+    discount: '',
+    receipt_number: '',
+    notes: '',
   });
 
   useEffect(() => {
@@ -40,15 +46,15 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
         due_date: payment.due_date,
         amount_due: payment.amount_due.toString(),
         amount_paid: payment.amount_paid.toString(),
-        payment_date: payment.payment_date || "",
-        payment_method: payment.payment_method || "",
-        status: payment.status || "معلق",
+        payment_date: payment.payment_date || '',
+        payment_method: payment.payment_method || '',
+        status: payment.status || 'معلق',
         discount: payment.discount.toString(),
-        receipt_number: payment.receipt_number || "",
-        notes: payment.notes || "",
+        receipt_number: payment.receipt_number || '',
+        notes: payment.notes || '',
       });
     } else if (contractId) {
-      setFormData(prev => ({ ...prev, contract_id: contractId }));
+      setFormData((prev) => ({ ...prev, contract_id: contractId }));
     }
   }, [payment, contractId]);
 
@@ -66,7 +72,7 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
 
     // Auto-set status to "مدفوع" if payment is made
     if (paymentData.amount_paid > 0 && paymentData.payment_date) {
-      paymentData.status = "مدفوع";
+      paymentData.status = 'مدفوع';
     }
 
     if (payment) {
@@ -80,178 +86,178 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
 
   const resetForm = () => {
     setFormData({
-      contract_id: contractId || "",
-      due_date: "",
-      amount_due: "",
-      amount_paid: "",
-      payment_date: "",
-      payment_method: "",
-      status: "معلق",
-      discount: "",
-      receipt_number: "",
-      notes: "",
+      contract_id: contractId || '',
+      due_date: '',
+      amount_due: '',
+      amount_paid: '',
+      payment_date: '',
+      payment_method: '',
+      status: 'معلق',
+      discount: '',
+      receipt_number: '',
+      notes: '',
     });
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
-      title={payment ? "تعديل دفعة" : "إضافة دفعة جديدة"}
-      description={payment ? "تعديل بيانات الدفعة" : "أدخل بيانات الدفعة الجديدة"}
+      title={payment ? 'تعديل دفعة' : 'إضافة دفعة جديدة'}
+      description={payment ? 'تعديل بيانات الدفعة' : 'أدخل بيانات الدفعة الجديدة'}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Info Alert */}
-          <div className="bg-info-light border border-info/30 rounded-lg p-3 text-sm text-info">
-            <div className="font-medium mb-1">💡 ملاحظة:</div>
-            <div>عند إدخال المبلغ المدفوع + تاريخ الدفع، ستتحول الحالة تلقائياً إلى "مدفوع"</div>
-          </div>
+        {/* Info Alert */}
+        <div className="bg-info-light border border-info/30 rounded-lg p-3 text-sm text-info">
+          <div className="font-medium mb-1">💡 ملاحظة:</div>
+          <div>عند إدخال المبلغ المدفوع + تاريخ الدفع، ستتحول الحالة تلقائياً إلى "مدفوع"</div>
+        </div>
 
-          {!contractId && (
-            <div className="space-y-2">
-              <Label>العقد *</Label>
-              <Select
-                value={formData.contract_id}
-                onValueChange={(value) => setFormData({ ...formData, contract_id: value })}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر العقد" />
-                </SelectTrigger>
-                <SelectContent>
-                  {contracts?.filter(c => matchesStatus(c.status, 'active')).map((contract) => (
+        {!contractId && (
+          <div className="space-y-2">
+            <Label>العقد *</Label>
+            <Select
+              value={formData.contract_id}
+              onValueChange={(value) => setFormData({ ...formData, contract_id: value })}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر العقد" />
+              </SelectTrigger>
+              <SelectContent>
+                {contracts
+                  ?.filter((c) => matchesStatus(c.status, 'active'))
+                  .map((contract) => (
                     <SelectItem key={contract.id} value={contract.id}>
                       {contract.contract_number} - {contract.tenant_name}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>تاريخ الاستحقاق *</Label>
-              <Input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>المبلغ المستحق *</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.amount_due}
-                onChange={(e) => setFormData({ ...formData, amount_due: e.target.value })}
-                required
-              />
-            </div>
+              </SelectContent>
+            </Select>
           </div>
+        )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>حالة الدفعة *</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر الحالة" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="معلق">معلق</SelectItem>
-                  <SelectItem value="تحت التحصيل">تحت التحصيل</SelectItem>
-                  <SelectItem value="مدفوع">مدفوع</SelectItem>
-                  <SelectItem value="متأخر">متأخر</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>تاريخ الدفع</Label>
-              <Input
-                type="date"
-                value={formData.payment_date}
-                onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
-                placeholder="أدخل تاريخ الدفع عند الدفع"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>المبلغ المدفوع</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.amount_paid}
-                onChange={(e) => setFormData({ ...formData, amount_paid: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>الخصم</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.discount}
-                onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>طريقة الدفع</Label>
-              <Select
-                value={formData.payment_method}
-                onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر طريقة الدفع" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="نقدي">نقدي</SelectItem>
-                  <SelectItem value="تحويل بنكي">تحويل بنكي</SelectItem>
-                  <SelectItem value="شيك">شيك</SelectItem>
-                  <SelectItem value="بطاقة">بطاقة</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>رقم الإيصال</Label>
-              <Input
-                value={formData.receipt_number}
-                onChange={(e) => setFormData({ ...formData, receipt_number: e.target.value })}
-              />
-            </div>
-          </div>
-
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>ملاحظات</Label>
-            <Textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              rows={3}
+            <Label>تاريخ الاستحقاق *</Label>
+            <Input
+              type="date"
+              value={formData.due_date}
+              onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+              required
             />
           </div>
 
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              إلغاء
-            </Button>
-            <Button type="submit">
-              {payment ? "تحديث" : "إضافة"}
-            </Button>
+          <div className="space-y-2">
+            <Label>المبلغ المستحق *</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={formData.amount_due}
+              onChange={(e) => setFormData({ ...formData, amount_due: e.target.value })}
+              required
+            />
           </div>
-        </form>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>حالة الدفعة *</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value) => setFormData({ ...formData, status: value })}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الحالة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="معلق">معلق</SelectItem>
+                <SelectItem value="تحت التحصيل">تحت التحصيل</SelectItem>
+                <SelectItem value="مدفوع">مدفوع</SelectItem>
+                <SelectItem value="متأخر">متأخر</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>تاريخ الدفع</Label>
+            <Input
+              type="date"
+              value={formData.payment_date}
+              onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
+              placeholder="أدخل تاريخ الدفع عند الدفع"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>المبلغ المدفوع</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={formData.amount_paid}
+              onChange={(e) => setFormData({ ...formData, amount_paid: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>الخصم</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={formData.discount}
+              onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>طريقة الدفع</Label>
+            <Select
+              value={formData.payment_method}
+              onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="اختر طريقة الدفع" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="نقدي">نقدي</SelectItem>
+                <SelectItem value="تحويل بنكي">تحويل بنكي</SelectItem>
+                <SelectItem value="شيك">شيك</SelectItem>
+                <SelectItem value="بطاقة">بطاقة</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>رقم الإيصال</Label>
+            <Input
+              value={formData.receipt_number}
+              onChange={(e) => setFormData({ ...formData, receipt_number: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>ملاحظات</Label>
+          <Textarea
+            value={formData.notes}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            rows={3}
+          />
+        </div>
+
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            إلغاء
+          </Button>
+          <Button type="submit">{payment ? 'تحديث' : 'إضافة'}</Button>
+        </div>
+      </form>
     </ResponsiveDialog>
   );
 };

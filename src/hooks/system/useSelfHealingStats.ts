@@ -4,8 +4,8 @@
  * @version 2.8.65
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { SystemService } from "@/services";
+import { useQuery } from '@tanstack/react-query';
+import { SystemService } from '@/services';
 
 interface SelfHealingStats {
   retrySuccessRate: number;
@@ -16,11 +16,15 @@ interface SelfHealingStats {
 }
 
 export function useSelfHealingStats() {
-  const { data: stats, isLoading, refetch } = useQuery({
+  const {
+    data: stats,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['self-healing-stats'],
     queryFn: async (): Promise<SelfHealingStats> => {
       const healthStats = await SystemService.getHealthStats();
-      
+
       return {
         retrySuccessRate: healthStats.fixSuccessRate,
         systemHealth: healthStats.healthScore,

@@ -3,10 +3,10 @@
  * @version 1.0.0
  */
 
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
-import { POSQuickAccessCard } from "@/components/pos";
-import { cn } from "@/lib/utils";
+import { BankBalanceCard } from '@/components/shared/BankBalanceCard';
+import { WaqfCorpusCard } from '@/components/shared/WaqfCorpusCard';
+import { POSQuickAccessCard } from '@/components/pos';
+import { cn } from '@/lib/utils';
 
 interface FinancialCardsRowProps {
   showPOS?: boolean;
@@ -17,8 +17,8 @@ export function FinancialCardsRow({ showPOS = true, className }: FinancialCardsR
   return (
     <div
       className={cn(
-        "grid gap-4 sm:gap-6",
-        showPOS ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2",
+        'grid gap-4 sm:gap-6',
+        showPOS ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2',
         className
       )}
     >

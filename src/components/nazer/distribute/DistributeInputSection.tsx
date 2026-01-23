@@ -3,18 +3,18 @@
  * قسم إدخال بيانات توزيع الغلة
  */
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { ActiveFiscalYear } from "@/hooks/fiscal-years";
+} from '@/components/ui/select';
+import type { ActiveFiscalYear } from '@/hooks/fiscal-years';
 
 interface DistributeInputSectionProps {
   totalAmount: string;
@@ -59,10 +59,7 @@ export function DistributeInputSection({
 
       <div className="space-y-2">
         <Label htmlFor="fiscalYear">السنة المالية</Label>
-        <Select
-          value={selectedFiscalYear}
-          onValueChange={setSelectedFiscalYear}
-        >
+        <Select value={selectedFiscalYear} onValueChange={setSelectedFiscalYear}>
           <SelectTrigger>
             <SelectValue placeholder="اختر السنة المالية" />
           </SelectTrigger>
@@ -100,9 +97,7 @@ export function DistributeInputSection({
       <div className="flex items-center justify-between md:col-span-2">
         <div className="space-y-0.5">
           <Label>إرسال إشعارات للورثة</Label>
-          <p className="text-sm text-muted-foreground">
-            إشعار الورثة بإيداع حصصهم
-          </p>
+          <p className="text-sm text-muted-foreground">إشعار الورثة بإيداع حصصهم</p>
         </div>
         <Switch checked={notifyHeirs} onCheckedChange={setNotifyHeirs} />
       </div>

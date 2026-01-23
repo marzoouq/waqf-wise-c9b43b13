@@ -4,7 +4,11 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AutoJournalService, type AutoJournalTemplate, type AutoJournalTemplateInsert } from '@/services/accounting.service';
+import {
+  AutoJournalService,
+  type AutoJournalTemplate,
+  type AutoJournalTemplateInsert,
+} from '@/services/accounting.service';
 import { useToast } from '@/hooks/ui/use-toast';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -15,13 +19,19 @@ export function useAutoJournalTemplates() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: templates, isLoading, error, refetch } = useQuery({
+  const {
+    data: templates,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES,
     queryFn: () => AutoJournalService.getTemplates(),
   });
 
   const createTemplate = useMutation({
-    mutationFn: (template: AutoJournalTemplateInsert) => AutoJournalService.createTemplate(template),
+    mutationFn: (template: AutoJournalTemplateInsert) =>
+      AutoJournalService.createTemplate(template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
       toast({ title: 'تم الحفظ', description: 'تم إنشاء قالب القيد التلقائي بنجاح' });
@@ -32,7 +42,7 @@ export function useAutoJournalTemplates() {
   });
 
   const updateTemplate = useMutation({
-    mutationFn: ({ id, ...template }: Partial<AutoJournalTemplate> & { id: string }) => 
+    mutationFn: ({ id, ...template }: Partial<AutoJournalTemplate> & { id: string }) =>
       AutoJournalService.updateTemplate(id, template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
@@ -55,7 +65,7 @@ export function useAutoJournalTemplates() {
   });
 
   const toggleActive = useMutation({
-    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) => 
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       AutoJournalService.toggleActive(id, is_active),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });

@@ -8,12 +8,12 @@ import { Beneficiary } from '@/types/beneficiary';
 import { SearchCriteria } from '@/components/beneficiary/admin/AdvancedSearchDialog';
 
 // أنواع الـ Dialogs
-export type DialogType = 
-  | 'form' 
-  | 'advancedSearch' 
-  | 'attachments' 
-  | 'activityLog' 
-  | 'enableLogin' 
+export type DialogType =
+  | 'form'
+  | 'advancedSearch'
+  | 'attachments'
+  | 'activityLog'
+  | 'enableLogin'
   | 'tribeManagement';
 
 // حالة الصفحة
@@ -59,7 +59,7 @@ function reducer(state: BeneficiariesPageState, action: Action): BeneficiariesPa
   switch (action.type) {
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload, currentPage: 1 };
-    
+
     case 'OPEN_DIALOG':
       switch (action.payload) {
         case 'form':
@@ -77,7 +77,7 @@ function reducer(state: BeneficiariesPageState, action: Action): BeneficiariesPa
         default:
           return state;
       }
-    
+
     case 'CLOSE_DIALOG':
       switch (action.payload) {
         case 'form':
@@ -95,16 +95,16 @@ function reducer(state: BeneficiariesPageState, action: Action): BeneficiariesPa
         default:
           return state;
       }
-    
+
     case 'SET_SELECTED_BENEFICIARY':
       return { ...state, selectedBeneficiary: action.payload };
-    
+
     case 'SET_CURRENT_PAGE':
       return { ...state, currentPage: action.payload };
-    
+
     case 'SET_ADVANCED_CRITERIA':
       return { ...state, advancedCriteria: action.payload, currentPage: 1 };
-    
+
     case 'RESET_DIALOGS':
       return {
         ...state,
@@ -115,7 +115,7 @@ function reducer(state: BeneficiariesPageState, action: Action): BeneficiariesPa
         enableLoginDialogOpen: false,
         tribeManagementDialogOpen: false,
       };
-    
+
     default:
       return state;
   }
@@ -181,7 +181,7 @@ export function useBeneficiariesPageState() {
   return {
     // State
     ...state,
-    
+
     // Actions (للتوافق مع الكود القديم)
     setSearchQuery,
     setDialogOpen,
@@ -193,7 +193,7 @@ export function useBeneficiariesPageState() {
     setSelectedBeneficiary,
     setCurrentPage,
     setAdvancedCriteria,
-    
+
     // Actions جديدة
     openDialog,
     closeDialog,

@@ -1,25 +1,28 @@
-import { useState, useMemo, Suspense } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, PieChart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DistributionDialog } from "@/components/funds/DistributionDialog";
-import { SimulationDialog } from "@/components/funds/SimulationDialog";
-import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
-import { useDistributions } from "@/hooks/distributions/useDistributions";
-import { useWaqfUnits } from "@/hooks/distributions/useWaqfUnits";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { logger } from "@/lib/logger";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab";
-import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
-import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useMemo, Suspense } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, PieChart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DistributionDialog } from '@/components/funds/DistributionDialog';
+import { SimulationDialog } from '@/components/funds/SimulationDialog';
+import { DistributionSettingsDialog } from '@/components/distributions/DistributionSettingsDialog';
+import { useDistributions } from '@/hooks/distributions/useDistributions';
+import { useWaqfUnits } from '@/hooks/distributions/useWaqfUnits';
+import { useJournalEntries } from '@/hooks/accounting/useJournalEntries';
+import { logger } from '@/lib/logger';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { AnnualDisclosureTab } from '@/components/funds/tabs/AnnualDisclosureTab';
+import { OverviewTab } from '@/components/funds/tabs/OverviewTab';
+import { DistributionsTab } from '@/components/funds/tabs/DistributionsTab';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
   const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
 
   const { distributions, addDistributionAsync } = useDistributions();
   const { waqfUnits } = useWaqfUnits();
@@ -32,11 +35,11 @@ const Funds = () => {
         total_amount: data.totalAmount as number,
         waqf_unit_id: data.waqfUnit as string,
         beneficiaries_count: (data.beneficiaryIds as string[])?.length || 0,
-        status: "معلق",
+        status: 'معلق',
         distribution_date: new Date().toISOString().split('T')[0],
         notes: (data.notes as string) || null,
       };
-      
+
       const result = await addDistributionAsync(dbData);
 
       await createAutoEntry(
@@ -55,10 +58,13 @@ const Funds = () => {
 
   const summaryStats = useMemo(() => {
     // حساب الإحصائيات من أقلام الوقف الفعلية
-    const totalAcquisitionValue = waqfUnits.reduce((sum, u) => sum + Number(u.acquisition_value || 0), 0);
+    const totalAcquisitionValue = waqfUnits.reduce(
+      (sum, u) => sum + Number(u.acquisition_value || 0),
+      0
+    );
     const totalCurrentValue = waqfUnits.reduce((sum, u) => sum + Number(u.current_value || 0), 0);
     const totalAnnualReturn = waqfUnits.reduce((sum, u) => sum + Number(u.annual_return || 0), 0);
-    const activeUnits = waqfUnits.filter(u => u.is_active).length;
+    const activeUnits = waqfUnits.filter((u) => u.is_active).length;
 
     return {
       totalAllocated: totalAcquisitionValue,
@@ -86,11 +92,7 @@ const Funds = () => {
                 <PieChart className="h-4 w-4" />
                 <span className="hidden sm:inline">محاكاة</span>
               </Button>
-              <Button
-                size="sm"
-                onClick={() => setDistributionDialogOpen(true)}
-                className="gap-2"
-              >
+              <Button size="sm" onClick={() => setDistributionDialogOpen(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">توزيع جديد</span>
               </Button>
@@ -102,9 +104,15 @@ const Funds = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
             <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 mb-6 h-auto">
-              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">نظرة عامة</TabsTrigger>
-              <TabsTrigger value="distributions" className="text-xs sm:text-sm px-3 py-2">التوزيعات</TabsTrigger>
-              <TabsTrigger value="disclosure" className="text-xs sm:text-sm px-3 py-2">الإفصاح السنوي</TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">
+                نظرة عامة
+              </TabsTrigger>
+              <TabsTrigger value="distributions" className="text-xs sm:text-sm px-3 py-2">
+                التوزيعات
+              </TabsTrigger>
+              <TabsTrigger value="disclosure" className="text-xs sm:text-sm px-3 py-2">
+                الإفصاح السنوي
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -117,12 +125,14 @@ const Funds = () => {
           </TabsContent>
 
           <TabsContent value="disclosure" className="space-y-6">
-            <Suspense fallback={
-              <div className="space-y-4">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-64 w-full" />
-              </div>
-            }>
+            <Suspense
+              fallback={
+                <div className="space-y-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-64 w-full" />
+                </div>
+              }
+            >
               <AnnualDisclosureTab />
             </Suspense>
           </TabsContent>
@@ -135,10 +145,7 @@ const Funds = () => {
           onDistribute={handleDistribute}
         />
 
-        <SimulationDialog
-          open={simulationDialogOpen}
-          onOpenChange={setSimulationDialogOpen}
-        />
+        <SimulationDialog open={simulationDialogOpen} onOpenChange={setSimulationDialogOpen} />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

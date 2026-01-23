@@ -34,7 +34,12 @@ interface PaymentRecord {
 export function ContractReceipts({ contractId, tenantName }: ContractReceiptsProps) {
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
 
-  const { data: payments, isLoading, error, refetch } = useQuery({
+  const {
+    data: payments,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['contract-receipts', contractId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,7 +58,7 @@ export function ContractReceipts({ contractId, tenantName }: ContractReceiptsPro
     setIsGenerating(payment.id);
     try {
       const orgSettings = await RentalPaymentService.getOrganizationSettings();
-      
+
       const receiptData = {
         id: payment.id,
         payment_number: payment.payment_number,
@@ -66,7 +71,7 @@ export function ContractReceipts({ contractId, tenantName }: ContractReceiptsPro
       };
 
       const doc = await generateReceiptPDF(receiptData, orgSettings);
-      
+
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl, '_blank');
@@ -128,9 +133,7 @@ export function ContractReceipts({ contractId, tenantName }: ContractReceiptsPro
                     {payment.payment_method}
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatDate(payment.payment_date)}
-                </p>
+                <p className="text-xs text-muted-foreground">{formatDate(payment.payment_date)}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span className="font-medium text-success">

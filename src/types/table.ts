@@ -38,7 +38,6 @@ export interface BeneficiaryTableRow extends TableRow {
   status: string;
 }
 
-
 export interface PaymentTableRow extends TableRow {
   payment_number: string;
   payment_date: string;

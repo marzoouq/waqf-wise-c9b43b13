@@ -26,7 +26,7 @@ export function OverduePaymentsCard() {
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-12 bg-muted rounded"></div>
             ))}
           </div>
@@ -48,9 +48,7 @@ export function OverduePaymentsCard() {
             المتأخرات
           </span>
           {overduePayments.length > 0 && (
-            <Badge variant="destructive">
-              {stats.overduePayments} دفعة
-            </Badge>
+            <Badge variant="destructive">{stats.overduePayments} دفعة</Badge>
           )}
         </CardTitle>
       </CardHeader>
@@ -58,16 +56,26 @@ export function OverduePaymentsCard() {
         {overduePayments.length === 0 ? (
           <div className="text-center py-6 text-muted-foreground">
             <div className="w-12 h-12 rounded-full bg-success/10 mx-auto mb-2 flex items-center justify-center">
-              <svg className="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="h-6 w-6 text-success"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <p className="text-sm">لا توجد متأخرات 🎉</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {overduePayments.slice(0, 5).map(payment => (
-              <div 
+            {overduePayments.slice(0, 5).map((payment) => (
+              <div
                 key={payment.id}
                 className="flex items-center justify-between p-3 bg-destructive/5 rounded-lg border border-destructive/20"
               >
@@ -101,8 +109,8 @@ export function OverduePaymentsCard() {
             </div>
 
             {/* زر متابعة */}
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               className="w-full gap-2"
               onClick={() => navigate('/payments')}
             >

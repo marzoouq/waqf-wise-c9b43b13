@@ -4,19 +4,19 @@
  * @version 2.9.0
  */
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  FileText, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  FileText,
+  TrendingUp,
+  TrendingDown,
+  Users,
   Calculator,
   Wallet,
   ArrowDown,
@@ -29,20 +29,28 @@ import {
   Lightbulb,
   Download,
   Printer,
-  Loader2
-} from "lucide-react";
-import { AnnualDisclosure, useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
-import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
-import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
-import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
-import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
-import { SmartInsights } from "@/components/disclosure/SmartInsights";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
-import { toast } from "sonner";
-import { usePrint } from "@/hooks/ui/usePrint";
-import { DisclosurePrintTemplate } from "@/components/beneficiary/tabs/DisclosurePrintTemplate";
+  Loader2,
+} from 'lucide-react';
+import { AnnualDisclosure, useAnnualDisclosures } from '@/hooks/reports/useAnnualDisclosures';
+import { SmartDisclosureDocuments } from '@/components/reports/SmartDisclosureDocuments';
+import { HistoricalRentalDetailsCard } from '@/components/fiscal-years';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableFooter,
+} from '@/components/ui/table';
+import { YearComparisonCard } from '@/components/disclosure/YearComparisonCard';
+import { DisclosureCharts } from '@/components/disclosure/DisclosureCharts';
+import { SmartInsights } from '@/components/disclosure/SmartInsights';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
+import { toast } from 'sonner';
+import { usePrint } from '@/hooks/ui/usePrint';
+import { DisclosurePrintTemplate } from '@/components/beneficiary/tabs/DisclosurePrintTemplate';
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -58,47 +66,47 @@ interface ExpenseItem {
 // ترجمة أسماء المصروفات من الإنجليزية إلى العربية
 const expenseNameTranslations: Record<string, string> = {
   // المصروفات الفعلية من قاعدة البيانات
-  'audit_2024': 'تدقيق 2024',
-  'audit_2025': 'تدقيق 2025',
-  'cleaning_worker': 'عامل نظافة',
-  'ejar_platform': 'منصة إيجار',
-  'electrical_works': 'أعمال كهربائية',
-  'electricity_bills': 'فواتير الكهرباء',
-  'electricity_maintenance': 'صيانة كهربائية',
-  'gypsum_works': 'أعمال جبس',
-  'miscellaneous': 'مصروفات متنوعة',
-  'plumbing_maintenance': 'صيانة سباكة',
-  'plumbing_works': 'أعمال سباكة',
-  'rental_commission': 'عمولة إيجار',
-  'water_bills': 'فواتير المياه',
-  'zakat': 'الزكاة',
-  'total': 'الإجمالي',
+  audit_2024: 'تدقيق 2024',
+  audit_2025: 'تدقيق 2025',
+  cleaning_worker: 'عامل نظافة',
+  ejar_platform: 'منصة إيجار',
+  electrical_works: 'أعمال كهربائية',
+  electricity_bills: 'فواتير الكهرباء',
+  electricity_maintenance: 'صيانة كهربائية',
+  gypsum_works: 'أعمال جبس',
+  miscellaneous: 'مصروفات متنوعة',
+  plumbing_maintenance: 'صيانة سباكة',
+  plumbing_works: 'أعمال سباكة',
+  rental_commission: 'عمولة إيجار',
+  water_bills: 'فواتير المياه',
+  zakat: 'الزكاة',
+  total: 'الإجمالي',
   // ترجمات إضافية احتياطية
-  'maintenance': 'مصروفات الصيانة',
-  'administrative': 'مصروفات إدارية',
-  'development': 'مصروفات التطوير',
-  'other': 'مصروفات أخرى',
-  'utilities': 'المرافق والخدمات',
-  'insurance': 'التأمين',
-  'taxes': 'الضرائب والرسوم',
-  'legal': 'المصروفات القانونية',
-  'salaries': 'الرواتب والأجور',
-  'repairs': 'الإصلاحات',
-  'security': 'الأمن والحراسة',
-  'bank_charges': 'رسوم بنكية',
+  maintenance: 'مصروفات الصيانة',
+  administrative: 'مصروفات إدارية',
+  development: 'مصروفات التطوير',
+  other: 'مصروفات أخرى',
+  utilities: 'المرافق والخدمات',
+  insurance: 'التأمين',
+  taxes: 'الضرائب والرسوم',
+  legal: 'المصروفات القانونية',
+  salaries: 'الرواتب والأجور',
+  repairs: 'الإصلاحات',
+  security: 'الأمن والحراسة',
+  bank_charges: 'رسوم بنكية',
 };
 
 // ترجمة أسماء الإيرادات
 const revenueNameTranslations: Record<string, string> = {
-  'jeddah_properties': 'عقارات جدة',
-  'nahdi_rental': 'إيجار النهدي',
-  'remaining_2024': 'متبقي 2024',
-  'residential_monthly': 'الإيجارات السكنية الشهرية',
-  'total': 'الإجمالي',
+  jeddah_properties: 'عقارات جدة',
+  nahdi_rental: 'إيجار النهدي',
+  remaining_2024: 'متبقي 2024',
+  residential_monthly: 'الإيجارات السكنية الشهرية',
+  total: 'الإجمالي',
   // ترجمات إضافية احتياطية
-  'rental_income': 'إيرادات الإيجار',
-  'investment_returns': 'عوائد الاستثمار',
-  'other_income': 'إيرادات أخرى',
+  rental_income: 'إيرادات الإيجار',
+  investment_returns: 'عوائد الاستثمار',
+  other_income: 'إيرادات أخرى',
 };
 
 const translateExpenseName = (name: string): string => {
@@ -130,27 +138,31 @@ interface BeneficiariesDetails {
 }
 
 const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount === null || amount === undefined) return "0 ر.س";
-  return new Intl.NumberFormat("ar-SA", {
-    style: "currency",
-    currency: "SAR",
+  if (amount === null || amount === undefined) return '0 ر.س';
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'currency',
+    currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
 };
 
-export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDisclosureDialogProps) {
+export function ViewDisclosureDialog({
+  open,
+  onOpenChange,
+  disclosure,
+}: ViewDisclosureDialogProps) {
   // جلب جميع الإفصاحات للمقارنة
   const { disclosures: allDisclosures } = useAnnualDisclosures();
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
   const { printWithData } = usePrint();
   const [isExporting, setIsExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
-  
+
   if (!disclosure) return null;
 
   // البحث عن السنة السابقة للتصدير
-  const prevYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
+  const prevYear = allDisclosures?.find((d) => d.year === disclosure.year - 1) || null;
 
   // وظيفة تصدير PDF
   const handleExportPDF = async () => {
@@ -158,9 +170,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], prevYear);
-      toast.success("تم تحميل ملف PDF بنجاح");
+      toast.success('تم تحميل ملف PDF بنجاح');
     } catch {
-      toast.error("فشل تحميل ملف PDF");
+      toast.error('فشل تحميل ملف PDF');
     } finally {
       setIsExporting(false);
     }
@@ -169,27 +181,26 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
   // وظيفة الطباعة - استخدام نافذة طباعة مستقلة
   const handlePrint = () => {
     // البحث عن السنة السابقة للمقارنة
-    const prevYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
-    
+    const prevYear = allDisclosures?.find((d) => d.year === disclosure.year - 1) || null;
+
     setIsPrinting(true);
-    printWithData(
-      { disclosure, previousYear: prevYear },
-      (data) => <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
-    );
+    printWithData({ disclosure, previousYear: prevYear }, (data) => (
+      <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
+    ));
     setIsPrinting(false);
   };
 
   // البحث عن السنة السابقة للمقارنة
-  const previousYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
+  const previousYear = allDisclosures?.find((d) => d.year === disclosure.year - 1) || null;
 
   // Parse expense breakdown (exclude 'total' as it's shown separately)
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
-  const expenseItems: ExpenseItem[] = expensesBreakdown 
+  const expenseItems: ExpenseItem[] = expensesBreakdown
     ? Object.entries(expensesBreakdown)
         .filter(([name]) => name.toLowerCase() !== 'total')
         .map(([name, amount]) => ({ name, amount: amount || 0 }))
     : [];
-  
+
   // Parse revenue breakdown (exclude 'total' as it's shown separately)
   const revenueBreakdown = disclosure.revenue_breakdown as Record<string, number> | null;
   const revenueItems: RevenueItem[] = revenueBreakdown
@@ -210,13 +221,13 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
   const charityShare = disclosure.charity_share || 0;
   const corpusShare = disclosure.corpus_share || 0;
   const distributedAmount = distributions?.total || 995000;
-  
+
   // Net after expenses
   const netAfterExpenses = totalRevenues - totalExpenses;
-  
+
   // Total deductions (VAT + Nazer + Charity)
   const totalDeductions = vatAmount + nazerShare + charityShare;
-  
+
   // Available for distribution
   const availableForDistribution = netAfterExpenses - totalDeductions;
 
@@ -261,14 +272,20 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 )}
                 <span className="hidden sm:inline">تصدير PDF</span>
               </Button>
-              <Badge variant="outline" className="text-sm sm:text-lg px-2 sm:px-4 py-1 sm:py-2 w-fit">
+              <Badge
+                variant="outline"
+                className="text-sm sm:text-lg px-2 sm:px-4 py-1 sm:py-2 w-fit"
+              >
                 {disclosure.status === 'published' ? 'منشور' : 'مسودة'}
               </Badge>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           {/* تبويبات للجوال */}
           <div className="block sm:hidden p-3">
             <Tabs defaultValue="summary" className="w-full">
@@ -298,23 +315,33 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <CardContent className="p-3 space-y-2">
                     <div className="flex justify-between items-center p-2 bg-success/10 rounded">
                       <span className="text-xs">الإيرادات</span>
-                      <span className="font-bold text-success text-sm">{formatCurrency(totalRevenues)}</span>
+                      <span className="font-bold text-success text-sm">
+                        {formatCurrency(totalRevenues)}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-destructive/10 rounded">
                       <span className="text-xs">المصروفات</span>
-                      <span className="font-bold text-destructive text-sm">({formatCurrency(totalExpenses)})</span>
+                      <span className="font-bold text-destructive text-sm">
+                        ({formatCurrency(totalExpenses)})
+                      </span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-info/10 rounded">
                       <span className="text-xs">صافي الدخل</span>
-                      <span className="font-bold text-info text-sm">{formatCurrency(netAfterExpenses)}</span>
+                      <span className="font-bold text-info text-sm">
+                        {formatCurrency(netAfterExpenses)}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-warning/10 rounded">
                       <span className="text-xs">التوزيعات</span>
-                      <span className="font-bold text-warning text-sm">({formatCurrency(distributedAmount)})</span>
+                      <span className="font-bold text-warning text-sm">
+                        ({formatCurrency(distributedAmount)})
+                      </span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-primary/10 rounded border border-primary">
                       <span className="text-xs font-medium">رقبة الوقف</span>
-                      <span className="font-bold text-primary text-sm">{formatCurrency(corpusShare)}</span>
+                      <span className="font-bold text-primary text-sm">
+                        {formatCurrency(corpusShare)}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -335,7 +362,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       </div>
                       <div className="text-center p-2 bg-heir-daughter/10 rounded">
                         <p className="text-[10px] text-muted-foreground">البنات</p>
-                        <p className="text-xs font-bold text-heir-daughter">{disclosure.daughters_count}</p>
+                        <p className="text-xs font-bold text-heir-daughter">
+                          {disclosure.daughters_count}
+                        </p>
                       </div>
                       <div className="text-center p-2 bg-heir-wife/10 rounded">
                         <p className="text-[10px] text-muted-foreground">الزوجات</p>
@@ -359,7 +388,10 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </CardHeader>
                     <CardContent className="p-3 pt-0 space-y-1">
                       {revenueItems.map((item) => (
-                        <div key={`revenue-${item.name}`} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                        <div
+                          key={`revenue-${item.name}`}
+                          className="flex justify-between text-xs p-1.5 bg-muted/50 rounded"
+                        >
                           <span>{translateRevenueName(item.name)}</span>
                           <span className="text-success">{formatCurrency(item.amount)}</span>
                         </div>
@@ -379,7 +411,10 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </CardHeader>
                     <CardContent className="p-3 pt-0 space-y-1">
                       {expenseItems.map((item) => (
-                        <div key={`expense-${item.name}`} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                        <div
+                          key={`expense-${item.name}`}
+                          className="flex justify-between text-xs p-1.5 bg-muted/50 rounded"
+                        >
                           <span>{translateExpenseName(item.name)}</span>
                           <span className="text-red-600">{formatCurrency(item.amount)}</span>
                         </div>
@@ -407,7 +442,6 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
 
           {/* عرض سطح المكتب الكامل */}
           <div className="hidden sm:block p-3 sm:p-6 space-y-4 sm:space-y-6">
-            
             {/* ============================================ */}
             {/* القسم 0: الرؤى الذكية والمقارنة السنوية */}
             {/* ============================================ */}
@@ -420,7 +454,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 0.5: الرسوم البيانية */}
             {/* ============================================ */}
             <DisclosureCharts disclosure={disclosure} />
-            
+
             {/* ============================================ */}
             {/* القسم 1: الكشف المالي المتسلسل (الأهم) */}
             {/* ============================================ */}
@@ -435,7 +469,6 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0">
-                
                 {/* 1. إجمالي الإيرادات */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-success/10 rounded-lg border border-success/20 gap-2">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -444,10 +477,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">إيرادات السنة المالية</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">جميع مصادر الدخل للسنة المالية</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        جميع مصادر الدخل للسنة المالية
+                      </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-success text-left sm:text-right">{formatCurrency(totalRevenues)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-success text-left sm:text-right">
+                    {formatCurrency(totalRevenues)}
+                  </p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -463,10 +500,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">(-) إجمالي المصروفات</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">صيانة + إدارية + أخرى ({expenseItems.length || 4} بند)</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        صيانة + إدارية + أخرى ({expenseItems.length || 4} بند)
+                      </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-destructive text-left sm:text-right">({formatCurrency(totalExpenses)})</p>
+                  <p className="text-lg sm:text-2xl font-bold text-destructive text-left sm:text-right">
+                    ({formatCurrency(totalExpenses)})
+                  </p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -482,10 +523,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </div>
                     <div>
                       <p className="font-semibold text-sm sm:text-lg">= صافي الدخل التشغيلي</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">الإيرادات - المصروفات</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        الإيرادات - المصروفات
+                      </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">{formatCurrency(netAfterExpenses)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">
+                    {formatCurrency(netAfterExpenses)}
+                  </p>
                 </div>
 
                 <Separator className="my-4" />
@@ -496,38 +541,50 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
                     الاستقطاعات النظامية:
                   </p>
-                  
+
                   {/* ضريبة القيمة المضافة */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-warning/10 rounded-lg border border-warning/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
                       <span className="text-xs sm:text-sm">(-) ضريبة القيمة المضافة (15%)</span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-warning">({formatCurrency(vatAmount)})</p>
+                    <p className="font-bold text-sm sm:text-base text-warning">
+                      ({formatCurrency(vatAmount)})
+                    </p>
                   </div>
 
                   {/* حصة الناظر */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                      <span className="text-xs sm:text-sm">(-) حصة الناظر ({disclosure.nazer_percentage}%)</span>
+                      <span className="text-xs sm:text-sm">
+                        (-) حصة الناظر ({disclosure.nazer_percentage}%)
+                      </span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-primary">({formatCurrency(nazerShare)})</p>
+                    <p className="font-bold text-sm sm:text-base text-primary">
+                      ({formatCurrency(nazerShare)})
+                    </p>
                   </div>
 
                   {/* صدقة الواقف */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-secondary/50 rounded-lg border border-secondary me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-secondary-foreground" />
-                      <span className="text-xs sm:text-sm">(-) صدقة الواقف ({disclosure.charity_percentage}%)</span>
+                      <span className="text-xs sm:text-sm">
+                        (-) صدقة الواقف ({disclosure.charity_percentage}%)
+                      </span>
                     </div>
-                    <p className="font-bold text-sm sm:text-base text-secondary-foreground">({formatCurrency(charityShare)})</p>
+                    <p className="font-bold text-sm sm:text-base text-secondary-foreground">
+                      ({formatCurrency(charityShare)})
+                    </p>
                   </div>
 
                   {/* إجمالي الاستقطاعات */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-muted rounded-lg me-0 sm:me-6 border gap-1">
                     <span className="font-semibold text-xs sm:text-sm">إجمالي الاستقطاعات</span>
-                    <p className="font-bold text-sm sm:text-base">({formatCurrency(totalDeductions)})</p>
+                    <p className="font-bold text-sm sm:text-base">
+                      ({formatCurrency(totalDeductions)})
+                    </p>
                   </div>
                 </div>
 
@@ -543,11 +600,17 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       <Coins className="h-4 w-4 sm:h-5 sm:w-5 text-info" />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm sm:text-lg">= المتاح للتوزيع على الورثة</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">صافي الدخل - الاستقطاعات</p>
+                      <p className="font-semibold text-sm sm:text-lg">
+                        = المتاح للتوزيع على الورثة
+                      </p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        صافي الدخل - الاستقطاعات
+                      </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">{formatCurrency(availableForDistribution)}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-info text-left sm:text-right">
+                    {formatCurrency(availableForDistribution)}
+                  </p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -568,7 +631,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       </p>
                     </div>
                   </div>
-                  <p className="text-lg sm:text-2xl font-bold text-warning text-left sm:text-right">({formatCurrency(distributedAmount)})</p>
+                  <p className="text-lg sm:text-2xl font-bold text-warning text-left sm:text-right">
+                    ({formatCurrency(distributedAmount)})
+                  </p>
                 </div>
 
                 {/* سهم للأسفل */}
@@ -584,10 +649,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     </div>
                     <div>
                       <p className="font-bold text-base sm:text-xl">= المتبقي (رقبة الوقف)</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">يُرحّل للسنة المالية القادمة</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        يُرحّل للسنة المالية القادمة
+                      </p>
                     </div>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-primary text-left sm:text-right">{formatCurrency(corpusShare)}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-primary text-left sm:text-right">
+                    {formatCurrency(corpusShare)}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -602,21 +671,27 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     تفصيل الإيرادات
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">جميع مصادر الدخل للسنة المالية</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">
+                    جميع مصادر الدخل للسنة المالية
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4 pt-0">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-right text-xs sm:text-sm">مصدر الإيراد</TableHead>
+                          <TableHead className="text-right text-xs sm:text-sm">
+                            مصدر الإيراد
+                          </TableHead>
                           <TableHead className="text-left text-xs sm:text-sm">المبلغ</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {revenueItems.map((item) => (
                           <TableRow key={`revenue-${item.name}`}>
-                            <TableCell className="font-medium text-xs sm:text-sm">{translateRevenueName(item.name)}</TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">
+                              {translateRevenueName(item.name)}
+                            </TableCell>
                             <TableCell className="text-emerald-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
                             </TableCell>
@@ -646,7 +721,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <TrendingDown className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                   تفصيل المصروفات ({expenseItems.length || 4} بند)
                 </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">جميع بنود المصروفات للسنة المالية</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  جميع بنود المصروفات للسنة المالية
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 pt-0">
                 {expenseItems.length > 0 ? (
@@ -654,16 +731,24 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-right w-8 sm:w-12 text-xs sm:text-sm">#</TableHead>
-                          <TableHead className="text-right text-xs sm:text-sm">بند المصروف</TableHead>
+                          <TableHead className="text-right w-8 sm:w-12 text-xs sm:text-sm">
+                            #
+                          </TableHead>
+                          <TableHead className="text-right text-xs sm:text-sm">
+                            بند المصروف
+                          </TableHead>
                           <TableHead className="text-left text-xs sm:text-sm">المبلغ</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {expenseItems.map((item, idx) => (
                           <TableRow key={`expense-${item.name}`}>
-                            <TableCell className="text-muted-foreground text-xs sm:text-sm">{idx + 1}</TableCell>
-                            <TableCell className="font-medium text-xs sm:text-sm">{translateExpenseName(item.name)}</TableCell>
+                            <TableCell className="text-muted-foreground text-xs sm:text-sm">
+                              {idx + 1}
+                            </TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">
+                              {translateExpenseName(item.name)}
+                            </TableCell>
                             <TableCell className="text-red-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
                             </TableCell>
@@ -673,7 +758,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       <TableFooter>
                         <TableRow className="bg-red-500/10">
                           <TableCell></TableCell>
-                          <TableCell className="font-bold text-xs sm:text-sm">إجمالي المصروفات</TableCell>
+                          <TableCell className="font-bold text-xs sm:text-sm">
+                            إجمالي المصروفات
+                          </TableCell>
                           <TableCell className="font-bold text-red-600 text-xs sm:text-sm">
                             {formatCurrency(totalExpenses)}
                           </TableCell>
@@ -685,24 +772,34 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <div className="space-y-2 sm:space-y-3">
                     <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                       <span>مصروفات الصيانة</span>
-                      <span className="font-semibold text-red-600">{formatCurrency(disclosure.maintenance_expenses)}</span>
+                      <span className="font-semibold text-red-600">
+                        {formatCurrency(disclosure.maintenance_expenses)}
+                      </span>
                     </div>
                     <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                       <span>مصروفات إدارية</span>
-                      <span className="font-semibold text-red-600">{formatCurrency(disclosure.administrative_expenses)}</span>
+                      <span className="font-semibold text-red-600">
+                        {formatCurrency(disclosure.administrative_expenses)}
+                      </span>
                     </div>
                     <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                       <span>مصروفات تطوير</span>
-                      <span className="font-semibold text-red-600">{formatCurrency(disclosure.development_expenses)}</span>
+                      <span className="font-semibold text-red-600">
+                        {formatCurrency(disclosure.development_expenses)}
+                      </span>
                     </div>
                     <div className="flex justify-between p-2 sm:p-3 bg-muted/50 rounded-lg text-xs sm:text-sm">
                       <span>مصروفات أخرى</span>
-                      <span className="font-semibold text-red-600">{formatCurrency(disclosure.other_expenses)}</span>
+                      <span className="font-semibold text-red-600">
+                        {formatCurrency(disclosure.other_expenses)}
+                      </span>
                     </div>
                     <Separator />
                     <div className="flex justify-between p-2 sm:p-3 bg-red-500/10 rounded-lg border border-red-500/20 text-xs sm:text-sm">
                       <span className="font-bold">الإجمالي</span>
-                      <span className="font-bold text-red-600">{formatCurrency(totalExpenses)}</span>
+                      <span className="font-bold text-red-600">
+                        {formatCurrency(totalExpenses)}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -729,7 +826,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                     <CardContent className="p-2 sm:p-4 text-center">
                       <Coins className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-1 sm:mb-2 text-amber-600" />
                       <p className="text-xs sm:text-sm text-muted-foreground">إجمالي الموزع</p>
-                      <p className="text-sm sm:text-xl font-bold text-amber-600">{formatCurrency(distributedAmount)}</p>
+                      <p className="text-sm sm:text-xl font-bold text-amber-600">
+                        {formatCurrency(distributedAmount)}
+                      </p>
                       <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                         {distributions?.heirs_count || disclosure.total_beneficiaries} وريث
                       </p>
@@ -796,12 +895,18 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">حصة الناظر</p>
                     <p className="text-lg sm:text-2xl font-bold">{disclosure.nazer_percentage}%</p>
-                    <p className="text-xs sm:text-sm text-purple-600">{formatCurrency(nazerShare)}</p>
+                    <p className="text-xs sm:text-sm text-purple-600">
+                      {formatCurrency(nazerShare)}
+                    </p>
                   </div>
                   <div className="text-center p-2 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">صدقة الواقف</p>
-                    <p className="text-lg sm:text-2xl font-bold">{disclosure.charity_percentage}%</p>
-                    <p className="text-xs sm:text-sm text-pink-600">{formatCurrency(charityShare)}</p>
+                    <p className="text-lg sm:text-2xl font-bold">
+                      {disclosure.charity_percentage}%
+                    </p>
+                    <p className="text-xs sm:text-sm text-pink-600">
+                      {formatCurrency(charityShare)}
+                    </p>
                   </div>
                   <div className="text-center p-2 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">رقبة الوقف</p>
@@ -811,7 +916,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   <div className="text-center p-2 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">ضريبة القيمة المضافة</p>
                     <p className="text-lg sm:text-2xl font-bold">15%</p>
-                    <p className="text-xs sm:text-sm text-orange-600">{formatCurrency(vatAmount)}</p>
+                    <p className="text-xs sm:text-sm text-orange-600">
+                      {formatCurrency(vatAmount)}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -821,8 +928,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 6: البيان التفصيلي للشقق السكنية */}
             {/* ============================================ */}
             {disclosure.fiscal_year_id && (
-              <HistoricalRentalDetailsCard 
-                fiscalYearId={disclosure.fiscal_year_id} 
+              <HistoricalRentalDetailsCard
+                fiscalYearId={disclosure.fiscal_year_id}
                 fiscalYearName={`${disclosure.year - 1}-${disclosure.year}`}
               />
             )}
@@ -831,7 +938,6 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 7: المستندات الداعمة */}
             {/* ============================================ */}
             <SmartDisclosureDocuments disclosureId={disclosure.id} />
-
           </div>
         </div>
       </DialogContent>

@@ -1,22 +1,35 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Settings, Info } from "lucide-react";
-import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Settings, Info } from 'lucide-react';
+import { useDistributionSettings } from '@/hooks/distributions/useDistributionSettings';
 
 export function DistributionSettingsDialog() {
   const { settings, updateSettings } = useDistributionSettings();
   const [open, setOpen] = useState(false);
 
   const [formData, setFormData] = useState({
-    distribution_frequency: settings?.distribution_frequency || "شهري",
-    distribution_rule: settings?.distribution_rule || "شرعي",
+    distribution_frequency: settings?.distribution_frequency || 'شهري',
+    distribution_rule: settings?.distribution_rule || 'شرعي',
     maintenance_percentage: settings?.maintenance_percentage || 5,
     nazer_percentage: settings?.nazer_percentage || 10,
     waqif_charity_percentage: settings?.waqif_charity_percentage || 5,
@@ -32,7 +45,11 @@ export function DistributionSettingsDialog() {
   const handleSubmit = async () => {
     await updateSettings({
       ...formData,
-      distribution_frequency: formData.distribution_frequency as 'شهري' | 'ربع_سنوي' | 'نصف_سنوي' | 'سنوي',
+      distribution_frequency: formData.distribution_frequency as
+        | 'شهري'
+        | 'ربع_سنوي'
+        | 'نصف_سنوي'
+        | 'سنوي',
       distribution_rule: formData.distribution_rule as 'شرعي' | 'متساوي' | 'مخصص',
       calculation_order: 'تسلسلي',
       is_active: true,
@@ -40,7 +57,7 @@ export function DistributionSettingsDialog() {
     setOpen(false);
   };
 
-  const totalPercentages = 
+  const totalPercentages =
     formData.maintenance_percentage +
     formData.nazer_percentage +
     formData.waqif_charity_percentage +
@@ -68,7 +85,12 @@ export function DistributionSettingsDialog() {
             <Label>تكرار التوزيع</Label>
             <Select
               value={formData.distribution_frequency}
-              onValueChange={(value) => setFormData({ ...formData, distribution_frequency: value as typeof formData.distribution_frequency })}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  distribution_frequency: value as typeof formData.distribution_frequency,
+                })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -99,58 +121,64 @@ export function DistributionSettingsDialog() {
           {/* Maintenance Percentage - Priority 1 */}
           <div className="rounded-lg border-2 border-success/30 bg-success-light p-4 space-y-2">
             <Label className="text-success font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-success text-success-foreground">1</Badge>
+              <Badge variant="secondary" className="bg-success text-success-foreground">
+                1
+              </Badge>
               نسبة الصيانة والعمارة
             </Label>
             <Input
               type="number"
               step="0.5"
               value={formData.maintenance_percentage}
-              onChange={(e) => setFormData({ ...formData, maintenance_percentage: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, maintenance_percentage: parseFloat(e.target.value) })
+              }
               min="0"
               max="20"
             />
-            <p className="text-xs text-success/80">
-              أول ما يُخرج من الغلة لحفظ عين الوقف
-            </p>
+            <p className="text-xs text-success/80">أول ما يُخرج من الغلة لحفظ عين الوقف</p>
           </div>
 
           {/* Nazer Percentage - Priority 2 */}
           <div className="rounded-lg border-2 border-info/30 bg-info-light p-4 space-y-2">
             <Label className="text-info font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-info text-info-foreground">2</Badge>
+              <Badge variant="secondary" className="bg-info text-info-foreground">
+                2
+              </Badge>
               نسبة الناظر
             </Label>
             <Input
               type="number"
               step="0.1"
               value={formData.nazer_percentage}
-              onChange={(e) => setFormData({ ...formData, nazer_percentage: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, nazer_percentage: parseFloat(e.target.value) })
+              }
               min="0"
               max="15"
             />
-            <p className="text-xs text-info/80">
-              تُحسب من الباقي بعد الصيانة
-            </p>
+            <p className="text-xs text-info/80">تُحسب من الباقي بعد الصيانة</p>
           </div>
 
           {/* Waqif Charity Percentage - Priority 3 */}
           <div className="rounded-lg border-2 border-accent/30 bg-accent/10 p-4 space-y-2">
             <Label className="text-accent font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-accent text-accent-foreground">3</Badge>
+              <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                3
+              </Badge>
               صدقة الواقف
             </Label>
             <Input
               type="number"
               step="0.1"
               value={formData.waqif_charity_percentage}
-              onChange={(e) => setFormData({ ...formData, waqif_charity_percentage: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, waqif_charity_percentage: parseFloat(e.target.value) })
+              }
               min="0"
               max="10"
             />
-            <p className="text-xs text-accent">
-              تُحسب من الباقي بعد الناظر
-            </p>
+            <p className="text-xs text-accent">تُحسب من الباقي بعد الناظر</p>
           </div>
 
           {/* Reserve Percentage - Optional */}
@@ -163,7 +191,9 @@ export function DistributionSettingsDialog() {
               type="number"
               step="0.5"
               value={formData.reserve_percentage}
-              onChange={(e) => setFormData({ ...formData, reserve_percentage: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, reserve_percentage: parseFloat(e.target.value) })
+              }
               min="0"
               max="10"
             />
@@ -186,7 +216,12 @@ export function DistributionSettingsDialog() {
             <Label>قاعدة التوزيع</Label>
             <Select
               value={formData.distribution_rule}
-              onValueChange={(value) => setFormData({ ...formData, distribution_rule: value as typeof formData.distribution_rule })}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  distribution_rule: value as typeof formData.distribution_rule,
+                })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -206,7 +241,9 @@ export function DistributionSettingsDialog() {
               type="number"
               step="0.1"
               value={formData.wives_share_ratio}
-              onChange={(e) => setFormData({ ...formData, wives_share_ratio: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, wives_share_ratio: parseFloat(e.target.value) })
+              }
             />
           </div>
 
@@ -218,7 +255,9 @@ export function DistributionSettingsDialog() {
               min="1"
               max="31"
               value={formData.distribution_day_of_month}
-              onChange={(e) => setFormData({ ...formData, distribution_day_of_month: parseInt(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, distribution_day_of_month: parseInt(e.target.value) })
+              }
             />
           </div>
 
@@ -227,7 +266,9 @@ export function DistributionSettingsDialog() {
             <Label>تفعيل التوزيع التلقائي</Label>
             <Switch
               checked={formData.auto_distribution}
-              onCheckedChange={(checked) => setFormData({ ...formData, auto_distribution: checked })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, auto_distribution: checked })
+              }
             />
           </div>
 
@@ -236,7 +277,9 @@ export function DistributionSettingsDialog() {
             <Label>إشعار المستفيدين</Label>
             <Switch
               checked={formData.notify_beneficiaries}
-              onCheckedChange={(checked) => setFormData({ ...formData, notify_beneficiaries: checked as true })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, notify_beneficiaries: checked as true })
+              }
             />
           </div>
 
@@ -245,7 +288,9 @@ export function DistributionSettingsDialog() {
             <Label>إشعار الناظر</Label>
             <Switch
               checked={formData.notify_nazer}
-              onCheckedChange={(checked) => setFormData({ ...formData, notify_nazer: checked as true })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, notify_nazer: checked as true })
+              }
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Building, FileText, DollarSign, Wrench, LucideIcon, Brain, Users } from "lucide-react";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { type Property } from "@/hooks/property/useProperties";
+import { Button } from '@/components/ui/button';
+import { Building, FileText, DollarSign, Wrench, LucideIcon, Brain, Users } from 'lucide-react';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { type Property } from '@/hooks/property/useProperties';
 
 interface PropertiesHeaderProps {
   activeTab: string;
@@ -11,18 +11,27 @@ interface PropertiesHeaderProps {
   onProvidersClick?: () => void;
 }
 
-export const PropertiesHeader = ({ activeTab, properties, onAddClick, onAIClick, onProvidersClick }: PropertiesHeaderProps) => {
+export const PropertiesHeader = ({
+  activeTab,
+  properties,
+  onAddClick,
+  onAIClick,
+  onProvidersClick,
+}: PropertiesHeaderProps) => {
   const getAddButton = () => {
-    const buttons: Record<string, { label: string; icon: LucideIcon; type: 'property' | 'contract' | 'payment' | 'maintenance' }> = {
-      properties: { label: "إضافة عقار", icon: Building, type: 'property' },
-      contracts: { label: "إضافة عقد", icon: FileText, type: 'contract' },
-      payments: { label: "إضافة دفعة", icon: DollarSign, type: 'payment' },
-      maintenance: { label: "إضافة طلب صيانة", icon: Wrench, type: 'maintenance' },
+    const buttons: Record<
+      string,
+      { label: string; icon: LucideIcon; type: 'property' | 'contract' | 'payment' | 'maintenance' }
+    > = {
+      properties: { label: 'إضافة عقار', icon: Building, type: 'property' },
+      contracts: { label: 'إضافة عقد', icon: FileText, type: 'contract' },
+      payments: { label: 'إضافة دفعة', icon: DollarSign, type: 'payment' },
+      maintenance: { label: 'إضافة طلب صيانة', icon: Wrench, type: 'maintenance' },
     };
 
     const button = buttons[activeTab];
     if (!button) return null;
-    
+
     const Icon = button.icon;
 
     return (
@@ -59,20 +68,28 @@ export const PropertiesHeader = ({ activeTab, properties, onAddClick, onAIClick,
             مقدمي الخدمة
           </Button>
         )}
-        {activeTab === "properties" && properties && properties.length > 0 && (
+        {activeTab === 'properties' && properties && properties.length > 0 && (
           <ExportButton
-            data={properties.map(p => ({
-              'الاسم': p.name,
-              'النوع': p.type,
-              'الموقع': p.location,
-              'عدد الوحدات': p.units || "-",
-              'المؤجرة': p.occupied || "-",
+            data={properties.map((p) => ({
+              الاسم: p.name,
+              النوع: p.type,
+              الموقع: p.location,
+              'عدد الوحدات': p.units || '-',
+              المؤجرة: p.occupied || '-',
               'الإيراد الشهري': p.monthly_revenue || 0,
-              'الحالة': p.status,
+              الحالة: p.status,
             }))}
             filename="properties"
             title="تقرير العقارات"
-            headers={['الاسم', 'النوع', 'الموقع', 'عدد الوحدات', 'المؤجرة', 'الإيراد الشهري', 'الحالة']}
+            headers={[
+              'الاسم',
+              'النوع',
+              'الموقع',
+              'عدد الوحدات',
+              'المؤجرة',
+              'الإيراد الشهري',
+              'الحالة',
+            ]}
           />
         )}
         {getAddButton()}

@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Plus, TrendingUp, TrendingDown } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { useBudgetManagement } from "@/hooks/accounting/useBudgetManagement";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { useBudgetManagement } from '@/hooks/accounting/useBudgetManagement';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function BudgetManagement() {
-  const [selectedPeriod, setSelectedPeriod] = useState("annual");
-  const { budgets, isLoading, error, refetch, calculatePercentage } = useBudgetManagement(selectedPeriod);
+  const [selectedPeriod, setSelectedPeriod] = useState('annual');
+  const { budgets, isLoading, error, refetch, calculatePercentage } =
+    useBudgetManagement(selectedPeriod);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الموازنات..." />;
@@ -30,25 +31,22 @@ export function BudgetManagement() {
       </div>
 
       <div className="flex gap-2 mb-4">
-        {["annual", "quarterly", "monthly"].map((period) => (
+        {['annual', 'quarterly', 'monthly'].map((period) => (
           <Button
             key={period}
-            variant={selectedPeriod === period ? "default" : "outline"}
+            variant={selectedPeriod === period ? 'default' : 'outline'}
             onClick={() => setSelectedPeriod(period)}
           >
-            {period === "annual" ? "سنوي" : period === "quarterly" ? "ربع سنوي" : "شهري"}
+            {period === 'annual' ? 'سنوي' : period === 'quarterly' ? 'ربع سنوي' : 'شهري'}
           </Button>
         ))}
       </div>
 
       <div className="grid gap-4">
         {budgets?.map((budget) => {
-          const percentage = calculatePercentage(
-            budget.actual_amount,
-            budget.budgeted_amount
-          );
+          const percentage = calculatePercentage(budget.actual_amount, budget.budgeted_amount);
           const isOverBudget = percentage > 100;
-          
+
           return (
             <Card key={budget.id} className="p-4">
               <div className="space-y-3">
@@ -64,7 +62,7 @@ export function BudgetManagement() {
                     ) : (
                       <TrendingDown className="h-4 w-4 text-success" />
                     )}
-                    <span className={isOverBudget ? "text-destructive" : "text-success"}>
+                    <span className={isOverBudget ? 'text-destructive' : 'text-success'}>
                       {percentage}%
                     </span>
                   </div>
@@ -83,9 +81,11 @@ export function BudgetManagement() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">الفرق</p>
-                    <p className={`font-semibold ${
-                      budget.variance_amount < 0 ? "text-destructive" : "text-success"
-                    }`}>
+                    <p
+                      className={`font-semibold ${
+                        budget.variance_amount < 0 ? 'text-destructive' : 'text-success'
+                      }`}
+                    >
                       {formatCurrency(Math.abs(budget.variance_amount))}
                     </p>
                   </div>

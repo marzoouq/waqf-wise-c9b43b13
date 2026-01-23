@@ -9,7 +9,10 @@ import type { BeneficiaryRequest, RequestType } from '@/types';
  * Request with request_type relation loaded
  */
 export interface RequestWithType extends Omit<BeneficiaryRequest, 'request_type'> {
-  request_type?: Pick<RequestType, 'name_ar' | 'name_en' | 'name' | 'category' | 'icon' | 'color'> | null;
+  request_type?: Pick<
+    RequestType,
+    'name_ar' | 'name_en' | 'name' | 'category' | 'icon' | 'color'
+  > | null;
 }
 
 /**
@@ -27,7 +30,10 @@ export interface RequestWithBeneficiaryRelation extends BeneficiaryRequest {
  * Full request with all relations
  */
 export interface RequestFull extends Omit<BeneficiaryRequest, 'request_type' | 'beneficiary'> {
-  request_type?: Pick<RequestType, 'name_ar' | 'name_en' | 'name' | 'category' | 'icon' | 'color'> | null;
+  request_type?: Pick<
+    RequestType,
+    'name_ar' | 'name_en' | 'name' | 'category' | 'icon' | 'color'
+  > | null;
   beneficiary?: {
     full_name: string;
     national_id?: string;

@@ -71,11 +71,19 @@ export function usePOSTransactions(shiftId?: string) {
 
   // إحصائيات العمليات
   const stats = {
-    totalCollections: transactions.filter(t => t.transaction_type === 'تحصيل').reduce((sum, t) => sum + t.amount, 0),
-    totalPayments: transactions.filter(t => t.transaction_type === 'صرف').reduce((sum, t) => sum + t.amount, 0),
+    totalCollections: transactions
+      .filter((t) => t.transaction_type === 'تحصيل')
+      .reduce((sum, t) => sum + t.amount, 0),
+    totalPayments: transactions
+      .filter((t) => t.transaction_type === 'صرف')
+      .reduce((sum, t) => sum + t.amount, 0),
     transactionsCount: transactions.length,
-    cashTransactions: transactions.filter(t => t.payment_method === 'نقدي').reduce((sum, t) => sum + t.amount, 0),
-    cardTransactions: transactions.filter(t => t.payment_method === 'شبكة').reduce((sum, t) => sum + t.amount, 0),
+    cashTransactions: transactions
+      .filter((t) => t.payment_method === 'نقدي')
+      .reduce((sum, t) => sum + t.amount, 0),
+    cardTransactions: transactions
+      .filter((t) => t.payment_method === 'شبكة')
+      .reduce((sum, t) => sum + t.amount, 0),
   };
 
   const refetch = () => {

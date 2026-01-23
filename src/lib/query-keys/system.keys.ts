@@ -12,11 +12,12 @@ export const SYSTEM_KEYS = {
   USERS_ACTIVITY_METRICS: ['users-activity-metrics'] as const,
   SYSTEM_ERROR_LOGS: ['system-error-logs'] as const,
   SYSTEM_ALERTS: ['system-alerts'] as const,
-  SYSTEM_ERRORS: (severity?: string, status?: string) => ['system-errors', severity, status] as const,
+  SYSTEM_ERRORS: (severity?: string, status?: string) =>
+    ['system-errors', severity, status] as const,
   RECENT_ERRORS: ['recent-errors'] as const,
   ACTIVE_ALERTS: ['active-alerts'] as const,
   FIX_ATTEMPTS: ['fix-attempts'] as const,
-  
+
   // Audit & Logs
   AUDIT_LOGS: ['audit-logs'] as const,
   ACTIVITIES: ['activities'] as const,
@@ -31,12 +32,12 @@ export const SYSTEM_KEYS = {
   NOTIFICATIONS: ['notifications'] as const,
   NOTIFICATION_SETTINGS: ['notification-settings'] as const,
   UNREAD_NOTIFICATIONS: ['unread-notifications'] as const,
-  
+
   // Messages
   MESSAGES: ['messages'] as const,
   UNREAD_MESSAGES: ['unread-messages'] as const,
   INTERNAL_MESSAGES: ['internal_messages'] as const,
-  
+
   // Backup
   BACKUP_LOGS: ['backup-logs'] as const,
   BACKUP_SCHEDULES: ['backup-schedules'] as const,
@@ -50,7 +51,8 @@ export const SYSTEM_KEYS = {
   DOCUMENT: (id: string) => ['document', id] as const,
   ARCHIVE_STATS: ['archive-stats'] as const,
   ARCHIVIST_STATS: ['archivist-stats'] as const,
-  RECENT_DOCUMENTS: (category: string, searchTerm: string) => ['recent-documents', category, searchTerm] as const,
+  RECENT_DOCUMENTS: (category: string, searchTerm: string) =>
+    ['recent-documents', category, searchTerm] as const,
   FOLDERS: ['folders'] as const,
   DOCUMENT_TAGS: (documentId?: string) => ['document-tags', documentId] as const,
   DOCUMENT_VERSIONS: (documentId: string) => ['document-versions', documentId] as const,
@@ -63,9 +65,11 @@ export const SYSTEM_KEYS = {
   SCHEDULED_REPORTS: ['scheduled-reports'] as const,
   ANNUAL_DISCLOSURES: ['annual-disclosures'] as const,
   ANNUAL_DISCLOSURE_CURRENT: ['annual-disclosure-current'] as const,
-  DISCLOSURE_BENEFICIARIES: (disclosureId?: string) => ['disclosure-beneficiaries', disclosureId] as const,
+  DISCLOSURE_BENEFICIARIES: (disclosureId?: string) =>
+    ['disclosure-beneficiaries', disclosureId] as const,
   DISCLOSURE_DOCUMENTS: (disclosureId?: string) => ['disclosure-documents', disclosureId] as const,
-  SMART_DISCLOSURE_DOCUMENTS: (disclosureId?: string) => ['smart-disclosure-documents', disclosureId] as const,
+  SMART_DISCLOSURE_DOCUMENTS: (disclosureId?: string) =>
+    ['smart-disclosure-documents', disclosureId] as const,
 
   // Knowledge Base
   KB_ARTICLES: ['kb-articles'] as const,
@@ -78,7 +82,7 @@ export const SYSTEM_KEYS = {
   PROJECT_PHASES: ['project-phases'] as const,
   PROJECT_DOCUMENTATION: (category?: string) => ['project-documentation', category] as const,
   PHASE_CHANGELOG: (phaseId: string) => ['phase-changelog', phaseId] as const,
-  
+
   // Search
   SEARCH_HISTORY: (searchType?: string) => ['search-history', searchType] as const,
   RECENT_SEARCHES: (searchType: string) => ['recent-searches', searchType] as const,
@@ -87,10 +91,10 @@ export const SYSTEM_KEYS = {
   GLOBAL_SEARCH_PROPERTIES: (query: string) => ['global-search-properties', query] as const,
   GLOBAL_SEARCH_LOANS: (query: string) => ['global-search-loans', query] as const,
   GLOBAL_SEARCH_DOCUMENTS: (query: string) => ['global-search-documents', query] as const,
-  
+
   // Translations
   TRANSLATIONS: ['translations'] as const,
-  
+
   // Tasks
   TASKS: ['tasks'] as const,
 

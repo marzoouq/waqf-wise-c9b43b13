@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 /**
  * Hook for debounced search input
  * Reduces re-renders by delaying callback execution
- * 
+ *
  * @param initialValue - Initial search value
  * @param callback - Function to call with debounced value
  * @param delay - Debounce delay in ms (default: 300)

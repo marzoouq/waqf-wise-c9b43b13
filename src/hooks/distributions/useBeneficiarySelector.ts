@@ -9,14 +9,20 @@ import { QUERY_KEYS } from '@/lib/query-keys';
 import { BeneficiarySelectorItem } from '@/types/beneficiary';
 
 export function useBeneficiarySelector() {
-  const { data: beneficiaries = [], isLoading: loading, refetch } = useQuery({
+  const {
+    data: beneficiaries = [],
+    isLoading: loading,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_SELECTOR,
     queryFn: () => DistributionService.getBeneficiariesForSelector(),
   });
 
   const filterBeneficiaries = (searchTerm: string) => {
-    return beneficiaries.filter((b: BeneficiarySelectorItem) =>
-      b.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || b.national_id.includes(searchTerm)
+    return beneficiaries.filter(
+      (b: BeneficiarySelectorItem) =>
+        b.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.national_id.includes(searchTerm)
     );
   };
 

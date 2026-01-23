@@ -22,14 +22,21 @@ export { useBeneficiaryProperties } from './useBeneficiaryProperties';
 export { useBeneficiaries } from './useBeneficiaries';
 export { useBeneficiaryRequests, type BeneficiaryRequestData } from './useBeneficiaryRequests';
 export { useBeneficiaryAttachments, type BeneficiaryAttachment } from './useBeneficiaryAttachments';
-export { useBeneficiaryActivityLog, type BeneficiaryActivity as BeneficiaryActivityLogType } from './useBeneficiaryActivityLog';
+export {
+  useBeneficiaryActivityLog,
+  type BeneficiaryActivity as BeneficiaryActivityLogType,
+} from './useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from './useBeneficiaryCategories';
 export { useBeneficiariesFilters } from './useBeneficiariesFilters';
 export { useEligibilityAssessment } from './useEligibilityAssessment';
 export { useFamilies, useFamilyMembers } from './useFamilies';
 export { useFamiliesPage, type FamilyWithHead } from './useFamiliesPage';
 export { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from './useTribes';
-export { useMyBeneficiaryRequests, type BeneficiaryRequest, type RequestFormData } from './useMyBeneficiaryRequests';
+export {
+  useMyBeneficiaryRequests,
+  type BeneficiaryRequest,
+  type RequestFormData,
+} from './useMyBeneficiaryRequests';
 export { useWaqfSummary } from './useWaqfSummary';
 export { useEmergencyAid } from './useEmergencyAid';
 export { useBeneficiarySession } from './useBeneficiarySession';
@@ -47,7 +54,7 @@ export {
   useBeneficiaryRequestsTab,
   useYearlyComparison,
   useMonthlyRevenue,
-  usePropertyStats
+  usePropertyStats,
 } from './useBeneficiaryTabsData';
 
 // ==================== Profile Data Hooks ====================
@@ -55,12 +62,15 @@ export {
   useFamilyTree,
   useRequestDetails,
   useBeneficiaryIntegrationStats,
-  useWaqfDistributionsSummary
+  useWaqfDistributionsSummary,
 } from './useBeneficiaryProfileData';
 export type { RequestWithDetails, HeirDistribution } from './useBeneficiaryProfileData';
 
 // ==================== Profile Components Hooks ====================
-export { useBeneficiaryProfileStats, type BeneficiaryProfileStats } from './useBeneficiaryProfileStats';
+export {
+  useBeneficiaryProfileStats,
+  type BeneficiaryProfileStats,
+} from './useBeneficiaryProfileStats';
 export { useBeneficiaryProfileDocuments } from './useBeneficiaryProfileDocuments';
 export { useBeneficiaryProfilePayments } from './useBeneficiaryProfilePayments';
 export { useBeneficiaryProfileRequests } from './useBeneficiaryProfileRequests';

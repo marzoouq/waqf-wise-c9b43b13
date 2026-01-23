@@ -2,10 +2,10 @@
  * أداة تصدير التقارير
  */
 
-import type { ReportResult, CustomReportTemplate } from "@/services/report.service";
-import * as ExcelJS from "exceljs";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import type { ReportResult, CustomReportTemplate } from '@/services/report.service';
+import * as ExcelJS from 'exceljs';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * تصدير التقرير إلى Excel
@@ -25,16 +25,16 @@ export async function exportToExcel(
   const headerRow = worksheet.getRow(1);
   headerRow.font = { bold: true };
   headerRow.fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: "FFE0E0E0" },
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFE0E0E0' },
   };
 
   // Add data rows
   result.data.forEach((row) => {
     const rowData = result.columns.map((col) => {
       const value = row[col.key];
-      if (value === null || value === undefined) return "";
+      if (value === null || value === undefined) return '';
       return value;
     });
     worksheet.addRow(rowData);
@@ -55,10 +55,10 @@ export async function exportToExcel(
   // Generate and download
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
   link.download = `${template.name}.xlsx`;
   link.click();
@@ -73,20 +73,20 @@ export async function exportToPDF(
   result: ReportResult
 ): Promise<void> {
   const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: "a4",
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
   });
 
   // Add title
-  doc.setFont("helvetica", "bold");
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
   doc.text(template.name, 14, 15);
 
   // Add metadata
-  doc.setFont("helvetica", "normal");
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text(`Generated: ${new Date().toLocaleDateString("ar-SA")}`, 14, 22);
+  doc.text(`Generated: ${new Date().toLocaleDateString('ar-SA')}`, 14, 22);
   doc.text(`Total Records: ${result.totalCount}`, 14, 28);
 
   // Prepare table data
@@ -94,9 +94,9 @@ export async function exportToPDF(
   const body = result.data.map((row) =>
     result.columns.map((col) => {
       const value = row[col.key];
-      if (value === null || value === undefined) return "-";
-      if (typeof value === "number") return value.toLocaleString("ar-SA");
-      if (typeof value === "boolean") return value ? "Yes" : "No";
+      if (value === null || value === undefined) return '-';
+      if (typeof value === 'number') return value.toLocaleString('ar-SA');
+      if (typeof value === 'boolean') return value ? 'Yes' : 'No';
       return String(value);
     })
   );
@@ -113,7 +113,7 @@ export async function exportToPDF(
     headStyles: {
       fillColor: [66, 139, 202],
       textColor: 255,
-      fontStyle: "bold",
+      fontStyle: 'bold',
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245],

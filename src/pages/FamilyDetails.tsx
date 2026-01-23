@@ -6,7 +6,10 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { FamilyTreeView } from '@/components/families/FamilyTreeView';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 
 /**
  * صفحة تفاصيل العائلة وشجرة الأفراد
@@ -22,8 +25,8 @@ export default function FamilyDetails() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل العائلة" 
+      <ErrorState
+        title="فشل تحميل العائلة"
         message="حدث خطأ أثناء تحميل بيانات العائلة"
         onRetry={() => refetch()}
         fullScreen

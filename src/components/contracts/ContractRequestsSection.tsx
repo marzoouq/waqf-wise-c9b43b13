@@ -48,16 +48,9 @@ const adjustmentStatusConfig = {
   negotiating: { label: 'قيد التفاوض', variant: 'outline' as const, icon: MessageSquare },
 };
 
-export function ContractRequestsSection({
-  contractId,
-  onRespond,
-}: ContractRequestsSectionProps) {
-  const {
-    terminationRequests,
-    rentAdjustmentRequests,
-    isLoading,
-    stats,
-  } = useContractRequests(contractId);
+export function ContractRequestsSection({ contractId, onRespond }: ContractRequestsSectionProps) {
+  const { terminationRequests, rentAdjustmentRequests, isLoading, stats } =
+    useContractRequests(contractId);
 
   if (isLoading) {
     return (
@@ -73,8 +66,7 @@ export function ContractRequestsSection({
   }
 
   const hasRequests =
-    (terminationRequests?.length || 0) > 0 ||
-    (rentAdjustmentRequests?.length || 0) > 0;
+    (terminationRequests?.length || 0) > 0 || (rentAdjustmentRequests?.length || 0) > 0;
 
   if (!hasRequests) {
     return null;
@@ -88,7 +80,8 @@ export function ContractRequestsSection({
           طلبات العقد
           {stats.terminationRequests.pending + stats.rentAdjustmentRequests.pending > 0 && (
             <Badge variant="destructive" className="me-2">
-              {stats.terminationRequests.pending + stats.rentAdjustmentRequests.pending} قيد المراجعة
+              {stats.terminationRequests.pending + stats.rentAdjustmentRequests.pending} قيد
+              المراجعة
             </Badge>
           )}
         </CardTitle>
@@ -142,18 +135,12 @@ export function ContractRequestsSection({
                           })}
                         </TableCell>
                         <TableCell>
-                          {request.termination_type === 'mutual'
-                            ? 'بالاتفاق'
-                            : 'من طرف واحد'}
+                          {request.termination_type === 'mutual' ? 'بالاتفاق' : 'من طرف واحد'}
                         </TableCell>
                         <TableCell>
-                          {request.requested_by === 'landlord'
-                            ? 'المؤجر'
-                            : 'المستأجر'}
+                          {request.requested_by === 'landlord' ? 'المؤجر' : 'المستأجر'}
                         </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {request.reason}
-                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">{request.reason}</TableCell>
                         <TableCell>
                           <Badge variant={statusConfig.variant} className="gap-1">
                             <StatusIcon className="h-3 w-3" />
@@ -177,9 +164,7 @@ export function ContractRequestsSection({
                 </TableBody>
               </Table>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                لا توجد طلبات فسخ
-              </div>
+              <div className="text-center py-8 text-muted-foreground">لا توجد طلبات فسخ</div>
             )}
           </TabsContent>
 
@@ -224,18 +209,10 @@ export function ContractRequestsSection({
                             {isIncrease ? 'رفع' : 'خفض'}
                           </span>
                         </TableCell>
+                        <TableCell>{request.current_rent.toLocaleString()} ر.س</TableCell>
+                        <TableCell>{request.requested_rent.toLocaleString()} ر.س</TableCell>
                         <TableCell>
-                          {request.current_rent.toLocaleString()} ر.س
-                        </TableCell>
-                        <TableCell>
-                          {request.requested_rent.toLocaleString()} ر.س
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={
-                              isIncrease ? 'text-green-600' : 'text-red-600'
-                            }
-                          >
+                          <span className={isIncrease ? 'text-green-600' : 'text-red-600'}>
                             {isIncrease ? '+' : ''}
                             {request.adjustment_percentage?.toFixed(1)}%
                           </span>

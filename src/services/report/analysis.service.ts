@@ -2,8 +2,8 @@
  * Analysis Service - خدمة التحليلات
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { logger } from "@/lib/logger";
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import { matchesStatus } from '@/lib/constants';
 
 export class AnalysisService {
@@ -23,10 +23,13 @@ export class AnalysisService {
 
       if (error) throw error;
 
-      const totalDistributed = (distributions || []).reduce((sum, d) => sum + (d.total_amount || 0), 0);
+      const totalDistributed = (distributions || []).reduce(
+        (sum, d) => sum + (d.total_amount || 0),
+        0
+      );
 
       const byYearMap: Record<number, number> = {};
-      (distributions || []).forEach(d => {
+      (distributions || []).forEach((d) => {
         const year = new Date(d.distribution_date).getFullYear();
         byYearMap[year] = (byYearMap[year] || 0) + (d.total_amount || 0);
       });
@@ -54,13 +57,11 @@ export class AnalysisService {
     funds: { name: string; totalRevenue: number; totalDistributed: number; balance: number }[];
   }> {
     try {
-      const { data: funds, error } = await supabase
-        .from('funds')
-        .select('*');
+      const { data: funds, error } = await supabase.from('funds').select('*');
 
       if (error) throw error;
 
-      const result = (funds || []).map(f => ({
+      const result = (funds || []).map((f) => ({
         name: f.name || '',
         totalRevenue: f.allocated_amount || 0,
         totalDistributed: f.spent_amount || 0,
@@ -92,10 +93,10 @@ export class AnalysisService {
       const totalBeneficiaries = beneficiaries.data?.length || 0;
       const totalProperties = properties.data?.length || 0;
       const totalDistributed = (distributions.data || [])
-        .filter(d => matchesStatus(d.status, 'paid', 'completed'))
+        .filter((d) => matchesStatus(d.status, 'paid', 'completed'))
         .reduce((sum, d) => sum + (d.total_amount || 0), 0);
       const totalCollected = (payments.data || [])
-        .filter(p => p.payment_type === 'receipt')
+        .filter((p) => p.payment_type === 'receipt')
         .reduce((sum, p) => sum + (p.amount || 0), 0);
 
       return {
@@ -132,9 +133,7 @@ export class AnalysisService {
       const total = (loans || []).reduce((sum, l) => sum + (l.loan_amount || 0), 0);
 
       return {
-        buckets: [
-          { label: 'قروض جارية', amount: total, count: loans?.length || 0 },
-        ],
+        buckets: [{ label: 'قروض جارية', amount: total, count: loans?.length || 0 }],
         total,
         overdueAmount: 0,
       };
@@ -184,7 +183,14 @@ export class AnalysisService {
    */
   static async getWaqfRevenue(
     fiscalYearId: string,
-    selectedYear: { id: string; name: string; start_date: string; end_date: string; is_active: boolean; is_closed: boolean },
+    selectedYear: {
+      id: string;
+      name: string;
+      start_date: string;
+      end_date: string;
+      is_active: boolean;
+      is_closed: boolean;
+    },
     waqfUnitId?: string
   ) {
     if (selectedYear.is_closed) {
@@ -215,7 +221,8 @@ export class AnalysisService {
 
     const { data: payments } = await supabase
       .from('rental_payments')
-      .select(`
+      .select(
+        `
         amount_due,
         tax_amount,
         status,
@@ -226,7 +233,8 @@ export class AnalysisService {
             waqf_unit_id
           )
         )
-      `)
+      `
+      )
       .eq('status', 'مدفوع')
       .gte('payment_date', selectedYear.start_date)
       .lte('payment_date', selectedYear.end_date);
@@ -252,7 +260,7 @@ export class AnalysisService {
     filteredPayments.forEach((payment: PaymentData) => {
       const amount = payment.amount_due || 0;
       const tax = payment.tax_amount || 0;
-      
+
       if (payment.contracts?.payment_frequency === 'شهري') {
         monthlyCollected += amount;
       } else {

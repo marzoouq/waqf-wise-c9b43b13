@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
+import { Calendar } from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface PaymentSettingsDialogProps {
   open: boolean;
@@ -20,8 +20,8 @@ export const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDia
   const handleSave = () => {
     localStorage.setItem('paymentDaysThreshold', daysThreshold);
     toast({
-      title: "تم الحفظ",
-      description: "تم تحديث إعدادات عرض الدفعات بنجاح",
+      title: 'تم الحفظ',
+      description: 'تم تحديث إعدادات عرض الدفعات بنجاح',
     });
     onOpenChange(false);
     window.location.reload(); // Reload to apply changes
@@ -39,9 +39,7 @@ export const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDia
 
         <div className="space-y-6 py-4">
           <div className="space-y-4">
-            <Label className="text-base font-semibold">
-              عرض الدفعات قبل موعد الاستحقاق بـ:
-            </Label>
+            <Label className="text-base font-semibold">عرض الدفعات قبل موعد الاستحقاق بـ:</Label>
             <RadioGroup value={daysThreshold} onValueChange={setDaysThreshold}>
               <div className="flex items-center space-x-2 space-x-reverse">
                 <RadioGroupItem value="30" id="30days" />
@@ -84,9 +82,7 @@ export const PaymentSettingsDialog = ({ open, onOpenChange }: PaymentSettingsDia
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
-          <Button onClick={handleSave}>
-            حفظ التغييرات
-          </Button>
+          <Button onClick={handleSave}>حفظ التغييرات</Button>
         </div>
       </DialogContent>
     </Dialog>

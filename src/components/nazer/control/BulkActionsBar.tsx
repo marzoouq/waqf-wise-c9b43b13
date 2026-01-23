@@ -1,15 +1,12 @@
 /**
  * شريط الإجراءات الجماعية للإعدادات
- * 
+ *
  * @version 2.8.91
  */
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Users, Save, Loader2, CheckCircle2, XCircle, 
-  RotateCcw, AlertCircle 
-} from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Users, Save, Loader2, CheckCircle2, XCircle, RotateCcw, AlertCircle } from 'lucide-react';
 
 interface BulkActionsBarProps {
   roleLabel: string;
@@ -54,32 +51,17 @@ export function BulkActionsBar({
             </Badge>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2 flex-wrap">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onEnableAll}
-            className="gap-1 text-xs"
-          >
+          <Button variant="outline" size="sm" onClick={onEnableAll} className="gap-1 text-xs">
             <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-success))]" />
             تفعيل الكل
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onDisableAll}
-            className="gap-1 text-xs"
-          >
+          <Button variant="outline" size="sm" onClick={onDisableAll} className="gap-1 text-xs">
             <XCircle className="h-3 w-3 text-destructive" />
             إلغاء الكل
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onResetToDefault}
-            className="gap-1 text-xs"
-          >
+          <Button variant="outline" size="sm" onClick={onResetToDefault} className="gap-1 text-xs">
             <RotateCcw className="h-3 w-3" />
             افتراضي
           </Button>
@@ -95,16 +77,11 @@ export function BulkActionsBar({
               لديك {pendingChangesCount} تغيير معلق. اضغط "حفظ التغييرات" لتطبيقها.
             </span>
             <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onDiscard}
-                className="text-xs h-7"
-              >
+              <Button variant="ghost" size="sm" onClick={onDiscard} className="text-xs h-7">
                 تجاهل
               </Button>
-              <Button 
-                onClick={onSave} 
+              <Button
+                onClick={onSave}
                 disabled={isUpdating}
                 size="sm"
                 className="gap-1 text-xs h-7"

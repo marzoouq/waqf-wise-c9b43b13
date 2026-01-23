@@ -1,7 +1,7 @@
 /**
  * نوع موحد لبنود الفواتير
  * @version 2.9.43
- * 
+ *
  * هذا الملف هو المصدر الوحيد لتعريف InvoiceLine
  * يجب استيراده في جميع الملفات التي تستخدم بنود الفواتير
  */
@@ -71,7 +71,7 @@ export function normalizeInvoiceLine(dbLine: InvoiceLineDB, invoiceId?: string):
     description: dbLine.description || '',
     quantity: dbLine.quantity,
     unit_price: dbLine.unit_price,
-    subtotal: dbLine.subtotal ?? (dbLine.quantity * dbLine.unit_price),
+    subtotal: dbLine.subtotal ?? dbLine.quantity * dbLine.unit_price,
     tax_rate: dbLine.tax_rate ?? 15,
     tax_amount: dbLine.tax_amount ?? 0,
     line_total: dbLine.line_total,

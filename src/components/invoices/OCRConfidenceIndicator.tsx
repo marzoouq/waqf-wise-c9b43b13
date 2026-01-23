@@ -7,10 +7,10 @@ interface OCRConfidenceIndicatorProps {
   className?: string;
 }
 
-export const OCRConfidenceIndicator = ({ 
-  confidence, 
+export const OCRConfidenceIndicator = ({
+  confidence,
   fieldName,
-  className 
+  className,
 }: OCRConfidenceIndicatorProps) => {
   const getConfidenceLevel = () => {
     if (confidence >= 90) return 'high';
@@ -47,21 +47,21 @@ export const OCRConfidenceIndicator = ({
   const { icon: Icon, color, bgColor, borderColor, label } = config[level];
 
   return (
-    <div 
+    <div
       className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-md border text-sm",
+        'flex items-center gap-2 px-3 py-2 rounded-md border text-sm',
         bgColor,
         borderColor,
         className
       )}
     >
-      <Icon className={cn("h-4 w-4", color)} />
+      <Icon className={cn('h-4 w-4', color)} />
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <span className="font-medium">{fieldName}</span>
-          <span className={cn("font-bold", color)}>{confidence}%</span>
+          <span className={cn('font-bold', color)}>{confidence}%</span>
         </div>
-        <span className={cn("text-xs", color)}>{label}</span>
+        <span className={cn('text-xs', color)}>{label}</span>
       </div>
     </div>
   );

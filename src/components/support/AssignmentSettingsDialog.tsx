@@ -24,10 +24,7 @@ interface AssignmentSettingsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function AssignmentSettingsDialog({
-  open,
-  onOpenChange,
-}: AssignmentSettingsDialogProps) {
+export function AssignmentSettingsDialog({ open, onOpenChange }: AssignmentSettingsDialogProps) {
   const { settings, updateSettings } = useAssignmentSettings();
   const [assignmentType, setAssignmentType] = useState('load_balanced');
   const [autoAssign, setAutoAssign] = useState(true);
@@ -55,24 +52,16 @@ export function AssignmentSettingsDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>إعدادات التعيين التلقائي</DialogTitle>
-          <DialogDescription>
-            إدارة كيفية توزيع التذاكر على فريق الدعم
-          </DialogDescription>
+          <DialogDescription>إدارة كيفية توزيع التذاكر على فريق الدعم</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="auto-assign">تفعيل التعيين التلقائي</Label>
-              <p className="text-sm text-muted-foreground">
-                توزيع التذاكر الجديدة تلقائياً
-              </p>
+              <p className="text-sm text-muted-foreground">توزيع التذاكر الجديدة تلقائياً</p>
             </div>
-            <Switch
-              id="auto-assign"
-              checked={autoAssign}
-              onCheckedChange={setAutoAssign}
-            />
+            <Switch id="auto-assign" checked={autoAssign} onCheckedChange={setAutoAssign} />
           </div>
 
           <div className="space-y-2">
@@ -85,25 +74,19 @@ export function AssignmentSettingsDialog({
                 <SelectItem value="round_robin">
                   <div>
                     <p className="font-medium">التعيين بالتناوب</p>
-                    <p className="text-xs text-muted-foreground">
-                      توزيع متساوي بين الموظفين
-                    </p>
+                    <p className="text-xs text-muted-foreground">توزيع متساوي بين الموظفين</p>
                   </div>
                 </SelectItem>
                 <SelectItem value="load_balanced">
                   <div>
                     <p className="font-medium">التعيين المتوازن</p>
-                    <p className="text-xs text-muted-foreground">
-                      بناءً على الحمل الحالي للموظف
-                    </p>
+                    <p className="text-xs text-muted-foreground">بناءً على الحمل الحالي للموظف</p>
                   </div>
                 </SelectItem>
                 <SelectItem value="skill_based">
                   <div>
                     <p className="font-medium">التعيين بالمهارات</p>
-                    <p className="text-xs text-muted-foreground">
-                      بناءً على تخصص الموظف
-                    </p>
+                    <p className="text-xs text-muted-foreground">بناءً على تخصص الموظف</p>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -126,16 +109,10 @@ export function AssignmentSettingsDialog({
           </div>
 
           <div className="flex gap-2 justify-end pt-4">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button
-              onClick={handleSave}
-              disabled={updateSettings.isPending}
-            >
+            <Button onClick={handleSave} disabled={updateSettings.isPending}>
               {updateSettings.isPending ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </Button>
           </div>

@@ -1,11 +1,11 @@
 /**
  * Distribution Service - خدمة إدارة التوزيعات (Facade)
- * 
+ *
  * يعيد تصدير جميع الخدمات من الملفات المقسمة للحفاظ على التوافق
  * @version 3.0.0
  */
 
-import { 
+import {
   DistributionCoreService,
   DistributionBeneficiaryService,
   DistributionVoucherService,
@@ -15,11 +15,17 @@ import {
   type VoucherRecord,
   type VoucherStats,
   type DistributionApproval,
-  type ApprovalHistoryItem
+  type ApprovalHistoryItem,
 } from './distribution';
 
 // إعادة تصدير الأنواع
-export type { DistributionSummary, VoucherRecord, VoucherStats, DistributionApproval, ApprovalHistoryItem };
+export type {
+  DistributionSummary,
+  VoucherRecord,
+  VoucherStats,
+  DistributionApproval,
+  ApprovalHistoryItem,
+};
 
 /**
  * Facade Class للحفاظ على التوافق مع الكود القديم
@@ -48,14 +54,15 @@ export class DistributionService {
   // === Voucher Operations ===
   static getVouchers = DistributionVoucherService.getVouchers;
   static createVoucher = DistributionVoucherService.createVoucher;
-  static getDistributionVouchersWithDetails = DistributionVoucherService.getDistributionVouchersWithDetails;
+  static getDistributionVouchersWithDetails =
+    DistributionVoucherService.getDistributionVouchersWithDetails;
   static getDistributionVoucherStats = DistributionVoucherService.getDistributionVoucherStats;
   static getPaymentVouchersList = DistributionVoucherService.getPaymentVouchersList;
 
   // === Approval Operations ===
   static getDistributionApprovals = DistributionApprovalService.getDistributionApprovals;
   static getDistributionHistory = DistributionApprovalService.getDistributionHistory;
-  
+
   /**
    * جلب الجدول الزمني للتوزيع
    */

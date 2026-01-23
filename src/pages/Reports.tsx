@@ -1,254 +1,302 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { InteractiveDashboard } from '@/components/reports/InteractiveDashboard';
 import { ScheduledReportsManager } from '@/components/reports/ScheduledReportsManager';
 import { CustomReportBuilder } from '@/components/reports/CustomReportBuilder';
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { BeneficiaryReports } from '@/components/reports/BeneficiaryReports';
 import { PropertiesReports } from '@/components/reports/PropertiesReports';
 import { ContractsReport } from '@/components/reports/ContractsReport';
-import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeStatement";
-import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceSheet";
-import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
-import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
-import { AccountingLinkReport } from "@/components/reports/AccountingLinkReport";
-import { DistributionAnalysisReport } from "@/components/reports/DistributionAnalysisReport";
-import { LoansAgingReport } from "@/components/reports/LoansAgingReport";
-import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostReport";
-import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
-import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedger";
-import { AgingReport } from "@/components/reports/AgingReport";
-import { AnnualDisclosuresReport } from "@/components/reports/AnnualDisclosuresReport";
-import { ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
-import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, ShieldCheck, FileStack, Wrench, ScrollText } from "lucide-react";
-import { Link } from "react-router-dom";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { EnhancedIncomeStatement } from '@/components/accounting/EnhancedIncomeStatement';
+import { EnhancedBalanceSheet } from '@/components/accounting/EnhancedBalanceSheet';
+import { TrialBalanceReport } from '@/components/accounting/TrialBalanceReport';
+import { CashFlowStatement } from '@/components/accounting/CashFlowStatement';
+import { AccountingLinkReport } from '@/components/reports/AccountingLinkReport';
+import { DistributionAnalysisReport } from '@/components/reports/DistributionAnalysisReport';
+import { LoansAgingReport } from '@/components/reports/LoansAgingReport';
+import { MaintenanceCostReport } from '@/components/reports/MaintenanceCostReport';
+import { FundsPerformanceReport } from '@/components/reports/FundsPerformanceReport';
+import { DetailedGeneralLedger } from '@/components/reports/DetailedGeneralLedger';
+import { AgingReport } from '@/components/reports/AgingReport';
+import { AnnualDisclosuresReport } from '@/components/reports/AnnualDisclosuresReport';
+import { ZATCASettings, ZATCAComplianceChecker } from '@/components/zatca';
+import {
+  BarChart3,
+  Calendar,
+  Settings,
+  Users,
+  Building2,
+  FileText,
+  DollarSign,
+  ShieldCheck,
+  FileStack,
+  Wrench,
+  ScrollText,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 
 const Reports = () => {
   return (
     <PageErrorBoundary pageName="التقارير">
       <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="التقارير والإحصائيات"
-        description="تقارير تحليلية شاملة ومتقدمة"
-        icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-      />
+        <MobileOptimizedHeader
+          title="التقارير والإحصائيات"
+          description="تقارير تحليلية شاملة ومتقدمة"
+          icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
-
-       {/* وصول سريع لتقارير النظام والأمان والمستخدمين */}
-       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
-         <Link to="/users" className="block">
-           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
-             <div className="flex items-center gap-2">
-               <Users className="h-4 w-4 text-primary" />
-               <div className="font-semibold">تقارير المستخدمين</div>
-             </div>
-             <div className="mt-1 text-sm text-muted-foreground">قائمة المستخدمين، الأدوار، سجل الدخول</div>
-           </div>
-         </Link>
-         <Link to="/security" className="block">
-           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
-             <div className="flex items-center gap-2">
-               <ShieldCheck className="h-4 w-4 text-primary" />
-               <div className="font-semibold">تقارير الأمان</div>
-             </div>
-             <div className="mt-1 text-sm text-muted-foreground">الأحداث الأمنية ومحاولات الدخول</div>
-           </div>
-         </Link>
-         <Link to="/system-monitoring" className="block">
-           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
-             <div className="flex items-center gap-2">
-               <BarChart3 className="h-4 w-4 text-primary" />
-               <div className="font-semibold">تقارير النظام</div>
-             </div>
-             <div className="mt-1 text-sm text-muted-foreground">صحة النظام، التنبيهات، الأخطاء</div>
-           </div>
-         </Link>
-         <Link to="/db-health" className="block">
-           <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
-             <div className="flex items-center gap-2">
-               <Building2 className="h-4 w-4 text-primary" />
-               <div className="font-semibold">تقارير البيانات</div>
-             </div>
-             <div className="mt-1 text-sm text-muted-foreground">صحة وأداء قاعدة البيانات</div>
-           </div>
-         </Link>
-       </div>
-
-       <div className="space-y-6">
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-          <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 lg:grid-cols-11 gap-1">
-              <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">لوحة التحكم</span>
-                <span className="sm:hidden">لوحة</span>
-              </TabsTrigger>
-              <TabsTrigger value="disclosures" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <ScrollText className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">الإفصاحات</span>
-                <span className="sm:hidden">إفصاح</span>
-              </TabsTrigger>
-              <TabsTrigger value="scheduled" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">جدولة</span>
-                <span className="sm:hidden">جدول</span>
-              </TabsTrigger>
-              <TabsTrigger value="builder" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">منشئ التقارير</span>
-                <span className="sm:hidden">منشئ</span>
-              </TabsTrigger>
-              <TabsTrigger value="beneficiaries" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">المستفيدون</span>
-                <span className="sm:hidden">مستفيد</span>
-              </TabsTrigger>
-              <TabsTrigger value="properties" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">العقارات</span>
-                <span className="sm:hidden">عقار</span>
-              </TabsTrigger>
-              <TabsTrigger value="contracts" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <FileStack className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">العقود</span>
-                <span className="sm:hidden">عقد</span>
-              </TabsTrigger>
-              <TabsTrigger value="maintenance" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">الصيانة</span>
-                <span className="sm:hidden">صيانة</span>
-              </TabsTrigger>
-              <TabsTrigger value="financial" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">المالية</span>
-                <span className="sm:hidden">مالي</span>
-              </TabsTrigger>
-              <TabsTrigger value="analysis" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">التحليلات</span>
-                <span className="sm:hidden">تحليل</span>
-              </TabsTrigger>
-              <TabsTrigger value="zatca" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
-                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4" />
-                ZATCA
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="dashboard">
-            <InteractiveDashboard />
-          </TabsContent>
-
-          <TabsContent value="disclosures">
-            <AnnualDisclosuresReport />
-          </TabsContent>
-
-          <TabsContent value="scheduled">
-            <ScheduledReportsManager />
-          </TabsContent>
-
-          <TabsContent value="builder">
-            <CustomReportBuilder />
-          </TabsContent>
-
-          <TabsContent value="beneficiaries">
-            <BeneficiaryReports />
-          </TabsContent>
-
-          <TabsContent value="properties" className="space-y-6">
-            <PropertiesReports />
-          </TabsContent>
-
-          <TabsContent value="contracts" className="space-y-6">
-            <ContractsReport />
-          </TabsContent>
-
-          <TabsContent value="maintenance" className="space-y-6">
-            <MaintenanceCostReport />
-          </TabsContent>
-
-          <TabsContent value="financial" className="space-y-6">
-            <Tabs defaultValue="income" className="space-y-4">
-              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
-                  <TabsTrigger value="income" className="text-xs sm:text-sm px-3 py-2">قائمة الدخل</TabsTrigger>
-                  <TabsTrigger value="balance" className="text-xs sm:text-sm px-3 py-2">الميزانية</TabsTrigger>
-                  <TabsTrigger value="trial" className="text-xs sm:text-sm px-3 py-2">ميزان المراجعة</TabsTrigger>
-                  <TabsTrigger value="cashflow" className="text-xs sm:text-sm px-3 py-2">التدفقات النقدية</TabsTrigger>
-                </TabsList>
+        {/* وصول سريع لتقارير النظام والأمان والمستخدمين */}
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Link to="/users" className="block">
+            <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                <div className="font-semibold">تقارير المستخدمين</div>
               </div>
-
-              <TabsContent value="income">
-                <EnhancedIncomeStatement />
-              </TabsContent>
-
-              <TabsContent value="balance">
-                <EnhancedBalanceSheet />
-              </TabsContent>
-
-              <TabsContent value="trial">
-                <TrialBalanceReport />
-              </TabsContent>
-
-              <TabsContent value="cashflow">
-                <CashFlowStatement />
-              </TabsContent>
-            </Tabs>
-          </TabsContent>
-
-          <TabsContent value="analysis" className="space-y-6">
-            <Tabs defaultValue="accounting" className="space-y-4">
-              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
-                  <TabsTrigger value="accounting" className="text-xs sm:text-sm px-2 sm:px-3 py-2">الربط المحاسبي</TabsTrigger>
-                  <TabsTrigger value="distributions" className="text-xs sm:text-sm px-2 sm:px-3 py-2">تحليل التوزيعات</TabsTrigger>
-                  <TabsTrigger value="loans" className="text-xs sm:text-sm px-2 sm:px-3 py-2">أعمار الديون</TabsTrigger>
-                  <TabsTrigger value="ledger" className="text-xs sm:text-sm px-2 sm:px-3 py-2">دفتر الأستاذ</TabsTrigger>
-                </TabsList>
+              <div className="mt-1 text-sm text-muted-foreground">
+                قائمة المستخدمين، الأدوار، سجل الدخول
               </div>
+            </div>
+          </Link>
+          <Link to="/security" className="block">
+            <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                <div className="font-semibold">تقارير الأمان</div>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                الأحداث الأمنية ومحاولات الدخول
+              </div>
+            </div>
+          </Link>
+          <Link to="/system-monitoring" className="block">
+            <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                <div className="font-semibold">تقارير النظام</div>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                صحة النظام، التنبيهات، الأخطاء
+              </div>
+            </div>
+          </Link>
+          <Link to="/db-health" className="block">
+            <div className="rounded-lg border bg-card p-4 hover:bg-muted/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-primary" />
+                <div className="font-semibold">تقارير البيانات</div>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">صحة وأداء قاعدة البيانات</div>
+            </div>
+          </Link>
+        </div>
 
-              <TabsContent value="accounting">
-                <AccountingLinkReport />
-              </TabsContent>
-
-              <TabsContent value="distributions">
-                <DistributionAnalysisReport />
-              </TabsContent>
-
-              <TabsContent value="loans">
-                <div className="space-y-4">
-                  <LoansAgingReport />
-                  <AgingReport />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="ledger">
-                <DetailedGeneralLedger />
-              </TabsContent>
-            </Tabs>
-
-            <FundsPerformanceReport />
-          </TabsContent>
-
-
-          <TabsContent value="zatca" className="space-y-6">
-            <Tabs defaultValue="compliance" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 h-auto">
-                <TabsTrigger value="compliance" className="text-xs sm:text-sm py-2">فحص الامتثال</TabsTrigger>
-                <TabsTrigger value="settings" className="text-xs sm:text-sm py-2">الإعدادات</TabsTrigger>
+        <div className="space-y-6">
+          <Tabs defaultValue="dashboard" className="space-y-6">
+            <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 lg:grid-cols-11 gap-1">
+                <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">لوحة التحكم</span>
+                  <span className="sm:hidden">لوحة</span>
+                </TabsTrigger>
+                <TabsTrigger value="disclosures" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <ScrollText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">الإفصاحات</span>
+                  <span className="sm:hidden">إفصاح</span>
+                </TabsTrigger>
+                <TabsTrigger value="scheduled" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">جدولة</span>
+                  <span className="sm:hidden">جدول</span>
+                </TabsTrigger>
+                <TabsTrigger value="builder" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">منشئ التقارير</span>
+                  <span className="sm:hidden">منشئ</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="beneficiaries"
+                  className="gap-1 px-2 sm:px-3 text-xs sm:text-sm"
+                >
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">المستفيدون</span>
+                  <span className="sm:hidden">مستفيد</span>
+                </TabsTrigger>
+                <TabsTrigger value="properties" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">العقارات</span>
+                  <span className="sm:hidden">عقار</span>
+                </TabsTrigger>
+                <TabsTrigger value="contracts" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <FileStack className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">العقود</span>
+                  <span className="sm:hidden">عقد</span>
+                </TabsTrigger>
+                <TabsTrigger value="maintenance" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">الصيانة</span>
+                  <span className="sm:hidden">صيانة</span>
+                </TabsTrigger>
+                <TabsTrigger value="financial" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">المالية</span>
+                  <span className="sm:hidden">مالي</span>
+                </TabsTrigger>
+                <TabsTrigger value="analysis" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">التحليلات</span>
+                  <span className="sm:hidden">تحليل</span>
+                </TabsTrigger>
+                <TabsTrigger value="zatca" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                  <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4" />
+                  ZATCA
+                </TabsTrigger>
               </TabsList>
+            </div>
 
-              <TabsContent value="compliance">
-                <ZATCAComplianceChecker />
-              </TabsContent>
+            <TabsContent value="dashboard">
+              <InteractiveDashboard />
+            </TabsContent>
 
-              <TabsContent value="settings">
-                <ZATCASettings />
-              </TabsContent>
-            </Tabs>
-          </TabsContent>
-        </Tabs>
-      </div>
+            <TabsContent value="disclosures">
+              <AnnualDisclosuresReport />
+            </TabsContent>
+
+            <TabsContent value="scheduled">
+              <ScheduledReportsManager />
+            </TabsContent>
+
+            <TabsContent value="builder">
+              <CustomReportBuilder />
+            </TabsContent>
+
+            <TabsContent value="beneficiaries">
+              <BeneficiaryReports />
+            </TabsContent>
+
+            <TabsContent value="properties" className="space-y-6">
+              <PropertiesReports />
+            </TabsContent>
+
+            <TabsContent value="contracts" className="space-y-6">
+              <ContractsReport />
+            </TabsContent>
+
+            <TabsContent value="maintenance" className="space-y-6">
+              <MaintenanceCostReport />
+            </TabsContent>
+
+            <TabsContent value="financial" className="space-y-6">
+              <Tabs defaultValue="income" className="space-y-4">
+                <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                  <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
+                    <TabsTrigger value="income" className="text-xs sm:text-sm px-3 py-2">
+                      قائمة الدخل
+                    </TabsTrigger>
+                    <TabsTrigger value="balance" className="text-xs sm:text-sm px-3 py-2">
+                      الميزانية
+                    </TabsTrigger>
+                    <TabsTrigger value="trial" className="text-xs sm:text-sm px-3 py-2">
+                      ميزان المراجعة
+                    </TabsTrigger>
+                    <TabsTrigger value="cashflow" className="text-xs sm:text-sm px-3 py-2">
+                      التدفقات النقدية
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <TabsContent value="income">
+                  <EnhancedIncomeStatement />
+                </TabsContent>
+
+                <TabsContent value="balance">
+                  <EnhancedBalanceSheet />
+                </TabsContent>
+
+                <TabsContent value="trial">
+                  <TrialBalanceReport />
+                </TabsContent>
+
+                <TabsContent value="cashflow">
+                  <CashFlowStatement />
+                </TabsContent>
+              </Tabs>
+            </TabsContent>
+
+            <TabsContent value="analysis" className="space-y-6">
+              <Tabs defaultValue="accounting" className="space-y-4">
+                <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                  <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
+                    <TabsTrigger
+                      value="accounting"
+                      className="text-xs sm:text-sm px-2 sm:px-3 py-2"
+                    >
+                      الربط المحاسبي
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="distributions"
+                      className="text-xs sm:text-sm px-2 sm:px-3 py-2"
+                    >
+                      تحليل التوزيعات
+                    </TabsTrigger>
+                    <TabsTrigger value="loans" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+                      أعمار الديون
+                    </TabsTrigger>
+                    <TabsTrigger value="ledger" className="text-xs sm:text-sm px-2 sm:px-3 py-2">
+                      دفتر الأستاذ
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <TabsContent value="accounting">
+                  <AccountingLinkReport />
+                </TabsContent>
+
+                <TabsContent value="distributions">
+                  <DistributionAnalysisReport />
+                </TabsContent>
+
+                <TabsContent value="loans">
+                  <div className="space-y-4">
+                    <LoansAgingReport />
+                    <AgingReport />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="ledger">
+                  <DetailedGeneralLedger />
+                </TabsContent>
+              </Tabs>
+
+              <FundsPerformanceReport />
+            </TabsContent>
+
+            <TabsContent value="zatca" className="space-y-6">
+              <Tabs defaultValue="compliance" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-2 h-auto">
+                  <TabsTrigger value="compliance" className="text-xs sm:text-sm py-2">
+                    فحص الامتثال
+                  </TabsTrigger>
+                  <TabsTrigger value="settings" className="text-xs sm:text-sm py-2">
+                    الإعدادات
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="compliance">
+                  <ZATCAComplianceChecker />
+                </TabsContent>
+
+                <TabsContent value="settings">
+                  <ZATCASettings />
+                </TabsContent>
+              </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

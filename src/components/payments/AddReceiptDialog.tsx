@@ -1,28 +1,41 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { format } from "@/lib/date";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { commonValidation } from "@/lib/validationSchemas";
-import { useAutoJournalEntry } from "@/hooks/payments/useAutoJournalEntry";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { format } from '@/lib/date';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { commonValidation } from '@/lib/validationSchemas';
+import { useAutoJournalEntry } from '@/hooks/payments/useAutoJournalEntry';
 
 const receiptSchema = z.object({
-  payment_date: commonValidation.dateString("التاريخ غير صحيح"),
-  amount: z.coerce.number().min(0.01, { message: "المبلغ يجب أن يكون أكبر من صفر" }),
-  payment_method: z.enum(["cash", "bank_transfer", "cheque", "card"], {
-    required_error: "طريقة الدفع مطلوبة",
+  payment_date: commonValidation.dateString('التاريخ غير صحيح'),
+  amount: z.coerce.number().min(0.01, { message: 'المبلغ يجب أن يكون أكبر من صفر' }),
+  payment_method: z.enum(['cash', 'bank_transfer', 'cheque', 'card'], {
+    required_error: 'طريقة الدفع مطلوبة',
   }),
-  payer_name: z.string().min(1, { message: "اسم الدافع مطلوب" }),
+  payer_name: z.string().min(1, { message: 'اسم الدافع مطلوب' }),
   reference_number: z.string().optional(),
-  description: z.string().min(1, { message: "البيان مطلوب" }),
+  description: z.string().min(1, { message: 'البيان مطلوب' }),
   notes: z.string().optional(),
 });
 
@@ -37,20 +50,20 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // استخدام hook بدلاً من supabase.rpc مباشرة
   const { createAutoJournalEntry } = useAutoJournalEntry();
 
   const form = useForm<ReceiptFormValues>({
     resolver: zodResolver(receiptSchema),
     defaultValues: {
-      payment_date: format(new Date(), "yyyy-MM-dd"),
+      payment_date: format(new Date(), 'yyyy-MM-dd'),
       amount: 0,
-      payment_method: "cash",
-      payer_name: "",
-      reference_number: "",
-      description: "",
-      notes: "",
+      payment_method: 'cash',
+      payer_name: '',
+      reference_number: '',
+      description: '',
+      notes: '',
     },
   });
 
@@ -68,20 +81,20 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
       });
 
       toast({
-        title: "تم الحفظ بنجاح",
-        description: "تم إضافة سند القبض وإنشاء القيد المحاسبي",
+        title: 'تم الحفظ بنجاح',
+        description: 'تم إضافة سند القبض وإنشاء القيد المحاسبي',
       });
 
       queryClient.invalidateQueries({ queryKey: ['cashier-stats'] });
-      
+
       form.reset();
       onOpenChange(false);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'فشل إضافة سند القبض';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -89,8 +102,8 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="إضافة سند قبض"
       description="قم بإدخال بيانات سند القبض في النموذج أدناه"
@@ -218,7 +231,7 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
               إلغاء
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "جاري الحفظ..." : "حفظ"}
+              {isSubmitting ? 'جاري الحفظ...' : 'حفظ'}
             </Button>
           </DialogFooter>
         </form>

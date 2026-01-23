@@ -1,28 +1,39 @@
-import { useState, useRef, useEffect, memo } from "react";
-import { Database } from "@/integrations/supabase/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, Sparkles } from "lucide-react";
-import { useChatbot } from "@/hooks/ai/useChatbot";
-import { cn } from "@/lib/utils";
-import { ChatbotActions } from "./ChatbotActions";
-import { MessagesSection } from "./MessagesSection";
-import { QuickRepliesSection } from "./QuickRepliesSection";
-import { ChatInputForm } from "./ChatInputForm";
-import { QuickActionsBar } from "./QuickActionsBar";
+import { useState, useRef, useEffect, memo } from 'react';
+import { Database } from '@/integrations/supabase/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bot, Sparkles } from 'lucide-react';
+import { useChatbot } from '@/hooks/ai/useChatbot';
+import { cn } from '@/lib/utils';
+import { ChatbotActions } from './ChatbotActions';
+import { MessagesSection } from './MessagesSection';
+import { QuickRepliesSection } from './QuickRepliesSection';
+import { ChatInputForm } from './ChatInputForm';
+import { QuickActionsBar } from './QuickActionsBar';
 
 interface ChatbotInterfaceProps {
   compact?: boolean;
 }
 
-export const ChatbotInterface = memo(function ChatbotInterface({ compact = false }: ChatbotInterfaceProps) {
-  const { conversations, quickReplies, quickActions, isLoading, isTyping, sendMessage, clearConversations, hasConversations } = useChatbot();
-  const [message, setMessage] = useState("");
+export const ChatbotInterface = memo(function ChatbotInterface({
+  compact = false,
+}: ChatbotInterfaceProps) {
+  const {
+    conversations,
+    quickReplies,
+    quickActions,
+    isLoading,
+    isTyping,
+    sendMessage,
+    clearConversations,
+    hasConversations,
+  } = useChatbot();
+  const [message, setMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // التمرير التلقائي للأسفل عند إضافة رسالة جديدة
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [conversations, isTyping]);
 
   const handleSendMessage = async (text?: string) => {
@@ -31,17 +42,19 @@ export const ChatbotInterface = memo(function ChatbotInterface({ compact = false
 
     try {
       await sendMessage({ message: messageToSend });
-      setMessage("");
+      setMessage('');
     } catch {
       // Error handled by useChatbot hook
     }
   };
 
-  const handleQuickReply = async (reply: Database['public']['Tables']['chatbot_quick_replies']['Row']) => {
+  const handleQuickReply = async (
+    reply: Database['public']['Tables']['chatbot_quick_replies']['Row']
+  ) => {
     try {
-      await sendMessage({ 
-        message: reply.prompt, 
-        quickReplyId: reply.id 
+      await sendMessage({
+        message: reply.prompt,
+        quickReplyId: reply.id,
       });
     } catch {
       // Error handled by useChatbot hook
@@ -63,7 +76,7 @@ export const ChatbotInterface = memo(function ChatbotInterface({ compact = false
 
       {/* شريط الإجراءات السريعة */}
       {quickActions.length > 0 && (
-        <div className={cn("px-4", compact ? "pt-3 pb-2 bg-muted/30" : "pt-4")}>
+        <div className={cn('px-4', compact ? 'pt-3 pb-2 bg-muted/30' : 'pt-4')}>
           <QuickActionsBar actions={quickActions} />
         </div>
       )}
@@ -115,7 +128,7 @@ export const ChatbotInterface = memo(function ChatbotInterface({ compact = false
               </p>
             </div>
           </CardTitle>
-          
+
           <ChatbotActions
             conversations={conversations}
             onClearHistory={clearConversations}

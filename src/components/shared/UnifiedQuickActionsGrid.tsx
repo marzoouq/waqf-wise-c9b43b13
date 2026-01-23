@@ -1,16 +1,19 @@
 /**
  * مكون الإجراءات السريعة الموحد
  * يستخدم في لوحات التحكم المختلفة (الناظر، المحاسب، المستفيد)
- * 
+ *
  * @version 2.9.0
  */
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useNewAuditLogsCount, useCriticalAuditLogsCount } from "@/hooks/system/useNewAuditLogsCount";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  useNewAuditLogsCount,
+  useCriticalAuditLogsCount,
+} from '@/hooks/system/useNewAuditLogsCount';
 
 export interface QuickAction {
   label: string;
@@ -42,21 +45,21 @@ function ActionBadge({ action }: { action: QuickAction }) {
   if (count === 0) return null;
 
   return (
-    <Badge 
-      variant={action.badgeType === 'critical' ? "destructive" : "secondary"}
+    <Badge
+      variant={action.badgeType === 'critical' ? 'destructive' : 'secondary'}
       className={cn(
-        "absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold",
-        action.badgeType === 'critical' && count > 0 && "animate-pulse"
+        'absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold',
+        action.badgeType === 'critical' && count > 0 && 'animate-pulse'
       )}
     >
-      {count > 99 ? "99+" : count}
+      {count > 99 ? '99+' : count}
     </Badge>
   );
 }
 
-export function UnifiedQuickActionsGrid({ 
+export function UnifiedQuickActionsGrid({
   actions,
-  title = "الإجراءات السريعة",
+  title = 'الإجراءات السريعة',
   columns = 4,
   variant = 'button',
   className,
@@ -64,32 +67,30 @@ export function UnifiedQuickActionsGrid({
   const navigate = useNavigate();
 
   const gridCols = {
-    2: "grid-cols-2",
-    3: "grid-cols-2 md:grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+    2: 'grid-cols-2',
+    3: 'grid-cols-2 md:grid-cols-3',
+    4: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
   };
 
   if (variant === 'card') {
     return (
-      <div className={cn("grid gap-3 sm:gap-4", gridCols[columns], className)}>
+      <div className={cn('grid gap-3 sm:gap-4', gridCols[columns], className)}>
         {actions.map((action) => {
           const Icon = action.icon;
           return (
-            <Card 
+            <Card
               key={action.path}
               className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1 relative"
               onClick={() => navigate(action.path)}
             >
               <ActionBadge action={action} />
               <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-                <div className={cn("p-3 rounded-full", action.bgColor)}>
-                  <Icon className={cn("h-6 w-6", action.color)} />
+                <div className={cn('p-3 rounded-full', action.bgColor)}>
+                  <Icon className={cn('h-6 w-6', action.color)} />
                 </div>
                 <div>
                   <p className="font-medium text-sm">{action.label}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {action.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{action.description}</p>
                 </div>
               </CardContent>
             </Card>
@@ -105,7 +106,7 @@ export function UnifiedQuickActionsGrid({
         <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent className="p-3 sm:p-6">
-        <div className={cn("grid gap-2 sm:gap-3 md:gap-4", gridCols[columns])}>
+        <div className={cn('grid gap-2 sm:gap-3 md:gap-4', gridCols[columns])}>
           {actions.map((action) => {
             const Icon = action.icon;
             return (
@@ -116,8 +117,8 @@ export function UnifiedQuickActionsGrid({
                   className="h-auto w-full flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 md:p-6 hover:shadow-md transition-all"
                   onClick={() => navigate(action.path)}
                 >
-                  <div className={cn("p-2 sm:p-3 rounded-full shrink-0", action.bgColor)}>
-                    <Icon className={cn("h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6", action.color)} />
+                  <div className={cn('p-2 sm:p-3 rounded-full shrink-0', action.bgColor)}>
+                    <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6', action.color)} />
                   </div>
                   <div className="text-center w-full">
                     <p className="font-medium text-xs sm:text-sm mb-0.5 sm:mb-1 truncate">

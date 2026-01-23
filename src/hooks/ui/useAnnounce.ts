@@ -52,7 +52,7 @@ export function useAnnounce({
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      
+
       timeoutRef.current = window.setTimeout(() => {
         announce(message, priority);
       }, debounceMs);
@@ -83,16 +83,17 @@ export function useAnnounce({
 
   const announceResults = useCallback(
     (count: number, type: string = 'نتيجة') => {
-      const message = count === 0
-        ? 'لا توجد نتائج'
-        : count === 1
-        ? `${type} واحدة`
-        : count === 2
-        ? `${type}ان`
-        : count <= 10
-        ? `${count} ${type}ات`
-        : `${count} ${type}`;
-      
+      const message =
+        count === 0
+          ? 'لا توجد نتائج'
+          : count === 1
+            ? `${type} واحدة`
+            : count === 2
+              ? `${type}ان`
+              : count <= 10
+                ? `${count} ${type}ات`
+                : `${count} ${type}`;
+
       debouncedAnnounce(message, 'polite');
     },
     [debouncedAnnounce]

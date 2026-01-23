@@ -1,16 +1,16 @@
 /**
  * Governance Service - خدمة الحوكمة (Facade)
  * @version 3.0.0
- * 
+ *
  * يعيد تصدير جميع الخدمات من الملفات المقسمة للحفاظ على التوافق
  */
 
-import { 
+import {
   GovernanceDecisionsService,
   GovernanceVotingService,
   GovernanceSettingsService,
   type EligibleVoter,
-  type GovernanceDecisionInput
+  type GovernanceDecisionInput,
 } from './governance';
 
 // إعادة تصدير الأنواع
@@ -38,7 +38,8 @@ export class GovernanceService {
 
   // === Settings Operations ===
   static getVisibilitySettings = GovernanceSettingsService.getVisibilitySettings;
-  static createDefaultVisibilitySettings = GovernanceSettingsService.createDefaultVisibilitySettings;
+  static createDefaultVisibilitySettings =
+    GovernanceSettingsService.createDefaultVisibilitySettings;
   static updateVisibilitySettings = GovernanceSettingsService.updateVisibilitySettings;
   static getOrganizationSettings = GovernanceSettingsService.getOrganizationSettings;
   static updateOrganizationSettings = GovernanceSettingsService.updateOrganizationSettings;

@@ -1,26 +1,47 @@
-import { useState } from "react";
-import { matchesStatus } from "@/lib/constants";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Download, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { format, arLocale as ar } from "@/lib/date";
-import { useUnifiedTransactions } from "@/hooks/transactions/useUnifiedTransactions";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { useState } from 'react';
+import { matchesStatus } from '@/lib/constants';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import {
+  Download,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { format, arLocale as ar } from '@/lib/date';
+import { useUnifiedTransactions } from '@/hooks/transactions/useUnifiedTransactions';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
 export default function AllTransactions() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterSource, setFilterSource] = useState<string>("all");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterSource, setFilterSource] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -30,14 +51,15 @@ export default function AllTransactions() {
   // تصفية البيانات
   const filteredTransactions = transactions.filter((transaction) => {
     const matchSearch =
-      searchTerm === "" ||
+      searchTerm === '' ||
       transaction.party_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.reference_number?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchSource = filterSource === "all" || transaction.source === filterSource;
-    const matchType = filterType === "all" || transaction.transaction_type === filterType;
-    const matchStatusFilter = filterStatus === "all" || matchesStatus(transaction.status, filterStatus);
+    const matchSource = filterSource === 'all' || transaction.source === filterSource;
+    const matchType = filterType === 'all' || transaction.transaction_type === filterType;
+    const matchStatusFilter =
+      filterStatus === 'all' || matchesStatus(transaction.status, filterStatus);
 
     return matchSearch && matchSource && matchType && matchStatusFilter;
   });
@@ -53,33 +75,40 @@ export default function AllTransactions() {
 
   // تصدير إلى Excel
   const handleExportExcel = async () => {
-    const { exportToExcel } = await import("@/lib/excel-helper");
-    
+    const { exportToExcel } = await import('@/lib/excel-helper');
+
     const exportData = filteredTransactions.map((t) => ({
-      "التاريخ": format(new Date(t.transaction_date), "dd/MM/yyyy", { locale: ar }),
-      "المصدر": t.source_name_ar,
-      "النوع": t.transaction_type,
-      "الطرف": t.party_name,
-      "المبلغ": t.amount,
-      "طريقة الدفع": t.payment_method,
-      "البيان": t.description,
-      "المرجع": t.reference_number,
-      "الحالة": t.status,
+      التاريخ: format(new Date(t.transaction_date), 'dd/MM/yyyy', { locale: ar }),
+      المصدر: t.source_name_ar,
+      النوع: t.transaction_type,
+      الطرف: t.party_name,
+      المبلغ: t.amount,
+      'طريقة الدفع': t.payment_method,
+      البيان: t.description,
+      المرجع: t.reference_number,
+      الحالة: t.status,
     }));
 
-    await exportToExcel(exportData, `جميع_المعاملات_${format(new Date(), "yyyy-MM-dd")}`, "المعاملات");
+    await exportToExcel(
+      exportData,
+      `جميع_المعاملات_${format(new Date(), 'yyyy-MM-dd')}`,
+      'المعاملات'
+    );
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
-      "مدفوع": { label: "مدفوع", variant: "default" },
-      "معلق": { label: "معلق", variant: "secondary" },
-      "معتمد": { label: "معتمد", variant: "outline" },
-      "completed": { label: "مكتمل", variant: "default" },
-      "pending": { label: "معلق", variant: "secondary" },
+    const variants: Record<
+      string,
+      { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }
+    > = {
+      مدفوع: { label: 'مدفوع', variant: 'default' },
+      معلق: { label: 'معلق', variant: 'secondary' },
+      معتمد: { label: 'معتمد', variant: 'outline' },
+      completed: { label: 'مكتمل', variant: 'default' },
+      pending: { label: 'معلق', variant: 'secondary' },
     };
 
-    const config = variants[status] || { label: status, variant: "secondary" };
+    const config = variants[status] || { label: status, variant: 'secondary' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -89,8 +118,8 @@ export default function AllTransactions() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل المعاملات" 
+      <ErrorState
+        title="فشل تحميل المعاملات"
         message="حدث خطأ أثناء تحميل بيانات المعاملات"
         onRetry={() => refetch()}
         fullScreen
@@ -120,21 +149,21 @@ export default function AllTransactions() {
         <UnifiedStatsGrid columns={4}>
           <UnifiedKPICard
             title="إجمالي الوارد"
-            value={`${stats.totalIncome.toLocaleString("ar-SA")} ريال`}
+            value={`${stats.totalIncome.toLocaleString('ar-SA')} ريال`}
             icon={TrendingUp}
             variant="success"
           />
           <UnifiedKPICard
             title="إجمالي الصادر"
-            value={`${stats.totalExpense.toLocaleString("ar-SA")} ريال`}
+            value={`${stats.totalExpense.toLocaleString('ar-SA')} ريال`}
             icon={TrendingDown}
             variant="destructive"
           />
           <UnifiedKPICard
             title="الصافي"
-            value={`${stats.netAmount.toLocaleString("ar-SA")} ريال`}
+            value={`${stats.netAmount.toLocaleString('ar-SA')} ريال`}
             icon={DollarSign}
-            variant={stats.netAmount >= 0 ? "success" : "destructive"}
+            variant={stats.netAmount >= 0 ? 'success' : 'destructive'}
           />
           <UnifiedKPICard
             title="عدد المعاملات"
@@ -216,10 +245,14 @@ export default function AllTransactions() {
                         <div>
                           <p className="font-medium text-sm">{transaction.party_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {format(new Date(transaction.transaction_date), "dd/MM/yyyy", { locale: ar })}
+                            {format(new Date(transaction.transaction_date), 'dd/MM/yyyy', {
+                              locale: ar,
+                            })}
                           </p>
                         </div>
-                        <Badge variant={transaction.transaction_type === "قبض" ? "default" : "secondary"}>
+                        <Badge
+                          variant={transaction.transaction_type === 'قبض' ? 'default' : 'secondary'}
+                        >
                           {transaction.transaction_type}
                         </Badge>
                       </div>
@@ -228,9 +261,13 @@ export default function AllTransactions() {
                         {getStatusBadge(transaction.status)}
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t">
-                        <span className="text-xs text-muted-foreground">{transaction.payment_method}</span>
-                        <span className={`font-semibold ${transaction.transaction_type === "قبض" ? "text-success" : "text-destructive"}`}>
-                          {transaction.amount.toLocaleString("ar-SA")} ريال
+                        <span className="text-xs text-muted-foreground">
+                          {transaction.payment_method}
+                        </span>
+                        <span
+                          className={`font-semibold ${transaction.transaction_type === 'قبض' ? 'text-success' : 'text-destructive'}`}
+                        >
+                          {transaction.amount.toLocaleString('ar-SA')} ريال
                         </span>
                       </div>
                     </Card>
@@ -247,7 +284,9 @@ export default function AllTransactions() {
                         <TableHead className="text-start">النوع</TableHead>
                         <TableHead className="text-start">الطرف</TableHead>
                         <TableHead className="text-start">المبلغ</TableHead>
-                        <TableHead className="text-start hidden lg:table-cell">طريقة الدفع</TableHead>
+                        <TableHead className="text-start hidden lg:table-cell">
+                          طريقة الدفع
+                        </TableHead>
                         <TableHead className="text-start hidden lg:table-cell">البيان</TableHead>
                         <TableHead className="text-start hidden xl:table-cell">المرجع</TableHead>
                         <TableHead className="text-start">الحالة</TableHead>
@@ -257,20 +296,32 @@ export default function AllTransactions() {
                       {paginatedTransactions.map((transaction) => (
                         <TableRow key={`${transaction.source}-${transaction.id}`}>
                           <TableCell>
-                            {format(new Date(transaction.transaction_date), "dd/MM/yyyy", { locale: ar })}
+                            {format(new Date(transaction.transaction_date), 'dd/MM/yyyy', {
+                              locale: ar,
+                            })}
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline">{transaction.source_name_ar}</Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={transaction.transaction_type === "قبض" ? "default" : "secondary"}>
+                            <Badge
+                              variant={
+                                transaction.transaction_type === 'قبض' ? 'default' : 'secondary'
+                              }
+                            >
                               {transaction.transaction_type}
                             </Badge>
                           </TableCell>
                           <TableCell className="font-medium">{transaction.party_name}</TableCell>
                           <TableCell className="font-semibold">
-                            <span className={transaction.transaction_type === "قبض" ? "text-success" : "text-destructive"}>
-                              {transaction.amount.toLocaleString("ar-SA")} ريال
+                            <span
+                              className={
+                                transaction.transaction_type === 'قبض'
+                                  ? 'text-success'
+                                  : 'text-destructive'
+                              }
+                            >
+                              {transaction.amount.toLocaleString('ar-SA')} ريال
                             </span>
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
@@ -295,7 +346,8 @@ export default function AllTransactions() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-4 px-2">
                 <div className="text-sm text-muted-foreground">
-                  عرض {startIndex + 1} إلى {Math.min(endIndex, filteredTransactions.length)} من {filteredTransactions.length} معاملة
+                  عرض {startIndex + 1} إلى {Math.min(endIndex, filteredTransactions.length)} من{' '}
+                  {filteredTransactions.length} معاملة
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -322,7 +374,7 @@ export default function AllTransactions() {
                       return (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
+                          variant={currentPage === pageNum ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => setCurrentPage(pageNum)}
                           className="w-8 h-8 p-0"

@@ -6,28 +6,21 @@
 /**
  * قائمة أسماء caches التي يجب حذفها
  */
-const WORKBOX_CACHE_PATTERNS = [
-  'workbox-',
-  'precache',
-  'runtime-',
-  'sw-',
-  'waqf-',
-  'cache-',
-];
+const WORKBOX_CACHE_PATTERNS = ['workbox-', 'precache', 'runtime-', 'sw-', 'waqf-', 'cache-'];
 
 /**
  * إلغاء تسجيل جميع Service Workers
  */
 export async function unregisterAllServiceWorkers(): Promise<boolean> {
   if (!('serviceWorker' in navigator)) return false;
-  
+
   try {
     const registrations = await navigator.serviceWorker.getRegistrations();
-    
+
     if (registrations.length === 0) {
       return false;
     }
-    
+
     for (const registration of registrations) {
       await registration.unregister();
       if (import.meta.env.DEV) {
@@ -35,7 +28,7 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
         logger.info('🗑️ تم إلغاء تسجيل Service Worker', { scope: registration.scope });
       }
     }
-    
+
     return true;
   } catch (error) {
     const { productionLogger } = await import('@/lib/logger/production-logger');
@@ -49,16 +42,16 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
  */
 export async function clearAllWorkboxCaches(): Promise<number> {
   if (!('caches' in window)) return 0;
-  
+
   try {
     const cacheNames = await caches.keys();
     let deletedCount = 0;
-    
+
     for (const cacheName of cacheNames) {
-      const shouldDelete = WORKBOX_CACHE_PATTERNS.some(pattern => 
+      const shouldDelete = WORKBOX_CACHE_PATTERNS.some((pattern) =>
         cacheName.toLowerCase().includes(pattern.toLowerCase())
       );
-      
+
       if (shouldDelete) {
         await caches.delete(cacheName);
         if (import.meta.env.DEV) {
@@ -68,7 +61,7 @@ export async function clearAllWorkboxCaches(): Promise<number> {
         deletedCount++;
       }
     }
-    
+
     return deletedCount;
   } catch (error) {
     const { productionLogger } = await import('@/lib/logger/production-logger');
@@ -86,7 +79,7 @@ export async function fullServiceWorkerCleanup(): Promise<{
 }> {
   const swUnregistered = await unregisterAllServiceWorkers();
   const cachesDeleted = await clearAllWorkboxCaches();
-  
+
   return { swUnregistered, cachesDeleted };
 }
 
@@ -95,14 +88,14 @@ export async function fullServiceWorkerCleanup(): Promise<{
  */
 export async function cleanupOldServiceWorkers(): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
-  
+
   try {
     // فحص توفر sw.js
-    const response = await fetch('/sw.js', { 
-      method: 'HEAD', 
-      cache: 'no-store' 
+    const response = await fetch('/sw.js', {
+      method: 'HEAD',
+      cache: 'no-store',
     });
-    
+
     if (!response.ok) {
       if (import.meta.env.DEV) {
         const { logger } = await import('@/lib/logger');
@@ -125,13 +118,13 @@ export async function cleanupOldServiceWorkers(): Promise<void> {
  * @returns true إذا تم معالجة الخطأ بنجاح
  */
 export async function handleSWRegistrationError(error: Error): Promise<boolean> {
-  const isNotFoundError = 
-    error.message?.includes('Not found') || 
+  const isNotFoundError =
+    error.message?.includes('Not found') ||
     error.message?.includes('404') ||
     error.message?.includes('Failed to update') ||
     error.message?.includes('workbox') ||
     error.message?.includes('Failed to fetch');
-  
+
   if (isNotFoundError) {
     if (import.meta.env.DEV) {
       const { logger } = await import('@/lib/logger');
@@ -140,6 +133,6 @@ export async function handleSWRegistrationError(error: Error): Promise<boolean> 
     const result = await fullServiceWorkerCleanup();
     return result.swUnregistered || result.cachesDeleted > 0;
   }
-  
+
   return false;
 }

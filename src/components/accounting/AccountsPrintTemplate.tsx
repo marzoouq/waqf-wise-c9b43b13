@@ -1,6 +1,6 @@
-import { PrintHeader } from "@/components/shared/PrintHeader";
-import { PrintFooter } from "@/components/shared/PrintFooter";
-import { getAccountTypeLabel } from "@/lib/constants";
+import { PrintHeader } from '@/components/shared/PrintHeader';
+import { PrintFooter } from '@/components/shared/PrintFooter';
+import { getAccountTypeLabel } from '@/lib/constants';
 
 interface Account {
   id: string;
@@ -19,11 +19,11 @@ interface AccountsPrintTemplateProps {
 
 export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplateProps) => {
   const totalDebit = accounts
-    .filter(a => a.account_nature === 'debit')
+    .filter((a) => a.account_nature === 'debit')
     .reduce((sum, a) => sum + (a.current_balance || 0), 0);
-    
+
   const totalCredit = accounts
-    .filter(a => a.account_nature === 'credit')
+    .filter((a) => a.account_nature === 'credit')
     .reduce((sum, a) => sum + (a.current_balance || 0), 0);
 
   return (
@@ -81,7 +81,7 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
           }
         }
       `}</style>
-      
+
       {/* ترويسة الوقف */}
       <PrintHeader title={title} subtitle={`عدد الحسابات: ${accounts.length}`} />
 

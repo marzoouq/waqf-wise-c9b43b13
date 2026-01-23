@@ -11,10 +11,10 @@ interface PrintFooterProps {
   className?: string;
 }
 
-export const PrintFooter = ({ 
+export const PrintFooter = ({
   showVersion = true,
   showConfidential = false,
-  className = '' 
+  className = '',
 }: PrintFooterProps) => {
   return (
     <div className={`print-footer ${className}`}>
@@ -47,29 +47,19 @@ export const PrintFooter = ({
           border-radius: 4px;
         }
       `}</style>
-      
+
       {/* النص الرسمي */}
-      <div className="print-footer-official">
-        * {WAQF_IDENTITY.footer}
-      </div>
-      
+      <div className="print-footer-official">* {WAQF_IDENTITY.footer}</div>
+
       {/* تاريخ ووقت الطباعة */}
-      <div className="print-footer-datetime">
-        تاريخ الطباعة: {getCurrentDateTimeArabic()}
-      </div>
-      
+      <div className="print-footer-datetime">تاريخ الطباعة: {getCurrentDateTimeArabic()}</div>
+
       {/* رقم الإصدار */}
-      {showVersion && (
-        <div className="print-footer-version">
-          الإصدار: {WAQF_IDENTITY.version}
-        </div>
-      )}
-      
+      {showVersion && <div className="print-footer-version">الإصدار: {WAQF_IDENTITY.version}</div>}
+
       {/* تحذير سري */}
       {showConfidential && (
-        <div className="print-footer-confidential">
-          {WAQF_IDENTITY.confidential}
-        </div>
+        <div className="print-footer-confidential">{WAQF_IDENTITY.confidential}</div>
       )}
     </div>
   );

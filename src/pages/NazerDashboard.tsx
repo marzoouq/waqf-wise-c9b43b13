@@ -1,50 +1,57 @@
-import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from "lucide-react";
-import { Suspense, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
-import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
-import PendingApprovalsSection from "@/components/dashboard/nazer/PendingApprovalsSection";
-import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
-import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
-import QuickActionsGrid from "@/components/dashboard/nazer/QuickActionsGrid";
-import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
-import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDialog";
-import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
-import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
-import { BeneficiaryControlSection } from "@/components/nazer/BeneficiaryControlSection";
-import { NazerBeneficiaryManagement } from "@/components/nazer/NazerBeneficiaryManagement";
-import { NazerReportsSection } from "@/components/nazer/NazerReportsSection";
-import { NazerSystemOverview } from "@/components/nazer/NazerSystemOverview";
-import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivityMonitor";
-import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBeneficiaryButton";
-import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
-import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
-import { ManualTasksCard } from "@/components/nazer/ManualTasksCard";
-import { WaqfBrandingSettings } from "@/components/nazer/WaqfBrandingSettings";
-import { TenantMaintenanceRequestsSection } from "@/components/nazer/TenantMaintenanceRequestsSection";
-import { ContractsOverviewSection } from "@/components/nazer/ContractsOverviewSection";
-import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
-import { CollectionOverviewCard } from "@/components/dashboard/shared/CollectionOverviewCard";
-import { ExpiringContractsCard } from "@/components/dashboard/shared/ExpiringContractsCard";
-import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
-import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
-import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
-import { SendNotificationDialog } from "@/components/notifications/SendNotificationDialog";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
-import { DashboardQuickSwitch } from "@/components/dashboard/shared/DashboardQuickSwitch";
+import { Mail, Coins, Globe, Settings, Users, FileText, Activity, Bell } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AdminSendMessageDialog } from '@/components/messages/AdminSendMessageDialog';
+import { ChartSkeleton, SectionSkeleton } from '@/components/dashboard';
+import { UnifiedDashboardLayout } from '@/components/dashboard/UnifiedDashboardLayout';
+import PendingApprovalsSection from '@/components/dashboard/nazer/PendingApprovalsSection';
+import NazerKPIs from '@/components/dashboard/nazer/NazerKPIs';
+import SmartAlertsSection from '@/components/dashboard/nazer/SmartAlertsSection';
+import QuickActionsGrid from '@/components/dashboard/nazer/QuickActionsGrid';
+import { AIInsightsWidget } from '@/components/dashboard/AIInsightsWidget';
+import { DistributeRevenueDialog } from '@/components/nazer/DistributeRevenueDialog';
+import { PublishFiscalYearDialog } from '@/components/nazer/PublishFiscalYearDialog';
+import { FiscalYearPublishStatus } from '@/components/nazer/FiscalYearPublishStatus';
+import { BeneficiaryControlSection } from '@/components/nazer/BeneficiaryControlSection';
+import { NazerBeneficiaryManagement } from '@/components/nazer/NazerBeneficiaryManagement';
+import { NazerReportsSection } from '@/components/nazer/NazerReportsSection';
+import { NazerSystemOverview } from '@/components/nazer/NazerSystemOverview';
+import { BeneficiaryActivityMonitor } from '@/components/nazer/BeneficiaryActivityMonitor';
+import { PreviewAsBeneficiaryButton } from '@/components/nazer/PreviewAsBeneficiaryButton';
+import { LastSyncIndicator } from '@/components/nazer/LastSyncIndicator';
+import { NazerAnalyticsSection } from '@/components/nazer/NazerAnalyticsSection';
+import { ManualTasksCard } from '@/components/nazer/ManualTasksCard';
+import { WaqfBrandingSettings } from '@/components/nazer/WaqfBrandingSettings';
+import { TenantMaintenanceRequestsSection } from '@/components/nazer/TenantMaintenanceRequestsSection';
+import { ContractsOverviewSection } from '@/components/nazer/ContractsOverviewSection';
+import {
+  CurrentFiscalYearCard,
+  RevenueProgressCard,
+  FinancialCardsRow,
+} from '@/components/dashboard/shared';
+import { CollectionOverviewCard } from '@/components/dashboard/shared/CollectionOverviewCard';
+import { ExpiringContractsCard } from '@/components/dashboard/shared/ExpiringContractsCard';
+import { LazyTabContent } from '@/components/dashboard/admin/LazyTabContent';
+import {
+  useNazerDashboardRealtime,
+  useNazerDashboardRefresh,
+} from '@/hooks/dashboard/useNazerDashboardRealtime';
+import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
+import { SendNotificationDialog } from '@/components/notifications/SendNotificationDialog';
+import { useNotifications } from '@/hooks/notifications/useNotifications';
+import { ScrollToTopButton } from '@/components/shared/ScrollToTopButton';
+import { DashboardQuickSwitch } from '@/components/dashboard/shared/DashboardQuickSwitch';
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // تفعيل التحديثات المباشرة الموحدة
   useNazerDashboardRealtime();
   const { refreshAll } = useNazerDashboardRefresh();
@@ -64,42 +71,57 @@ export default function NazerDashboard() {
         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {/* التنقل السريع بين اللوحات */}
           <DashboardQuickSwitch />
-          
+
           {/* مؤشر آخر تحديث */}
-          <LastSyncIndicator 
-            lastUpdated={lastUpdated} 
+          <LastSyncIndicator
+            lastUpdated={lastUpdated}
             onRefresh={handleRefresh}
             isRefreshing={isRefreshing}
             className="hidden md:flex"
           />
-          
+
           {/* زر معاينة كـ مستفيد */}
           <PreviewAsBeneficiaryButton />
-          
-          <Button onClick={() => setDistributeDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="default" size="sm">
+
+          <Button
+            onClick={() => setDistributeDialogOpen(true)}
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3"
+            variant="default"
+            size="sm"
+          >
             <Coins className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden xs:inline text-xs sm:text-sm">توزيع</span>
             <span className="hidden sm:inline text-sm"> الغلة</span>
           </Button>
-          <Button onClick={() => setPublishDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="outline" size="sm">
+          <Button
+            onClick={() => setPublishDialogOpen(true)}
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3"
+            variant="outline"
+            size="sm"
+          >
             <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden xs:inline text-xs sm:text-sm">نشر</span>
           </Button>
-          <Button onClick={() => setMessageDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
+          <Button
+            onClick={() => setMessageDialogOpen(true)}
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3"
+            variant="ghost"
+            size="sm"
+          >
             <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">رسالة</span>
           </Button>
-          <Button 
-            onClick={() => setNotificationDialogOpen(true)} 
-            className="gap-1.5 sm:gap-2 px-2 sm:px-3 relative" 
-            variant="ghost" 
+          <Button
+            onClick={() => setNotificationDialogOpen(true)}
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3 relative"
+            variant="ghost"
             size="sm"
           >
             <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">إشعار</span>
             {unreadCount > 0 && (
-              <Badge 
-                variant="destructive" 
+              <Badge
+                variant="destructive"
                 className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px]"
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -117,19 +139,31 @@ export default function NazerDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 mb-4 min-w-full sm:min-w-0">
-              <TabsTrigger value="overview" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+              <TabsTrigger
+                value="overview"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap"
+              >
                 <Activity className="h-4 w-4" />
                 <span className="text-xs sm:text-sm">نظرة عامة</span>
               </TabsTrigger>
-              <TabsTrigger value="beneficiaries" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+              <TabsTrigger
+                value="beneficiaries"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap"
+              >
                 <Users className="h-4 w-4" />
                 <span className="text-xs sm:text-sm">المستفيدون</span>
               </TabsTrigger>
-              <TabsTrigger value="reports" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+              <TabsTrigger
+                value="reports"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap"
+              >
                 <FileText className="h-4 w-4" />
                 <span className="text-xs sm:text-sm">التقارير</span>
               </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+              <TabsTrigger
+                value="settings"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap"
+              >
                 <Settings className="h-4 w-4" />
                 <span className="text-xs sm:text-sm">التحكم</span>
               </TabsTrigger>
@@ -191,7 +225,7 @@ export default function NazerDashboard() {
           </TabsContent>
 
           {/* تبويب المستفيدين - تحميل كسول */}
-          <LazyTabContent isActive={activeTab === "beneficiaries"}>
+          <LazyTabContent isActive={activeTab === 'beneficiaries'}>
             <div className="space-y-6">
               <Suspense fallback={<SectionSkeleton />}>
                 <NazerSystemOverview />
@@ -209,7 +243,7 @@ export default function NazerDashboard() {
           </LazyTabContent>
 
           {/* تبويب التقارير - تحميل كسول */}
-          <LazyTabContent isActive={activeTab === "reports"}>
+          <LazyTabContent isActive={activeTab === 'reports'}>
             <div className="space-y-6">
               <Suspense fallback={<SectionSkeleton />}>
                 <NazerReportsSection />
@@ -218,7 +252,7 @@ export default function NazerDashboard() {
           </LazyTabContent>
 
           {/* تبويب التحكم - تحميل كسول */}
-          <LazyTabContent isActive={activeTab === "settings"}>
+          <LazyTabContent isActive={activeTab === 'settings'}>
             <div className="space-y-6">
               <Suspense fallback={<SectionSkeleton />}>
                 <ManualTasksCard />
@@ -234,20 +268,11 @@ export default function NazerDashboard() {
         </Tabs>
       </div>
 
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
+      <AdminSendMessageDialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} />
 
-      <DistributeRevenueDialog
-        open={distributeDialogOpen}
-        onOpenChange={setDistributeDialogOpen}
-      />
+      <DistributeRevenueDialog open={distributeDialogOpen} onOpenChange={setDistributeDialogOpen} />
 
-      <PublishFiscalYearDialog
-        open={publishDialogOpen}
-        onOpenChange={setPublishDialogOpen}
-      />
+      <PublishFiscalYearDialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen} />
 
       <SendNotificationDialog
         open={notificationDialogOpen}

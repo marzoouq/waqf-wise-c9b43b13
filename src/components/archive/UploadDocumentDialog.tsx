@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog, DialogFooter } from '@/components/shared/ResponsiveDialog';
 import {
   Form,
   FormControl,
@@ -10,33 +10,33 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useDocumentUpload } from "@/hooks/archive/useDocumentUpload";
-import { useFolders } from "@/hooks/archive/useFolders";
-import { Upload, Loader2, FileText } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { DocumentUploadData } from "@/types/documents";
-import { productionLogger } from "@/lib/logger/production-logger";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useDocumentUpload } from '@/hooks/archive/useDocumentUpload';
+import { useFolders } from '@/hooks/archive/useFolders';
+import { Upload, Loader2, FileText } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { DocumentUploadData } from '@/types/documents';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 const uploadSchema = z.object({
   name: z
     .string()
-    .min(3, { message: "اسم المستند يجب أن يكون 3 أحرف على الأقل" })
-    .max(100, { message: "اسم المستند يجب ألا يتجاوز 100 حرف" }),
-  category: z.string().min(1, { message: "الفئة مطلوبة" }),
+    .min(3, { message: 'اسم المستند يجب أن يكون 3 أحرف على الأقل' })
+    .max(100, { message: 'اسم المستند يجب ألا يتجاوز 100 حرف' }),
+  category: z.string().min(1, { message: 'الفئة مطلوبة' }),
   description: z.string().optional(),
   folder_id: z.string().optional(),
-  file: z.instanceof(FileList).refine((files) => files?.length > 0, "الملف مطلوب"),
+  file: z.instanceof(FileList).refine((files) => files?.length > 0, 'الملف مطلوب'),
 });
 
 type UploadFormValues = z.infer<typeof uploadSchema>;
@@ -48,19 +48,16 @@ interface UploadDocumentDialogProps {
 }
 
 const DOCUMENT_CATEGORIES = [
-  { value: "contracts", label: "العقود" },
-  { value: "legal", label: "المستندات القانونية" },
-  { value: "reports", label: "التقارير المالية" },
-  { value: "governance", label: "محاضر الاجتماعات" },
-  { value: "beneficiary", label: "مستندات المستفيدين" },
-  { value: "receipts", label: "سندات القبض والصرف" },
-  { value: "other", label: "أخرى" },
+  { value: 'contracts', label: 'العقود' },
+  { value: 'legal', label: 'المستندات القانونية' },
+  { value: 'reports', label: 'التقارير المالية' },
+  { value: 'governance', label: 'محاضر الاجتماعات' },
+  { value: 'beneficiary', label: 'مستندات المستفيدين' },
+  { value: 'receipts', label: 'سندات القبض والصرف' },
+  { value: 'other', label: 'أخرى' },
 ];
 
-export function UploadDocumentDialog({
-  open,
-  onOpenChange,
-}: UploadDocumentDialogProps) {
+export function UploadDocumentDialog({ open, onOpenChange }: UploadDocumentDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { uploadDocument, isUploading } = useDocumentUpload();
   const { folders } = useFolders();
@@ -68,10 +65,10 @@ export function UploadDocumentDialog({
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
-      name: "",
-      category: "",
-      description: "",
-      folder_id: "",
+      name: '',
+      category: '',
+      description: '',
+      folder_id: '',
     },
   });
 
@@ -89,15 +86,18 @@ export function UploadDocumentDialog({
   const handleSubmit = async (data: UploadFormValues) => {
     const file = data.file[0];
     const maxSize = 10 * 1024 * 1024; // 10MB
-    
+
     if (file.size > maxSize) {
       form.setError('file', { message: 'حجم الملف يجب ألا يتجاوز 10 ميجابايت' });
       return;
     }
 
     try {
-      productionLogger.debug('[UploadDocument] بدء الرفع', { name: data.name, category: data.category });
-      
+      productionLogger.debug('[UploadDocument] بدء الرفع', {
+        name: data.name,
+        category: data.category,
+      });
+
       await uploadDocument({
         file,
         name: data.name,
@@ -105,7 +105,7 @@ export function UploadDocumentDialog({
         description: data.description,
         folder_id: data.folder_id || undefined,
       });
-      
+
       productionLogger.debug('[UploadDocument] تم الرفع بنجاح');
       form.reset();
       setSelectedFile(null);
@@ -123,8 +123,8 @@ export function UploadDocumentDialog({
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="رفع مستند جديد"
       description="قم بإدخال بيانات المستند واختر الملف للرفع إلى الأرشيف"
@@ -216,9 +216,9 @@ export function UploadDocumentDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>المجلد</FormLabel>
-                  <Select 
-                    onValueChange={(val) => field.onChange(val === "__none__" ? "" : val)} 
-                    value={field.value || "__none__"}
+                  <Select
+                    onValueChange={(val) => field.onChange(val === '__none__' ? '' : val)}
+                    value={field.value || '__none__'}
                   >
                     <FormControl>
                       <SelectTrigger>

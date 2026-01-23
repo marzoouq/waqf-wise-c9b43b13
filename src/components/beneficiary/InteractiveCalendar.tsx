@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Calendar as CalendarIcon } from "lucide-react";
-import { formatFullDate, formatTime } from "@/lib/date";
+import { useMemo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { formatFullDate, formatTime } from '@/lib/date';
 
 interface InteractiveCalendarProps {
   beneficiaryId: string;
@@ -30,9 +30,7 @@ export function InteractiveCalendar({ beneficiaryId: _beneficiaryId }: Interacti
             <CalendarIcon className="h-8 w-8 text-primary" />
             <div>
               <p className="text-sm text-muted-foreground">التاريخ الميلادي</p>
-              <p className="text-2xl font-bold">
-                {formattedDate}
-              </p>
+              <p className="text-2xl font-bold">{formattedDate}</p>
             </div>
           </div>
 
@@ -41,9 +39,7 @@ export function InteractiveCalendar({ beneficiaryId: _beneficiaryId }: Interacti
             <Clock className="h-8 w-8 text-primary" />
             <div>
               <p className="text-sm text-muted-foreground">الوقت الحالي</p>
-              <p className="text-2xl font-bold">
-                {formattedTime}
-              </p>
+              <p className="text-2xl font-bold">{formattedTime}</p>
             </div>
           </div>
         </div>

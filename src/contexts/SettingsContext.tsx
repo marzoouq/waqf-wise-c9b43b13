@@ -19,24 +19,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     'paymentDaysThreshold',
     90
   );
-  
-  const [itemsPerPage, setItemsPerPage] = useLocalStorage(
-    'itemsPerPage',
-    10
-  );
-  
-  const [language, setLanguage] = useLocalStorage<'ar' | 'en'>(
-    'language',
-    'ar'
-  );
-  
+
+  const [itemsPerPage, setItemsPerPage] = useLocalStorage('itemsPerPage', 10);
+
+  const [language, setLanguage] = useLocalStorage<'ar' | 'en'>('language', 'ar');
+
   const [notificationsEnabled, setNotificationsEnabled] = useLocalStorage(
     'notificationsEnabled',
     true
   );
 
   return (
-    <SettingsContext.Provider 
+    <SettingsContext.Provider
       value={{
         paymentDaysThreshold,
         setPaymentDaysThreshold,

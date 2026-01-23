@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Shield, Lock, Eye, Database, UserCheck, FileText } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { LandingHeader } from '@/components/landing/LandingHeader';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { Shield, Lock, Eye, Database, UserCheck, FileText } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   return (
@@ -23,7 +23,8 @@ export default function PrivacyPolicy() {
               <h2 className="text-xl font-semibold text-foreground m-0">مقدمة</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نحن في منصة الوقف نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية جمع واستخدام وحماية المعلومات التي تقدمها لنا عند استخدام خدماتنا.
+              نحن في منصة الوقف نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية
+              جمع واستخدام وحماية المعلومات التي تقدمها لنا عند استخدام خدماتنا.
             </p>
           </section>
 
@@ -59,7 +60,8 @@ export default function PrivacyPolicy() {
               <h2 className="text-xl font-semibold text-foreground m-0">حماية البيانات</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نستخدم أحدث تقنيات التشفير والحماية لضمان أمان بياناتك. جميع البيانات مشفرة أثناء النقل والتخزين، ونطبق أفضل الممارسات الأمنية لحماية معلوماتك.
+              نستخدم أحدث تقنيات التشفير والحماية لضمان أمان بياناتك. جميع البيانات مشفرة أثناء
+              النقل والتخزين، ونطبق أفضل الممارسات الأمنية لحماية معلوماتك.
             </p>
           </section>
 
@@ -78,10 +80,7 @@ export default function PrivacyPolicy() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
-            to="/" 
-            className="text-primary hover:text-primary/80 font-medium"
-          >
+          <Link to="/" className="text-primary hover:text-primary/80 font-medium">
             ← العودة للصفحة الرئيسية
           </Link>
         </div>

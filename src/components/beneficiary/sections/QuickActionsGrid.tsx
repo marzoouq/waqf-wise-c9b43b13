@@ -4,41 +4,41 @@
  * @version 2.8.91
  */
 
-import { FileText, Receipt, Send, HelpCircle } from "lucide-react";
-import { UnifiedQuickActionsGrid } from "@/components/shared/UnifiedQuickActionsGrid";
+import { FileText, Receipt, Send, HelpCircle } from 'lucide-react';
+import { UnifiedQuickActionsGrid } from '@/components/shared/UnifiedQuickActionsGrid';
 
 const BENEFICIARY_QUICK_ACTIONS = [
   {
     icon: FileText,
-    label: "الإفصاح السنوي",
-    description: "عرض الإفصاح المالي والتقارير",
-    color: "text-[hsl(var(--chart-1))]",
-    bgColor: "bg-[hsl(var(--chart-1)/0.1)]",
-    path: "/beneficiary-portal?tab=reports",
+    label: 'الإفصاح السنوي',
+    description: 'عرض الإفصاح المالي والتقارير',
+    color: 'text-[hsl(var(--chart-1))]',
+    bgColor: 'bg-[hsl(var(--chart-1)/0.1)]',
+    path: '/beneficiary-portal?tab=reports',
   },
   {
     icon: Receipt,
-    label: "التوزيعات",
-    description: "عرض التوزيعات وكشف الحساب",
-    color: "text-[hsl(var(--status-success))]",
-    bgColor: "bg-[hsl(var(--status-success)/0.1)]",
-    path: "/beneficiary-portal?tab=distributions",
+    label: 'التوزيعات',
+    description: 'عرض التوزيعات وكشف الحساب',
+    color: 'text-[hsl(var(--status-success))]',
+    bgColor: 'bg-[hsl(var(--status-success)/0.1)]',
+    path: '/beneficiary-portal?tab=distributions',
   },
   {
     icon: Send,
-    label: "تقديم طلب",
-    description: "إرسال طلب للإدارة",
-    color: "text-[hsl(var(--status-warning))]",
-    bgColor: "bg-[hsl(var(--status-warning)/0.1)]",
-    path: "/beneficiary-portal?tab=requests",
+    label: 'تقديم طلب',
+    description: 'إرسال طلب للإدارة',
+    color: 'text-[hsl(var(--status-warning))]',
+    bgColor: 'bg-[hsl(var(--status-warning)/0.1)]',
+    path: '/beneficiary-portal?tab=requests',
   },
   {
     icon: HelpCircle,
-    label: "الدعم الفني",
-    description: "التواصل مع فريق الدعم",
-    color: "text-[hsl(var(--chart-5))]",
-    bgColor: "bg-[hsl(var(--chart-5)/0.1)]",
-    path: "/beneficiary-support",
+    label: 'الدعم الفني',
+    description: 'التواصل مع فريق الدعم',
+    color: 'text-[hsl(var(--chart-5))]',
+    bgColor: 'bg-[hsl(var(--chart-5)/0.1)]',
+    path: '/beneficiary-support',
   },
 ];
 
@@ -51,11 +51,7 @@ export function QuickActionsGrid() {
         <h2 className="text-xl font-bold">إجراءات سريعة</h2>
       </div>
 
-      <UnifiedQuickActionsGrid 
-        actions={BENEFICIARY_QUICK_ACTIONS} 
-        variant="card"
-        columns={4}
-      />
+      <UnifiedQuickActionsGrid actions={BENEFICIARY_QUICK_ACTIONS} variant="card" columns={4} />
     </div>
   );
 }

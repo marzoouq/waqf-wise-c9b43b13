@@ -1,9 +1,9 @@
-import { useFinancialReports } from "@/hooks/accounting/useFinancialReports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FileText, Printer, TrendingUp, TrendingDown } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { Progress } from "@/components/ui/progress";
+import { useFinancialReports } from '@/hooks/accounting/useFinancialReports';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FileText, Printer, TrendingUp, TrendingDown } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import { Progress } from '@/components/ui/progress';
 
 export function EnhancedIncomeStatement() {
   const { incomeStatement, isLoading } = useFinancialReports();
@@ -19,9 +19,10 @@ export function EnhancedIncomeStatement() {
     return <div className="text-center py-8">جاري التحميل...</div>;
   }
 
-  const profitMargin = incomeStatement.revenue.total > 0
-    ? (incomeStatement.netIncome / incomeStatement.revenue.total) * 100
-    : 0;
+  const profitMargin =
+    incomeStatement.revenue.total > 0
+      ? (incomeStatement.netIncome / incomeStatement.revenue.total) * 100
+      : 0;
 
   const handlePrint = () => {
     window.print();
@@ -29,7 +30,7 @@ export function EnhancedIncomeStatement() {
 
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
-    const { exportFinancialStatementToPDF } = await import("@/lib/exportHelpers");
+    const { exportFinancialStatementToPDF } = await import('@/lib/exportHelpers');
     const sections = [
       {
         title: 'الإيرادات',
@@ -37,7 +38,7 @@ export function EnhancedIncomeStatement() {
           { label: 'إيرادات عقارية', amount: incomeStatement.revenue.property },
           { label: 'إيرادات استثمارات', amount: incomeStatement.revenue.investment },
           { label: 'إيرادات أخرى', amount: incomeStatement.revenue.other },
-        ]
+        ],
       },
       {
         title: 'المصروفات',
@@ -45,8 +46,8 @@ export function EnhancedIncomeStatement() {
           { label: 'مصروفات إدارية', amount: incomeStatement.expenses.administrative },
           { label: 'مصروفات تشغيلية', amount: incomeStatement.expenses.operational },
           { label: 'مصروفات المستفيدين', amount: incomeStatement.expenses.beneficiaries },
-        ]
-      }
+        ],
+      },
     ];
 
     const totals = [
@@ -56,10 +57,10 @@ export function EnhancedIncomeStatement() {
     ];
 
     await exportFinancialStatementToPDF(
-      `قائمة الدخل - ${format(new Date(), "dd/MM/yyyy")}`,
+      `قائمة الدخل - ${format(new Date(), 'dd/MM/yyyy')}`,
       sections,
       totals,
-      `income-statement-${format(new Date(), "yyyyMMdd")}`
+      `income-statement-${format(new Date(), 'yyyyMMdd')}`
     );
   };
 
@@ -70,15 +71,25 @@ export function EnhancedIncomeStatement() {
           <div>
             <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة الدخل</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              للفترة المنتهية في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
+              للفترة المنتهية في: {format(new Date(), 'dd MMMM yyyy', { locale: ar })}
             </p>
           </div>
           <div className="flex gap-2 flex-wrap print:hidden">
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handlePrint}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={handlePrint}
+            >
               <Printer className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleExportPDF}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={handleExportPDF}
+            >
               <FileText className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
@@ -92,23 +103,23 @@ export function EnhancedIncomeStatement() {
             <TrendingUp className="h-5 w-5 text-success" />
             الإيرادات
           </h3>
-          
+
           <div className="space-y-3 pe-6">
             <div className="flex justify-between items-center">
               <span>إيرادات عقارية</span>
               <span className="font-mono">{formatNumber(incomeStatement.revenue.property)}</span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span>إيرادات استثمارات</span>
               <span className="font-mono">{formatNumber(incomeStatement.revenue.investment)}</span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span>إيرادات أخرى</span>
               <span className="font-mono">{formatNumber(incomeStatement.revenue.other)}</span>
             </div>
-            
+
             <div className="flex justify-between items-center pt-2 border-t-2 font-semibold">
               <span>إيرادات الفترة</span>
               <span className="font-mono text-success text-lg">
@@ -122,9 +133,18 @@ export function EnhancedIncomeStatement() {
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>إيرادات عقارية</span>
-                <span>{((incomeStatement.revenue.property / incomeStatement.revenue.total) * 100).toFixed(1)}%</span>
+                <span>
+                  {(
+                    (incomeStatement.revenue.property / incomeStatement.revenue.total) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </span>
               </div>
-              <Progress value={(incomeStatement.revenue.property / incomeStatement.revenue.total) * 100} className="h-2" />
+              <Progress
+                value={(incomeStatement.revenue.property / incomeStatement.revenue.total) * 100}
+                className="h-2"
+              />
             </div>
           </div>
         </div>
@@ -135,23 +155,29 @@ export function EnhancedIncomeStatement() {
             <TrendingDown className="h-5 w-5 text-destructive" />
             المصروفات
           </h3>
-          
+
           <div className="space-y-3 pe-6">
             <div className="flex justify-between items-center">
               <span>مصروفات إدارية</span>
-              <span className="font-mono">{formatNumber(incomeStatement.expenses.administrative)}</span>
+              <span className="font-mono">
+                {formatNumber(incomeStatement.expenses.administrative)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span>مصروفات تشغيلية</span>
-              <span className="font-mono">{formatNumber(incomeStatement.expenses.operational)}</span>
+              <span className="font-mono">
+                {formatNumber(incomeStatement.expenses.operational)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span>مصروفات المستفيدين</span>
-              <span className="font-mono">{formatNumber(incomeStatement.expenses.beneficiaries)}</span>
+              <span className="font-mono">
+                {formatNumber(incomeStatement.expenses.beneficiaries)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between items-center pt-2 border-t-2 font-semibold">
               <span>إجمالي المصروفات</span>
               <span className="font-mono text-destructive text-lg">
@@ -166,13 +192,17 @@ export function EnhancedIncomeStatement() {
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-xl font-bold">صافي الدخل</h3>
-              <p className="text-sm text-muted-foreground">هامش الربح: {profitMargin.toFixed(2)}%</p>
+              <p className="text-sm text-muted-foreground">
+                هامش الربح: {profitMargin.toFixed(2)}%
+              </p>
             </div>
             <div className="text-left">
-              <span className={`font-mono font-bold text-2xl ${
-                incomeStatement.netIncome >= 0 ? "text-success" : "text-destructive"
-              }`}>
-                {incomeStatement.netIncome >= 0 ? "+" : "-"}
+              <span
+                className={`font-mono font-bold text-2xl ${
+                  incomeStatement.netIncome >= 0 ? 'text-success' : 'text-destructive'
+                }`}
+              >
+                {incomeStatement.netIncome >= 0 ? '+' : '-'}
                 {formatNumber(Math.abs(incomeStatement.netIncome))}
               </span>
               <p className="text-xs text-muted-foreground mt-1">ريال سعودي</p>
@@ -188,18 +218,21 @@ export function EnhancedIncomeStatement() {
               {((incomeStatement.expenses.total / incomeStatement.revenue.total) * 100).toFixed(1)}%
             </p>
           </Card>
-          
+
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">العائد على الإيرادات</p>
-            <p className="text-2xl font-bold text-success">
-              {profitMargin.toFixed(1)}%
-            </p>
+            <p className="text-2xl font-bold text-success">{profitMargin.toFixed(1)}%</p>
           </Card>
-          
+
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">كفاءة التشغيل</p>
             <p className="text-2xl font-bold">
-              {((incomeStatement.revenue.total - incomeStatement.expenses.operational) / incomeStatement.revenue.total * 100).toFixed(1)}%
+              {(
+                ((incomeStatement.revenue.total - incomeStatement.expenses.operational) /
+                  incomeStatement.revenue.total) *
+                100
+              ).toFixed(1)}
+              %
             </p>
           </Card>
         </div>

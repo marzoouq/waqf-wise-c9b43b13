@@ -1,12 +1,19 @@
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileText, Trash2, Eye } from "lucide-react";
-import { DocumentUploadDialog } from "../DocumentUploadDialog";
-import { useBeneficiaryDocuments } from "@/hooks/beneficiary/useBeneficiaryTabsData";
-import { format, arLocale as ar } from "@/lib/date";
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Upload, FileText, Trash2, Eye } from 'lucide-react';
+import { DocumentUploadDialog } from '../DocumentUploadDialog';
+import { useBeneficiaryDocuments } from '@/hooks/beneficiary/useBeneficiaryTabsData';
+import { format, arLocale as ar } from '@/lib/date';
 
 interface BeneficiaryDocumentsTabProps {
   beneficiaryId: string;
@@ -15,13 +22,13 @@ interface BeneficiaryDocumentsTabProps {
 export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsTabProps) {
   const queryClient = useQueryClient();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  
-  const { 
-    data: documents = [], 
-    isLoading, 
-    deleteDocument, 
-    isDeleting, 
-    viewDocument 
+
+  const {
+    data: documents = [],
+    isLoading,
+    deleteDocument,
+    isDeleting,
+    viewDocument,
   } = useBeneficiaryDocuments(beneficiaryId);
 
   return (
@@ -52,7 +59,9 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">جاري التحميل...</TableCell>
+                    <TableCell colSpan={5} className="text-center">
+                      جاري التحميل...
+                    </TableCell>
                   </TableRow>
                 ) : documents.length === 0 ? (
                   <TableRow>
@@ -69,10 +78,11 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
                       </TableCell>
                       <TableCell>{doc.file_type}</TableCell>
                       <TableCell>
-                        {doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : "—"}
+                        {doc.file_size ? `${(doc.file_size / 1024).toFixed(2)} KB` : '—'}
                       </TableCell>
                       <TableCell>
-                        {doc.created_at && format(new Date(doc.created_at), "dd/MM/yyyy", { locale: ar })}
+                        {doc.created_at &&
+                          format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar })}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -107,7 +117,7 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
         onUploadComplete={() => {
-          queryClient.invalidateQueries({ queryKey: ["beneficiary-documents"] });
+          queryClient.invalidateQueries({ queryKey: ['beneficiary-documents'] });
         }}
       />
     </div>

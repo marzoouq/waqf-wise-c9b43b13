@@ -3,10 +3,10 @@
  * @version 2.8.65
  */
 
-import React, { useState } from "react";
-import { SettingsService } from "@/services/settings.service";
-import { toast } from "sonner";
-import { CheckCircle } from "lucide-react";
+import React, { useState } from 'react';
+import { SettingsService } from '@/services/settings.service';
+import { toast } from 'sonner';
+import { CheckCircle } from 'lucide-react';
 
 interface ZATCASettingsState {
   enabled: boolean;
@@ -19,15 +19,15 @@ interface ZATCASettingsState {
 export function useZATCASettings() {
   const [settings, setSettings] = useState<ZATCASettingsState>({
     enabled: false,
-    organizationId: "",
-    vatNumber: "",
-    apiKey: "",
+    organizationId: '',
+    vatNumber: '',
+    apiKey: '',
     testMode: true,
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const updateSettings = (updates: Partial<ZATCASettingsState>) => {
-    setSettings(prev => ({ ...prev, ...updates }));
+    setSettings((prev) => ({ ...prev, ...updates }));
   };
 
   const saveSettings = async () => {
@@ -40,14 +40,14 @@ export function useZATCASettings() {
         { key: 'zatca_api_key', value: settings.apiKey },
         { key: 'zatca_test_mode', value: settings.testMode ? 'true' : 'false' },
       ]);
-      
-      toast.success("تم حفظ الإعدادات", {
-        description: "تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح",
+
+      toast.success('تم حفظ الإعدادات', {
+        description: 'تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح',
       });
       return true;
     } catch {
-      toast.error("خطأ في الحفظ", {
-        description: "تعذر حفظ الإعدادات. الرجاء المحاولة مرة أخرى.",
+      toast.error('خطأ في الحفظ', {
+        description: 'تعذر حفظ الإعدادات. الرجاء المحاولة مرة أخرى.',
       });
       return false;
     } finally {
@@ -56,22 +56,22 @@ export function useZATCASettings() {
   };
 
   const testConnection = async () => {
-    toast.info("جاري الاختبار...", {
-      description: "يتم التحقق من الاتصال بخدمة الهيئة",
+    toast.info('جاري الاختبار...', {
+      description: 'يتم التحقق من الاتصال بخدمة الهيئة',
     });
 
     // محاكاة اختبار الاتصال
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     if (settings.apiKey && settings.organizationId) {
-      toast.success("نجح الاتصال", {
-        description: "تم التحقق من الاتصال بنجاح",
-        icon: React.createElement(CheckCircle, { className: "h-5 w-5 text-success" }),
+      toast.success('نجح الاتصال', {
+        description: 'تم التحقق من الاتصال بنجاح',
+        icon: React.createElement(CheckCircle, { className: 'h-5 w-5 text-success' }),
       });
       return true;
     } else {
-      toast.error("فشل الاتصال", {
-        description: "الرجاء التحقق من البيانات المدخلة",
+      toast.error('فشل الاتصال', {
+        description: 'الرجاء التحقق من البيانات المدخلة',
       });
       return false;
     }

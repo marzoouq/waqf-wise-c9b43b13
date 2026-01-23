@@ -11,7 +11,9 @@ export class BeneficiaryDocumentsService {
   /**
    * جلب مستندات المستفيد
    */
-  static async getDocuments(beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_attachments']['Row'][]> {
+  static async getDocuments(
+    beneficiaryId: string
+  ): Promise<Database['public']['Tables']['beneficiary_attachments']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('beneficiary_attachments')
@@ -31,21 +33,22 @@ export class BeneficiaryDocumentsService {
    * رفع مستند للمستفيد
    */
   static async uploadDocument(
-    beneficiaryId: string, 
-    file: File, 
-    fileType: string, 
+    beneficiaryId: string,
+    file: File,
+    fileType: string,
     description?: string
   ): Promise<Database['public']['Tables']['beneficiary_attachments']['Row']> {
     try {
       // ⚠️ المسار يجب أن يبدأ بـ beneficiaryId مباشرة حتى يتطابق مع سياسة RLS
       // لأن السياسة تتحقق من: (storage.foldername(name))[1]::uuid = beneficiary_id
-      const uniqueId = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-      
+      const uniqueId =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
       const filePath = `${beneficiaryId}/${uniqueId}.${fileExt}`;
-      
+
       const { error: uploadError } = await supabase.storage
         .from('beneficiary-documents')
         .upload(filePath, file);
@@ -54,15 +57,17 @@ export class BeneficiaryDocumentsService {
 
       const { data, error } = await supabase
         .from('beneficiary_attachments')
-        .insert([{
-          beneficiary_id: beneficiaryId,
-          file_name: file.name,
-          file_path: filePath,
-          file_type: fileType,
-          file_size: file.size,
-          mime_type: file.type,
-          description,
-        }])
+        .insert([
+          {
+            beneficiary_id: beneficiaryId,
+            file_name: file.name,
+            file_path: filePath,
+            file_type: fileType,
+            file_size: file.size,
+            mime_type: file.type,
+            description,
+          },
+        ])
         .select()
         .maybeSingle();
 
@@ -87,9 +92,7 @@ export class BeneficiaryDocumentsService {
         .maybeSingle();
 
       if (doc?.file_path) {
-        await supabase.storage
-          .from('beneficiary-documents')
-          .remove([doc.file_path]);
+        await supabase.storage.from('beneficiary-documents').remove([doc.file_path]);
       }
 
       const { error } = await supabase
@@ -107,7 +110,9 @@ export class BeneficiaryDocumentsService {
   /**
    * جلب سجل نشاط المستفيد
    */
-  static async getActivity(beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_activity_log']['Row'][]> {
+  static async getActivity(
+    beneficiaryId: string
+  ): Promise<Database['public']['Tables']['beneficiary_activity_log']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('beneficiary_activity_log')
@@ -127,7 +132,9 @@ export class BeneficiaryDocumentsService {
   /**
    * جلب الحسابات البنكية للمستفيد
    */
-  static async getBankAccounts(beneficiaryId: string): Promise<{ iban: string; bank_name: string; account_number: string }[]> {
+  static async getBankAccounts(
+    beneficiaryId: string
+  ): Promise<{ iban: string; bank_name: string; account_number: string }[]> {
     try {
       const { data, error } = await supabase
         .from('beneficiaries')
@@ -136,14 +143,16 @@ export class BeneficiaryDocumentsService {
         .maybeSingle();
 
       if (error) throw error;
-      
+
       if (!data?.iban) return [];
-      
-      return [{
-        iban: data.iban,
-        bank_name: data.bank_name || '',
-        account_number: data.bank_account_number || '',
-      }];
+
+      return [
+        {
+          iban: data.iban,
+          bank_name: data.bank_name || '',
+          account_number: data.bank_account_number || '',
+        },
+      ];
     } catch (error) {
       productionLogger.error('Error fetching bank accounts', error);
       throw error;

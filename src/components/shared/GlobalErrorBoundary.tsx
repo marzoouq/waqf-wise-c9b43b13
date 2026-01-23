@@ -5,11 +5,11 @@ import { AlertTriangle, RefreshCcw, Home, Trash2, Wifi, Download, X } from 'luci
 import { logger } from '@/lib/logger';
 import { logErrorToSupport } from '@/hooks/system/useGlobalErrorLogging';
 import { clearAllCaches } from '@/lib/clearCache';
-import { 
-  isChunkLoadError, 
-  getChunkErrorInfo, 
+import {
+  isChunkLoadError,
+  getChunkErrorInfo,
   logChunkError,
-  type ChunkErrorType 
+  type ChunkErrorType,
 } from '@/lib/errors/chunk-error-handler';
 
 interface Props {
@@ -36,7 +36,7 @@ const AUTO_RELOAD_DELAY = 3; // seconds
 export class GlobalErrorBoundary extends Component<Props, State> {
   private autoReloadTimeout: ReturnType<typeof setTimeout> | null = null;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
-  
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -54,7 +54,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): Partial<State> {
     const isChunk = isChunkLoadError(error);
     const errorInfo = isChunk ? getChunkErrorInfo(error) : null;
-    
+
     return {
       hasError: true,
       error,
@@ -65,23 +65,23 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const isChunk = isChunkLoadError(error);
     const chunkErrorInfo = isChunk ? getChunkErrorInfo(error) : null;
-    
+
     // Log using unified handler
     if (isChunk) {
       logChunkError(error, { component: 'GlobalErrorBoundary' });
     }
-    
+
     // تسجيل الخطأ
-    logger.error(error, { 
-      context: 'global_error_boundary', 
+    logger.error(error, {
+      context: 'global_error_boundary',
       severity: isChunk ? 'warning' : 'critical',
-      metadata: { 
-        errorInfo, 
+      metadata: {
+        errorInfo,
         errorCount: this.state.errorCount + 1,
-        errorType: chunkErrorInfo?.type || 'runtime_error'
-      }
+        errorType: chunkErrorInfo?.type || 'runtime_error',
+      },
     });
-    
+
     this.setState((prevState) => ({
       errorInfo,
       errorCount: prevState.errorCount + 1,
@@ -90,8 +90,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
     // إذا كان خطأ Chunk، جرب إعادة التحميل تلقائياً
     if (isChunk && chunkErrorInfo?.shouldReload) {
-      const reloadCount = parseInt(sessionStorage.getItem('dynamic_import_reload_count') || '0', 10);
-      
+      const reloadCount = parseInt(
+        sessionStorage.getItem('dynamic_import_reload_count') || '0',
+        10
+      );
+
       if (reloadCount < 2) {
         sessionStorage.setItem('dynamic_import_reload_count', String(reloadCount + 1));
         this.startAutoReload();
@@ -107,14 +110,14 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   startAutoReload = () => {
-    this.setState({ 
-      isAutoReloading: true, 
-      autoReloadCountdown: AUTO_RELOAD_DELAY 
+    this.setState({
+      isAutoReloading: true,
+      autoReloadCountdown: AUTO_RELOAD_DELAY,
     });
-    
+
     // Countdown
     this.countdownInterval = setInterval(() => {
-      this.setState(prev => {
+      this.setState((prev) => {
         const newCount = prev.autoReloadCountdown - 1;
         if (newCount <= 0) {
           this.handleHardRefresh();
@@ -133,7 +136,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   handleReset = () => {
     if (this.autoReloadTimeout) clearTimeout(this.autoReloadTimeout);
     if (this.countdownInterval) clearInterval(this.countdownInterval);
-    
+
     this.setState({
       hasError: false,
       error: null,
@@ -146,7 +149,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   handleHardRefresh = async () => {
     this.setState({ isClearing: true });
-    
+
     try {
       await clearAllCaches();
       localStorage.removeItem('waqf_app_version');
@@ -170,42 +173,42 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   getErrorMessage = (): { title: string; description: string } => {
     const { errorType, error } = this.state;
-    
+
     if (errorType && error) {
       const info = getChunkErrorInfo(error);
-      
+
       switch (errorType) {
         case 'update':
           return {
             title: 'جاري تحديث التطبيق...',
-            description: info.userMessage
+            description: info.userMessage,
           };
         case 'network':
           return {
             title: 'مشكلة في الاتصال',
-            description: info.userMessage
+            description: info.userMessage,
           };
         case 'server':
           return {
             title: 'خطأ في الخادم',
-            description: info.userMessage
+            description: info.userMessage,
           };
         case 'timeout':
           return {
             title: 'انتهت مهلة التحميل',
-            description: info.userMessage
+            description: info.userMessage,
           };
         default:
           return {
             title: 'فشل تحميل الصفحة',
-            description: info.userMessage
+            description: info.userMessage,
           };
       }
     }
-    
+
     return {
       title: 'حدث خطأ غير متوقع',
-      description: 'نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.'
+      description: 'نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.',
     };
   };
 
@@ -214,14 +217,16 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       const { errorType, isAutoReloading, autoReloadCountdown, isClearing } = this.state;
       const isChunk = errorType !== null;
       const { title, description } = this.getErrorMessage();
-      
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <Card className="max-w-2xl w-full">
             <CardHeader className="text-center">
-              <div className={`mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
-                isChunk ? 'bg-warning/10' : 'bg-destructive/10'
-              }`}>
+              <div
+                className={`mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
+                  isChunk ? 'bg-warning/10' : 'bg-destructive/10'
+                }`}
+              >
                 {isChunk ? (
                   <Download className="w-6 h-6 text-warning" />
                 ) : (
@@ -247,10 +252,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <div className="bg-warning/10 p-4 rounded-lg text-center">
                   <Wifi className="w-8 h-8 mx-auto mb-2 text-warning" />
                   <p className="text-sm text-warning-foreground">
-                    {errorType === 'network' 
+                    {errorType === 'network'
                       ? 'تحقق من اتصالك بالإنترنت'
-                      : 'يبدو أن هناك تحديث جديد للتطبيق'
-                    }
+                      : 'يبدو أن هناك تحديث جديد للتطبيق'}
                   </p>
                 </div>
               )}
@@ -294,8 +298,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               {/* أزرار الإجراءات */}
               <div className="flex flex-col gap-3">
                 {isAutoReloading ? (
-                  <Button 
-                    onClick={this.handleCancelAutoReload} 
+                  <Button
+                    onClick={this.handleCancelAutoReload}
                     variant="outline"
                     className="w-full gap-2"
                   >
@@ -304,8 +308,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                   </Button>
                 ) : (
                   <>
-                    <Button 
-                      onClick={this.handleHardRefresh} 
+                    <Button
+                      onClick={this.handleHardRefresh}
                       className="w-full gap-2 bg-primary hover:bg-primary/90"
                       disabled={isClearing}
                     >
@@ -317,19 +321,19 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                       {isClearing ? 'جاري المسح...' : 'مسح ذاكرة التخزين وإعادة التحميل'}
                     </Button>
                     <div className="flex gap-3 justify-center pt-2">
-                      <Button 
-                        onClick={this.handleReset} 
-                        variant="outline" 
-                        size="lg" 
+                      <Button
+                        onClick={this.handleReset}
+                        variant="outline"
+                        size="lg"
                         disabled={isClearing}
                       >
                         <RefreshCcw className="w-4 h-4 ms-2" />
                         إعادة المحاولة
                       </Button>
-                      <Button 
-                        onClick={this.handleGoHome} 
-                        variant="ghost" 
-                        size="lg" 
+                      <Button
+                        onClick={this.handleGoHome}
+                        variant="ghost"
+                        size="lg"
                         disabled={isClearing}
                       >
                         <Home className="w-4 h-4 ms-2" />

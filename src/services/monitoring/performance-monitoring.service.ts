@@ -3,7 +3,7 @@
  * خدمة مراقبة الأداء الحي
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface LivePerformanceStats {
   requests: number;
@@ -18,24 +18,21 @@ export const PerformanceMonitoringService = {
   async getLiveStats(): Promise<LivePerformanceStats> {
     const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-    const [
-      { count: requestsCount },
-      { count: errorsCount },
-      { count: usersCount },
-    ] = await Promise.all([
-      supabase
-        .from("audit_logs")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", hourAgo),
-      supabase
-        .from("system_error_logs")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", hourAgo),
-      supabase
-        .from("beneficiary_sessions")
-        .select("*", { count: "exact", head: true })
-        .eq("is_online", true),
-    ]);
+    const [{ count: requestsCount }, { count: errorsCount }, { count: usersCount }] =
+      await Promise.all([
+        supabase
+          .from('audit_logs')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', hourAgo),
+        supabase
+          .from('system_error_logs')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', hourAgo),
+        supabase
+          .from('beneficiary_sessions')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_online', true),
+      ]);
 
     return {
       requests: requestsCount || 0,

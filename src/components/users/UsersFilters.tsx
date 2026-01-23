@@ -2,20 +2,26 @@
  * UsersFilters Component
  * مكون فلترة المستخدمين - البحث والتصفية حسب الدور والنوع
  * @version 2.9.15
- * 
+ *
  * التحسينات:
  * - إضافة تبويبات لفصل المشرفين عن المستفيدين
  */
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Search, Users, UserCheck } from "lucide-react";
-import { ROLE_LABELS } from "@/types/roles";
-import { useDebouncedSearch } from "@/hooks/ui/useDebouncedSearch";
-import { STAFF_ROLES, BENEFICIARY_ROLES, type UserTypeFilter } from "@/hooks/users/useUsersFilter";
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Search, Users, UserCheck } from 'lucide-react';
+import { ROLE_LABELS } from '@/types/roles';
+import { useDebouncedSearch } from '@/hooks/ui/useDebouncedSearch';
+import { STAFF_ROLES, BENEFICIARY_ROLES, type UserTypeFilter } from '@/hooks/users/useUsersFilter';
 
 interface UsersFiltersProps {
   searchTerm: string;
@@ -47,11 +53,11 @@ export function UsersFilters({
     <Card>
       <CardContent className="pt-6 space-y-4">
         {/* تبويبات فصل المشرفين عن المستفيدين */}
-        <Tabs 
-          value={userTypeFilter} 
+        <Tabs
+          value={userTypeFilter}
           onValueChange={(val) => {
             onUserTypeFilterChange(val as UserTypeFilter);
-            onRoleFilterChange("all"); // إعادة تعيين فلتر الدور عند تغيير التبويب
+            onRoleFilterChange('all'); // إعادة تعيين فلتر الدور عند تغيير التبويب
           }}
           className="w-full"
         >

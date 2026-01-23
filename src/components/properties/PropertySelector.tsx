@@ -1,25 +1,22 @@
-import { memo } from "react";
-import { Building2 } from "lucide-react";
+import { memo } from 'react';
+import { Building2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useProperties } from "@/hooks/property/useProperties";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorState } from "@/components/shared/ErrorState";
+} from '@/components/ui/select';
+import { useProperties } from '@/hooks/property/useProperties';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface PropertySelectorProps {
   selectedPropertyId: string;
   onSelect: (propertyId: string) => void;
 }
 
-export const PropertySelector = memo(({
-  selectedPropertyId,
-  onSelect,
-}: PropertySelectorProps) => {
+export const PropertySelector = memo(({ selectedPropertyId, onSelect }: PropertySelectorProps) => {
   const { properties, isLoading, error, refetch } = useProperties();
 
   if (isLoading) {
@@ -27,7 +24,13 @@ export const PropertySelector = memo(({
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل العقارات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل العقارات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -54,7 +57,7 @@ export const PropertySelector = memo(({
       </div>
       {selectedPropertyId && (
         <span className="text-sm text-muted-foreground hidden md:block">
-          {properties.find(p => p.id === selectedPropertyId)?.units || 0} وحدة
+          {properties.find((p) => p.id === selectedPropertyId)?.units || 0} وحدة
         </span>
       )}
     </div>

@@ -2,10 +2,10 @@
  * useRequestAttachments Hook - مرفقات الطلبات
  * يستخدم RequestService
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { RequestService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { RequestService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface RequestAttachment {
   id: string;
@@ -31,32 +31,32 @@ export function useRequestAttachments(requestId?: string) {
 
   const uploadAttachment = useMutation({
     mutationFn: async ({ file, description }: { file: File; description?: string }) => {
-      if (!requestId) throw new Error("Request ID is required");
+      if (!requestId) throw new Error('Request ID is required');
       return RequestService.uploadAttachment(requestId, file, description);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
-      toast({ title: "تم رفع المرفق", description: "تم رفع المرفق بنجاح" });
+      toast({ title: 'تم رفع المرفق', description: 'تم رفع المرفق بنجاح' });
     },
     onError: (error: Error) => {
-      toast({ title: "خطأ في الرفع", description: error.message, variant: "destructive" });
+      toast({ title: 'خطأ في الرفع', description: error.message, variant: 'destructive' });
     },
   });
 
   const deleteAttachment = useMutation({
     mutationFn: async (attachmentId: string) => {
       const attachment = attachments.find((a) => a.id === attachmentId);
-      if (!attachment) throw new Error("Attachment not found");
+      if (!attachment) throw new Error('Attachment not found');
       return RequestService.deleteAttachment(attachmentId, attachment.file_path, requestId!);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
-      toast({ title: "تم الحذف", description: "تم حذف المرفق بنجاح" });
+      toast({ title: 'تم الحذف', description: 'تم حذف المرفق بنجاح' });
     },
     onError: (error: Error) => {
-      toast({ title: "خطأ في الحذف", description: error.message, variant: "destructive" });
+      toast({ title: 'خطأ في الحذف', description: error.message, variant: 'destructive' });
     },
   });
 

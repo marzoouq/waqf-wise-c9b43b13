@@ -1,14 +1,22 @@
 /**
  * نظام تصدير كشف حساب المستفيد الاحترافي
  * Professional Beneficiary Statement PDF Export
- * 
+ *
  * @version 2.9.75
  * @description تم تحويل الاستيرادات إلى Dynamic Import لتحسين الأداء
  */
 
-import type jsPDF from "jspdf";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles, processArabicText, formatCurrencyForPDF } from "./arabic-pdf-utils";
-import { logger } from "@/lib/logger";
+import type jsPDF from 'jspdf';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  WAQF_COLORS,
+  getDefaultTableStyles,
+  processArabicText,
+  formatCurrencyForPDF,
+} from './arabic-pdf-utils';
+import { logger } from '@/lib/logger';
 
 // Type extension for jsPDF with autoTable
 interface JsPDFWithAutoTable extends jsPDF {
@@ -57,58 +65,61 @@ interface ExportOptions {
  */
 export const exportBeneficiaryStatementPDF = async (options: ExportOptions): Promise<void> => {
   const { beneficiary, payments, summary, dateRange } = options;
-  
+
   try {
     // ✅ Dynamic Import - يُحمّل عند الحاجة فقط
     const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
       import('jspdf'),
-      import('jspdf-autotable')
+      import('jspdf-autotable'),
     ]);
-    
+
     const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
     });
 
     // تحميل الخط العربي
     const fontName = await loadArabicFontToPDF(doc);
-    
+
     // إضافة ترويسة الوقف
-    let yPosition = addWaqfHeader(doc, fontName, "كشف حساب المستفيد");
-    
+    let yPosition = addWaqfHeader(doc, fontName, 'كشف حساب المستفيد');
+
     const pageWidth = doc.internal.pageSize.width;
-    
+
     // معلومات المستفيد
     yPosition = addBeneficiaryInfo(doc, fontName, beneficiary, yPosition, pageWidth);
-    
+
     // الفترة الزمنية (إن وجدت)
     if (dateRange) {
       yPosition = addDateRange(doc, fontName, dateRange, yPosition, pageWidth);
     }
-    
+
     // ملخص الحساب
     yPosition = addAccountSummary(doc, fontName, summary, yPosition, pageWidth);
-    
+
     // جدول المدفوعات
     if (payments.length > 0) {
       yPosition = addPaymentsTable(doc, fontName, payments, yPosition, autoTable);
     } else {
-      doc.setFont(fontName, "normal");
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(12);
       doc.setTextColor(...WAQF_COLORS.muted);
-      doc.text(processArabicText("لا توجد مدفوعات في هذه الفترة"), pageWidth / 2, yPosition + 10, { align: "center" });
+      doc.text(processArabicText('لا توجد مدفوعات في هذه الفترة'), pageWidth / 2, yPosition + 10, {
+        align: 'center',
+      });
     }
-    
+
     // إضافة تذييل الوقف
     addWaqfFooter(doc, fontName);
-    
+
     // حفظ الملف
     const fileName = `كشف_حساب_${beneficiary.full_name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
-    
-    logger.info(`Beneficiary statement PDF exported: ${beneficiary.national_id}, payments: ${payments.length}`);
-    
+
+    logger.info(
+      `Beneficiary statement PDF exported: ${beneficiary.national_id}, payments: ${payments.length}`
+    );
   } catch (error) {
     logger.error(error, { context: 'export_beneficiary_statement_pdf', severity: 'medium' });
     throw new Error('فشل في تصدير كشف الحساب');
@@ -119,61 +130,76 @@ export const exportBeneficiaryStatementPDF = async (options: ExportOptions): Pro
  * إضافة معلومات المستفيد
  */
 const addBeneficiaryInfo = (
-  doc: jsPDF, 
-  fontName: string, 
-  beneficiary: BeneficiaryInfo, 
+  doc: jsPDF,
+  fontName: string,
+  beneficiary: BeneficiaryInfo,
   startY: number,
   pageWidth: number
 ): number => {
   let yPosition = startY;
-  
+
   // إطار معلومات المستفيد
   doc.setDrawColor(...WAQF_COLORS.primary);
   doc.setFillColor(249, 250, 251);
   doc.roundedRect(15, yPosition, pageWidth - 30, 35, 3, 3, 'FD');
-  
+
   yPosition += 8;
-  
-  doc.setFont(fontName, "bold");
+
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...WAQF_COLORS.text);
-  doc.text(processArabicText("معلومات المستفيد"), pageWidth - 20, yPosition, { align: "right" });
-  
+  doc.text(processArabicText('معلومات المستفيد'), pageWidth - 20, yPosition, { align: 'right' });
+
   yPosition += 7;
-  
-  doc.setFont(fontName, "normal");
+
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
-  
+
   // الاسم
-  doc.text(processArabicText(`الاسم: ${beneficiary.full_name}`), pageWidth - 20, yPosition, { align: "right" });
-  
+  doc.text(processArabicText(`الاسم: ${beneficiary.full_name}`), pageWidth - 20, yPosition, {
+    align: 'right',
+  });
+
   // رقم الهوية
-  doc.text(processArabicText(`رقم الهوية: ${beneficiary.national_id}`), pageWidth / 2, yPosition, { align: "right" });
-  
+  doc.text(processArabicText(`رقم الهوية: ${beneficiary.national_id}`), pageWidth / 2, yPosition, {
+    align: 'right',
+  });
+
   yPosition += 6;
-  
+
   // رقم الجوال
   if (beneficiary.phone) {
-    doc.text(processArabicText(`الجوال: ${beneficiary.phone}`), pageWidth - 20, yPosition, { align: "right" });
+    doc.text(processArabicText(`الجوال: ${beneficiary.phone}`), pageWidth - 20, yPosition, {
+      align: 'right',
+    });
   }
-  
+
   // التصنيف
   if (beneficiary.category) {
-    doc.text(processArabicText(`التصنيف: ${beneficiary.category}`), pageWidth / 2, yPosition, { align: "right" });
+    doc.text(processArabicText(`التصنيف: ${beneficiary.category}`), pageWidth / 2, yPosition, {
+      align: 'right',
+    });
   }
-  
+
   yPosition += 6;
-  
+
   // الحالة
   if (beneficiary.status) {
-    doc.text(processArabicText(`الحالة: ${beneficiary.status}`), pageWidth - 20, yPosition, { align: "right" });
+    doc.text(processArabicText(`الحالة: ${beneficiary.status}`), pageWidth - 20, yPosition, {
+      align: 'right',
+    });
   }
-  
+
   // رقم المستفيد
   if (beneficiary.beneficiary_number) {
-    doc.text(processArabicText(`رقم المستفيد: ${beneficiary.beneficiary_number}`), pageWidth / 2, yPosition, { align: "right" });
+    doc.text(
+      processArabicText(`رقم المستفيد: ${beneficiary.beneficiary_number}`),
+      pageWidth / 2,
+      yPosition,
+      { align: 'right' }
+    );
   }
-  
+
   return startY + 42;
 };
 
@@ -181,22 +207,22 @@ const addBeneficiaryInfo = (
  * إضافة الفترة الزمنية
  */
 const addDateRange = (
-  doc: jsPDF, 
-  fontName: string, 
-  dateRange: { from: string; to: string }, 
+  doc: jsPDF,
+  fontName: string,
+  dateRange: { from: string; to: string },
   startY: number,
   pageWidth: number
 ): number => {
-  doc.setFont(fontName, "normal");
+  doc.setFont(fontName, 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...WAQF_COLORS.muted);
   doc.text(
-    processArabicText(`الفترة من ${dateRange.from} إلى ${dateRange.to}`), 
-    pageWidth / 2, 
-    startY, 
-    { align: "center" }
+    processArabicText(`الفترة من ${dateRange.from} إلى ${dateRange.to}`),
+    pageWidth / 2,
+    startY,
+    { align: 'center' }
   );
-  
+
   return startY + 8;
 };
 
@@ -204,55 +230,68 @@ const addDateRange = (
  * إضافة ملخص الحساب
  */
 const addAccountSummary = (
-  doc: jsPDF, 
-  fontName: string, 
-  summary: StatementSummary, 
+  doc: jsPDF,
+  fontName: string,
+  summary: StatementSummary,
   startY: number,
   pageWidth: number
 ): number => {
   let yPosition = startY;
-  
-  doc.setFont(fontName, "bold");
+
+  doc.setFont(fontName, 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...WAQF_COLORS.text);
-  doc.text(processArabicText("ملخص الحساب"), pageWidth / 2, yPosition, { align: "center" });
-  
+  doc.text(processArabicText('ملخص الحساب'), pageWidth / 2, yPosition, { align: 'center' });
+
   yPosition += 8;
-  
+
   // صناديق الملخص
   const boxWidth = (pageWidth - 40) / 4;
   const boxHeight = 20;
   const startX = 15;
-  
+
   const summaryItems = [
-    { label: "إجمالي المستلم", value: summary.total_received, color: WAQF_COLORS.primary },
-    { label: "المبلغ المعلق", value: summary.total_pending, color: [234, 179, 8] as [number, number, number] },
-    { label: "رصيد الحساب", value: summary.account_balance, color: [59, 130, 246] as [number, number, number] },
-    { label: "عدد المدفوعات", value: summary.total_payments, isCount: true, color: WAQF_COLORS.muted },
+    { label: 'إجمالي المستلم', value: summary.total_received, color: WAQF_COLORS.primary },
+    {
+      label: 'المبلغ المعلق',
+      value: summary.total_pending,
+      color: [234, 179, 8] as [number, number, number],
+    },
+    {
+      label: 'رصيد الحساب',
+      value: summary.account_balance,
+      color: [59, 130, 246] as [number, number, number],
+    },
+    {
+      label: 'عدد المدفوعات',
+      value: summary.total_payments,
+      isCount: true,
+      color: WAQF_COLORS.muted,
+    },
   ];
-  
+
   summaryItems.forEach((item, index) => {
-    const x = startX + (index * (boxWidth + 5));
-    
+    const x = startX + index * (boxWidth + 5);
+
     // الإطار
     doc.setDrawColor(...item.color);
     doc.setFillColor(255, 255, 255);
     doc.roundedRect(x, yPosition, boxWidth, boxHeight, 2, 2, 'FD');
-    
+
     // العنوان
-    doc.setFont(fontName, "normal");
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...WAQF_COLORS.muted);
-    doc.text(processArabicText(item.label), x + boxWidth / 2, yPosition + 6, { align: "center" });
-    
+    doc.text(processArabicText(item.label), x + boxWidth / 2, yPosition + 6, { align: 'center' });
+
     // القيمة
-    doc.setFont(fontName, "bold");
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(10);
     doc.setTextColor(...item.color);
     const valueText = item.isCount ? String(item.value) : formatCurrencyForPDF(item.value);
-    doc.text(processArabicText(valueText), x + boxWidth / 2, yPosition + 14, { align: "center" });
+    doc.text(processArabicText(valueText), x + boxWidth / 2, yPosition + 14, { align: 'center' });
   });
-  
+
   return yPosition + boxHeight + 10;
 };
 
@@ -260,14 +299,14 @@ const addAccountSummary = (
  * إضافة جدول المدفوعات
  */
 const addPaymentsTable = (
-  doc: jsPDF, 
-  fontName: string, 
-  payments: Payment[], 
+  doc: jsPDF,
+  fontName: string,
+  payments: Payment[],
   startY: number,
   autoTable: typeof import('jspdf-autotable').default
 ): number => {
   const tableStyles = getDefaultTableStyles(fontName);
-  
+
   // تحويل البيانات للجدول - مع معالجة النصوص العربية
   const tableData = payments.map((payment, index) => [
     processArabicText(payment.status === 'completed' || payment.status === 'مكتمل' ? '✓' : '○'),
@@ -277,17 +316,17 @@ const addPaymentsTable = (
     processArabicText(new Date(payment.payment_date).toLocaleDateString('ar-SA')),
     processArabicText(String(index + 1)),
   ]);
-  
+
   // معالجة رؤوس الجدول
   const headers = [
-    processArabicText('الحالة'), 
-    processArabicText('المبلغ'), 
-    processArabicText('طريقة الدفع'), 
-    processArabicText('المصدر'), 
-    processArabicText('التاريخ'), 
-    processArabicText('#')
+    processArabicText('الحالة'),
+    processArabicText('المبلغ'),
+    processArabicText('طريقة الدفع'),
+    processArabicText('المصدر'),
+    processArabicText('التاريخ'),
+    processArabicText('#'),
   ];
-  
+
   autoTable(doc, {
     startY: startY,
     head: [headers],
@@ -305,7 +344,7 @@ const addPaymentsTable = (
     didDrawPage: (data) => {
       // إضافة رقم الصفحة
       const pageCount = doc.getNumberOfPages();
-      doc.setFont(fontName, "normal");
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(8);
       doc.setTextColor(...WAQF_COLORS.muted);
       doc.text(
@@ -316,7 +355,7 @@ const addPaymentsTable = (
       );
     },
   });
-  
+
   // autoTable adds lastAutoTable property to the document
   return (doc as JsPDFWithAutoTable).lastAutoTable?.finalY || startY + 50;
 };

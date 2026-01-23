@@ -10,12 +10,12 @@ const FamiliesStats = () => {
   const { families, isLoading } = useFamilies();
   const navigate = useNavigate();
 
-  const activeFamilies = families.filter(f => matchesStatus(f.status, 'active'));
+  const activeFamilies = families.filter((f) => matchesStatus(f.status, 'active'));
   const totalMembers = families.reduce((sum, f) => sum + f.total_members, 0);
-  
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const newFamilies = families.filter(f => new Date(f.created_at) >= thirtyDaysAgo);
+  const newFamilies = families.filter((f) => new Date(f.created_at) >= thirtyDaysAgo);
 
   const stats = [
     {
@@ -61,7 +61,7 @@ const FamiliesStats = () => {
           </button>
         }
       />
-      
+
       <UnifiedStatsGrid columns={{ sm: 2, lg: 4 }}>
         {stats.map((stat) => (
           <UnifiedKPICard

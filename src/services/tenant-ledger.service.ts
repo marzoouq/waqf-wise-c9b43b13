@@ -6,7 +6,7 @@
  * تتبع نمط Component → Hook → Service → Supabase
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface TenantLedgerEntry {
   id: string;

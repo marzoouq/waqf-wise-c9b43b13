@@ -1,9 +1,9 @@
-import { UseFormReturn } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import type { ContractFormValues } from "../contractSchema";
+import { UseFormReturn } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import type { ContractFormValues } from '../contractSchema';
 
 interface Props {
   form: UseFormReturn<ContractFormValues>;
@@ -19,10 +19,7 @@ export function RenewalFields({ form }: Props) {
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2 space-x-reverse">
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <FormLabel className="!mt-0">قابل للتجديد</FormLabel>
             </FormItem>
@@ -35,10 +32,7 @@ export function RenewalFields({ form }: Props) {
           render={({ field }) => (
             <FormItem className="flex items-center space-x-2 space-x-reverse">
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <FormLabel className="!mt-0">تجديد تلقائي</FormLabel>
             </FormItem>

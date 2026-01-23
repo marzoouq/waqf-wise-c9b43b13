@@ -4,9 +4,9 @@
  * @version 2.8.44
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface UnifiedTransaction {
   source: string;
@@ -46,11 +46,11 @@ export function useUnifiedTransactions() {
 
   const calculateStats = (filteredTransactions: UnifiedTransaction[]): TransactionStats => {
     const totalIncome = filteredTransactions
-      .filter((t) => t.transaction_type === "قبض")
+      .filter((t) => t.transaction_type === 'قبض')
       .reduce((sum, t) => sum + t.amount, 0);
-    
+
     const totalExpense = filteredTransactions
-      .filter((t) => t.transaction_type === "صرف")
+      .filter((t) => t.transaction_type === 'صرف')
       .reduce((sum, t) => sum + t.amount, 0);
 
     return {

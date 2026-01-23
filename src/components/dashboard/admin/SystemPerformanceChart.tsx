@@ -1,10 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, RefreshCw } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { useSystemPerformanceMetrics } from "@/hooks/system/useSystemPerformanceMetrics";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, RefreshCw } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
+import { useSystemPerformanceMetrics } from '@/hooks/system/useSystemPerformanceMetrics';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 // استخراج الأنماط خارج المكون لتحسين الأداء
 const TOOLTIP_STYLE = {
@@ -42,10 +51,7 @@ export function SystemPerformanceChart() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ErrorState 
-            title="خطأ في تحميل بيانات الأداء"
-            onRetry={refetch}
-          />
+          <ErrorState title="خطأ في تحميل بيانات الأداء" onRetry={refetch} />
         </CardContent>
       </Card>
     );
@@ -58,12 +64,7 @@ export function SystemPerformanceChart() {
           <TrendingUp className="h-5 w-5" />
           أداء النظام (آخر 24 ساعة)
         </CardTitle>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => refetch()}
-          disabled={isFetching}
-        >
+        <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
         </Button>
       </CardHeader>
@@ -71,35 +72,32 @@ export function SystemPerformanceChart() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="time" 
+            <XAxis
+              dataKey="time"
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
             />
-            <YAxis 
-              className="text-xs"
-              tick={{ fill: 'hsl(var(--muted-foreground))' }}
-            />
+            <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="responseTime" 
-              stroke="hsl(var(--primary))" 
+            <Line
+              type="monotone"
+              dataKey="responseTime"
+              stroke="hsl(var(--primary))"
               name="وقت الاستجابة (ms)"
               strokeWidth={2}
             />
-            <Line 
-              type="monotone" 
-              dataKey="requests" 
-              stroke="hsl(var(--chart-2))" 
+            <Line
+              type="monotone"
+              dataKey="requests"
+              stroke="hsl(var(--chart-2))"
               name="الطلبات"
               strokeWidth={2}
             />
-            <Line 
-              type="monotone" 
-              dataKey="cpu" 
-              stroke="hsl(var(--chart-3))" 
+            <Line
+              type="monotone"
+              dataKey="cpu"
+              stroke="hsl(var(--chart-3))"
               name="استخدام CPU (%)"
               strokeWidth={2}
             />

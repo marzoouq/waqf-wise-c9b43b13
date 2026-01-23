@@ -12,18 +12,14 @@ export async function clearAllCaches(): Promise<void> {
     // مسح جميع الـ caches
     if ('caches' in window) {
       const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map(cacheName => caches.delete(cacheName))
-      );
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
       productionLogger.info(`🗑️ تم مسح ${cacheNames.length} cache`);
     }
-    
+
     // إلغاء تسجيل جميع Service Workers
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(
-        registrations.map(registration => registration.unregister())
-      );
+      await Promise.all(registrations.map((registration) => registration.unregister()));
       productionLogger.info(`🗑️ تم إلغاء تسجيل ${registrations.length} service worker`);
     }
   } catch (error) {
@@ -54,16 +50,12 @@ export async function clearOldCaches(): Promise<void> {
   if ('caches' in window) {
     try {
       const cacheNames = await caches.keys();
-      const oldCaches = cacheNames.filter(name => 
-        name.includes('workbox') || 
-        name.includes('cache') ||
-        name.includes('precache')
+      const oldCaches = cacheNames.filter(
+        (name) => name.includes('workbox') || name.includes('cache') || name.includes('precache')
       );
-      
-      await Promise.all(
-        oldCaches.map(cacheName => caches.delete(cacheName))
-      );
-      
+
+      await Promise.all(oldCaches.map((cacheName) => caches.delete(cacheName)));
+
       if (oldCaches.length > 0) {
         productionLogger.info(`🗑️ تم مسح ${oldCaches.length} cache قديم`);
       }
@@ -77,29 +69,23 @@ export async function clearOldCaches(): Promise<void> {
  * تنظيف ذكي - يحافظ على بيانات المستخدم الأساسية
  */
 export async function smartCacheClear(): Promise<void> {
-  const keysToPreserve = [
-    'waqf_app_version',
-    'theme',
-    'vite-ui-theme',
-    'language',
-    'i18nextLng',
-  ];
-  
+  const keysToPreserve = ['waqf_app_version', 'theme', 'vite-ui-theme', 'language', 'i18nextLng'];
+
   // حفظ البيانات المهمة
   const preserved: Record<string, string | null> = {};
-  keysToPreserve.forEach(key => {
+  keysToPreserve.forEach((key) => {
     preserved[key] = localStorage.getItem(key);
   });
-  
+
   // تنظيف كل شيء
   await clearAllCaches();
   localStorage.clear();
   sessionStorage.clear();
-  
+
   // استعادة البيانات المهمة
   Object.entries(preserved).forEach(([key, value]) => {
     if (value) localStorage.setItem(key, value);
   });
-  
+
   productionLogger.info('✅ تم التنظيف الذكي مع الحفاظ على الإعدادات');
 }

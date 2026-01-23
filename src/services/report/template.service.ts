@@ -2,10 +2,10 @@
  * Report Template Service - خدمة قوالب التقارير
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { logger } from "@/lib/logger";
-import type { ReportTemplate, ReportData, ReportFilters } from "@/types/reports/index";
-import type { Json } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
+import type { ReportTemplate, ReportData, ReportFilters } from '@/types/reports/index';
+import type { Json } from '@/integrations/supabase/types';
 
 export class ReportTemplateService {
   /**
@@ -14,7 +14,7 @@ export class ReportTemplateService {
   static async createTemplate(template: ReportTemplate) {
     try {
       const { data, error } = await supabase
-        .from("report_templates")
+        .from('report_templates')
         .insert([template])
         .select()
         .maybeSingle();
@@ -26,7 +26,7 @@ export class ReportTemplateService {
 
       return { success: true, data };
     } catch (error) {
-      logger.error(error, { context: "create_report_template", severity: "medium" });
+      logger.error(error, { context: 'create_report_template', severity: 'medium' });
       throw error;
     }
   }
@@ -37,12 +37,12 @@ export class ReportTemplateService {
   static async getTemplates(type?: string) {
     try {
       let query = supabase
-        .from("report_templates")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .from('report_templates')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (type) {
-        query = query.eq("report_type", type);
+        query = query.eq('report_type', type);
       }
 
       const { data, error } = await query;
@@ -51,7 +51,7 @@ export class ReportTemplateService {
 
       return { success: true, templates: data || [] };
     } catch (error) {
-      logger.error(error, { context: "get_report_templates", severity: "low" });
+      logger.error(error, { context: 'get_report_templates', severity: 'low' });
       throw error;
     }
   }
@@ -62,42 +62,42 @@ export class ReportTemplateService {
   static async generateReport(templateId: string, _customFilters?: ReportFilters) {
     try {
       const { data: template, error: templateError } = await supabase
-        .from("report_templates")
-        .select("*")
-        .eq("id", templateId)
+        .from('report_templates')
+        .select('*')
+        .eq('id', templateId)
         .maybeSingle();
 
       if (templateError) throw templateError;
-      if (!template) throw new Error("قالب التقرير غير موجود");
+      if (!template) throw new Error('قالب التقرير غير موجود');
 
       let reportData: ReportData[] = [];
-      
+
       switch (template.report_type) {
-        case "distributions": {
+        case 'distributions': {
           const { data: distributions } = await supabase
-            .from("distributions")
-            .select("*")
-            .order("distribution_date", { ascending: false })
+            .from('distributions')
+            .select('*')
+            .order('distribution_date', { ascending: false })
             .limit(100);
           reportData = distributions || [];
           break;
         }
 
-        case "beneficiaries": {
+        case 'beneficiaries': {
           const { data: beneficiaries } = await supabase
-            .from("beneficiaries")
-            .select("*")
-            .eq("status", "نشط")
-            .order("full_name");
+            .from('beneficiaries')
+            .select('*')
+            .eq('status', 'نشط')
+            .order('full_name');
           reportData = beneficiaries || [];
           break;
         }
 
-        case "financial": {
+        case 'financial': {
           const { data: entries } = await supabase
-            .from("journal_entries")
-            .select("*")
-            .order("entry_date", { ascending: false })
+            .from('journal_entries')
+            .select('*')
+            .order('entry_date', { ascending: false })
             .limit(100);
           reportData = entries || [];
           break;
@@ -116,7 +116,7 @@ export class ReportTemplateService {
         generatedAt: new Date().toISOString(),
       };
     } catch (error) {
-      logger.error(error, { context: "generate_report", severity: "medium" });
+      logger.error(error, { context: 'generate_report', severity: 'medium' });
       throw error;
     }
   }
@@ -128,15 +128,15 @@ export class ReportTemplateService {
   static async deleteTemplate(templateId: string, reason: string = 'تم الإلغاء') {
     try {
       const { data: userData } = await supabase.auth.getUser();
-      
+
       const { error } = await supabase
-        .from("report_templates")
+        .from('report_templates')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: userData?.user?.id || null,
           deletion_reason: reason,
         })
-        .eq("id", templateId);
+        .eq('id', templateId);
 
       if (error) throw error;
 
@@ -144,7 +144,7 @@ export class ReportTemplateService {
 
       return { success: true };
     } catch (error) {
-      logger.error(error, { context: "delete_report_template", severity: "medium" });
+      logger.error(error, { context: 'delete_report_template', severity: 'medium' });
       throw error;
     }
   }
@@ -159,13 +159,15 @@ export class ReportTemplateService {
     columns: string[];
   }): Promise<{ success: boolean }> {
     try {
-      const { error } = await supabase.from('report_templates').insert([{
-        template_name: data.name,
-        report_type: data.type,
-        columns: data.columns,
-        filters: data.filters as unknown as Json,
-        is_public: false,
-      }]);
+      const { error } = await supabase.from('report_templates').insert([
+        {
+          template_name: data.name,
+          report_type: data.type,
+          columns: data.columns,
+          filters: data.filters as unknown as Json,
+          is_public: false,
+        },
+      ]);
 
       if (error) throw error;
 
@@ -181,7 +183,9 @@ export class ReportTemplateService {
   /**
    * جلب التقارير المجدولة
    */
-  static async getScheduledReports(): Promise<{ id: string; name: string; schedule: string; next_run: string }[]> {
+  static async getScheduledReports(): Promise<
+    { id: string; name: string; schedule: string; next_run: string }[]
+  > {
     try {
       const { data, error } = await supabase
         .from('report_templates')
@@ -190,8 +194,8 @@ export class ReportTemplateService {
         .limit(10);
 
       if (error) throw error;
-      
-      return (data || []).map(r => ({
+
+      return (data || []).map((r) => ({
         id: r.id,
         name: r.template_name,
         schedule: 'يومي',
@@ -208,15 +212,15 @@ export class ReportTemplateService {
    */
   private static async logActivity(action: string) {
     try {
-      await supabase.from("activities").insert([
+      await supabase.from('activities').insert([
         {
-          user_name: "النظام",
+          user_name: 'النظام',
           action,
           timestamp: new Date().toISOString(),
         },
       ]);
     } catch (error) {
-      logger.error(error, { context: "log_report_activity", severity: "low" });
+      logger.error(error, { context: 'log_report_activity', severity: 'low' });
     }
   }
 }

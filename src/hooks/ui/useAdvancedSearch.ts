@@ -4,7 +4,14 @@ import { SearchService } from '@/services/search.service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface SearchFilters {
-  [key: string]: string | number | boolean | null | undefined | { gte: string; lte: string } | string[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | { gte: string; lte: string }
+    | string[];
 }
 
 interface SearchHistoryItem {
@@ -32,9 +39,13 @@ export function useAdvancedSearch(searchType: string) {
 
   // حفظ عملية بحث
   const saveSearch = useMutation({
-    mutationFn: async ({ query, filters, resultsCount }: { 
-      query: string; 
-      filters: SearchFilters; 
+    mutationFn: async ({
+      query,
+      filters,
+      resultsCount,
+    }: {
+      query: string;
+      filters: SearchFilters;
       resultsCount: number;
     }) => {
       await SearchService.saveSearchHistory(searchType, query, filters, resultsCount);
@@ -53,7 +64,7 @@ export function useAdvancedSearch(searchType: string) {
     customFilters?: SearchFilters
   ): Promise<unknown[]> => {
     const searchFilters = customFilters || filters;
-    
+
     const data = await SearchService.advancedSearch(tableName, columns, query, searchFilters);
 
     // حفظ في السجل

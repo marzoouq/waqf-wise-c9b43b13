@@ -1,8 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { TrendingUp } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useYearlyComparison } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import { TrendingUp } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useYearlyComparison } from '@/hooks/beneficiary/useBeneficiaryTabsData';
 
 interface YearlyComparisonProps {
   beneficiaryId: string;
@@ -24,11 +33,12 @@ export function YearlyComparison({ beneficiaryId }: YearlyComparisonProps) {
     );
   }
 
-  const chartData = yearlyData?.map((item) => ({
-    year: item.year,
-    "إجمالي المدفوعات": item.total,
-    "عدد المدفوعات": item.count,
-  })) || [];
+  const chartData =
+    yearlyData?.map((item) => ({
+      year: item.year,
+      'إجمالي المدفوعات': item.total,
+      'عدد المدفوعات': item.count,
+    })) || [];
 
   return (
     <Card>
@@ -47,8 +57,8 @@ export function YearlyComparison({ beneficiaryId }: YearlyComparisonProps) {
               <XAxis dataKey="year" />
               <YAxis />
               <Tooltip
-                formatter={(value: number) => value.toLocaleString("ar-SA")}
-                labelStyle={{ direction: "rtl" }}
+                formatter={(value: number) => value.toLocaleString('ar-SA')}
+                labelStyle={{ direction: 'rtl' }}
               />
               <Legend />
               <Bar dataKey="إجمالي المدفوعات" fill="hsl(var(--primary))" />

@@ -3,11 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { 
-  observeLCP, 
-  optimizePageImages,
-  preloadImages 
-} from '@/lib/imageOptimization';
+import { observeLCP, optimizePageImages, preloadImages } from '@/lib/imageOptimization';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 export function useImageOptimization() {
@@ -20,11 +16,11 @@ export function useImageOptimization() {
     // مراقبة LCP
     observeLCP((lcpValue) => {
       setLcp(lcpValue);
-      
+
       // تسجيل للتطوير فقط
       if (import.meta.env.DEV) {
         productionLogger.debug(`📊 LCP: ${lcpValue.toFixed(2)}ms`);
-        
+
         if (lcpValue > 2500) {
           productionLogger.warn('⚠️ LCP is above recommended threshold (2.5s)');
         } else if (lcpValue <= 2500) {

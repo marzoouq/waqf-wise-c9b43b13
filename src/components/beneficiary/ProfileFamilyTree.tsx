@@ -25,7 +25,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .slice(0, 2)
       .toUpperCase();
@@ -67,7 +67,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
               <Users className="h-4 w-4" />
               أفراد العائلة ({familyMembers.length})
             </h4>
-            
+
             <div className="grid gap-3">
               {familyMembers.map((member) => (
                 <div
@@ -79,15 +79,11 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                       {getInitials(member.full_name)}
                     </AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-foreground">
-                        {member.full_name}
-                      </h4>
-                      {member.is_head_of_family && (
-                        <Crown className="h-3 w-3 text-warning" />
-                      )}
+                      <h4 className="font-semibold text-foreground">{member.full_name}</h4>
+                      {member.is_head_of_family && <Crown className="h-3 w-3 text-warning" />}
                     </div>
                     <div className="flex flex-wrap gap-2 text-sm">
                       <Badge variant="outline" className="text-xs">
@@ -97,9 +93,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                         {member.category}
                       </Badge>
                       {member.gender && (
-                        <span className="text-muted-foreground">
-                          {member.gender}
-                        </span>
+                        <span className="text-muted-foreground">{member.gender}</span>
                       )}
                       {member.date_of_birth && (
                         <span className="text-muted-foreground">

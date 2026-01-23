@@ -43,7 +43,9 @@ export function useEligibilityAssessment(beneficiaryId: string) {
   const runAssessment = useMutation({
     mutationFn: () => BeneficiaryService.runEligibilityAssessment(beneficiaryId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId) });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId),
+      });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       showSuccess('تم التقييم', 'تم تقييم الأهلية بنجاح');
     },

@@ -5,11 +5,11 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/ui/use-toast';
-import { 
-  CustomReportsService, 
-  type CustomReportTemplate, 
+import {
+  CustomReportsService,
+  type CustomReportTemplate,
   type ReportResult,
-  type ReportConfig 
+  type ReportConfig,
 } from '@/services/report.service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -27,8 +27,9 @@ export function useCustomReports() {
 
   // إنشاء قالب تقرير جديد
   const createTemplate = useMutation({
-    mutationFn: (template: Omit<CustomReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => 
-      CustomReportsService.createCustomTemplate(template),
+    mutationFn: (
+      template: Omit<CustomReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>
+    ) => CustomReportsService.createCustomTemplate(template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOM_REPORTS });
       toast({

@@ -26,7 +26,7 @@ export function TodayDuePaymentsCard() {
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-12 bg-muted rounded"></div>
             ))}
           </div>
@@ -48,9 +48,7 @@ export function TodayDuePaymentsCard() {
             مستحقات اليوم
           </span>
           {todayPayments.length > 0 && (
-            <Badge variant="secondary">
-              {todayPayments.length} دفعة
-            </Badge>
+            <Badge variant="secondary">{todayPayments.length} دفعة</Badge>
           )}
         </CardTitle>
       </CardHeader>
@@ -62,8 +60,8 @@ export function TodayDuePaymentsCard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {todayPayments.slice(0, 5).map(payment => (
-              <div 
+            {todayPayments.slice(0, 5).map((payment) => (
+              <div
                 key={payment.id}
                 className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
               >
@@ -78,9 +76,7 @@ export function TodayDuePaymentsCard() {
                     )}
                   </div>
                 </div>
-                <span className="font-bold text-primary">
-                  {formatCurrency(payment.amount)}
-                </span>
+                <span className="font-bold text-primary">{formatCurrency(payment.amount)}</span>
               </div>
             ))}
 
@@ -93,8 +89,8 @@ export function TodayDuePaymentsCard() {
             </div>
 
             {/* زر عرض الكل */}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full gap-2"
               onClick={() => navigate('/payments')}
             >

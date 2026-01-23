@@ -4,13 +4,13 @@
  * @version 2.9.43
  */
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { type AppRole } from "@/types/roles";
-import { Permission } from "@/hooks/auth/usePermissions";
-import { PermissionsService } from "@/services/permissions.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { type AppRole } from '@/types/roles';
+import { Permission } from '@/hooks/auth/usePermissions';
+import { PermissionsService } from '@/services/permissions.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface RolePermissionState {
   permissionId: string;
@@ -18,13 +18,13 @@ export interface RolePermissionState {
   modified: boolean;
 }
 
-export function usePermissionsManagement(initialRole: AppRole = "accountant") {
+export function usePermissionsManagement(initialRole: AppRole = 'accountant') {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [selectedRole, setSelectedRole] = useState<AppRole>(initialRole);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
 
   // جلب جميع الصلاحيات باستخدام الخدمة
@@ -52,28 +52,22 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
 
   // تحديث صلاحية باستخدام الخدمة
   const updatePermissionMutation = useMutation({
-    mutationFn: async ({
-      permissionId,
-      granted,
-    }: {
-      permissionId: string;
-      granted: boolean;
-    }) => {
+    mutationFn: async ({ permissionId, granted }: { permissionId: string; granted: boolean }) => {
       await PermissionsService.updateRolePermission(selectedRole, permissionId, granted);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole) });
       toast({
-        title: "تم الحفظ",
-        description: "تم تحديث الصلاحيات بنجاح",
+        title: 'تم الحفظ',
+        description: 'تم تحديث الصلاحيات بنجاح',
       });
       setModifications(new Map());
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
-        description: error.message || "فشل تحديث الصلاحيات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: error.message || 'فشل تحديث الصلاحيات',
+        variant: 'destructive',
       });
     },
   });
@@ -84,9 +78,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
     if (modification !== undefined) {
       return modification.granted;
     }
-    return rolePermissions.some(
-      (rp) => rp.permission_id === permissionId && rp.granted
-    );
+    return rolePermissions.some((rp) => rp.permission_id === permissionId && rp.granted);
   };
 
   // تبديل حالة الصلاحية
@@ -127,19 +119,21 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
     const matchesSearch =
       perm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       perm.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || perm.category === categoryFilter;
+    const matchesCategory = categoryFilter === 'all' || perm.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
   // تجميع الصلاحيات حسب الفئة
-  const groupedPermissions = filteredPermissions.reduce((acc, perm) => {
-    if (!acc[perm.category]) {
-      acc[perm.category] = [];
-    }
-    acc[perm.category].push(perm);
-    return acc;
-  }, {} as Record<string, Permission[]>);
+  const groupedPermissions = filteredPermissions.reduce(
+    (acc, perm) => {
+      if (!acc[perm.category]) {
+        acc[perm.category] = [];
+      }
+      acc[perm.category].push(perm);
+      return acc;
+    },
+    {} as Record<string, Permission[]>
+  );
 
   // استخراج الفئات الفريدة
   const categories = [...new Set(allPermissions.map((p) => p.category))];
@@ -166,7 +160,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
     // التعديلات
     modifications,
     hasModifications,
-    
+
     // الحالة
     isLoading,
     isSaving: updatePermissionMutation.isPending,

@@ -2,9 +2,9 @@
  * useNewAuditLogsCount Hook - عدد السجلات الجديدة للـ Badge
  * @version 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 /**
  * جلب عدد السجلات الجديدة منذ آخر 24 ساعة
@@ -17,9 +17,9 @@ export const useNewAuditLogsCount = () => {
       yesterday.setHours(yesterday.getHours() - 24);
 
       const { count, error } = await supabase
-        .from("audit_logs")
-        .select("*", { count: 'exact', head: true })
-        .gte("created_at", yesterday.toISOString());
+        .from('audit_logs')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', yesterday.toISOString());
 
       if (error) throw error;
       return count || 0;
@@ -40,10 +40,10 @@ export const useCriticalAuditLogsCount = () => {
       yesterday.setHours(yesterday.getHours() - 24);
 
       const { count, error } = await supabase
-        .from("audit_logs")
-        .select("*", { count: 'exact', head: true })
-        .gte("created_at", yesterday.toISOString())
-        .in("severity", ['critical', 'error']);
+        .from('audit_logs')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', yesterday.toISOString())
+        .in('severity', ['critical', 'error']);
 
       if (error) throw error;
       return count || 0;

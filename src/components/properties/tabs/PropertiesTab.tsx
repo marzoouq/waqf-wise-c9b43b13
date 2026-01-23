@@ -1,24 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
-import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
-import { useProperties, type Property } from "@/hooks/property/useProperties";
-import { usePropertiesStats } from "@/hooks/property/usePropertiesStats";
-import { useTableSort } from "@/hooks/ui/useTableSort";
-import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { useDeleteConfirmation } from "@/hooks/shared";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
-import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
-import { PaginationControls } from "@/components/ui/pagination-controls";
-import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from 'react';
+import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from 'lucide-react';
+import { useProperties, type Property } from '@/hooks/property/useProperties';
+import { usePropertiesStats } from '@/hooks/property/usePropertiesStats';
+import { useTableSort } from '@/hooks/ui/useTableSort';
+import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { UnifiedDataTable } from '@/components/unified/UnifiedDataTable';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { useDeleteConfirmation } from '@/hooks/shared';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
+import {
+  AdvancedFiltersDialog,
+  type FilterConfig,
+  type FiltersRecord,
+} from '@/components/shared/AdvancedFiltersDialog';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/lib/pagination.types';
+import { toast } from 'sonner';
 
 // تعريف الفلاتر
 const propertiesFilterConfigs: FilterConfig[] = [
@@ -51,7 +55,7 @@ interface Props {
 }
 
 export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -77,7 +81,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
 
   const filteredProperties = useMemo(() => {
     let result = properties || [];
-    
+
     // فلترة بالبحث
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -88,20 +92,20 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
           p.location.toLowerCase().includes(query)
       );
     }
-    
+
     // فلترة بالفلاتر المتقدمة
     if (advancedFilters.type) {
-      result = result.filter(p => p.type === advancedFilters.type);
+      result = result.filter((p) => p.type === advancedFilters.type);
     }
     if (advancedFilters.status) {
-      result = result.filter(p => p.status === advancedFilters.status);
+      result = result.filter((p) => p.status === advancedFilters.status);
     }
     if (advancedFilters.location) {
-      result = result.filter(p => 
+      result = result.filter((p) =>
         p.location.toLowerCase().includes(String(advancedFilters.location).toLowerCase())
       );
     }
-    
+
     return result;
   }, [properties, searchQuery, advancedFilters]);
 
@@ -144,16 +148,16 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
 
   const handleBulkExport = () => {
     const selectedData = paginatedData
-      .filter(p => selectedIds.includes(p.id))
-      .map(p => ({
+      .filter((p) => selectedIds.includes(p.id))
+      .map((p) => ({
         'اسم العقار': p.name,
-        'النوع': p.type,
-        'الموقع': p.location,
+        النوع: p.type,
+        الموقع: p.location,
         'الوحدات الكلية': p.units,
         'الوحدات المشغولة': p.occupied,
         'الوحدات الشاغرة': p.units - p.occupied,
         'الإيراد الشهري': Number(p.monthly_revenue || 0).toLocaleString(),
-        'الحالة': p.status,
+        الحالة: p.status,
       }));
     return selectedData;
   };
@@ -169,34 +173,34 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
     const occupiedUnits = properties?.reduce((sum, p) => sum + p.occupied, 0) || 0;
-    
+
     // استخدام الإيراد السنوي من العقود النشطة (مصدر الحقيقة الموحد)
     const totalAnnualRevenue = unifiedStats?.expectedAnnualRevenue || 0;
 
     return [
       {
-        label: "إجمالي العقارات",
-        value: properties?.length.toString() || "0",
+        label: 'إجمالي العقارات',
+        value: properties?.length.toString() || '0',
         icon: Building,
-        color: "text-primary",
+        color: 'text-primary',
       },
       {
-        label: "الوحدات المؤجرة",
+        label: 'الوحدات المؤجرة',
         value: (unifiedStats?.occupiedUnits || occupiedUnits).toString(),
         icon: Home,
-        color: "text-success",
+        color: 'text-success',
       },
       {
-        label: "الوحدات الشاغرة",
-        value: (unifiedStats?.vacantUnits || (totalUnits - occupiedUnits)).toString(),
+        label: 'الوحدات الشاغرة',
+        value: (unifiedStats?.vacantUnits || totalUnits - occupiedUnits).toString(),
         icon: MapPin,
-        color: "text-warning",
+        color: 'text-warning',
       },
       {
-        label: "الإيرادات السنوية",
+        label: 'الإيرادات السنوية',
         value: `${totalAnnualRevenue.toLocaleString()} ر.س`,
         icon: DollarSign,
-        color: "text-accent",
+        color: 'text-accent',
       },
     ];
   }, [properties, unifiedStats]);
@@ -206,15 +210,15 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   };
 
   // بيانات التصدير
-  const exportData = filteredProperties.map(p => ({
+  const exportData = filteredProperties.map((p) => ({
     'اسم العقار': p.name,
-    'النوع': p.type,
-    'الموقع': p.location,
+    النوع: p.type,
+    الموقع: p.location,
     'الوحدات الكلية': p.units,
     'الوحدات المشغولة': p.occupied,
     'الوحدات الشاغرة': p.units - p.occupied,
     'الإيراد الشهري': Number(p.monthly_revenue || 0).toLocaleString(),
-    'الحالة': p.status,
+    الحالة: p.status,
   }));
 
   return (
@@ -240,7 +244,16 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
           data={exportData}
           filename="العقارات"
           title="العقارات"
-          headers={['اسم العقار', 'النوع', 'الموقع', 'الوحدات الكلية', 'الوحدات المشغولة', 'الوحدات الشاغرة', 'الإيراد الشهري', 'الحالة']}
+          headers={[
+            'اسم العقار',
+            'النوع',
+            'الموقع',
+            'الوحدات الكلية',
+            'الوحدات المشغولة',
+            'الوحدات الشاغرة',
+            'الإيراد الشهري',
+            'الحالة',
+          ]}
         />
       </div>
 
@@ -253,10 +266,15 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
             value={stat.value}
             icon={stat.icon}
             variant={
-              stat.color === "text-primary" ? "primary" :
-              stat.color === "text-success" ? "success" :
-              stat.color === "text-warning" ? "warning" :
-              stat.color === "text-accent" ? "info" : "default"
+              stat.color === 'text-primary'
+                ? 'primary'
+                : stat.color === 'text-success'
+                  ? 'success'
+                  : stat.color === 'text-warning'
+                    ? 'warning'
+                    : stat.color === 'text-accent'
+                      ? 'info'
+                      : 'default'
             }
           />
         ))}
@@ -267,7 +285,7 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
         title="العقارات"
         columns={[
           {
-            key: "select",
+            key: 'select',
             label: (
               <Checkbox
                 checked={isAllSelected}
@@ -285,68 +303,66 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
             ),
           },
           {
-            key: "name",
-            label: "اسم العقار",
-            render: (value: string) => (
-              <span className="font-medium">{value}</span>
-            )
+            key: 'name',
+            label: 'اسم العقار',
+            render: (value: string) => <span className="font-medium">{value}</span>,
           },
           {
-            key: "type",
-            label: "النوع",
+            key: 'type',
+            label: 'النوع',
             render: (value: string) => (
               <Badge variant="outline" className="border-primary/30">
                 {value}
               </Badge>
-            )
+            ),
           },
           {
-            key: "location",
-            label: "الموقع",
+            key: 'location',
+            label: 'الموقع',
             hideOnMobile: true,
             render: (value: string) => (
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span>{value}</span>
               </div>
-            )
+            ),
           },
           {
-            key: "units",
-            label: "الوحدات",
+            key: 'units',
+            label: 'الوحدات',
             hideOnTablet: true,
             render: (_: unknown, row: Property) => (
               <span className="font-medium whitespace-nowrap">
                 {row.occupied}/{row.units}
               </span>
-            )
+            ),
           },
           {
-            key: "monthly_revenue",
-            label: "الإيراد الشهري",
+            key: 'monthly_revenue',
+            label: 'الإيراد الشهري',
             render: (value: number) => (
               <span className="font-bold text-primary whitespace-nowrap">
                 {Number(value || 0).toLocaleString()} ر.س
               </span>
-            )
+            ),
           },
           {
-            key: "status",
-            label: "الحالة",
+            key: 'status',
+            label: 'الحالة',
             render: (value: string) => (
               <Badge
                 className={
-                  value === "مؤجر"
-                    ? "bg-success/10 text-success border-success/30"
-                    : value === "شاغر"
-                    ? "bg-warning/10 text-warning border-warning/30"
-                    : "bg-primary/10 text-primary border-primary/30"
+                  value === 'مؤجر'
+                    ? 'bg-success/10 text-success border-success/30'
+                    : value === 'شاغر'
+                      ? 'bg-warning/10 text-warning border-warning/30'
+                      : 'bg-primary/10 text-primary border-primary/30'
                 }
               >
                 {value}
               </Badge>
-            )
-          }
+            ),
+          },
         ]}
         data={paginatedData}
         loading={isLoading}
@@ -404,8 +420,8 @@ export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
             setPageSize(size);
             setCurrentPage(1);
           }}
-          onNext={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-          onPrev={() => setCurrentPage(p => Math.max(p - 1, 1))}
+          onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
           onFirst={() => setCurrentPage(1)}
           onLast={() => setCurrentPage(totalPages)}
         />

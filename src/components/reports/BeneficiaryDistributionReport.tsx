@@ -1,16 +1,28 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { Users, TrendingUp, DollarSign, Download, Award } from 'lucide-react';
 import { matchesStatus } from '@/lib/constants';
-import type { 
-  BeneficiaryReportData, 
-  DistributionReportData, 
-  CategoryDataItem, 
-  TribeDataItem, 
+import type {
+  BeneficiaryReportData,
+  DistributionReportData,
+  CategoryDataItem,
+  TribeDataItem,
   TypeDataItem,
-  CityDataItem 
+  CityDataItem,
 } from '@/types/reports/index';
 
 interface BeneficiaryDistributionReportProps {
@@ -33,14 +45,13 @@ export function BeneficiaryDistributionReport({
   // حساب الإحصائيات
   const stats = {
     totalBeneficiaries: beneficiaries.length,
-    activeBeneficiaries: beneficiaries.filter(b => matchesStatus(b.status, 'active')).length,
+    activeBeneficiaries: beneficiaries.filter((b) => matchesStatus(b.status, 'active')).length,
     totalDistributed: distributions.reduce((sum, d) => sum + (d.total_amount || 0), 0),
     avgPerBeneficiary: 0,
   };
 
-  stats.avgPerBeneficiary = stats.activeBeneficiaries > 0
-    ? stats.totalDistributed / stats.activeBeneficiaries
-    : 0;
+  stats.avgPerBeneficiary =
+    stats.activeBeneficiaries > 0 ? stats.totalDistributed / stats.activeBeneficiaries : 0;
 
   // التوزيع حسب الفئة
   const byCategory = beneficiaries.reduce<Record<string, CategoryDataItem>>((acc, b) => {
@@ -53,10 +64,10 @@ export function BeneficiaryDistributionReport({
     return acc;
   }, {});
 
-  const categoryData = Object.values(byCategory).map((item) => ({ 
-    name: item.name, 
-    count: item.count, 
-    amount: item.amount 
+  const categoryData = Object.values(byCategory).map((item) => ({
+    name: item.name,
+    count: item.count,
+    amount: item.amount,
   }));
 
   // التوزيع حسب القبيلة
@@ -84,9 +95,9 @@ export function BeneficiaryDistributionReport({
     return acc;
   }, {});
 
-  const typeData = Object.values(byType).map((item) => ({ 
-    name: item.name, 
-    value: item.value
+  const typeData = Object.values(byType).map((item) => ({
+    name: item.name,
+    value: item.value,
   }));
 
   // التوزيع حسب المدينة
@@ -110,13 +121,14 @@ export function BeneficiaryDistributionReport({
     .slice(0, 10);
 
   // تحليل التكرار
-  const frequencyAnalysis = beneficiaries.map(b => ({
-    name: b.full_name,
-    frequency: distributions.filter(d =>
-      d.distribution_details?.some((dd) => dd.beneficiary_id === b.id)
-    ).length,
-  }))
-    .filter(b => b.frequency > 0)
+  const frequencyAnalysis = beneficiaries
+    .map((b) => ({
+      name: b.full_name,
+      frequency: distributions.filter((d) =>
+        d.distribution_details?.some((dd) => dd.beneficiary_id === b.id)
+      ).length,
+    }))
+    .filter((b) => b.frequency > 0)
     .sort((a, b) => b.frequency - a.frequency)
     .slice(0, 10);
 
@@ -143,9 +155,7 @@ export function BeneficiaryDistributionReport({
           </div>
           <div className="text-sm text-muted-foreground mb-1">إجمالي المستفيدين</div>
           <div className="text-2xl font-bold">{stats.totalBeneficiaries}</div>
-          <div className="text-xs text-success mt-1">
-            {stats.activeBeneficiaries} نشط
-          </div>
+          <div className="text-xs text-success mt-1">{stats.activeBeneficiaries} نشط</div>
         </Card>
 
         <Card className="p-4">
@@ -289,7 +299,10 @@ export function BeneficiaryDistributionReport({
         <h3 className="text-lg font-semibold mb-4">تكرار الاستفادة (أكثر 10 مستفيدين)</h3>
         <div className="space-y-2">
           {frequencyAnalysis.map((item, index) => (
-            <div key={item.name} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div
+              key={item.name}
+              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold">
                   {index + 1}

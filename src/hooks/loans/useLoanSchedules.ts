@@ -3,10 +3,10 @@
  * @version 2.8.43
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { LoansService } from "@/services";
-import { LoanSchedule } from "@/types/loans";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { LoansService } from '@/services';
+import { LoanSchedule } from '@/types/loans';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useLoanSchedules(loanId: string) {
   return useQuery({

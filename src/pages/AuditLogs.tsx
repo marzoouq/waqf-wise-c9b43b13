@@ -1,7 +1,7 @@
-import { Shield } from "lucide-react";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { AuditLogsTable } from "@/components/audit";
-import { useRealtimeAuditAlerts } from "@/hooks/system/useAuditAlerts";
+import { Shield } from 'lucide-react';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { AuditLogsTable } from '@/components/audit';
+import { useRealtimeAuditAlerts } from '@/hooks/system/useAuditAlerts';
 
 const AuditLogs = () => {
   // الاشتراك في التنبيهات الفورية

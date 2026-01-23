@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { FileText, Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/ui/use-toast";
-import { StorageService, DistributionService } from "@/services";
-import { logger } from "@/lib/logger";
+import { useState } from 'react';
+import { FileText, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/ui/use-toast';
+import { StorageService, DistributionService } from '@/services';
+import { logger } from '@/lib/logger';
 
 interface BankStatementUploadProps {
   disclosureId: string;
@@ -14,7 +14,7 @@ interface BankStatementUploadProps {
 
 export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStatementUploadProps) {
   const [uploading, setUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "success" | "error">("idle");
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { toast } = useToast();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,9 +25,9 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
       toast({
-        title: "نوع ملف غير مدعوم",
-        description: "يُرجى رفع ملف PDF أو صورة فقط",
-        variant: "destructive",
+        title: 'نوع ملف غير مدعوم',
+        description: 'يُرجى رفع ملف PDF أو صورة فقط',
+        variant: 'destructive',
       });
       return;
     }
@@ -35,15 +35,15 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
     // التحقق من حجم الملف (أقصى 10 ميجا)
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "الملف كبير جداً",
-        description: "يُرجى رفع ملف أصغر من 10 ميجابايت",
-        variant: "destructive",
+        title: 'الملف كبير جداً',
+        description: 'يُرجى رفع ملف أصغر من 10 ميجابايت',
+        variant: 'destructive',
       });
       return;
     }
 
     setUploading(true);
-    setUploadStatus("idle");
+    setUploadStatus('idle');
 
     try {
       // إنشاء اسم ملف فريد
@@ -61,25 +61,25 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
       // تحديث الإفصاح بالرابط
       await DistributionService.uploadBankStatement(disclosureId, file);
 
-      setUploadStatus("success");
+      setUploadStatus('success');
       toast({
-        title: "تم رفع كشف الحساب",
-        description: "تم رفع كشف الحساب البنكي بنجاح",
+        title: 'تم رفع كشف الحساب',
+        description: 'تم رفع كشف الحساب البنكي بنجاح',
       });
 
       onUploadComplete?.(uploadResult.url || '');
     } catch (error: unknown) {
-      logger.error(error, { 
-        context: 'upload_bank_statement', 
+      logger.error(error, {
+        context: 'upload_bank_statement',
         severity: 'medium',
-        metadata: { disclosureId }
+        metadata: { disclosureId },
       });
-      setUploadStatus("error");
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء رفع كشف الحساب";
+      setUploadStatus('error');
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء رفع كشف الحساب';
       toast({
-        title: "فشل الرفع",
+        title: 'فشل الرفع',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setUploading(false);
@@ -93,9 +93,7 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
           <FileText className="h-5 w-5" />
           كشف الحساب البنكي
         </CardTitle>
-        <CardDescription>
-          ارفع كشف الحساب البنكي للسنة المالية (PDF أو صورة)
-        </CardDescription>
+        <CardDescription>ارفع كشف الحساب البنكي للسنة المالية (PDF أو صورة)</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -112,8 +110,8 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
               className="flex-1"
             />
             {uploading && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
-            {uploadStatus === "success" && <CheckCircle2 className="h-5 w-5 text-success" />}
-            {uploadStatus === "error" && <XCircle className="h-5 w-5 text-destructive" />}
+            {uploadStatus === 'success' && <CheckCircle2 className="h-5 w-5 text-success" />}
+            {uploadStatus === 'error' && <XCircle className="h-5 w-5 text-destructive" />}
           </div>
 
           <div className="text-sm text-muted-foreground">

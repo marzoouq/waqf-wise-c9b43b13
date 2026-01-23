@@ -1,4 +1,4 @@
-import { Users, Building2, Banknote, CalendarDays } from "lucide-react";
+import { Users, Building2, Banknote, CalendarDays } from 'lucide-react';
 
 interface StatItemProps {
   icon: React.ElementType;
@@ -21,7 +21,7 @@ function StatItem({ icon: Icon, value, suffix, label, color }: StatItemProps) {
 
         {/* Value - بدون animation للـ LCP */}
         <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-1 sm:mb-2">
-          <span>{value.toLocaleString("ar-SA")}</span>
+          <span>{value.toLocaleString('ar-SA')}</span>
           <span className="text-primary">{suffix}</span>
         </div>
 
@@ -36,30 +36,30 @@ const stats = [
   {
     icon: Users,
     value: 1000,
-    suffix: "+",
-    label: "مستفيد مسجل",
-    color: "bg-gradient-to-br from-blue-500 to-blue-600",
+    suffix: '+',
+    label: 'مستفيد مسجل',
+    color: 'bg-gradient-to-br from-blue-500 to-blue-600',
   },
   {
     icon: Building2,
     value: 50,
-    suffix: "+",
-    label: "عقار مُدار",
-    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+    suffix: '+',
+    label: 'عقار مُدار',
+    color: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
   },
   {
     icon: Banknote,
     value: 5,
-    suffix: "M+",
-    label: "ريال موزعة",
-    color: "bg-gradient-to-br from-amber-500 to-amber-600",
+    suffix: 'M+',
+    label: 'ريال موزعة',
+    color: 'bg-gradient-to-br from-amber-500 to-amber-600',
   },
   {
     icon: CalendarDays,
     value: 10,
-    suffix: "+",
-    label: "سنوات خبرة",
-    color: "bg-gradient-to-br from-violet-500 to-violet-600",
+    suffix: '+',
+    label: 'سنوات خبرة',
+    color: 'bg-gradient-to-br from-violet-500 to-violet-600',
   },
 ];
 

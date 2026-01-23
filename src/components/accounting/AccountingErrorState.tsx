@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface AccountingErrorStateProps {
   error: Error;
@@ -17,7 +17,7 @@ export function AccountingErrorState({ error, onRetry }: AccountingErrorStatePro
           </div>
           <h3 className="text-lg font-semibold mb-2">حدث خطأ أثناء تحميل البيانات</h3>
           <p className="text-sm text-muted-foreground mb-1 max-w-md">
-            {error.message || "تعذر تحميل البيانات المحاسبية. الرجاء المحاولة مرة أخرى."}
+            {error.message || 'تعذر تحميل البيانات المحاسبية. الرجاء المحاولة مرة أخرى.'}
           </p>
           <p className="text-xs text-muted-foreground mb-6">
             إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني

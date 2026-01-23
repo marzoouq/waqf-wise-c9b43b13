@@ -3,12 +3,12 @@
  * يجلب بيانات تقرير المستفيدين مع التحديث المباشر
  */
 
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BeneficiaryReportData } from "@/types/reports/index";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { BeneficiaryService, RealtimeService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { BeneficiaryReportData } from '@/types/reports/index';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { BeneficiaryService, RealtimeService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useBeneficiaryReportsData() {
   const queryClient = useQueryClient();
@@ -24,7 +24,7 @@ export function useBeneficiaryReportsData() {
     queryKey: QUERY_KEYS.BENEFICIARIES_REPORT,
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
-      return (result.data || []).map(b => ({
+      return (result.data || []).map((b) => ({
         id: b.id,
         full_name: b.full_name,
         national_id: b.national_id,
@@ -47,10 +47,12 @@ export function useBeneficiaryReportsData() {
   }, [dataUpdatedAt]);
 
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable("beneficiaries", () => {
+    const subscription = RealtimeService.subscribeToTable('beneficiaries', () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES_REPORT });
     });
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   const handleRefresh = () => {

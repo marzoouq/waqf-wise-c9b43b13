@@ -1,10 +1,10 @@
-import { useFamilyTree } from "@/hooks/beneficiary/useBeneficiaryProfileData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users, User } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { MaskedValue } from "@/components/shared/MaskedValue";
-import { matchesStatus } from "@/lib/constants";
+import { useFamilyTree } from '@/hooks/beneficiary/useBeneficiaryProfileData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Users, User } from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import { MaskedValue } from '@/components/shared/MaskedValue';
+import { matchesStatus } from '@/lib/constants';
 
 interface FamilyTreeTabProps {
   beneficiaryId: string;
@@ -50,7 +50,7 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
         <CardContent className="p-3 sm:p-6">
           <div className="space-y-3 sm:space-y-4">
             {familyMembers?.map((member) => (
-              <Card key={member.id} className={member.id === beneficiaryId ? "border-primary" : ""}>
+              <Card key={member.id} className={member.id === beneficiaryId ? 'border-primary' : ''}>
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
@@ -60,34 +60,38 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                           {settings?.show_other_beneficiaries_names ? (
-                            <h4 className="font-medium text-xs sm:text-sm truncate">{member.full_name}</h4>
+                            <h4 className="font-medium text-xs sm:text-sm truncate">
+                              {member.full_name}
+                            </h4>
                           ) : member.id === beneficiaryId ? (
-                            <h4 className="font-medium text-xs sm:text-sm truncate">{member.full_name}</h4>
+                            <h4 className="font-medium text-xs sm:text-sm truncate">
+                              {member.full_name}
+                            </h4>
                           ) : (
                             <h4 className="font-medium text-xs sm:text-sm">مستفيد</h4>
                           )}
                           {member.is_head_of_family && (
-                            <Badge variant="outline" className="text-[10px] sm:text-xs">رب الأسرة</Badge>
+                            <Badge variant="outline" className="text-[10px] sm:text-xs">
+                              رب الأسرة
+                            </Badge>
                           )}
                           {member.id === beneficiaryId && (
                             <Badge className="text-[10px] sm:text-xs">أنت</Badge>
                           )}
                         </div>
-                        
+
                         {settings?.show_other_beneficiaries_personal_data && (
                           <div className="mt-1.5 sm:mt-2 space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-muted-foreground">
                             {member.relationship && (
                               <p className="truncate">الصلة: {member.relationship}</p>
                             )}
-                            {member.gender && (
-                              <p>الجنس: {member.gender}</p>
-                            )}
+                            {member.gender && <p>الجنس: {member.gender}</p>}
                             {member.marital_status && (
                               <p>الحالة الاجتماعية: {member.marital_status}</p>
                             )}
                             {member.phone && (
                               <p className="truncate">
-                                الهاتف:{" "}
+                                الهاتف:{' '}
                                 <MaskedValue
                                   value={member.phone}
                                   type="phone"
@@ -101,12 +105,12 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
                         {settings?.show_other_beneficiaries_amounts && member.total_received && (
                           <div className="mt-1.5 sm:mt-2">
                             <p className="text-xs sm:text-sm text-muted-foreground">
-                              إجمالي المستحقات:{" "}
+                              إجمالي المستحقات:{' '}
                               <MaskedValue
-                                value={member.total_received.toLocaleString("ar-SA")}
+                                value={member.total_received.toLocaleString('ar-SA')}
                                 type="amount"
                                 masked={settings?.mask_exact_amounts || false}
-                              />{" "}
+                              />{' '}
                               ريال
                             </p>
                           </div>
@@ -114,8 +118,8 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
                       </div>
                     </div>
 
-                    <Badge 
-                      variant={matchesStatus(member.status, 'active') ? "default" : "secondary"}
+                    <Badge
+                      variant={matchesStatus(member.status, 'active') ? 'default' : 'secondary'}
                       className="text-[10px] sm:text-xs shrink-0"
                     >
                       {member.status}

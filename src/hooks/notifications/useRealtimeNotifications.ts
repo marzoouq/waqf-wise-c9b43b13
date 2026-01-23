@@ -18,7 +18,9 @@ export function useRealtimeNotifications() {
 
   // استخدام refs لتجنب إعادة إنشاء الاشتراكات
   const toastRef = useRef(toast);
-  useEffect(() => { toastRef.current = toast; }, [toast]);
+  useEffect(() => {
+    toastRef.current = toast;
+  }, [toast]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -39,7 +41,7 @@ export function useRealtimeNotifications() {
         },
         (payload) => {
           queryInvalidationManager.invalidate(['notifications']);
-          
+
           const notification = payload.new as RealtimeNotification;
           toastRef.current({
             title: notification.title,
@@ -80,7 +82,7 @@ export function useRealtimeNotifications() {
         },
         (payload) => {
           queryInvalidationManager.invalidate(['internal-messages']);
-          
+
           const message = payload.new as InternalMessage;
           toastRef.current({
             title: '📨 رسالة جديدة',

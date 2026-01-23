@@ -1,21 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Printer, FileDown } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Printer, FileDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Beneficiary } from "@/types/beneficiary";
-import { PrintableBeneficiariesList } from "./PrintableBeneficiariesList";
-import { createRoot } from "react-dom/client";
+} from '@/components/ui/dropdown-menu';
+import { Beneficiary } from '@/types/beneficiary';
+import { PrintableBeneficiariesList } from './PrintableBeneficiariesList';
+import { createRoot } from 'react-dom/client';
 
 interface BeneficiariesPrintButtonProps {
   beneficiaries: Beneficiary[];
 }
 
 export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintButtonProps) {
-  
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
@@ -24,9 +23,7 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
     printWindow.document.body.appendChild(container);
 
     const root = createRoot(container);
-    root.render(
-      <PrintableBeneficiariesList beneficiaries={beneficiaries} />
-    );
+    root.render(<PrintableBeneficiariesList beneficiaries={beneficiaries} />);
 
     setTimeout(() => {
       printWindow.print();
@@ -37,21 +34,21 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
   };
 
   const handleExportExcel = async () => {
-    const { exportToExcel } = await import("@/lib/excel-helper");
-    
+    const { exportToExcel } = await import('@/lib/excel-helper');
+
     const data = beneficiaries.map((b, index) => ({
-      'م': index + 1,
+      م: index + 1,
       'الاسم الكامل': b.full_name,
       'رقم الهوية': b.national_id,
-      'الجنسية': b.nationality || 'سعودي',
+      الجنسية: b.nationality || 'سعودي',
       'صلة القرابة': b.relationship,
-      'الجنس': b.gender,
+      الجنس: b.gender,
       'رقم الجوال': b.phone,
       'البريد الإلكتروني': b.email || '',
-      'الحالة': b.status,
+      الحالة: b.status,
     }));
 
-    await exportToExcel(data, `كشف_المستفيدين_${new Date().getTime()}`, "المستفيدين");
+    await exportToExcel(data, `كشف_المستفيدين_${new Date().getTime()}`, 'المستفيدين');
   };
 
   return (

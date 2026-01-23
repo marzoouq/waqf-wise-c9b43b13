@@ -1,7 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Loader2, UserPlus, Trash2, Shield } from 'lucide-react';
 import { ROLE_LABELS, SYSTEM_ROLES, type AppRole } from '@/types/roles';
 import { useUserRolesManager } from '@/hooks/users/useUserRolesManager';
@@ -34,7 +40,13 @@ export function UserRolesManager({ userId }: { userId: string }) {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الأدوار" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل الأدوار"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -44,9 +56,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
           <Shield className="h-5 w-5" />
           إدارة الأدوار
         </CardTitle>
-        <CardDescription>
-          إضافة وإزالة أدوار المستخدم في النظام
-        </CardDescription>
+        <CardDescription>إضافة وإزالة أدوار المستخدم في النظام</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* الأدوار الحالية */}
@@ -88,10 +98,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
               ))}
             </SelectContent>
           </Select>
-          <Button
-            onClick={addRole}
-            disabled={isAdding}
-          >
+          <Button onClick={addRole} disabled={isAdding}>
             {isAdding ? (
               <Loader2 className="h-4 w-4 animate-spin ms-2" />
             ) : (

@@ -3,17 +3,21 @@
  * @version 2.8.79
  */
 
-import { Suspense, lazy } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
-import { BarChart3, PieChart, TrendingUp, Building2 } from "lucide-react";
+import { Suspense, lazy } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ChartSkeleton } from '@/components/dashboard/ChartSkeleton';
+import { BarChart3, PieChart, TrendingUp, Building2 } from 'lucide-react';
 
 // Lazy load chart components
-const RevenueDistributionChart = lazy(() => import("@/components/dashboard/nazer/RevenueDistributionChart"));
-const PropertiesPerformanceChart = lazy(() => import("@/components/dashboard/nazer/PropertiesPerformanceChart"));
-const BudgetComparisonChart = lazy(() => import("./BudgetComparisonChart"));
-const RevenueExpenseChart = lazy(() => import("./RevenueExpenseChart"));
+const RevenueDistributionChart = lazy(
+  () => import('@/components/dashboard/nazer/RevenueDistributionChart')
+);
+const PropertiesPerformanceChart = lazy(
+  () => import('@/components/dashboard/nazer/PropertiesPerformanceChart')
+);
+const BudgetComparisonChart = lazy(() => import('./BudgetComparisonChart'));
+const RevenueExpenseChart = lazy(() => import('./RevenueExpenseChart'));
 
 export function NazerAnalyticsSection() {
   return (
@@ -23,9 +27,7 @@ export function NazerAnalyticsSection() {
           <BarChart3 className="h-5 w-5 text-primary" />
           <CardTitle className="text-lg">التحليلات والرسوم البيانية</CardTitle>
         </div>
-        <CardDescription>
-          نظرة تحليلية شاملة على أداء الوقف المالي والتشغيلي
-        </CardDescription>
+        <CardDescription>نظرة تحليلية شاملة على أداء الوقف المالي والتشغيلي</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="revenue" className="w-full">

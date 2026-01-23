@@ -2,7 +2,7 @@
  * Hook لجلب المستفيدين من الإفصاح
  * @version 2.9.0
  */
-import { DisclosureService } from "@/services/disclosure.service";
+import { DisclosureService } from '@/services/disclosure.service';
 
 export interface DisclosureBeneficiary {
   id: string;
@@ -17,8 +17,12 @@ export interface DisclosureBeneficiary {
 }
 
 export function useDisclosureBeneficiaries() {
-  const fetchDisclosureBeneficiaries = async (disclosureId: string): Promise<DisclosureBeneficiary[]> => {
-    return DisclosureService.getDisclosureBeneficiaries(disclosureId) as Promise<DisclosureBeneficiary[]>;
+  const fetchDisclosureBeneficiaries = async (
+    disclosureId: string
+  ): Promise<DisclosureBeneficiary[]> => {
+    return DisclosureService.getDisclosureBeneficiaries(disclosureId) as Promise<
+      DisclosureBeneficiary[]
+    >;
   };
 
   return {

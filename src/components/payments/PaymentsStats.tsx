@@ -1,6 +1,6 @@
-import { Receipt, CreditCard } from "lucide-react";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { Receipt, CreditCard } from 'lucide-react';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 interface PaymentsStatsProps {
   totalReceipts: number;
@@ -17,12 +17,7 @@ export function PaymentsStats({
 }: PaymentsStatsProps) {
   return (
     <UnifiedStatsGrid columns={4}>
-      <UnifiedKPICard
-        title="سندات القبض"
-        value={totalReceipts}
-        icon={Receipt}
-        variant="success"
-      />
+      <UnifiedKPICard title="سندات القبض" value={totalReceipts} icon={Receipt} variant="success" />
       <UnifiedKPICard
         title="إجمالي القبض"
         value={`${totalReceiptsAmount.toLocaleString()} ر.س`}

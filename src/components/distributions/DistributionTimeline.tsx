@@ -111,7 +111,7 @@ export function DistributionTimeline({ events }: DistributionTimelineProps) {
       <div className="mt-6 pt-6 border-t">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(statusConfig).map(([status, config]) => {
-            const count = events.filter(e => e.status === status).length;
+            const count = events.filter((e) => e.status === status).length;
             if (count === 0) return null;
 
             return (

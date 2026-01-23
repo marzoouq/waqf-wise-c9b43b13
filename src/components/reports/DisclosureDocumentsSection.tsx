@@ -1,48 +1,54 @@
 /**
  * قسم عرض مستندات الإفصاح السنوي
  */
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  FileText, 
-  Download, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  FileText,
+  Download,
   Eye,
   Zap,
   Wrench,
   Receipt,
   Calculator,
   Wallet,
-  FileCheck
-} from "lucide-react";
-import { useDisclosureDocuments, DisclosureDocument } from "@/hooks/reports/useDisclosureDocuments";
+  FileCheck,
+} from 'lucide-react';
+import { useDisclosureDocuments, DisclosureDocument } from '@/hooks/reports/useDisclosureDocuments';
 
 interface DisclosureDocumentsSectionProps {
   disclosureId?: string;
 }
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
-  'فاتورة_خدمات': Zap,
-  'صيانة': Wrench,
-  'زكاة_ضرائب': Receipt,
-  'تقرير_مالي': FileText,
-  'خدمات_محاسبية': Calculator,
-  'مصاريف_عامة': Wallet,
-  'اقفال_سنوي': FileCheck,
+  فاتورة_خدمات: Zap,
+  صيانة: Wrench,
+  زكاة_ضرائب: Receipt,
+  تقرير_مالي: FileText,
+  خدمات_محاسبية: Calculator,
+  مصاريف_عامة: Wallet,
+  اقفال_سنوي: FileCheck,
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  'فاتورة_خدمات': 'bg-info/10 text-info',
-  'صيانة': 'bg-warning/10 text-warning',
-  'زكاة_ضرائب': 'bg-success/10 text-success',
-  'تقرير_مالي': 'bg-primary/10 text-primary',
-  'خدمات_محاسبية': 'bg-accent/10 text-accent-foreground',
-  'مصاريف_عامة': 'bg-muted text-muted-foreground',
-  'اقفال_سنوي': 'bg-success/10 text-success',
+  فاتورة_خدمات: 'bg-info/10 text-info',
+  صيانة: 'bg-warning/10 text-warning',
+  زكاة_ضرائب: 'bg-success/10 text-success',
+  تقرير_مالي: 'bg-primary/10 text-primary',
+  خدمات_محاسبية: 'bg-accent/10 text-accent-foreground',
+  مصاريف_عامة: 'bg-muted text-muted-foreground',
+  اقفال_سنوي: 'bg-success/10 text-success',
 };
 
-function DocumentCard({ document, typeLabel }: { document: DisclosureDocument; typeLabel: string }) {
+function DocumentCard({
+  document,
+  typeLabel,
+}: {
+  document: DisclosureDocument;
+  typeLabel: string;
+}) {
   const Icon = TYPE_ICONS[document.document_type] || FileText;
   const colorClass = TYPE_COLORS[document.document_type] || TYPE_COLORS['مصاريف_عامة'];
 
@@ -86,7 +92,8 @@ function DocumentCard({ document, typeLabel }: { document: DisclosureDocument; t
 }
 
 export function DisclosureDocumentsSection({ disclosureId }: DisclosureDocumentsSectionProps) {
-  const { documents, groupedDocuments, isLoading, getTypeLabel } = useDisclosureDocuments(disclosureId);
+  const { documents, groupedDocuments, isLoading, getTypeLabel } =
+    useDisclosureDocuments(disclosureId);
 
   if (isLoading) {
     return (
@@ -142,14 +149,16 @@ export function DisclosureDocumentsSection({ disclosureId }: DisclosureDocuments
                 return <Icon className="h-4 w-4" />;
               })()}
               {getTypeLabel(type)}
-              <Badge variant="outline" className="text-xs">{docs.length}</Badge>
+              <Badge variant="outline" className="text-xs">
+                {docs.length}
+              </Badge>
             </h4>
             <div className="space-y-2">
               {docs.map((doc) => (
-                <DocumentCard 
-                  key={doc.id} 
-                  document={doc} 
-                  typeLabel={getTypeLabel(doc.document_type)} 
+                <DocumentCard
+                  key={doc.id}
+                  document={doc}
+                  typeLabel={getTypeLabel(doc.document_type)}
                 />
               ))}
             </div>

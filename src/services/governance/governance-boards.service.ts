@@ -74,10 +74,12 @@ export class GovernanceBoardsService {
   /**
    * جلب المجالس مع عدد الأعضاء
    */
-  static async getBoardsWithMemberCount(): Promise<(GovernanceBoardRow & { member_count: number })[]> {
+  static async getBoardsWithMemberCount(): Promise<
+    (GovernanceBoardRow & { member_count: number })[]
+  > {
     try {
       const boards = await this.getBoards();
-      
+
       const boardsWithCount = await Promise.all(
         boards.map(async (board) => {
           const { count } = await supabase
@@ -85,14 +87,14 @@ export class GovernanceBoardsService {
             .select('*', { count: 'exact', head: true })
             .eq('board_id', board.id)
             .eq('is_active', true);
-          
+
           return {
             ...board,
             member_count: count || 0,
           };
         })
       );
-      
+
       return boardsWithCount;
     } catch (error) {
       productionLogger.error('Error fetching boards with member count', error);
@@ -123,7 +125,10 @@ export class GovernanceBoardsService {
   /**
    * تحديث مجلس
    */
-  static async updateBoard(id: string, updates: GovernanceBoardUpdate): Promise<GovernanceBoardRow> {
+  static async updateBoard(
+    id: string,
+    updates: GovernanceBoardUpdate
+  ): Promise<GovernanceBoardRow> {
     try {
       const { data, error } = await supabase
         .from('governance_boards')
@@ -146,10 +151,7 @@ export class GovernanceBoardsService {
    */
   static async deleteBoard(id: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('governance_boards')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('governance_boards').delete().eq('id', id);
 
       if (error) throw error;
     } catch (error) {
@@ -204,10 +206,7 @@ export class GovernanceBoardsService {
    */
   static async removeMember(id: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('governance_board_members')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('governance_board_members').delete().eq('id', id);
 
       if (error) throw error;
     } catch (error) {

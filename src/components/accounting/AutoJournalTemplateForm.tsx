@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { AutoJournalTemplate, AutoJournalTemplateInsert } from "@/hooks/accounting/useAutoJournalTemplates";
+} from '@/components/ui/select';
+import type {
+  AutoJournalTemplate,
+  AutoJournalTemplateInsert,
+} from '@/hooks/accounting/useAutoJournalTemplates';
 
 const TRIGGER_EVENTS = [
   { value: 'payment_received', label: 'استلام دفعة' },
@@ -123,8 +126,8 @@ export function AutoJournalTemplateForm({
 
       <div className="bg-muted/50 p-4 rounded-lg space-y-3">
         <p className="text-sm text-muted-foreground">
-          ملاحظة: تعيين الحسابات المدينة والدائنة يتم من خلال إعدادات الحسابات المحاسبية.
-          القالب سيستخدم الحسابات الافتراضية للحدث المحدد.
+          ملاحظة: تعيين الحسابات المدينة والدائنة يتم من خلال إعدادات الحسابات المحاسبية. القالب
+          سيستخدم الحسابات الافتراضية للحدث المحدد.
         </p>
       </div>
 
@@ -132,7 +135,10 @@ export function AutoJournalTemplateForm({
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           إلغاء
         </Button>
-        <Button type="submit" disabled={isSubmitting || !formData.template_name || !formData.trigger_event}>
+        <Button
+          type="submit"
+          disabled={isSubmitting || !formData.template_name || !formData.trigger_event}
+        >
           {isSubmitting ? 'جاري الحفظ...' : template ? 'تحديث' : 'إنشاء'}
         </Button>
       </div>

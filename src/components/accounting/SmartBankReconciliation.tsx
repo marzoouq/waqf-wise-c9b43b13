@@ -5,7 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { useBankMatching } from '@/hooks/payments/useBankMatching';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 interface MatchSuggestion {
@@ -46,7 +53,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
         journalEntryId: suggestion.journalEntryId,
         notes: `مطابقة مقترحة بثقة ${(suggestion.confidence * 100).toFixed(0)}%`,
       });
-      setSuggestions(suggestions.filter(s => s !== suggestion));
+      setSuggestions(suggestions.filter((s) => s !== suggestion));
     } catch (error) {
       productionLogger.error('Error accepting suggestion', error);
     }
@@ -96,7 +103,9 @@ export function SmartBankReconciliation({ statementId }: Props) {
               <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-lg">
                 <TrendingUp className="h-8 w-8 text-primary" />
                 <div className="flex-1">
-                  <h4 className="font-semibold">تم العثور على {suggestions.length} اقتراح مطابقة</h4>
+                  <h4 className="font-semibold">
+                    تم العثور على {suggestions.length} اقتراح مطابقة
+                  </h4>
                   <p className="text-sm text-muted-foreground">
                     راجع الاقتراحات أدناه وقم بقبول أو رفض كل واحدة منها
                   </p>
@@ -120,12 +129,16 @@ export function SmartBankReconciliation({ statementId }: Props) {
                         <TableCell>{getConfidenceBadge(suggestion.confidence)}</TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">{suggestion.bankTransactionId.substring(0, 8)}...</div>
+                            <div className="font-medium">
+                              {suggestion.bankTransactionId.substring(0, 8)}...
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">{suggestion.journalEntryId.substring(0, 8)}...</div>
+                            <div className="font-medium">
+                              {suggestion.journalEntryId.substring(0, 8)}...
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
@@ -133,17 +146,16 @@ export function SmartBankReconciliation({ statementId }: Props) {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => handleAcceptSuggestion(suggestion)}
-                            >
+                            <Button size="sm" onClick={() => handleAcceptSuggestion(suggestion)}>
                               <CheckCircle2 className="h-4 w-4 ms-1" />
                               قبول
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setSuggestions(suggestions.filter(s => s !== suggestion))}
+                              onClick={() =>
+                                setSuggestions(suggestions.filter((s) => s !== suggestion))
+                              }
                             >
                               تجاهل
                             </Button>
@@ -217,7 +229,9 @@ export function SmartBankReconciliation({ statementId }: Props) {
                         {match.journal_entry_id.substring(0, 8)}...
                       </TableCell>
                       <TableCell>
-                        {match.confidence_score ? `${(match.confidence_score * 100).toFixed(0)}%` : '-'}
+                        {match.confidence_score
+                          ? `${(match.confidence_score * 100).toFixed(0)}%`
+                          : '-'}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {new Date(match.matched_at).toLocaleDateString('ar-SA')}

@@ -1,6 +1,6 @@
 /**
  * Notification Service - خدمة إدارة الإشعارات
- * 
+ *
  * تتولى إرسال الإشعارات للمستخدمين عبر قنوات متعددة
  */
 
@@ -63,19 +63,17 @@ export class NotificationService {
    */
   static async send(data: NotificationData): Promise<{ success: boolean }> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: data.user_id,
-          title: data.title,
-          message: data.message,
-          type: data.type || 'info',
-          priority: data.priority || 'medium',
-          reference_type: data.reference_type,
-          reference_id: data.reference_id,
-          action_url: data.action_url,
-          is_read: false,
-        });
+      const { error } = await supabase.from('notifications').insert({
+        user_id: data.user_id,
+        title: data.title,
+        message: data.message,
+        type: data.type || 'info',
+        priority: data.priority || 'medium',
+        reference_type: data.reference_type,
+        reference_id: data.reference_id,
+        action_url: data.action_url,
+        is_read: false,
+      });
 
       if (error) throw error;
       return { success: true };
@@ -92,21 +90,19 @@ export class NotificationService {
    */
   static async sendBulk(notifications: NotificationData[]): Promise<{ success: boolean }> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert(
-          notifications.map(n => ({
-            user_id: n.user_id,
-            title: n.title,
-            message: n.message,
-            type: n.type || 'info',
-            priority: n.priority || 'medium',
-            reference_type: n.reference_type,
-            reference_id: n.reference_id,
-            action_url: n.action_url,
-            is_read: false,
-          }))
-        );
+      const { error } = await supabase.from('notifications').insert(
+        notifications.map((n) => ({
+          user_id: n.user_id,
+          title: n.title,
+          message: n.message,
+          type: n.type || 'info',
+          priority: n.priority || 'medium',
+          reference_type: n.reference_type,
+          reference_id: n.reference_id,
+          action_url: n.action_url,
+          is_read: false,
+        }))
+      );
 
       if (error) throw error;
       return { success: true };
@@ -143,7 +139,7 @@ export class NotificationService {
 
     if (!beneficiaries || beneficiaries.length === 0) return;
 
-    const notifications: NotificationData[] = beneficiaries.map(b => ({
+    const notifications: NotificationData[] = beneficiaries.map((b) => ({
       user_id: b.user_id!,
       title: 'توزيع جديد',
       message: `تم اعتماد توزيع ${distribution.month} بتاريخ ${distribution.distribution_date}`,
@@ -269,7 +265,10 @@ export class NotificationService {
   /**
    * جلب إشعارات المستخدم
    */
-  static async getUserNotifications(userId: string, limit: number = 20): Promise<UserNotification[]> {
+  static async getUserNotifications(
+    userId: string,
+    limit: number = 20
+  ): Promise<UserNotification[]> {
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -383,7 +382,7 @@ export class NotificationService {
         .in('role', ['admin', 'nazer']);
 
       if (adminUsers && adminUsers.length > 0) {
-        const notifications: NotificationData[] = adminUsers.map(admin => ({
+        const notifications: NotificationData[] = adminUsers.map((admin) => ({
           user_id: admin.user_id,
           title: `رسالة جديدة: ${formData.subject}`,
           message: `رسالة من ${formData.name}: ${formData.subject}`,
@@ -427,15 +426,17 @@ export class NotificationService {
       }
 
       // 2. إنشاء الإشعارات لجميع المستخدمين
-      const notifications: NotificationData[] = users.map((u: { user_id: string; full_name: string }) => ({
-        user_id: u.user_id,
-        title: params.title,
-        message: params.message,
-        type: params.type || 'info',
-        priority: params.priority || 'medium',
-        action_url: params.actionUrl,
-        reference_type: 'broadcast',
-      }));
+      const notifications: NotificationData[] = users.map(
+        (u: { user_id: string; full_name: string }) => ({
+          user_id: u.user_id,
+          title: params.title,
+          message: params.message,
+          type: params.type || 'info',
+          priority: params.priority || 'medium',
+          action_url: params.actionUrl,
+          reference_type: 'broadcast',
+        })
+      );
 
       // 3. إرسال الإشعارات
       const result = await this.sendBulk(notifications);
@@ -446,7 +447,7 @@ export class NotificationService {
 
       // 4. تسجيل الإشعار الجماعي في سجل البث
       const { data: currentUser } = await supabase.auth.getUser();
-      
+
       await supabase.from('broadcast_notifications').insert({
         title: params.title,
         message: params.message,
@@ -460,7 +461,9 @@ export class NotificationService {
         action_url: params.actionUrl,
       });
 
-      productionLogger.info(`Broadcast notification sent to ${users.length} users (${params.targetType})`);
+      productionLogger.info(
+        `Broadcast notification sent to ${users.length} users (${params.targetType})`
+      );
 
       return { success: true, recipientCount: users.length };
     } catch (error) {
@@ -495,16 +498,18 @@ export class NotificationService {
   /**
    * جلب سجل الإشعارات الجماعية
    */
-  static async getBroadcastHistory(limit: number = 20): Promise<{
-    id: string;
-    title: string;
-    message: string;
-    target_type: string;
-    target_value: string | null;
-    recipient_count: number;
-    sent_by_name: string | null;
-    created_at: string;
-  }[]> {
+  static async getBroadcastHistory(limit: number = 20): Promise<
+    {
+      id: string;
+      title: string;
+      message: string;
+      target_type: string;
+      target_value: string | null;
+      recipient_count: number;
+      sent_by_name: string | null;
+      created_at: string;
+    }[]
+  > {
     try {
       const { data, error } = await supabase
         .from('broadcast_notifications')

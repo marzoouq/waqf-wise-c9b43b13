@@ -34,8 +34,15 @@ export const useRequests = (beneficiaryId?: string) => {
   const { addTask } = useTasks();
 
   // Fetch requests using RequestService
-  const { data: requests = [], isLoading, error, refetch } = useQuery({
-    queryKey: beneficiaryId ? [...QUERY_KEYS.REQUESTS, 'beneficiary', beneficiaryId] : QUERY_KEYS.REQUESTS,
+  const {
+    data: requests = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: beneficiaryId
+      ? [...QUERY_KEYS.REQUESTS, 'beneficiary', beneficiaryId]
+      : QUERY_KEYS.REQUESTS,
     queryFn: () => RequestService.getAll(beneficiaryId),
   });
 
@@ -56,7 +63,18 @@ export const useRequests = (beneficiaryId?: string) => {
 
   // Create request
   const createRequest = useMutation({
-    mutationFn: async (newRequest: Omit<BeneficiaryRequest, 'id' | 'request_number' | 'created_at' | 'updated_at' | 'submitted_at' | 'sla_due_at' | 'is_overdue'>) => {
+    mutationFn: async (
+      newRequest: Omit<
+        BeneficiaryRequest,
+        | 'id'
+        | 'request_number'
+        | 'created_at'
+        | 'updated_at'
+        | 'submitted_at'
+        | 'sla_due_at'
+        | 'is_overdue'
+      >
+    ) => {
       const result = await RequestService.create({
         beneficiary_id: newRequest.beneficiary_id,
         request_type_id: newRequest.request_type_id || '',
@@ -64,9 +82,9 @@ export const useRequests = (beneficiaryId?: string) => {
         amount: newRequest.amount,
         priority: newRequest.priority as 'منخفضة' | 'متوسطة' | 'عالية' | 'عاجلة' | undefined,
       });
-      
+
       if (!result.success) throw new Error(result.message);
-      
+
       // Fetch the created request to return
       if (result.id) {
         const created = await RequestService.getById(result.id);
@@ -76,7 +94,7 @@ export const useRequests = (beneficiaryId?: string) => {
     },
     onSuccess: (data: BeneficiaryRequest) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
-      
+
       // إنشاء مهمة للمراجعة
       if (data?.status === 'قيد المراجعة') {
         addTask({
@@ -87,7 +105,7 @@ export const useRequests = (beneficiaryId?: string) => {
           logger.error(error, { context: 'add_request_task', severity: 'low' });
         });
       }
-      
+
       toast({
         title: 'تم بنجاح',
         description: 'تم إرسال الطلب بنجاح',
@@ -150,7 +168,7 @@ export const useRequests = (beneficiaryId?: string) => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
-      
+
       const statusText = variables.status === 'موافق' ? 'الموافقة على' : 'رفض';
       toast({
         title: 'تم بنجاح',

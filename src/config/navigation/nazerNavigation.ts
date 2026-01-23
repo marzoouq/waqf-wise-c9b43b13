@@ -4,43 +4,43 @@
  * @version 1.0.0
  */
 
-import { Home, CheckCircle, Users, FileBarChart, MoreHorizontal } from "lucide-react";
-import type { NavigationItem } from "@/types/navigation";
+import { Home, CheckCircle, Users, FileBarChart, MoreHorizontal } from 'lucide-react';
+import type { NavigationItem } from '@/types/navigation';
 
 export const nazerNavigationItems: readonly NavigationItem[] = [
   {
-    id: "home",
-    label: "الرئيسية",
+    id: 'home',
+    label: 'الرئيسية',
     icon: Home,
-    path: "/nazer-dashboard",
-    matchPaths: ["/nazer-dashboard"],
+    path: '/nazer-dashboard',
+    matchPaths: ['/nazer-dashboard'],
   },
   {
-    id: "approvals",
-    label: "الموافقات",
+    id: 'approvals',
+    label: 'الموافقات',
     icon: CheckCircle,
-    path: "/approvals",
-    matchPaths: ["/approvals"],
+    path: '/approvals',
+    matchPaths: ['/approvals'],
   },
   {
-    id: "beneficiaries",
-    label: "المستفيدون",
+    id: 'beneficiaries',
+    label: 'المستفيدون',
     icon: Users,
-    path: "/beneficiaries",
-    matchPaths: ["/beneficiaries", "/beneficiary-profile"],
+    path: '/beneficiaries',
+    matchPaths: ['/beneficiaries', '/beneficiary-profile'],
   },
   {
-    id: "reports",
-    label: "التقارير",
+    id: 'reports',
+    label: 'التقارير',
     icon: FileBarChart,
-    path: "/reports",
-    matchPaths: ["/reports"],
+    path: '/reports',
+    matchPaths: ['/reports'],
   },
   {
-    id: "more",
-    label: "المزيد",
+    id: 'more',
+    label: 'المزيد',
     icon: MoreHorizontal,
-    path: "/settings",
-    matchPaths: ["/settings", "/governance-decisions"],
+    path: '/settings',
+    matchPaths: ['/settings', '/governance-decisions'],
   },
 ] as const;

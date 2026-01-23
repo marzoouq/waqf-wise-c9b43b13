@@ -42,11 +42,7 @@ const paymentMethods = [
   { value: 'بطاقة', label: 'بطاقة ائتمان/مدى' },
 ];
 
-export function QuickPaymentDialog({
-  open,
-  onOpenChange,
-  tenant,
-}: QuickPaymentDialogProps) {
+export function QuickPaymentDialog({ open, onOpenChange, tenant }: QuickPaymentDialogProps) {
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('نقدي');
@@ -68,13 +64,13 @@ export function QuickPaymentDialog({
         paymentMethod,
         notes: notes || undefined,
       });
-      
+
       const paymentDate = new Date().toISOString().split('T')[0];
 
       // 3. توليد سند القبض PDF
       try {
         const orgSettings = await RentalPaymentService.getOrganizationSettings();
-        
+
         const receiptData = {
           id: ledgerEntry.id,
           payment_number: receiptNumber,
@@ -87,12 +83,11 @@ export function QuickPaymentDialog({
         };
 
         const doc = await generateReceiptPDF(receiptData, orgSettings);
-        
+
         // فتح السند في نافذة جديدة
         const pdfBlob = doc.output('blob');
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
-        
       } catch (pdfError) {
         console.error('Error generating receipt PDF:', pdfError);
         // لا نوقف العملية إذا فشل توليد PDF
@@ -107,17 +102,16 @@ export function QuickPaymentDialog({
           </div>
         </div>
       );
-      
+
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_RECEIPTS });
-      
+
       // إغلاق بعد ثانيتين لإظهار رسالة النجاح
       setTimeout(() => {
         onOpenChange(false);
         resetForm();
       }, 1500);
-      
     } catch (error) {
       console.error('Error recording payment:', error);
       toast.error('حدث خطأ أثناء تسجيل الدفعة');
@@ -139,10 +133,13 @@ export function QuickPaymentDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => {
-      if (!open) resetForm();
-      onOpenChange(open);
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) resetForm();
+        onOpenChange(open);
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -158,7 +155,9 @@ export function QuickPaymentDialog({
               <p className="font-medium">{tenant.full_name}</p>
               <div className="flex justify-between items-center mt-1">
                 <span className="text-sm text-muted-foreground">الرصيد المستحق:</span>
-                <span className={`font-bold ${tenant.current_balance > 0 ? 'text-destructive' : 'text-green-600'}`}>
+                <span
+                  className={`font-bold ${tenant.current_balance > 0 ? 'text-destructive' : 'text-green-600'}`}
+                >
                   {formatCurrency(tenant.current_balance)}
                 </span>
               </div>
@@ -183,12 +182,7 @@ export function QuickPaymentDialog({
                   className="flex-1"
                 />
                 {tenant.current_balance > 0 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePayFullBalance}
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={handlePayFullBalance}>
                     الكل
                   </Button>
                 )}

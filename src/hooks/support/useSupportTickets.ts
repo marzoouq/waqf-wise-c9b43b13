@@ -8,11 +8,7 @@ import { SupportService, type SupportFilters } from '@/services/support.service'
 import { supabase } from '@/integrations/supabase/client';
 import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
-import type { 
-  SupportTicket, 
-  CreateTicketInput, 
-  UpdateTicketInput 
-} from '@/types/support';
+import type { SupportTicket, CreateTicketInput, UpdateTicketInput } from '@/types/support';
 
 /**
  * Hook لإدارة تذاكر الدعم الفني
@@ -21,7 +17,11 @@ export function useSupportTickets(filters?: SupportFilters) {
   const queryClient = useQueryClient();
 
   // جلب التذاكر
-  const { data: tickets, isLoading, error } = useQuery({
+  const {
+    data: tickets,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: [QUERY_KEYS.SUPPORT_TICKETS, filters],
     queryFn: () => SupportService.getTickets(filters),
   });
@@ -29,27 +29,31 @@ export function useSupportTickets(filters?: SupportFilters) {
   // إنشاء تذكرة جديدة
   const createTicket = useMutation({
     mutationFn: async (input: CreateTicketInput) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('يجب تسجيل الدخول');
 
       const ticketNumber = `TKT-${Date.now()}`;
-      
+
       const { data, error } = await supabase
         .from('support_tickets')
-        .insert([{
-          ticket_number: ticketNumber,
-          subject: input.subject,
-          description: input.description,
-          category: input.category,
-          priority: input.priority,
-          source: 'portal',
-          user_id: user.id,
-          beneficiary_id: input.beneficiary_id || null,
-          tags: input.tags || null,
-        }])
+        .insert([
+          {
+            ticket_number: ticketNumber,
+            subject: input.subject,
+            description: input.description,
+            category: input.category,
+            priority: input.priority,
+            source: 'portal',
+            user_id: user.id,
+            beneficiary_id: input.beneficiary_id || null,
+            tags: input.tags || null,
+          },
+        ])
         .select()
         .maybeSingle();
-      
+
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء التذكرة');
       return data;
@@ -103,7 +107,9 @@ export function useSupportTickets(filters?: SupportFilters) {
   // تعيين تذكرة لموظف
   const assignTicket = useMutation({
     mutationFn: async ({ ticketId, userId }: { ticketId: string; userId: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('يجب تسجيل الدخول');
       return SupportService.assign(ticketId, userId, user.id);
     },

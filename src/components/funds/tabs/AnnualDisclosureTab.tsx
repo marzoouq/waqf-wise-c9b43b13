@@ -1,15 +1,22 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { Separator } from "@/components/ui/separator";
-import { 
-  FileText, 
-  TrendingUp, 
-  Users, 
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { Separator } from '@/components/ui/separator';
+import {
+  FileText,
+  TrendingUp,
+  Users,
   Eye,
   FileCheck,
   Download,
@@ -17,16 +24,28 @@ import {
   BarChart3,
   TrendingDown,
   Plus,
-} from "lucide-react";
-import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
-import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
-import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
+} from 'lucide-react';
+import { useAnnualDisclosures, AnnualDisclosure } from '@/hooks/reports/useAnnualDisclosures';
+import { GenerateDisclosureDialog } from '@/components/distributions/GenerateDisclosureDialog';
+import { ViewDisclosureDialog } from '@/components/distributions/ViewDisclosureDialog';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from 'recharts';
 
 export function AnnualDisclosureTab() {
-  const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } = useAnnualDisclosures();
+  const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } =
+    useAnnualDisclosures();
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
@@ -34,26 +53,29 @@ export function AnnualDisclosureTab() {
   const [publishing, setPublishing] = useState(false);
 
   // بيانات المقارنة السنوية
-  const comparisonData = (disclosures || []).slice(0, 5).reverse().map(d => ({
-    year: d.year.toString(),
-    revenues: d.total_revenues,
-    expenses: d.total_expenses,
-    netIncome: d.net_income,
-    beneficiaries: d.total_beneficiaries,
-  }));
+  const comparisonData = (disclosures || [])
+    .slice(0, 5)
+    .reverse()
+    .map((d) => ({
+      year: d.year.toString(),
+      revenues: d.total_revenues,
+      expenses: d.total_expenses,
+      netIncome: d.net_income,
+      beneficiaries: d.total_beneficiaries,
+    }));
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "outline"> = {
-      draft: "secondary",
-      published: "default",
-      archived: "outline",
+    const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
+      draft: 'secondary',
+      published: 'default',
+      archived: 'outline',
     };
     const labels: Record<string, string> = {
-      draft: "مسودة",
-      published: "منشور",
-      archived: "مؤرشف",
+      draft: 'مسودة',
+      published: 'منشور',
+      archived: 'مؤرشف',
     };
-    return <Badge variant={variants[status] || "secondary"}>{labels[status] || status}</Badge>;
+    return <Badge variant={variants[status] || 'secondary'}>{labels[status] || status}</Badge>;
   };
 
   const handlePublish = async (disclosureId: string) => {
@@ -69,7 +91,7 @@ export function AnnualDisclosureTab() {
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       // البحث عن السنة السابقة
-      const previousYear = disclosures?.find(d => d.year === disclosure.year - 1) || null;
+      const previousYear = disclosures?.find((d) => d.year === disclosure.year - 1) || null;
       await generateDisclosurePDF(disclosure, beneficiaries, previousYear);
     } catch {
       // Error already handled in generateDisclosurePDF
@@ -106,7 +128,7 @@ export function AnnualDisclosureTab() {
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
-                  
+
                   <div className="space-y-1 p-3 bg-destructive-light dark:bg-destructive/10 rounded-lg border border-destructive/30">
                     <p className="text-sm text-destructive">إجمالي المصروفات</p>
                     <p className="text-2xl font-bold text-destructive">
@@ -114,7 +136,7 @@ export function AnnualDisclosureTab() {
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
-                  
+
                   <div className="space-y-1 p-3 bg-info-light dark:bg-info/10 rounded-lg border border-info/30">
                     <p className="text-sm text-info">صافي الدخل</p>
                     <p className="text-2xl font-bold text-info">
@@ -122,14 +144,16 @@ export function AnnualDisclosureTab() {
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
-                  
+
                   <div className="space-y-1 p-3 bg-warning-light rounded-lg border border-warning">
                     <p className="text-sm text-warning">عدد المستفيدين</p>
                     <p className="text-2xl font-bold text-warning-foreground">
                       {currentYearDisclosure.total_beneficiaries}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      ({currentYearDisclosure.sons_count} أبناء، {currentYearDisclosure.daughters_count} بنات، {currentYearDisclosure.wives_count} زوجات)
+                      ({currentYearDisclosure.sons_count} أبناء،{' '}
+                      {currentYearDisclosure.daughters_count} بنات،{' '}
+                      {currentYearDisclosure.wives_count} زوجات)
                     </p>
                   </div>
                 </div>
@@ -179,21 +203,21 @@ export function AnnualDisclosureTab() {
                     <Eye className="h-4 w-4" />
                     عرض التفاصيل الكاملة
                   </Button>
-                  
+
                   {currentYearDisclosure.status === 'draft' && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="gap-2"
                       onClick={() => handlePublish(currentYearDisclosure.id)}
                       disabled={publishing}
                     >
                       <FileCheck className="h-4 w-4" />
-                      {publishing ? "جاري النشر..." : "نشر الإفصاح"}
+                      {publishing ? 'جاري النشر...' : 'نشر الإفصاح'}
                     </Button>
                   )}
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     className="gap-2"
                     onClick={() => handleExportPDF(currentYearDisclosure)}
                   >
@@ -269,7 +293,8 @@ export function AnnualDisclosureTab() {
                             <div className="text-sm">
                               <span className="font-medium">{disclosure.total_beneficiaries}</span>
                               <span className="text-muted-foreground text-xs me-1">
-                                ({disclosure.sons_count} ابن، {disclosure.daughters_count} بنت، {disclosure.wives_count} زوجة)
+                                ({disclosure.sons_count} ابن، {disclosure.daughters_count} بنت،{' '}
+                                {disclosure.wives_count} زوجة)
                               </span>
                             </div>
                           </TableCell>
@@ -349,10 +374,10 @@ export function AnnualDisclosureTab() {
                       <YAxis />
                       <Tooltip formatter={(value: number) => value.toLocaleString()} />
                       <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="netIncome" 
-                        stroke="hsl(var(--primary))" 
+                      <Line
+                        type="monotone"
+                        dataKey="netIncome"
+                        stroke="hsl(var(--primary))"
                         strokeWidth={2}
                         name="صافي الدخل"
                       />
@@ -376,10 +401,10 @@ export function AnnualDisclosureTab() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="beneficiaries" 
-                        stroke="hsl(var(--accent))" 
+                      <Line
+                        type="monotone"
+                        dataKey="beneficiaries"
+                        stroke="hsl(var(--accent))"
                         strokeWidth={2}
                         name="عدد المستفيدين"
                       />
@@ -408,10 +433,10 @@ export function AnnualDisclosureTab() {
                       <TableBody>
                         {comparisonData.map((data, index) => {
                           const prevYear = index > 0 ? comparisonData[index - 1] : null;
-                          const change = prevYear 
-                            ? ((data.netIncome - prevYear.netIncome) / prevYear.netIncome) * 100 
+                          const change = prevYear
+                            ? ((data.netIncome - prevYear.netIncome) / prevYear.netIncome) * 100
                             : 0;
-                          
+
                           return (
                             <TableRow key={data.year}>
                               <TableCell className="font-medium">{data.year}</TableCell>
@@ -433,7 +458,9 @@ export function AnnualDisclosureTab() {
                                     ) : (
                                       <TrendingDown className="h-4 w-4 text-destructive" />
                                     )}
-                                    <span className={change > 0 ? "text-success" : "text-destructive"}>
+                                    <span
+                                      className={change > 0 ? 'text-success' : 'text-destructive'}
+                                    >
                                       {Math.abs(change).toFixed(1)}%
                                     </span>
                                   </div>
@@ -462,10 +489,7 @@ export function AnnualDisclosureTab() {
         </TabsContent>
       </Tabs>
 
-      <GenerateDisclosureDialog
-        open={generateOpen}
-        onOpenChange={setGenerateOpen}
-      />
+      <GenerateDisclosureDialog open={generateOpen} onOpenChange={setGenerateOpen} />
 
       <ViewDisclosureDialog
         open={viewOpen}

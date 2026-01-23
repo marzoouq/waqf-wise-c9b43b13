@@ -51,12 +51,15 @@ const ratioInfo: Record<string, { label: string; description: string; goodAbove?
 export function FinancialRatiosReport() {
   const { kpis, isLoading } = useFinancialAnalytics();
 
-  const latestKPIs = kpis.reduce((acc: Record<string, FinancialRatioKPI>, kpi) => {
-    if (!acc[kpi.kpi_name] || new Date(kpi.created_at) > new Date(acc[kpi.kpi_name].created_at)) {
-      acc[kpi.kpi_name] = kpi;
-    }
-    return acc;
-  }, {} as Record<string, FinancialRatioKPI>);
+  const latestKPIs = kpis.reduce(
+    (acc: Record<string, FinancialRatioKPI>, kpi) => {
+      if (!acc[kpi.kpi_name] || new Date(kpi.created_at) > new Date(acc[kpi.kpi_name].created_at)) {
+        acc[kpi.kpi_name] = kpi;
+      }
+      return acc;
+    },
+    {} as Record<string, FinancialRatioKPI>
+  );
 
   const getStatus = (kpi: FinancialRatioKPI) => {
     if (!kpi.kpi_target) return 'neutral';
@@ -91,9 +94,7 @@ export function FinancialRatiosReport() {
           <Activity className="h-5 w-5 text-primary" />
           تقرير النسب والمؤشرات المالية
         </CardTitle>
-        <CardDescription>
-          تحليل النسب المالية الرئيسية ومؤشرات الأداء
-        </CardDescription>
+        <CardDescription>تحليل النسب المالية الرئيسية ومؤشرات الأداء</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,7 +103,7 @@ export function FinancialRatiosReport() {
             if (!info) return null;
 
             const status = getStatus(kpi);
-            const achievement = kpi.kpi_target 
+            const achievement = kpi.kpi_target
               ? Math.min((kpi.kpi_value / kpi.kpi_target) * 100, 150)
               : 0;
 
@@ -112,9 +113,7 @@ export function FinancialRatiosReport() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-base">{info.label}</CardTitle>
-                      <CardDescription className="text-xs mt-1">
-                        {info.description}
-                      </CardDescription>
+                      <CardDescription className="text-xs mt-1">{info.description}</CardDescription>
                     </div>
                     {status === 'good' && (
                       <TrendingUp className="h-5 w-5 text-success flex-shrink-0" />
@@ -126,9 +125,7 @@ export function FinancialRatiosReport() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-end gap-2">
-                    <div className="text-3xl font-bold">
-                      {kpi.kpi_value.toFixed(2)}
-                    </div>
+                    <div className="text-3xl font-bold">{kpi.kpi_value.toFixed(2)}</div>
                     {name.includes('margin') || name.includes('expense') ? (
                       <span className="text-muted-foreground mb-1">%</span>
                     ) : name.includes('ratio') ? (
@@ -149,10 +146,7 @@ export function FinancialRatiosReport() {
                           {achievement.toFixed(0)}%
                         </Badge>
                       </div>
-                      <Progress
-                        value={achievement}
-                        className="h-2"
-                      />
+                      <Progress value={achievement} className="h-2" />
                     </div>
                   )}
 

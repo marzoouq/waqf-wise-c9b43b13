@@ -3,8 +3,8 @@
  * Core application routes
  */
 
-import { Route } from "react-router-dom";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import {
   Beneficiaries,
   BeneficiaryProfile,
@@ -44,351 +44,365 @@ import {
   Notifications,
   Chatbot,
   NotFound,
-} from "./lazyPages";
+} from './lazyPages';
 
 export const coreRoutes = [
   // المستفيدين
-  <Route 
+  <Route
     key="beneficiaries"
-    path="/beneficiaries" 
+    path="/beneficiaries"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Beneficiaries />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="beneficiaries-profile"
-    path="/beneficiaries/:id" 
+    path="/beneficiaries/:id"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant', 'beneficiary', 'waqf_heir']}>
         <BeneficiaryProfile />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // العائلات
-  <Route 
+  <Route
     key="families"
-    path="/families" 
+    path="/families"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Families />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="family-details"
-    path="/families/:id" 
+    path="/families/:id"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <FamilyDetails />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // العقارات والأصول
   <Route
     key="properties"
-    path="/properties" 
+    path="/properties"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Properties />
       </ProtectedRoute>
-    } 
+    }
   />,
   <Route
     key="tenants"
-    path="/tenants" 
+    path="/tenants"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant', 'cashier']}>
         <Tenants />
       </ProtectedRoute>
-    } 
+    }
   />,
   <Route
     key="tenant-details"
-    path="/tenants/:id" 
+    path="/tenants/:id"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant', 'cashier']}>
         <TenantDetails />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="funds"
-    path="/funds" 
+    path="/funds"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Funds />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="waqf-units"
-    path="/waqf-units" 
+    path="/waqf-units"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <WaqfUnits />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // الأرشيف
-  <Route 
+  <Route
     key="archive"
-    path="/archive" 
+    path="/archive"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "archivist", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'archivist', 'waqf_heir']}>
         <Archive />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // المحاسبة والمالية
-  <Route 
+  <Route
     key="accounting"
-    path="/accounting" 
+    path="/accounting"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Accounting />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="fiscal-years"
-    path="/fiscal-years" 
+    path="/fiscal-years"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <FiscalYearsManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="fiscal-years-management"
-    path="/fiscal-years-management" 
+    path="/fiscal-years-management"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <FiscalYearsManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="budgets"
     path="/budgets"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Budgets />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="invoices"
-    path="/invoices" 
+    path="/invoices"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Invoices />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="payments"
-    path="/payments" 
+    path="/payments"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute
+        requiredRoles={['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'waqf_heir']}
+      >
         <Payments />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="payment-vouchers"
-    path="/payment-vouchers" 
+    path="/payment-vouchers"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant', 'cashier']}>
         <PaymentVouchers />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="loans"
-    path="/loans" 
+    path="/loans"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Loans />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="bank-transfers"
-    path="/bank-transfers" 
+    path="/bank-transfers"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <BankTransfers />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="all-transactions"
-    path="/all-transactions" 
+    path="/all-transactions"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <AllTransactions />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="approvals"
-    path="/approvals" 
+    path="/approvals"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Approvals />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // التقارير
-  <Route 
+  <Route
     key="reports"
-    path="/reports" 
+    path="/reports"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Reports />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="reports-custom"
-    path="/reports/custom" 
+    path="/reports/custom"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <CustomReportsPage />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // الطلبات
-  <Route 
+  <Route
     key="requests"
-    path="/requests" 
+    path="/requests"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant', 'cashier']}>
         <Requests />
       </ProtectedRoute>
-    } 
+    }
   />,
   // Redirect old staff/requests to new requests page
-  <Route 
+  <Route
     key="staff-requests-redirect"
-    path="/staff/requests" 
+    path="/staff/requests"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <Requests />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="emergency-aid"
-    path="/emergency-aid" 
+    path="/emergency-aid"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'accountant']}>
         <EmergencyAidManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // الدعم والمساعدة
   <Route key="support" path="/support" element={<Support />} />,
   <Route key="knowledge-base" path="/knowledge-base" element={<KnowledgeBase />} />,
-  <Route 
+  <Route
     key="messages"
-    path="/messages" 
+    path="/messages"
     element={
       <ProtectedRoute>
         <Messages />
       </ProtectedRoute>
-    } 
+    }
   />,
   <Route key="chatbot" path="/chatbot" element={<Chatbot />} />,
-  
+
   // الحوكمة
-  <Route 
+  <Route
     key="governance-decisions"
-    path="/governance/decisions" 
+    path="/governance/decisions"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'beneficiary', 'waqf_heir']}>
         <GovernanceDecisions />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="decision-details"
-    path="/governance/decisions/:id" 
+    path="/governance/decisions/:id"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'beneficiary', 'waqf_heir']}>
         <DecisionDetails />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="governance-boards"
-    path="/governance/boards" 
+    path="/governance/boards"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <GovernanceBoards />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="governance-policies"
-    path="/governance/policies" 
+    path="/governance/policies"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "archivist"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer', 'archivist']}>
         <GovernancePolicies />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="governance-guide"
-    path="/governance/guide" 
+    path="/governance/guide"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "archivist", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute
+        requiredRoles={[
+          'admin',
+          'nazer',
+          'accountant',
+          'cashier',
+          'archivist',
+          'beneficiary',
+          'waqf_heir',
+        ]}
+      >
         <WaqfGovernanceGuide />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // الإعدادات
-  <Route 
+  <Route
     key="settings"
-    path="/settings" 
+    path="/settings"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <Settings />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="transparency-settings"
-    path="/transparency-settings" 
+    path="/transparency-settings"
     element={
       <ProtectedRoute requiredRole="nazer">
         <TransparencySettings />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="notifications-settings"
-    path="/notifications/settings" 
+    path="/notifications/settings"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary", "waqf_heir"]}>
+      <ProtectedRoute
+        requiredRoles={['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'waqf_heir']}
+      >
         <NotificationSettingsPage />
       </ProtectedRoute>
-    } 
+    }
   />,
-  
+
   // الإشعارات
   <Route key="notifications" path="/notifications" element={<Notifications />} />,
-  
+
   // صفحة غير موجودة
   <Route key="not-found" path="*" element={<NotFound />} />,
 ];

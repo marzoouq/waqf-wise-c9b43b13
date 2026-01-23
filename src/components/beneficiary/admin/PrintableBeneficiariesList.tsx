@@ -1,16 +1,16 @@
-import { Beneficiary } from "@/types/beneficiary";
-import { format, arLocale as ar } from "@/lib/date";
+import { Beneficiary } from '@/types/beneficiary';
+import { format, arLocale as ar } from '@/lib/date';
 
 interface PrintableBeneficiariesListProps {
   beneficiaries: Beneficiary[];
   title?: string;
 }
 
-export function PrintableBeneficiariesList({ 
+export function PrintableBeneficiariesList({
   beneficiaries,
-  title = "كشف المستفيدين من الدرجة الأولى"
+  title = 'كشف المستفيدين من الدرجة الأولى',
 }: PrintableBeneficiariesListProps) {
-  const printDate = format(new Date(), "dd MMMM yyyy", { locale: ar });
+  const printDate = format(new Date(), 'dd MMMM yyyy', { locale: ar });
 
   return (
     <div className="print-container">
@@ -157,18 +157,18 @@ export function PrintableBeneficiariesList({
         <div style={{ marginBottom: '20px' }}>
           <strong>إجمالي عدد المستفيدين:</strong> {beneficiaries.length}
         </div>
-        
+
         <div className="signature-section">
           <div className="signature-box">
             <div className="signature-line"></div>
             <div>المعد</div>
           </div>
-          
+
           <div className="signature-box">
             <div className="signature-line"></div>
             <div>المراجع</div>
           </div>
-          
+
           <div className="signature-box">
             <div className="signature-line"></div>
             <div>الناظر</div>

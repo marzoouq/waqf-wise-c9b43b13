@@ -91,10 +91,21 @@ export function useJournalEntryForm() {
   });
 
   return {
-    entryDate, setEntryDate, description, setDescription, lines,
-    accounts, activeFiscalYear,
-    totalDebit, totalCredit, isBalanced,
-    addLine, removeLine, updateLine, saveEntry, resetForm,
+    entryDate,
+    setEntryDate,
+    description,
+    setDescription,
+    lines,
+    accounts,
+    activeFiscalYear,
+    totalDebit,
+    totalCredit,
+    isBalanced,
+    addLine,
+    removeLine,
+    updateLine,
+    saveEntry,
+    resetForm,
     isSaving: saveEntry.isPending,
   };
 }

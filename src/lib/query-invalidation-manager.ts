@@ -45,7 +45,7 @@ class QueryInvalidationManager {
     }
 
     const key = JSON.stringify(queryKey);
-    
+
     // منع الإبطال المتكرر لنفس المفتاح
     if (this.pendingInvalidations.has(key)) {
       return;
@@ -67,7 +67,7 @@ class QueryInvalidationManager {
    * إضافة عدة مفاتيح للإبطال دفعة واحدة
    */
   invalidateMultiple(queryKeys: (readonly unknown[])[]): void {
-    queryKeys.forEach(key => this.invalidate(key));
+    queryKeys.forEach((key) => this.invalidate(key));
   }
 
   /**
@@ -75,7 +75,7 @@ class QueryInvalidationManager {
    */
   private flushInvalidations(): void {
     if (!this.queryClient || this.isProcessing) return;
-    
+
     this.isProcessing = true;
     const count = this.pendingInvalidations.size;
 
@@ -86,7 +86,7 @@ class QueryInvalidationManager {
     }
 
     // تنفيذ الإبطالات
-    this.pendingInvalidations.forEach(keyStr => {
+    this.pendingInvalidations.forEach((keyStr) => {
       try {
         const queryKey = JSON.parse(keyStr);
         this.queryClient!.invalidateQueries({ queryKey });
@@ -133,13 +133,13 @@ class QueryInvalidationManager {
    */
   clearAllCache(): void {
     if (!this.queryClient) return;
-    
+
     // إلغاء جميع الإبطالات المعلقة
     this.clearPending();
-    
+
     // مسح جميع الـ cache
     this.queryClient.clear();
-    
+
     if (import.meta.env.DEV) {
       import('@/lib/logger').then(({ logger }) =>
         logger.info('[QueryInvalidationManager] ✅ All cache cleared')

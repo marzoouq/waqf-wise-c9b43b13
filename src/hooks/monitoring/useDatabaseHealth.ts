@@ -3,13 +3,10 @@
  * Comprehensive Database Health Monitoring Hook
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
-import { toast } from "sonner";
-import { 
-  dbHealthService, 
-  type HealthAlert 
-} from "@/services/monitoring/db-health.service";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { toast } from 'sonner';
+import { dbHealthService, type HealthAlert } from '@/services/monitoring/db-health.service';
 
 const QUERY_KEY = 'database-health';
 const REFRESH_INTERVAL = 60000; // 1 minute
@@ -17,12 +14,12 @@ const REFRESH_INTERVAL = 60000; // 1 minute
 export function useDatabaseHealth() {
   const queryClient = useQueryClient();
 
-  const { 
-    data: report, 
-    isLoading, 
-    error, 
+  const {
+    data: report,
+    isLoading,
+    error,
     refetch,
-    dataUpdatedAt 
+    dataUpdatedAt,
   } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => dbHealthService.getHealthReport(),
@@ -38,38 +35,38 @@ export function useDatabaseHealth() {
   }, [report]);
 
   // Filter alerts by type
-  const criticalAlerts = alerts.filter(a => a.type === 'critical');
-  const warningAlerts = alerts.filter(a => a.type === 'warning');
+  const criticalAlerts = alerts.filter((a) => a.type === 'critical');
+  const warningAlerts = alerts.filter((a) => a.type === 'warning');
 
   // Health score calculation (0-100)
   const healthScore = useMemo(() => {
     if (!report) return 100;
-    
+
     let score = 100;
-    
+
     // Deduct for duplicate indexes (max -20)
     score -= Math.min(report.duplicateIndexes.length * 2, 20);
-    
+
     // Deduct for duplicate policies (max -10)
     score -= Math.min(report.duplicatePolicies.length * 2, 10);
-    
+
     // Deduct for dead rows (max -20)
     if (report.summary.total_dead_rows > 10000) {
       score -= Math.min(Math.floor(report.summary.total_dead_rows / 10000) * 5, 20);
     }
-    
+
     // Deduct for low cache hit (max -15)
     if (report.summary.cache_hit_ratio > 0 && report.summary.cache_hit_ratio < 95) {
       score -= Math.min(Math.floor((95 - report.summary.cache_hit_ratio) * 1.5), 15);
     }
-    
+
     // Deduct for query errors (max -15)
     score -= Math.min(report.queryErrors.length * 3, 15);
-    
+
     // Deduct for tables needing vacuum (max -10)
-    const tablesNeedingVacuum = report.deadRowsInfo.filter(t => t.dead_pct > 50).length;
+    const tablesNeedingVacuum = report.deadRowsInfo.filter((t) => t.dead_pct > 50).length;
     score -= Math.min(tablesNeedingVacuum * 2, 10);
-    
+
     return Math.max(score, 0);
   }, [report]);
 
@@ -119,18 +116,18 @@ export function useDatabaseHealth() {
     error,
     refetch,
     lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : null,
-    
+
     // Alerts
     alerts,
     criticalAlerts,
     warningAlerts,
     hasAlerts: alerts.length > 0,
     hasCriticalAlerts: criticalAlerts.length > 0,
-    
+
     // Health metrics
     healthScore,
     healthStatus,
-    
+
     // Actions
     runVacuumAll: vacuumAllMutation.mutate,
     isRunningVacuumAll: vacuumAllMutation.isPending,

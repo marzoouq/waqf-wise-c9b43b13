@@ -3,7 +3,7 @@
  * @version 2.8.52
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ScheduledReport {
   id: string;
@@ -32,17 +32,19 @@ export class ScheduledReportService {
   static async getAll(): Promise<ScheduledReport[]> {
     const { data, error } = await supabase
       .from('scheduled_report_jobs')
-      .select(`
+      .select(
+        `
         *,
         report_template:report_template_id(*)
-      `)
+      `
+      )
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map(item => ({
+    return (data || []).map((item) => ({
       ...item,
-      recipients: item.recipients as Array<{ user_id: string; email: string }>
+      recipients: item.recipients as Array<{ user_id: string; email: string }>,
     })) as ScheduledReport[];
   }
 
@@ -52,7 +54,9 @@ export class ScheduledReportService {
   static async create(
     report: Omit<ScheduledReport, 'id' | 'created_at' | 'updated_at' | 'created_by'>
   ): Promise<ScheduledReport> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const nextRun = this.calculateNextRun(report.schedule_type);
 
     const { data, error } = await supabase
@@ -69,14 +73,17 @@ export class ScheduledReportService {
     if (!data) throw new Error('فشل إنشاء التقرير المجدول');
     return {
       ...data,
-      recipients: data.recipients as Array<{ user_id: string; email: string }>
+      recipients: data.recipients as Array<{ user_id: string; email: string }>,
     } as ScheduledReport;
   }
 
   /**
    * تحديث تقرير مجدول
    */
-  static async update(id: string, updates: Partial<ScheduledReport>): Promise<ScheduledReport | null> {
+  static async update(
+    id: string,
+    updates: Partial<ScheduledReport>
+  ): Promise<ScheduledReport | null> {
     const { data, error } = await supabase
       .from('scheduled_report_jobs')
       .update(updates)
@@ -88,7 +95,7 @@ export class ScheduledReportService {
     if (!data) return null;
     return {
       ...data,
-      recipients: data.recipients as Array<{ user_id: string; email: string }>
+      recipients: data.recipients as Array<{ user_id: string; email: string }>,
     } as ScheduledReport;
   }
 
@@ -96,15 +103,17 @@ export class ScheduledReportService {
    * حذف تقرير مجدول (Soft Delete)
    */
   static async delete(id: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('scheduled_report_jobs')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id,
         deletion_reason: 'حذف بواسطة المستخدم',
-        is_active: false
+        is_active: false,
       })
       .eq('id', id);
 
@@ -116,7 +125,7 @@ export class ScheduledReportService {
    */
   static async trigger(reportId: string): Promise<unknown> {
     const { data, error } = await supabase.functions.invoke('generate-scheduled-report', {
-      body: { reportId }
+      body: { reportId },
     });
 
     if (error) throw error;

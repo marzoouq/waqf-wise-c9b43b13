@@ -1,15 +1,15 @@
 /**
  * Beneficiary Service - خدمة إدارة المستفيدين (Facade)
  * @version 2.8.82
- * 
+ *
  * هذا الملف يعمل كـ Facade للتوافق مع الكود القديم
  * الخدمات الفعلية موجودة في مجلد beneficiary/
  */
 
-import { 
-  BeneficiaryCoreService, 
-  BeneficiaryDocumentsService, 
-  BeneficiaryAnalyticsService, 
+import {
+  BeneficiaryCoreService,
+  BeneficiaryDocumentsService,
+  BeneficiaryAnalyticsService,
   BeneficiaryVerificationService,
   BeneficiaryTabsService,
   type BeneficiaryFilters,

@@ -18,7 +18,12 @@ interface OpenShiftDialogProps {
   isLoading?: boolean;
 }
 
-export function OpenShiftDialog({ open, onOpenChange, onConfirm, isLoading }: OpenShiftDialogProps) {
+export function OpenShiftDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  isLoading,
+}: OpenShiftDialogProps) {
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {

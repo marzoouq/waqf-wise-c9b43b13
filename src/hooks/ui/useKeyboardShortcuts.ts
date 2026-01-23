@@ -81,7 +81,8 @@ export function useBeneficiaryKeyboardShortcuts() {
       action: () => {
         toast({
           title: 'اختصارات لوحة المفاتيح',
-          description: 'Alt + H: الصفحة الرئيسية | Alt + R: طلب فزعة | Alt + L: طلب قرض | Alt + M: الرسائل',
+          description:
+            'Alt + H: الصفحة الرئيسية | Alt + R: طلب فزعة | Alt + L: طلب قرض | Alt + M: الرسائل',
         });
       },
       description: 'عرض قائمة الاختصارات',

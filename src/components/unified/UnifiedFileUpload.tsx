@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
-import { Upload, X, File, Image, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState, useRef } from 'react';
+import { Upload, X, File, Image, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/ui/use-toast';
 
 export interface UploadedFile {
   id: string;
@@ -22,7 +22,7 @@ interface UnifiedFileUploadProps {
   onUpload?: (files: File[]) => Promise<void>;
   disabled?: boolean;
   className?: string;
-  variant?: "default" | "compact" | "avatar";
+  variant?: 'default' | 'compact' | 'avatar';
   showPreview?: boolean;
   dragDropText?: string;
   browseText?: string;
@@ -31,7 +31,7 @@ interface UnifiedFileUploadProps {
 /**
  * مكون رفع ملفات موحد
  * يدعم السحب والإفلات، معاينة الصور، تحديد أنواع الملفات
- * 
+ *
  * @example
  * <UnifiedFileUpload
  *   accept="image/*"
@@ -51,10 +51,10 @@ export function UnifiedFileUpload({
   onUpload,
   disabled = false,
   className,
-  variant = "default",
+  variant = 'default',
   showPreview = true,
-  dragDropText = "اسحب الملفات هنا أو انقر للاختيار",
-  browseText = "اختر ملفات",
+  dragDropText = 'اسحب الملفات هنا أو انقر للاختيار',
+  browseText = 'اختر ملفات',
 }: UnifiedFileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>(value);
@@ -65,33 +65,33 @@ export function UnifiedFileUpload({
     if (!newFiles || newFiles.length === 0) return;
 
     const fileArray = Array.from(newFiles);
-    
+
     // التحقق من عدد الملفات
     if (!multiple && fileArray.length > 1) {
       toast({
-        title: "خطأ",
-        description: "يمكنك رفع ملف واحد فقط",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يمكنك رفع ملف واحد فقط',
+        variant: 'destructive',
       });
       return;
     }
 
     if (files.length + fileArray.length > maxFiles) {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: `لا يمكن رفع أكثر من ${maxFiles} ملف`,
-        variant: "destructive",
+        variant: 'destructive',
       });
       return;
     }
 
     // التحقق من حجم الملفات
-    const oversizedFiles = fileArray.filter(f => f.size > maxSize * 1024 * 1024);
+    const oversizedFiles = fileArray.filter((f) => f.size > maxSize * 1024 * 1024);
     if (oversizedFiles.length > 0) {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: `حجم الملف يجب أن لا يتجاوز ${maxSize} ميجابايت`,
-        variant: "destructive",
+        variant: 'destructive',
       });
       return;
     }
@@ -102,7 +102,7 @@ export function UnifiedFileUpload({
         const id = Math.random().toString(36).substr(2, 9);
         let preview: string | undefined;
 
-        if (file.type.startsWith("image/")) {
+        if (file.type.startsWith('image/')) {
           preview = await new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result as string);
@@ -123,14 +123,14 @@ export function UnifiedFileUpload({
       try {
         await onUpload(fileArray);
         toast({
-          title: "تم الرفع بنجاح",
+          title: 'تم الرفع بنجاح',
           description: `تم رفع ${fileArray.length} ملف`,
         });
       } catch {
         toast({
-          title: "خطأ في الرفع",
-          description: "حدث خطأ أثناء رفع الملفات",
-          variant: "destructive",
+          title: 'خطأ في الرفع',
+          description: 'حدث خطأ أثناء رفع الملفات',
+          variant: 'destructive',
         });
       }
     }
@@ -158,28 +158,32 @@ export function UnifiedFileUpload({
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith("image/")) return Image;
-    if (file.type.startsWith("text/") || file.type.includes("document")) return FileText;
+    if (file.type.startsWith('image/')) return Image;
+    if (file.type.startsWith('text/') || file.type.includes('document')) return FileText;
     return File;
   };
 
-  if (variant === "avatar") {
+  if (variant === 'avatar') {
     const currentFile = files[0];
     return (
-      <div className={cn("flex flex-col items-center gap-4", className)}>
+      <div className={cn('flex flex-col items-center gap-4', className)}>
         <div
           onClick={() => !disabled && fileInputRef.current?.click()}
           className={cn(
-            "relative w-32 h-32 rounded-full overflow-hidden border-2 border-dashed cursor-pointer transition-colors",
-            isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-            disabled && "opacity-50 cursor-not-allowed"
+            'relative w-32 h-32 rounded-full overflow-hidden border-2 border-dashed cursor-pointer transition-colors',
+            isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25',
+            disabled && 'opacity-50 cursor-not-allowed'
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
           {currentFile?.preview ? (
-            <img src={currentFile.preview} alt="صورة الملف المحمل" className="w-full h-full object-cover" />
+            <img
+              src={currentFile.preview}
+              alt="صورة الملف المحمل"
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
               <Upload className="h-8 w-8 text-muted-foreground" />
@@ -208,9 +212,9 @@ export function UnifiedFileUpload({
     );
   }
 
-  if (variant === "compact") {
+  if (variant === 'compact') {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className={cn('space-y-2', className)}>
         <Button
           type="button"
           variant="outline"
@@ -254,12 +258,12 @@ export function UnifiedFileUpload({
   }
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       <Card
         className={cn(
-          "border-2 border-dashed transition-colors cursor-pointer",
-          isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-          disabled && "opacity-50 cursor-not-allowed"
+          'border-2 border-dashed transition-colors cursor-pointer',
+          isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25',
+          disabled && 'opacity-50 cursor-not-allowed'
         )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

@@ -4,12 +4,12 @@
  * @version 2.9.11
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { PropertyService, type PropertyFilters } from "@/services/property.service";
-import type { PaginatedResult } from "@/lib/pagination.types";
-import type { Database } from "@/integrations/supabase/types";
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { PropertyService, type PropertyFilters } from '@/services/property.service';
+import type { PaginatedResult } from '@/lib/pagination.types';
+import type { Database } from '@/integrations/supabase/types';
 
 type PropertyRow = Database['public']['Tables']['properties']['Row'];
 
@@ -21,15 +21,15 @@ interface UsePropertiesPaginatedOptions {
 
 export function usePropertiesPaginated(options: UsePropertiesPaginatedOptions = {}) {
   const { initialPage = 1, initialPageSize = 15, filters } = options;
-  
+
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const query = useQuery({
-    queryKey: [...QUERY_KEYS.PROPERTIES, "paginated", page, pageSize, filters],
+    queryKey: [...QUERY_KEYS.PROPERTIES, 'paginated', page, pageSize, filters],
     queryFn: async (): Promise<PaginatedResult<PropertyRow>> => {
       const allProperties = await PropertyService.getAll(filters);
-      
+
       const totalItems = allProperties.length;
       const totalPages = Math.ceil(totalItems / pageSize);
       const startIndex = (page - 1) * pageSize;

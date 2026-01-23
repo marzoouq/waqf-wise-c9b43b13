@@ -1,9 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, FileCheck, Printer } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import { loadArabicFontToPDF, addWaqfFooter, WAQF_COLORS, processArabicText } from "@/lib/pdf/arabic-pdf-utils";
-import { WAQF_IDENTITY } from "@/lib/waqf-identity";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, FileCheck, Printer } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import {
+  loadArabicFontToPDF,
+  addWaqfFooter,
+  WAQF_COLORS,
+  processArabicText,
+} from '@/lib/pdf/arabic-pdf-utils';
+import { WAQF_IDENTITY } from '@/lib/waqf-identity';
 
 interface BeneficiaryCertificateProps {
   beneficiaryName: string;
@@ -26,16 +31,13 @@ export function BeneficiaryCertificate({
   };
 
   const handleGeneratePDF = async () => {
-    const [jsPDFModule] = await Promise.all([
-      import('jspdf'),
-      import('jspdf-autotable')
-    ]);
-    
+    const [jsPDFModule] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
+
     const jsPDF = jsPDFModule.default;
     const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
     });
 
     // تحميل الخط العربي من الملف المحلي
@@ -51,86 +53,95 @@ export function BeneficiaryCertificate({
     doc.rect(15, 15, 180, 267);
 
     // شعار واسم الوقف
-    doc.setFont(fontName, "bold");
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(18);
     doc.setTextColor(...WAQF_COLORS.primary);
-    doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, 35, { align: "center" });
+    doc.text(processArabicText(`${WAQF_IDENTITY.logo} ${WAQF_IDENTITY.name}`), pageWidth / 2, 35, {
+      align: 'center',
+    });
 
     // العنوان الرئيسي
     doc.setFontSize(24);
-    doc.text(processArabicText("شهادة استحقاق"), pageWidth / 2, 55, { align: "center" });
+    doc.text(processArabicText('شهادة استحقاق'), pageWidth / 2, 55, { align: 'center' });
 
     // العنوان الفرعي
-    doc.setFont(fontName, "normal");
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(14);
     doc.setTextColor(...WAQF_COLORS.muted);
-    doc.text(processArabicText("من منصة إدارة الوقف الإلكترونية"), pageWidth / 2, 68, { align: "center" });
+    doc.text(processArabicText('من منصة إدارة الوقف الإلكترونية'), pageWidth / 2, 68, {
+      align: 'center',
+    });
 
     // المحتوى الرئيسي
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
     const startY = 90;
-    
-    doc.text(processArabicText("تشهد منصة إدارة الوقف أن:"), pageWidth / 2, startY, { align: "center" });
-    
+
+    doc.text(processArabicText('تشهد منصة إدارة الوقف أن:'), pageWidth / 2, startY, {
+      align: 'center',
+    });
+
     // اسم المستفيد
-    doc.setFont(fontName, "bold");
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(20);
     doc.setTextColor(...WAQF_COLORS.primary);
-    doc.text(processArabicText(beneficiaryName), pageWidth / 2, startY + 20, { align: "center" });
-    
+    doc.text(processArabicText(beneficiaryName), pageWidth / 2, startY + 20, { align: 'center' });
+
     // رقم الهوية
-    doc.setFont(fontName, "normal");
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text(processArabicText(`رقم الهوية: ${nationalId}`), pageWidth / 2, startY + 35, { align: "center" });
-    
+    doc.text(processArabicText(`رقم الهوية: ${nationalId}`), pageWidth / 2, startY + 35, {
+      align: 'center',
+    });
+
     // النص
+    doc.text(processArabicText('هو من المستفيدين المسجلين لدى الوقف'), pageWidth / 2, startY + 55, {
+      align: 'center',
+    });
+
     doc.text(
-      processArabicText("هو من المستفيدين المسجلين لدى الوقف"),
-      pageWidth / 2,
-      startY + 55,
-      { align: "center" }
-    );
-    
-    doc.text(
-      processArabicText("وله الحق في الانتفاع من غلة الوقف حسب الشروط"),
+      processArabicText('وله الحق في الانتفاع من غلة الوقف حسب الشروط'),
       pageWidth / 2,
       startY + 70,
-      { align: "center" }
+      { align: 'center' }
     );
 
     // الفئة والحالة
-    doc.setFont(fontName, "bold");
+    doc.setFont(fontName, 'bold');
     doc.setTextColor(...WAQF_COLORS.secondary);
-    doc.text(processArabicText(`الفئة: ${category}`), pageWidth / 2, startY + 95, { align: "center" });
-    doc.text(processArabicText(`الحالة: ${status}`), pageWidth / 2, startY + 110, { align: "center" });
+    doc.text(processArabicText(`الفئة: ${category}`), pageWidth / 2, startY + 95, {
+      align: 'center',
+    });
+    doc.text(processArabicText(`الحالة: ${status}`), pageWidth / 2, startY + 110, {
+      align: 'center',
+    });
 
     // تاريخ الإصدار
-    doc.setFont(fontName, "normal");
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(12);
     doc.setTextColor(...WAQF_COLORS.muted);
     doc.text(
-      processArabicText(`تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`),
+      processArabicText(`تاريخ الإصدار: ${format(new Date(), 'dd MMMM yyyy', { locale: ar })}`),
       pageWidth / 2,
       startY + 135,
-      { align: "center" }
+      { align: 'center' }
     );
 
     // منطقة التوقيع
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text(processArabicText("الناظر"), 50, 240);
+    doc.text(processArabicText('الناظر'), 50, 240);
     doc.line(30, 245, 80, 245);
-    
-    doc.text(processArabicText("الختم الرسمي"), 150, 240);
+
+    doc.text(processArabicText('الختم الرسمي'), 150, 240);
     doc.setDrawColor(...WAQF_COLORS.primary);
     doc.circle(150, 255, 15);
 
     // التذييل
     addWaqfFooter(doc, fontName);
 
-    doc.save(`شهادة-استحقاق-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    doc.save(`شهادة-استحقاق-${beneficiaryName}-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
@@ -164,7 +175,7 @@ export function BeneficiaryCertificate({
           {/* Content */}
           <div className="space-y-4 text-center">
             <p className="text-lg">تشهد منصة إدارة الوقف الإلكترونية بأن:</p>
-            
+
             <div className="py-4">
               <p className="text-2xl font-bold text-primary mb-2">{beneficiaryName}</p>
               <p className="text-muted-foreground">رقم الهوية: {nationalId}</p>
@@ -178,7 +189,7 @@ export function BeneficiaryCertificate({
               <div>
                 <p className="text-sm text-muted-foreground">تاريخ التسجيل</p>
                 <p className="font-semibold">
-                  {format(new Date(registrationDate), "dd MMMM yyyy", { locale: ar })}
+                  {format(new Date(registrationDate), 'dd MMMM yyyy', { locale: ar })}
                 </p>
               </div>
               <div>
@@ -195,8 +206,7 @@ export function BeneficiaryCertificate({
           {/* Footer */}
           <div className="border-t pt-4 space-y-2">
             <p className="text-sm text-muted-foreground text-center">
-              صدرت هذه الشهادة بتاريخ:{" "}
-              {format(new Date(), "dd MMMM yyyy", { locale: ar })}
+              صدرت هذه الشهادة بتاريخ: {format(new Date(), 'dd MMMM yyyy', { locale: ar })}
             </p>
             <div className="flex justify-between items-center pt-4">
               <div className="text-center">
@@ -215,7 +225,7 @@ export function BeneficiaryCertificate({
           {/* Watermark */}
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
-              رقم مرجعي: WF-{nationalId}-{format(new Date(), "yyyy")}
+              رقم مرجعي: WF-{nationalId}-{format(new Date(), 'yyyy')}
             </p>
           </div>
         </div>

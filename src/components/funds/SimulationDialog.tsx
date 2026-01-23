@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
 import {
   Form,
   FormControl,
@@ -10,24 +10,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
-import { useDistributionEngine, SimulationResult } from "@/hooks/distributions/useDistributionEngine";
-import { DistributionPatternSelector } from "./DistributionPatternSelector";
-import { ScenarioComparison } from "../distributions/ScenarioComparison";
-import { SmartRecommendations } from "../distributions/SmartRecommendations";
-import { Loader2, TrendingUp } from "lucide-react";
-import { matchesStatus } from "@/lib/constants";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import {
+  useDistributionEngine,
+  SimulationResult,
+} from '@/hooks/distributions/useDistributionEngine';
+import { DistributionPatternSelector } from './DistributionPatternSelector';
+import { ScenarioComparison } from '../distributions/ScenarioComparison';
+import { SmartRecommendations } from '../distributions/SmartRecommendations';
+import { Loader2, TrendingUp } from 'lucide-react';
+import { matchesStatus } from '@/lib/constants';
 
 const simulationSchema = z.object({
-  availableAmount: z.coerce
-    .number()
-    .min(1, { message: "المبلغ المتاح يجب أن يكون أكبر من صفر" }),
+  availableAmount: z.coerce.number().min(1, { message: 'المبلغ المتاح يجب أن يكون أكبر من صفر' }),
   nazer_percentage: z.coerce.number().min(0).max(100).default(5),
   reserve_percentage: z.coerce.number().min(0).max(100).default(10),
   waqf_corpus_percentage: z.coerce.number().min(0).max(100).default(5),
@@ -45,7 +46,8 @@ interface SimulationDialogProps {
 
 export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) {
   const { beneficiaries, isLoading: loadingBeneficiaries } = useBeneficiaries();
-  const { calculate, calculateMultipleScenarios, scenarios, isCalculating } = useDistributionEngine();
+  const { calculate, calculateMultipleScenarios, scenarios, isCalculating } =
+    useDistributionEngine();
   const [activeTab, setActiveTab] = useState<'single' | 'comparison'>('single');
   const [singleResult, setSingleResult] = useState<SimulationResult | null>(null);
 
@@ -63,8 +65,8 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
   });
 
   const handleSimulate = async (data: SimulationFormValues) => {
-    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
-    
+    const activeBeneficiaries = beneficiaries.filter((b) => matchesStatus(b.status, 'active'));
+
     if (activeBeneficiaries.length === 0) {
       return;
     }
@@ -88,8 +90,8 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
   };
 
   const handleCompareScenarios = async () => {
-    const activeBeneficiaries = beneficiaries.filter(b => matchesStatus(b.status, 'active'));
-    
+    const activeBeneficiaries = beneficiaries.filter((b) => matchesStatus(b.status, 'active'));
+
     if (activeBeneficiaries.length === 0) {
       return;
     }
@@ -110,11 +112,13 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
     setActiveTab('comparison');
   };
 
-  const activeBeneficiariesCount = beneficiaries.filter(b => matchesStatus(b.status, 'active')).length;
+  const activeBeneficiariesCount = beneficiaries.filter((b) =>
+    matchesStatus(b.status, 'active')
+  ).length;
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="محاكاة التوزيع الذكية"
       description="محاكاة توزيع متقدمة باستخدام 5 أنماط مختلفة"
@@ -240,13 +244,17 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
               </Card>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={isCalculating || loadingBeneficiaries} className="flex-1">
+                <Button
+                  type="submit"
+                  disabled={isCalculating || loadingBeneficiaries}
+                  className="flex-1"
+                >
                   {isCalculating && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                   تشغيل المحاكاة
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={handleCompareScenarios}
                   disabled={isCalculating || loadingBeneficiaries}
                 >
@@ -293,23 +301,33 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex justify-between">
                         <span>الناظر:</span>
-                        <span className="font-medium">{singleResult.summary.deductions.nazer_share.toLocaleString()} ر.س</span>
+                        <span className="font-medium">
+                          {singleResult.summary.deductions.nazer_share.toLocaleString()} ر.س
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>الاحتياطي:</span>
-                        <span className="font-medium">{singleResult.summary.deductions.reserve.toLocaleString()} ر.س</span>
+                        <span className="font-medium">
+                          {singleResult.summary.deductions.reserve.toLocaleString()} ر.س
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>رأس المال:</span>
-                        <span className="font-medium">{singleResult.summary.deductions.waqf_corpus.toLocaleString()} ر.س</span>
+                        <span className="font-medium">
+                          {singleResult.summary.deductions.waqf_corpus.toLocaleString()} ر.س
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>الصيانة:</span>
-                        <span className="font-medium">{singleResult.summary.deductions.maintenance.toLocaleString()} ر.س</span>
+                        <span className="font-medium">
+                          {singleResult.summary.deductions.maintenance.toLocaleString()} ر.س
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>التطوير:</span>
-                        <span className="font-medium">{singleResult.summary.deductions.development.toLocaleString()} ر.س</span>
+                        <span className="font-medium">
+                          {singleResult.summary.deductions.development.toLocaleString()} ر.س
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -322,10 +340,13 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
         <TabsContent value="comparison" className="space-y-4">
           {scenarios.length > 0 ? (
             <>
-              <SmartRecommendations 
-                scenarios={scenarios} 
+              <SmartRecommendations
+                scenarios={scenarios}
                 onSelectScenario={(pattern) => {
-                  form.setValue('pattern', pattern as 'shariah' | 'equal' | 'need_based' | 'custom' | 'hybrid');
+                  form.setValue(
+                    'pattern',
+                    pattern as 'shariah' | 'equal' | 'need_based' | 'custom' | 'hybrid'
+                  );
                   setActiveTab('single');
                 }}
               />

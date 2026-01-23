@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSecurityAlerts } from "@/hooks/system/useSecurityAlerts";
-import { Shield, AlertTriangle, AlertCircle, Info } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSecurityAlerts } from '@/hooks/system/useSecurityAlerts';
+import { Shield, AlertTriangle, AlertCircle, Info } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function SecurityAlertsSection() {
   const { data: alerts, isLoading, error, refetch } = useSecurityAlerts();
@@ -32,40 +32,58 @@ export function SecurityAlertsSection() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل التنبيهات الأمنية" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل التنبيهات الأمنية"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!alerts) return null;
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-status-error" />;
-      case 'high': return <AlertCircle className="h-4 w-4 text-status-warning" />;
-      case 'medium': return <AlertCircle className="h-4 w-4 text-status-warning" />;
-      default: return <Info className="h-4 w-4 text-status-info" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-status-error" />;
+      case 'high':
+        return <AlertCircle className="h-4 w-4 text-status-warning" />;
+      case 'medium':
+        return <AlertCircle className="h-4 w-4 text-status-warning" />;
+      default:
+        return <Info className="h-4 w-4 text-status-info" />;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-status-error/10 text-status-error border-status-error/20';
-      case 'high': return 'bg-status-warning/10 text-status-warning border-status-warning/20';
-      case 'medium': return 'bg-status-warning/10 text-status-warning border-status-warning/20';
-      default: return 'bg-status-info/10 text-status-info border-status-info/20';
+      case 'critical':
+        return 'bg-status-error/10 text-status-error border-status-error/20';
+      case 'high':
+        return 'bg-status-warning/10 text-status-warning border-status-warning/20';
+      case 'medium':
+        return 'bg-status-warning/10 text-status-warning border-status-warning/20';
+      default:
+        return 'bg-status-info/10 text-status-info border-status-info/20';
     }
   };
 
   const getSeverityLabel = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'حرج';
-      case 'high': return 'عالي';
-      case 'medium': return 'متوسط';
-      default: return 'منخفض';
+      case 'critical':
+        return 'حرج';
+      case 'high':
+        return 'عالي';
+      case 'medium':
+        return 'متوسط';
+      default:
+        return 'منخفض';
     }
   };
 
-  const criticalCount = alerts.filter(a => a.severity === 'critical').length;
-  const highCount = alerts.filter(a => a.severity === 'high').length;
+  const criticalCount = alerts.filter((a) => a.severity === 'critical').length;
+  const highCount = alerts.filter((a) => a.severity === 'high').length;
 
   return (
     <Card>
@@ -76,16 +94,16 @@ export function SecurityAlertsSection() {
             التنبيهات الأمنية
           </CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            {criticalCount > 0 && <span className="text-status-error font-medium">{criticalCount} حرج</span>}
+            {criticalCount > 0 && (
+              <span className="text-status-error font-medium">{criticalCount} حرج</span>
+            )}
             {criticalCount > 0 && highCount > 0 && <span className="mx-1">•</span>}
-            {highCount > 0 && <span className="text-status-warning font-medium">{highCount} عالي</span>}
+            {highCount > 0 && (
+              <span className="text-status-warning font-medium">{highCount} عالي</span>
+            )}
           </p>
         </div>
-        <Button 
-          size="sm" 
-          variant="outline"
-          onClick={() => navigate('/audit-logs')}
-        >
+        <Button size="sm" variant="outline" onClick={() => navigate('/audit-logs')}>
           عرض السجل الكامل
         </Button>
       </CardHeader>
@@ -103,28 +121,22 @@ export function SecurityAlertsSection() {
                   key={alert.id}
                   className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow"
                 >
-                  <div className="mt-0.5">
-                    {getSeverityIcon(alert.severity)}
-                  </div>
+                  <div className="mt-0.5">{getSeverityIcon(alert.severity)}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className="text-sm font-medium">{alert.message}</p>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getSeverityColor(alert.severity)}`}
                       >
                         {getSeverityLabel(alert.severity)}
                       </Badge>
                     </div>
                     {alert.user_email && (
-                      <p className="text-xs text-muted-foreground">
-                        المستخدم: {alert.user_email}
-                      </p>
+                      <p className="text-xs text-muted-foreground">المستخدم: {alert.user_email}</p>
                     )}
                     {alert.ip_address && (
-                      <p className="text-xs text-muted-foreground">
-                        IP: {alert.ip_address}
-                      </p>
+                      <p className="text-xs text-muted-foreground">IP: {alert.ip_address}</p>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">
                       {new Date(alert.timestamp).toLocaleString('ar-SA')}

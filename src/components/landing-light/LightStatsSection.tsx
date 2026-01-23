@@ -1,14 +1,38 @@
 /**
  * مكون Stats Section للصفحة الخفيفة
  */
-import { Users, Building2, Banknote, CalendarDays } from "lucide-react";
-import { StatItem } from "./StatItem";
+import { Users, Building2, Banknote, CalendarDays } from 'lucide-react';
+import { StatItem } from './StatItem';
 
 const stats = [
-  { icon: Users, value: 1000, suffix: "+", label: "مستفيد مسجل", color: "bg-gradient-to-br from-blue-500 to-blue-600" },
-  { icon: Building2, value: 50, suffix: "+", label: "عقار مُدار", color: "bg-gradient-to-br from-emerald-500 to-emerald-600" },
-  { icon: Banknote, value: 5, suffix: "M+", label: "ريال موزعة", color: "bg-gradient-to-br from-amber-500 to-amber-600" },
-  { icon: CalendarDays, value: 10, suffix: "+", label: "سنوات خبرة", color: "bg-gradient-to-br from-violet-500 to-violet-600" },
+  {
+    icon: Users,
+    value: 1000,
+    suffix: '+',
+    label: 'مستفيد مسجل',
+    color: 'bg-gradient-to-br from-blue-500 to-blue-600',
+  },
+  {
+    icon: Building2,
+    value: 50,
+    suffix: '+',
+    label: 'عقار مُدار',
+    color: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+  },
+  {
+    icon: Banknote,
+    value: 5,
+    suffix: 'M+',
+    label: 'ريال موزعة',
+    color: 'bg-gradient-to-br from-amber-500 to-amber-600',
+  },
+  {
+    icon: CalendarDays,
+    value: 10,
+    suffix: '+',
+    label: 'سنوات خبرة',
+    color: 'bg-gradient-to-br from-violet-500 to-violet-600',
+  },
 ];
 
 export function LightStatsSection() {

@@ -110,7 +110,10 @@ export class GovernancePoliciesService {
   /**
    * تحديث سياسة
    */
-  static async updatePolicy(id: string, updates: GovernancePolicyUpdate): Promise<GovernancePolicyRow> {
+  static async updatePolicy(
+    id: string,
+    updates: GovernancePolicyUpdate
+  ): Promise<GovernancePolicyRow> {
     try {
       const { data, error } = await supabase
         .from('governance_policies')
@@ -133,14 +136,16 @@ export class GovernancePoliciesService {
    */
   static async deletePolicy(id: string): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from('governance_policies')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: user?.id,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         })
         .eq('id', id);
 
@@ -169,12 +174,10 @@ export class GovernancePoliciesService {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
 
-      const { data: policies } = await supabase
-        .from('governance_policies')
-        .select('category');
+      const { data: policies } = await supabase.from('governance_policies').select('category');
 
       const categoryMap = new Map<string, number>();
-      policies?.forEach(p => {
+      policies?.forEach((p) => {
         if (p.category) {
           categoryMap.set(p.category, (categoryMap.get(p.category) || 0) + 1);
         }

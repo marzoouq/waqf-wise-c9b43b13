@@ -3,23 +3,23 @@
  * Automatic Fiscal Year Closing Dialog
  */
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import { EdgeFunctionService } from "@/services";
-import { toast } from "sonner";
-import type { FiscalYear } from "@/hooks/accounting/useFiscalYears";
-import { FiscalYearClosingStats } from "./FiscalYearClosingStats";
-import { formatCurrency } from "@/lib/utils";
-import { useClosingPreview } from "@/hooks/fiscal-years/useFiscalYearData";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { EdgeFunctionService } from '@/services';
+import { toast } from 'sonner';
+import type { FiscalYear } from '@/hooks/accounting/useFiscalYears';
+import { FiscalYearClosingStats } from './FiscalYearClosingStats';
+import { formatCurrency } from '@/lib/utils';
+import { useClosingPreview } from '@/hooks/fiscal-years/useFiscalYearData';
 
 interface AutomaticClosingDialogProps {
   open: boolean;
@@ -42,22 +42,22 @@ export function AutomaticClosingDialog({
     try {
       const result = await EdgeFunctionService.invokeAutoCloseFiscalYear({
         fiscalYearId: fiscalYear.id,
-        preview: false
+        preview: false,
       });
-      
+
       if (!result.success) throw new Error(result.error);
-      
+
       if (result.data?.success) {
-        toast.success("تم إقفال السنة المالية بنجاح");
+        toast.success('تم إقفال السنة المالية بنجاح');
         onOpenChange(false);
       } else {
-        throw new Error(result.data?.error || "فشل الإقفال");
+        throw new Error(result.data?.error || 'فشل الإقفال');
       }
     } catch (error) {
       if (import.meta.env.DEV) {
-        console.error("Error confirming closing:", error);
+        console.error('Error confirming closing:', error);
       }
-      toast.error("حدث خطأ أثناء إقفال السنة المالية");
+      toast.error('حدث خطأ أثناء إقفال السنة المالية');
     } finally {
       setConfirming(false);
     }
@@ -68,9 +68,7 @@ export function AutomaticClosingDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>إقفال تلقائي للسنة المالية: {fiscalYear.name}</DialogTitle>
-          <DialogDescription>
-            معاينة الإقفال التلقائي قبل التأكيد النهائي
-          </DialogDescription>
+          <DialogDescription>معاينة الإقفال التلقائي قبل التأكيد النهائي</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -177,8 +175,8 @@ export function AutomaticClosingDialog({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button 
-              onClick={handleConfirm} 
+            <Button
+              onClick={handleConfirm}
               disabled={confirming || isLoading || !preview?.can_close}
             >
               {confirming && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}

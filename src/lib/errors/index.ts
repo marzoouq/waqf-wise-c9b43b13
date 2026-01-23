@@ -32,43 +32,39 @@ export function handleError(
     severity?: ErrorSeverity;
   } = {}
 ) {
-  const {
-    context,
-    showToast = true,
-    toastTitle,
-    severity = 'medium'
-  } = options;
+  const { context, showToast = true, toastTitle, severity = 'medium' } = options;
 
   const message = getErrorMessage(error);
   const title = toastTitle || getErrorTitle(error, context);
-  
+
   // تسجيل الخطأ
   errorTracker.logError(message, severity, context?.metadata);
-  
+
   // عرض Toast
   if (showToast) {
     toast.error(title, {
       description: message,
     });
   }
-  
+
   return message;
 }
 
 /**
  * معالج أخطاء للـ mutations
  */
-export function createMutationErrorHandler(options: {
-  context?: string | ErrorContext;
-  severity?: ErrorSeverity;
-  showToast?: boolean;
-  toastTitle?: string;
-} = {}) {
+export function createMutationErrorHandler(
+  options: {
+    context?: string | ErrorContext;
+    severity?: ErrorSeverity;
+    showToast?: boolean;
+    toastTitle?: string;
+  } = {}
+) {
   return (error: unknown) => {
-    const contextObj = typeof options.context === 'string' 
-      ? { operation: options.context } 
-      : options.context;
-    
+    const contextObj =
+      typeof options.context === 'string' ? { operation: options.context } : options.context;
+
     handleError(error, {
       context: contextObj,
       severity: options.severity,
@@ -88,7 +84,7 @@ export function logError(
 ) {
   // تحويل الرسالة إلى نص إذا كانت كائن
   let cleanMessage: string;
-  
+
   if (typeof message === 'string') {
     cleanMessage = message;
   } else if (typeof message === 'object' && message !== null) {
@@ -100,12 +96,12 @@ export function logError(
   } else {
     cleanMessage = String(message);
   }
-  
+
   // تجاهل رسائل "[object Object]"
   if (cleanMessage === '[object Object]') {
     return;
   }
-  
+
   errorTracker.logError(cleanMessage, severity, additionalData);
 }
 

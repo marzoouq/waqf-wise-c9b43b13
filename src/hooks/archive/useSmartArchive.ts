@@ -1,10 +1,10 @@
-import { useState, useCallback, useRef } from "react";
-import { ArchiveService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState, useCallback, useRef } from 'react';
+import { ArchiveService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
 
 export function useSmartArchive() {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -21,7 +21,7 @@ export function useSmartArchive() {
 
     try {
       intervalRef.current = setInterval(() => {
-        setOcrProgress(prev => {
+        setOcrProgress((prev) => {
           if (prev >= 100) {
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
@@ -36,14 +36,14 @@ export function useSmartArchive() {
       await ArchiveService.invokeOCR('scan_all');
 
       toast({
-        title: "اكتمل المسح الضوئي",
-        description: "تم استخراج النص من جميع المستندات",
+        title: 'اكتمل المسح الضوئي',
+        description: 'تم استخراج النص من جميع المستندات',
       });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'فشل معالجة المستند';
       toast({
-        variant: "destructive",
-        title: "حدث خطأ",
+        variant: 'destructive',
+        title: 'حدث خطأ',
         description: errorMessage,
       });
     } finally {
@@ -59,9 +59,9 @@ export function useSmartArchive() {
   const handleSmartSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
       toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "يرجى إدخال نص للبحث",
+        variant: 'destructive',
+        title: 'خطأ',
+        description: 'يرجى إدخال نص للبحث',
       });
       return [];
     }
@@ -70,7 +70,7 @@ export function useSmartArchive() {
       const results = await ArchiveService.smartSearch(searchQuery, 'text');
 
       toast({
-        title: "نتائج البحث",
+        title: 'نتائج البحث',
         description: `تم العثور على ${results.length} مستند`,
       });
 
@@ -78,8 +78,8 @@ export function useSmartArchive() {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'فشل البحث الذكي';
       toast({
-        variant: "destructive",
-        title: "حدث خطأ",
+        variant: 'destructive',
+        title: 'حدث خطأ',
         description: errorMessage,
       });
       return [];

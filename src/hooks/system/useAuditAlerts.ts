@@ -2,15 +2,21 @@
  * useAuditAlerts Hook - تنبيهات التدقيق الذكية
  * @version 1.0.0
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { toast } from "sonner";
-import { useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { toast } from 'sonner';
+import { useEffect, useCallback } from 'react';
 
 export interface AuditAlert {
   id: string;
-  type: 'mass_delete' | 'financial_change' | 'unusual_access' | 'role_change' | 'sensitive_data' | 'failed_access';
+  type:
+    | 'mass_delete'
+    | 'financial_change'
+    | 'unusual_access'
+    | 'role_change'
+    | 'sensitive_data'
+    | 'failed_access';
   title: string;
   description: string;
   severity: 'critical' | 'high' | 'medium' | 'low';
@@ -58,7 +64,14 @@ const DEFAULT_ALERT_RULES: AuditAlertRule[] = [
     name: 'تغيير مالي',
     type: 'financial_change',
     conditions: {
-      tableName: ['payment_vouchers', 'journal_entries', 'journal_entry_lines', 'distributions', 'loans', 'bank_transfers'],
+      tableName: [
+        'payment_vouchers',
+        'journal_entries',
+        'journal_entry_lines',
+        'distributions',
+        'loans',
+        'bank_transfers',
+      ],
       actionType: ['INSERT', 'UPDATE', 'DELETE'],
     },
     severity: 'high',
@@ -100,10 +113,10 @@ export const useAuditAlerts = () => {
 
       // جلب السجلات الأخيرة
       const { data: recentLogs, error } = await supabase
-        .from("audit_logs")
-        .select("*")
-        .gte("created_at", last24Hours.toISOString())
-        .order("created_at", { ascending: false })
+        .from('audit_logs')
+        .select('*')
+        .gte('created_at', last24Hours.toISOString())
+        .order('created_at', { ascending: false })
         .limit(1000);
 
       if (error) throw error;
@@ -112,10 +125,10 @@ export const useAuditAlerts = () => {
       const logs = recentLogs || [];
 
       // فحص الحذف الجماعي
-      const deletesByUserAndTable = new Map<string, Array<{ log: typeof logs[0]; time: Date }>>();
+      const deletesByUserAndTable = new Map<string, Array<{ log: (typeof logs)[0]; time: Date }>>();
       logs
-        .filter(l => l.action_type === 'DELETE')
-        .forEach(log => {
+        .filter((l) => l.action_type === 'DELETE')
+        .forEach((log) => {
           const key = `${log.user_email || 'unknown'}_${log.table_name || 'unknown'}`;
           if (!deletesByUserAndTable.has(key)) {
             deletesByUserAndTable.set(key, []);
@@ -132,8 +145,8 @@ export const useAuditAlerts = () => {
         for (let i = 0; i < sorted.length - 4; i++) {
           const windowStart = sorted[i].time;
           const windowEnd = new Date(windowStart.getTime() + 5 * 60 * 1000);
-          const inWindow = sorted.filter(d => d.time >= windowStart && d.time <= windowEnd);
-          
+          const inWindow = sorted.filter((d) => d.time >= windowStart && d.time <= windowEnd);
+
           if (inWindow.length >= 5) {
             const [userEmail, tableName] = key.split('_');
             alerts.push({
@@ -157,10 +170,18 @@ export const useAuditAlerts = () => {
       });
 
       // فحص التغييرات المالية الحساسة
-      const financialTables = ['payment_vouchers', 'journal_entries', 'journal_entry_lines', 'distributions', 'loans', 'bank_transfers', 'bank_transfer_files'];
+      const financialTables = [
+        'payment_vouchers',
+        'journal_entries',
+        'journal_entry_lines',
+        'distributions',
+        'loans',
+        'bank_transfers',
+        'bank_transfer_files',
+      ];
       logs
-        .filter(l => financialTables.includes(l.table_name || '') && l.severity === 'critical')
-        .forEach(log => {
+        .filter((l) => financialTables.includes(l.table_name || '') && l.severity === 'critical')
+        .forEach((log) => {
           alerts.push({
             id: `financial_${log.id}`,
             type: 'financial_change',
@@ -184,8 +205,8 @@ export const useAuditAlerts = () => {
 
       // فحص تغييرات الأدوار
       logs
-        .filter(l => l.table_name === 'user_roles')
-        .forEach(log => {
+        .filter((l) => l.table_name === 'user_roles')
+        .forEach((log) => {
           alerts.push({
             id: `role_${log.id}`,
             type: 'role_change',
@@ -209,9 +230,9 @@ export const useAuditAlerts = () => {
 
       // فحص الوصول لبيانات المستفيدين الحساسة
       logs
-        .filter(l => l.table_name === 'beneficiaries' && l.action_type === 'VIEW_ACCESS')
+        .filter((l) => l.table_name === 'beneficiaries' && l.action_type === 'VIEW_ACCESS')
         .slice(0, 10)
-        .forEach(log => {
+        .forEach((log) => {
           alerts.push({
             id: `access_${log.id}`,
             type: 'unusual_access',
@@ -251,16 +272,16 @@ export const useAuditAlertsStats = () => {
 
   return {
     total: alerts.length,
-    critical: alerts.filter(a => a.severity === 'critical').length,
-    high: alerts.filter(a => a.severity === 'high').length,
-    medium: alerts.filter(a => a.severity === 'medium').length,
-    low: alerts.filter(a => a.severity === 'low').length,
-    unread: alerts.filter(a => !a.isRead).length,
+    critical: alerts.filter((a) => a.severity === 'critical').length,
+    high: alerts.filter((a) => a.severity === 'high').length,
+    medium: alerts.filter((a) => a.severity === 'medium').length,
+    low: alerts.filter((a) => a.severity === 'low').length,
+    unread: alerts.filter((a) => !a.isRead).length,
     byType: {
-      mass_delete: alerts.filter(a => a.type === 'mass_delete').length,
-      financial_change: alerts.filter(a => a.type === 'financial_change').length,
-      role_change: alerts.filter(a => a.type === 'role_change').length,
-      unusual_access: alerts.filter(a => a.type === 'unusual_access').length,
+      mass_delete: alerts.filter((a) => a.type === 'mass_delete').length,
+      financial_change: alerts.filter((a) => a.type === 'financial_change').length,
+      role_change: alerts.filter((a) => a.type === 'role_change').length,
+      unusual_access: alerts.filter((a) => a.type === 'unusual_access').length,
     },
   };
 };
@@ -296,17 +317,29 @@ export const useRealtimeAuditAlerts = (onAlert?: (alert: AuditAlert) => void) =>
           };
 
           // فحص إذا كان يستوجب تنبيه
-          const criticalTables = ['payment_vouchers', 'journal_entries', 'distributions', 'user_roles', 'bank_transfers'];
-          
+          const criticalTables = [
+            'payment_vouchers',
+            'journal_entries',
+            'distributions',
+            'user_roles',
+            'bank_transfers',
+          ];
+
           if (log.severity === 'critical' || criticalTables.includes(log.table_name)) {
             const alert: AuditAlert = {
               id: `realtime_${log.id}`,
-              type: log.table_name === 'user_roles' ? 'role_change' : 
-                    criticalTables.includes(log.table_name) ? 'financial_change' : 
-                    'sensitive_data',
-              title: log.action_type === 'DELETE' ? '🗑️ عملية حذف' : 
-                     log.action_type === 'INSERT' ? '➕ عملية إضافة' : 
-                     '✏️ عملية تعديل',
+              type:
+                log.table_name === 'user_roles'
+                  ? 'role_change'
+                  : criticalTables.includes(log.table_name)
+                    ? 'financial_change'
+                    : 'sensitive_data',
+              title:
+                log.action_type === 'DELETE'
+                  ? '🗑️ عملية حذف'
+                  : log.action_type === 'INSERT'
+                    ? '➕ عملية إضافة'
+                    : '✏️ عملية تعديل',
               description: log.description || `${log.action_type} في ${log.table_name}`,
               severity: log.severity as AuditAlert['severity'],
               relatedLogId: log.id,

@@ -11,13 +11,18 @@ import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useFinancialReportsData() {
   // ميزان المراجعة
-  const { data: trialBalanceRaw = [], isLoading: loadingTrial, error: trialError, refetch: refetchTrial } = useQuery({
+  const {
+    data: trialBalanceRaw = [],
+    isLoading: loadingTrial,
+    error: trialError,
+    refetch: refetchTrial,
+  } = useQuery({
     queryKey: QUERY_KEYS.TRIAL_BALANCE,
     queryFn: () => AccountingService.getTrialBalanceSimple(),
   });
 
   // تحويل البيانات للنوع المطلوب
-  const trialBalance: TrialBalanceItem[] = trialBalanceRaw.map(item => ({
+  const trialBalance: TrialBalanceItem[] = trialBalanceRaw.map((item) => ({
     code: item.code,
     name_ar: item.name,
     account_type: '',
@@ -27,18 +32,23 @@ export function useFinancialReportsData() {
   }));
 
   // قائمة الدخل - الحسابات
-  const { data: accounts = [], isLoading: loadingIncome, error: incomeError, refetch: refetchIncome } = useQuery<AccountWithBalance[]>({
+  const {
+    data: accounts = [],
+    isLoading: loadingIncome,
+    error: incomeError,
+    refetch: refetchIncome,
+  } = useQuery<AccountWithBalance[]>({
     queryKey: QUERY_KEYS.ACCOUNTS_WITH_BALANCES,
     queryFn: () => AccountingService.getRevenueAccounts(),
   });
 
   // حسابات الإيرادات والمصروفات
   const totalRevenue = accounts
-    .filter(acc => acc.account_type === 'revenue')
+    .filter((acc) => acc.account_type === 'revenue')
     .reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
 
   const totalExpense = accounts
-    .filter(acc => acc.account_type === 'expense')
+    .filter((acc) => acc.account_type === 'expense')
     .reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
 
   const netIncome = totalRevenue - totalExpense;

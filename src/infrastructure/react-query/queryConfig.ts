@@ -2,15 +2,15 @@
  * Query Config - إعدادات الاستعلامات الموحدة
  * @version 1.0.0
  * @module infrastructure/react-query
- * 
+ *
  * @description
  * هذا الملف هو المصدر الوحيد لجميع إعدادات React Query
  * يجب عدم تعريف QUERY_CONFIG في أي ملف آخر
- * 
+ *
  * @example
  * ```typescript
  * import { QUERY_CONFIG } from '@/infrastructure/react-query';
- * 
+ *
  * useQuery({
  *   queryKey: ['data'],
  *   queryFn: fetchData,
@@ -23,7 +23,7 @@ import { CACHE_TIMES } from './cacheTimes';
 
 /**
  * Query configuration presets - إعدادات موحدة للاستعلامات
- * 
+ *
  * الفئات:
  * - DEFAULT: الإعداد الافتراضي للاستعلامات العامة
  * - DASHBOARD_KPIS: لمؤشرات الأداء الرئيسية
@@ -47,14 +47,14 @@ export const QUERY_CONFIG = {
     refetchOnMount: true,
     retry: 2,
   },
-  
+
   REALTIME: {
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 2 * 60 * 1000, // ✅ إضافة gcTime
     refetchOnWindowFocus: true, // البيانات الحية تحتاج تحديث
     retry: 1,
   },
-  
+
   STATIC: {
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // ✅ إضافة gcTime
@@ -71,7 +71,7 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: true, // تحديث عند العودة للنافذة - مهم للوحات التحكم
     retry: 2,
   },
-  
+
   ADMIN_KPIS: {
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000,
@@ -97,7 +97,7 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: true, // الموافقات مهمة - تحتاج تحديث
     retry: 2,
   },
-  
+
   ALERTS: {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
@@ -114,7 +114,7 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: false, // ✅ الرسوم لا تتغير كثيراً
     retry: 1,
   },
-  
+
   ACTIVITIES: {
     staleTime: CACHE_TIMES.STANDARD, // 5 minutes
     gcTime: CACHE_TIMES.STANDARD * 2,
@@ -131,7 +131,7 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: false, // ✅ تقليل الطلبات
     retry: 2,
   },
-  
+
   LOANS: {
     staleTime: CACHE_TIMES.STATIC, // 1 hour
     gcTime: CACHE_TIMES.STATIC * 2,
@@ -170,4 +170,4 @@ export const QUERY_CONFIG = {
 } as const;
 
 export type QueryConfigKey = keyof typeof QUERY_CONFIG;
-export type QueryConfigType = typeof QUERY_CONFIG[QueryConfigKey];
+export type QueryConfigType = (typeof QUERY_CONFIG)[QueryConfigKey];

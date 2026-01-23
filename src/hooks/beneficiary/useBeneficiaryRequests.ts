@@ -1,13 +1,13 @@
 /**
  * useBeneficiaryRequests Hook - تقديم طلبات المستفيدين
  * @version 2.8.65
- * 
+ *
  * يستخدم RequestService للوصول لقاعدة البيانات
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/ui/use-toast';
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { RequestService } from '@/services';
 
 export interface BeneficiaryRequestData {
@@ -24,13 +24,13 @@ export function useBeneficiaryRequests(beneficiaryId: string) {
   const submitRequest = useMutation({
     mutationFn: async (formData: BeneficiaryRequestData) => {
       const priorityMap: Record<string, 'عاجلة' | 'عالية' | 'متوسطة' | 'منخفضة'> = {
-        'عاجلة': 'عاجلة',
-        'مهمة': 'عالية',
-        'عالية': 'عالية',
-        'متوسطة': 'متوسطة',
-        'منخفضة': 'منخفضة',
+        عاجلة: 'عاجلة',
+        مهمة: 'عالية',
+        عالية: 'عالية',
+        متوسطة: 'متوسطة',
+        منخفضة: 'منخفضة',
       };
-      
+
       const result = await RequestService.create({
         beneficiary_id: beneficiaryId,
         request_type_id: formData.request_type_id,

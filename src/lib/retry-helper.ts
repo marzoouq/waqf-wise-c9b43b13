@@ -1,11 +1,11 @@
 /**
  * Retry Helper - مساعد إعادة المحاولة
  * يوفر آلية retry مع exponential backoff للاستعلامات
- * 
+ *
  * @version 1.0.0
  */
 
-import { productionLogger } from "@/lib/logger/production-logger";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface RetryOptions {
   /** عدد المحاولات القصوى */
@@ -44,16 +44,13 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
  * تأخير التنفيذ
  */
 function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
  * تنفيذ دالة مع إعادة المحاولة
  */
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options: RetryOptions = {}
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   let lastError: Error;
   let currentDelay = opts.initialDelay;
@@ -63,10 +60,10 @@ export async function withRetry<T>(
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       const isLastAttempt = attempt === opts.maxRetries;
       const canRetry = opts.shouldRetry(lastError);
-      
+
       if (isLastAttempt || !canRetry) {
         productionLogger.error(`[Retry] فشلت جميع المحاولات (${attempt}/${opts.maxRetries})`, {
           error: lastError.message,
@@ -74,12 +71,12 @@ export async function withRetry<T>(
         });
         throw lastError;
       }
-      
+
       productionLogger.warn(`[Retry] المحاولة ${attempt} فشلت، إعادة بعد ${currentDelay}ms`, {
         error: lastError.message,
         nextAttempt: attempt + 1,
       });
-      
+
       await delay(currentDelay);
       currentDelay = Math.min(currentDelay * opts.backoffMultiplier, opts.maxDelay);
     }
@@ -161,7 +158,7 @@ export interface IdempotentInsertResult<T> {
 /**
  * معالجة نتيجة INSERT لتحويل unique_violation إلى idempotency
  * يُستخدم لجعل عمليات INSERT آمنة مع retry
- * 
+ *
  * @example
  * const result = await supabase.from('table').insert(data).select().single();
  * const { data, error, isDuplicate } = handleUniqueViolation(result);

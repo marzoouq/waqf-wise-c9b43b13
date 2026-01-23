@@ -31,12 +31,13 @@ export function useApprovals() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVALS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
-      
+
       toast({
         title: variables.status === 'approved' ? 'تمت الموافقة' : 'تم الرفض',
-        description: variables.status === 'approved' 
-          ? 'تمت الموافقة على القيد المحاسبي بنجاح'
-          : 'تم رفض القيد المحاسبي',
+        description:
+          variables.status === 'approved'
+            ? 'تمت الموافقة على القيد المحاسبي بنجاح'
+            : 'تم رفض القيد المحاسبي',
       });
     },
     onError: () => {
@@ -48,9 +49,9 @@ export function useApprovals() {
     },
   });
 
-  return { 
-    approvals, 
-    isLoading, 
-    addApproval 
+  return {
+    approvals,
+    isLoading,
+    addApproval,
   };
 }

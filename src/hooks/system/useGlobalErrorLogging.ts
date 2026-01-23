@@ -10,11 +10,7 @@ interface ErrorInfo {
   componentStack?: string;
 }
 
-export async function logErrorToSupport(
-  error: Error, 
-  errorInfo: ErrorInfo,
-  errorCount: number
-) {
+export async function logErrorToSupport(error: Error, errorInfo: ErrorInfo, errorCount: number) {
   try {
     await supabase.functions.invoke('log-error', {
       body: {
@@ -30,12 +26,12 @@ export async function logErrorToSupport(
         },
       },
     });
-    
+
     logger.info('✅ Error logged to support team successfully');
   } catch (notifyError) {
-    logger.error(notifyError, { 
-      context: 'notify_support_team_failed', 
-      severity: 'low'
+    logger.error(notifyError, {
+      context: 'notify_support_team_failed',
+      severity: 'low',
     });
   }
 }

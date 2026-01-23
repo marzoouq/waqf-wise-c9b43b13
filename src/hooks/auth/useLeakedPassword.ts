@@ -9,7 +9,7 @@ async function sha1(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   return hashHex.toUpperCase();
 }
 
@@ -35,16 +35,19 @@ export function useLeakedPassword() {
       const suffix = sha1Hash.substring(5);
 
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-      
+
       if (!response.ok) {
-        logger.error(new Error('Failed to check password'), { context: 'leaked_password_api', severity: 'medium' });
+        logger.error(new Error('Failed to check password'), {
+          context: 'leaked_password_api',
+          severity: 'medium',
+        });
         return false;
       }
 
       const data = await response.text();
       const hashes = data.split('\n');
-      
-      const isLeaked = hashes.some(line => {
+
+      const isLeaked = hashes.some((line) => {
         const [hashSuffix] = line.split(':');
         return hashSuffix === suffix;
       });
@@ -82,15 +85,15 @@ export function useLeakedPassword() {
       const suffix = sha1Hash.substring(5);
 
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-      
+
       if (!response.ok) {
         return false;
       }
 
       const data = await response.text();
       const hashes = data.split('\n');
-      
-      return hashes.some(line => {
+
+      return hashes.some((line) => {
         const [hashSuffix] = line.split(':');
         return hashSuffix === suffix;
       });

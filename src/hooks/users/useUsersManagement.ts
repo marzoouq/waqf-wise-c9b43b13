@@ -4,17 +4,17 @@
  * @version 2.9.11
  */
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { type AppRole } from "@/types/roles";
-import { type UserProfile } from "@/types/auth";
-import { AuthService } from "@/services/auth.service";
-import { invalidateUserQueries } from "@/lib/query-invalidation";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { type AppRole } from '@/types/roles';
+import { type UserProfile } from '@/types/auth';
+import { AuthService } from '@/services/auth.service';
+import { invalidateUserQueries } from '@/lib/query-invalidation';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 // Re-export UserProfile for backward compatibility
-export type { UserProfile } from "@/types/auth";
+export type { UserProfile } from '@/types/auth';
 
 /**
  * جلب قائمة المستخدمين مع أدوارهم
@@ -42,17 +42,17 @@ export function useDeleteUser() {
     },
     onSuccess: () => {
       toast({
-        title: "تم الحذف",
-        description: "تم حذف المستخدم بنجاح",
+        title: 'تم الحذف',
+        description: 'تم حذف المستخدم بنجاح',
       });
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      productionLogger.error("Error deleting user:", error);
+      productionLogger.error('Error deleting user:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حذف المستخدم",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء حذف المستخدم',
+        variant: 'destructive',
       });
     },
   });
@@ -71,17 +71,17 @@ export function useUpdateUserRoles() {
     },
     onSuccess: () => {
       toast({
-        title: "تم التحديث",
-        description: "تم تحديث أدوار المستخدم بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تحديث أدوار المستخدم بنجاح',
       });
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      productionLogger.error("Error updating roles:", error);
+      productionLogger.error('Error updating roles:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الأدوار",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تحديث الأدوار',
+        variant: 'destructive',
       });
     },
   });
@@ -100,17 +100,17 @@ export function useUpdateUserStatus() {
     },
     onSuccess: () => {
       toast({
-        title: "تم التحديث",
-        description: "تم تحديث حالة المستخدم بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تحديث حالة المستخدم بنجاح',
       });
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      productionLogger.error("Error updating status:", error);
+      productionLogger.error('Error updating status:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الحالة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تحديث الحالة',
+        variant: 'destructive',
       });
     },
   });
@@ -129,18 +129,18 @@ export function useResetUserPassword() {
     },
     onSuccess: () => {
       toast({
-        title: "تم التحديث",
-        description: "تم تعيين كلمة المرور الجديدة بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تعيين كلمة المرور الجديدة بنجاح',
       });
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "فشل تحديث كلمة المرور";
+      const errorMessage = error instanceof Error ? error.message : 'فشل تحديث كلمة المرور';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
-    }
+    },
   });
 }
 
@@ -160,19 +160,19 @@ export function useUsersManagement() {
     isLoading: usersQuery.isLoading,
     error: usersQuery.error,
     refetch: usersQuery.refetch,
-    
+
     // الحذف
     deleteUser: deleteUserMutation,
     isDeleting: deleteUserMutation.isPending,
-    
+
     // تحديث الأدوار
     updateRoles: updateRolesMutation,
     isUpdatingRoles: updateRolesMutation.isPending,
-    
+
     // تحديث الحالة
     updateStatus: updateStatusMutation,
     isUpdatingStatus: updateStatusMutation.isPending,
-    
+
     // إعادة تعيين كلمة المرور
     resetPassword: resetPasswordMutation,
     isResettingPassword: resetPasswordMutation.isPending,

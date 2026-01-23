@@ -36,13 +36,13 @@ export function PushNotificationsSetup() {
       if (permission === 'granted') {
         // Register service worker and subscribe
         const registration = await navigator.serviceWorker.ready;
-        
+
         // Generate VAPID keys or use existing ones
         await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
             'YOUR_VAPID_PUBLIC_KEY' // يجب استبداله بالمفتاح الحقيقي
-          )
+          ),
         });
 
         // Save subscription to database
@@ -63,7 +63,7 @@ export function PushNotificationsSetup() {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
-      
+
       if (subscription) {
         await subscription.unsubscribe();
         await unsubscribe();
@@ -86,9 +86,7 @@ export function PushNotificationsSetup() {
               <Bell className="h-5 w-5" />
               الإشعارات الفورية
             </CardTitle>
-            <CardDescription>
-              استقبل إشعارات فورية على هذا الجهاز
-            </CardDescription>
+            <CardDescription>استقبل إشعارات فورية على هذا الجهاز</CardDescription>
           </div>
           {permission === 'granted' && (
             <Badge variant="default" className="flex items-center gap-1">

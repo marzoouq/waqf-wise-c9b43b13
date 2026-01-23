@@ -4,13 +4,21 @@
  * - إصلاح مشكلة الطباعة: إضافة أنماط print للمكونات
  */
 
-import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
+import { useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableFooter,
+} from '@/components/ui/table';
 import {
   FileText,
   TrendingUp,
@@ -24,20 +32,20 @@ import {
   Wallet,
   ArrowDown,
   CheckCircle2,
-  Percent
-} from "lucide-react";
-import { useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
-import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
-import { toast } from "sonner";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
-import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
-import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
-import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
-import { SmartInsights } from "@/components/disclosure/SmartInsights";
-import { DisclosurePrintTemplate } from "./DisclosurePrintTemplate";
-import { usePrint } from "@/hooks/ui/usePrint";
+  Percent,
+} from 'lucide-react';
+import { useAnnualDisclosures } from '@/hooks/reports/useAnnualDisclosures';
+import { generateDisclosurePDF } from '@/lib/generateDisclosurePDF';
+import { useDisclosureBeneficiaries } from '@/hooks/reports/useDisclosureBeneficiaries';
+import { toast } from 'sonner';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { SmartDisclosureDocuments } from '@/components/reports/SmartDisclosureDocuments';
+import { HistoricalRentalDetailsCard } from '@/components/fiscal-years';
+import { YearComparisonCard } from '@/components/disclosure/YearComparisonCard';
+import { DisclosureCharts } from '@/components/disclosure/DisclosureCharts';
+import { SmartInsights } from '@/components/disclosure/SmartInsights';
+import { DisclosurePrintTemplate } from './DisclosurePrintTemplate';
+import { usePrint } from '@/hooks/ui/usePrint';
 
 interface ExpenseItem {
   name: string;
@@ -64,35 +72,35 @@ interface BeneficiariesDetails {
 
 // ترجمة أسماء المصروفات
 const expenseNameTranslations: Record<string, string> = {
-  'audit_2024': 'تدقيق 2024',
-  'audit_2025': 'تدقيق 2025',
-  'cleaning_worker': 'عامل نظافة',
-  'ejar_platform': 'منصة إيجار',
-  'electrical_works': 'أعمال كهربائية',
-  'electricity_bills': 'فواتير الكهرباء',
-  'electricity_maintenance': 'صيانة كهربائية',
-  'gypsum_works': 'أعمال جبس',
-  'miscellaneous': 'مصروفات متنوعة',
-  'plumbing_maintenance': 'صيانة سباكة',
-  'plumbing_works': 'أعمال سباكة',
-  'rental_commission': 'عمولة إيجار',
-  'water_bills': 'فواتير المياه',
-  'zakat': 'الزكاة',
-  'maintenance': 'مصروفات الصيانة',
-  'administrative': 'مصروفات إدارية',
-  'development': 'مصروفات التطوير',
-  'other': 'مصروفات أخرى',
+  audit_2024: 'تدقيق 2024',
+  audit_2025: 'تدقيق 2025',
+  cleaning_worker: 'عامل نظافة',
+  ejar_platform: 'منصة إيجار',
+  electrical_works: 'أعمال كهربائية',
+  electricity_bills: 'فواتير الكهرباء',
+  electricity_maintenance: 'صيانة كهربائية',
+  gypsum_works: 'أعمال جبس',
+  miscellaneous: 'مصروفات متنوعة',
+  plumbing_maintenance: 'صيانة سباكة',
+  plumbing_works: 'أعمال سباكة',
+  rental_commission: 'عمولة إيجار',
+  water_bills: 'فواتير المياه',
+  zakat: 'الزكاة',
+  maintenance: 'مصروفات الصيانة',
+  administrative: 'مصروفات إدارية',
+  development: 'مصروفات التطوير',
+  other: 'مصروفات أخرى',
 };
 
 // ترجمة أسماء الإيرادات
 const revenueNameTranslations: Record<string, string> = {
-  'jeddah_properties': 'عقارات جدة',
-  'nahdi_rental': 'إيجار النهدي',
-  'remaining_2024': 'متبقي 2024',
-  'residential_monthly': 'الإيجارات السكنية الشهرية',
-  'rental_income': 'إيرادات الإيجار',
-  'investment_returns': 'عوائد الاستثمار',
-  'other_income': 'إيرادات أخرى',
+  jeddah_properties: 'عقارات جدة',
+  nahdi_rental: 'إيجار النهدي',
+  remaining_2024: 'متبقي 2024',
+  residential_monthly: 'الإيجارات السكنية الشهرية',
+  rental_income: 'إيرادات الإيجار',
+  investment_returns: 'عوائد الاستثمار',
+  other_income: 'إيرادات أخرى',
 };
 
 const translateExpenseName = (name: string): string => {
@@ -104,10 +112,10 @@ const translateRevenueName = (name: string): string => {
 };
 
 const formatCurrency = (amount: number | null | undefined): string => {
-  if (amount === null || amount === undefined) return "0 ر.س";
-  return new Intl.NumberFormat("ar-SA", {
-    style: "currency",
-    currency: "SAR",
+  if (amount === null || amount === undefined) return '0 ر.س';
+  return new Intl.NumberFormat('ar-SA', {
+    style: 'currency',
+    currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
@@ -116,17 +124,17 @@ const formatCurrency = (amount: number | null | undefined): string => {
 export function DisclosureDetailsTab() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const disclosureId = searchParams.get("id");
+  const disclosureId = searchParams.get('id');
   const { disclosures, isLoading } = useAnnualDisclosures();
   const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
   const [isExporting, setIsExporting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const disclosure = disclosures?.find(d => d.id === disclosureId);
-  const previousYear = disclosures?.find(d => d.year === (disclosure?.year || 0) - 1) || null;
+  const disclosure = disclosures?.find((d) => d.id === disclosureId);
+  const previousYear = disclosures?.find((d) => d.year === (disclosure?.year || 0) - 1) || null;
 
   const handleBack = () => {
-    navigate("/beneficiary-portal?tab=reports");
+    navigate('/beneficiary-portal?tab=reports');
   };
 
   const handleExportPDF = async () => {
@@ -135,28 +143,25 @@ export function DisclosureDetailsTab() {
     try {
       const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || [], previousYear);
-      toast.success("تم تحميل ملف PDF بنجاح");
+      toast.success('تم تحميل ملف PDF بنجاح');
     } catch {
-      toast.error("فشل تحميل ملف PDF");
+      toast.error('فشل تحميل ملف PDF');
     } finally {
       setIsExporting(false);
     }
   };
-
-  
 
   const { printWithData } = usePrint();
 
   const handlePrint = () => {
     if (!disclosure) return;
     setIsPrinting(true);
-    
+
     // استخدام printWithData لفتح نافذة طباعة مستقلة بدون تداخل CSS
-    printWithData(
-      { disclosure, previousYear },
-      (data) => <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
-    );
-    
+    printWithData({ disclosure, previousYear }, (data) => (
+      <DisclosurePrintTemplate disclosure={data.disclosure} previousYear={data.previousYear} />
+    ));
+
     setIsPrinting(false);
   };
 
@@ -172,9 +177,9 @@ export function DisclosureDetailsTab() {
 
   if (!disclosure) {
     return (
-      <ErrorState 
-        title="خطأ في تحميل الإفصاح" 
-        message="لم يتم العثور على الإفصاح المطلوب" 
+      <ErrorState
+        title="خطأ في تحميل الإفصاح"
+        message="لم يتم العثور على الإفصاح المطلوب"
         onRetry={handleBack}
       />
     );
@@ -182,7 +187,7 @@ export function DisclosureDetailsTab() {
 
   // Parse expense breakdown
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
-  const expenseItems: ExpenseItem[] = expensesBreakdown 
+  const expenseItems: ExpenseItem[] = expensesBreakdown
     ? Object.entries(expensesBreakdown)
         .filter(([name]) => name.toLowerCase() !== 'total')
         .map(([name, amount]) => ({ name, amount: amount || 0 }))
@@ -212,7 +217,6 @@ export function DisclosureDetailsTab() {
   return (
     <div className="space-y-6 print:space-y-4">
       {/* محتوى الطباعة المُحسّن */}
-      
 
       {/* Header - مخفي عند الطباعة */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
@@ -282,9 +286,7 @@ export function DisclosureDetailsTab() {
             <Calculator className="h-5 w-5 text-primary" />
             الكشف المالي المتسلسل
           </CardTitle>
-          <CardDescription>
-            رحلة الأموال من الإيرادات إلى المتبقي (رقبة الوقف)
-          </CardDescription>
+          <CardDescription>رحلة الأموال من الإيرادات إلى المتبقي (رقبة الوقف)</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* إجمالي الإيرادات */}
@@ -301,7 +303,9 @@ export function DisclosureDetailsTab() {
             <p className="text-2xl font-bold text-success">{formatCurrency(totalRevenues)}</p>
           </div>
 
-          <div className="flex justify-center"><ArrowDown className="h-6 w-6 text-muted-foreground" /></div>
+          <div className="flex justify-center">
+            <ArrowDown className="h-6 w-6 text-muted-foreground" />
+          </div>
 
           {/* إجمالي المصروفات */}
           <div className="flex items-center justify-between p-4 bg-destructive/10 rounded-lg border border-destructive/20">
@@ -317,7 +321,9 @@ export function DisclosureDetailsTab() {
             <p className="text-2xl font-bold text-destructive">({formatCurrency(totalExpenses)})</p>
           </div>
 
-          <div className="flex justify-center"><ArrowDown className="h-6 w-6 text-muted-foreground" /></div>
+          <div className="flex justify-center">
+            <ArrowDown className="h-6 w-6 text-muted-foreground" />
+          </div>
 
           {/* صافي الدخل */}
           <div className="flex items-center justify-between p-4 bg-info/10 rounded-lg border border-info/20">
@@ -333,7 +339,9 @@ export function DisclosureDetailsTab() {
             <p className="text-2xl font-bold text-info">{formatCurrency(netAfterExpenses)}</p>
           </div>
 
-          <div className="flex justify-center"><ArrowDown className="h-6 w-6 text-muted-foreground" /></div>
+          <div className="flex justify-center">
+            <ArrowDown className="h-6 w-6 text-muted-foreground" />
+          </div>
 
           {/* التوزيعات */}
           <div className="flex items-center justify-between p-4 bg-warning/10 rounded-lg border border-warning/20">
@@ -349,7 +357,9 @@ export function DisclosureDetailsTab() {
             <p className="text-2xl font-bold text-warning">({formatCurrency(distributedAmount)})</p>
           </div>
 
-          <div className="flex justify-center"><ArrowDown className="h-6 w-6 text-muted-foreground" /></div>
+          <div className="flex justify-center">
+            <ArrowDown className="h-6 w-6 text-muted-foreground" />
+          </div>
 
           {/* رقبة الوقف */}
           <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg border-2 border-primary">
@@ -389,7 +399,9 @@ export function DisclosureDetailsTab() {
                 <TableBody>
                   {revenueItems.map((item) => (
                     <TableRow key={`revenue-${item.name}`}>
-                      <TableCell className="font-medium">{translateRevenueName(item.name)}</TableCell>
+                      <TableCell className="font-medium">
+                        {translateRevenueName(item.name)}
+                      </TableCell>
                       <TableCell className="text-success">{formatCurrency(item.amount)}</TableCell>
                     </TableRow>
                   ))}
@@ -397,7 +409,9 @@ export function DisclosureDetailsTab() {
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">الإجمالي</TableCell>
-                    <TableCell className="font-bold text-success">{formatCurrency(totalRevenues)}</TableCell>
+                    <TableCell className="font-bold text-success">
+                      {formatCurrency(totalRevenues)}
+                    </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
@@ -425,15 +439,21 @@ export function DisclosureDetailsTab() {
                 <TableBody>
                   {expenseItems.map((item) => (
                     <TableRow key={`expense-${item.name}`}>
-                      <TableCell className="font-medium">{translateExpenseName(item.name)}</TableCell>
-                      <TableCell className="text-destructive">{formatCurrency(item.amount)}</TableCell>
+                      <TableCell className="font-medium">
+                        {translateExpenseName(item.name)}
+                      </TableCell>
+                      <TableCell className="text-destructive">
+                        {formatCurrency(item.amount)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter>
                   <TableRow>
                     <TableCell className="font-bold">الإجمالي</TableCell>
-                    <TableCell className="font-bold text-destructive">{formatCurrency(totalExpenses)}</TableCell>
+                    <TableCell className="font-bold text-destructive">
+                      {formatCurrency(totalExpenses)}
+                    </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
@@ -456,28 +476,36 @@ export function DisclosureDetailsTab() {
               <p className="text-sm text-muted-foreground">الأبناء</p>
               <p className="text-2xl font-bold text-heir-son">{disclosure.sons_count}</p>
               {distributions?.sons_share && (
-                <p className="text-sm text-muted-foreground mt-1">{formatCurrency(distributions.sons_share)}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(distributions.sons_share)}
+                </p>
               )}
             </div>
             <div className="text-center p-4 bg-heir-daughter/10 rounded-lg">
               <p className="text-sm text-muted-foreground">البنات</p>
               <p className="text-2xl font-bold text-heir-daughter">{disclosure.daughters_count}</p>
               {distributions?.daughters_share && (
-                <p className="text-sm text-muted-foreground mt-1">{formatCurrency(distributions.daughters_share)}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(distributions.daughters_share)}
+                </p>
               )}
             </div>
             <div className="text-center p-4 bg-heir-wife/10 rounded-lg">
               <p className="text-sm text-muted-foreground">الزوجات</p>
               <p className="text-2xl font-bold text-heir-wife">{disclosure.wives_count}</p>
               {distributions?.wives_share && (
-                <p className="text-sm text-muted-foreground mt-1">{formatCurrency(distributions.wives_share)}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(distributions.wives_share)}
+                </p>
               )}
             </div>
             <div className="text-center p-4 bg-primary/10 rounded-lg">
               <p className="text-sm text-muted-foreground">الإجمالي</p>
               <p className="text-2xl font-bold text-primary">{disclosure.total_beneficiaries}</p>
               {distributions?.total && (
-                <p className="text-sm text-muted-foreground mt-1">{formatCurrency(distributions.total)}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(distributions.total)}
+                </p>
               )}
             </div>
           </div>
@@ -516,8 +544,8 @@ export function DisclosureDetailsTab() {
       {/* تفاصيل العقارات - مخفي عند الطباعة */}
       <div className="print:hidden">
         {disclosure.fiscal_year_id && (
-          <HistoricalRentalDetailsCard 
-            fiscalYearId={disclosure.fiscal_year_id} 
+          <HistoricalRentalDetailsCard
+            fiscalYearId={disclosure.fiscal_year_id}
             fiscalYearName={`${disclosure.year - 1}-${disclosure.year}`}
           />
         )}

@@ -1,8 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { FileText, User, DollarSign, Calendar } from "lucide-react";
-import { formatDate } from "@/lib/date";
-import { MaskedValue } from "@/components/shared/MaskedValue";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { FileText, User, DollarSign, Calendar } from 'lucide-react';
+import { formatDate } from '@/lib/date';
+import { MaskedValue } from '@/components/shared/MaskedValue';
 
 interface MobileContractCardProps {
   contract: {
@@ -22,20 +22,20 @@ interface MobileContractCardProps {
   maskTenant?: boolean;
 }
 
-export function MobileContractCard({ 
-  contract, 
-  masked = false, 
+export function MobileContractCard({
+  contract,
+  masked = false,
   showRevenue = true,
-  maskTenant = false 
+  maskTenant = false,
 }: MobileContractCardProps) {
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
-      "نشط": { variant: "default" },
-      "منتهي": { variant: "destructive" },
-      "معلق": { variant: "secondary" },
+    const config: Record<string, { variant: 'default' | 'secondary' | 'destructive' }> = {
+      نشط: { variant: 'default' },
+      منتهي: { variant: 'destructive' },
+      معلق: { variant: 'secondary' },
     };
 
-    return <Badge variant={config[status]?.variant || "secondary"}>{status}</Badge>;
+    return <Badge variant={config[status]?.variant || 'secondary'}>{status}</Badge>;
   };
 
   return (
@@ -57,9 +57,7 @@ export function MobileContractCard({
         <div className="grid grid-cols-1 gap-2 pt-2 border-t">
           <div className="flex items-center gap-2">
             <User className="h-3 w-3 text-muted-foreground shrink-0" />
-            <p className="text-sm font-medium">
-              {maskTenant ? "مستأجر" : contract.tenant_name}
-            </p>
+            <p className="text-sm font-medium">{maskTenant ? 'مستأجر' : contract.tenant_name}</p>
           </div>
 
           {showRevenue && (
@@ -70,10 +68,11 @@ export function MobileContractCard({
               </div>
               <p className="text-sm font-bold text-success">
                 <MaskedValue
-                  value={Number(contract.monthly_rent).toLocaleString("ar-SA")}
+                  value={Number(contract.monthly_rent).toLocaleString('ar-SA')}
                   type="amount"
                   masked={masked}
-                /> ريال
+                />{' '}
+                ريال
               </p>
             </div>
           )}
@@ -81,12 +80,12 @@ export function MobileContractCard({
           <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {formatDate(contract.start_date, "dd/MM/yyyy")}
+              {formatDate(contract.start_date, 'dd/MM/yyyy')}
             </div>
             <span>←</span>
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {formatDate(contract.end_date, "dd/MM/yyyy")}
+              {formatDate(contract.end_date, 'dd/MM/yyyy')}
             </div>
           </div>
         </div>

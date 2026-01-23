@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { useRequestDetails } from "@/hooks/beneficiary/useBeneficiaryProfileData";
+import { useState } from 'react';
+import { useRequestDetails } from '@/hooks/beneficiary/useBeneficiaryProfileData';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SLAIndicator } from "./SLAIndicator";
-import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SLAIndicator } from './SLAIndicator';
+import { RequestAttachmentsUploader } from './RequestAttachmentsUploader';
 import {
   FileText,
   MessageSquare,
@@ -24,7 +24,7 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface RequestDetailsDialogProps {
   requestId: string;
@@ -32,24 +32,20 @@ interface RequestDetailsDialogProps {
   onClose: () => void;
 }
 
-export function RequestDetailsDialog({
-  requestId,
-  isOpen,
-  onClose,
-}: RequestDetailsDialogProps) {
-  const [activeTab, setActiveTab] = useState("details");
+export function RequestDetailsDialog({ requestId, isOpen, onClose }: RequestDetailsDialogProps) {
+  const [activeTab, setActiveTab] = useState('details');
 
   const { request, messages, isLoading } = useRequestDetails(requestId, isOpen);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "معتمد":
-      case "مكتمل":
+      case 'معتمد':
+      case 'مكتمل':
         return <CheckCircle className="h-5 w-5 text-success" />;
-      case "مرفوض":
+      case 'مرفوض':
         return <XCircle className="h-5 w-5 text-destructive" />;
-      case "قيد المراجعة":
-      case "قيد المعالجة":
+      case 'قيد المراجعة':
+      case 'قيد المعالجة':
         return <Clock className="h-5 w-5 text-warning" />;
       default:
         return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
@@ -57,16 +53,16 @@ export function RequestDetailsDialog({
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      "قيد المراجعة": "secondary",
-      "قيد المعالجة": "default",
-      معتمد: "default",
-      مرفوض: "destructive",
-      مكتمل: "default",
+    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
+      'قيد المراجعة': 'secondary',
+      'قيد المعالجة': 'default',
+      معتمد: 'default',
+      مرفوض: 'destructive',
+      مكتمل: 'default',
     };
 
     return (
-      <Badge variant={variants[status] || "default"} className="gap-1">
+      <Badge variant={variants[status] || 'default'} className="gap-1">
         {getStatusIcon(status)}
         <span>{status}</span>
       </Badge>
@@ -77,9 +73,9 @@ export function RequestDetailsDialog({
     if (!priority) return null;
 
     const colors: Record<string, string> = {
-      عاجل: "text-destructive border-destructive/20 bg-destructive/10",
-      مهم: "text-warning border-warning/20 bg-warning/10",
-      عادية: "text-info border-info/20 bg-info/10",
+      عاجل: 'text-destructive border-destructive/20 bg-destructive/10',
+      مهم: 'text-warning border-warning/20 bg-warning/10',
+      عادية: 'text-info border-info/20 bg-info/10',
     };
 
     return (
@@ -116,8 +112,8 @@ export function RequestDetailsDialog({
             {getPriorityBadge(request.priority)}
           </DialogTitle>
           <DialogDescription>
-            {request.request_types?.name_ar} • تم التقديم في{" "}
-            {new Date(request.submitted_at || request.created_at).toLocaleDateString("ar-SA")}
+            {request.request_types?.name_ar} • تم التقديم في{' '}
+            {new Date(request.submitted_at || request.created_at).toLocaleDateString('ar-SA')}
           </DialogDescription>
         </DialogHeader>
 
@@ -127,9 +123,7 @@ export function RequestDetailsDialog({
             <TabsTrigger value="attachments">
               المرفقات ({request.attachments_count || 0})
             </TabsTrigger>
-            <TabsTrigger value="messages">
-              الرسائل ({messages.length})
-            </TabsTrigger>
+            <TabsTrigger value="messages">الرسائل ({messages.length})</TabsTrigger>
           </TabsList>
 
           <ScrollArea className="h-[500px] mt-4">
@@ -154,9 +148,7 @@ export function RequestDetailsDialog({
                     <User className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">المستفيد</p>
-                      <p className="font-medium">
-                        {request.beneficiaries?.full_name}
-                      </p>
+                      <p className="font-medium">{request.beneficiaries?.full_name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -164,7 +156,7 @@ export function RequestDetailsDialog({
                     <div>
                       <p className="text-sm text-muted-foreground">تاريخ التقديم</p>
                       <p className="font-medium">
-                        {new Date(request.submitted_at).toLocaleDateString("ar-SA")}
+                        {new Date(request.submitted_at).toLocaleDateString('ar-SA')}
                       </p>
                     </div>
                   </div>
@@ -176,7 +168,7 @@ export function RequestDetailsDialog({
                     <div>
                       <p className="text-sm text-muted-foreground">المبلغ المطلوب</p>
                       <p className="text-xl font-bold text-primary">
-                        {request.amount.toLocaleString("ar-SA")} ريال
+                        {request.amount.toLocaleString('ar-SA')} ريال
                       </p>
                     </div>
                   </div>
@@ -199,9 +191,7 @@ export function RequestDetailsDialog({
                     <Separator />
                     <div>
                       <h4 className="font-semibold mb-2">ملاحظات القرار</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {request.decision_notes}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{request.decision_notes}</p>
                     </div>
                   </>
                 )}
@@ -210,9 +200,7 @@ export function RequestDetailsDialog({
                   <>
                     <Separator />
                     <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-                      <h4 className="font-semibold mb-2 text-destructive">
-                        سبب الرفض
-                      </h4>
+                      <h4 className="font-semibold mb-2 text-destructive">سبب الرفض</h4>
                       <p className="text-sm">{request.rejection_reason}</p>
                     </div>
                   </>
@@ -243,15 +231,13 @@ export function RequestDetailsDialog({
                     >
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-semibold">{message.subject}</h4>
-                        <Badge variant={message.is_read ? "secondary" : "default"}>
-                          {message.is_read ? "مقروءة" : "جديدة"}
+                        <Badge variant={message.is_read ? 'secondary' : 'default'}>
+                          {message.is_read ? 'مقروءة' : 'جديدة'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {message.body}
-                      </p>
+                      <p className="text-sm text-muted-foreground mb-2">{message.body}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(message.created_at).toLocaleString("ar-SA")}
+                        {new Date(message.created_at).toLocaleString('ar-SA')}
                       </p>
                     </div>
                   ))}

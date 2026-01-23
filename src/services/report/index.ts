@@ -4,5 +4,10 @@
  */
 
 export { ReportTemplateService } from './template.service';
-export { FinancialReportService, type CashFlowData, type PropertyWithContracts, type OperationRecord } from './financial-report.service';
+export {
+  FinancialReportService,
+  type CashFlowData,
+  type PropertyWithContracts,
+  type OperationRecord,
+} from './financial-report.service';
 export { AnalysisService } from './analysis.service';

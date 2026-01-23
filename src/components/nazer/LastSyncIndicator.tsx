@@ -1,17 +1,17 @@
 /**
  * مؤشر آخر تحديث
  * يعرض وقت آخر تحديث للبيانات مع إمكانية التحديث اليدوي
- * 
+ *
  * @version 2.8.78
  */
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface LastSyncIndicatorProps {
   lastUpdated?: Date | string | null;
@@ -26,15 +26,15 @@ export function LastSyncIndicator({
   onRefresh,
   isRefreshing = false,
   className,
-  showLabel = true
+  showLabel = true,
 }: LastSyncIndicatorProps) {
-  const [displayTime, setDisplayTime] = useState<string>("");
+  const [displayTime, setDisplayTime] = useState<string>('');
   const [isRecent, setIsRecent] = useState(false);
   const [isStale, setIsStale] = useState(false);
 
   useEffect(() => {
     if (!lastUpdated) {
-      setDisplayTime("غير محدد");
+      setDisplayTime('غير محدد');
       return;
     }
 
@@ -46,12 +46,12 @@ export function LastSyncIndicator({
 
       // إذا كان التحديث خلال الدقيقتين الأخيرتين، يعتبر حديث
       setIsRecent(diffMinutes < 2);
-      
+
       // تحذير إذا كانت البيانات أقدم من 5 دقائق
       setIsStale(diffMinutes >= 5);
 
       if (diffMinutes < 1) {
-        setDisplayTime("الآن");
+        setDisplayTime('الآن');
       } else {
         setDisplayTime(formatDistanceToNow(date, { addSuffix: true, locale: ar }));
       }
@@ -64,11 +64,13 @@ export function LastSyncIndicator({
   }, [lastUpdated]);
 
   const indicator = (
-    <div className={cn(
-      "flex items-center gap-2 text-xs text-muted-foreground",
-      isStale && "text-warning",
-      className
-    )}>
+    <div
+      className={cn(
+        'flex items-center gap-2 text-xs text-muted-foreground',
+        isStale && 'text-warning',
+        className
+      )}
+    >
       {isStale ? (
         <AlertTriangle className="h-3 w-3 text-warning" />
       ) : isRecent ? (
@@ -76,13 +78,15 @@ export function LastSyncIndicator({
       ) : (
         <Clock className="h-3 w-3" />
       )}
-      
+
       {showLabel && <span>آخر تحديث:</span>}
-      
-      <span className={cn(
-        isRecent && "text-status-success font-medium",
-        isStale && "text-warning font-medium"
-      )}>
+
+      <span
+        className={cn(
+          isRecent && 'text-status-success font-medium',
+          isStale && 'text-warning font-medium'
+        )}
+      >
         {displayTime}
       </span>
 
@@ -90,15 +94,12 @@ export function LastSyncIndicator({
         <Button
           variant="ghost"
           size="icon"
-          className={cn(
-            "h-5 w-5 p-0 hover:bg-muted",
-            isStale && "text-warning hover:text-warning"
-          )}
+          className={cn('h-5 w-5 p-0 hover:bg-muted', isStale && 'text-warning hover:text-warning')}
           onClick={onRefresh}
           disabled={isRefreshing}
           title="تحديث البيانات"
         >
-          <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
+          <RefreshCw className={cn('h-3 w-3', isRefreshing && 'animate-spin')} />
         </Button>
       )}
     </div>
@@ -108,9 +109,7 @@ export function LastSyncIndicator({
     return (
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
-            {indicator}
-          </TooltipTrigger>
+          <TooltipTrigger asChild>{indicator}</TooltipTrigger>
           <TooltipContent>
             <p>البيانات قديمة! انقر للتحديث</p>
           </TooltipContent>

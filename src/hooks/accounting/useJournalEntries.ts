@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
-import { logger } from "@/lib/logger";
-import { createAutoJournalEntry as createAutoJournalEntryWrapper } from "@/lib/supabase-wrappers";
-import { createMutationErrorHandler } from "@/lib/errors";
-import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
-import { AccountingService } from "@/services/accounting.service";
-import { RealtimeService } from "@/services/realtime.service";
-import { invalidateAccountingQueries } from "@/lib/query-invalidation";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useActivities } from '@/hooks/ui/useActivities';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
+import { createAutoJournalEntry as createAutoJournalEntryWrapper } from '@/lib/supabase-wrappers';
+import { createMutationErrorHandler } from '@/lib/errors';
+import type { JournalEntryInsert, JournalLineInsert } from '@/types/accounting';
+import { AccountingService } from '@/services/accounting.service';
+import { RealtimeService } from '@/services/realtime.service';
+import { invalidateAccountingQueries } from '@/lib/query-invalidation';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface JournalEntry {
   id: string;
@@ -55,7 +55,12 @@ export function useJournalEntries() {
     };
   }, [queryClient]);
 
-  const { data: entries = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: entries = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.JOURNAL_ENTRIES,
     queryFn: () => AccountingService.getJournalEntriesWithLines(),
   });
@@ -73,14 +78,14 @@ export function useJournalEntries() {
       const totalCredit = lines.reduce((sum, line) => sum + line.credit_amount, 0);
 
       if (totalDebit !== totalCredit) {
-        throw new Error("القيد غير متوازن: مجموع المدين يجب أن يساوي مجموع الدائن");
+        throw new Error('القيد غير متوازن: مجموع المدين يجب أن يساوي مجموع الدائن');
       }
 
       return AccountingService.createJournalEntry(entry, lines);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
-      
+
       // إضافة نشاط
       addActivity({
         action: `تم إنشاء قيد محاسبي: ${data.entry_number}`,
@@ -88,10 +93,10 @@ export function useJournalEntries() {
       }).catch((error) => {
         logger.error(error, { context: 'journal_entry_activity', severity: 'low' });
       });
-      
+
       toast({
-        title: "تم الإنشاء",
-        description: "تم إنشاء القيد بنجاح",
+        title: 'تم الإنشاء',
+        description: 'تم إنشاء القيد بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -106,8 +111,8 @@ export function useJournalEntries() {
     onSuccess: () => {
       invalidateAccountingQueries(queryClient);
       toast({
-        title: "تم الترحيل",
-        description: "تم ترحيل القيد بنجاح",
+        title: 'تم الترحيل',
+        description: 'تم ترحيل القيد بنجاح',
       });
     },
     onError: createMutationErrorHandler({
@@ -133,7 +138,7 @@ export function useJournalEntries() {
       });
 
       if (result.error) throw result.error;
-      
+
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       return result.data?.id;
     } catch (error) {

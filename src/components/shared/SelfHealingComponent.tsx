@@ -55,15 +55,11 @@ export class SelfHealingComponent extends Component<Props, State> {
     productionLogger.warn('Component error caught', { error, errorInfo });
 
     // تسجيل الخطأ
-    errorTracker.logError(
-      `Component error: ${error.message}`,
-      'high',
-      {
-        componentName: this.props.componentName || 'Unknown',
-        componentStack: errorInfo.componentStack,
-        errorStack: error.stack,
-      }
-    );
+    errorTracker.logError(`Component error: ${error.message}`, 'high', {
+      componentName: this.props.componentName || 'Unknown',
+      componentStack: errorInfo.componentStack,
+      errorStack: error.stack,
+    });
 
     this.setState({ errorInfo });
 
@@ -81,7 +77,7 @@ export class SelfHealingComponent extends Component<Props, State> {
 
   private scheduleRetry = (): void => {
     const delay = this.props.retryDelay || 2000;
-    
+
     productionLogger.info(`Scheduling auto-retry in ${delay}ms...`);
     this.setState({ isRetrying: true });
 
@@ -92,7 +88,7 @@ export class SelfHealingComponent extends Component<Props, State> {
 
   private handleRetry = (): void => {
     productionLogger.info('Attempting component recovery...');
-    
+
     this.setState((prevState) => ({
       hasError: false,
       error: null,
@@ -101,14 +97,10 @@ export class SelfHealingComponent extends Component<Props, State> {
       isRetrying: false,
     }));
 
-    errorTracker.logError(
-      'Component auto-recovery attempted',
-      'low',
-      {
-        componentName: this.props.componentName || 'Unknown',
-        retryCount: this.state.retryCount + 1,
-      }
-    );
+    errorTracker.logError('Component auto-recovery attempted', 'low', {
+      componentName: this.props.componentName || 'Unknown',
+      retryCount: this.state.retryCount + 1,
+    });
   };
 
   render(): ReactNode {
@@ -132,9 +124,7 @@ export class SelfHealingComponent extends Component<Props, State> {
               <p className="font-medium">{this.state.error?.message}</p>
               {this.state.errorInfo && (
                 <details className="text-xs text-muted-foreground">
-                  <summary className="cursor-pointer hover:text-foreground">
-                    تفاصيل الخطأ
-                  </summary>
+                  <summary className="cursor-pointer hover:text-foreground">تفاصيل الخطأ</summary>
                   <pre className="mt-2 p-2 bg-muted rounded overflow-auto max-h-40">
                     {this.state.errorInfo.componentStack}
                   </pre>
@@ -143,15 +133,11 @@ export class SelfHealingComponent extends Component<Props, State> {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                onClick={this.handleRetry}
-                disabled={this.state.isRetrying}
-                size="sm"
-              >
-                <RefreshCw className={`h-4 w-4 ms-2 ${this.state.isRetrying ? 'animate-spin' : ''}`} />
-                {this.state.isRetrying
-                  ? 'جاري الاسترجاع...'
-                  : 'إعادة المحاولة'}
+              <Button onClick={this.handleRetry} disabled={this.state.isRetrying} size="sm">
+                <RefreshCw
+                  className={`h-4 w-4 ms-2 ${this.state.isRetrying ? 'animate-spin' : ''}`}
+                />
+                {this.state.isRetrying ? 'جاري الاسترجاع...' : 'إعادة المحاولة'}
               </Button>
 
               {this.state.retryCount > 0 && (

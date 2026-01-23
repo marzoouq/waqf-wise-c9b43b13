@@ -35,7 +35,9 @@ export class BeneficiaryTabsService {
   /**
    * جلب توزيعات المستفيد
    */
-  static async getDistributions(beneficiaryId: string): Promise<Database['public']['Tables']['heir_distributions']['Row'][]> {
+  static async getDistributions(
+    beneficiaryId: string
+  ): Promise<Database['public']['Tables']['heir_distributions']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('heir_distributions')
@@ -112,11 +114,14 @@ export class BeneficiaryTabsService {
   /**
    * جلب مدفوعات المستفيد
    */
-  static async getBeneficiaryPayments(beneficiaryId: string, filters?: {
-    dateFrom?: string;
-    dateTo?: string;
-    paymentMethod?: string;
-  }) {
+  static async getBeneficiaryPayments(
+    beneficiaryId: string,
+    filters?: {
+      dateFrom?: string;
+      dateTo?: string;
+      paymentMethod?: string;
+    }
+  ) {
     try {
       let query = supabase
         .from('payments')
@@ -172,7 +177,12 @@ export class BeneficiaryTabsService {
   /**
    * تحديث جلسة المستفيد
    */
-  static async updateSession(sessionId: string | null, beneficiaryId: string, userId: string | undefined, page: string) {
+  static async updateSession(
+    sessionId: string | null,
+    beneficiaryId: string,
+    userId: string | undefined,
+    page: string
+  ) {
     try {
       if (sessionId) {
         await supabase
@@ -225,7 +235,9 @@ export class BeneficiaryTabsService {
   /**
    * جلب طلبات المستفيد
    */
-  static async getRequests(beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_requests']['Row'][]> {
+  static async getRequests(
+    beneficiaryId: string
+  ): Promise<Database['public']['Tables']['beneficiary_requests']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('beneficiary_requests')
@@ -244,26 +256,31 @@ export class BeneficiaryTabsService {
   /**
    * إنشاء طلب جديد
    */
-  static async createRequest(beneficiaryId: string, data: {
-    request_type_id: string;
-    description: string;
-    amount?: number;
-    priority?: string;
-  }): Promise<Database['public']['Tables']['beneficiary_requests']['Row']> {
+  static async createRequest(
+    beneficiaryId: string,
+    data: {
+      request_type_id: string;
+      description: string;
+      amount?: number;
+      priority?: string;
+    }
+  ): Promise<Database['public']['Tables']['beneficiary_requests']['Row']> {
     try {
       const { data: request, error } = await supabase
         .from('beneficiary_requests')
-        .insert([{
-          beneficiary_id: beneficiaryId,
-          ...data,
-          status: 'submitted',
-          submitted_at: new Date().toISOString(),
-        }])
+        .insert([
+          {
+            beneficiary_id: beneficiaryId,
+            ...data,
+            status: 'submitted',
+            submitted_at: new Date().toISOString(),
+          },
+        ])
         .select()
         .maybeSingle();
 
       if (error) throw error;
-      if (!request) throw new Error("فشل في إنشاء الطلب");
+      if (!request) throw new Error('فشل في إنشاء الطلب');
       return request;
     } catch (error) {
       productionLogger.error('Error creating request', error);
@@ -313,7 +330,9 @@ export class BeneficiaryTabsService {
   /**
    * جلب الإفصاحات للمستفيد
    */
-  static async getDisclosures(_beneficiaryId: string): Promise<Database['public']['Tables']['annual_disclosures']['Row'][]> {
+  static async getDisclosures(
+    _beneficiaryId: string
+  ): Promise<Database['public']['Tables']['annual_disclosures']['Row'][]> {
     try {
       const { data, error } = await supabase
         .from('annual_disclosures')
@@ -354,13 +373,31 @@ export class BeneficiaryTabsService {
    */
   static async getIntegrationStats(beneficiaryId: string) {
     try {
-      const [paymentsRes, documentsRes, requestsRes, activeRequestsRes, beneficiaryRes] = await Promise.all([
-        supabase.from("payments").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
-        supabase.from("beneficiary_attachments").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
-        supabase.from("beneficiary_requests").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
-        supabase.from("beneficiary_requests").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId).in("status", ["معلق", "قيد المعالجة", "قيد المراجعة"]),
-        supabase.from("beneficiaries").select("family_name, is_head_of_family").eq("id", beneficiaryId).maybeSingle()
-      ]);
+      const [paymentsRes, documentsRes, requestsRes, activeRequestsRes, beneficiaryRes] =
+        await Promise.all([
+          supabase
+            .from('payments')
+            .select('*', { count: 'exact', head: true })
+            .eq('beneficiary_id', beneficiaryId),
+          supabase
+            .from('beneficiary_attachments')
+            .select('*', { count: 'exact', head: true })
+            .eq('beneficiary_id', beneficiaryId),
+          supabase
+            .from('beneficiary_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('beneficiary_id', beneficiaryId),
+          supabase
+            .from('beneficiary_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('beneficiary_id', beneficiaryId)
+            .in('status', ['معلق', 'قيد المعالجة', 'قيد المراجعة']),
+          supabase
+            .from('beneficiaries')
+            .select('family_name, is_head_of_family')
+            .eq('id', beneficiaryId)
+            .maybeSingle(),
+        ]);
 
       return {
         paymentsCount: paymentsRes.count || 0,
@@ -382,8 +419,9 @@ export class BeneficiaryTabsService {
   static async getWaqfDistributionsSummary(beneficiaryId: string) {
     try {
       const { data, error } = await supabase
-        .from("heir_distributions")
-        .select(`
+        .from('heir_distributions')
+        .select(
+          `
           id,
           share_amount,
           heir_type,
@@ -396,9 +434,10 @@ export class BeneficiaryTabsService {
             is_closed,
             is_active
           )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("distribution_date", { ascending: false });
+        `
+        )
+        .eq('beneficiary_id', beneficiaryId)
+        .order('distribution_date', { ascending: false });
 
       if (error) throw error;
       return data || [];
@@ -414,9 +453,11 @@ export class BeneficiaryTabsService {
   static async getQuickList(limit: number = 20) {
     try {
       const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, phone, email, status, category, total_received, account_balance, national_id")
-        .order("created_at", { ascending: false })
+        .from('beneficiaries')
+        .select(
+          'id, full_name, phone, email, status, category, total_received, account_balance, national_id'
+        )
+        .order('created_at', { ascending: false })
         .limit(limit);
 
       // إذا كان خطأ صلاحيات، أرجع قائمة فارغة
@@ -440,9 +481,9 @@ export class BeneficiaryTabsService {
    */
   static async getApprovalsLog(limit: number = 50): Promise<ApprovalLogItem[]> {
     const { data, error } = await supabase
-      .from("approval_history")
-      .select("*")
-      .order("created_at", { ascending: false })
+      .from('approval_history')
+      .select('*')
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
@@ -453,10 +494,7 @@ export class BeneficiaryTabsService {
    * جلب الحسابات البنكية للوقف
    */
   static async getWaqfBankAccounts(): Promise<BeneficiaryBankAccount[]> {
-    const { data, error } = await supabase
-      .from("bank_accounts")
-      .select("*")
-      .eq("is_active", true);
+    const { data, error } = await supabase.from('bank_accounts').select('*').eq('is_active', true);
 
     if (error) throw error;
     return (data || []) as BeneficiaryBankAccount[];
@@ -467,10 +505,10 @@ export class BeneficiaryTabsService {
    */
   static async getStatementsSimple(beneficiaryId: string) {
     const { data, error } = await supabase
-      .from("payments")
-      .select("*")
-      .eq("beneficiary_id", beneficiaryId)
-      .order("payment_date", { ascending: false });
+      .from('payments')
+      .select('*')
+      .eq('beneficiary_id', beneficiaryId)
+      .order('payment_date', { ascending: false });
 
     if (error) throw error;
     return data || [];
@@ -481,9 +519,9 @@ export class BeneficiaryTabsService {
    */
   static async getAnnualDisclosures(limit: number = 10) {
     const { data, error } = await supabase
-      .from("annual_disclosures")
-      .select("*")
-      .order("year", { ascending: false })
+      .from('annual_disclosures')
+      .select('*')
+      .order('year', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
@@ -495,10 +533,10 @@ export class BeneficiaryTabsService {
    */
   static async getDistributionChartData() {
     const { data: latestDistribution, error: distError } = await supabase
-      .from("distributions")
-      .select("id, total_amount")
-      .eq("status", "معتمد")
-      .order("distribution_date", { ascending: false })
+      .from('distributions')
+      .select('id, total_amount')
+      .eq('status', 'معتمد')
+      .order('distribution_date', { ascending: false })
       .limit(1)
       .maybeSingle();
 
@@ -507,16 +545,16 @@ export class BeneficiaryTabsService {
     }
 
     const { data: details, error: detailsError } = await supabase
-      .from("distribution_details")
-      .select("allocated_amount, beneficiary_type")
-      .eq("distribution_id", latestDistribution.id);
+      .from('distribution_details')
+      .select('allocated_amount, beneficiary_type')
+      .eq('distribution_id', latestDistribution.id);
 
     if (detailsError || !details?.length) {
       return [];
     }
 
     const typeData: { [key: string]: number } = {};
-    
+
     details.forEach((detail) => {
       const type = detail.beneficiary_type || 'أخرى';
       if (!typeData[type]) {
@@ -541,16 +579,18 @@ export class BeneficiaryTabsService {
    */
   static async getRequestsWithTypes(beneficiaryId: string) {
     const { data, error } = await supabase
-      .from("beneficiary_requests")
-      .select(`
+      .from('beneficiary_requests')
+      .select(
+        `
         *,
         request_types (
           name_ar,
           requires_amount
         )
-      `)
-      .eq("beneficiary_id", beneficiaryId)
-      .order("created_at", { ascending: false });
+      `
+      )
+      .eq('beneficiary_id', beneficiaryId)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
@@ -566,11 +606,11 @@ export class BeneficiaryTabsService {
     const results = await Promise.all(
       years.map(async (year) => {
         const { data, error } = await supabase
-          .from("payments")
-          .select("amount")
-          .eq("beneficiary_id", beneficiaryId)
-          .gte("payment_date", `${year}-01-01`)
-          .lte("payment_date", `${year}-12-31`);
+          .from('payments')
+          .select('amount')
+          .eq('beneficiary_id', beneficiaryId)
+          .gte('payment_date', `${year}-01-01`)
+          .lte('payment_date', `${year}-12-31`);
 
         if (error) throw error;
 
@@ -592,23 +632,23 @@ export class BeneficiaryTabsService {
   /**
    * استيراد مستفيدين من ملف
    */
-  static async importBeneficiaries(beneficiaries: Array<{
-    full_name: string;
-    national_id: string;
-    phone: string;
-    gender: string;
-    relationship: string;
-    category: string;
-    nationality: string;
-  }>): Promise<void> {
-    const records = beneficiaries.map(b => ({
+  static async importBeneficiaries(
+    beneficiaries: Array<{
+      full_name: string;
+      national_id: string;
+      phone: string;
+      gender: string;
+      relationship: string;
+      category: string;
+      nationality: string;
+    }>
+  ): Promise<void> {
+    const records = beneficiaries.map((b) => ({
       ...b,
       status: 'نشط',
     }));
 
-    const { error } = await supabase
-      .from('beneficiaries')
-      .insert(records);
+    const { error } = await supabase.from('beneficiaries').insert(records);
 
     if (error) throw error;
   }
@@ -616,10 +656,7 @@ export class BeneficiaryTabsService {
   /**
    * رفع مرفقات المستفيد
    */
-  static async uploadAttachment(
-    beneficiaryId: string,
-    file: File
-  ): Promise<{ filePath: string }> {
+  static async uploadAttachment(beneficiaryId: string, file: File): Promise<{ filePath: string }> {
     const fileExt = file.name.split('.').pop();
     const fileName = `${beneficiaryId}/${Date.now()}.${fileExt}`;
 
@@ -629,16 +666,14 @@ export class BeneficiaryTabsService {
 
     if (uploadError) throw uploadError;
 
-    const { error: dbError } = await supabase
-      .from('beneficiary_attachments')
-      .insert({
-        beneficiary_id: beneficiaryId,
-        file_name: file.name,
-        file_path: fileName,
-        file_type: file.type.split('/')[0] || 'document',
-        file_size: file.size,
-        mime_type: file.type,
-      });
+    const { error: dbError } = await supabase.from('beneficiary_attachments').insert({
+      beneficiary_id: beneficiaryId,
+      file_name: file.name,
+      file_path: fileName,
+      file_type: file.type.split('/')[0] || 'document',
+      file_size: file.size,
+      mime_type: file.type,
+    });
 
     if (dbError) throw dbError;
 
@@ -650,14 +685,16 @@ export class BeneficiaryTabsService {
    */
   static async deleteAttachment(attachmentId: string, _filePath: string): Promise<void> {
     // لا نحذف الملف من Storage، نقوم فقط بـ soft delete للسجل
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error: dbError } = await supabase
       .from('beneficiary_attachments')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id,
-        deletion_reason: 'حذف بواسطة المستخدم'
+        deletion_reason: 'حذف بواسطة المستخدم',
       })
       .eq('id', attachmentId);
 
@@ -676,8 +713,8 @@ export class BeneficiaryTabsService {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: { full_name: beneficiary.full_name }
-      }
+        data: { full_name: beneficiary.full_name },
+      },
     });
 
     if (authError) throw authError;
@@ -688,7 +725,7 @@ export class BeneficiaryTabsService {
       .update({
         user_id: authData.user.id,
         can_login: true,
-        login_enabled_at: new Date().toISOString()
+        login_enabled_at: new Date().toISOString(),
       })
       .eq('id', beneficiary.id);
 
@@ -705,7 +742,7 @@ export class BeneficiaryTabsService {
       .from('beneficiaries')
       .update({
         can_login: enabled,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', beneficiaryId);
 

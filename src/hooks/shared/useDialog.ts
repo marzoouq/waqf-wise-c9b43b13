@@ -30,14 +30,14 @@ interface UseDialogReturn<T = unknown> {
 
 /**
  * Hook لإدارة dialog واحد
- * 
+ *
  * @example
  * ```tsx
  * const editDialog = useDialog<User>();
- * 
+ *
  * // فتح مع بيانات
  * <Button onClick={() => editDialog.open(user)}>تعديل</Button>
- * 
+ *
  * // في الـ Dialog
  * <Dialog open={editDialog.isOpen} onOpenChange={editDialog.onOpenChange}>
  *   <UserForm user={editDialog.data} />
@@ -98,19 +98,17 @@ export function useDialog<T = unknown>(initialOpen = false): UseDialogReturn<T> 
 
 /**
  * Hook لإدارة عدة dialogs
- * 
+ *
  * @example
  * ```tsx
  * const dialogs = useMultipleDialogs(['create', 'edit', 'delete'] as const);
- * 
+ *
  * dialogs.open('edit', user);
  * dialogs.isOpen('edit'); // true
  * dialogs.getData('edit'); // user
  * ```
  */
-export function useMultipleDialogs<K extends string, T = unknown>(
-  dialogKeys: readonly K[]
-) {
+export function useMultipleDialogs<K extends string, T = unknown>(dialogKeys: readonly K[]) {
   const [states, setStates] = useState<Record<K, DialogState<T>>>(() => {
     const initial = {} as Record<K, DialogState<T>>;
     dialogKeys.forEach((key) => {
@@ -146,12 +144,15 @@ export function useMultipleDialogs<K extends string, T = unknown>(
   const isOpen = useCallback((key: K) => states[key]?.isOpen ?? false, [states]);
   const getData = useCallback((key: K) => states[key]?.data ?? null, [states]);
 
-  const onOpenChange = useCallback((key: K) => (open: boolean) => {
-    setStates((prev) => ({
-      ...prev,
-      [key]: { ...prev[key], isOpen: open },
-    }));
-  }, []);
+  const onOpenChange = useCallback(
+    (key: K) => (open: boolean) => {
+      setStates((prev) => ({
+        ...prev,
+        [key]: { ...prev[key], isOpen: open },
+      }));
+    },
+    []
+  );
 
   return {
     states,

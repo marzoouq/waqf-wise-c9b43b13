@@ -1,13 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, Eye, FileText, LucideIcon } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
-import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
-import { BadgeVariant, JournalEntryWithLines } from "@/types";
-import { useJournalApprovals } from "@/hooks/approvals";
-import { useDialogState } from "@/hooks/ui/useDialogState";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, XCircle, Clock, Eye, FileText, LucideIcon } from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
+import ViewJournalEntryDialog from '@/components/accounting/ViewJournalEntryDialog';
+import { BadgeVariant, JournalEntryWithLines } from '@/types';
+import { useJournalApprovals } from '@/hooks/approvals';
+import { useDialogState } from '@/hooks/ui/useDialogState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function JournalApprovalsTab() {
   const viewDialog = useDialogState<JournalEntryWithLines>();
@@ -15,9 +15,9 @@ export function JournalApprovalsTab() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {
-      pending: { label: "قيد المراجعة", variant: "secondary", icon: Clock },
-      approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
-      rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
+      pending: { label: 'قيد المراجعة', variant: 'secondary', icon: Clock },
+      approved: { label: 'موافق عليه', variant: 'default', icon: CheckCircle },
+      rejected: { label: 'مرفوض', variant: 'destructive', icon: XCircle },
     };
     const c = config[status] || config.pending;
     const Icon = c.icon;
@@ -45,8 +45,8 @@ export function JournalApprovalsTab() {
     <>
       <div className="space-y-4">
         {approvals?.map((approval) => (
-          <Card 
-            key={approval.id} 
+          <Card
+            key={approval.id}
             className="overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300"
           >
             <CardHeader className="bg-muted/30 border-b border-border/30 pb-4">
@@ -67,9 +67,11 @@ export function JournalApprovalsTab() {
                   <p className="text-base font-medium">{approval.journal_entry?.description}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">تاريخ القيد</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                    تاريخ القيد
+                  </p>
                   <p className="text-base">
-                    {format(new Date(approval.journal_entry?.entry_date), "dd MMM yyyy", {
+                    {format(new Date(approval.journal_entry?.entry_date), 'dd MMM yyyy', {
                       locale: ar,
                     })}
                   </p>
@@ -81,7 +83,9 @@ export function JournalApprovalsTab() {
               </div>
               {approval.notes && (
                 <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border/30">
-                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">ملاحظات:</p>
+                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wide">
+                    ملاحظات:
+                  </p>
                   <p className="text-sm">{approval.notes}</p>
                 </div>
               )}
@@ -110,8 +114,12 @@ export function JournalApprovalsTab() {
               <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                 <Clock className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-lg font-medium text-muted-foreground">لا توجد موافقات قيود محاسبية</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">ستظهر القيود المعلقة هنا عند إضافتها</p>
+              <p className="text-lg font-medium text-muted-foreground">
+                لا توجد موافقات قيود محاسبية
+              </p>
+              <p className="text-sm text-muted-foreground/70 mt-1">
+                ستظهر القيود المعلقة هنا عند إضافتها
+              </p>
             </CardContent>
           </Card>
         )}

@@ -1,53 +1,72 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherDialog";
-import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign, Link2, Link2Off, Loader2 } from "lucide-react";
-import { formatRelative, format, arLocale as ar } from "@/lib/date";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { usePaymentVouchersData } from "@/hooks/payments/usePaymentVouchersData";
-import { useToast } from "@/hooks/ui/use-toast";
-import { VoucherLinkingService } from "@/services/voucher-linking.service";
-import { ExportButton } from "@/components/shared/ExportButton";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { PaymentVoucherDialog } from '@/components/distributions/PaymentVoucherDialog';
+import {
+  Receipt,
+  Search,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Clock,
+  DollarSign,
+  Link2,
+  Link2Off,
+  Loader2,
+} from 'lucide-react';
+import { formatRelative, format, arLocale as ar } from '@/lib/date';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { usePaymentVouchersData } from '@/hooks/payments/usePaymentVouchersData';
+import { useToast } from '@/hooks/ui/use-toast';
+import { VoucherLinkingService } from '@/services/voucher-linking.service';
+import { ExportButton } from '@/components/shared/ExportButton';
 
 export default function PaymentVouchers() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [linkingVoucherId, setLinkingVoucherId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const { vouchers, stats, isLoading, refetch } = usePaymentVouchersData(searchTerm, selectedStatus);
+  const { vouchers, stats, isLoading, refetch } = usePaymentVouchersData(
+    searchTerm,
+    selectedStatus
+  );
 
   // حساب السندات غير المرتبطة
-  const unlinkedCount = vouchers?.filter(v => !v.journal_entry_id && v.voucher_type === 'payment').length || 0;
+  const unlinkedCount =
+    vouchers?.filter((v) => !v.journal_entry_id && v.voucher_type === 'payment').length || 0;
 
   // فلترة السندات غير المرتبطة
-  const filteredVouchers = selectedStatus === 'unlinked' 
-    ? vouchers?.filter(v => !v.journal_entry_id && v.voucher_type === 'payment')
-    : vouchers;
+  const filteredVouchers =
+    selectedStatus === 'unlinked'
+      ? vouchers?.filter((v) => !v.journal_entry_id && v.voucher_type === 'payment')
+      : vouchers;
 
   const handleLinkVoucher = async (voucherId: string, voucherNumber: string) => {
     setLinkingVoucherId(voucherId);
     try {
       await VoucherLinkingService.linkVoucherToJournal(voucherId);
-      
+
       toast({
-        title: "تم الربط بنجاح",
+        title: 'تم الربط بنجاح',
         description: `تم ربط السند ${voucherNumber} بقيد محاسبي`,
       });
       refetch();
     } catch (err) {
       console.error('Error linking voucher:', err);
       toast({
-        title: "خطأ في الربط",
-        description: "فشل ربط السند بقيد محاسبي",
-        variant: "destructive",
+        title: 'خطأ في الربط',
+        description: 'فشل ربط السند بقيد محاسبي',
+        variant: 'destructive',
       });
     } finally {
       setLinkingVoucherId(null);
@@ -55,30 +74,46 @@ export default function PaymentVouchers() {
   };
 
   const getStatusBadge = (status: string) => {
-    type BadgeVariant = "default" | "secondary" | "outline" | "destructive";
-    const configs: Record<string, { label: string; variant: BadgeVariant; icon: React.ComponentType<{ className?: string }>; className?: string }> = {
-      draft: { label: "مسودة", variant: "secondary" as const, icon: Clock },
-      approved: { label: "معتمد", variant: "default" as const, icon: CheckCircle },
-      paid: { label: "مدفوع", variant: "default" as const, icon: CheckCircle, className: "bg-success text-success-foreground" },
-      pending: { label: "معلق", variant: "secondary" as const, icon: Clock },
-      cancelled: { label: "ملغي", variant: "outline" as const, icon: XCircle },
-      rejected: { label: "مرفوض", variant: "destructive" as const, icon: XCircle },
+    type BadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive';
+    const configs: Record<
+      string,
+      {
+        label: string;
+        variant: BadgeVariant;
+        icon: React.ComponentType<{ className?: string }>;
+        className?: string;
+      }
+    > = {
+      draft: { label: 'مسودة', variant: 'secondary' as const, icon: Clock },
+      approved: { label: 'معتمد', variant: 'default' as const, icon: CheckCircle },
+      paid: {
+        label: 'مدفوع',
+        variant: 'default' as const,
+        icon: CheckCircle,
+        className: 'bg-success text-success-foreground',
+      },
+      pending: { label: 'معلق', variant: 'secondary' as const, icon: Clock },
+      cancelled: { label: 'ملغي', variant: 'outline' as const, icon: XCircle },
+      rejected: { label: 'مرفوض', variant: 'destructive' as const, icon: XCircle },
     };
 
     const config = configs[status] || configs.draft;
     const Icon = config.icon;
 
     return (
-      <Badge variant={config.variant} className={config.className || ""}>
+      <Badge variant={config.variant} className={config.className || ''}>
         <Icon className="ms-1 h-3 w-3" />
         {config.label}
       </Badge>
     );
   };
 
-  const getJournalLinkBadge = (voucher: { journal_entry_id?: string | null; voucher_type: string }) => {
+  const getJournalLinkBadge = (voucher: {
+    journal_entry_id?: string | null;
+    voucher_type: string;
+  }) => {
     if (voucher.voucher_type !== 'payment') return null;
-    
+
     if (voucher.journal_entry_id) {
       return (
         <Badge variant="outline" className="bg-success/10 text-success border-success/30">
@@ -97,9 +132,9 @@ export default function PaymentVouchers() {
 
   const getVoucherTypeLabel = (type: string) => {
     const types = {
-      payment: "سند صرف",
-      receipt: "سند قبض",
-      journal: "قيد يومية",
+      payment: 'سند صرف',
+      receipt: 'سند قبض',
+      journal: 'قيد يومية',
     };
     return types[type as keyof typeof types] || type;
   };
@@ -115,19 +150,28 @@ export default function PaymentVouchers() {
             <div className="flex gap-2">
               {vouchers && vouchers.length > 0 && (
                 <ExportButton
-                  data={vouchers.map(v => ({
+                  data={vouchers.map((v) => ({
                     'رقم السند': v.voucher_number,
-                    'النوع': getVoucherTypeLabel(v.voucher_type),
-                    'الوصف': v.description || '-',
-                    'المبلغ': v.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 }) + ' ر.س',
-                    'الحالة': v.status,
-                    'المستفيد': v.beneficiaries?.full_name || '-',
+                    النوع: getVoucherTypeLabel(v.voucher_type),
+                    الوصف: v.description || '-',
+                    المبلغ: v.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 }) + ' ر.س',
+                    الحالة: v.status,
+                    المستفيد: v.beneficiaries?.full_name || '-',
                     'طريقة الدفع': v.payment_method || '-',
-                    'التاريخ': format(new Date(v.created_at), 'dd/MM/yyyy', { locale: ar }),
+                    التاريخ: format(new Date(v.created_at), 'dd/MM/yyyy', { locale: ar }),
                   }))}
                   filename="سندات_الدفع"
                   title="تقرير سندات الدفع والقبض"
-                  headers={['رقم السند', 'النوع', 'الوصف', 'المبلغ', 'الحالة', 'المستفيد', 'طريقة الدفع', 'التاريخ']}
+                  headers={[
+                    'رقم السند',
+                    'النوع',
+                    'الوصف',
+                    'المبلغ',
+                    'الحالة',
+                    'المستفيد',
+                    'طريقة الدفع',
+                    'التاريخ',
+                  ]}
                 />
               )}
               <Button onClick={() => setShowCreateDialog(true)} size="sm">
@@ -147,24 +191,9 @@ export default function PaymentVouchers() {
             icon={FileText}
             variant="default"
           />
-          <UnifiedKPICard
-            title="مسودات"
-            value={stats.draft}
-            icon={Clock}
-            variant="warning"
-          />
-          <UnifiedKPICard
-            title="معتمدة"
-            value={stats.approved}
-            icon={CheckCircle}
-            variant="info"
-          />
-          <UnifiedKPICard
-            title="مدفوعة"
-            value={stats.paid}
-            icon={CheckCircle}
-            variant="success"
-          />
+          <UnifiedKPICard title="مسودات" value={stats.draft} icon={Clock} variant="warning" />
+          <UnifiedKPICard title="معتمدة" value={stats.approved} icon={CheckCircle} variant="info" />
+          <UnifiedKPICard title="مدفوعة" value={stats.paid} icon={CheckCircle} variant="success" />
         </UnifiedStatsGrid>
 
         {/* Financial Stats */}
@@ -179,7 +208,7 @@ export default function PaymentVouchers() {
             title="غير مرتبطة بقيود"
             value={unlinkedCount}
             icon={Link2Off}
-            variant={unlinkedCount > 0 ? "warning" : "default"}
+            variant={unlinkedCount > 0 ? 'warning' : 'default'}
             subtitle="تحتاج ربط محاسبي"
           />
         </UnifiedStatsGrid>
@@ -199,38 +228,38 @@ export default function PaymentVouchers() {
               </div>
               <div className="flex gap-2 flex-wrap">
                 <Button
-                  variant={selectedStatus === "all" ? "default" : "outline"}
-                  onClick={() => setSelectedStatus("all")}
+                  variant={selectedStatus === 'all' ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus('all')}
                   size="sm"
                 >
                   الكل
                 </Button>
                 <Button
-                  variant={selectedStatus === "draft" ? "default" : "outline"}
-                  onClick={() => setSelectedStatus("draft")}
+                  variant={selectedStatus === 'draft' ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus('draft')}
                   size="sm"
                 >
                   مسودات
                 </Button>
                 <Button
-                  variant={selectedStatus === "approved" ? "default" : "outline"}
-                  onClick={() => setSelectedStatus("approved")}
+                  variant={selectedStatus === 'approved' ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus('approved')}
                   size="sm"
                 >
                   معتمدة
                 </Button>
                 <Button
-                  variant={selectedStatus === "paid" ? "default" : "outline"}
-                  onClick={() => setSelectedStatus("paid")}
+                  variant={selectedStatus === 'paid' ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus('paid')}
                   size="sm"
                 >
                   مدفوعة
                 </Button>
                 <Button
-                  variant={selectedStatus === "unlinked" ? "default" : "outline"}
-                  onClick={() => setSelectedStatus("unlinked")}
+                  variant={selectedStatus === 'unlinked' ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus('unlinked')}
                   size="sm"
-                  className={selectedStatus !== "unlinked" ? "text-warning hover:text-warning" : ""}
+                  className={selectedStatus !== 'unlinked' ? 'text-warning hover:text-warning' : ''}
                 >
                   <Link2Off className="ms-1 h-4 w-4" />
                   غير مرتبطة ({unlinkedCount})
@@ -290,9 +319,7 @@ export default function PaymentVouchers() {
                         {voucher.reference_number && (
                           <span>المرجع: {voucher.reference_number}</span>
                         )}
-                        <span>
-                          {formatRelative(voucher.created_at)}
-                        </span>
+                        <span>{formatRelative(voucher.created_at)}</span>
                       </div>
                     </div>
 
@@ -303,7 +330,7 @@ export default function PaymentVouchers() {
                         </p>
                         <p className="text-sm text-muted-foreground">ريال سعودي</p>
                       </div>
-                      
+
                       {/* زر الربط للسندات غير المرتبطة */}
                       {voucher.voucher_type === 'payment' && !voucher.journal_entry_id && (
                         <Button

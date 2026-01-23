@@ -3,7 +3,7 @@
  * @version 1.0.0
  */
 
-import type { ComponentType } from "react";
+import type { ComponentType } from 'react';
 
 /**
  * عنصر تنقل واحد في شريط التنقل السفلي

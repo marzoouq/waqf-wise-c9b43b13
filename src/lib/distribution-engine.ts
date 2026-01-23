@@ -70,10 +70,7 @@ export class DistributionEngine {
   /**
    * حساب الاستقطاعات
    */
-  private static calculateDeductions(
-    totalAmount: number,
-    config: DeductionsConfig
-  ) {
+  private static calculateDeductions(totalAmount: number, config: DeductionsConfig) {
     const nazer_share = totalAmount * (config.nazer_percentage || 0.05);
     const reserve = totalAmount * (config.reserve_percentage || 0.1);
     const waqf_corpus = totalAmount * (config.waqf_corpus_percentage || 0.05);
@@ -96,9 +93,10 @@ export class DistributionEngine {
    * 1. التوزيع الشرعي (حسب الأنصبة الشرعية)
    * الذكر له ضعف الأنثى
    */
-  static calculateShariahDistribution(
-    params: DistributionParams
-  ): { results: DistributionResult[]; summary: DistributionSummary } {
+  static calculateShariahDistribution(params: DistributionParams): {
+    results: DistributionResult[];
+    summary: DistributionSummary;
+  } {
     const deductions = this.calculateDeductions(params.total_amount, params.deductions);
     const distributableAmount = params.total_amount - deductions.total;
 
@@ -163,9 +161,10 @@ export class DistributionEngine {
   /**
    * 2. التوزيع المتساوي (بالتساوي بين الجميع)
    */
-  static calculateEqualDistribution(
-    params: DistributionParams
-  ): { results: DistributionResult[]; summary: DistributionSummary } {
+  static calculateEqualDistribution(params: DistributionParams): {
+    results: DistributionResult[];
+    summary: DistributionSummary;
+  } {
     const deductions = this.calculateDeductions(params.total_amount, params.deductions);
     const distributableAmount = params.total_amount - deductions.total;
 
@@ -205,9 +204,10 @@ export class DistributionEngine {
   /**
    * 3. التوزيع حسب الحاجة (بناء على حجم الأسرة والدخل)
    */
-  static calculateNeedBasedDistribution(
-    params: DistributionParams
-  ): { results: DistributionResult[]; summary: DistributionSummary } {
+  static calculateNeedBasedDistribution(params: DistributionParams): {
+    results: DistributionResult[];
+    summary: DistributionSummary;
+  } {
     const deductions = this.calculateDeductions(params.total_amount, params.deductions);
     const distributableAmount = params.total_amount - deductions.total;
 
@@ -217,11 +217,12 @@ export class DistributionEngine {
 
     params.beneficiaries.forEach((b) => {
       // نقاط حجم الأسرة (1 نقطة لكل فرد)
-      const familySize = (b.family_size || 1) + 
-                        (b.number_of_sons || 0) + 
-                        (b.number_of_daughters || 0) + 
-                        (b.number_of_wives || 0);
-      
+      const familySize =
+        (b.family_size || 1) +
+        (b.number_of_sons || 0) +
+        (b.number_of_daughters || 0) +
+        (b.number_of_wives || 0);
+
       const familyPoints = familySize;
 
       // نقاط الدخل (عكسي: كلما قل الدخل زادت النقاط)
@@ -272,9 +273,10 @@ export class DistributionEngine {
   /**
    * 4. التوزيع المخصص (نسب يدوية)
    */
-  static calculateCustomDistribution(
-    params: DistributionParams
-  ): { results: DistributionResult[]; summary: DistributionSummary } {
+  static calculateCustomDistribution(params: DistributionParams): {
+    results: DistributionResult[];
+    summary: DistributionSummary;
+  } {
     const deductions = this.calculateDeductions(params.total_amount, params.deductions);
     const distributableAmount = params.total_amount - deductions.total;
 
@@ -285,7 +287,7 @@ export class DistributionEngine {
     const results: DistributionResult[] = params.beneficiaries.map((b) => {
       const weight = params.custom_weights![b.id] || 1;
       const percentage = weight;
-      const amount = Math.round((distributableAmount * percentage / 100) * 100) / 100;
+      const amount = Math.round(((distributableAmount * percentage) / 100) * 100) / 100;
 
       return {
         beneficiary_id: b.id,
@@ -318,25 +320,29 @@ export class DistributionEngine {
   /**
    * 5. التوزيع المختلط (مزيج من الشرعي والحاجة)
    */
-  static calculateHybridDistribution(
-    params: DistributionParams
-  ): { results: DistributionResult[]; summary: DistributionSummary } {
+  static calculateHybridDistribution(params: DistributionParams): {
+    results: DistributionResult[];
+    summary: DistributionSummary;
+  } {
     const config = params.hybrid_config || { shariah_weight: 0.6, need_weight: 0.4 };
-    
+
     // حساب التوزيع الشرعي
     const shariahResult = this.calculateShariahDistribution(params);
-    
+
     // حساب التوزيع حسب الحاجة
     const needResult = this.calculateNeedBasedDistribution(params);
 
     // دمج النتائج
     const results: DistributionResult[] = params.beneficiaries.map((b) => {
-      const shariahAmount = shariahResult.results.find(r => r.beneficiary_id === b.id)?.allocated_amount || 0;
-      const needAmount = needResult.results.find(r => r.beneficiary_id === b.id)?.allocated_amount || 0;
+      const shariahAmount =
+        shariahResult.results.find((r) => r.beneficiary_id === b.id)?.allocated_amount || 0;
+      const needAmount =
+        needResult.results.find((r) => r.beneficiary_id === b.id)?.allocated_amount || 0;
 
-      const amount = Math.round(
-        (shariahAmount * config.shariah_weight + needAmount * config.need_weight) * 100
-      ) / 100;
+      const amount =
+        Math.round(
+          (shariahAmount * config.shariah_weight + needAmount * config.need_weight) * 100
+        ) / 100;
 
       return {
         beneficiary_id: b.id,

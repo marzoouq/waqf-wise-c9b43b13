@@ -7,11 +7,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 
 /** Column definition for UnifiedDataTable with improved type safety for row parameter */
 export interface Column<T = Record<string, unknown>> {
@@ -19,7 +19,7 @@ export interface Column<T = Record<string, unknown>> {
   label: string | ReactNode;
   /** Render function receives the cell value and the typed row */
   render?: (value: ReactNode, row: T) => ReactNode;
-  align?: "right" | "left" | "center";
+  align?: 'right' | 'left' | 'center';
   hideOnMobile?: boolean;
   hideOnTablet?: boolean;
   className?: string;
@@ -56,10 +56,10 @@ interface UnifiedDataTableProps<T = Record<string, unknown>> {
  */
 export function UnifiedDataTable<T extends { id?: string }>({
   title,
-  columns, 
+  columns,
   data,
   loading = false,
-  emptyMessage = "لا توجد بيانات",
+  emptyMessage = 'لا توجد بيانات',
   pagination,
   actions,
   showMobileScrollHint = true,
@@ -68,10 +68,10 @@ export function UnifiedDataTable<T extends { id?: string }>({
   rowHeight = 48,
 }: UnifiedDataTableProps<T>) {
   const parentRef = useRef<HTMLDivElement>(null);
-  
+
   // Auto-enable virtualization for large datasets
   const shouldVirtualize = virtualized || data.length > 100;
-  
+
   const virtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => parentRef.current,
@@ -85,19 +85,19 @@ export function UnifiedDataTable<T extends { id?: string }>({
 
   // Helper to get responsive classes
   const getColumnClasses = (column: Column<T>) => {
-    const classes = ["text-right", "font-semibold", "whitespace-nowrap", "text-xs", "sm:text-sm"];
-    if (column.hideOnMobile) classes.push("hidden", "md:table-cell");
-    if (column.hideOnTablet) classes.push("hidden", "lg:table-cell");
-    if (column.align === "center") classes.push("text-center");
-    return classes.join(" ");
+    const classes = ['text-right', 'font-semibold', 'whitespace-nowrap', 'text-xs', 'sm:text-sm'];
+    if (column.hideOnMobile) classes.push('hidden', 'md:table-cell');
+    if (column.hideOnTablet) classes.push('hidden', 'lg:table-cell');
+    if (column.align === 'center') classes.push('text-center');
+    return classes.join(' ');
   };
 
   const getCellClasses = (column: Column<T>) => {
-    const classes = ["text-xs", "sm:text-sm"];
-    if (column.hideOnMobile) classes.push("hidden", "md:table-cell");
-    if (column.hideOnTablet) classes.push("hidden", "lg:table-cell");
-    if (column.align === "center") classes.push("text-center");
-    return classes.join(" ");
+    const classes = ['text-xs', 'sm:text-sm'];
+    if (column.hideOnMobile) classes.push('hidden', 'md:table-cell');
+    if (column.hideOnTablet) classes.push('hidden', 'lg:table-cell');
+    if (column.align === 'center') classes.push('text-center');
+    return classes.join(' ');
   };
 
   if (loading) {
@@ -127,7 +127,7 @@ export function UnifiedDataTable<T extends { id?: string }>({
         <TableHeader>
           <TableRow className="bg-muted/30">
             {columns.map((column) => (
-              <TableHead 
+              <TableHead
                 key={column.key}
                 className={getColumnClasses(column)}
                 style={{ width: column.width }}
@@ -145,11 +145,7 @@ export function UnifiedDataTable<T extends { id?: string }>({
       </Table>
 
       {/* Virtualized body */}
-      <div
-        ref={parentRef}
-        className="overflow-auto"
-        style={{ maxHeight: virtualMaxHeight }}
-      >
+      <div ref={parentRef} className="overflow-auto" style={{ maxHeight: virtualMaxHeight }}>
         <div
           style={{
             height: `${totalSize}px`,
@@ -178,23 +174,18 @@ export function UnifiedDataTable<T extends { id?: string }>({
                     {columns.map((column) => {
                       const value = (row as Record<string, unknown>)[column.key];
                       return (
-                        <TableCell 
+                        <TableCell
                           key={column.key}
                           className={getCellClasses(column)}
                           style={{ width: column.width }}
                         >
-                          {column.render 
+                          {column.render
                             ? column.render(value as ReactNode, row)
-                            : String(value ?? '')
-                          }
+                            : String(value ?? '')}
                         </TableCell>
                       );
                     })}
-                    {actions && (
-                      <TableCell>
-                        {actions(row)}
-                      </TableCell>
-                    )}
+                    {actions && <TableCell>{actions(row)}</TableCell>}
                   </TableRow>
                 );
               })}
@@ -219,10 +210,7 @@ export function UnifiedDataTable<T extends { id?: string }>({
             <TableHeader>
               <TableRow className="bg-muted/30">
                 {columns.map((column) => (
-                  <TableHead 
-                    key={column.key}
-                    className={getColumnClasses(column)}
-                  >
+                  <TableHead key={column.key} className={getColumnClasses(column)}>
                     {column.label}
                   </TableHead>
                 ))}
@@ -235,26 +223,21 @@ export function UnifiedDataTable<T extends { id?: string }>({
             </TableHeader>
             <TableBody>
               {data.map((row) => (
-                <TableRow key={row.id || JSON.stringify(row)} className="hover:bg-muted/50 transition-colors">
+                <TableRow
+                  key={row.id || JSON.stringify(row)}
+                  className="hover:bg-muted/50 transition-colors"
+                >
                   {columns.map((column) => {
                     const value = (row as Record<string, unknown>)[column.key];
                     return (
-                      <TableCell 
-                        key={column.key}
-                        className={getCellClasses(column)}
-                      >
-                        {column.render 
+                      <TableCell key={column.key} className={getCellClasses(column)}>
+                        {column.render
                           ? column.render(value as ReactNode, row)
-                          : String(value ?? '')
-                        }
+                          : String(value ?? '')}
                       </TableCell>
                     );
                   })}
-                  {actions && (
-                    <TableCell>
-                      {actions(row)}
-                    </TableCell>
-                  )}
+                  {actions && <TableCell>{actions(row)}</TableCell>}
                 </TableRow>
               ))}
             </TableBody>
@@ -285,11 +268,9 @@ export function UnifiedDataTable<T extends { id?: string }>({
       )}
       <CardContent className="p-0">
         {showMobileScrollHint && !shouldVirtualize && <MobileScrollHint />}
-        
+
         {data.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {emptyMessage}
-          </div>
+          <div className="p-8 text-center text-muted-foreground">{emptyMessage}</div>
         ) : shouldVirtualize ? (
           renderVirtualizedTable()
         ) : (

@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChatbotService, ChatMessage, QuickReply } from "@/services/chatbot.service";
-import { UserService } from "@/services/user.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChatbotService, ChatMessage, QuickReply } from '@/services/chatbot.service';
+import { UserService } from '@/services/user.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
-export type { ChatMessage, QuickReply } from "@/services/chatbot.service";
+export type { ChatMessage, QuickReply } from '@/services/chatbot.service';
 
 export interface QuickAction {
   label: string;
@@ -34,13 +34,14 @@ export function useChatbot() {
     enabled: !!userId,
   });
 
-  const isStaff = useMemo(() => 
-    userRoles.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r)),
+  const isStaff = useMemo(
+    () =>
+      userRoles.some((r) => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r)),
     [userRoles]
   );
 
-  const isBeneficiary = useMemo(() => 
-    userRoles.some(r => ['beneficiary', 'waqf_heir'].includes(r)),
+  const isBeneficiary = useMemo(
+    () => userRoles.some((r) => ['beneficiary', 'waqf_heir'].includes(r)),
     [userRoles]
   );
 
@@ -49,7 +50,7 @@ export function useChatbot() {
     queryKey: QUERY_KEYS.CHATBOT_CONVERSATIONS(userId),
     queryFn: async () => {
       if (!userId) return [];
-      return await ChatbotService.getConversations(userId) as ChatMessage[];
+      return (await ChatbotService.getConversations(userId)) as ChatMessage[];
     },
     enabled: !!userId,
   });
@@ -63,39 +64,31 @@ export function useChatbot() {
   // فلترة الردود السريعة حسب دور المستخدم
   const quickReplies = useMemo(() => {
     if (isStaff) {
-      return allQuickReplies.filter(r => 
+      return allQuickReplies.filter((r) =>
         ['financial', 'properties', 'requests', 'distributions', 'help'].includes(r.category)
       );
     } else if (isBeneficiary) {
-      return allQuickReplies.filter(r => 
-        ['beneficiary', 'general'].includes(r.category)
-      );
+      return allQuickReplies.filter((r) => ['beneficiary', 'general'].includes(r.category));
     }
     return allQuickReplies;
   }, [allQuickReplies, isStaff, isBeneficiary]);
 
   // إرسال رسالة
   const sendMessage = useMutation({
-    mutationFn: async ({ 
-      message, 
-      quickReplyId 
-    }: { 
-      message: string; 
-      quickReplyId?: string 
-    }) => {
+    mutationFn: async ({ message, quickReplyId }: { message: string; quickReplyId?: string }) => {
       if (!userId) {
         throw new Error('يجب تسجيل الدخول أولاً');
       }
 
       setIsTyping(true);
-      
+
       const data = await ChatbotService.sendMessage(userId, message, quickReplyId);
-      
+
       // تحديث الإجراءات السريعة
       if (data.quickActions && data.quickActions.length > 0) {
         setQuickActions(data.quickActions);
       }
-      
+
       return data;
     },
     onSuccess: () => {
@@ -104,11 +97,11 @@ export function useChatbot() {
     },
     onError: (error: unknown) => {
       setIsTyping(false);
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إرسال الرسالة";
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إرسال الرسالة';
       toast({
-        title: "خطأ في الإرسال",
+        title: 'خطأ في الإرسال',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -122,16 +115,16 @@ export function useChatbot() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHATBOT_CONVERSATIONS(userId) });
       toast({
-        title: "تم المسح",
-        description: "تم مسح سجل المحادثات بنجاح",
+        title: 'تم المسح',
+        description: 'تم مسح سجل المحادثات بنجاح',
       });
     },
     onError: (error: unknown) => {
-      const errorMessage = error instanceof Error ? error.message : "فشل في مسح سجل المحادثات";
+      const errorMessage = error instanceof Error ? error.message : 'فشل في مسح سجل المحادثات';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

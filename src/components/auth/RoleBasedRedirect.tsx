@@ -12,7 +12,7 @@ export { getDashboardForRoles } from '@/types/roles';
 /**
  * مكون التوجيه التلقائي حسب الدور
  * يستخدم بعد تسجيل الدخول للتوجيه المباشر إلى لوحة التحكم المناسبة
- * 
+ *
  * ✅ محسّن: timeout مخفض + جلب الأدوار مباشرة كـ fallback
  */
 export function RoleBasedRedirect() {
@@ -34,13 +34,10 @@ export function RoleBasedRedirect() {
     const fetchDirectRoles = async () => {
       if (user && roles.length === 0 && !rolesLoading && loadingTooLong) {
         try {
-          const { data } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', user.id);
-          
+          const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+
           if (data && data.length > 0) {
-            setDirectRoles(data.map(r => r.role as AppRole));
+            setDirectRoles(data.map((r) => r.role as AppRole));
           }
         } catch (error) {
           console.error('Error fetching roles directly:', error);
@@ -65,7 +62,7 @@ export function RoleBasedRedirect() {
   }
 
   // ✅ استخدام الأدوار المجلوبة مباشرة إذا توفرت
-  const effectiveRoles = roles.length > 0 ? roles : (directRoles || []);
+  const effectiveRoles = roles.length > 0 ? roles : directRoles || [];
 
   // ✅ إذا توفرت أدوار (من أي مصدر)، توجيه فوري
   if (user && effectiveRoles.length > 0) {
@@ -88,7 +85,7 @@ export function RoleBasedRedirect() {
     } catch {
       // تجاهل أخطاء localStorage
     }
-    
+
     // ✅ توجيه للوحة الافتراضية
     if (import.meta.env.DEV) {
       console.warn('⚠️ [RoleBasedRedirect] Timeout - توجيه للوحة الافتراضية');

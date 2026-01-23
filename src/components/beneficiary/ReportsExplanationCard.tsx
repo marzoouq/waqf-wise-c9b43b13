@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Zap, Download, CheckCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, Zap, Download, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function ReportsExplanationCard() {
   return (
@@ -29,11 +29,10 @@ export function ReportsExplanationCard() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <CheckCircle className="h-5 w-5 text-success mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                تقرير المدفوعات (PDF)
-              </p>
+              <p className="font-semibold text-sm text-foreground">تقرير المدفوعات (PDF)</p>
               <p className="text-xs text-muted-foreground mt-1">
-                يتم جمع جميع مدفوعاتك تلقائياً من قاعدة البيانات وإنشاء ملف PDF منسق احترافياً بضغطة زر واحدة
+                يتم جمع جميع مدفوعاتك تلقائياً من قاعدة البيانات وإنشاء ملف PDF منسق احترافياً بضغطة
+                زر واحدة
               </p>
             </div>
           </div>
@@ -41,11 +40,10 @@ export function ReportsExplanationCard() {
           <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <CheckCircle className="h-5 w-5 text-success mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-foreground">
-                كشف الحساب (PDF)
-              </p>
+              <p className="font-semibold text-sm text-foreground">كشف الحساب (PDF)</p>
               <p className="text-xs text-muted-foreground mt-1">
-                ملخص شامل لحسابك يشمل: اسمك، رقمك الوطني، إجمالي المدفوعات، وجدول تفصيلي لكل العمليات
+                ملخص شامل لحسابك يشمل: اسمك، رقمك الوطني، إجمالي المدفوعات، وجدول تفصيلي لكل
+                العمليات
               </p>
             </div>
           </div>
@@ -60,9 +58,14 @@ export function ReportsExplanationCard() {
 
         <div className="pt-2 border-t border-info/30 dark:border-info/20">
           <p className="text-xs text-info dark:text-info-foreground/80">
-            💡 <strong>ملاحظة:</strong> يستخدم النظام مكتبات محلية لتوليد التقارير
-            {" "}<code className="bg-info-light/50 dark:bg-info/20 px-1.5 py-0.5 rounded text-info dark:text-info-foreground">jsPDF</code>{" "}
-            و <code className="bg-info-light/50 dark:bg-info/20 px-1.5 py-0.5 rounded text-info dark:text-info-foreground">xlsx</code>{" "}
+            💡 <strong>ملاحظة:</strong> يستخدم النظام مكتبات محلية لتوليد التقارير{' '}
+            <code className="bg-info-light/50 dark:bg-info/20 px-1.5 py-0.5 rounded text-info dark:text-info-foreground">
+              jsPDF
+            </code>{' '}
+            و{' '}
+            <code className="bg-info-light/50 dark:bg-info/20 px-1.5 py-0.5 rounded text-info dark:text-info-foreground">
+              xlsx
+            </code>{' '}
             لضمان تنسيق احترافي وسهولة الطباعة.
           </p>
         </div>

@@ -2,9 +2,9 @@
  * useNotificationSystem Hook - نظام الإشعارات
  * يستخدم EdgeFunctionService
  */
-import { toast } from "sonner";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { EdgeFunctionService } from "@/services";
+import { toast } from 'sonner';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { EdgeFunctionService } from '@/services';
 
 interface SendNotificationParams {
   userId: string;
@@ -48,7 +48,12 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyPaymentDue = async (userId: string, description: string, amount: number, dueDate: string) => {
+  const notifyPaymentDue = async (
+    userId: string,
+    description: string,
+    amount: number,
+    dueDate: string
+  ) => {
     return sendNotification({
       userId,
       title: 'تذكير: دفعة مستحقة',
@@ -60,7 +65,11 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyRequestApproved = async (userId: string, requestType: string, requestNumber: string) => {
+  const notifyRequestApproved = async (
+    userId: string,
+    requestType: string,
+    requestNumber: string
+  ) => {
     return sendNotification({
       userId,
       title: 'تمت الموافقة',
@@ -72,7 +81,12 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyRequestRejected = async (userId: string, requestType: string, requestNumber: string, reason?: string) => {
+  const notifyRequestRejected = async (
+    userId: string,
+    requestType: string,
+    requestNumber: string,
+    reason?: string
+  ) => {
     return sendNotification({
       userId,
       title: 'تم رفض الطلب',
@@ -84,7 +98,11 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyDistributionCreated = async (userId: string, amount: number, distributionDate: string) => {
+  const notifyDistributionCreated = async (
+    userId: string,
+    amount: number,
+    distributionDate: string
+  ) => {
     return sendNotification({
       userId,
       title: 'توزيع جديد',

@@ -1,7 +1,7 @@
-import { CheckSquare, X, Trash2, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { CheckSquare, X, Trash2, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -13,7 +13,7 @@ interface BulkActionsBarProps {
     label: string;
     icon: React.ReactNode;
     action: string;
-    variant?: "default" | "destructive" | "outline";
+    variant?: 'default' | 'destructive' | 'outline';
   }>;
 }
 
@@ -51,7 +51,7 @@ export function BulkActionsBar({
             <Button
               key={action.action}
               size="sm"
-              variant={action.variant || "outline"}
+              variant={action.variant || 'outline'}
               onClick={() => onCustomAction?.(action.action)}
             >
               {action.icon}

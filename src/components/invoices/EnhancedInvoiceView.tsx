@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -7,13 +7,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { formatVATNumber, formatZATCACurrency } from "@/lib/zatca";
-import { Building2, Calendar, Clock, User, Image as ImageIcon } from "lucide-react";
-import InvoiceStatusBadge from "./InvoiceStatusBadge";
-import { ZATCAQRCode } from "./ZATCAQRCode";
-import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
-import type { InvoiceLine } from "@/types/invoice-line";
+} from '@/components/ui/table';
+import { formatVATNumber, formatZATCACurrency } from '@/lib/zatca';
+import { Building2, Calendar, Clock, User, Image as ImageIcon } from 'lucide-react';
+import InvoiceStatusBadge from './InvoiceStatusBadge';
+import { ZATCAQRCode } from './ZATCAQRCode';
+import type { OrganizationSettings } from '@/hooks/governance/useOrganizationSettings';
+import type { InvoiceLine } from '@/types/invoice-line';
 
 interface Invoice {
   id: string;
@@ -101,7 +101,7 @@ export default function EnhancedInvoiceView({
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="font-semibold">التاريخ:</span>
-              <span>{new Date(invoice.invoice_date).toLocaleDateString("ar-SA")}</span>
+              <span>{new Date(invoice.invoice_date).toLocaleDateString('ar-SA')}</span>
               {invoice.invoice_time && (
                 <>
                   <Clock className="h-4 w-4 text-muted-foreground me-4" />
@@ -147,9 +147,7 @@ export default function EnhancedInvoiceView({
                 </div>
                 <div>
                   <span className="text-muted-foreground">السجل التجاري:</span>
-                  <p className="font-semibold">
-                    {orgSettings.commercial_registration_number}
-                  </p>
+                  <p className="font-semibold">{orgSettings.commercial_registration_number}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">العنوان:</span>
@@ -170,9 +168,7 @@ export default function EnhancedInvoiceView({
                 )}
               </>
             ) : (
-              <p className="text-muted-foreground italic">
-                لم يتم تعيين معلومات المنشأة
-              </p>
+              <p className="text-muted-foreground italic">لم يتم تعيين معلومات المنشأة</p>
             )}
           </CardContent>
         </Card>
@@ -201,9 +197,7 @@ export default function EnhancedInvoiceView({
             {invoice.customer_commercial_registration && (
               <div>
                 <span className="text-muted-foreground">السجل التجاري:</span>
-                <p className="font-semibold">
-                  {invoice.customer_commercial_registration}
-                </p>
+                <p className="font-semibold">{invoice.customer_commercial_registration}</p>
               </div>
             )}
             {invoice.customer_address && (
@@ -263,9 +257,7 @@ export default function EnhancedInvoiceView({
                     <TableCell className="text-right font-mono">
                       {formatZATCACurrency(line.subtotal)}
                     </TableCell>
-                    <TableCell className="text-center font-semibold">
-                      {line.tax_rate}%
-                    </TableCell>
+                    <TableCell className="text-center font-semibold">{line.tax_rate}%</TableCell>
                     <TableCell className="text-right font-mono">
                       {formatZATCACurrency(line.tax_amount)}
                     </TableCell>
@@ -318,9 +310,7 @@ export default function EnhancedInvoiceView({
             <h3 className="font-bold">ملاحظات</h3>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {invoice.notes}
-            </p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{invoice.notes}</p>
           </CardContent>
         </Card>
       )}

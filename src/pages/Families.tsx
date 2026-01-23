@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import {
   Table,
   TableBody,
@@ -37,7 +37,10 @@ import { FamilyMembersDialog } from '@/components/families/FamilyMembersDialog';
 import { FamilyMobileCard } from '@/components/families/FamilyMobileCard';
 import { FamiliesStatsCards } from '@/components/families/FamiliesStatsCards';
 import { FamiliesFilters } from '@/components/families/FamiliesFilters';
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 import { Pagination } from '@/components/shared/Pagination';
 import { EnhancedEmptyState } from '@/components/shared';
 import { ExportButton } from '@/components/shared/ExportButton';
@@ -102,7 +105,7 @@ const Families = memo(() => {
       key: 'tribe',
       label: 'القبيلة',
       type: 'select',
-      options: Array.from(new Set(families.map(f => f.tribe).filter(Boolean))).map(tribe => ({
+      options: Array.from(new Set(families.map((f) => f.tribe).filter(Boolean))).map((tribe) => ({
         value: tribe!,
         label: tribe!,
       })),
@@ -134,20 +137,31 @@ const Families = memo(() => {
               />
               {filteredFamilies.length > 0 && (
                 <ExportButton
-                  data={filteredFamilies.map(f => ({
+                  data={filteredFamilies.map((f) => ({
                     'اسم العائلة': f.family_name,
                     'رب الأسرة': (f as FamilyWithHead).head_of_family?.full_name || '-',
-                    'القبيلة': f.tribe || '-',
+                    القبيلة: f.tribe || '-',
                     'عدد الأفراد': f.total_members,
-                    'الحالة': f.status,
+                    الحالة: f.status,
                     'تاريخ التسجيل': new Date(f.created_at).toLocaleDateString('ar-SA'),
                   }))}
                   filename="العائلات"
                   title="تقرير العائلات"
-                  headers={['اسم العائلة', 'رب الأسرة', 'القبيلة', 'عدد الأفراد', 'الحالة', 'تاريخ التسجيل']}
+                  headers={[
+                    'اسم العائلة',
+                    'رب الأسرة',
+                    'القبيلة',
+                    'عدد الأفراد',
+                    'الحالة',
+                    'تاريخ التسجيل',
+                  ]}
                 />
               )}
-              <Button onClick={handleAddFamily} className="w-full sm:w-auto gap-2 text-sm sm:text-base" size="sm">
+              <Button
+                onClick={handleAddFamily}
+                className="w-full sm:w-auto gap-2 text-sm sm:text-base"
+                size="sm"
+              >
                 <Plus className="h-4 w-4" />
                 إضافة عائلة
               </Button>
@@ -168,8 +182,14 @@ const Families = memo(() => {
               <EnhancedEmptyState
                 icon={Users}
                 title="لا توجد عائلات"
-                description={searchQuery ? 'لا توجد نتائج مطابقة لبحثك.' : 'لم يتم إضافة أي عائلات بعد.'}
-                action={!searchQuery ? { label: "إضافة عائلة جديدة", onClick: handleAddFamily } : undefined}
+                description={
+                  searchQuery ? 'لا توجد نتائج مطابقة لبحثك.' : 'لم يتم إضافة أي عائلات بعد.'
+                }
+                action={
+                  !searchQuery
+                    ? { label: 'إضافة عائلة جديدة', onClick: handleAddFamily }
+                    : undefined
+                }
               />
             ) : isMobile ? (
               <div className="space-y-3">
@@ -208,12 +228,40 @@ const Families = memo(() => {
                             aria-label="تحديد الكل"
                           />
                         </TableHead>
-                        <SortableTableHeader label="اسم العائلة" sortKey="family_name" currentSort={sortConfig} onSort={handleSort} />
+                        <SortableTableHeader
+                          label="اسم العائلة"
+                          sortKey="family_name"
+                          currentSort={sortConfig}
+                          onSort={handleSort}
+                        />
                         <TableHead className="text-start">رب الأسرة</TableHead>
-                        <SortableTableHeader label="القبيلة" sortKey="tribe" currentSort={sortConfig} onSort={handleSort} className="hidden md:table-cell" />
-                        <SortableTableHeader label="عدد الأفراد" sortKey="total_members" currentSort={sortConfig} onSort={handleSort} />
-                        <SortableTableHeader label="الحالة" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell" />
-                        <SortableTableHeader label="تاريخ التسجيل" sortKey="created_at" currentSort={sortConfig} onSort={handleSort} className="hidden lg:table-cell" />
+                        <SortableTableHeader
+                          label="القبيلة"
+                          sortKey="tribe"
+                          currentSort={sortConfig}
+                          onSort={handleSort}
+                          className="hidden md:table-cell"
+                        />
+                        <SortableTableHeader
+                          label="عدد الأفراد"
+                          sortKey="total_members"
+                          currentSort={sortConfig}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="الحالة"
+                          sortKey="status"
+                          currentSort={sortConfig}
+                          onSort={handleSort}
+                          className="hidden lg:table-cell"
+                        />
+                        <SortableTableHeader
+                          label="تاريخ التسجيل"
+                          sortKey="created_at"
+                          currentSort={sortConfig}
+                          onSort={handleSort}
+                          className="hidden lg:table-cell"
+                        />
                         <TableHead className="text-start w-[100px]">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -226,12 +274,29 @@ const Families = memo(() => {
                               onCheckedChange={() => bulkSelection.toggleSelection(family.id)}
                             />
                           </TableCell>
-                          <TableCell className="font-medium text-xs sm:text-sm">{family.family_name}</TableCell>
-                          <TableCell className="text-xs sm:text-sm">{(family as FamilyWithHead).head_of_family?.full_name || '-'}</TableCell>
-                          <TableCell className="hidden md:table-cell text-xs sm:text-sm">{family.tribe || '-'}</TableCell>
-                          <TableCell><Badge variant="secondary" className="text-xs">{family.total_members} أفراد</Badge></TableCell>
+                          <TableCell className="font-medium text-xs sm:text-sm">
+                            {family.family_name}
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm">
+                            {(family as FamilyWithHead).head_of_family?.full_name || '-'}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-xs sm:text-sm">
+                            {family.tribe || '-'}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="text-xs">
+                              {family.total_members} أفراد
+                            </Badge>
+                          </TableCell>
                           <TableCell className="hidden lg:table-cell">
-                            <Badge variant={matchesStatus(family.status, 'active') ? 'default' : 'secondary'} className="text-xs">{family.status}</Badge>
+                            <Badge
+                              variant={
+                                matchesStatus(family.status, 'active') ? 'default' : 'secondary'
+                              }
+                              className="text-xs"
+                            >
+                              {family.status}
+                            </Badge>
                           </TableCell>
                           <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">
                             {new Date(family.created_at).toLocaleDateString('ar-SA')}
@@ -239,13 +304,25 @@ const Families = memo(() => {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleViewMembers(family)}><Eye className="ms-2 h-4 w-4" />عرض الأفراد</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleEditFamily(family)}><Edit className="ms-2 h-4 w-4" />تعديل</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(family)}>
-                                  <Trash2 className="ms-2 h-4 w-4" />حذف
+                                <DropdownMenuItem onClick={() => handleViewMembers(family)}>
+                                  <Eye className="ms-2 h-4 w-4" />
+                                  عرض الأفراد
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditFamily(family)}>
+                                  <Edit className="ms-2 h-4 w-4" />
+                                  تعديل
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => handleDeleteClick(family)}
+                                >
+                                  <Trash2 className="ms-2 h-4 w-4" />
+                                  حذف
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -294,12 +371,18 @@ const Families = memo(() => {
             <AlertDialogHeader>
               <AlertDialogTitle>حذف العائلة</AlertDialogTitle>
               <AlertDialogDescription>
-                هل أنت متأكد من حذف عائلة "{familyToDelete?.family_name}"؟ هذا الإجراء لا يمكن التراجع عنه.
+                هل أنت متأكد من حذف عائلة "{familyToDelete?.family_name}"؟ هذا الإجراء لا يمكن
+                التراجع عنه.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>إلغاء</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground">حذف</AlertDialogAction>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                className="bg-destructive text-destructive-foreground"
+              >
+                حذف
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

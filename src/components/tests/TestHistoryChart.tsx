@@ -5,9 +5,19 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend, AreaChart, Area
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Legend,
+  AreaChart,
+  Area,
 } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, AlertTriangle } from 'lucide-react';
 import type { TestRun } from '@/hooks/tests/useTestHistory';
@@ -23,9 +33,9 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
       .slice(0, 15)
       .reverse()
       .map((run, index) => ({
-        name: new Date(run.run_date).toLocaleDateString('ar-SA', { 
-          month: 'short', 
-          day: 'numeric' 
+        name: new Date(run.run_date).toLocaleDateString('ar-SA', {
+          month: 'short',
+          day: 'numeric',
         }),
         passRate: Number(run.pass_rate),
         passed: run.passed_tests,
@@ -36,25 +46,24 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
       }));
   }, [history]);
 
-  const TrendIcon = trend === 'improving' 
-    ? TrendingUp 
-    : trend === 'declining' 
-      ? TrendingDown 
-      : Minus;
+  const TrendIcon =
+    trend === 'improving' ? TrendingUp : trend === 'declining' ? TrendingDown : Minus;
 
-  const trendColor = trend === 'improving' 
-    ? 'text-green-500' 
-    : trend === 'declining' 
-      ? 'text-red-500' 
-      : 'text-yellow-500';
+  const trendColor =
+    trend === 'improving'
+      ? 'text-green-500'
+      : trend === 'declining'
+        ? 'text-red-500'
+        : 'text-yellow-500';
 
-  const trendLabel = trend === 'improving' 
-    ? 'تحسن' 
-    : trend === 'declining' 
-      ? 'تراجع' 
-      : trend === 'stable'
-        ? 'مستقر'
-        : 'غير محدد';
+  const trendLabel =
+    trend === 'improving'
+      ? 'تحسن'
+      : trend === 'declining'
+        ? 'تراجع'
+        : trend === 'stable'
+          ? 'مستقر'
+          : 'غير محدد';
 
   if (history.length === 0) {
     return (
@@ -93,26 +102,20 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                tick={{ fontSize: 11 }}
-                className="text-muted-foreground"
-              />
-              <YAxis 
-                domain={[0, 100]} 
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+              <YAxis
+                domain={[0, 100]}
                 tick={{ fontSize: 11 }}
                 tickFormatter={(v) => `${v}%`}
                 className="text-muted-foreground"
               />
-              <Tooltip 
+              <Tooltip
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
                       <div className="bg-popover border rounded-lg p-3 shadow-lg">
                         <p className="font-medium">{label}</p>
-                        <p className="text-primary">
-                          نسبة النجاح: {payload[0].value}%
-                        </p>
+                        <p className="text-primary">نسبة النجاح: {payload[0].value}%</p>
                       </div>
                     );
                   }
@@ -140,16 +143,9 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                tick={{ fontSize: 11 }}
-                className="text-muted-foreground"
-              />
-              <YAxis 
-                tick={{ fontSize: 11 }}
-                className="text-muted-foreground"
-              />
-              <Tooltip 
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+              <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" />
+              <Tooltip
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
@@ -163,9 +159,7 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
                   return null;
                 }}
               />
-              <Legend 
-                formatter={(value) => value === 'passed' ? 'نجح' : 'فشل'}
-              />
+              <Legend formatter={(value) => (value === 'passed' ? 'نجح' : 'فشل')} />
               <Bar dataKey="passed" fill="#10B981" name="passed" radius={[4, 4, 0, 0]} />
               <Bar dataKey="failed" fill="#EF4444" name="failed" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -182,35 +176,29 @@ export function TestHistoryChart({ history, trend }: TestHistoryChartProps) {
           <ResponsiveContainer width="100%" height={150}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
-                tick={{ fontSize: 11 }}
-                className="text-muted-foreground"
-              />
-              <YAxis 
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+              <YAxis
                 tick={{ fontSize: 11 }}
                 tickFormatter={(v) => `${v}ms`}
                 className="text-muted-foreground"
               />
-              <Tooltip 
+              <Tooltip
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
                       <div className="bg-popover border rounded-lg p-3 shadow-lg">
                         <p className="font-medium">{label}</p>
-                        <p className="text-orange-500">
-                          متوسط الزمن: {payload[0].value}ms
-                        </p>
+                        <p className="text-orange-500">متوسط الزمن: {payload[0].value}ms</p>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="avgDuration" 
-                stroke="#F59E0B" 
+              <Line
+                type="monotone"
+                dataKey="avgDuration"
+                stroke="#F59E0B"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />

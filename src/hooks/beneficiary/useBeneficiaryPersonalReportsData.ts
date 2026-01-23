@@ -3,15 +3,15 @@
  * يجلب بيانات التقارير الشخصية للمستفيد مع التوزيعات من heir_distributions
  */
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { BeneficiaryService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import type { HeirDistribution } from "@/types/distributions";
-import { matchesStatus } from "@/lib/constants";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { BeneficiaryService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import type { HeirDistribution } from '@/types/distributions';
+import { matchesStatus } from '@/lib/constants';
 
 interface Request {
   status: string | null;
@@ -45,7 +45,11 @@ export function useBeneficiaryPersonalReportsData() {
   const [reportType, setReportType] = useState<'annual' | 'monthly' | 'quarterly'>('annual');
 
   // جلب بيانات المستفيد
-  const { data: beneficiary, error: beneficiaryError, refetch: refetchBeneficiary } = useQuery({
+  const {
+    data: beneficiary,
+    error: beneficiaryError,
+    refetch: refetchBeneficiary,
+  } = useQuery({
     queryKey: QUERY_KEYS.MY_BENEFICIARY(user?.id),
     queryFn: async () => {
       if (!user?.id) return null;
@@ -55,11 +59,18 @@ export function useBeneficiaryPersonalReportsData() {
   });
 
   // جلب التوزيعات من heir_distributions للسنة المحددة
-  const { data: distributions = [], isLoading: isLoadingDistributions, error: distributionsError, refetch: refetchDistributions } = useQuery({
+  const {
+    data: distributions = [],
+    isLoading: isLoadingDistributions,
+    error: distributionsError,
+    refetch: refetchDistributions,
+  } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_YEARLY_DISTRIBUTIONS(beneficiary?.id, parseInt(selectedYear)),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
-      return BeneficiaryService.getYearlyDistributions(beneficiary.id, selectedYear) as Promise<HeirDistribution[]>;
+      return BeneficiaryService.getYearlyDistributions(beneficiary.id, selectedYear) as Promise<
+        HeirDistribution[]
+      >;
     },
     enabled: !!beneficiary?.id && !!selectedYear,
   });
@@ -69,7 +80,9 @@ export function useBeneficiaryPersonalReportsData() {
     queryKey: QUERY_KEYS.BENEFICIARY_YEARLY_REQUESTS(beneficiary?.id, parseInt(selectedYear)),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
-      return BeneficiaryService.getYearlyRequests(beneficiary.id, selectedYear) as Promise<Request[]>;
+      return BeneficiaryService.getYearlyRequests(beneficiary.id, selectedYear) as Promise<
+        Request[]
+      >;
     },
     enabled: !!beneficiary?.id && !!selectedYear,
   });
@@ -78,21 +91,22 @@ export function useBeneficiaryPersonalReportsData() {
   const yearlyStats = {
     totalReceived: distributions.reduce((sum, d) => sum + Number(d.share_amount), 0),
     paymentsCount: distributions.length,
-    avgPayment: distributions.length > 0 
-      ? distributions.reduce((sum, d) => sum + Number(d.share_amount), 0) / distributions.length 
-      : 0,
+    avgPayment:
+      distributions.length > 0
+        ? distributions.reduce((sum, d) => sum + Number(d.share_amount), 0) / distributions.length
+        : 0,
     requestsCount: requests.length,
-    approvedRequests: requests.filter(r => matchesStatus(r.status, 'approved')).length,
+    approvedRequests: requests.filter((r) => matchesStatus(r.status, 'approved')).length,
   };
 
   // بيانات المخطط الشهري
   const monthlyData: MonthlyData[] = Array.from({ length: 12 }, (_, i) => {
     const month = i + 1;
-    const monthDistributions = distributions.filter(d => {
+    const monthDistributions = distributions.filter((d) => {
       const distMonth = new Date(d.distribution_date).getMonth() + 1;
       return distMonth === month;
     });
-    
+
     return {
       month: format(new Date(2024, i, 1), 'MMM', { locale: ar }),
       amount: monthDistributions.reduce((sum, d) => sum + Number(d.share_amount), 0),
@@ -102,10 +116,13 @@ export function useBeneficiaryPersonalReportsData() {
 
   // بيانات حالة الطلبات
   const requestsStatusData: RequestStatusData[] = [
-    { name: 'معتمد', value: requests.filter(r => matchesStatus(r.status, 'approved')).length },
-    { name: 'قيد المراجعة', value: requests.filter(r => matchesStatus(r.status, 'pending')).length },
-    { name: 'مرفوض', value: requests.filter(r => matchesStatus(r.status, 'rejected')).length },
-  ].filter(item => item.value > 0);
+    { name: 'معتمد', value: requests.filter((r) => matchesStatus(r.status, 'approved')).length },
+    {
+      name: 'قيد المراجعة',
+      value: requests.filter((r) => matchesStatus(r.status, 'pending')).length,
+    },
+    { name: 'مرفوض', value: requests.filter((r) => matchesStatus(r.status, 'rejected')).length },
+  ].filter((item) => item.value > 0);
 
   const refetch = () => {
     refetchBeneficiary();

@@ -2,10 +2,10 @@
  * useAuditLogsEnhanced Hook - سجلات التدقيق المحسّنة
  * @version 1.0.0
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { toast } from 'sonner';
 
 export interface EnhancedAuditLog {
   id: string;
@@ -56,34 +56,33 @@ export const useAuditLogsEnhanced = (filters?: EnhancedAuditFilters) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'enhanced', filters],
     queryFn: async (): Promise<EnhancedAuditLog[]> => {
-      let query = supabase
-        .from("audit_logs")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from('audit_logs').select('*').order('created_at', { ascending: false });
 
       if (filters?.userId) {
-        query = query.eq("user_id", filters.userId);
+        query = query.eq('user_id', filters.userId);
       }
       if (filters?.userEmail) {
-        query = query.ilike("user_email", `%${filters.userEmail}%`);
+        query = query.ilike('user_email', `%${filters.userEmail}%`);
       }
       if (filters?.tableName) {
-        query = query.eq("table_name", filters.tableName);
+        query = query.eq('table_name', filters.tableName);
       }
       if (filters?.actionType) {
-        query = query.eq("action_type", filters.actionType);
+        query = query.eq('action_type', filters.actionType);
       }
       if (filters?.severity) {
-        query = query.eq("severity", filters.severity);
+        query = query.eq('severity', filters.severity);
       }
       if (filters?.startDate) {
-        query = query.gte("created_at", filters.startDate);
+        query = query.gte('created_at', filters.startDate);
       }
       if (filters?.endDate) {
-        query = query.lte("created_at", filters.endDate);
+        query = query.lte('created_at', filters.endDate);
       }
       if (filters?.search) {
-        query = query.or(`description.ilike.%${filters.search}%,table_name.ilike.%${filters.search}%`);
+        query = query.or(
+          `description.ilike.%${filters.search}%,table_name.ilike.%${filters.search}%`
+        );
       }
 
       const { data, error } = await query.limit(500);
@@ -104,14 +103,14 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
     queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'stats', dateRange],
     queryFn: async (): Promise<AuditLogsStats> => {
       let query = supabase
-        .from("audit_logs")
-        .select("action_type, severity, table_name, user_email");
+        .from('audit_logs')
+        .select('action_type, severity, table_name, user_email');
 
       if (dateRange?.start) {
-        query = query.gte("created_at", dateRange.start);
+        query = query.gte('created_at', dateRange.start);
       }
       if (dateRange?.end) {
-        query = query.lte("created_at", dateRange.end);
+        query = query.lte('created_at', dateRange.end);
       }
 
       // ADR-004: Max limit is 500 without pagination
@@ -120,16 +119,18 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
       if (error) throw error;
 
       const logs = data || [];
-      const uniqueUsers = new Set(logs.map(l => l.user_email).filter(Boolean));
-      const affectedTables = [...new Set(logs.map(l => l.table_name).filter(Boolean))] as string[];
+      const uniqueUsers = new Set(logs.map((l) => l.user_email).filter(Boolean));
+      const affectedTables = [
+        ...new Set(logs.map((l) => l.table_name).filter(Boolean)),
+      ] as string[];
 
       return {
         totalLogs: logs.length,
-        insertCount: logs.filter(l => l.action_type === 'INSERT').length,
-        updateCount: logs.filter(l => l.action_type === 'UPDATE').length,
-        deleteCount: logs.filter(l => l.action_type === 'DELETE').length,
-        criticalCount: logs.filter(l => l.severity === 'critical').length,
-        warningCount: logs.filter(l => l.severity === 'warning').length,
+        insertCount: logs.filter((l) => l.action_type === 'INSERT').length,
+        updateCount: logs.filter((l) => l.action_type === 'UPDATE').length,
+        deleteCount: logs.filter((l) => l.action_type === 'DELETE').length,
+        criticalCount: logs.filter((l) => l.severity === 'critical').length,
+        warningCount: logs.filter((l) => l.severity === 'warning').length,
         uniqueUsers: uniqueUsers.size,
         affectedTables,
       };
@@ -148,9 +149,9 @@ export const useAuditLogDetails = (logId: string | null) => {
       if (!logId) return null;
 
       const { data, error } = await supabase
-        .from("audit_logs")
-        .select("*")
-        .eq("id", logId)
+        .from('audit_logs')
+        .select('*')
+        .eq('id', logId)
         .maybeSingle();
 
       if (error) throw error;
@@ -168,14 +169,14 @@ export const useAuditLogTables = () => {
     queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'tables'],
     queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
-        .from("audit_logs")
-        .select("table_name")
-        .not("table_name", "is", null)
+        .from('audit_logs')
+        .select('table_name')
+        .not('table_name', 'is', null)
         .limit(1000);
 
       if (error) throw error;
 
-      const tables = [...new Set(data?.map(d => d.table_name).filter(Boolean))] as string[];
+      const tables = [...new Set(data?.map((d) => d.table_name).filter(Boolean))] as string[];
       return tables.sort();
     },
     staleTime: 5 * 60 * 1000,
@@ -190,15 +191,15 @@ export const useAuditLogUsers = () => {
     queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'users'],
     queryFn: async (): Promise<Array<{ email: string; count: number }>> => {
       const { data, error } = await supabase
-        .from("audit_logs")
-        .select("user_email")
-        .not("user_email", "is", null)
+        .from('audit_logs')
+        .select('user_email')
+        .not('user_email', 'is', null)
         .limit(200);
 
       if (error) throw error;
 
       const userCounts = new Map<string, number>();
-      data?.forEach(d => {
+      data?.forEach((d) => {
         if (d.user_email) {
           userCounts.set(d.user_email, (userCounts.get(d.user_email) || 0) + 1);
         }

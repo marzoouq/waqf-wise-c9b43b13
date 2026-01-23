@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, Calendar, DollarSign } from "lucide-react";
-import { formatDate } from "@/lib/date";
-import { formatCurrency } from "@/lib/utils";
-import { MaskedValue } from "@/components/shared/MaskedValue";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, Clock, Calendar, DollarSign } from 'lucide-react';
+import { formatDate } from '@/lib/date';
+import { formatCurrency } from '@/lib/utils';
+import { MaskedValue } from '@/components/shared/MaskedValue';
 
 interface MobileDistributionCardProps {
   distribution: {
@@ -16,17 +16,23 @@ interface MobileDistributionCardProps {
   masked?: boolean;
 }
 
-export function MobileDistributionCard({ distribution, masked = false }: MobileDistributionCardProps) {
+export function MobileDistributionCard({
+  distribution,
+  masked = false,
+}: MobileDistributionCardProps) {
   const formattedAmount = formatCurrency(distribution.amount);
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { icon: typeof CheckCircle2; variant: "default" | "secondary" | "outline" }> = {
-      "مدفوع": { icon: CheckCircle2, variant: "outline" },
-      "معلق": { icon: Clock, variant: "secondary" },
-      "قيد المعالجة": { icon: Clock, variant: "default" },
+    const config: Record<
+      string,
+      { icon: typeof CheckCircle2; variant: 'default' | 'secondary' | 'outline' }
+    > = {
+      مدفوع: { icon: CheckCircle2, variant: 'outline' },
+      معلق: { icon: Clock, variant: 'secondary' },
+      'قيد المعالجة': { icon: Clock, variant: 'default' },
     };
 
-    const s = config[status] || { icon: Clock, variant: "secondary" };
+    const s = config[status] || { icon: Clock, variant: 'secondary' };
     const Icon = s.icon;
 
     return (
@@ -43,9 +49,9 @@ export function MobileDistributionCard({ distribution, masked = false }: MobileD
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">رقم التوزيع</p>
-            <p className="font-mono font-semibold">{distribution.reference_number || "—"}</p>
+            <p className="font-mono font-semibold">{distribution.reference_number || '—'}</p>
           </div>
-          {getStatusBadge(distribution.status || "معلق")}
+          {getStatusBadge(distribution.status || 'معلق')}
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-2 border-t">
@@ -55,7 +61,7 @@ export function MobileDistributionCard({ distribution, masked = false }: MobileD
               التاريخ
             </div>
             <p className="text-sm font-medium">
-              {formatDate(distribution.payment_date, "dd/MM/yyyy")}
+              {formatDate(distribution.payment_date, 'dd/MM/yyyy')}
             </p>
           </div>
 

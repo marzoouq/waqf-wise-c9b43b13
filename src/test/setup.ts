@@ -36,9 +36,15 @@ const globalWithObservers = globalThis as unknown as {
 
 if (typeof globalWithObservers.ResizeObserver === 'undefined') {
   class MockResizeObserver {
-    observe() { return; }
-    unobserve() { return; }
-    disconnect() { return; }
+    observe() {
+      return;
+    }
+    unobserve() {
+      return;
+    }
+    disconnect() {
+      return;
+    }
   }
   globalWithObservers.ResizeObserver = MockResizeObserver as unknown as GenericCtor;
 }
@@ -49,17 +55,27 @@ if (typeof globalWithObservers.IntersectionObserver === 'undefined') {
     readonly root: Element | null = null;
     readonly rootMargin: string = '';
     readonly thresholds: ReadonlyArray<number> = [];
-    observe() { return; }
-    unobserve() { return; }
-    disconnect() { return; }
-    takeRecords() { return []; }
+    observe() {
+      return;
+    }
+    unobserve() {
+      return;
+    }
+    disconnect() {
+      return;
+    }
+    takeRecords() {
+      return [];
+    }
   }
   globalWithObservers.IntersectionObserver = MockIntersectionObserver as unknown as GenericCtor;
 }
 
 // Force navigator language to en-US to avoid Arabic-digit formatting in tests
 if (typeof navigator !== 'undefined') {
-  try { Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true }); } catch {
+  try {
+    Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true });
+  } catch {
     // Silently ignore errors when navigator.language cannot be configured
   }
 }
@@ -70,9 +86,12 @@ const _OriginalNumberFormat = Intl.NumberFormat;
 Object.defineProperty(Intl, 'NumberFormat', {
   writable: true,
   configurable: true,
-  value: function (locales?: string | string[], options?: Intl.NumberFormatOptions): Intl.NumberFormat {
+  value: function (
+    locales?: string | string[],
+    options?: Intl.NumberFormatOptions
+  ): Intl.NumberFormat {
     return new _OriginalNumberFormat(locales || 'en-US', options);
-  }
+  },
 });
 
 // Mock scrollIntoView for Radix UI components (Select, etc.)
@@ -87,17 +106,32 @@ export const setMockTableData = <T>(tableName: string, data: T[]) => {
 };
 
 export const clearMockTableData = () => {
-  Object.keys(mockTableData).forEach(key => delete mockTableData[key]);
+  Object.keys(mockTableData).forEach((key) => delete mockTableData[key]);
 };
 
 const createMockQueryBuilder = <T>(data: T[] = []) => {
   let operation = 'select';
   const builder = {
-    select: (_columns?: string) => { operation = 'select'; return builder; },
-    insert: (_data?: unknown) => { operation = 'insert'; return builder; },
-    update: (_data?: unknown) => { operation = 'update'; return builder; },
-    delete: () => { operation = 'delete'; return builder; },
-    upsert: (_data?: unknown) => { operation = 'upsert'; return builder; },
+    select: (_columns?: string) => {
+      operation = 'select';
+      return builder;
+    },
+    insert: (_data?: unknown) => {
+      operation = 'insert';
+      return builder;
+    },
+    update: (_data?: unknown) => {
+      operation = 'update';
+      return builder;
+    },
+    delete: () => {
+      operation = 'delete';
+      return builder;
+    },
+    upsert: (_data?: unknown) => {
+      operation = 'upsert';
+      return builder;
+    },
     eq: (_column?: string, _value?: unknown) => builder,
     neq: (_column?: string, _value?: unknown) => builder,
     in: (_column?: string, _values?: unknown[]) => builder,
@@ -124,7 +158,9 @@ const createMockQueryBuilder = <T>(data: T[] = []) => {
     maybeSingle: async () => ({ data: data[0] || null, error: null }),
     throwOnError: () => builder,
     then: async <TResult>(
-      onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
+      onfulfilled?:
+        | ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>)
+        | null
     ): Promise<TResult> => {
       let result: { data: T[] | T | null; error: null; count?: number };
       if (operation === 'select') {
@@ -151,10 +187,14 @@ vi.mock('@/integrations/supabase/client', () => {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
         getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
-        signInWithPassword: vi.fn().mockResolvedValue({ data: { user: null, session: null }, error: null }),
+        signInWithPassword: vi
+          .fn()
+          .mockResolvedValue({ data: { user: null, session: null }, error: null }),
         signUp: vi.fn().mockResolvedValue({ data: { user: null, session: null }, error: null }),
         signOut: vi.fn().mockResolvedValue({ error: null }),
-        onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+        onAuthStateChange: vi
+          .fn()
+          .mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
         signInWithOAuth: vi.fn().mockResolvedValue({ data: { url: '' }, error: null }),
         resetPasswordForEmail: vi.fn().mockResolvedValue({ error: null }),
         updateUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),

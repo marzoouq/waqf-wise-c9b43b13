@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { DistributionDetail } from "@/types/distributions";
-import { FundService } from "@/services/fund.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { DistributionDetail } from '@/types/distributions';
+import { FundService } from '@/services/fund.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useDistributionDetails(distributionId?: string) {
   const { data: details = [], isLoading } = useQuery({

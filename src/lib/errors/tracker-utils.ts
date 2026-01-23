@@ -8,24 +8,26 @@ import { IGNORE_ERROR_PATTERNS } from './tracker-config';
  * فحص إذا كان يجب تجاهل الخطأ
  */
 export function shouldIgnoreError(
-  message: string, 
+  message: string,
   additionalData?: Record<string, unknown>
 ): boolean {
   // فحص رسالة الخطأ الرئيسية
-  if (IGNORE_ERROR_PATTERNS.some(pattern => pattern.test(message))) {
+  if (IGNORE_ERROR_PATTERNS.some((pattern) => pattern.test(message))) {
     return true;
   }
-  
+
   // فحص additional_data للتأكد من عدم تسجيل أخطاء auth
   if (additionalData?.request_url) {
     const url = String(additionalData.request_url);
-    if (url.includes('/auth/v1/user') || 
-        url.includes('/auth/v1/session') ||
-        url.includes('/auth/v1/token')) {
+    if (
+      url.includes('/auth/v1/user') ||
+      url.includes('/auth/v1/session') ||
+      url.includes('/auth/v1/token')
+    ) {
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -39,7 +41,7 @@ export function cleanUrl(url: string): string {
     urlObj.searchParams.delete('__lovable_token');
     urlObj.searchParams.delete('token');
     urlObj.searchParams.delete('access_token');
-    
+
     let cleanedUrl = urlObj.toString();
     // Truncate to 500 characters max
     if (cleanedUrl.length > 500) {
@@ -59,7 +61,7 @@ export function cleanErrorMessage(message: unknown): string {
   if (typeof message === 'string') {
     return message;
   }
-  
+
   if (typeof message === 'object' && message !== null) {
     try {
       return JSON.stringify(message);
@@ -67,7 +69,7 @@ export function cleanErrorMessage(message: unknown): string {
       return String(message);
     }
   }
-  
+
   return String(message || 'Unknown error');
 }
 
@@ -80,7 +82,7 @@ export function sanitizeAdditionalData(
   if (!data || Object.keys(data).length === 0) {
     return undefined;
   }
-  
+
   try {
     return JSON.parse(JSON.stringify(data));
   } catch {
@@ -99,10 +101,12 @@ export function createErrorKey(errorType: string, errorMessage: string): string 
  * فحص إذا كان الخطأ متعلق بالمصادقة
  */
 export function isAuthRelatedUrl(url: string): boolean {
-  return url.includes('log-error') || 
-         url.includes('analytics') ||
-         url.includes('auth/v1/user') ||
-         url.includes('auth/v1/session');
+  return (
+    url.includes('log-error') ||
+    url.includes('analytics') ||
+    url.includes('auth/v1/user') ||
+    url.includes('auth/v1/session')
+  );
 }
 
 /**
@@ -127,7 +131,5 @@ const EXPECTED_EDGE_FUNCTION_ERRORS = [
  */
 export function isExpectedEdgeFunctionError(message: string): boolean {
   const lowerMessage = message.toLowerCase();
-  return EXPECTED_EDGE_FUNCTION_ERRORS.some(err => 
-    lowerMessage.includes(err.toLowerCase())
-  );
+  return EXPECTED_EDGE_FUNCTION_ERRORS.some((err) => lowerMessage.includes(err.toLowerCase()));
 }

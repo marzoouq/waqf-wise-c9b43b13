@@ -15,14 +15,14 @@ export function SessionManager() {
   useEffect(() => {
     // لا تفعل شيء حتى يكتمل التحميل
     if (isLoading) return;
-    
+
     // ✅ إصلاح: لا نتحقق من التنظيف إذا كان المستخدم مسجل دخول فعلاً
     if (user) {
       // إزالة علامة التنظيف المعلق إذا وجدت - المستخدم مسجل دخول
       localStorage.removeItem('waqf_session_cleanup_pending');
       return;
     }
-    
+
     // التحقق من تنظيف معلق عند تحميل التطبيق (فقط إذا لا يوجد مستخدم)
     const checkAndCleanup = async () => {
       const hadCleanup = await checkPendingCleanup();
@@ -44,12 +44,12 @@ export function SessionManager() {
 
     // الاستماع لأحداث التفاعل
     const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
-    events.forEach(event => {
+    events.forEach((event) => {
       window.addEventListener(event, handleUserActivity, { passive: true });
     });
 
     return () => {
-      events.forEach(event => {
+      events.forEach((event) => {
         window.removeEventListener(event, handleUserActivity);
       });
     };

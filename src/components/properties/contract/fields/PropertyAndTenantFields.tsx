@@ -1,16 +1,22 @@
-import { useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Property } from "@/hooks/property/useProperties";
-import { useTenants } from "@/hooks/property/useTenants";
-import { TenantDialog } from "@/components/tenants/TenantDialog";
-import { UserPlus, Search } from "lucide-react";
-import type { TenantInsert } from "@/types/tenants";
-import type { ContractFormValues } from "../contractSchema";
+import { useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Property } from '@/hooks/property/useProperties';
+import { useTenants } from '@/hooks/property/useTenants';
+import { TenantDialog } from '@/components/tenants/TenantDialog';
+import { UserPlus, Search } from 'lucide-react';
+import type { TenantInsert } from '@/types/tenants';
+import type { ContractFormValues } from '../contractSchema';
 
 interface Props {
   form: UseFormReturn<ContractFormValues>;
@@ -25,7 +31,7 @@ export function PropertyAndTenantFields({ form, properties, isEditing }: Props) 
 
   // عند اختيار مستأجر من القائمة
   const handleTenantSelect = (tenantId: string) => {
-    const selectedTenant = tenants.find(t => t.id === tenantId);
+    const selectedTenant = tenants.find((t) => t.id === tenantId);
     if (selectedTenant) {
       form.setValue('tenant_id', tenantId);
       form.setValue('tenant_name', selectedTenant.full_name);
@@ -59,11 +65,7 @@ export function PropertyAndTenantFields({ form, properties, isEditing }: Props) 
           render={({ field }) => (
             <FormItem>
               <FormLabel>العقار *</FormLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={isEditing}
-              >
+              <Select value={field.value} onValueChange={field.onChange} disabled={isEditing}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر العقار" />
@@ -145,10 +147,7 @@ export function PropertyAndTenantFields({ form, properties, isEditing }: Props) 
         </div>
 
         {searchMode === 'select' ? (
-          <Select
-            value={form.watch('tenant_id') || ''}
-            onValueChange={handleTenantSelect}
-          >
+          <Select value={form.watch('tenant_id') || ''} onValueChange={handleTenantSelect}>
             <SelectTrigger>
               <SelectValue placeholder="اختر المستأجر" />
             </SelectTrigger>

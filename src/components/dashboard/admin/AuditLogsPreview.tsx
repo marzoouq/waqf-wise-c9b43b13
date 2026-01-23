@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuditLogs } from "@/hooks/system/useAuditLogs";
-import { FileText, User, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuditLogs } from '@/hooks/system/useAuditLogs';
+import { FileText, User, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function AuditLogsPreview() {
   const { data: logs, isLoading, error, refetch } = useAuditLogs();
@@ -32,7 +32,13 @@ export function AuditLogsPreview() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل سجل العمليات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل سجل العمليات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!logs || logs.length === 0) {
@@ -76,15 +82,17 @@ export function AuditLogsPreview() {
           <FileText className="h-5 w-5" />
           سجل العمليات الأخير
         </CardTitle>
-        <Button 
-          size="sm" 
+        <Button
+          size="sm"
           variant="outline"
-          onClick={() => navigate('/audit-logs', { 
-            state: { 
-              fromDashboard: true,
-              previewCount: logs?.length || 0 
-            } 
-          })}
+          onClick={() =>
+            navigate('/audit-logs', {
+              state: {
+                fromDashboard: true,
+                previewCount: logs?.length || 0,
+              },
+            })
+          }
         >
           عرض الكل
         </Button>
@@ -105,21 +113,17 @@ export function AuditLogsPreview() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getActionColor(log.action_type)}`}
                       >
                         {log.action_type}
                       </Badge>
                       {log.table_name && (
-                        <span className="text-xs text-muted-foreground">
-                          في {log.table_name}
-                        </span>
+                        <span className="text-xs text-muted-foreground">في {log.table_name}</span>
                       )}
                     </div>
-                    {log.description && (
-                      <p className="text-sm mb-2">{log.description}</p>
-                    )}
+                    {log.description && <p className="text-sm mb-2">{log.description}</p>}
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       {log.user_email && (
                         <div className="flex items-center gap-1">

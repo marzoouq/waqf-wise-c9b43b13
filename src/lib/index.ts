@@ -1,7 +1,7 @@
 /**
  * Barrel exports for lib utilities
  * المكتبة المركزية للتطبيق
- * 
+ *
  * يمكن الاستيراد من:
  * 1. المجلد الرئيسي: @/lib
  * 2. المجلدات الفرعية: @/lib/pdf, @/lib/banking, etc.
@@ -44,4 +44,11 @@ export * from './version';
 // ==================== UX Integration ====================
 export * from './ux-integration';
 export * from './microcopy';
-export { runFullVerification, logVerificationReport, getPhaseSummary, PHASES_SUMMARY, type VerificationReport, type VerificationResult } from './ux-verification';
+export {
+  runFullVerification,
+  logVerificationReport,
+  getPhaseSummary,
+  PHASES_SUMMARY,
+  type VerificationReport,
+  type VerificationResult,
+} from './ux-verification';

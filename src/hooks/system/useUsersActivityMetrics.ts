@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { subDays, format, eachDayOfInterval, parseISO, startOfDay, endOfDay } from "date-fns";
-import { ar } from "date-fns/locale";
-import { MonitoringService } from "@/services";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { subDays, format, eachDayOfInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { MonitoringService } from '@/services';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 interface UserActivityDataPoint {
   day: string;
@@ -21,24 +21,25 @@ export function useUsersActivityMetrics() {
     queryFn: async (): Promise<UserActivityDataPoint[]> => {
       const now = new Date();
       const weekAgo = subDays(now, 7);
-      
-      const { loginAttempts, newProfiles, activities } = await MonitoringService.getUserActivityMetrics(weekAgo);
+
+      const { loginAttempts, newProfiles, activities } =
+        await MonitoringService.getUserActivityMetrics(weekAgo);
 
       // إنشاء نقاط البيانات لكل يوم
       const days = eachDayOfInterval({ start: weekAgo, end: now });
-      
-      const dataPoints: UserActivityDataPoint[] = days.slice(0, 7).map(day => {
+
+      const dataPoints: UserActivityDataPoint[] = days.slice(0, 7).map((day) => {
         const dayStart = startOfDay(day);
         const dayEnd = endOfDay(day);
-        
+
         // عد عمليات الدخول الناجحة في هذا اليوم
-        const dayLogins = loginAttempts.filter(attempt => {
+        const dayLogins = loginAttempts.filter((attempt) => {
           const attemptDate = parseISO(attempt.created_at);
           return attemptDate >= dayStart && attemptDate <= dayEnd && attempt.success;
         }).length;
 
         // عد المستخدمين الجدد في هذا اليوم
-        const dayNewUsers = newProfiles.filter(profile => {
+        const dayNewUsers = newProfiles.filter((profile) => {
           const profileDate = parseISO(profile.created_at);
           return profileDate >= dayStart && profileDate <= dayEnd;
         }).length;
@@ -46,15 +47,15 @@ export function useUsersActivityMetrics() {
         // عد المستخدمين النشطين (المستخدمين الفريدين الذين لديهم نشاط)
         const uniqueActiveUsers = new Set(
           activities
-            .filter(activity => {
+            .filter((activity) => {
               const activityDate = parseISO(activity.timestamp);
               return activityDate >= dayStart && activityDate <= dayEnd;
             })
-            .map(a => a.user_name)
+            .map((a) => a.user_name)
         ).size;
 
         return {
-          day: format(day, "EEEE", { locale: ar }),
+          day: format(day, 'EEEE', { locale: ar }),
           activeUsers: uniqueActiveUsers,
           newUsers: dayNewUsers,
           logins: dayLogins,

@@ -1,7 +1,7 @@
-import { memo } from "react";
-import { FileText, CheckCircle, Clock, AlertTriangle, RefreshCw, XCircle } from "lucide-react";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { memo } from 'react';
+import { FileText, CheckCircle, Clock, AlertTriangle, RefreshCw, XCircle } from 'lucide-react';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 interface ContractsStatsProps {
   total: number;
@@ -26,52 +26,52 @@ export const ContractsStatsCards = memo(function ContractsStatsCards({
 }: ContractsStatsProps) {
   const cards = [
     {
-      key: "all",
-      title: "جميع العقود",
+      key: 'all',
+      title: 'جميع العقود',
       value: total,
       icon: FileText,
-      variant: "default" as const,
-      subtitle: "إجمالي العقود",
+      variant: 'default' as const,
+      subtitle: 'إجمالي العقود',
     },
     {
-      key: "active",
-      title: "العقود النشطة",
+      key: 'active',
+      title: 'العقود النشطة',
       value: active,
       icon: CheckCircle,
-      variant: "success" as const,
-      subtitle: "عقود فعالة",
+      variant: 'success' as const,
+      subtitle: 'عقود فعالة',
     },
     {
-      key: "draft",
-      title: "العقود المسودة",
+      key: 'draft',
+      title: 'العقود المسودة',
       value: draft,
       icon: Clock,
-      variant: "warning" as const,
-      subtitle: "بانتظار التفعيل",
+      variant: 'warning' as const,
+      subtitle: 'بانتظار التفعيل',
     },
     {
-      key: "renewal",
-      title: "جاهز للتجديد",
+      key: 'renewal',
+      title: 'جاهز للتجديد',
       value: readyForRenewal,
       icon: AlertTriangle,
-      variant: "warning" as const,
-      subtitle: "ينتهي خلال 60 يوم",
+      variant: 'warning' as const,
+      subtitle: 'ينتهي خلال 60 يوم',
     },
     {
-      key: "autoRenew",
-      title: "المتجددة تلقائياً",
+      key: 'autoRenew',
+      title: 'المتجددة تلقائياً',
       value: autoRenewing,
       icon: RefreshCw,
-      variant: "success" as const,
-      subtitle: "تجديد آلي",
+      variant: 'success' as const,
+      subtitle: 'تجديد آلي',
     },
     {
-      key: "expired",
-      title: "العقود المنتهية",
+      key: 'expired',
+      title: 'العقود المنتهية',
       value: expired,
       icon: XCircle,
-      variant: "destructive" as const,
-      subtitle: "عقود منتهية",
+      variant: 'destructive' as const,
+      subtitle: 'عقود منتهية',
     },
   ];
 
@@ -82,9 +82,7 @@ export const ContractsStatsCards = memo(function ContractsStatsCards({
           key={card.key}
           onClick={() => onFilterClick?.(card.key)}
           className={`cursor-pointer transition-all duration-200 rounded-lg ${
-            activeFilter === card.key
-              ? "ring-2 ring-primary ring-offset-2"
-              : "hover:scale-[1.02]"
+            activeFilter === card.key ? 'ring-2 ring-primary ring-offset-2' : 'hover:scale-[1.02]'
           }`}
         >
           <UnifiedKPICard

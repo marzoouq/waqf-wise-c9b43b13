@@ -6,12 +6,7 @@
 import React from 'react';
 import { Wifi, WifiOff, AlertTriangle } from 'lucide-react';
 import { useConnectionMonitor } from '@/hooks/system/useConnectionMonitor';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface NetworkStatusIndicatorProps {
@@ -19,7 +14,10 @@ interface NetworkStatusIndicatorProps {
   showLabel?: boolean;
 }
 
-export function NetworkStatusIndicator({ className, showLabel = false }: NetworkStatusIndicatorProps) {
+export function NetworkStatusIndicator({
+  className,
+  showLabel = false,
+}: NetworkStatusIndicatorProps) {
   const { stats, isOnline } = useConnectionMonitor();
 
   const getIcon = () => {
@@ -50,18 +48,9 @@ export function NetworkStatusIndicator({ className, showLabel = false }: Network
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div 
-            className={cn(
-              'flex items-center gap-1.5 cursor-help',
-              className
-            )}
-          >
+          <div className={cn('flex items-center gap-1.5 cursor-help', className)}>
             {getIcon()}
-            {showLabel && (
-              <span className="text-xs text-muted-foreground">
-                {getLabel()}
-              </span>
-            )}
+            {showLabel && <span className="text-xs text-muted-foreground">{getLabel()}</span>}
           </div>
         </TooltipTrigger>
         <TooltipContent>

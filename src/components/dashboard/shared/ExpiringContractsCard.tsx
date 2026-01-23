@@ -27,7 +27,7 @@ export function ExpiringContractsCard() {
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-12 bg-muted rounded"></div>
             ))}
           </div>
@@ -59,16 +59,26 @@ export function ExpiringContractsCard() {
         {contracts.length === 0 ? (
           <div className="text-center py-6 text-muted-foreground">
             <div className="w-12 h-12 rounded-full bg-success/10 mx-auto mb-2 flex items-center justify-center">
-              <svg className="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="h-6 w-6 text-success"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <p className="text-sm">لا توجد عقود تنتهي خلال 30 يوم</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {contracts.map(contract => (
-              <div 
+            {contracts.map((contract) => (
+              <div
                 key={contract.id}
                 className="flex items-center justify-between p-3 bg-warning/5 rounded-lg border border-warning/20"
               >
@@ -93,8 +103,8 @@ export function ExpiringContractsCard() {
             ))}
 
             {/* زر عرض الكل */}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full gap-2 border-warning/30 text-warning hover:bg-warning/10"
               onClick={() => navigate('/contracts')}
             >
