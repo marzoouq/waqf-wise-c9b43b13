@@ -5,7 +5,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { format, subDays, startOfDay, endOfDay } from "date-fns";
+import { format, subDays, startOfDay } from "date-fns";
+
+// Reserved for future use
+// import { endOfDay } from "date-fns";
 
 export interface DailyActivityData {
   date: string;

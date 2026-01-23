@@ -4,7 +4,10 @@
  * @version 2.8.91
  */
 
-import { test, expect, devices } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+
+// Reserved for future device-specific testing
+// import { devices } from '@playwright/test';
 
 // الأجهزة للاختبار
 const testDevices = [

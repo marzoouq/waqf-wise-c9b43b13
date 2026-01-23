@@ -2,10 +2,13 @@
  * useAuditLogsEnhanced Hook - سجلات التدقيق المحسّنة
  * @version 1.0.0
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { toast } from "sonner";
+
+// Reserved for future mutations and toast notifications
+// import { useMutation } from "@tanstack/react-query";
+// import { toast } from "sonner";
 
 export interface EnhancedAuditLog {
   id: string;
@@ -115,7 +118,7 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
       }
 
       // ADR-004: Max limit is 500 without pagination
-      const { data, error, count } = await query.limit(500);
+      const { data, error } = await query.limit(500);
 
       if (error) throw error;
 

@@ -155,7 +155,6 @@ test.describe('Screen Reader Support @a11y', () => {
         const id = await input.getAttribute('id');
         const ariaLabel = await input.getAttribute('aria-label');
         const ariaLabelledBy = await input.getAttribute('aria-labelledby');
-        const placeholder = await input.getAttribute('placeholder');
         
         // التحقق من وجود label مرتبط
         if (id) {
