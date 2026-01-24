@@ -1,53 +1,66 @@
 /**
  * TabRenderer Component
  * مكون موحد لعرض التبويبات مع دعم الصلاحيات والتحميل الكسول
- * @version 4.0.0 - إعادة تنظيم التبويبات
+ * @version 4.1.0 - إضافة Retry للتحميل الديناميكي
  */
 
-import { Suspense, lazy, ComponentType } from "react";
+import { Suspense, ComponentType } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabErrorBoundary } from "./common/TabErrorBoundary";
+import { lazyWithRetryNamed } from "@/lib/lazy-with-retry";
 import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 
-// Lazy loaded tab components
-const LazyBeneficiaryProfileTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryProfileTab").then(m => ({ default: m.BeneficiaryProfileTab }))
+// Lazy loaded tab components with retry support
+const LazyBeneficiaryProfileTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryProfileTab"),
+  "BeneficiaryProfileTab"
 );
-const LazyBeneficiaryDistributionsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryDistributionsTab").then(m => ({ default: m.BeneficiaryDistributionsTab }))
+const LazyBeneficiaryDistributionsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryDistributionsTab"),
+  "BeneficiaryDistributionsTab"
 );
-const LazyBeneficiaryPropertiesTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryPropertiesTab").then(m => ({ default: m.BeneficiaryPropertiesTab }))
+const LazyBeneficiaryPropertiesTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryPropertiesTab"),
+  "BeneficiaryPropertiesTab"
 );
-const LazyFamilyTreeTab = lazy(() => 
-  import("@/components/beneficiary/tabs/FamilyTreeTab").then(m => ({ default: m.FamilyTreeTab }))
+const LazyFamilyTreeTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FamilyTreeTab"),
+  "FamilyTreeTab"
 );
-const LazyBankAccountsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BankAccountsTab").then(m => ({ default: m.BankAccountsTab }))
+const LazyBankAccountsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BankAccountsTab"),
+  "BankAccountsTab"
 );
-const LazyFinancialReportsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/FinancialReportsTab").then(m => ({ default: m.FinancialReportsTab }))
+const LazyFinancialReportsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FinancialReportsTab"),
+  "FinancialReportsTab"
 );
-const LazyGovernanceTab = lazy(() => 
-  import("@/components/beneficiary/tabs/GovernanceTab").then(m => ({ default: m.GovernanceTab }))
+const LazyGovernanceTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/GovernanceTab"),
+  "GovernanceTab"
 );
-const LazyLoansOverviewTab = lazy(() => 
-  import("@/components/beneficiary/tabs/LoansOverviewTab").then(m => ({ default: m.LoansOverviewTab }))
+const LazyLoansOverviewTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/LoansOverviewTab"),
+  "LoansOverviewTab"
 );
-const LazyBeneficiaryRequestsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryRequestsTab").then(m => ({ default: m.BeneficiaryRequestsTab }))
+const LazyBeneficiaryRequestsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryRequestsTab"),
+  "BeneficiaryRequestsTab"
 );
-const LazyBeneficiaryDocumentsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab").then(m => ({ default: m.BeneficiaryDocumentsTab }))
+const LazyBeneficiaryDocumentsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab"),
+  "BeneficiaryDocumentsTab"
 );
 // New consolidated tabs
-const LazyFamilyAccountTab = lazy(() => 
-  import("@/components/beneficiary/tabs/FamilyAccountTab").then(m => ({ default: m.FamilyAccountTab }))
+const LazyFamilyAccountTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FamilyAccountTab"),
+  "FamilyAccountTab"
 );
-const LazyMoreMenuTab = lazy(() => 
-  import("@/components/beneficiary/tabs/MoreMenuTab").then(m => ({ default: m.MoreMenuTab }))
+const LazyMoreMenuTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/MoreMenuTab"),
+  "MoreMenuTab"
 );
 
 interface TabConfig {
