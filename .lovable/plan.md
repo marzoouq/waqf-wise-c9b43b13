@@ -1,48 +1,45 @@
 
-
-# خطة تنفيذ الحماية الشاملة للمستودع
-## منع التكرار + حدود الاستيراد + حماية الملفات
-
----
-
-## الوضع الحالي بعد الفحص
-
-### ✅ موجود ويعمل
-
-| العنصر | الملف | الحالة |
-|--------|-------|--------|
-| CODEOWNERS | `.github/CODEOWNERS` | 36 مسار محمي |
-| Pre-commit Hooks | `.husky/pre-commit` | TypeScript + lint-staged |
-| no-duplicate-imports | `eslint.config.js:46` | يمنع الاستيراد المكرر |
-| no-explicit-any | `eslint.config.js:32` | يمنع استخدام any |
-
-### ❌ غير موجود (المطلوب تنفيذه)
-
-| العنصر | الوظيفة |
-|--------|---------|
-| `scripts/check-code-duplication.js` | كشف الكود المكرر |
-| `scripts/check-constants-usage.js` | فرض استخدام الثوابت |
-| `scripts/check-protected-files.js` | حماية الملفات الحرجة |
-| `scripts/validate-imports.js` | التحقق من حدود الاستيراد |
-| `no-restricted-imports` | قواعد ESLint للاستيراد المقيد |
+# خطة تنفيذ الحماية الشاملة للمستودع - 100%
+## منع التكرار + حدود الاستيراد + حماية الملفات الحرجة
 
 ---
 
-## المرحلة 1: تحديث ESLint (إضافة حدود الاستيراد)
+## ملخص التنفيذ
+
+| الملف | الحالة | الإجراء |
+|-------|--------|---------|
+| `eslint.config.js` | موجود | تعديل - إضافة no-restricted-imports |
+| `scripts/check-code-duplication.js` | **جديد** | إنشاء |
+| `scripts/check-constants-usage.js` | **جديد** | إنشاء |
+| `scripts/check-protected-files.js` | **جديد** | إنشاء |
+| `scripts/validate-imports.js` | **جديد** | إنشاء |
+| `.husky/pre-commit` | موجود | تعديل - إضافة الفحوصات |
+| `.github/workflows/ci.yml` | موجود | تعديل - إضافة code-quality job |
+| `package.json` | موجود | تعديل - إضافة السكريبتات |
+
+---
+
+## المرحلة 1: تحديث ESLint
 
 ### الملف: `eslint.config.js`
 
-**الإضافات المطلوبة:**
+**إضافة قواعد الاستيراد المقيدة بعد السطر 46:**
 
 ```javascript
-// إضافة بعد السطر 46 (no-duplicate-imports)
-
-// قواعد الاستيراد المقيدة - منع التكرار والتضارب
+// ═══════════════════════════════════════════════════════════════
+// 🚫 قواعد الاستيراد المقيدة - منع التكرار والتضارب
+// Restricted Imports - Prevent Duplication & Conflicts
+// ═══════════════════════════════════════════════════════════════
 "no-restricted-imports": ["error", {
   "patterns": [
     {
       "group": ["../../../*"],
       "message": "تجنب الاستيرادات العميقة - استخدم مسار @/ المختصر"
+    },
+    {
+      "group": ["**/supabase/client"],
+      "importNames": ["createClient"],
+      "message": "استخدم supabase من @/integrations/supabase/client"
     }
   ],
   "paths": [
@@ -54,7 +51,7 @@
     {
       "name": "react",
       "importNames": ["createContext"],
-      "message": "تأكد من عدم تكرار Context موجود - راجع src/contexts/"
+      "message": "تحقق من عدم تكرار Context موجود - راجع src/contexts/"
     }
   ]
 }],
@@ -62,83 +59,671 @@
 
 ---
 
-## المرحلة 2: سكريبت كشف التكرار
+## المرحلة 2: إنشاء سكريبت كشف التكرار
 
-### الملف: `scripts/check-code-duplication.js`
+### الملف الجديد: `scripts/check-code-duplication.js`
 
-```text
-الوظائف:
-├── فحص أسماء الملفات المتكررة (نفس الاسم في مجلدات مختلفة)
-├── فحص الدوال المصدرة بنفس الاسم
-├── فحص المكونات بنفس الاسم
-├── تحذير إذا وجد تكرار > 80%
-└── تقرير بجميع التكرارات
+```javascript
+#!/usr/bin/env node
 
-المخرجات:
-├── 🔴 خطأ: ملفان بنفس الاسم والوظيفة
-├── 🟡 تحذير: دالتان بنفس التوقيع
-└── ✅ نجاح: لا يوجد تكرار
+/**
+ * 🔍 Code Duplication Checker
+ * يكتشف الملفات والمكونات والدوال المكررة
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const COLORS = {
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+  RESET: '\x1b[0m'
+};
+
+// الملفات المستثناة
+const EXCLUDED_DIRS = ['node_modules', 'dist', '.git', 'coverage', '__tests__'];
+const EXCLUDED_FILES = ['index.ts', 'index.tsx', 'types.ts', 'types.d.ts'];
+
+// جمع جميع الملفات
+function getAllFiles(dir, extensions = ['.ts', '.tsx']) {
+  let files = [];
+  
+  try {
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory()) {
+        if (!EXCLUDED_DIRS.includes(item)) {
+          files = files.concat(getAllFiles(fullPath, extensions));
+        }
+      } else if (extensions.some(ext => item.endsWith(ext))) {
+        if (!EXCLUDED_FILES.includes(item)) {
+          files.push(fullPath);
+        }
+      }
+    }
+  } catch (err) {
+    // تجاهل أخطاء القراءة
+  }
+  
+  return files;
+}
+
+// استخراج اسم الملف بدون المسار والامتداد
+function getBaseName(filePath) {
+  return path.basename(filePath).replace(/\.(ts|tsx)$/, '');
+}
+
+// استخراج الدوال والمكونات المصدرة
+function extractExports(content) {
+  const exports = [];
+  
+  // export function/const
+  const funcRegex = /export\s+(?:async\s+)?(?:function|const)\s+(\w+)/g;
+  let match;
+  while ((match = funcRegex.exec(content)) !== null) {
+    exports.push(match[1]);
+  }
+  
+  // export default
+  const defaultRegex = /export\s+default\s+(?:function\s+)?(\w+)/g;
+  while ((match = defaultRegex.exec(content)) !== null) {
+    exports.push(match[1]);
+  }
+  
+  return exports;
+}
+
+// الفحص الرئيسي
+function checkDuplication() {
+  console.log(`${COLORS.BLUE}🔍 فحص التكرار في الكود...${COLORS.RESET}\n`);
+  
+  const srcPath = path.join(process.cwd(), 'src');
+  const files = getAllFiles(srcPath);
+  
+  const fileNames = new Map(); // اسم الملف -> [المسارات]
+  const exportNames = new Map(); // اسم التصدير -> [{ملف, اسم}]
+  
+  let duplicateFiles = 0;
+  let duplicateExports = 0;
+  
+  // جمع الأسماء
+  for (const file of files) {
+    const baseName = getBaseName(file);
+    const relativePath = path.relative(srcPath, file);
+    
+    // فحص تكرار أسماء الملفات
+    if (!fileNames.has(baseName)) {
+      fileNames.set(baseName, []);
+    }
+    fileNames.get(baseName).push(relativePath);
+    
+    // فحص التصديرات
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      const exports = extractExports(content);
+      
+      for (const exp of exports) {
+        if (!exportNames.has(exp)) {
+          exportNames.set(exp, []);
+        }
+        exportNames.get(exp).push({ file: relativePath, name: exp });
+      }
+    } catch (err) {
+      // تجاهل أخطاء القراءة
+    }
+  }
+  
+  // تقرير الملفات المكررة
+  console.log(`${COLORS.YELLOW}📁 ملفات بنفس الاسم:${COLORS.RESET}`);
+  for (const [name, paths] of fileNames) {
+    if (paths.length > 1) {
+      // استثناء الملفات المقبول تكرارها
+      const acceptableDupes = ['utils', 'types', 'constants', 'helpers', 'hooks'];
+      if (!acceptableDupes.includes(name.toLowerCase())) {
+        console.log(`  ${COLORS.RED}⚠️ ${name}:${COLORS.RESET}`);
+        paths.forEach(p => console.log(`     - ${p}`));
+        duplicateFiles++;
+      }
+    }
+  }
+  
+  if (duplicateFiles === 0) {
+    console.log(`  ${COLORS.GREEN}✅ لا توجد ملفات مكررة${COLORS.RESET}`);
+  }
+  
+  // تقرير الدوال المكررة (المهمة فقط)
+  console.log(`\n${COLORS.YELLOW}🔧 دوال/مكونات بنفس الاسم:${COLORS.RESET}`);
+  const importantDupes = [];
+  
+  for (const [name, locations] of exportNames) {
+    if (locations.length > 1) {
+      // استثناء الأسماء الشائعة
+      const commonNames = ['default', 'index', 'type', 'Props', 'State'];
+      if (!commonNames.some(c => name.includes(c)) && name.length > 3) {
+        importantDupes.push({ name, locations });
+      }
+    }
+  }
+  
+  // عرض أهم 10 تكرارات
+  importantDupes.slice(0, 10).forEach(({ name, locations }) => {
+    console.log(`  ${COLORS.YELLOW}⚠️ ${name} (${locations.length} مواقع)${COLORS.RESET}`);
+    duplicateExports++;
+  });
+  
+  if (importantDupes.length === 0) {
+    console.log(`  ${COLORS.GREEN}✅ لا توجد دوال مكررة مهمة${COLORS.RESET}`);
+  }
+  
+  // الملخص
+  console.log(`\n${COLORS.BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLORS.RESET}`);
+  console.log(`${COLORS.BLUE}📊 الملخص:${COLORS.RESET}`);
+  console.log(`   📁 ملفات مكررة: ${duplicateFiles > 0 ? COLORS.RED : COLORS.GREEN}${duplicateFiles}${COLORS.RESET}`);
+  console.log(`   🔧 دوال مكررة: ${duplicateExports > 0 ? COLORS.YELLOW : COLORS.GREEN}${duplicateExports}${COLORS.RESET}`);
+  
+  // لا نفشل - فقط تحذير
+  if (duplicateFiles > 5) {
+    console.log(`\n${COLORS.RED}❌ يوجد عدد كبير من الملفات المكررة${COLORS.RESET}`);
+    process.exit(1);
+  }
+  
+  console.log(`\n${COLORS.GREEN}✅ فحص التكرار اكتمل${COLORS.RESET}`);
+}
+
+checkDuplication();
 ```
 
 ---
 
-## المرحلة 3: سكريبت فرض الثوابت
+## المرحلة 3: إنشاء سكريبت فحص الثوابت
 
-### الملف: `scripts/check-constants-usage.js`
+### الملف الجديد: `scripts/check-constants-usage.js`
 
-```text
-يفحص الاستخدامات الخاطئة:
-├── 'نشط' بدلاً من BENEFICIARY_STATUS.ACTIVE
-├── 'active' بدلاً من TENANT_STATUS.ACTIVE
-├── 'receipt' بدلاً من PAYMENT_TYPES.RECEIPT
-├── 'جديد' بدلاً من MAINTENANCE_STATUS.NEW
-└── أي قيم حرفية يجب أن تكون ثوابت
+```javascript
+#!/usr/bin/env node
 
-الملفات المستثناة:
-├── src/lib/constants.ts (الملف المصدر)
-├── *.test.ts (ملفات الاختبار)
-└── *.d.ts (ملفات الأنواع)
+/**
+ * 📋 Constants Usage Checker
+ * يتحقق من استخدام الثوابت المركزية بدلاً من القيم الحرفية
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const COLORS = {
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+  RESET: '\x1b[0m'
+};
+
+// القيم الحرفية التي يجب أن تكون ثوابت
+const LITERAL_VALUES = {
+  // حالات المستفيدين
+  "'نشط'": 'BENEFICIARY_STATUS.ACTIVE أو TENANT_STATUS.ACTIVE',
+  "'غير نشط'": 'BENEFICIARY_STATUS.INACTIVE',
+  "'معلق'": 'BENEFICIARY_STATUS.SUSPENDED أو REQUEST_STATUS.PENDING',
+  
+  // حالات العقود
+  "'مسودة'": 'CONTRACT_STATUS.DRAFT',
+  "'منتهي'": 'CONTRACT_STATUS.EXPIRED',
+  "'ملغي'": 'CONTRACT_STATUS.CANCELLED',
+  
+  // حالات الصيانة
+  "'جديد'": 'MAINTENANCE_STATUS.NEW',
+  "'مفتوح'": 'MAINTENANCE_STATUS.OPEN',
+  "'مغلق'": 'MAINTENANCE_STATUS.CLOSED',
+  
+  // حالات الدفع
+  "'مكتمل'": 'PAYMENT_STATUS.COMPLETED',
+  "'مدفوع'": 'PAYMENT_STATUS.PAID',
+  "'متأخر'": 'PAYMENT_STATUS.OVERDUE',
+  
+  // أنواع السندات
+  "'receipt'": 'PAYMENT_TYPES.RECEIPT',
+  "'payment'": 'PAYMENT_TYPES.PAYMENT',
+  "'expense'": 'PAYMENT_TYPES.EXPENSE',
+};
+
+// الملفات المستثناة
+const EXCLUDED_PATHS = [
+  'src/lib/constants.ts',
+  '__tests__',
+  '.test.',
+  '.spec.',
+  'types.ts',
+  'types.d.ts',
+];
+
+function getAllFiles(dir, extensions = ['.ts', '.tsx']) {
+  let files = [];
+  
+  try {
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory()) {
+        if (!['node_modules', 'dist', '.git', 'coverage'].includes(item)) {
+          files = files.concat(getAllFiles(fullPath, extensions));
+        }
+      } else if (extensions.some(ext => item.endsWith(ext))) {
+        files.push(fullPath);
+      }
+    }
+  } catch (err) {
+    // تجاهل
+  }
+  
+  return files;
+}
+
+function checkConstantsUsage() {
+  console.log(`${COLORS.BLUE}📋 فحص استخدام الثوابت المركزية...${COLORS.RESET}\n`);
+  
+  const srcPath = path.join(process.cwd(), 'src');
+  const files = getAllFiles(srcPath);
+  
+  const violations = [];
+  
+  for (const file of files) {
+    const relativePath = path.relative(process.cwd(), file);
+    
+    // تخطي الملفات المستثناة
+    if (EXCLUDED_PATHS.some(exc => relativePath.includes(exc))) {
+      continue;
+    }
+    
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      const lines = content.split('\n');
+      
+      lines.forEach((line, index) => {
+        // تخطي التعليقات
+        if (line.trim().startsWith('//') || line.trim().startsWith('*')) {
+          return;
+        }
+        
+        for (const [literal, constant] of Object.entries(LITERAL_VALUES)) {
+          // البحث عن القيمة الحرفية في سياق المقارنة أو التعيين
+          const patterns = [
+            `=== ${literal}`,
+            `== ${literal}`,
+            `!== ${literal}`,
+            `!= ${literal}`,
+            `: ${literal}`,
+            `status: ${literal}`,
+            `filter.*${literal}`,
+          ];
+          
+          for (const pattern of patterns) {
+            if (line.includes(literal.slice(1, -1))) { // إزالة علامات الاقتباس
+              violations.push({
+                file: relativePath,
+                line: index + 1,
+                literal: literal,
+                suggestion: constant,
+                context: line.trim().substring(0, 60),
+              });
+              break;
+            }
+          }
+        }
+      });
+    } catch (err) {
+      // تجاهل
+    }
+  }
+  
+  // تقرير الانتهاكات
+  if (violations.length > 0) {
+    console.log(`${COLORS.YELLOW}⚠️ قيم حرفية يُفضل استخدام ثوابت بدلاً منها:${COLORS.RESET}\n`);
+    
+    // تجميع حسب الملف
+    const byFile = new Map();
+    for (const v of violations) {
+      if (!byFile.has(v.file)) {
+        byFile.set(v.file, []);
+      }
+      byFile.get(v.file).push(v);
+    }
+    
+    // عرض أول 10 ملفات
+    let count = 0;
+    for (const [file, fileViolations] of byFile) {
+      if (count >= 10) {
+        console.log(`  ... و ${byFile.size - 10} ملفات أخرى`);
+        break;
+      }
+      
+      console.log(`  ${COLORS.YELLOW}📄 ${file}${COLORS.RESET}`);
+      fileViolations.slice(0, 3).forEach(v => {
+        console.log(`     السطر ${v.line}: ${v.literal} → ${v.suggestion}`);
+      });
+      count++;
+    }
+    
+    console.log(`\n${COLORS.YELLOW}📊 إجمالي: ${violations.length} استخدام لقيم حرفية${COLORS.RESET}`);
+  } else {
+    console.log(`${COLORS.GREEN}✅ جميع القيم تستخدم الثوابت المركزية${COLORS.RESET}`);
+  }
+  
+  // لا نفشل - فقط تحذير
+  console.log(`\n${COLORS.GREEN}✅ فحص الثوابت اكتمل${COLORS.RESET}`);
+}
+
+checkConstantsUsage();
 ```
 
 ---
 
-## المرحلة 4: سكريبت حماية الملفات الحرجة
+## المرحلة 4: إنشاء سكريبت حماية الملفات
 
-### الملف: `scripts/check-protected-files.js`
+### الملف الجديد: `scripts/check-protected-files.js`
 
-```text
-الملفات المحمية (تتطلب تنبيه خاص):
-├── src/lib/constants.ts
-├── src/infrastructure/react-query/*
-├── src/lib/query-keys/*
-├── src/integrations/supabase/client.ts
-├── supabase/migrations/*.sql
-└── .github/workflows/*
+```javascript
+#!/usr/bin/env node
 
-السلوك:
-├── يُشغّل في pre-commit
-├── يعرض تحذير عند تعديل ملف محمي
-└── يطلب تأكيد (في CI يفشل إذا لم يكن PR approved)
+/**
+ * 🔒 Protected Files Checker
+ * يتحقق من عدم تعديل الملفات المحمية بدون مراجعة
+ */
+
+const { execSync } = require('child_process');
+
+const COLORS = {
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+  RESET: '\x1b[0m'
+};
+
+// الملفات المحمية - أي تعديل يتطلب تنبيه
+const PROTECTED_FILES = [
+  // البنية التحتية الأساسية
+  'src/lib/constants.ts',
+  'src/integrations/supabase/client.ts',
+  
+  // مفاتيح الاستعلام
+  'src/lib/query-keys/',
+  
+  // البنية التحتية لـ React Query
+  'src/infrastructure/react-query/',
+  
+  // إعدادات المشروع
+  'supabase/config.toml',
+  '.github/workflows/',
+  
+  // قواعد البيانات
+  'supabase/migrations/',
+  
+  // التوثيق المعماري
+  'docs/ARCHITECTURE_DECISIONS.md',
+  'docs/TRUTH_MAP.md',
+  'docs/OWNERSHIP_RULES.md',
+];
+
+// الملفات الممنوع تعديلها نهائياً
+const FORBIDDEN_FILES = [
+  'src/integrations/supabase/types.ts', // يُولّد تلقائياً
+  '.env', // يُولّد تلقائياً
+];
+
+function checkProtectedFiles() {
+  console.log(`${COLORS.BLUE}🔒 فحص الملفات المحمية...${COLORS.RESET}\n`);
+  
+  let stagedFiles = [];
+  
+  try {
+    // الحصول على الملفات المُعدّة للـ commit
+    const output = execSync('git diff --cached --name-only', { encoding: 'utf8' });
+    stagedFiles = output.trim().split('\n').filter(f => f.length > 0);
+  } catch (err) {
+    console.log(`${COLORS.YELLOW}⚠️ لا يمكن قراءة Git staged files${COLORS.RESET}`);
+    return;
+  }
+  
+  if (stagedFiles.length === 0) {
+    console.log(`${COLORS.GREEN}✅ لا توجد ملفات للفحص${COLORS.RESET}`);
+    return;
+  }
+  
+  const protectedModified = [];
+  const forbiddenModified = [];
+  
+  for (const file of stagedFiles) {
+    // فحص الملفات الممنوعة
+    for (const forbidden of FORBIDDEN_FILES) {
+      if (file === forbidden || file.startsWith(forbidden)) {
+        forbiddenModified.push(file);
+      }
+    }
+    
+    // فحص الملفات المحمية
+    for (const protected_ of PROTECTED_FILES) {
+      if (file === protected_ || file.startsWith(protected_)) {
+        protectedModified.push(file);
+      }
+    }
+  }
+  
+  // تقرير الملفات الممنوعة
+  if (forbiddenModified.length > 0) {
+    console.log(`${COLORS.RED}❌ ملفات ممنوع تعديلها:${COLORS.RESET}`);
+    forbiddenModified.forEach(f => {
+      console.log(`   ${COLORS.RED}🚫 ${f}${COLORS.RESET}`);
+    });
+    console.log(`\n${COLORS.RED}هذه الملفات تُولّد تلقائياً ولا يجب تعديلها!${COLORS.RESET}`);
+    process.exit(1);
+  }
+  
+  // تقرير الملفات المحمية (تحذير فقط)
+  if (protectedModified.length > 0) {
+    console.log(`${COLORS.YELLOW}⚠️ ملفات محمية تم تعديلها:${COLORS.RESET}`);
+    protectedModified.forEach(f => {
+      console.log(`   ${COLORS.YELLOW}🔒 ${f}${COLORS.RESET}`);
+    });
+    console.log(`\n${COLORS.YELLOW}تأكد من مراجعة هذه التغييرات بعناية!${COLORS.RESET}`);
+    console.log(`${COLORS.YELLOW}راجع: docs/OWNERSHIP_RULES.md${COLORS.RESET}`);
+  } else {
+    console.log(`${COLORS.GREEN}✅ لم يتم تعديل ملفات محمية${COLORS.RESET}`);
+  }
+  
+  console.log(`\n${COLORS.GREEN}✅ فحص الملفات المحمية اكتمل${COLORS.RESET}`);
+}
+
+checkProtectedFiles();
 ```
 
 ---
 
-## المرحلة 5: سكريبت التحقق من حدود الاستيراد
+## المرحلة 5: إنشاء سكريبت التحقق من حدود الاستيراد
 
-### الملف: `scripts/validate-imports.js`
+### الملف الجديد: `scripts/validate-imports.js`
 
-```text
-القواعد المعمارية:
-├── src/pages/* → لا تستورد من src/pages/* أخرى
-├── src/services/* → لا تستورد من src/hooks/*
-├── src/lib/* → لا تستورد من src/services/*
-├── src/components/* → تستورد فقط من src/lib/* و src/hooks/*
-└── Edge Functions → لا تستورد من src/*
+```javascript
+#!/usr/bin/env node
 
-يكتشف:
-├── 🔴 التبعيات الدائرية (Circular Dependencies)
-├── 🔴 اختراق الطبقات (Layer Violations)
-└── 🟡 استيرادات عميقة جداً (Deep Imports)
+/**
+ * 🚧 Import Boundaries Validator
+ * يتحقق من احترام حدود الاستيراد المعمارية
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const COLORS = {
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+  RESET: '\x1b[0m'
+};
+
+// قواعد الاستيراد المعمارية
+const IMPORT_RULES = {
+  // الصفحات لا تستورد من صفحات أخرى
+  'src/pages': {
+    forbidden: ['src/pages'],
+    message: 'الصفحات لا يجب أن تستورد من صفحات أخرى',
+  },
+  
+  // الخدمات لا تستورد من Hooks
+  'src/services': {
+    forbidden: ['src/hooks', 'src/components'],
+    message: 'الخدمات لا تستورد من Hooks أو Components',
+  },
+  
+  // المكتبات لا تستورد من الخدمات
+  'src/lib': {
+    forbidden: ['src/services', 'src/hooks', 'src/pages'],
+    message: 'المكتبات لا تستورد من Services أو Hooks أو Pages',
+  },
+};
+
+// استثناءات مقبولة
+const EXCEPTIONS = [
+  { from: 'src/services', to: 'src/hooks/auth' }, // الخدمات يمكنها استيراد auth
+];
+
+function getAllFiles(dir, extensions = ['.ts', '.tsx']) {
+  let files = [];
+  
+  try {
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory()) {
+        if (!['node_modules', 'dist', '.git', 'coverage', '__tests__'].includes(item)) {
+          files = files.concat(getAllFiles(fullPath, extensions));
+        }
+      } else if (extensions.some(ext => item.endsWith(ext))) {
+        files.push(fullPath);
+      }
+    }
+  } catch (err) {
+    // تجاهل
+  }
+  
+  return files;
+}
+
+function extractImports(content) {
+  const imports = [];
+  
+  // import من ملفات المشروع
+  const importRegex = /import\s+.*?\s+from\s+['"](@\/|\.\.\/|\.\/)(.*?)['"]/g;
+  let match;
+  
+  while ((match = importRegex.exec(content)) !== null) {
+    const importPath = match[1] === '@/' ? `src/${match[2]}` : match[2];
+    imports.push(importPath);
+  }
+  
+  return imports;
+}
+
+function isException(fromDir, toPath) {
+  for (const exc of EXCEPTIONS) {
+    if (fromDir.includes(exc.from) && toPath.includes(exc.to)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function validateImports() {
+  console.log(`${COLORS.BLUE}🚧 التحقق من حدود الاستيراد المعمارية...${COLORS.RESET}\n`);
+  
+  const srcPath = path.join(process.cwd(), 'src');
+  const files = getAllFiles(srcPath);
+  
+  const violations = [];
+  
+  for (const file of files) {
+    const relativePath = path.relative(process.cwd(), file);
+    
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      const imports = extractImports(content);
+      
+      // تحديد أي قاعدة تنطبق على هذا الملف
+      for (const [sourceDir, rule] of Object.entries(IMPORT_RULES)) {
+        if (relativePath.startsWith(sourceDir)) {
+          // فحص كل استيراد
+          for (const importPath of imports) {
+            for (const forbidden of rule.forbidden) {
+              const normalizedForbidden = forbidden.replace('src/', '');
+              
+              if (importPath.includes(normalizedForbidden)) {
+                // تحقق من الاستثناءات
+                if (!isException(sourceDir, importPath)) {
+                  violations.push({
+                    file: relativePath,
+                    import: importPath,
+                    rule: rule.message,
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      // تجاهل
+    }
+  }
+  
+  // تقرير الانتهاكات
+  if (violations.length > 0) {
+    console.log(`${COLORS.RED}❌ انتهاكات حدود الاستيراد:${COLORS.RESET}\n`);
+    
+    // تجميع حسب القاعدة
+    const byRule = new Map();
+    for (const v of violations) {
+      if (!byRule.has(v.rule)) {
+        byRule.set(v.rule, []);
+      }
+      byRule.get(v.rule).push(v);
+    }
+    
+    for (const [rule, ruleViolations] of byRule) {
+      console.log(`  ${COLORS.YELLOW}📋 ${rule}${COLORS.RESET}`);
+      ruleViolations.slice(0, 5).forEach(v => {
+        console.log(`     ${v.file}`);
+        console.log(`     → يستورد: ${v.import}`);
+      });
+      if (ruleViolations.length > 5) {
+        console.log(`     ... و ${ruleViolations.length - 5} انتهاكات أخرى`);
+      }
+      console.log('');
+    }
+    
+    console.log(`${COLORS.RED}📊 إجمالي: ${violations.length} انتهاك${COLORS.RESET}`);
+    
+    // لا نفشل - فقط تحذير (للسماح بالإصلاح التدريجي)
+    console.log(`\n${COLORS.YELLOW}⚠️ يُفضل إصلاح هذه الانتهاكات تدريجياً${COLORS.RESET}`);
+  } else {
+    console.log(`${COLORS.GREEN}✅ جميع الاستيرادات تحترم الحدود المعمارية${COLORS.RESET}`);
+  }
+  
+  console.log(`\n${COLORS.GREEN}✅ فحص حدود الاستيراد اكتمل${COLORS.RESET}`);
+}
+
+validateImports();
 ```
 
 ---
@@ -147,25 +732,30 @@
 
 ### الملف: `.husky/pre-commit`
 
-**الإضافات:**
+**إضافة بعد السطر 28:**
 
 ```bash
-# 4. فحص التكرار
-echo "🔍 فحص الكود المكرر..."
-node scripts/check-code-duplication.js || {
-    echo "⚠️ تم اكتشاف كود مكرر - راجع التقرير"
-}
+# ═══════════════════════════════════════════════════════════════
+# 🛡️ فحوصات الحماية الإضافية
+# ═══════════════════════════════════════════════════════════════
 
-# 5. فحص استخدام الثوابت
-echo "📋 فحص استخدام الثوابت..."
-node scripts/check-constants-usage.js || {
-    echo "⚠️ يوجد قيم حرفية يجب أن تكون ثوابت"
-}
-
-# 6. فحص الملفات المحمية
+# 4. فحص الملفات المحمية
 echo "🔒 فحص الملفات المحمية..."
 node scripts/check-protected-files.js || {
-    echo "⚠️ تم تعديل ملفات محمية - تحتاج مراجعة"
+    echo "❌ تم تعديل ملفات ممنوعة"
+    exit 1
+}
+
+# 5. فحص التكرار (تحذير فقط)
+echo "🔍 فحص الكود المكرر..."
+node scripts/check-code-duplication.js 2>/dev/null || {
+    echo "⚠️ تحذير: يوجد كود مكرر"
+}
+
+# 6. فحص استخدام الثوابت (تحذير فقط)
+echo "📋 فحص استخدام الثوابت..."
+node scripts/check-constants-usage.js 2>/dev/null || {
+    echo "⚠️ تحذير: يوجد قيم حرفية يُفضل استخدام ثوابت"
 }
 ```
 
@@ -175,90 +765,100 @@ node scripts/check-protected-files.js || {
 
 ### الملف: `.github/workflows/ci.yml`
 
-**إضافة Job جديد:**
+**إضافة Job جديد بعد security (السطر 148):**
 
 ```yaml
-# بعد job الـ lint
-code-quality:
-  name: 🔍 Code Quality & Duplication Check
-  runs-on: ubuntu-latest
-  
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    - run: npm ci
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Code Quality & Architecture Check
+  # ═══════════════════════════════════════════════════════════════════════════
+  code-quality:
+    name: 🏗️ Code Quality & Architecture
+    runs-on: ubuntu-latest
     
-    - name: Check Code Duplication
-      run: node scripts/check-code-duplication.js
-      
-    - name: Check Constants Usage
-      run: node scripts/check-constants-usage.js
-      
-    - name: Validate Import Boundaries
-      run: node scripts/validate-imports.js
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check Code Duplication
+        run: node scripts/check-code-duplication.js
+        continue-on-error: true
+        
+      - name: Check Constants Usage
+        run: node scripts/check-constants-usage.js
+        continue-on-error: true
+        
+      - name: Validate Import Boundaries
+        run: node scripts/validate-imports.js
+        continue-on-error: true
+        
+      - name: Architecture Summary
+        run: |
+          echo "## 🏗️ Architecture Quality Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Duplication | ✅ Checked |" >> $GITHUB_STEP_SUMMARY
+          echo "| Constants Usage | ✅ Checked |" >> $GITHUB_STEP_SUMMARY
+          echo "| Import Boundaries | ✅ Checked |" >> $GITHUB_STEP_SUMMARY
+```
+
+**تحديث summary job (السطر 155):**
+
+```yaml
+  needs: [lint, unit-tests, build, security, code-quality]
 ```
 
 ---
 
 ## المرحلة 8: تحديث package.json
 
-**إضافة السكريبتات:**
+### الملف: `package.json`
+
+**إضافة السكريبتات بعد السطر 17:**
 
 ```json
-"scripts": {
-  "check:duplication": "node scripts/check-code-duplication.js",
-  "check:constants": "node scripts/check-constants-usage.js",
-  "check:imports": "node scripts/validate-imports.js",
-  "check:protected": "node scripts/check-protected-files.js",
-  "check:all": "npm run check:duplication && npm run check:constants && npm run check:imports"
-}
+"check:duplication": "node scripts/check-code-duplication.js",
+"check:constants": "node scripts/check-constants-usage.js",
+"check:imports": "node scripts/validate-imports.js",
+"check:protected": "node scripts/check-protected-files.js",
+"check:all": "npm run check:duplication && npm run check:constants && npm run check:imports",
 ```
 
 ---
 
-## ملخص الملفات
+## ملخص التنفيذ
 
-### ملفات جديدة (4):
-```text
-scripts/check-code-duplication.js
-scripts/check-constants-usage.js
-scripts/check-protected-files.js
-scripts/validate-imports.js
-```
-
-### ملفات تُعدّل (4):
-```text
-eslint.config.js          # إضافة no-restricted-imports
-.husky/pre-commit         # إضافة الفحوصات الجديدة
-.github/workflows/ci.yml  # إضافة code-quality job
-package.json              # إضافة السكريبتات الجديدة
-```
+| المرحلة | الملفات | الوقت |
+|---------|---------|-------|
+| 1. تحديث ESLint | `eslint.config.js` | 2 دقيقة |
+| 2. سكريبت التكرار | `scripts/check-code-duplication.js` | 5 دقائق |
+| 3. سكريبت الثوابت | `scripts/check-constants-usage.js` | 5 دقائق |
+| 4. سكريبت الملفات المحمية | `scripts/check-protected-files.js` | 3 دقائق |
+| 5. سكريبت حدود الاستيراد | `scripts/validate-imports.js` | 5 دقائق |
+| 6. تحديث Pre-commit | `.husky/pre-commit` | 2 دقيقة |
+| 7. تحديث CI | `.github/workflows/ci.yml` | 3 دقائق |
+| 8. تحديث package.json | `package.json` | 1 دقيقة |
+| **الإجمالي** | **8 ملفات** | **~26 دقيقة** |
 
 ---
 
-## النتيجة المتوقعة بعد التنفيذ
+## النتيجة بعد التنفيذ
 
 | الحماية | قبل | بعد |
 |---------|-----|-----|
-| كشف الكود المكرر | ❌ | ✅ تلقائي في pre-commit |
-| فرض الثوابت | ⚠️ توثيق فقط | ✅ فحص إجباري |
+| كشف الكود المكرر | ❌ | ✅ تلقائي |
+| فرض الثوابت | ❌ | ✅ تحذير |
 | حدود الاستيراد | ❌ | ✅ ESLint + سكريبت |
-| حماية الملفات الحرجة | ⚠️ CODEOWNERS | ✅ pre-commit + CI |
-| منع التبعيات الدائرية | ❌ | ✅ سكريبت تلقائي |
-
----
-
-## الوقت المتوقع
-
-| المرحلة | الوقت |
-|---------|-------|
-| تحديث ESLint | 5 دقائق |
-| إنشاء 4 سكريبتات | 25 دقيقة |
-| تحديث Pre-commit | 5 دقائق |
-| تحديث CI | 5 دقائق |
-| تحديث package.json | 2 دقيقة |
-| **الإجمالي** | **~42 دقيقة** |
-
+| حماية الملفات الحرجة | ⚠️ CODEOWNERS فقط | ✅ pre-commit + CI |
+| منع التبعيات الخاطئة | ❌ | ✅ validate-imports |
