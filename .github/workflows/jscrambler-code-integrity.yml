@@ -33,7 +33,17 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      - name: Jscrambler Code Integrity (disabled - missing jscrambler.json)
-        run: |
-          echo "Jscrambler Code Integrity step is currently disabled."
-          echo "To enable it, add jscrambler.json to the repository and configure this workflow to use it."
+      - name: Jscrambler Code Integrity
+        id: jscrambler
+        # the complete list of inputs can be found here: https://github.com/marketplace/actions/jscrambler#inputs
+        uses: jscrambler/code-integrity-actions/protect@ab65962a2ecffcc362b75a997e24a181d0bde5fb
+        with:
+          application-id: ${{ secrets.JSCRAMBLER_APPLICATION_ID }}  # This value should be created within your Jscrambler account
+          secret-key: ${{ secrets.JSCRAMBLER_SECRET_KEY }}          # This value can be found in your Jscrambler account
+          access-key: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}          # This value can be found in your Jscrambler account
+          jscrambler-config-path: jscrambler.json                   # Download from your Jscrambler account
+          files-src: |                                              # List of Files to be protected
+            dist/**/*
+          # Output to a separate directory to avoid overwriting the original dist directory
+          # This allows for deployment flexibility and preserves the unprotected build
+          files-dest: dist-protected
