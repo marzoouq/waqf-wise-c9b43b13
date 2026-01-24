@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, User, Phone, CreditCard, Users, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import type { Database } from "@/integrations/supabase/types";
 
 type Beneficiary = Database["public"]["Tables"]["beneficiaries"]["Row"];
@@ -99,6 +101,7 @@ export function EditProfileDialog({
   beneficiary,
   onSuccess,
 }: EditProfileDialogProps) {
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("contact");
 
@@ -123,9 +126,9 @@ export function EditProfileDialog({
     },
   });
 
-  // تحديث القيم عند تغيير المستفيد
+  // تحديث القيم عند تغيير المستفيد أو فتح الحوار
   useEffect(() => {
-    if (beneficiary) {
+    if (beneficiary && open) {
       form.reset({
         phone: beneficiary.phone || "",
         email: beneficiary.email || "",
@@ -150,8 +153,8 @@ export function EditProfileDialog({
     setIsSubmitting(true);
 
     try {
-      // تحديث البيانات
-      const { error } = await supabase
+      // تحديث البيانات مع select للتحقق من نجاح التحديث
+      const { data: updatedData, error } = await supabase
         .from("beneficiaries")
         .update({
           phone: data.phone,
@@ -171,16 +174,30 @@ export function EditProfileDialog({
           notes: data.notes || null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", beneficiary.id);
+        .eq("id", beneficiary.id)
+        .select()
+        .single();
 
       if (error) throw error;
+      
+      // التحقق من أن التحديث تم فعلاً
+      if (!updatedData) {
+        throw new Error("فشل تحديث البيانات - تأكد من صلاحياتك");
+      }
+
+      // إبطال الكاش لإعادة جلب البيانات المحدثة
+      await queryClient.invalidateQueries({ queryKey: ['current-beneficiary'] });
+      await queryClient.invalidateQueries({ queryKey: ['preview-beneficiary'] });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) });
 
       toast.success("تم تحديث الملف الشخصي بنجاح");
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("فشل تحديث الملف الشخصي");
+      const errorMessage = error instanceof Error ? error.message : "فشل تحديث الملف الشخصي";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
