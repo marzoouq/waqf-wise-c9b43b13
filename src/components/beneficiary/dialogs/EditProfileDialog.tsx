@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -102,6 +103,7 @@ export function EditProfileDialog({
   onSuccess,
 }: EditProfileDialogProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("contact");
 
@@ -147,7 +149,7 @@ export function EditProfileDialog({
         notes: beneficiary.notes || "",
       });
     }
-  }, [beneficiary, form]);
+  }, [beneficiary, form, open]);
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
@@ -185,11 +187,15 @@ export function EditProfileDialog({
         throw new Error("فشل تحديث البيانات - تأكد من صلاحياتك");
       }
 
-      // إبطال الكاش لإعادة جلب البيانات المحدثة
-      await queryClient.invalidateQueries({ queryKey: ['current-beneficiary'] });
-      await queryClient.invalidateQueries({ queryKey: ['preview-beneficiary'] });
+      // إبطال الكاش لإعادة جلب البيانات المحدثة - مع userId الصحيح
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) });
+      await queryClient.invalidateQueries({ queryKey: ['preview-beneficiary', beneficiary.id] });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) });
+      
+      // إعادة جلب البيانات بشكل قسري لضمان التحديث الفوري
+      await queryClient.refetchQueries({ queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) });
+      await queryClient.refetchQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) });
 
       toast.success("تم تحديث الملف الشخصي بنجاح");
       onOpenChange(false);
