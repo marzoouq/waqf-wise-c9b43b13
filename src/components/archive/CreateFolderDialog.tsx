@@ -13,8 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/ui/use-toast";
 
+// Fixed: removed useless escape for `-` at end of character class
 const folderSchema = z.object({
   name: z
     .string()
@@ -39,8 +39,6 @@ export function CreateFolderDialog({
   onOpenChange,
   onCreate,
 }: CreateFolderDialogProps) {
-  const _toast = useToast();
-
   const form = useForm<FolderFormValues>({
     resolver: zodResolver(folderSchema),
     defaultValues: {
