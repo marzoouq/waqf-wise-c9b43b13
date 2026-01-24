@@ -8,7 +8,7 @@
  * 
  * @version 2.8.91
  */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Eye, EyeOff } from "lucide-react";
@@ -49,10 +49,10 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
     setPendingChanges({});
   };
 
-  const getSettingValue = (key: string): boolean => {
+  const getSettingValue = useCallback((key: string): boolean => {
     if (key in pendingChanges) return pendingChanges[key];
-    return settings?.[key as keyof typeof settings] as boolean ?? true;
-  };
+    return (settings?.[key as keyof typeof settings] as boolean) ?? true;
+  }, [pendingChanges, settings]);
 
   const isChanged = (key: string): boolean => key in pendingChanges;
 
@@ -97,7 +97,7 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
     return SETTING_CATEGORIES.reduce((acc, cat) => 
       acc + cat.settings.filter(s => getSettingValue(s.key)).length, 0
     );
-  }, [settings, pendingChanges]);
+  }, [getSettingValue]);
 
   const toggleCategory = (categoryId: string) => {
     setExpandedCategories(prev => 
