@@ -33,6 +33,9 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       - name: Jscrambler Code Integrity
         id: jscrambler
         # the complete list of inputs can be found here: https://github.com/marketplace/actions/jscrambler#inputs
