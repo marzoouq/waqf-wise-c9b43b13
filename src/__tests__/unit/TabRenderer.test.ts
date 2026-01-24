@@ -76,41 +76,41 @@ describe('TabRenderer Type Safety', () => {
     });
 
     it('should return true when setting is true', () => {
-      const alwaysVisible = false;
+      const alwaysVisible: boolean = false;
       const settings: Partial<VisibilitySettings> = {
         show_profile: true,
       };
       
-      const isVisible = alwaysVisible === true || settings?.['show_profile'] === true;
+      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_profile'] === true;
       
       expect(isVisible).toBe(true);
     });
 
     it('should return false when alwaysVisible is false and settings is null', () => {
-      const alwaysVisible = false;
+      const alwaysVisible: boolean = false;
       const settings = null;
       
-      const isVisible = alwaysVisible === true || settings?.['show_profile'] === true;
+      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_profile'] === true;
       
       expect(isVisible).toBe(false);
     });
 
     it('should return false when alwaysVisible is false and setting is false', () => {
-      const alwaysVisible = false;
+      const alwaysVisible: boolean = false;
       const settings: Partial<VisibilitySettings> = {
         show_profile: false,
       };
       
-      const isVisible = alwaysVisible === true || settings?.['show_profile'] === true;
+      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_profile'] === true;
       
       expect(isVisible).toBe(false);
     });
 
     it('should return false when alwaysVisible is false and setting is undefined', () => {
-      const alwaysVisible = false;
+      const alwaysVisible: boolean = false;
       const settings: Partial<VisibilitySettings> = {};
       
-      const isVisible = alwaysVisible === true || settings?.['show_profile'] === true;
+      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_profile'] === true;
       
       expect(isVisible).toBe(false);
     });
