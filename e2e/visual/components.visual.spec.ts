@@ -1,4 +1,5 @@
-import { test, expect, _fullPageOptions, waitForPageStability } from '../fixtures/visual-test.fixture';
+import { test, expect, waitForPageStability } from '../fixtures/visual-test.fixture';
+import { Page } from '@playwright/test';
 
 /**
  * Components Visual Regression Tests
@@ -8,7 +9,7 @@ import { test, expect, _fullPageOptions, waitForPageStability } from '../fixture
 test.describe('Shared Components Visual Tests', () => {
   
   test.describe('Buttons', () => {
-    test('primary button on landing @visual', async ({ page }) => {
+    test('primary button on landing @visual', async ({ page }: { page: Page }) => {
       await page.goto('/');
       await waitForPageStability(page);
       
@@ -20,7 +21,7 @@ test.describe('Shared Components Visual Tests', () => {
       }
     });
 
-    test('primary button hover @visual', async ({ page }) => {
+    test('primary button hover @visual', async ({ page }: { page: Page }) => {
       await page.goto('/');
       await waitForPageStability(page);
       
@@ -35,12 +36,12 @@ test.describe('Shared Components Visual Tests', () => {
   });
 
   test.describe('Form Inputs', () => {
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page }: { page: Page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
     });
 
-    test('text input states @visual', async ({ page }) => {
+    test('text input states @visual', async ({ page }: { page: Page }) => {
       const input = page.locator('input[type="email"], input[type="text"]').first();
       if (await input.isVisible()) {
         // Empty state
@@ -62,7 +63,7 @@ test.describe('Shared Components Visual Tests', () => {
       }
     });
 
-    test('password input with toggle @visual', async ({ page }) => {
+    test('password input with toggle @visual', async ({ page }: { page: Page }) => {
       const passwordWrapper = page.locator('input[type="password"]').locator('..').first();
       if (await passwordWrapper.isVisible()) {
         await expect(passwordWrapper).toHaveScreenshot('component-password-input.png', {
@@ -73,7 +74,7 @@ test.describe('Shared Components Visual Tests', () => {
   });
 
   test.describe('Tabs', () => {
-    test('tabs default state @visual', async ({ page }) => {
+    test('tabs default state @visual', async ({ page }: { page: Page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
       
@@ -85,7 +86,7 @@ test.describe('Shared Components Visual Tests', () => {
       }
     });
 
-    test('tabs active state @visual', async ({ page }) => {
+    test('tabs active state @visual', async ({ page }: { page: Page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
       
@@ -103,7 +104,7 @@ test.describe('Shared Components Visual Tests', () => {
   });
 
   test.describe('Cards', () => {
-    test('card component @visual', async ({ page }) => {
+    test('card component @visual', async ({ page }: { page: Page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
       
@@ -117,7 +118,7 @@ test.describe('Shared Components Visual Tests', () => {
   });
 
   test.describe('Loading States', () => {
-    test('button loading state @visual', async ({ page }) => {
+    test('button loading state @visual', async ({ page }: { page: Page }) => {
       await page.goto('/login');
       await waitForPageStability(page);
       
