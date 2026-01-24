@@ -1,7 +1,7 @@
 /**
  * TabRenderer Component
  * مكون موحد لعرض التبويبات مع دعم الصلاحيات والتحميل الكسول
- * @version 3.0.0 - إصدار مُحسّن بدون تكرار
+ * @version 4.0.0 - إعادة تنظيم التبويبات
  */
 
 import { Suspense, lazy, ComponentType } from "react";
@@ -42,6 +42,13 @@ const LazyBeneficiaryRequestsTab = lazy(() =>
 const LazyBeneficiaryDocumentsTab = lazy(() => 
   import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab").then(m => ({ default: m.BeneficiaryDocumentsTab }))
 );
+// New consolidated tabs
+const LazyFamilyAccountTab = lazy(() => 
+  import("@/components/beneficiary/tabs/FamilyAccountTab").then(m => ({ default: m.FamilyAccountTab }))
+);
+const LazyMoreMenuTab = lazy(() => 
+  import("@/components/beneficiary/tabs/MoreMenuTab").then(m => ({ default: m.MoreMenuTab }))
+);
 
 interface TabConfig {
   key: string;
@@ -54,11 +61,19 @@ interface TabConfig {
 
 /**
  * التبويبات المُدمجة:
- * - "distributions" يشمل الآن كشف الحساب أيضاً
- * - "reports" يشمل الإفصاحات السنوية
- * - "governance" يشمل الميزانيات وسجل الموافقات
+ * - "family-account" يشمل: الملف الشخصي + شجرة العائلة + الحسابات البنكية
+ * - "more" قائمة خيارات للتقارير والعقارات والمستندات وغيرها
+ * - "reports-detail" للوصول للتقارير من قائمة "المزيد"
  */
 const TAB_CONFIGS: TabConfig[] = [
+  // التبويبات الرئيسية (الشريط السفلي)
+  { key: "family-account", settingKey: "show_profile", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
+  { key: "more", settingKey: "show_overview", component: LazyMoreMenuTab, alwaysVisible: true },
+  
+  // التبويبات الفرعية (من قائمة "المزيد")
+  { key: "reports-detail", settingKey: "show_financial_reports", component: LazyFinancialReportsTab },
+  
+  // التبويبات الأصلية للتوافق مع القائمة الجانبية
   { key: "profile", settingKey: "show_profile", component: LazyBeneficiaryProfileTab, requiresBeneficiary: true },
   { key: "requests", settingKey: "show_requests", component: LazyBeneficiaryRequestsTab, requiresBeneficiaryId: true },
   { key: "distributions", settingKey: "show_distributions", component: LazyBeneficiaryDistributionsTab, requiresBeneficiaryId: true },
@@ -70,7 +85,6 @@ const TAB_CONFIGS: TabConfig[] = [
   { key: "governance", settingKey: "show_governance", component: LazyGovernanceTab },
   { key: "loans", settingKey: "show_own_loans", component: LazyLoansOverviewTab },
 ];
-
 function TabSkeleton() {
   return (
     <div className="space-y-4">
