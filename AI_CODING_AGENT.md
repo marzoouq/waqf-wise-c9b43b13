@@ -1,7 +1,8 @@
 # Waqf Management System - AI Coding Agent Instructions
 
 > **Version**: 3.1.0  
-> **Last Updated**: 2025-12-22
+> **Last Updated**: 2026-01-24  
+> **Note**: This is a supplementary document. For primary AI agent instructions, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
 
 ## Architecture Overview
 
