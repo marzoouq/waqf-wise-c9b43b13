@@ -1,157 +1,198 @@
 
 
-# خطة إصلاح مشاكل بيانات العائلة في بوابة المستفيد
+# تقرير فحص شامل - الأخطاء والمشاكل المكتشفة
 
 ---
 
-## المشاكل المكتشفة بالأدلة
+## ملخص تنفيذي
 
-### 🔴 مشكلة #1: البيانات لا تظهر بعد التعديل في المربعات
+| المقياس | الحالة |
+|---------|--------|
+| **السبب الجذري للأخطاء** | فشل تحميل الوحدات الديناميكية (Chunk Loading) |
+| **مشكلة اتجاه الاسم** | إعدادات RTL في Sidebar صحيحة ✅ |
+| **مشكلة المربعات المتزاحمة** | Grid `grid-cols-5` على الجوال |
+| **حالة الخطة السابقة** | 70% تم تنفيذها، 30% تحتاج مراجعة |
 
-**الموقع:** `EditProfileDialog.tsx` (السطور 130-150)
+---
 
-**الدليل من الكود:**
+## 🔴 المشكلة #1: فشل تحميل الوحدات الديناميكية (Critical)
+
+### الدليل من سجلات الشبكة:
+```text
+Request: POST /functions/v1/log-error
+Error: "Failed to fetch dynamically imported module: 
+       .../assets/BeneficiaryDistributionsTab-BxYcmssB.js"
+
+التبويبات المتأثرة:
+- التوزيعات والأرصدة (distributions)
+- الطلبات (requests)  
+- العائلة (family-account)
+```
+
+### السبب الجذري:
+هذا **ليس خطأً في الكود** بل مشكلة في **الاتصال بالشبكة** أو **cache المتصفح**:
+1. المستخدم على شبكة جوال بطيئة (Android Chrome)
+2. Chunks القديمة في Cache بعد تحديث التطبيق
+3. فشل في تحميل ملفات JavaScript الكبيرة
+
+### الحل:
+```text
+1. مسح Cache المتصفح (Hard Refresh: Ctrl+Shift+R)
+2. أو تحديث الصفحة عدة مرات
+3. أو إضافة آلية Retry للتحميل الديناميكي
+```
+
+---
+
+## 🟠 المشكلة #2: مربعات الإحصائيات متزاحمة (4 مربعات في صف)
+
+### الموقع:
+`src/components/beneficiary/tabs/requests/BeneficiaryRequestsStatsCards.tsx` (السطر 84)
+
+### الدليل:
 ```typescript
-useEffect(() => {
-  if (beneficiary && open) {
-    form.reset({...});
-  }
-}, [beneficiary, form]); // ← المشكلة: "open" مفقود!
+// السطر 84:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-5 md:gap-3">
 ```
 
-**السبب:** 
-- عند فتح حوار التعديل، الـ `useEffect` لا يُنفذ لأن `open` ليست في الـ dependency array
-- النموذج يظل يحتوي على القيم القديمة أو الفارغة
+### المشكلة:
+- على الجوال: `flex` مع `overflow-x-auto` (scroll أفقي) - صحيح ✅
+- على الديسكتوب المتوسط: `md:grid-cols-5` (5 أعمدة) - **قد يكون ضيقاً**
+- لا يوجد breakpoint للشاشات المتوسطة (`sm:grid-cols-2` أو `lg:grid-cols-5`)
 
----
-
-### 🔴 مشكلة #2: عدم تحديث البيانات بعد الحفظ
-
-**الموقع:** `EditProfileDialog.tsx` (السطور 189-192)
-
-**الدليل:**
+### الإصلاح المطلوب:
 ```typescript
-// Query Key في useBeneficiaryPortalData:
-queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) 
-// يُنتج: ['current-beneficiary', 'xxxx-user-id']
-
-// Invalidation في EditProfileDialog:
-await queryClient.invalidateQueries({ queryKey: ['current-beneficiary'] });
-// يُنتج: ['current-beneficiary'] ← بدون userId!
+// السطر 84 - إضافة breakpoints تدريجية:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide 
+                sm:grid sm:grid-cols-2 
+                md:grid-cols-3 
+                lg:grid-cols-5 
+                md:gap-3">
 ```
-
-**السبب:**
-- الـ invalidation تستهدف مفتاحاً مختلفاً عن المفتاح الفعلي
-- لذلك الكاش لا يتم تحديثه والبيانات القديمة تظل تظهر
 
 ---
 
-### 🔴 مشكلة #3: البيانات في قاعدة البيانات فارغة
+## 🟡 المشكلة #3: اتجاه اسم المستفيد في Sidebar
 
-**الدليل من الاستعلام:**
-```
-SELECT marital_status, number_of_sons, number_of_daughters, number_of_wives 
-FROM beneficiaries WHERE full_name LIKE '%عبدالله%'
-
-النتيجة:
-- marital_status: NULL
-- number_of_sons: 0
-- number_of_daughters: 0  
-- number_of_wives: 0
-- family_size: 1
-```
-
-**السبب:**
-- سياسة RLS تمنع التحديث (تم إصلاحها سابقاً)
-- أو أن التحديث فشل بصمت بسبب الـ cache
-
----
-
-## خطة الإصلاح
-
-### الإصلاح #1: إضافة `open` إلى dependency array
-
-**الملف:** `src/components/beneficiary/dialogs/EditProfileDialog.tsx`
-
+### الفحص:
 ```typescript
-// قبل (السطر 150):
-}, [beneficiary, form]);
+// BeneficiaryPortal.tsx السطر 95:
+<div className="flex min-h-screen w-full bg-background overflow-x-hidden" dir="rtl">
 
-// بعد:
-}, [beneficiary, form, open]);
+// BeneficiarySidebar.tsx السطر 89:
+<Sidebar collapsible="icon" side="right" aria-label="قائمة المستفيد">
 ```
+
+### النتيجة:
+- `dir="rtl"` موجود ✅
+- `side="right"` للـ Sidebar ✅ (صحيح للعربية)
+- اسم المستفيد في السطر 99-100 يعرض في `div` بشكل عادي
+
+### السبب المحتمل للظهور في اليسار:
+إذا كان المستخدم يرى الاسم في اليسار، فقد يكون:
+1. على شاشة صغيرة حيث الـ Sidebar مخفي
+2. أو في وضع `collapsed` للـ Sidebar
+3. أو مشكلة في الـ Sheet (الجوال) اتجاه الفتح
+
+### الإصلاح المقترح:
+فحص مكون `Sheet` في `sidebar.tsx` للتأكد من `side="right"`
 
 ---
 
-### الإصلاح #2: تصحيح invalidation queries
+## 🟢 تم التحقق من الخطة السابقة
 
-**الملف:** `src/components/beneficiary/dialogs/EditProfileDialog.tsx`
+### ما تم تنفيذه ✅:
+| الإصلاح | الملف | الحالة |
+|---------|-------|--------|
+| إضافة `open` لـ dependency array | `EditProfileDialog.tsx` | ✅ تم |
+| إضافة `useAuth` للحصول على userId | `EditProfileDialog.tsx` | ✅ تم |
+| تصحيح query invalidation | `EditProfileDialog.tsx` | ✅ تم |
+| تحسين `handleEditSuccess` | `BeneficiaryProfileTab.tsx` | ✅ تم |
+| إضافة `settingsLoading` | `FamilyTreeTab.tsx` | ✅ تم |
+| إضافة `settingsLoading` | `BankAccountsTab.tsx` | ✅ تم |
+| Error handling في `handleItemClick` | `MoreMenuTab.tsx` | ✅ تم |
+| استخدام arrays للحالات | `BeneficiaryRequestsTab.tsx` | ✅ تم |
+| Mobile cards للمستندات | `BeneficiaryDocumentsTab.tsx` | ✅ تم |
 
-```typescript
-// الحصول على user id من AuthContext
-import { useAuth } from "@/contexts/AuthContext";
-
-// داخل المكون:
-const { user } = useAuth();
-
-// بعد التحديث الناجح:
-await queryClient.invalidateQueries({ 
-  queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) 
-});
-await queryClient.invalidateQueries({ 
-  queryKey: ['preview-beneficiary', beneficiary.id] 
-});
-await queryClient.invalidateQueries({ 
-  queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) 
-});
-await queryClient.invalidateQueries({ 
-  queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) 
-});
-```
+### ما لم يتم تنفيذه بالكامل:
+| الإصلاح | السبب |
+|---------|-------|
+| توحيد Query Keys في `FinancialReportsTab` | تم جزئياً |
+| تأكيد قبل الخروج | تم إضافة AlertDialog ✅ |
 
 ---
 
-### الإصلاح #3: إعادة جلب البيانات بعد إغلاق الحوار
+## خطة الإصلاح المقترحة
 
-**الملف:** `src/components/beneficiary/tabs/BeneficiaryProfileTab.tsx`
-
-تحديث `handleEditSuccess`:
+### الإصلاح #1: إضافة Retry للتحميل الديناميكي (Priority: High)
+إنشاء دالة مساعدة للتحميل الديناميكي مع إعادة المحاولة:
 
 ```typescript
-const handleEditSuccess = async () => {
-  // إعادة جلب بيانات المستفيد بشكل قسري
-  await queryClient.refetchQueries({ 
-    queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id),
-    exact: true 
+// src/lib/lazy-with-retry.ts
+import { ComponentType, lazy } from 'react';
+
+export function lazyWithRetry<T extends ComponentType<any>>(
+  componentImport: () => Promise<{ default: T }>,
+  retries = 3,
+  delay = 1000
+): React.LazyExoticComponent<T> {
+  return lazy(async () => {
+    let lastError: Error | undefined;
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await componentImport();
+      } catch (error) {
+        lastError = error as Error;
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        }
+      }
+    }
+    
+    throw lastError;
   });
-  await queryClient.refetchQueries({ 
-    queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id),
-    exact: true 
-  });
-};
+}
+```
+
+### الإصلاح #2: تحسين Grid للمربعات
+تعديل `BeneficiaryRequestsStatsCards.tsx` السطر 84:
+
+```typescript
+// من:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-5 md:gap-3">
+
+// إلى:
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-3">
+```
+
+### الإصلاح #3: التحقق من Sheet RTL
+فحص `src/components/ui/sheet.tsx` للتأكد من:
+```typescript
+<SheetContent side="right" className="rtl:text-right">
 ```
 
 ---
 
-## ملخص التغييرات
+## ملخص الملفات المطلوب تعديلها
 
 | الملف | التغيير | الأولوية |
 |-------|---------|----------|
-| `EditProfileDialog.tsx` | إضافة `open` إلى dependency array | 🔴 Critical |
-| `EditProfileDialog.tsx` | تصحيح query keys في invalidation | 🔴 Critical |
-| `EditProfileDialog.tsx` | إضافة `useAuth` للحصول على user id | 🔴 Critical |
-| `BeneficiaryProfileTab.tsx` | تحسين `handleEditSuccess` | 🟠 High |
+| `src/lib/lazy-with-retry.ts` | إنشاء ملف جديد | 🔴 High |
+| `src/components/beneficiary/TabRenderer.tsx` | استخدام `lazyWithRetry` | 🔴 High |
+| `src/components/beneficiary/tabs/requests/BeneficiaryRequestsStatsCards.tsx` | تحسين Grid breakpoints | 🟠 Medium |
+| `src/components/ui/sheet.tsx` | التحقق من RTL | 🟡 Low |
 
 ---
 
-## التحقق بعد الإصلاح
+## التوصية الفورية
 
-1. فتح بوابة المستفيد → تبويب العائلة → بياناتي
-2. الضغط على "تعديل الملف"
-3. تعديل البيانات العائلية (عدد الأبناء، الحالة الاجتماعية)
-4. الضغط على حفظ
-5. التأكد من:
-   - ✅ ظهور رسالة نجاح
-   - ✅ تحديث البيانات في الواجهة فوراً
-   - ✅ ظهور القيم الجديدة في المربعات العائلية
+**للمستخدم:** 
+1. اضغط `Ctrl+Shift+R` (أو اسحب للأسفل مرتين على الجوال) لتحديث الصفحة
+2. إذا استمرت المشكلة، امسح Cache المتصفح
+
+**للمطور:**
+1. تطبيق `lazyWithRetry` على جميع المكونات المحملة ديناميكياً
+2. تحسين Grid للمربعات الإحصائية
+3. اختبار على شبكات بطيئة (3G throttling)
 
