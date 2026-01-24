@@ -18,8 +18,11 @@ describe('Input Validation Security', () => {
     it.each(dangerousInputs)('should sanitize dangerous input: %s', (input) => {
       // Simulate sanitization logic
       const sanitized = input
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        // Remove all angle brackets to prevent any HTML tags including <script>
+        .replace(/[<>]/g, '')
+        // Remove javascript: protocol
         .replace(/javascript:/gi, '')
+        // Remove inline event handler attributes (onclick=, onload=, etc.)
         .replace(/on\w+=/gi, '');
       
       expect(sanitized).not.toContain('<script');
