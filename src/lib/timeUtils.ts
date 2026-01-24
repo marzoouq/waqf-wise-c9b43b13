@@ -15,6 +15,17 @@ export interface TimeZoneInfo {
 }
 
 /**
+ * Get local timezone (cached for performance)
+ */
+let cachedLocalTimeZone: string | null = null;
+function getLocalTimeZone(): string {
+  if (!cachedLocalTimeZone) {
+    cachedLocalTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+  return cachedLocalTimeZone;
+}
+
+/**
  * Predefined list of major world timezones
  */
 export const WORLD_TIMEZONES: TimeZoneInfo[] = [
@@ -22,7 +33,7 @@ export const WORLD_TIMEZONES: TimeZoneInfo[] = [
     id: 'local',
     name: 'Local Time',
     nameAr: 'التوقيت المحلي',
-    offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    offset: '', // Set on first access
   },
   {
     id: 'utc',
@@ -74,13 +85,16 @@ export const WORLD_TIMEZONES: TimeZoneInfo[] = [
   },
 ];
 
+// Initialize local timezone on first module load
+WORLD_TIMEZONES[0].offset = getLocalTimeZone();
+
 /**
  * Get current time in a specific timezone
  */
 export function getTimeInTimeZone(timezone: string): Date {
   const now = new Date();
   
-  if (timezone === 'local' || timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) {
+  if (timezone === 'local' || timezone === getLocalTimeZone()) {
     return now;
   }
   
