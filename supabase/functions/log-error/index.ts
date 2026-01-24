@@ -238,6 +238,12 @@ Deno.serve(async (req) => {
     }
 
     // 🧹 7. تنظيف رسائل الخطأ من HTML tags
+    errorReport.error_type = xss(errorReport.error_type, {
+      whiteList: {},
+      stripIgnoreTag: true,
+      stripIgnoreTagBody: ['script', 'style', 'iframe'],
+    }).substring(0, 100);
+    
     errorReport.error_message = xss(errorReport.error_message, {
       whiteList: {},
       stripIgnoreTag: true,
