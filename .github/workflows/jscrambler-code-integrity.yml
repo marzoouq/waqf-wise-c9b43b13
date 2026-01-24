@@ -43,6 +43,6 @@ jobs:
           access-key: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}          # This value can be found in your Jscrambler account
           files-src: |                                              # List of Files to be protected
             dist/**/*
-          # Output to a separate directory to avoid overwriting the original dist directory
-          # This allows for deployment flexibility and preserves the unprotected build
-          files-dest: dist-protected
+          # Output back to the dist directory, which should already be ignored in version control
+          # This keeps protected build artifacts out of commits by using an existing build output folder
+          files-dest: dist
