@@ -1,9 +1,14 @@
 /**
  * تبويبات المستفيد
  * Beneficiary Tabs Components
+ * @version 2.0.0 - إعادة تنظيم التبويبات
  */
 
-// التبويبات الرئيسية
+// التبويبات الرئيسية المُدمجة (جديد)
+export { FamilyAccountTab } from './FamilyAccountTab';
+export { MoreMenuTab } from './MoreMenuTab';
+
+// التبويبات الأصلية
 export { BeneficiaryStatementsTab } from './BeneficiaryStatementsTab';
 export { BeneficiaryDistributionsTab } from './BeneficiaryDistributionsTab';
 export { BeneficiaryPropertiesTab } from './BeneficiaryPropertiesTab';

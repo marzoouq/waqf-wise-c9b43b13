@@ -1,21 +1,21 @@
 /**
  * Beneficiary Sidebar Configuration
  * بيانات ثابتة للقائمة الجانبية - إصدار مُحسّن
- * @version 3.0.1
+ * @version 4.0.0 - إعادة تنظيم التبويبات
  */
 
 import {
   LayoutDashboard,
-  User,
+  Users,
   FileEdit,
   PieChart,
   Building2,
   FolderOpen,
-  Users,
   FileBarChart,
   Scale,
   CreditCard,
   HelpCircle,
+  MoreHorizontal,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -30,8 +30,8 @@ export interface SidebarItem {
 
 /**
  * الأقسام المتاحة للمستفيد:
- * - تم إزالة "الحسابات البنكية" لأنها تعرض حسابات الوقف وليس المستفيد
- * - بيانات المستفيد البنكية تظهر في "الملف الشخصي"
+ * - "العائلة" الآن يشمل: الملف الشخصي + شجرة العائلة + الحسابات البنكية
+ * - "المزيد" يوفر قائمة للوصول السريع للأقسام الأخرى
  */
 export const sidebarItems: SidebarItem[] = [
   { 
@@ -43,12 +43,12 @@ export const sidebarItems: SidebarItem[] = [
     description: "ملخص الوقف والإحصائيات العامة"
   },
   { 
-    id: "profile", 
-    label: "الملف الشخصي", 
-    icon: User, 
-    tab: "profile", 
-    visibilityKey: "show_profile",
-    description: "بياناتك الشخصية والبنكية"
+    id: "distributions", 
+    label: "التوزيعات والأرصدة", 
+    icon: PieChart, 
+    tab: "distributions", 
+    visibilityKey: "show_distributions",
+    description: "توزيعاتك وكشف الحساب"
   },
   { 
     id: "requests", 
@@ -59,13 +59,21 @@ export const sidebarItems: SidebarItem[] = [
     description: "طلباتك والمساعدات الطارئة"
   },
   { 
-    id: "distributions", 
-    label: "التوزيعات والأرصدة", 
-    icon: PieChart, 
-    tab: "distributions", 
-    visibilityKey: "show_distributions",
-    description: "توزيعاتك وكشف الحساب"
+    id: "family-account", 
+    label: "العائلة والحساب", 
+    icon: Users, 
+    tab: "family-account", 
+    visibilityKey: "show_profile",
+    description: "بياناتك وشجرة العائلة والحسابات البنكية"
   },
+  { 
+    id: "more", 
+    label: "المزيد", 
+    icon: MoreHorizontal, 
+    tab: "more", 
+    description: "خيارات إضافية"
+  },
+  // الأقسام الفرعية (تظهر من قائمة "المزيد")
   { 
     id: "properties", 
     label: "العقارات", 
@@ -81,14 +89,6 @@ export const sidebarItems: SidebarItem[] = [
     tab: "documents", 
     visibilityKey: "show_documents",
     description: "مستنداتك ومرفقاتك"
-  },
-  { 
-    id: "family", 
-    label: "العائلة", 
-    icon: Users, 
-    tab: "family", 
-    visibilityKey: "show_family_tree",
-    description: "شجرة العائلة والورثة"
   },
   { 
     id: "reports", 

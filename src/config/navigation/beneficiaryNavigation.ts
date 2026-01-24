@@ -1,10 +1,10 @@
 /**
  * Beneficiary Bottom Navigation Configuration
  * شريط التنقل السفلي للمستفيد
- * @version 2.0.0
+ * @version 3.0.0 - إعادة تنظيم التبويبات
  */
 
-import { Home, Wallet, FileText, User, MoreHorizontal } from "lucide-react";
+import { Home, Wallet, FileText, Users, MoreHorizontal } from "lucide-react";
 import type { NavigationItem } from "@/types/navigation";
 
 export const beneficiaryNavigationItems: readonly NavigationItem[] = [
@@ -30,17 +30,31 @@ export const beneficiaryNavigationItems: readonly NavigationItem[] = [
     matchPaths: ["/beneficiary-portal?tab=requests", "/beneficiary/requests"],
   },
   {
-    id: "profile",
-    label: "ملفي",
-    icon: User,
-    path: "/beneficiary-portal?tab=profile",
-    matchPaths: ["/beneficiary-portal?tab=profile"],
+    id: "family",
+    label: "العائلة",
+    icon: Users,
+    path: "/beneficiary-portal?tab=family-account",
+    matchPaths: [
+      "/beneficiary-portal?tab=family-account", 
+      "/beneficiary-portal?tab=profile",
+      "/beneficiary-portal?tab=family",
+      "/beneficiary-portal?tab=bank"
+    ],
   },
   {
     id: "more",
     label: "المزيد",
     icon: MoreHorizontal,
-    path: "/beneficiary-portal?tab=reports",
-    matchPaths: ["/beneficiary-portal?tab=reports", "/beneficiary-settings", "/beneficiary-support"],
+    path: "/beneficiary-portal?tab=more",
+    matchPaths: [
+      "/beneficiary-portal?tab=more",
+      "/beneficiary-portal?tab=reports-detail",
+      "/beneficiary-portal?tab=properties",
+      "/beneficiary-portal?tab=documents",
+      "/beneficiary-portal?tab=governance",
+      "/beneficiary-portal?tab=loans",
+      "/beneficiary-settings", 
+      "/beneficiary-support"
+    ],
   },
 ] as const;
