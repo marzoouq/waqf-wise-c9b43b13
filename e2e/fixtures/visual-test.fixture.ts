@@ -14,9 +14,7 @@ export const test = base.extend<{
     await page.waitForLoadState('domcontentloaded');
     
     // انتظار تحميل الخطوط العربية
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
+    await page.evaluate(`(async () => { await document.fonts.ready; })()`);
     
     // انتظار استقرار الشبكة
     await page.waitForLoadState('networkidle').catch(() => {
@@ -49,29 +47,27 @@ export const maskedOptions = (page: Page, selectors: string[] = []) => ({
 // دالة مساعدة لانتظار استقرار الصفحة
 export async function waitForPageStability(page: Page, timeout = 1000) {
   await page.waitForLoadState('domcontentloaded');
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
+  await page.evaluate(`(async () => { await document.fonts.ready; })()`);
   await page.waitForTimeout(timeout);
 }
 
 // دالة مساعدة لتفعيل الوضع الداكن
 export async function enableDarkMode(page: Page) {
-  await page.evaluate(() => {
+  await page.evaluate(`
     document.documentElement.classList.remove('light');
     document.documentElement.classList.add('dark');
     localStorage.setItem('theme', 'dark');
-  });
+  `);
   await page.waitForTimeout(300);
 }
 
 // دالة مساعدة لتفعيل الوضع الفاتح
 export async function enableLightMode(page: Page) {
-  await page.evaluate(() => {
+  await page.evaluate(`
     document.documentElement.classList.remove('dark');
     document.documentElement.classList.add('light');
     localStorage.setItem('theme', 'light');
-  });
+  `);
   await page.waitForTimeout(300);
 }
 

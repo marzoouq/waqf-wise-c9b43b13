@@ -1,10 +1,11 @@
 /**
  * System Service - خدمة النظام والإعدادات
- * @version 2.8.25
+ * @version 2.9.0 - تحسين Type Safety
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { matchesStatus } from "@/lib/constants";
+import { softDeleteWithCurrentUser } from "@/lib/supabase-type-helpers";
 
 export interface SystemSetting {
   id: string;
@@ -548,17 +549,32 @@ export class SystemService {
   static async cleanupResolvedErrors(): Promise<void> {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    // جلب الأخطاء المحلولة القديمة
+    const { data: oldErrors, error: fetchError } = await supabase
       .from('system_error_logs')
-      .update({
-        deleted_at: new Date().toISOString(),
-        deletion_reason: 'أرشفة تلقائية للأخطاء القديمة المحلولة'
-      })
+      .select('id')
       .in('status', ['resolved', 'auto_resolved'])
       .lt('resolved_at', oneWeekAgo)
-      .is('deleted_at', null);
-
-    if (error) throw error;
+      .is('deleted_at', null)
+      .limit(100);
+    
+    if (fetchError) throw fetchError;
+    if (!oldErrors || oldErrors.length === 0) return;
+    
+    // أرشفة كل خطأ باستخدام Type Helper
+    const results = await Promise.all(
+      oldErrors.map(error => 
+        softDeleteWithCurrentUser(
+          'system_error_logs',
+          error.id,
+          'أرشفة تلقائية للأخطاء القديمة المحلولة'
+        )
+      )
+    );
+    
+    const failed = results.filter(r => !r.success);
+    if (failed.length > 0) {
+      console.warn(`[SystemService] فشل أرشفة ${failed.length} من ${oldErrors.length} خطأ`);
+    }
   }
 }

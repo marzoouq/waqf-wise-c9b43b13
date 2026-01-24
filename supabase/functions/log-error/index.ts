@@ -1,6 +1,7 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { 
+import xss from 'https://esm.sh/xss@1.0.14';
+import {
   handleCors, 
   jsonResponse, 
   errorResponse, 
@@ -236,10 +237,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 🧹 7. تنظيف رسائل الخطأ من HTML tags
-    errorReport.error_message = errorReport.error_message
-      .replace(/<[^>]*>/g, '')
-      .substring(0, 2000);
+    // 🧹 7. تنظيف رسائل الخطأ من HTML tags باستخدام مكتبة xss
+    errorReport.error_message = xss(errorReport.error_message, {
+      whiteList: {},              // إزالة جميع وسوم HTML
+      stripIgnoreTag: true,       // إزالة الوسوم غير المسموحة
+      stripIgnoreTagBody: ['script', 'style', 'iframe', 'noscript', 'object', 'embed'],
+    }).substring(0, 2000);
 
     if (errorReport.error_stack) {
       errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
@@ -375,7 +378,7 @@ function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
+async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, _alert: SystemAlert) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];

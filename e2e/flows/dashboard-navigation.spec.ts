@@ -11,7 +11,7 @@ const TEST_USER = {
 };
 
 // Dashboard routes by role
-const ROLE_DASHBOARDS = {
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',
@@ -145,12 +145,13 @@ test.describe('Sidebar Navigation', () => {
 
     if (await collapseButton.isVisible()) {
       const sidebar = page.locator('aside, [class*="sidebar"]').first();
-      const initialWidth = await sidebar.evaluate((el) => el.getBoundingClientRect().width);
+      // Use `any` to avoid DOM lib typing requirements in Node context
+      const initialWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
 
       await collapseButton.click();
       await page.waitForTimeout(500);
 
-      const newWidth = await sidebar.evaluate((el) => el.getBoundingClientRect().width);
+      const newWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
 
       // Width should change (either collapsed or expanded)
       expect(newWidth).not.toBe(initialWidth);

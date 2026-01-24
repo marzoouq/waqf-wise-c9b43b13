@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { Home, Users, FileText, Bell, MoreHorizontal } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { NavigationItem } from '@/types/navigation';
@@ -46,6 +47,7 @@ interface BottomNavigationProps {
 
 /**
  * شريط التنقل السفلي للجوال - موحد ومحسّن للأداء
+ * يدعم query parameters للتنقل بين التبويبات
  */
 export const BottomNavigation = memo(function BottomNavigation({ 
   items,
@@ -54,14 +56,35 @@ export const BottomNavigation = memo(function BottomNavigation({
   const navigationItems = items || defaultNavigationItems;
   const location = useLocation();
 
-  // تحديد العنصر النشط
+  // تحديد العنصر النشط مع دعم query parameters
   const isItemActive = useMemo(() => {
+    const fullPath = location.pathname + location.search;
+    
     return (item: NavigationItem) => {
-      if (location.pathname === item.path) return true;
-      if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
+      // 1. مطابقة تامة مع المسار الكامل (بما فيه query params)
+      if (fullPath === item.path) return true;
+      
+      // 2. مطابقة المسار بدون query params (للصفحة الرئيسية فقط)
+      if (location.pathname === item.path && !location.search) return true;
+      
+      // 3. التحقق من matchPaths
+      if (item.matchPaths?.some(matchPath => {
+        if (matchPath.includes('?')) {
+          // مسار مع query params - مطابقة تامة أو مع params إضافية
+          return fullPath === matchPath || fullPath.startsWith(matchPath + '&');
+        }
+        // مسار بسيط بدون query
+        if (item.id === 'home') {
+          // للرئيسية: نشط فقط إذا لم يكن هناك query params
+          return location.pathname === matchPath && !location.search;
+        }
+        // للمسارات العادية
+        return location.pathname === matchPath || location.pathname.startsWith(matchPath + '/');
+      })) return true;
+      
       return false;
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <nav 
@@ -89,16 +112,27 @@ export const BottomNavigation = memo(function BottomNavigation({
               )}
               aria-current={isActive ? "page" : undefined}
             >
-              {/* Active indicator */}
-              {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
-              )}
+              {/* Active indicator مع animation سلسة */}
+              <AnimatePresence mode="wait">
+                {isActive && (
+                  <motion.div 
+                    layoutId="bottomNavActiveIndicator"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full"
+                    initial={{ opacity: 0, scaleX: 0 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </AnimatePresence>
               
-              <div className="relative">
-                <item.icon className={cn(
-                  "h-5 w-5",
-                  isActive && "scale-110"
-                )} />
+              <motion.div 
+                className="relative"
+                whileTap={{ scale: 0.9 }}
+                animate={{ scale: isActive ? 1.1 : 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <item.icon className="h-5 w-5" />
                 
                 {/* Badge for notifications/requests */}
                 {item.badge && item.badge > 0 && (
@@ -109,14 +143,21 @@ export const BottomNavigation = memo(function BottomNavigation({
                     {item.badge > 9 ? '9+' : item.badge}
                   </Badge>
                 )}
-              </div>
+              </motion.div>
               
-              <span className={cn(
-                "text-[10px] mt-1",
-                isActive ? "font-bold" : "font-medium"
-              )}>
+              <motion.span 
+                className={cn(
+                  "text-[10px] mt-1",
+                  isActive ? "font-bold" : "font-medium"
+                )}
+                animate={{ 
+                  fontWeight: isActive ? 700 : 500,
+                  scale: isActive ? 1.05 : 1 
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
                 {item.label}
-              </span>
+              </motion.span>
             </NavLink>
           );
         })}

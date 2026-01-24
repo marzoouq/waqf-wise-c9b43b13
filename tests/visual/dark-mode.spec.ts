@@ -27,7 +27,7 @@ test.describe('Dark Mode Visual Tests @theme', () => {
       
       // التحقق من تطبيق الوضع الداكن
       const html = page.locator('html');
-      const isDark = await html.evaluate((el) => 
+      const _isDark = await html.evaluate((el) => 
         el.classList.contains('dark') || 
         el.getAttribute('data-theme') === 'dark' ||
         window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -193,7 +193,7 @@ test.describe('Reduced Motion with Theme @theme', () => {
     // يجب أن تكون الـ animations متوقفة
     for (let i = 0; i < count; i++) {
       const element = animatedElements.nth(i);
-      const animationDuration = await element.evaluate((el) => {
+      const _animationDuration = await element.evaluate((el) => {
         return window.getComputedStyle(el).animationDuration;
       });
       

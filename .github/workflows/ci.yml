@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

@@ -56,10 +56,15 @@ export function LoansOverviewTab() {
     },
   });
 
-  // إيجاد ID نوع القرض والفزعة ديناميكياً
-  const loanTypeId = useMemo(() => 
-    requestTypes.find(t => t.name_ar === 'قرض')?.id || null
-  , [requestTypes]);
+  // إيجاد ID نوع القرض ديناميكياً - البحث بالاسم العربي
+  const loanTypeId = useMemo(() => {
+    // البحث بالاسم العربي
+    const byName = requestTypes.find(t => 
+      t.name_ar === 'قرض' || 
+      t.name_ar?.includes('قرض')
+    );
+    return byName?.id || null;
+  }, [requestTypes]);
   
   const handleEmergencySubmit = async (data: { amount: number; emergency_reason: string; description: string }) => {
     if (!beneficiaryId) {

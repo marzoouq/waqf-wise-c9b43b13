@@ -81,7 +81,7 @@ export const BeneficiaryRequestsStatsCards = memo(function BeneficiaryRequestsSt
   onFilterChange,
 }: BeneficiaryRequestsStatsCardsProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-5 md:gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-3">
       {statItems.map((item) => {
         const value = item.getValue(stats);
         const isActive = activeFilter === item.key;

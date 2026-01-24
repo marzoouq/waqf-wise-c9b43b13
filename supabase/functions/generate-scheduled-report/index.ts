@@ -113,7 +113,7 @@ serve(async (req) => {
         }
 
         // حفظ التقرير في الأرشيف
-        const reportFile = {
+        const _reportFile = {
           name: `${template.name}_${new Date().toISOString()}.json`,
           content: JSON.stringify(reportData, null, 2)
         };
@@ -177,7 +177,7 @@ serve(async (req) => {
   }
 });
 
-function calculateNextRun(scheduleType: string, cronExpression?: string): string {
+function calculateNextRun(scheduleType: string, _cronExpression?: string): string {
   const now = new Date();
   
   switch (scheduleType) {

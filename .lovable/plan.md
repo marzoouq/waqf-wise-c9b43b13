@@ -1,206 +1,198 @@
 
-# خطة إزالة مبلغ 1,300 ريال + إعادة احتساب الأرصدة
 
-## الهدف
-إزالة المبلغ الوهمي (1,300 ريال) من جميع التقارير واللوحات، مع إعادة احتساب الأرصدة من القيود الفعلية المرحَّلة.
+# تقرير فحص شامل - الأخطاء والمشاكل المكتشفة
 
 ---
 
-## المرحلة 1: تنظيف قاعدة البيانات
+## ملخص تنفيذي
 
-### 1.1 حذف سطور القيد المرتبطة
-```sql
-UPDATE journal_entry_lines
-SET deleted_at = NOW(), 
-    deleted_by = NULL, 
-    deletion_reason = 'حذف سطور قيد وهمي مرتبط بسند V-1768526034377'
-WHERE journal_entry_id = 'e2925c24-903e-4f78-8129-3f0a065869ad'
-  AND deleted_at IS NULL;
+| المقياس | الحالة |
+|---------|--------|
+| **السبب الجذري للأخطاء** | فشل تحميل الوحدات الديناميكية (Chunk Loading) |
+| **مشكلة اتجاه الاسم** | إعدادات RTL في Sidebar صحيحة ✅ |
+| **مشكلة المربعات المتزاحمة** | Grid `grid-cols-5` على الجوال |
+| **حالة الخطة السابقة** | 70% تم تنفيذها، 30% تحتاج مراجعة |
+
+---
+
+## 🔴 المشكلة #1: فشل تحميل الوحدات الديناميكية (Critical)
+
+### الدليل من سجلات الشبكة:
+```text
+Request: POST /functions/v1/log-error
+Error: "Failed to fetch dynamically imported module: 
+       .../assets/BeneficiaryDistributionsTab-BxYcmssB.js"
+
+التبويبات المتأثرة:
+- التوزيعات والأرصدة (distributions)
+- الطلبات (requests)  
+- العائلة (family-account)
 ```
 
-### 1.2 إعادة احتساب رصيد حساب النقدية والبنوك
-```sql
-WITH valid_lines AS (
-  SELECT 
-    jel.account_id,
-    SUM(jel.debit_amount) as total_debit,
-    SUM(jel.credit_amount) as total_credit
-  FROM journal_entry_lines jel
-  INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
-  WHERE je.deleted_at IS NULL 
-    AND jel.deleted_at IS NULL
-    AND je.status = 'posted'
-  GROUP BY jel.account_id
-)
-UPDATE accounts a
-SET current_balance = CASE 
-  WHEN a.account_nature = 'debit' THEN COALESCE(vl.total_debit, 0) - COALESCE(vl.total_credit, 0)
-  ELSE COALESCE(vl.total_credit, 0) - COALESCE(vl.total_debit, 0)
-END
-FROM valid_lines vl
-WHERE a.id = vl.account_id;
+### السبب الجذري:
+هذا **ليس خطأً في الكود** بل مشكلة في **الاتصال بالشبكة** أو **cache المتصفح**:
+1. المستخدم على شبكة جوال بطيئة (Android Chrome)
+2. Chunks القديمة في Cache بعد تحديث التطبيق
+3. فشل في تحميل ملفات JavaScript الكبيرة
 
--- تصفير الحسابات التي ليس لها قيود
-UPDATE accounts
-SET current_balance = 0
-WHERE id NOT IN (
-  SELECT DISTINCT jel.account_id 
-  FROM journal_entry_lines jel
-  INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
-  WHERE je.deleted_at IS NULL AND jel.deleted_at IS NULL AND je.status = 'posted'
-);
+### الحل:
+```text
+1. مسح Cache المتصفح (Hard Refresh: Ctrl+Shift+R)
+2. أو تحديث الصفحة عدة مرات
+3. أو إضافة آلية Retry للتحميل الديناميكي
 ```
 
 ---
 
-## المرحلة 2: إصلاح الخدمات (طبقة الكود)
+## 🟠 المشكلة #2: مربعات الإحصائيات متزاحمة (4 مربعات في صف)
 
-### 2.1 تحديث `JournalEntryService.getJournalEntriesWithLines`
-- إضافة `.is('deleted_at', null)` لجدول `journal_entries`
-- التحقق من أن سطور القيود تُستثنى المحذوفة
+### الموقع:
+`src/components/beneficiary/tabs/requests/BeneficiaryRequestsStatsCards.tsx` (السطر 84)
 
-### 2.2 تحديث `JournalEntryService.updateAccountBalances`
-- إضافة فلتر لاستثناء القيود المحذوفة عند إعادة الحساب
-
-### 2.3 تحديث `FinancialCardsService.getRevenueProgress`
-- إضافة `.is('deleted_at', null)` لجدول `payment_vouchers`
-
----
-
-## المرحلة 3: إنشاء دالة إعادة احتساب الأرصدة
-
-### 3.1 دالة `recalculate_all_account_balances()`
-```sql
-CREATE OR REPLACE FUNCTION recalculate_all_account_balances()
-RETURNS void AS $$
-BEGIN
-  -- إعادة حساب كل الأرصدة من القيود المرحَّلة الفعلية
-  UPDATE accounts a
-  SET current_balance = COALESCE((
-    SELECT CASE 
-      WHEN a.account_nature = 'debit' THEN SUM(jel.debit_amount) - SUM(jel.credit_amount)
-      ELSE SUM(jel.credit_amount) - SUM(jel.debit_amount)
-    END
-    FROM journal_entry_lines jel
-    INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
-    WHERE jel.account_id = a.id
-      AND je.deleted_at IS NULL
-      AND jel.deleted_at IS NULL
-      AND je.status = 'posted'
-  ), 0);
-END;
-$$ LANGUAGE plpgsql;
-```
-
-### 3.2 Trigger للحذف التلقائي لإعادة الرصيد
-```sql
-CREATE OR REPLACE FUNCTION on_journal_entry_soft_delete()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL THEN
-    -- إعادة حساب أرصدة الحسابات المتأثرة
-    UPDATE accounts a
-    SET current_balance = COALESCE((
-      SELECT CASE 
-        WHEN a.account_nature = 'debit' THEN SUM(jel.debit_amount) - SUM(jel.credit_amount)
-        ELSE SUM(jel.credit_amount) - SUM(jel.debit_amount)
-      END
-      FROM journal_entry_lines jel
-      INNER JOIN journal_entries je ON je.id = jel.journal_entry_id
-      WHERE jel.account_id = a.id
-        AND je.deleted_at IS NULL
-        AND jel.deleted_at IS NULL
-        AND je.status = 'posted'
-    ), 0)
-    WHERE a.id IN (
-      SELECT account_id FROM journal_entry_lines WHERE journal_entry_id = OLD.id
-    );
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_journal_entry_soft_delete
-AFTER UPDATE ON journal_entries
-FOR EACH ROW
-WHEN (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL)
-EXECUTE FUNCTION on_journal_entry_soft_delete();
-```
-
----
-
-## المرحلة 4: تحديث الاستعلامات في الخدمات
-
-### الملفات المتأثرة:
-
-| الملف | التغيير |
-|-------|---------|
-| `src/services/dashboard/kpi.service.ts` | إضافة `.is('deleted_at', null)` للسندات والقيود |
-| `src/services/property/property-stats.service.ts` | إضافة `.is('deleted_at', null)` للسندات |
-| `src/services/accounting/journal-entry.service.ts` | إضافة الفلاتر للقيود والسطور |
-| `src/services/dashboard/financial-cards.service.ts` | إضافة الفلتر للسندات |
-
-### مثال التغيير:
+### الدليل:
 ```typescript
-// قبل
-.from("payment_vouchers")
-.select("amount")
-.eq("voucher_type", "receipt")
-.eq("status", "paid")
+// السطر 84:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-5 md:gap-3">
+```
 
-// بعد
-.from("payment_vouchers")
-.select("amount")
-.eq("voucher_type", "receipt")
-.eq("status", "paid")
-.is("deleted_at", null)  // ← إضافة
+### المشكلة:
+- على الجوال: `flex` مع `overflow-x-auto` (scroll أفقي) - صحيح ✅
+- على الديسكتوب المتوسط: `md:grid-cols-5` (5 أعمدة) - **قد يكون ضيقاً**
+- لا يوجد breakpoint للشاشات المتوسطة (`sm:grid-cols-2` أو `lg:grid-cols-5`)
+
+### الإصلاح المطلوب:
+```typescript
+// السطر 84 - إضافة breakpoints تدريجية:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide 
+                sm:grid sm:grid-cols-2 
+                md:grid-cols-3 
+                lg:grid-cols-5 
+                md:gap-3">
 ```
 
 ---
 
-## المرحلة 5: التحقق والاختبار
+## 🟡 المشكلة #3: اتجاه اسم المستفيد في Sidebar
 
-### 5.1 استعلامات التحقق
-```sql
--- التحقق من رصيد النقدية
-SELECT code, name_ar, current_balance FROM accounts WHERE code = '1.1.1';
--- يجب أن يكون: 0
+### الفحص:
+```typescript
+// BeneficiaryPortal.tsx السطر 95:
+<div className="flex min-h-screen w-full bg-background overflow-x-hidden" dir="rtl">
 
--- التحقق من عدم وجود سندات نشطة بـ 1300
-SELECT COUNT(*) FROM payment_vouchers WHERE amount = 1300 AND deleted_at IS NULL;
--- يجب أن يكون: 0
-
--- التحقق من عدم وجود قيود نشطة مرتبطة
-SELECT COUNT(*) FROM journal_entries 
-WHERE reference_id = 'd9f7a74b-5dec-470f-beb3-700063f8b798' AND deleted_at IS NULL;
--- يجب أن يكون: 0
+// BeneficiarySidebar.tsx السطر 89:
+<Sidebar collapsible="icon" side="right" aria-label="قائمة المستفيد">
 ```
 
-### 5.2 اختبار اللوحات
-- لوحة الناظر: إجمالي الأصول = 0
-- لوحة المشرف: التحصيل = 0
-- بطاقة الرصيد البنكي: 0 ر.س
+### النتيجة:
+- `dir="rtl"` موجود ✅
+- `side="right"` للـ Sidebar ✅ (صحيح للعربية)
+- اسم المستفيد في السطر 99-100 يعرض في `div` بشكل عادي
+
+### السبب المحتمل للظهور في اليسار:
+إذا كان المستخدم يرى الاسم في اليسار، فقد يكون:
+1. على شاشة صغيرة حيث الـ Sidebar مخفي
+2. أو في وضع `collapsed` للـ Sidebar
+3. أو مشكلة في الـ Sheet (الجوال) اتجاه الفتح
+
+### الإصلاح المقترح:
+فحص مكون `Sheet` في `sidebar.tsx` للتأكد من `side="right"`
 
 ---
 
-## ملخص التنفيذ
+## 🟢 تم التحقق من الخطة السابقة
 
-| المرحلة | الإجراء | الأولوية |
-|---------|---------|----------|
-| 1 | تنظيف قاعدة البيانات (soft delete للسطور + إعادة احتساب) | 🔴 عاجل |
-| 2 | إضافة فلاتر `deleted_at` للخدمات | 🔴 عاجل |
-| 3 | إنشاء دالة وtrigger للحذف المستقبلي | 🟠 مهم |
-| 4 | تحديث الاستعلامات | 🟠 مهم |
-| 5 | التحقق والاختبار | 🟢 تأكيد |
+### ما تم تنفيذه ✅:
+| الإصلاح | الملف | الحالة |
+|---------|-------|--------|
+| إضافة `open` لـ dependency array | `EditProfileDialog.tsx` | ✅ تم |
+| إضافة `useAuth` للحصول على userId | `EditProfileDialog.tsx` | ✅ تم |
+| تصحيح query invalidation | `EditProfileDialog.tsx` | ✅ تم |
+| تحسين `handleEditSuccess` | `BeneficiaryProfileTab.tsx` | ✅ تم |
+| إضافة `settingsLoading` | `FamilyTreeTab.tsx` | ✅ تم |
+| إضافة `settingsLoading` | `BankAccountsTab.tsx` | ✅ تم |
+| Error handling في `handleItemClick` | `MoreMenuTab.tsx` | ✅ تم |
+| استخدام arrays للحالات | `BeneficiaryRequestsTab.tsx` | ✅ تم |
+| Mobile cards للمستندات | `BeneficiaryDocumentsTab.tsx` | ✅ تم |
+
+### ما لم يتم تنفيذه بالكامل:
+| الإصلاح | السبب |
+|---------|-------|
+| توحيد Query Keys في `FinancialReportsTab` | تم جزئياً |
+| تأكيد قبل الخروج | تم إضافة AlertDialog ✅ |
 
 ---
 
-## النتيجة المتوقعة
+## خطة الإصلاح المقترحة
 
-بعد التنفيذ:
-- **إجمالي الأصول**: 0 ر.س
-- **التحصيل الفعلي**: 0 ر.س
-- **الرصيد البنكي**: 0 ر.س
-- **الميزانية المتاحة**: 0 ر.س
+### الإصلاح #1: إضافة Retry للتحميل الديناميكي (Priority: High)
+إنشاء دالة مساعدة للتحميل الديناميكي مع إعادة المحاولة:
 
-مع ضمان أن أي حذف مستقبلي سيُعيد الأرصدة تلقائياً.
+```typescript
+// src/lib/lazy-with-retry.ts
+import { ComponentType, lazy } from 'react';
+
+export function lazyWithRetry<T extends ComponentType<any>>(
+  componentImport: () => Promise<{ default: T }>,
+  retries = 3,
+  delay = 1000
+): React.LazyExoticComponent<T> {
+  return lazy(async () => {
+    let lastError: Error | undefined;
+    
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await componentImport();
+      } catch (error) {
+        lastError = error as Error;
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        }
+      }
+    }
+    
+    throw lastError;
+  });
+}
+```
+
+### الإصلاح #2: تحسين Grid للمربعات
+تعديل `BeneficiaryRequestsStatsCards.tsx` السطر 84:
+
+```typescript
+// من:
+<div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-5 md:gap-3">
+
+// إلى:
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-3">
+```
+
+### الإصلاح #3: التحقق من Sheet RTL
+فحص `src/components/ui/sheet.tsx` للتأكد من:
+```typescript
+<SheetContent side="right" className="rtl:text-right">
+```
+
+---
+
+## ملخص الملفات المطلوب تعديلها
+
+| الملف | التغيير | الأولوية |
+|-------|---------|----------|
+| `src/lib/lazy-with-retry.ts` | إنشاء ملف جديد | 🔴 High |
+| `src/components/beneficiary/TabRenderer.tsx` | استخدام `lazyWithRetry` | 🔴 High |
+| `src/components/beneficiary/tabs/requests/BeneficiaryRequestsStatsCards.tsx` | تحسين Grid breakpoints | 🟠 Medium |
+| `src/components/ui/sheet.tsx` | التحقق من RTL | 🟡 Low |
+
+---
+
+## التوصية الفورية
+
+**للمستخدم:** 
+1. اضغط `Ctrl+Shift+R` (أو اسحب للأسفل مرتين على الجوال) لتحديث الصفحة
+2. إذا استمرت المشكلة، امسح Cache المتصفح
+
+**للمطور:**
+1. تطبيق `lazyWithRetry` على جميع المكونات المحملة ديناميكياً
+2. تحسين Grid للمربعات الإحصائية
+3. اختبار على شبكات بطيئة (3G throttling)
+

@@ -1,9 +1,11 @@
 /**
  * User Service - خدمة المستخدمين
+ * @version 2.1.0 - تحسين Type Safety
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { softDeleteRecord } from "@/lib/supabase-type-helpers";
 import type { AppRole } from "@/types/roles";
 
 export interface UserStats {
@@ -191,10 +193,10 @@ export class UserService {
     
     return (data || []).map((u) => {
       // استخراج الأدوار من user_roles JSON array
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userRoles = u.user_roles as any;
+      interface UserRoleRecord { role: string }
+      const userRoles = u.user_roles as unknown as UserRoleRecord[] | null;
       const rolesArray: string[] = Array.isArray(userRoles) 
-        ? userRoles.map((r: { role: string }) => r.role)
+        ? userRoles.map((r) => r.role)
         : [];
       
       return {
@@ -238,18 +240,28 @@ export class UserService {
    */
   static async removeRole(userId: string, role: AppRole): Promise<void> {
     const { data: user } = await supabase.auth.getUser();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    
+    // جلب معرف السجل أولاً
+    const { data: roleRecord, error: fetchError } = await supabase
       .from("user_roles")
-      .update({
-        deleted_at: new Date().toISOString(),
-        deleted_by: user?.user?.id || null,
-        deletion_reason: `إلغاء دور ${role} بواسطة المسؤول`
-      })
+      .select("id")
       .eq("user_id", userId)
       .eq("role", role)
-      .is("deleted_at", null);
-    if (error) throw error;
+      .is("deleted_at", null)
+      .maybeSingle();
+    
+    if (fetchError) throw fetchError;
+    if (!roleRecord) throw new Error(`الدور ${role} غير موجود للمستخدم`);
+    
+    // استخدام الـ Type Helper للحذف اللين
+    const result = await softDeleteRecord(
+      'user_roles',
+      roleRecord.id,
+      user?.user?.id,
+      `إلغاء دور ${role} بواسطة المسؤول`
+    );
+    
+    if (!result.success) throw new Error(result.error);
   }
 
   /**
