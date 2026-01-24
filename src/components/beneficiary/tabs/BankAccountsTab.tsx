@@ -7,8 +7,20 @@ import { MaskedValue } from "@/components/shared/MaskedValue";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export function BankAccountsTab() {
-  const { settings } = useVisibilitySettings();
-  const { data: bankAccounts, isLoading, error, refetch } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
+  const { settings, isLoading: settingsLoading } = useVisibilitySettings();
+  const { data: bankAccounts, isLoading, error, refetch } = useBeneficiaryBankAccounts(settings?.show_bank_accounts ?? true);
+
+  // عرض حالة التحميل أثناء جلب الإعدادات
+  if (settingsLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-sm text-muted-foreground mt-2">جاري تحميل الإعدادات...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!settings?.show_bank_accounts) {
     return (
