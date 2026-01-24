@@ -65,7 +65,7 @@ const LazyMoreMenuTab = lazyWithRetryNamed(
 
 interface TabConfig {
   key: string;
-  settingKey: string;
+  settingKey: keyof VisibilitySettings;
   component: ComponentType<{ beneficiaryId?: string; beneficiary?: unknown }>;
   requiresBeneficiaryId?: boolean;
   requiresBeneficiary?: boolean;
@@ -73,14 +73,19 @@ interface TabConfig {
 }
 
 /**
- * التبويبات المُدمجة:
- * - "family-account" يشمل: الملف الشخصي + شجرة العائلة + الحسابات البنكية
- * - "more" قائمة خيارات للتقارير والعقارات والمستندات وغيرها
- * - "reports-detail" للوصول للتقارير من قائمة "المزيد"
+ * التبويبات المُدمجة (Main Navigation):
+ * - "family-account": حساب العائلة (يحتوي على: الملف الشخصي + شجرة العائلة + الحسابات البنكية)
+ * - "more": قائمة المزيد (يحتوي على: التقارير، العقارات، المستندات، القروض، الحوكمة)
+ * 
+ * التبويبات الفرعية (Sub Navigation):
+ * - "reports-detail": للوصول المباشر لصفحة التقارير من قائمة "المزيد"
+ * 
+ * التبويبات القديمة (Legacy - للتوافق مع القوائم الجانبية):
+ * - profile, requests, distributions, properties, documents, family, bank, reports, governance, loans
  */
 const TAB_CONFIGS: TabConfig[] = [
   // التبويبات الرئيسية (الشريط السفلي)
-  { key: "family-account", settingKey: "show_profile", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
+  { key: "family-account", settingKey: "show_family_tree", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
   { key: "more", settingKey: "show_overview", component: LazyMoreMenuTab, alwaysVisible: true },
   
   // التبويبات الفرعية (من قائمة "المزيد")
@@ -131,7 +136,7 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
   
   if (!tabConfig) return null;
 
-  const isVisible = tabConfig.alwaysVisible || settings?.[tabConfig.settingKey as keyof typeof settings];
+  const isVisible = tabConfig.alwaysVisible === true || settings?.[tabConfig.settingKey] === true;
   
   if (!isVisible) {
     return <AccessDenied />;
@@ -148,6 +153,9 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
   }
 
   const tabNames: Record<string, string> = {
+    "family-account": "حساب العائلة",
+    "more": "المزيد",
+    "reports-detail": "التقارير المالية",
     profile: "الملف الشخصي",
     requests: "الطلبات",
     distributions: "التوزيعات والأرصدة",
