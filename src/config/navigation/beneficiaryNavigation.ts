@@ -13,7 +13,7 @@ export const beneficiaryNavigationItems: readonly NavigationItem[] = [
     label: "الرئيسية",
     icon: Home,
     path: "/beneficiary-portal",
-    matchPaths: ["/beneficiary-portal"],
+    matchPaths: [], // فارغ - المنطق الجديد في BottomNavigation يتعامل مع الرئيسية
   },
   {
     id: "distributions",
