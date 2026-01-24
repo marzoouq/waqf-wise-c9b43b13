@@ -10,7 +10,7 @@ const TEST_USER = {
   password: process.env.TEST_USER_PASSWORD || 'Test123!',
 };
 
-const TEST_BENEFICIARY = {
+const _TEST_BENEFICIARY = {
   nationalId: process.env.TEST_NATIONAL_ID || '1234567890',
   password: process.env.TEST_BENEFICIARY_PASSWORD || 'Test123!',
 };

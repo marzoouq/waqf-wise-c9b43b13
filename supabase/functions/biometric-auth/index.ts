@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
   try {
     // ✅ قراءة body مرة واحدة فقط
     const bodyText = await req.text();
-    let bodyData: Record<string, any> = {};
+    let bodyData: Record<string, unknown> = {};
     
     if (bodyText) {
       try {
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     // ✅ استخدام bodyData المحفوظة بدلاً من req.json()
-    const { credentialId, userId, challenge } = bodyData;
+    const { credentialId, userId, _challenge } = bodyData;
     
     // ✅ التحقق من وجود المعاملات
     if (!credentialId || !userId) {

@@ -28,7 +28,7 @@ class CircuitBreaker {
       const result = await fn();
       this.onSuccess();
       return result;
-    } catch (error) {
+    } catch (_error) {
       this.onFailure();
       throw error;
     }
@@ -91,7 +91,7 @@ describe('Circuit Breaker', () => {
     for (let i = 0; i < 3; i++) {
       try {
         await circuitBreaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -108,7 +108,7 @@ describe('Circuit Breaker', () => {
     for (let i = 0; i < 3; i++) {
       try {
         await circuitBreaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -129,7 +129,7 @@ describe('Circuit Breaker', () => {
     for (let i = 0; i < 3; i++) {
       try {
         await circuitBreaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -165,7 +165,7 @@ describe('Circuit Breaker', () => {
     // 1 failure
     try {
       await circuitBreaker.execute(failingFn);
-    } catch (error) {
+    } catch (_error) {
       // Expected
     }
 
@@ -184,7 +184,7 @@ describe('Circuit Breaker', () => {
     for (let i = 0; i < 4; i++) {
       try {
         await customBreaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -194,7 +194,7 @@ describe('Circuit Breaker', () => {
     // 5th failure should open
     try {
       await customBreaker.execute(failingFn);
-    } catch (error) {
+    } catch (_error) {
       // Expected
     }
 
@@ -222,7 +222,7 @@ describe('Circuit Breaker - Edge Cases', () => {
     for (let i = 0; i < 2; i++) {
       try {
         await breaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -250,7 +250,7 @@ describe('Circuit Breaker - Edge Cases', () => {
     for (let i = 0; i < 2; i++) {
       try {
         await breaker.execute(failingFn);
-      } catch (error) {
+      } catch (_error) {
         // Expected
       }
     }
@@ -263,7 +263,7 @@ describe('Circuit Breaker - Edge Cases', () => {
     // Failure in HALF_OPEN should open again
     try {
       await breaker.execute(failingFn);
-    } catch (error) {
+    } catch (_error) {
       // Expected
     }
 

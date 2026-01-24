@@ -119,7 +119,7 @@ serve(async (req) => {
 
     console.log(`Authorized AI insights by user: ${user.id}, Rate limit remaining: ${rateCheck.remaining}`);
 
-    const { reportType, dataQuery, filters } = await req.json();
+    const { reportType, _dataQuery, _filters } = await req.json();
 
     // جمع البيانات المطلوبة
     let data;

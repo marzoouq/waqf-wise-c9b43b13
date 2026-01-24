@@ -8,7 +8,7 @@ import {
   forbiddenResponse
 } from '../_shared/cors.ts';
 
-interface ZATCASubmitRequest {
+interface _ZATCASubmitRequest {
   invoice_id: string;
   submission_type: 'reporting' | 'clearance';
 }

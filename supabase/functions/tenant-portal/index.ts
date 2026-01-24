@@ -109,9 +109,9 @@ serve(async (req) => {
               end_date: contract.end_date,
               status: contract.status,
               property_id: contract.property_id,
-              property_name: (contract as any).properties?.name || "غير محدد",
-              property_location: (contract as any).properties?.location,
-              property_type: (contract as any).properties?.type,
+              property_name: (contract as { properties?: { name?: string } }).properties?.name || "غير محدد",
+              property_location: (contract as { properties?: { location?: string } }).properties?.location,
+              property_type: (contract as { properties?: { type?: string } }).properties?.type,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -128,9 +128,9 @@ serve(async (req) => {
             end_date: contract.end_date,
             status: contract.status,
             property_id: contract.property_id,
-            property_name: (contract as any).properties?.name || "غير محدد",
-            property_location: (contract as any).properties?.location,
-            property_type: (contract as any).properties?.type,
+            property_name: (contract as { properties?: { name?: string } }).properties?.name || "غير محدد",
+            property_location: (contract as { properties?: { location?: string } }).properties?.location,
+            property_type: (contract as { properties?: { type?: string } }).properties?.type,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,
@@ -171,7 +171,7 @@ serve(async (req) => {
         .order("created_at", { ascending: false });
 
       // إضافة اسم العقار والوحدة للطلبات
-      const enrichedRequests = (requests || []).map((r: any) => ({
+      const enrichedRequests = (requests || []).map((r: { properties?: { name?: string }; property_units?: { unit_name?: string; unit_number?: string }; [key: string]: unknown }) => ({
         ...r,
         property_name: r.properties?.name || "غير محدد",
         unit_name: r.property_units?.unit_name || r.property_units?.unit_number || null,
