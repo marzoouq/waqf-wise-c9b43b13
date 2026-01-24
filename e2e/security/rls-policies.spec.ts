@@ -58,6 +58,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       const { data, _error } = await supabase.from('beneficiaries').select('*').limit(1);
 
       // Should return empty or error due to RLS
+      void error;
       expect(data?.length || 0).toBe(0);
     });
 
@@ -66,6 +67,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
 
       const { data, _error } = await supabase.from('audit_logs').select('*').limit(1);
 
+      void error;
       expect(data?.length || 0).toBe(0);
     });
 

@@ -46,12 +46,12 @@ const ThemeToggle = memo(function ThemeToggle() {
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       aria-label="تبديل الوضع الليلي"
-      className="h-9 w-9"
+      className="min-w-[44px] min-h-[44px] h-11 w-11 touch-manipulation"
     >
       {theme === 'dark' ? (
-        <Sun className="h-4 w-4" aria-hidden="true" />
+        <Sun className="h-5 w-5" aria-hidden="true" />
       ) : (
-        <Moon className="h-4 w-4" aria-hidden="true" />
+        <Moon className="h-5 w-5" aria-hidden="true" />
       )}
     </Button>
   );
@@ -83,22 +83,26 @@ const MobileHeader = memo(function MobileHeader({
       </div>
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
         onClick={onSearchOpen}
-        className="gap-2"
+        className="min-w-[44px] min-h-[44px] h-11 w-11 touch-manipulation"
         aria-label="فتح البحث"
       >
-        <Search className="h-4 w-4" aria-hidden="true" />
+        <Search className="h-5 w-5" aria-hidden="true" />
       </Button>
       <ThemeToggle />
-      <GovernanceGuideButton />
       <NotificationsBell />
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full" aria-label="قائمة المستخدم">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full min-w-[44px] min-h-[44px] h-11 w-11 p-0 touch-manipulation" 
+            aria-label="قائمة المستخدم"
+          >
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {userInitial}
               </AvatarFallback>
             </Avatar>
@@ -112,7 +116,7 @@ const MobileHeader = memo(function MobileHeader({
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer">
+          <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer min-h-[44px]">
             <LogOut className="ms-2 h-4 w-4" />
             تسجيل الخروج
           </DropdownMenuItem>

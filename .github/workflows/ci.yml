@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -156,23 +161,32 @@ jobs:
     if: always()
     
     steps:
-      - name: Check results
+      - name: Write CI Summary (safe)
+        continue-on-error: true
+        shell: bash
         run: |
-          echo "## CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          # Safe fallback if GITHUB_STEP_SUMMARY is not available
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
           
+          {
+            echo "## 📊 CI Pipeline Summary"
+            echo ""
+            echo "| Job | Status |"
+            echo "|-----|--------|"
+            echo "| 🔍 Lint | ${{ needs.lint.result }} |"
+            echo "| 🧪 Unit Tests | ${{ needs.unit-tests.result }} |"
+            echo "| 🏗️ Build | ${{ needs.build.result }} |"
+            echo "| 🔒 Security | ${{ needs.security.result }} |"
+            echo ""
+          } >> "$SUMMARY_FILE"
+          
+      - name: Check for failures
+        run: |
           if [[ "${{ needs.lint.result }}" == "failure" ]] || \
              [[ "${{ needs.build.result }}" == "failure" ]] || \
              [[ "${{ needs.security.result }}" == "failure" ]]; then
-            echo "❌ **Pipeline failed** - Please check the logs above." >> $GITHUB_STEP_SUMMARY
+            echo "❌ Pipeline failed - Please check the logs above."
             exit 1
           else
-            echo "✅ **All checks passed!**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ All checks passed!"
           fi

@@ -26,6 +26,11 @@ on:
         type: boolean
         default: true
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: integration-${{ github.ref }}
   cancel-in-progress: true
@@ -102,12 +107,16 @@ jobs:
 
       - name: Generate Summary
         if: always()
+        continue-on-error: true
         run: |
-          echo "## 🌐 Public Functions Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f test-results/public-functions.json ]; then
-            echo "Results saved to artifacts" >> $GITHUB_STEP_SUMMARY
-          fi
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "## 🌐 Public Functions Test Results"
+            echo ""
+            if [ -f test-results/public-functions.json ]; then
+              echo "Results saved to artifacts"
+            fi
+          } >> "$SUMMARY_FILE"
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Authenticated Functions Tests
@@ -156,10 +165,14 @@ jobs:
 
       - name: Generate Summary
         if: always()
+        continue-on-error: true
         run: |
-          echo "## 🔐 Authenticated Functions Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Test user: ${{ secrets.TEST_USER_EMAIL != '' && '✅ Configured' || '⚠️ Not configured' }}" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "## 🔐 Authenticated Functions Test Results"
+            echo ""
+            echo "Test user: ${{ secrets.TEST_USER_EMAIL != '' && '✅ Configured' || '⚠️ Not configured' }}"
+          } >> "$SUMMARY_FILE"
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Performance Tests
@@ -206,15 +219,19 @@ jobs:
 
       - name: Generate Performance Summary
         if: always()
+        continue-on-error: true
         run: |
-          echo "## ⚡ Performance Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Threshold |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|-----------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Cold Start | < 15s |" >> $GITHUB_STEP_SUMMARY
-          echo "| Average Response | < 5s |" >> $GITHUB_STEP_SUMMARY
-          echo "| Concurrent (5) | 80% success |" >> $GITHUB_STEP_SUMMARY
-          echo "| Concurrent (10) | 70% success |" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "## ⚡ Performance Test Results"
+            echo ""
+            echo "| Metric | Threshold |"
+            echo "|--------|-----------|"
+            echo "| Cold Start | < 15s |"
+            echo "| Average Response | < 5s |"
+            echo "| Concurrent (5) | 80% success |"
+            echo "| Concurrent (10) | 70% success |"
+          } >> "$SUMMARY_FILE"
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Summary Report
@@ -232,28 +249,32 @@ jobs:
           path: all-results
           
       - name: Generate Summary Report
+        continue-on-error: true
         run: |
-          echo "# 🔌 Edge Functions Integration Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Run:** ${{ github.run_number }} | **Branch:** ${{ github.ref_name }} | **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Test Suite Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌐 Public Functions | ${{ needs.public-functions.result == 'success' && '✅ Passed' || needs.public-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔐 Authenticated Functions | ${{ needs.authenticated-functions.result == 'success' && '✅ Passed' || needs.authenticated-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Performance Tests | ${{ needs.performance-tests.result == 'success' && '✅ Passed' || needs.performance-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # Overall status
-          if [[ "${{ needs.public-functions.result }}" == "failure" ]] || \
-             [[ "${{ needs.authenticated-functions.result }}" == "failure" ]]; then
-            echo "## ❌ Some Critical Tests Failed" >> $GITHUB_STEP_SUMMARY
-            echo "Please review the test logs and fix the failing tests." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "## ✅ All Critical Tests Passed" >> $GITHUB_STEP_SUMMARY
-          fi
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "# 🔌 Edge Functions Integration Test Summary"
+            echo ""
+            echo "**Run:** ${{ github.run_number }} | **Branch:** ${{ github.ref_name }} | **Trigger:** ${{ github.event_name }}"
+            echo ""
+            echo "## Test Suite Results"
+            echo ""
+            echo "| Test Suite | Status |"
+            echo "|------------|--------|"
+            echo "| 🌐 Public Functions | ${{ needs.public-functions.result == 'success' && '✅ Passed' || needs.public-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |"
+            echo "| 🔐 Authenticated Functions | ${{ needs.authenticated-functions.result == 'success' && '✅ Passed' || needs.authenticated-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |"
+            echo "| ⚡ Performance Tests | ${{ needs.performance-tests.result == 'success' && '✅ Passed' || needs.performance-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |"
+            echo ""
+            
+            # Overall status
+            if [[ "${{ needs.public-functions.result }}" == "failure" ]] || \
+               [[ "${{ needs.authenticated-functions.result }}" == "failure" ]]; then
+              echo "## ❌ Some Critical Tests Failed"
+              echo "Please review the test logs and fix the failing tests."
+            else
+              echo "## ✅ All Critical Tests Passed"
+            fi
+          } >> "$SUMMARY_FILE"
 
       - name: Check for failures
         if: needs.public-functions.result == 'failure' || needs.authenticated-functions.result == 'failure'
@@ -270,11 +291,15 @@ jobs:
     
     steps:
       - name: Notify skipped
+        continue-on-error: true
         run: |
-          echo "## ⚠️ Integration Tests Skipped" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Supabase configuration not found. To enable integration tests:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. Add \`VITE_SUPABASE_URL\` secret to your repository" >> $GITHUB_STEP_SUMMARY
-          echo "2. Add \`VITE_SUPABASE_ANON_KEY\` secret to your repository" >> $GITHUB_STEP_SUMMARY
-          echo "3. (Optional) Add \`TEST_USER_EMAIL\` and \`TEST_USER_PASSWORD\` for authenticated tests" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "## ⚠️ Integration Tests Skipped"
+            echo ""
+            echo "Supabase configuration not found. To enable integration tests:"
+            echo ""
+            echo "1. Add \`VITE_SUPABASE_URL\` secret to your repository"
+            echo "2. Add \`VITE_SUPABASE_ANON_KEY\` secret to your repository"
+            echo "3. (Optional) Add \`TEST_USER_EMAIL\` and \`TEST_USER_PASSWORD\` for authenticated tests"
+          } >> "$SUMMARY_FILE"

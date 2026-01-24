@@ -3,9 +3,10 @@
  * اللائحة التنفيذية لوقف مرزوق علي الثبيتي
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollText, Printer, Download, ChevronUp, Info, Calendar, Building2, Loader2 } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,20 @@ import { toast } from "sonner";
 
 const WaqfGovernanceGuide = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [_showScrollTop, _setShowScrollTop] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // تفعيل زر العودة للأعلى عند التمرير
+  useEffect(() => {
+    const container = document.querySelector('[data-scroll-container]');
+    if (!container) return;
+    
+    const handleScroll = () => {
+      setShowScrollTop(container.scrollTop > 300);
+    };
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
   
   const {
     searchQuery,
@@ -58,8 +72,9 @@ const WaqfGovernanceGuide = () => {
   };
 
   return (
-    <MobileOptimizedLayout className="relative">
-      {/* Header Section */}
+    <PageErrorBoundary pageName="الدليل الإرشادي والحوكمة">
+      <MobileOptimizedLayout className="relative">
+        {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <MobileOptimizedHeader
           title="الدليل الإرشادي والحوكمة"
@@ -197,18 +212,19 @@ const WaqfGovernanceGuide = () => {
         searchQuery={searchQuery}
       />
 
-      {/* زر العودة للأعلى */}
-      {showScrollTop && (
-        <Button
-          variant="secondary"
-          size="icon"
-          className="fixed bottom-6 left-6 z-50 rounded-full shadow-lg"
-          onClick={scrollToTop}
-        >
-          <ChevronUp className="h-5 w-5" />
-        </Button>
-      )}
-    </MobileOptimizedLayout>
+        {/* زر العودة للأعلى */}
+        {showScrollTop && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="fixed bottom-6 left-6 z-50 rounded-full shadow-lg"
+            onClick={scrollToTop}
+          >
+            <ChevronUp className="h-5 w-5" />
+          </Button>
+        )}
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

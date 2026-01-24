@@ -122,10 +122,16 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
   // التحقق من إمكانية التعديل
   const canEdit = (settings as VisibilitySettings & { allow_profile_edit?: boolean })?.allow_profile_edit !== false;
 
-  const handleEditSuccess = () => {
-    // إعادة تحميل بيانات المستفيد
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) });
+  const handleEditSuccess = async () => {
+    // إعادة جلب بيانات المستفيد بشكل قسري لضمان التحديث الفوري
+    await queryClient.refetchQueries({ 
+      queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id),
+      exact: true 
+    });
+    await queryClient.refetchQueries({ 
+      queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id),
+      exact: true 
+    });
   };
 
   // تحديد حالة التحقق

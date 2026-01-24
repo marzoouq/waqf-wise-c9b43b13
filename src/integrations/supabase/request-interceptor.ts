@@ -37,7 +37,7 @@ export function initializeSupabaseInterceptor(): void {
       });
     }
     
-    if (event === 'TOKEN_REFRESHED') {
+    if (_event === 'TOKEN_REFRESHED') {
       connectionMonitor.logEvent({
         type: 'api',
         status: 'reconnected',

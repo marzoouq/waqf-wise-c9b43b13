@@ -1,9 +1,15 @@
 /**
  * 🕋 Soft Delete Service
  * خدمة الحذف اللين - نظام الوقف المالي
+ * @version 2.0.0 - تحسين Type Safety
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { 
+  softDeleteRecord, 
+  restoreRecord, 
+  type SoftDeletableTableName,
+  type SoftDeleteResult 
+} from '@/lib/supabase-type-helpers';
 
 /**
  * الجداول المحمية من الحذف الفيزيائي
@@ -14,11 +20,7 @@ export const PROTECTED_FINANCIAL_TABLES: string[] = [
   'families', 'beneficiaries', 'tenants', 'properties', 'documents',
 ];
 
-export interface SoftDeleteResult {
-  success: boolean;
-  error?: string;
-  deletedAt?: string;
-}
+export type { SoftDeleteResult };
 
 export function isProtectedTable(tableName: string): boolean {
   return PROTECTED_FINANCIAL_TABLES.includes(tableName);
@@ -26,6 +28,7 @@ export function isProtectedTable(tableName: string): boolean {
 
 /**
  * SoftDeleteService Class
+ * يستخدم الآن supabase-type-helpers للأنواع الآمنة
  */
 export class SoftDeleteService {
   static async softDelete(
@@ -34,36 +37,28 @@ export class SoftDeleteService {
     userId?: string,
     reason: string = 'حذف بواسطة المستخدم'
   ): Promise<void> {
-    const deletedAt = new Date().toISOString();
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from(tableName)
-      .update({
-        deleted_at: deletedAt,
-        deleted_by: userId || null,
-        deletion_reason: reason,
-      })
-      .eq('id', recordId);
+    const result = await softDeleteRecord(
+      tableName as SoftDeletableTableName,
+      recordId,
+      userId,
+      reason
+    );
 
-    if (error) {
-      console.error('[SoftDeleteService] Error:', error);
-      throw error;
+    if (!result.success) {
+      console.error('[SoftDeleteService] Error:', result.error);
+      throw new Error(result.error);
     }
   }
 
   static async restore(tableName: string, recordId: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from(tableName)
-      .update({
-        deleted_at: null,
-        deleted_by: null,
-        deletion_reason: null,
-      })
-      .eq('id', recordId);
+    const result = await restoreRecord(
+      tableName as SoftDeletableTableName,
+      recordId
+    );
 
-    if (error) throw error;
+    if (!result.success) {
+      throw new Error(result.error);
+    }
   }
 }
 
@@ -72,24 +67,19 @@ export async function softDelete(
   recordId: string,
   reason: string
 ): Promise<SoftDeleteResult> {
-  try {
-    await SoftDeleteService.softDelete(tableName, recordId, undefined, reason);
-    return { success: true, deletedAt: new Date().toISOString() };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+  return softDeleteRecord(
+    tableName as SoftDeletableTableName,
+    recordId,
+    undefined,
+    reason
+  );
 }
 
 export async function restoreDeleted(
   tableName: string,
   recordId: string
 ): Promise<SoftDeleteResult> {
-  try {
-    await SoftDeleteService.restore(tableName, recordId);
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: String(error) };
-  }
+  return restoreRecord(tableName as SoftDeletableTableName, recordId);
 }
 
 export const excludeDeleted = { deleted_at: null } as const;

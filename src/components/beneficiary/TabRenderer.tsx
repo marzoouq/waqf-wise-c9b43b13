@@ -1,51 +1,71 @@
 /**
  * TabRenderer Component
  * مكون موحد لعرض التبويبات مع دعم الصلاحيات والتحميل الكسول
- * @version 3.0.0 - إصدار مُحسّن بدون تكرار
+ * @version 4.1.0 - إضافة Retry للتحميل الديناميكي
  */
 
-import { Suspense, lazy, ComponentType } from "react";
+import { Suspense, ComponentType } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabErrorBoundary } from "./common/TabErrorBoundary";
+import { lazyWithRetryNamed } from "@/lib/lazy-with-retry";
 import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 
-// Lazy loaded tab components
-const LazyBeneficiaryProfileTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryProfileTab").then(m => ({ default: m.BeneficiaryProfileTab }))
+// Lazy loaded tab components with retry support
+const LazyBeneficiaryProfileTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryProfileTab"),
+  "BeneficiaryProfileTab"
 );
-const LazyBeneficiaryDistributionsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryDistributionsTab").then(m => ({ default: m.BeneficiaryDistributionsTab }))
+const LazyBeneficiaryDistributionsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryDistributionsTab"),
+  "BeneficiaryDistributionsTab"
 );
-const LazyBeneficiaryPropertiesTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryPropertiesTab").then(m => ({ default: m.BeneficiaryPropertiesTab }))
+const LazyBeneficiaryPropertiesTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryPropertiesTab"),
+  "BeneficiaryPropertiesTab"
 );
-const LazyFamilyTreeTab = lazy(() => 
-  import("@/components/beneficiary/tabs/FamilyTreeTab").then(m => ({ default: m.FamilyTreeTab }))
+const LazyFamilyTreeTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FamilyTreeTab"),
+  "FamilyTreeTab"
 );
-const LazyBankAccountsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BankAccountsTab").then(m => ({ default: m.BankAccountsTab }))
+const LazyBankAccountsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BankAccountsTab"),
+  "BankAccountsTab"
 );
-const LazyFinancialReportsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/FinancialReportsTab").then(m => ({ default: m.FinancialReportsTab }))
+const LazyFinancialReportsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FinancialReportsTab"),
+  "FinancialReportsTab"
 );
-const LazyGovernanceTab = lazy(() => 
-  import("@/components/beneficiary/tabs/GovernanceTab").then(m => ({ default: m.GovernanceTab }))
+const LazyGovernanceTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/GovernanceTab"),
+  "GovernanceTab"
 );
-const LazyLoansOverviewTab = lazy(() => 
-  import("@/components/beneficiary/tabs/LoansOverviewTab").then(m => ({ default: m.LoansOverviewTab }))
+const LazyLoansOverviewTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/LoansOverviewTab"),
+  "LoansOverviewTab"
 );
-const LazyBeneficiaryRequestsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryRequestsTab").then(m => ({ default: m.BeneficiaryRequestsTab }))
+const LazyBeneficiaryRequestsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryRequestsTab"),
+  "BeneficiaryRequestsTab"
 );
-const LazyBeneficiaryDocumentsTab = lazy(() => 
-  import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab").then(m => ({ default: m.BeneficiaryDocumentsTab }))
+const LazyBeneficiaryDocumentsTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/BeneficiaryDocumentsTab"),
+  "BeneficiaryDocumentsTab"
+);
+// New consolidated tabs
+const LazyFamilyAccountTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/FamilyAccountTab"),
+  "FamilyAccountTab"
+);
+const LazyMoreMenuTab = lazyWithRetryNamed(
+  () => import("@/components/beneficiary/tabs/MoreMenuTab"),
+  "MoreMenuTab"
 );
 
 interface TabConfig {
   key: string;
-  settingKey: string;
+  settingKey: keyof VisibilitySettings;
   component: ComponentType<{ beneficiaryId?: string; beneficiary?: unknown }>;
   requiresBeneficiaryId?: boolean;
   requiresBeneficiary?: boolean;
@@ -53,12 +73,25 @@ interface TabConfig {
 }
 
 /**
- * التبويبات المُدمجة:
- * - "distributions" يشمل الآن كشف الحساب أيضاً
- * - "reports" يشمل الإفصاحات السنوية
- * - "governance" يشمل الميزانيات وسجل الموافقات
+ * التبويبات المُدمجة (Main Navigation):
+ * - "family-account": حساب العائلة (يحتوي على: الملف الشخصي + شجرة العائلة + الحسابات البنكية)
+ * - "more": قائمة المزيد (يحتوي على: التقارير، العقارات، المستندات، القروض، الحوكمة)
+ * 
+ * التبويبات الفرعية (Sub Navigation):
+ * - "reports-detail": للوصول المباشر لصفحة التقارير من قائمة "المزيد"
+ * 
+ * التبويبات القديمة (Legacy - للتوافق مع القوائم الجانبية):
+ * - profile, requests, distributions, properties, documents, family, bank, reports, governance, loans
  */
 const TAB_CONFIGS: TabConfig[] = [
+  // التبويبات الرئيسية (الشريط السفلي)
+  { key: "family-account", settingKey: "show_profile", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
+  { key: "more", settingKey: "show_overview", component: LazyMoreMenuTab, alwaysVisible: true },
+  
+  // التبويبات الفرعية (من قائمة "المزيد")
+  { key: "reports-detail", settingKey: "show_financial_reports", component: LazyFinancialReportsTab },
+  
+  // التبويبات الأصلية للتوافق مع القائمة الجانبية
   { key: "profile", settingKey: "show_profile", component: LazyBeneficiaryProfileTab, requiresBeneficiary: true },
   { key: "requests", settingKey: "show_requests", component: LazyBeneficiaryRequestsTab, requiresBeneficiaryId: true },
   { key: "distributions", settingKey: "show_distributions", component: LazyBeneficiaryDistributionsTab, requiresBeneficiaryId: true },
@@ -70,7 +103,6 @@ const TAB_CONFIGS: TabConfig[] = [
   { key: "governance", settingKey: "show_governance", component: LazyGovernanceTab },
   { key: "loans", settingKey: "show_own_loans", component: LazyLoansOverviewTab },
 ];
-
 function TabSkeleton() {
   return (
     <div className="space-y-4">
@@ -104,7 +136,7 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
   
   if (!tabConfig) return null;
 
-  const isVisible = tabConfig.alwaysVisible || settings?.[tabConfig.settingKey as keyof typeof settings];
+  const isVisible = tabConfig.alwaysVisible === true || settings?.[tabConfig.settingKey] === true;
   
   if (!isVisible) {
     return <AccessDenied />;
@@ -121,6 +153,9 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
   }
 
   const tabNames: Record<string, string> = {
+    "family-account": "حساب العائلة",
+    "more": "المزيد",
+    "reports-detail": "التقارير المالية",
     profile: "الملف الشخصي",
     requests: "الطلبات",
     distributions: "التوزيعات والأرصدة",

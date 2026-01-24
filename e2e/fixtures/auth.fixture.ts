@@ -1,20 +1,23 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, Page } from '@playwright/test';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Authentication Test Fixtures
  * أدوات مساعدة لاختبارات المصادقة
- * تم إفراغ المحتوى - جاهز لإضافة بيانات جديدة
  */
 
-// Test user credentials - empty
-export const TEST_CREDENTIALS = {};
+export const TEST_CREDENTIALS = {
+  admin: { email: 'admin@test.waqf.sa', password: 'TestAdmin123!' },
+  nazer: { email: 'nazer@test.waqf.sa', password: 'TestNazer123!' },
+  accountant: { email: 'accountant@test.waqf.sa', password: 'TestAccountant123!' },
+  beneficiary: { email: 'beneficiary@test.waqf.sa', password: 'TestBeneficiary123!' },
+};
 
 // Supabase configuration
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
 
-export type UserRole = string;
+export type UserRole = 'admin' | 'nazer' | 'accountant' | 'beneficiary' | 'cashier' | 'archivist' | string;
 
 interface AuthFixtures {
   supabase: SupabaseClient;
@@ -28,7 +31,7 @@ interface AuthFixtures {
  * Extended test with authentication fixtures
  */
 export const test = base.extend<AuthFixtures>({
-  supabase: async (_unusedWorkerInfo, use) => {
+  supabase: async (_, use) => {
     const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     await use(client);
     await client.auth.signOut();
@@ -43,6 +46,10 @@ export const test = base.extend<AuthFixtures>({
 
   loginWithCredentials: async ({ _page }, use) => {
     const loginWithCredentials = async (_email: string, _password: string): Promise<boolean> => {
+  loginWithCredentials: async ({ page }, use) => {
+    const loginWithCredentials = async (_email: string, _password: string): Promise<boolean> => {
+      // Implementation can use page for navigation
+      void page;
       return false;
     };
     await use(loginWithCredentials);
@@ -55,6 +62,8 @@ export const test = base.extend<AuthFixtures>({
 
   isLoggedIn: async ({ _page }, use) => {
     const isLoggedIn = async (): Promise<boolean> => {
+      // Implementation can use page for navigation
+      void page;
       return false;
     };
     await use(isLoggedIn);

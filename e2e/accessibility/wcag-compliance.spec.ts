@@ -57,14 +57,13 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       const h1Elements = await page.locator('h1').all();
       expect(h1Elements.length).toBe(1);
 
-      // Get all headings and verify hierarchy
-      const headings = await page.evaluate(() => {
-        const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        return Array.from(h).map((el) => ({
+      // Get all headings and verify hierarchy using string eval
+      const headings = await page.evaluate(`
+        Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((el) => ({
           level: parseInt(el.tagName[1]),
           text: el.textContent?.trim() || '',
-        }));
-      });
+        }))
+      `) as Array<{ level: number; text: string }>;
 
       // Check for heading level jumps (e.g., h1 to h3 without h2)
       for (let i = 1; i < headings.length; i++) {
@@ -124,16 +123,18 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       for (const element of focusable.slice(0, 5)) {
         await element.focus();
 
-        // Check for focus styles
-        const styles = await element.evaluate((el) => {
-          const computed = window.getComputedStyle(el);
-          return {
-            outline: computed.outline,
-            outlineWidth: computed.outlineWidth,
-            boxShadow: computed.boxShadow,
-            border: computed.border,
-          };
-        });
+        // Check for focus styles using string eval
+        const styles = await element.evaluate(`
+          (function(el) {
+            const computed = window.getComputedStyle(el);
+            return {
+              outline: computed.outline,
+              outlineWidth: computed.outlineWidth,
+              boxShadow: computed.boxShadow,
+              border: computed.border,
+            };
+          })(arguments[0])
+        `) as { outline: string; outlineWidth: string; boxShadow: string; border: string };
 
         // Element should have some visible focus indicator
         const hasFocusIndicator =
@@ -160,10 +161,12 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
         await page.keyboard.press('Tab');
         tabCount++;
 
-        const focusedTag = await page.evaluate(() => {
-          const el = document.activeElement;
-          return el ? `${el.tagName}${el.id ? `#${el.id}` : ''}` : 'BODY';
-        });
+        const focusedTag = await page.evaluate(`
+          (function() {
+            const el = document.activeElement;
+            return el ? el.tagName + (el.id ? '#' + el.id : '') : 'BODY';
+          })()
+        `) as string;
 
         if (focusedTag === 'BODY') break;
         focusedElements.push(focusedTag);
@@ -216,9 +219,9 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       const mainContent = page.locator('main, [role="main"], .container').first();
 
       if ((await mainContent.count()) > 0) {
-        const direction = await mainContent.evaluate((el) => {
-          return window.getComputedStyle(el).direction;
-        });
+        const direction = await mainContent.evaluate(`
+          window.getComputedStyle(arguments[0]).direction
+        `) as string;
 
         expect(direction).toBe('rtl');
       }
@@ -307,9 +310,9 @@ test.describe('WCAG 2.1 AA Compliance - Core Tests @accessibility', () => {
       await page.goto('/login');
 
       // Check for horizontal overflow
-      const hasHorizontalScroll = await page.evaluate(() => {
-        return document.documentElement.scrollWidth > document.documentElement.clientWidth;
-      });
+      const hasHorizontalScroll = await page.evaluate(`
+        document.documentElement.scrollWidth > document.documentElement.clientWidth
+      `) as boolean;
 
       expect(hasHorizontalScroll).toBeFalsy();
     });

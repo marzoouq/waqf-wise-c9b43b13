@@ -6,7 +6,8 @@ import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { PropertyService } from "@/services/property.service";
 import { DistributionService } from "@/services/distribution.service";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryCoreService } from "@/services/beneficiary";
+import type { Beneficiary } from "@/types/beneficiary";
 
 interface DashboardDialogsProps {
   beneficiaryDialogOpen: boolean;
@@ -34,8 +35,7 @@ export function DashboardDialogs({
 
   const handleSaveBeneficiary = async (data: Record<string, unknown>) => {
     try {
-      const { error } = await supabase.from("beneficiaries").insert(data as never);
-      if (error) throw error;
+      await BeneficiaryCoreService.create(data as Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>);
       
       toast({
         title: "تم الإضافة",

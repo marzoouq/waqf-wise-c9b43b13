@@ -210,11 +210,11 @@ test.describe('Visual Regression Tests', () => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
       
-      // Ensure light theme
-      await page.evaluate(() => {
+      // Ensure light theme using string eval to avoid TypeScript DOM issues
+      await page.evaluate(`
         document.documentElement.classList.remove('dark');
         document.documentElement.classList.add('light');
-      });
+      `);
       
       await expect(page).toHaveScreenshot('light-theme.png', {
         fullPage: false,
@@ -226,11 +226,11 @@ test.describe('Visual Regression Tests', () => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
       
-      // Switch to dark theme
-      await page.evaluate(() => {
+      // Switch to dark theme using string eval to avoid TypeScript DOM issues
+      await page.evaluate(`
         document.documentElement.classList.remove('light');
         document.documentElement.classList.add('dark');
-      });
+      `);
       
       await page.waitForTimeout(300);
       

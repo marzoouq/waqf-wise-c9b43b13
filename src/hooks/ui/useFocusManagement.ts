@@ -41,6 +41,8 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>({
   useEffect(() => {
     if (!enabled || !containerRef.current) return;
 
+    const focusRestoreRef = focusRestore.current;
+
     // حفظ التركيز الحالي
     if (restoreFocus) {
       focusRestore.current.save();

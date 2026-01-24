@@ -342,7 +342,8 @@ test.describe('Form Accessibility', () => {
     // Tab to first input
     await page.keyboard.press('Tab');
 
-    const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
+    // Use string eval to avoid TypeScript DOM lib requirement in Node context
+    const focusedElement = (await page.evaluate(`document.activeElement?.tagName`)) as string | null;
     expect(['INPUT', 'BUTTON', 'A']).toContain(focusedElement);
 
     // Tab through form
@@ -350,7 +351,7 @@ test.describe('Form Accessibility', () => {
     await page.keyboard.press('Tab');
 
     // Should still be in the form area
-    const stillFocused = await page.evaluate(() => document.activeElement?.tagName);
+    const stillFocused = (await page.evaluate(`document.activeElement?.tagName`)) as string | null;
     expect(['INPUT', 'BUTTON', 'A']).toContain(stillFocused);
   });
 

@@ -55,14 +55,29 @@ export function MobileCardBase({
   className,
   onClick,
 }: MobileCardBaseProps) {
+  // دعم لوحة المفاتيح للتفاعل مع البطاقة
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+      // منع السلوك الافتراضي فقط لمفتاح المسافة لتجنب التأثير على التمرير
+      if (e.key === ' ') {
+        e.preventDefault();
+      }
+      onClick();
+    }
+  };
+
   return (
     <Card 
       className={cn(
         "hover:shadow-md transition-shadow",
-        onClick && "cursor-pointer",
+        onClick && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         className
       )}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? "button" : undefined}
+      aria-label={onClick ? title : undefined}
     >
       <CardContent className="p-4 space-y-3">
         {/* Header */}

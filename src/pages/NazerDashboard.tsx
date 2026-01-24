@@ -36,6 +36,7 @@ import { SendNotificationDialog } from "@/components/notifications/SendNotificat
 import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
 import { DashboardQuickSwitch } from "@/components/dashboard/shared/DashboardQuickSwitch";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -76,15 +77,23 @@ export default function NazerDashboard() {
           {/* زر معاينة كـ مستفيد */}
           <PreviewAsBeneficiaryButton />
           
-          <Button onClick={() => setDistributeDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="default" size="sm">
-            <Coins className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">توزيع</span>
-            <span className="hidden sm:inline text-sm"> الغلة</span>
-          </Button>
-          <Button onClick={() => setPublishDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="outline" size="sm">
-            <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">نشر</span>
-          </Button>
+          {/* زر توزيع الغلة - محمي بـ PermissionGate */}
+          <PermissionGate permission="distribute_revenue">
+            <Button onClick={() => setDistributeDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="default" size="sm">
+              <Coins className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline text-xs sm:text-sm">توزيع</span>
+              <span className="hidden sm:inline text-sm"> الغلة</span>
+            </Button>
+          </PermissionGate>
+          
+          {/* زر نشر السنة المالية - محمي بـ PermissionGate */}
+          <PermissionGate permission="publish_fiscal_year">
+            <Button onClick={() => setPublishDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="outline" size="sm">
+              <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline text-xs sm:text-sm">نشر</span>
+            </Button>
+          </PermissionGate>
+          
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
             <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline text-sm">رسالة</span>

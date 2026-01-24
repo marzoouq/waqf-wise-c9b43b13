@@ -349,9 +349,8 @@ export class AuthService {
   static async updateUserRoles(userId: string, roles: AppRole[]): Promise<void> {
     const { data: user } = await supabase.auth.getUser();
     
-    // Soft-delete الأدوار الحالية بدلاً من الحذف الفيزيائي
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    // Soft-delete الأدوار الحالية باستخدام Type Helper
+    await supabase
       .from("user_roles")
       .update({
         deleted_at: new Date().toISOString(),

@@ -43,12 +43,13 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
       <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
         <div className="flex flex-col gap-3 sm:gap-4">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" aria-hidden="true" />
             <Input
               placeholder="البحث (الاسم، رقم الهوية، العائلة...)"
               value={searchQuery}
               onChange={handleSearchChange}
               className="pe-9 sm:pe-10 text-sm sm:text-base"
+              aria-label="البحث عن المستفيدين بالاسم أو رقم الهوية أو العائلة"
             />
           </div>
           <div className="flex flex-wrap gap-2">

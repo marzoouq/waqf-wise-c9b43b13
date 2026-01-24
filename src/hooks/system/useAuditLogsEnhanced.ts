@@ -6,6 +6,9 @@ import { useQuery, _useMutation, _useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { _toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface EnhancedAuditLog {
   id: string;
@@ -151,10 +154,10 @@ export const useAuditLogDetails = (logId: string | null) => {
         .from("audit_logs")
         .select("*")
         .eq("id", logId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as EnhancedAuditLog;
+      return data as EnhancedAuditLog | null;
     },
     enabled: !!logId,
   });

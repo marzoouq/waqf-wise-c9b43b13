@@ -81,7 +81,7 @@ export function AppearanceSettingsDialog({
   const [font, setFont] = useState(() => localStorage.getItem("app-font") || "cairo");
 
   useEffect(() => {
-    // تطبيق الإعدادات عند فتح الحوار
+    // تطبيق الإعدادات عند فتح الحوار أو تغير الإعدادات
     applyTheme(theme);
     applyAccentColor(accentColor);
     applyFont(font);
