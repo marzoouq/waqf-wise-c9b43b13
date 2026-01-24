@@ -43,10 +43,10 @@ jobs:
       #    - JSCRAMBLER_SECRET_KEY (found in your Jscrambler account)
       #    - JSCRAMBLER_ACCESS_KEY (found in your Jscrambler account)
       
-      - name: Jscrambler Code Integrity (disabled - missing jscrambler.json)
-        if: false  # Enable this step after adding jscrambler.json and configuring secrets
+      - name: Jscrambler Code Integrity
+        # Automatically enabled when jscrambler.json is present in the repository
+        if: hashFiles('jscrambler.json') != ''
         id: jscrambler
-        # Using v1 tag - corresponds to SHA ab65962a2ecffcc362b75a997e24a181d0bde5fb
         # Complete list of inputs: https://github.com/marketplace/actions/jscrambler#inputs
         uses: jscrambler/code-integrity-actions/protect@v1
         with:
