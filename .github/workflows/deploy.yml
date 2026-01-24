@@ -14,6 +14,12 @@ on:
           - production
           - staging
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+  deployments: write
+
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true

@@ -26,6 +26,11 @@ on:
         type: boolean
         default: true
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: integration-${{ github.ref }}
   cancel-in-progress: true
