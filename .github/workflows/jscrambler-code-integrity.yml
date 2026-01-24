@@ -14,9 +14,6 @@ name: Jscrambler Code Integrity
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -31,17 +28,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - name: Jscrambler Code Integrity
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      # NOTE: Before enabling this step, ensure the following are configured:
+      # 1. Add jscrambler.json configuration file to the repository (download from your Jscrambler account)
+      # 2. Configure these repository secrets:
+      #    - JSCRAMBLER_APPLICATION_ID (created within your Jscrambler account)
+      #    - JSCRAMBLER_SECRET_KEY (found in your Jscrambler account)
+      #    - JSCRAMBLER_ACCESS_KEY (found in your Jscrambler account)
+      
+      - name: Jscrambler Code Integrity (disabled - missing jscrambler.json)
+        if: false  # Enable this step after adding jscrambler.json and configuring secrets
         id: jscrambler
-        # the complete list of inputs can be found here: https://github.com/marketplace/actions/jscrambler#inputs
-        uses: jscrambler/code-integrity-actions/protect@ab65962a2ecffcc362b75a997e24a181d0bde5fb
+        # Using v1 tag - corresponds to SHA ab65962a2ecffcc362b75a997e24a181d0bde5fb
+        # Complete list of inputs: https://github.com/marketplace/actions/jscrambler#inputs
+        uses: jscrambler/code-integrity-actions/protect@v1
         with:
-          application-id: ${{ secrets.JSCRAMBLER_APPLICATION_ID }}  # This value should be created within your Jscrambler account
-          secret-key: ${{ secrets.JSCRAMBLER_SECRET_KEY }}          # This value can be found in your Jscrambler account
-          access-key: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}          # This value can be found in your Jscrambler account
-          jscrambler-config-path: jscrambler.json                   # Download from your Jscrambler account
-          files-src: |                                              # List of Files to be protected
+          application-id: ${{ secrets.JSCRAMBLER_APPLICATION_ID }}
+          secret-key: ${{ secrets.JSCRAMBLER_SECRET_KEY }}
+          access-key: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}
+          jscrambler-config-path: jscrambler.json
+          files-src: |
             dist/**/*
-          files-dest: .
+          files-dest: dist-protected  # Output to separate directory to avoid overwriting original dist
