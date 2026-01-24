@@ -43,6 +43,7 @@ import {
   NotificationSettingsPage,
   Notifications,
   Chatbot,
+  WorldClock,
   NotFound,
 } from "./lazyPages";
 
@@ -309,6 +310,9 @@ export const coreRoutes = [
     } 
   />,
   <Route key="chatbot" path="/chatbot" element={<Chatbot />} />,
+  
+  // الأدوات
+  <Route key="world-clock" path="/world-clock" element={<WorldClock />} />,
   
   // الحوكمة
   <Route 

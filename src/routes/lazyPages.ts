@@ -122,6 +122,9 @@ export const EdgeFunctionTest = lazyWithRetry(() => import("@/pages/EdgeFunction
 export const EdgeFunctionsMonitor = lazyWithRetry(() => import("@/pages/EdgeFunctionsMonitor"));
 export const Chatbot = lazyWithRetry(() => import("@/pages/Chatbot"));
 
+// ==================== الأدوات ====================
+export const WorldClock = lazyWithRetry(() => import("@/pages/WorldClock"));
+
 // ==================== نقطة البيع ====================
 export const PointOfSale = lazyWithRetry(() => import("@/pages/PointOfSale"));
 
