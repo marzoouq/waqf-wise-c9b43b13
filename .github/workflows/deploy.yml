@@ -113,13 +113,17 @@ jobs:
           
       - name: Integration test summary
         if: always()
+        continue-on-error: true
         run: |
-          echo "## 🔌 Integration Test Results" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ steps.tests.outputs.passed }}" == "true" ]]; then
-            echo "✅ All critical integration tests passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Integration tests failed - deployment blocked" >> $GITHUB_STEP_SUMMARY
-          fi
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "## 🔌 Integration Test Results"
+            if [[ "${{ steps.tests.outputs.passed }}" == "true" ]]; then
+              echo "✅ All critical integration tests passed"
+            else
+              echo "❌ Integration tests failed - deployment blocked"
+            fi
+          } >> "$SUMMARY_FILE"
 
   # ═══════════════════════════════════════════════════════════════════════════
   # المرحلة 3: النشر على Vercel
