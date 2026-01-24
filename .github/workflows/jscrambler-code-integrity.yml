@@ -41,7 +41,6 @@ jobs:
           application-id: ${{ secrets.JSCRAMBLER_APPLICATION_ID }}  # This value should be created within your Jscrambler account
           secret-key: ${{ secrets.JSCRAMBLER_SECRET_KEY }}          # This value can be found in your Jscrambler account
           access-key: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}          # This value can be found in your Jscrambler account
-          jscrambler-config-path: jscrambler.json                   # Download from your Jscrambler account
           files-src: |                                              # List of Files to be protected
             dist/**/*
           # Output to a separate directory to avoid overwriting the original dist directory
