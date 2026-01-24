@@ -1,416 +1,157 @@
 
 
-# تقرير الفحص المنهجي الشامل
-## بوابة المستفيد وصفحات العائلات
+# خطة إصلاح مشاكل بيانات العائلة في بوابة المستفيد
 
 ---
 
-## الفحص 1: هيكل بوابة المستفيد
+## المشاكل المكتشفة بالأدلة
 
-### ✅ ما تم التحقق منه وهو صحيح:
+### 🔴 مشكلة #1: البيانات لا تظهر بعد التعديل في المربعات
 
-| المكون | الحالة | الدليل |
-|--------|--------|--------|
-| جدول `beneficiary_visibility_settings` | ✅ موجود | استعلام قاعدة البيانات أرجع سجلين (`beneficiary` و `waqf_heir`) |
-| اتجاه RTL | ✅ مُصحح | `dir="rtl"` في `BeneficiaryPortal.tsx` السطر 95 |
-| `FamilyAccountTab` الجديد | ✅ يعمل | يحتوي على 3 تبويبات فرعية (بياناتي، شجرة العائلة، البنكية) |
-| `MoreMenuTab` الجديد | ✅ يعمل | قائمة بـ 8 خيارات مع أيقونات ووصف |
-| التنقل السفلي | ✅ محدّث | 5 أزرار: الرئيسية، التوزيعات، الطلبات، العائلة، المزيد |
+**الموقع:** `EditProfileDialog.tsx` (السطور 130-150)
 
----
-
-## الفحص 2: المشاكل المكتشفة بالأدلة
-
-### 🔴 مشكلة حرجة #1: عدم وجود Loading State قبل فحص الصلاحيات
-
-**الموقع:** `FamilyTreeTab.tsx` (السطور 14-29)
-
-**الدليل:**
+**الدليل من الكود:**
 ```typescript
-// السطر 14-15
-const { settings } = useVisibilitySettings();
-// لا يوجد isLoading هنا!
-
-// السطر 21-28 - يتم فحص الصلاحيات مباشرة
-if (!settings?.show_family_tree) {
-  return (
-    <Card>
-      <CardContent className="p-4 sm:p-6 text-center text-muted-foreground text-xs sm:text-sm">
-        غير مصرح بعرض شجرة العائلة  // ← تظهر هذه الرسالة أثناء التحميل!
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-**المشكلة:** عندما `settings` = `undefined` (جاري التحميل)، الشرط `!settings?.show_family_tree` يكون `true`، فتظهر رسالة "غير مصرح" خطأً.
-
-**الإصلاح المطلوب:**
-```typescript
-const { settings, isLoading: settingsLoading } = useVisibilitySettings();
-
-if (settingsLoading) {
-  return <LoadingState message="جاري التحميل..." />;
-}
-
-if (!settings?.show_family_tree) {
-  // ... رسالة عدم الصلاحية
-}
-```
-
----
-
-### 🔴 مشكلة حرجة #2: نفس المشكلة في BankAccountsTab
-
-**الموقع:** `BankAccountsTab.tsx` (السطور 10-21)
-
-**الدليل:**
-```typescript
-// السطر 10
-const { settings } = useVisibilitySettings();
-// السطر 11
-const { data: bankAccounts, isLoading, error, refetch } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
-
-// السطر 13-20
-if (!settings?.show_bank_accounts) {
-  return (
-    <Card>
-      <CardContent className="p-6 text-center text-muted-foreground">
-        غير مصرح بعرض الحسابات البنكية  // ← تظهر أثناء التحميل!
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-**نفس المشكلة:** يتم تمرير `false` لـ `useBeneficiaryBankAccounts` عندما `settings` غير محمّل بعد.
-
----
-
-### 🟠 مشكلة متوسطة #3: عدم وجود Error Handling في MoreMenuTab
-
-**الموقع:** `MoreMenuTab.tsx` (السطور 105-113)
-
-**الدليل:**
-```typescript
-const handleItemClick = (item: MenuItem) => {
-  if (item.action) {
-    item.action();  // ← لا يوجد try/catch!
-  } else if (item.href) {
-    navigate(item.href);
-  } else if (item.tab) {
-    setSearchParams({ tab: item.tab });
+useEffect(() => {
+  if (beneficiary && open) {
+    form.reset({...});
   }
-};
+}, [beneficiary, form]); // ← المشكلة: "open" مفقود!
 ```
 
-**المشكلة:** إذا فشل `handleLogout()` أو أي action أخرى، لن يتم إبلاغ المستخدم.
+**السبب:** 
+- عند فتح حوار التعديل، الـ `useEffect` لا يُنفذ لأن `open` ليست في الـ dependency array
+- النموذج يظل يحتوي على القيم القديمة أو الفارغة
 
 ---
 
-### 🟠 مشكلة متوسطة #4: استخدام اسم عربي للبحث عن نوع الطلب
+### 🔴 مشكلة #2: عدم تحديث البيانات بعد الحفظ
 
-**الموقع:** `LoansOverviewTab.tsx` (السطور 60-62)
+**الموقع:** `EditProfileDialog.tsx` (السطور 189-192)
 
 **الدليل:**
 ```typescript
-const loanTypeId = useMemo(() => 
-  requestTypes.find(t => t.name_ar === 'قرض')?.id || null  // ← يعتمد على النص العربي!
-, [requestTypes]);
+// Query Key في useBeneficiaryPortalData:
+queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) 
+// يُنتج: ['current-beneficiary', 'xxxx-user-id']
+
+// Invalidation في EditProfileDialog:
+await queryClient.invalidateQueries({ queryKey: ['current-beneficiary'] });
+// يُنتج: ['current-beneficiary'] ← بدون userId!
 ```
 
-**المشكلة:** إذا تغير اسم النوع في قاعدة البيانات (مثلاً "قرض شخصي" بدلاً من "قرض")، سيفشل الكود.
-
-**الإصلاح المطلوب:** استخدام `code` أو `slug` ثابت بدلاً من `name_ar`.
+**السبب:**
+- الـ invalidation تستهدف مفتاحاً مختلفاً عن المفتاح الفعلي
+- لذلك الكاش لا يتم تحديثه والبيانات القديمة تظل تظهر
 
 ---
 
-### 🟠 مشكلة متوسطة #5: استخدام نصوص عربية مباشرة للفلترة
+### 🔴 مشكلة #3: البيانات في قاعدة البيانات فارغة
 
-**الموقع:** `BeneficiaryRequestsTab.tsx` (السطور 66-70)
+**الدليل من الاستعلام:**
+```
+SELECT marital_status, number_of_sons, number_of_daughters, number_of_wives 
+FROM beneficiaries WHERE full_name LIKE '%عبدالله%'
 
-**الدليل:**
-```typescript
-const pending = requests.filter((r) => 
-  r.status === "معلق" || r.status === "قيد المراجعة"  // ← Hardcoded!
-).length;
-const approved = requests.filter((r) => r.status === "معتمد").length;
-const rejected = requests.filter((r) => r.status === "مرفوض").length;
+النتيجة:
+- marital_status: NULL
+- number_of_sons: 0
+- number_of_daughters: 0  
+- number_of_wives: 0
+- family_size: 1
 ```
 
-**المشكلة:** لا يستخدم `matchesStatus` أو الثوابت من `constants.ts`.
+**السبب:**
+- سياسة RLS تمنع التحديث (تم إصلاحها سابقاً)
+- أو أن التحديث فشل بصمت بسبب الـ cache
 
 ---
 
-### 🟠 مشكلة متوسطة #6: BeneficiaryDocumentsTab غير متجاوب للجوال
+## خطة الإصلاح
 
-**الموقع:** `BeneficiaryDocumentsTab.tsx` (السطور 41-101)
+### الإصلاح #1: إضافة `open` إلى dependency array
 
-**الدليل:**
-```typescript
-// السطور 41-50: جدول ثابت بدون تجاوب
-<Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead className="text-right">اسم الملف</TableHead>
-      <TableHead className="text-right">النوع</TableHead>
-      <TableHead className="text-right">الحجم</TableHead>  // ← لا يوجد hidden
-      <TableHead className="text-right">تاريخ الرفع</TableHead>
-      <TableHead className="text-right">إجراءات</TableHead>
-    </TableRow>
-  </TableHeader>
-```
-
-**المشكلة:** الجدول لا يختفي على الجوال ولا توجد بطاقات بديلة.
-
----
-
-### 🟠 مشكلة متوسطة #7: Query Key غير موحد في FinancialReportsTab
-
-**الموقع:** `FinancialReportsTab.tsx` (السطور 97-99)
-
-**الدليل:**
-```typescript
-// السطر 98-99
-const { data: disclosure, isLoading: disclosureLoading } = useQuery({
-  queryKey: ['annual-disclosure-latest'],  // ← غير موحد!
-```
-
-**المشكلة:** يستخدم مفتاح استعلام مباشر بدلاً من `QUERY_KEYS.ANNUAL_DISCLOSURE_LATEST`.
-
----
-
-### 🟡 ملاحظة #8: عدم وجود تأكيد قبل تسجيل الخروج
-
-**الموقع:** `MoreMenuTab.tsx` (السطور 35-39)
-
-**الدليل:**
-```typescript
-const handleLogout = async () => {
-  await supabase.auth.signOut();  // ← ينفذ مباشرة بدون تأكيد!
-  toast.success("تم تسجيل الخروج بنجاح");
-  navigate("/auth");
-};
-```
-
----
-
-### 🟡 ملاحظة #9: FamilyMembersDialog يستخدم familyName بدلاً من familyId
-
-**الموقع:** `FamilyMembersDialog.tsx` (السطور 29-30)
-
-**الدليل:**
-```typescript
-// السطر 14: Props تتضمن familyId لكنه غير مستخدم!
-interface FamilyMembersDialogProps {
-  familyId: string;  // ← موجود لكن غير مستخدم
-  familyName: string;
-}
-
-// السطر 30: يستخدم familyName فقط
-const { data: members = [], isLoading } = useFamilyMembersDialog(familyName, open);
-```
-
-**المشكلة:** `familyId` في Props لكن البحث يتم بـ `familyName` مما قد يسبب مشاكل إذا تكرر الاسم.
-
----
-
-### 🟡 ملاحظة #10: FamilyTreeView - حوار إضافة فرد ناقص
-
-**الموقع:** `FamilyTreeView.tsx` (السطور 166-220)
-
-**الدليل:**
-```typescript
-// السطر 166-168: لا يوجد اختيار للمستفيد!
-<div className="space-y-2">
-  <Label htmlFor="relationship">العلاقة برب الأسرة</Label>
-  <Select ...>
-
-// ملاحظة: لا يوجد Select لاختيار beneficiary_id
-// formData.beneficiary_id لا يتم تعيينه في أي مكان!
-```
-
-**المشكلة:** حوار إضافة فرد لا يتضمن اختيار المستفيد الذي سيتم إضافته.
-
----
-
-## الفحص 3: صفحة العائلات (Families.tsx)
-
-### ✅ ما هو صحيح:
-
-| العنصر | الحالة | الدليل |
-|--------|--------|--------|
-| استخدام `matchesStatus` | ✅ صحيح | السطر 234: `matchesStatus(family.status, 'active')` |
-| دعم الجوال | ✅ موجود | السطر 174-196: `FamilyMobileCard` للجوال |
-| Pagination | ✅ موجود | السطر 188-195 و 258-265 |
-| Bulk Actions | ✅ موجود | السطر 271-276: `BulkActionsBar` |
-| Error Handling | ✅ موجود | السطر 116-118: `FamiliesErrorState` |
-
-### 🟡 ملاحظة: عدم استخدام useFamiliesPage في FamilyDialog
-
-**الموقع:** `FamilyDialog.tsx` (ملف summary)
-
-الـ Dialog يستخدم `useBeneficiaries()` لجلب قائمة رؤساء الأسر، وهذا صحيح.
-
----
-
-## الفحص 4: إعدادات الرؤية (Visibility Settings)
-
-### ✅ البيانات في قاعدة البيانات:
-
-```text
-┌─────────────────────────────────────────┐
-│ target_role: beneficiary                 │
-├─────────────────────────────────────────┤
-│ show_overview: true                      │
-│ show_profile: true                       │
-│ show_family_tree: true                   │
-│ show_bank_accounts: true                 │
-│ show_documents: true                     │
-│ show_properties: true                    │
-│ show_governance: true                    │
-│ show_own_loans: true                     │
-│ show_financial_reports: true             │
-└─────────────────────────────────────────┘
-```
-
-**الحالة:** جميع الإعدادات مفعلة - لذلك المشاكل المتعلقة بالصلاحيات لن تظهر للمستخدمين الحاليين.
-
----
-
-## الفحص 5: التوافق بين التبويبات
-
-### خريطة التبويبات:
-
-| Tab Key | الشريط السفلي | القائمة الجانبية | TabRenderer | الحالة |
-|---------|--------------|-----------------|-------------|--------|
-| `overview` | ✅ الرئيسية | ✅ | يُعالج خارجياً | ✅ |
-| `distributions` | ✅ التوزيعات | ✅ | ✅ (سطر 79) | ✅ |
-| `requests` | ✅ الطلبات | ✅ | ✅ (سطر 78) | ✅ |
-| `family-account` | ✅ العائلة | ❌ غير موجود | ✅ (سطر 70) | ⚠️ |
-| `more` | ✅ المزيد | ❌ غير موجود | ✅ (سطر 71) | ⚠️ |
-| `profile` | ❌ | ✅ | ✅ (سطر 77) | ✅ |
-| `family` | ❌ | ✅ | ✅ (سطر 82) | ✅ |
-| `reports-detail` | ❌ | ❌ | ✅ (سطر 74) | ✅ |
-
-**ملاحظة:** القائمة الجانبية لا تتضمن `family-account` و `more` الجديدين لكنها تعمل عبر التبويبات القديمة (`profile`, `family`).
-
----
-
-## ملخص الإصلاحات المطلوبة
-
-### المرحلة 1: إصلاحات حرجة (فورية)
-
-| # | الملف | الإصلاح | الأولوية |
-|---|-------|---------|----------|
-| 1 | `FamilyTreeTab.tsx` | إضافة `settingsLoading` check قبل فحص الصلاحيات | 🔴 |
-| 2 | `BankAccountsTab.tsx` | إضافة `settingsLoading` check قبل فحص الصلاحيات | 🔴 |
-| 3 | `MoreMenuTab.tsx` | إضافة try/catch في `handleItemClick` | 🟠 |
-
-### المرحلة 2: تحسينات متوسطة
-
-| # | الملف | الإصلاح | الأولوية |
-|---|-------|---------|----------|
-| 4 | `LoansOverviewTab.tsx` | استخدام `code` بدلاً من `name_ar` للبحث | 🟠 |
-| 5 | `BeneficiaryRequestsTab.tsx` | استخدام `matchesStatus` أو الثوابت | 🟠 |
-| 6 | `BeneficiaryDocumentsTab.tsx` | إضافة بطاقات للجوال | 🟠 |
-| 7 | `FinancialReportsTab.tsx` | توحيد Query Keys | 🟠 |
-
-### المرحلة 3: تحسينات منخفضة
-
-| # | الملف | الإصلاح | الأولوية |
-|---|-------|---------|----------|
-| 8 | `MoreMenuTab.tsx` | إضافة Dialog تأكيد قبل الخروج | 🟡 |
-| 9 | `FamilyMembersDialog.tsx` | استخدام `familyId` بدلاً من `familyName` | 🟡 |
-| 10 | `FamilyTreeView.tsx` | إضافة Select لاختيار المستفيد | 🟡 |
-
----
-
-## خطة التنفيذ التفصيلية
-
-### الإصلاح #1: FamilyTreeTab.tsx
+**الملف:** `src/components/beneficiary/dialogs/EditProfileDialog.tsx`
 
 ```typescript
-// قبل الإصلاح (السطر 14):
-const { settings } = useVisibilitySettings();
+// قبل (السطر 150):
+}, [beneficiary, form]);
 
-// بعد الإصلاح:
-const { settings, isLoading: settingsLoading } = useVisibilitySettings();
-
-// إضافة بعد السطر 19:
-if (settingsLoading) {
-  return (
-    <Card>
-      <CardContent className="p-4 sm:p-6 text-center">
-        <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-sm text-muted-foreground mt-2">جاري تحميل الإعدادات...</p>
-      </CardContent>
-    </Card>
-  );
-}
+// بعد:
+}, [beneficiary, form, open]);
 ```
 
-### الإصلاح #2: BankAccountsTab.tsx
+---
+
+### الإصلاح #2: تصحيح invalidation queries
+
+**الملف:** `src/components/beneficiary/dialogs/EditProfileDialog.tsx`
 
 ```typescript
-// قبل الإصلاح (السطر 10):
-const { settings } = useVisibilitySettings();
+// الحصول على user id من AuthContext
+import { useAuth } from "@/contexts/AuthContext";
 
-// بعد الإصلاح:
-const { settings, isLoading: settingsLoading } = useVisibilitySettings();
+// داخل المكون:
+const { user } = useAuth();
 
-// إضافة قبل فحص الصلاحيات:
-if (settingsLoading) {
-  return (
-    <Card>
-      <CardContent className="p-6 text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-sm text-muted-foreground mt-2">جاري تحميل الإعدادات...</p>
-      </CardContent>
-    </Card>
-  );
-}
+// بعد التحديث الناجح:
+await queryClient.invalidateQueries({ 
+  queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) 
+});
+await queryClient.invalidateQueries({ 
+  queryKey: ['preview-beneficiary', beneficiary.id] 
+});
+await queryClient.invalidateQueries({ 
+  queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) 
+});
+await queryClient.invalidateQueries({ 
+  queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) 
+});
 ```
 
-### الإصلاح #3: MoreMenuTab.tsx
+---
+
+### الإصلاح #3: إعادة جلب البيانات بعد إغلاق الحوار
+
+**الملف:** `src/components/beneficiary/tabs/BeneficiaryProfileTab.tsx`
+
+تحديث `handleEditSuccess`:
 
 ```typescript
-// قبل الإصلاح (السطور 105-113):
-const handleItemClick = (item: MenuItem) => {
-  if (item.action) {
-    item.action();
-  } ...
-};
-
-// بعد الإصلاح:
-const handleItemClick = async (item: MenuItem) => {
-  try {
-    if (item.action) {
-      await item.action();
-    } else if (item.href) {
-      navigate(item.href);
-    } else if (item.tab) {
-      setSearchParams({ tab: item.tab });
-    }
-  } catch (error) {
-    console.error('Navigation error:', error);
-    toast.error('حدث خطأ أثناء التنقل');
-  }
+const handleEditSuccess = async () => {
+  // إعادة جلب بيانات المستفيد بشكل قسري
+  await queryClient.refetchQueries({ 
+    queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id),
+    exact: true 
+  });
+  await queryClient.refetchQueries({ 
+    queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id),
+    exact: true 
+  });
 };
 ```
 
 ---
 
-## التوصيات النهائية
+## ملخص التغييرات
 
-1. **الإصلاحات الفورية (3 ملفات):** معالجة حالة التحميل في `FamilyTreeTab` و `BankAccountsTab`، وإضافة Error Handling في `MoreMenuTab`
+| الملف | التغيير | الأولوية |
+|-------|---------|----------|
+| `EditProfileDialog.tsx` | إضافة `open` إلى dependency array | 🔴 Critical |
+| `EditProfileDialog.tsx` | تصحيح query keys في invalidation | 🔴 Critical |
+| `EditProfileDialog.tsx` | إضافة `useAuth` للحصول على user id | 🔴 Critical |
+| `BeneficiaryProfileTab.tsx` | تحسين `handleEditSuccess` | 🟠 High |
 
-2. **التحسينات المتوسطة (4 ملفات):** توحيد استخدام الثوابت وتحسين تجاوب المستندات
+---
 
-3. **التحسينات المستقبلية (3 ملفات):** تأكيد الخروج وإصلاح حوار إضافة أفراد العائلة
+## التحقق بعد الإصلاح
 
-4. **الاختبار المطلوب:**
-   - اختبار التنقل بين جميع التبويبات
-   - اختبار على شاشات الجوال
-   - اختبار سيناريو تحميل بطيء للتأكد من عدم ظهور رسائل خاطئة
+1. فتح بوابة المستفيد → تبويب العائلة → بياناتي
+2. الضغط على "تعديل الملف"
+3. تعديل البيانات العائلية (عدد الأبناء، الحالة الاجتماعية)
+4. الضغط على حفظ
+5. التأكد من:
+   - ✅ ظهور رسالة نجاح
+   - ✅ تحديث البيانات في الواجهة فوراً
+   - ✅ ظهور القيم الجديدة في المربعات العائلية
 
