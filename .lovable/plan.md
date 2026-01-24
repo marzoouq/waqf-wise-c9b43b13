@@ -1,172 +1,381 @@
 
-# خطة إصلاح شريط التنقل السفلي لبوابة المستفيد
 
-## 🎯 الأهداف
-1. إصلاح منطق تحديد العنصر النشط لدعم query parameters
-2. إضافة animations سلسة باستخدام framer-motion
-3. ضمان عمل التنقل بشكل صحيح بين جميع التبويبات
+# خطة إعادة تنظيم تبويبات بوابة المستفيد
+## تحليل منهجي مُصحح ومُحقق
 
 ---
 
-## 📋 المشاكل المكتشفة
+## التحقق من الوضع الحالي
 
-### المشكلة 1: منطق `isItemActive` لا يدعم query params
-**الملف:** `src/components/mobile/BottomNavigation.tsx` (السطور 58-64)
+### الأزرار الخمسة في الشريط السفلي:
+| # | الزر | المسار | المحتوى الفعلي |
+|---|------|--------|----------------|
+| 1 | الرئيسية | `/beneficiary-portal` | `WaqfSummaryTab` - ملخص الوقف والإحصائيات |
+| 2 | التوزيعات | `?tab=distributions` | `BeneficiaryDistributionsTab` - كشف حساب + سجل التوزيعات |
+| 3 | الطلبات | `?tab=requests` | `BeneficiaryRequestsTab` - طلبات المستفيد |
+| 4 | ملفي | `?tab=profile` | `BeneficiaryProfileTab` - بيانات شخصية + **ملخص عائلي (أعداد)** + بنكية |
+| 5 | المزيد | `?tab=reports` | `FinancialReportsTab` - تقارير مالية + إفصاحات |
+
+### التبويبات في القائمة الجانبية فقط (غير موجودة في الشريط السفلي):
+- `family` → شجرة العائلة (FamilyTreeTab)
+- `properties` → العقارات
+- `documents` → المستندات
+- `governance` → الحوكمة
+- `loans` → القروض
+- `bank` → الحسابات البنكية
+
+---
+
+## المشاكل المكتشفة بعد التحقق
+
+### المشكلة 1: الخلط بين "ملخص العائلة" و "شجرة العائلة"
+**الموقع:** `BeneficiaryProfileTab.tsx` (السطور 307-337)
+
+```text
+زر "ملفي" يعرض:
+┌─────────────────────────────────┐
+│ المعلومات العائلية             │
+│ ────────────────────────────── │
+│ الحالة الاجتماعية: متزوج       │
+│ حجم الأسرة: 5                  │
+│ ┌─────┬─────┬─────┐           │
+│ │ 2   │ 2   │ 1   │           │
+│ │أبناء│بنات │زوجات│           │
+│ └─────┴─────┴─────┘           │
+└─────────────────────────────────┘
+           ↓
+    أعداد فقط، بدون أسماء أو تفاصيل
+```
+
+**بينما المستخدم يتوقع:**
+```text
+شجرة العائلة (FamilyTreeTab):
+┌─────────────────────────────────┐
+│ 👤 محمد أحمد [رب الأسرة] [أنت] │
+│ 👤 عبدالله محمد                │
+│ 👤 فاطمة محمد                  │
+│ ...                            │
+└─────────────────────────────────┘
+           ↓
+    قائمة بالأسماء والتفاصيل
+```
+
+### المشكلة 2: زر "المزيد" يفتح صفحة مباشرة بدلاً من قائمة
+**الموقع:** `beneficiaryNavigation.ts` (السطر 43)
 
 ```typescript
-// الكود الحالي - المشكلة
-const isItemActive = useMemo(() => {
-  return (item: NavigationItem) => {
-    if (location.pathname === item.path) return true;
-    if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
-    return false;
+path: "/beneficiary-portal?tab=reports" // يفتح التقارير مباشرة
+```
+
+**بينما المتوقع:** قائمة خيارات (عقارات، مستندات، حوكمة، قروض، إعدادات)
+
+---
+
+## خطة الإصلاح
+
+### المرحلة 1: دمج "ملفي" مع "العائلة"
+
+**الهدف:** إنشاء تبويب موحد "العائلة والحساب" يحتوي:
+- تبويب فرعي "بياناتي" ← المحتوى الحالي لـ `BeneficiaryProfileTab`
+- تبويب فرعي "شجرة العائلة" ← المحتوى الحالي لـ `FamilyTreeTab`
+- تبويب فرعي "البنكية" ← قسم المعلومات البنكية
+
+**الملفات المتأثرة:**
+1. `src/components/beneficiary/tabs/FamilyAccountTab.tsx` ← **ملف جديد**
+2. `src/components/beneficiary/TabRenderer.tsx` ← تحديث
+3. `src/config/navigation/beneficiaryNavigation.ts` ← تحديث
+
+**الكود الجديد (`FamilyAccountTab.tsx`):**
+
+```typescript
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Users, CreditCard } from "lucide-react";
+import { BeneficiaryProfileTab } from "./BeneficiaryProfileTab";
+import { FamilyTreeTab } from "./FamilyTreeTab";
+import { BankAccountsTab } from "./BankAccountsTab";
+
+interface FamilyAccountTabProps {
+  beneficiaryId: string;
+  beneficiary: unknown;
+}
+
+export function FamilyAccountTab({ beneficiaryId, beneficiary }: FamilyAccountTabProps) {
+  const [activeSubTab, setActiveSubTab] = useState("profile");
+
+  return (
+    <div className="space-y-4">
+      <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            بياناتي
+          </TabsTrigger>
+          <TabsTrigger value="family" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            شجرة العائلة
+          </TabsTrigger>
+          <TabsTrigger value="bank" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4" />
+            البنكية
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile">
+          <BeneficiaryProfileTab beneficiary={beneficiary} />
+        </TabsContent>
+
+        <TabsContent value="family">
+          <FamilyTreeTab beneficiaryId={beneficiaryId} />
+        </TabsContent>
+
+        <TabsContent value="bank">
+          <BankAccountsTab />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+```
+
+### المرحلة 2: تحويل "المزيد" إلى قائمة
+
+**الهدف:** إنشاء قائمة خيارات بدلاً من فتح التقارير مباشرة
+
+**الملفات المتأثرة:**
+1. `src/components/beneficiary/tabs/MoreMenuTab.tsx` ← **ملف جديد**
+2. `src/components/beneficiary/TabRenderer.tsx` ← تحديث
+3. `src/config/navigation/beneficiaryNavigation.ts` ← تحديث
+
+**الكود الجديد (`MoreMenuTab.tsx`):**
+
+```typescript
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  FileText, Building2, FolderOpen, Scale, 
+  CreditCard, Settings, LogOut, ChevronLeft 
+} from "lucide-react";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  tab?: string;
+  href?: string;
+  action?: () => void;
+  settingKey?: string;
+}
+
+export function MoreMenuTab() {
+  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
+  const { settings } = useVisibilitySettings();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("تم تسجيل الخروج");
+    navigate("/auth");
   };
-}, [location.pathname]); // ❌ لا يتضمن location.search
-```
 
-**النتيجة:**
-- المستخدم على `/beneficiary-portal?tab=requests`
-- زر "الرئيسية" يظهر نشطاً (خطأ)
-- زر "الطلبات" لا يظهر نشطاً (خطأ)
+  const menuItems: MenuItem[] = [
+    { 
+      id: "reports", 
+      label: "التقارير والإفصاحات", 
+      icon: FileText, 
+      tab: "reports-detail",
+      settingKey: "show_financial_reports"
+    },
+    { 
+      id: "properties", 
+      label: "العقارات", 
+      icon: Building2, 
+      tab: "properties",
+      settingKey: "show_properties"
+    },
+    { 
+      id: "documents", 
+      label: "المستندات", 
+      icon: FolderOpen, 
+      tab: "documents",
+      settingKey: "show_documents"
+    },
+    { 
+      id: "governance", 
+      label: "الحوكمة", 
+      icon: Scale, 
+      tab: "governance",
+      settingKey: "show_governance"
+    },
+    { 
+      id: "loans", 
+      label: "القروض", 
+      icon: CreditCard, 
+      tab: "loans",
+      settingKey: "show_own_loans"
+    },
+    { 
+      id: "settings", 
+      label: "الإعدادات", 
+      icon: Settings, 
+      href: "/beneficiary-settings"
+    },
+    { 
+      id: "logout", 
+      label: "تسجيل الخروج", 
+      icon: LogOut, 
+      action: handleLogout
+    },
+  ];
 
-### المشكلة 2: `matchPaths` للرئيسية واسع جداً
-**الملف:** `src/config/navigation/beneficiaryNavigation.ts` (السطر 16)
-
-```typescript
-matchPaths: ["/beneficiary-portal"], // ❌ يتطابق مع كل شيء يبدأ بـ /beneficiary-portal
-```
-
-### المشكلة 3: لا توجد animations
-- الانتقال بين الأزرار فوري بدون تأثير بصري
-- لا يوجد feedback عند الضغط
-
----
-
-## ✅ خطة الإصلاح
-
-### المرحلة 1: إصلاح منطق `isItemActive`
-
-**الملف:** `src/components/mobile/BottomNavigation.tsx`
-
-**التغييرات:**
-1. إضافة `location.search` للتحقق من query params
-2. تحديث dependencies في `useMemo`
-3. منطق مطابقة ذكي يفرق بين المسارات العادية والمسارات مع query params
-
-```typescript
-// الكود الجديد
-const isItemActive = useMemo(() => {
-  const fullPath = location.pathname + location.search;
-  
-  return (item: NavigationItem) => {
-    // 1. مطابقة تامة مع المسار الكامل
-    if (fullPath === item.path) return true;
-    if (location.pathname === item.path && !location.search) return true;
-    
-    // 2. التحقق من matchPaths
-    if (item.matchPaths?.some(matchPath => {
-      if (matchPath.includes('?')) {
-        // مسار مع query params - مطابقة تامة
-        return fullPath === matchPath || fullPath.startsWith(matchPath + '&');
-      }
-      // مسار بسيط بدون query - فقط إذا لم يكن هناك query params
-      if (item.id === 'home') {
-        return location.pathname === matchPath && !location.search;
-      }
-      return location.pathname === matchPath || location.pathname.startsWith(matchPath + '/');
-    })) return true;
-    
-    return false;
+  const handleItemClick = (item: MenuItem) => {
+    if (item.action) {
+      item.action();
+    } else if (item.href) {
+      navigate(item.href);
+    } else if (item.tab) {
+      setSearchParams({ tab: item.tab });
+    }
   };
-}, [location.pathname, location.search]);
+
+  const visibleItems = menuItems.filter(item => {
+    if (!item.settingKey) return true;
+    return settings?.[item.settingKey as keyof typeof settings];
+  });
+
+  return (
+    <div className="space-y-2">
+      {visibleItems.map((item) => (
+        <Card 
+          key={item.id}
+          className="cursor-pointer hover:bg-accent/50 transition-colors"
+          onClick={() => handleItemClick(item)}
+        >
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <item.icon className="h-5 w-5 text-primary" />
+              </div>
+              <span className="font-medium">{item.label}</span>
+            </div>
+            <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 ```
 
-### المرحلة 2: إضافة Animations سلسة
+### المرحلة 3: تحديث التنقل والإعدادات
 
-**الملف:** `src/components/mobile/BottomNavigation.tsx`
-
-**التغييرات:**
-1. استيراد `motion` و `AnimatePresence` من `framer-motion`
-2. إضافة `layoutId` للمؤشر النشط للانتقال السلس
-3. إضافة `whileTap` للتغذية الراجعة عند الضغط
-4. استخدام spring animation للحركة الطبيعية
+**تحديث `beneficiaryNavigation.ts`:**
 
 ```typescript
-import { motion, AnimatePresence } from 'framer-motion';
-
-// المؤشر النشط مع animation
-<AnimatePresence mode="wait">
-  {isActive && (
-    <motion.div 
-      layoutId="bottomNavActiveIndicator"
-      className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full"
-      initial={{ opacity: 0, scaleX: 0 }}
-      animate={{ opacity: 1, scaleX: 1 }}
-      exit={{ opacity: 0, scaleX: 0 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-    />
-  )}
-</AnimatePresence>
-
-// الأيقونة مع animation
-<motion.div
-  whileTap={{ scale: 0.9 }}
-  animate={{ scale: isActive ? 1.1 : 1 }}
-  transition={{ type: "spring", stiffness: 400, damping: 17 }}
->
-  <item.icon className="h-5 w-5" />
-</motion.div>
+export const beneficiaryNavigationItems: readonly NavigationItem[] = [
+  {
+    id: "home",
+    label: "الرئيسية",
+    icon: Home,
+    path: "/beneficiary-portal",
+    matchPaths: [],
+  },
+  {
+    id: "distributions",
+    label: "التوزيعات",
+    icon: Wallet,
+    path: "/beneficiary-portal?tab=distributions",
+    matchPaths: ["/beneficiary-portal?tab=distributions"],
+  },
+  {
+    id: "requests",
+    label: "الطلبات",
+    icon: FileText,
+    path: "/beneficiary-portal?tab=requests",
+    matchPaths: ["/beneficiary-portal?tab=requests"],
+  },
+  {
+    id: "family",
+    label: "العائلة", // ← تغيير من "ملفي"
+    icon: Users, // ← تغيير الأيقونة
+    path: "/beneficiary-portal?tab=family-account",
+    matchPaths: ["/beneficiary-portal?tab=family-account", "/beneficiary-portal?tab=profile"],
+  },
+  {
+    id: "more",
+    label: "المزيد",
+    icon: MoreHorizontal,
+    path: "/beneficiary-portal?tab=more",
+    matchPaths: ["/beneficiary-portal?tab=more"],
+  },
+] as const;
 ```
 
-### المرحلة 3: تحديث إعداد تنقل المستفيد (اختياري)
+**تحديث `TabRenderer.tsx`:**
 
-**الملف:** `src/config/navigation/beneficiaryNavigation.ts`
-
-**التغييرات:**
-تحديث `matchPaths` للرئيسية لتكون أكثر تحديداً:
+إضافة التبويبات الجديدة:
 
 ```typescript
-{
-  id: "home",
-  label: "الرئيسية",
-  icon: Home,
-  path: "/beneficiary-portal",
-  matchPaths: [], // فارغ - يعتمد على المنطق الجديد في isItemActive
-},
+const LazyFamilyAccountTab = lazy(() => 
+  import("@/components/beneficiary/tabs/FamilyAccountTab").then(m => ({ default: m.FamilyAccountTab }))
+);
+const LazyMoreMenuTab = lazy(() => 
+  import("@/components/beneficiary/tabs/MoreMenuTab").then(m => ({ default: m.MoreMenuTab }))
+);
+
+// في TAB_CONFIGS:
+{ key: "family-account", settingKey: "show_profile", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
+{ key: "more", settingKey: "show_overview", component: LazyMoreMenuTab, alwaysVisible: true },
+// تغيير reports إلى reports-detail للوصول من قائمة "المزيد"
+{ key: "reports-detail", settingKey: "show_financial_reports", component: LazyFinancialReportsTab },
 ```
 
 ---
 
-## 📊 ملخص التغييرات
+## ملخص التغييرات
 
-| الملف | التغيير | الأسطر |
-|-------|---------|--------|
-| `src/components/mobile/BottomNavigation.tsx` | إصلاح `isItemActive` + إضافة framer-motion | 1-126 |
-| `src/config/navigation/beneficiaryNavigation.ts` | تنظيف `matchPaths` (اختياري) | 16 |
+| الملف | العملية | الوصف |
+|-------|---------|-------|
+| `src/components/beneficiary/tabs/FamilyAccountTab.tsx` | **إنشاء** | تبويب مُدمج للعائلة والملف الشخصي |
+| `src/components/beneficiary/tabs/MoreMenuTab.tsx` | **إنشاء** | قائمة خيارات "المزيد" |
+| `src/components/beneficiary/TabRenderer.tsx` | **تحديث** | إضافة التبويبات الجديدة |
+| `src/config/navigation/beneficiaryNavigation.ts` | **تحديث** | تغيير الأزرار |
+| `src/components/beneficiary/tabs/index.ts` | **تحديث** | تصدير المكونات الجديدة |
 
 ---
 
-## 🧪 اختبار الإصلاح
+## الهيكل النهائي
+
+```text
+📱 الشريط السفلي (5 أزرار):
+├── 🏠 الرئيسية → WaqfSummaryTab
+├── 💰 التوزيعات → BeneficiaryDistributionsTab
+├── 📝 الطلبات → BeneficiaryRequestsTab
+├── 👨‍👩‍👧‍👦 العائلة → FamilyAccountTab (جديد)
+│   ├── بياناتي (BeneficiaryProfileTab)
+│   ├── شجرة العائلة (FamilyTreeTab)
+│   └── البنكية (BankAccountsTab)
+└── ⚙️ المزيد → MoreMenuTab (جديد)
+    ├── التقارير والإفصاحات
+    ├── العقارات
+    ├── المستندات
+    ├── الحوكمة
+    ├── القروض
+    ├── الإعدادات
+    └── تسجيل الخروج
+```
+
+---
+
+## اختبار الحل
 
 | السيناريو | النتيجة المتوقعة |
 |-----------|-----------------|
-| `/beneficiary-portal` | ✅ الرئيسية نشطة |
-| `/beneficiary-portal?tab=distributions` | ✅ التوزيعات نشطة |
-| `/beneficiary-portal?tab=requests` | ✅ الطلبات نشطة |
-| `/beneficiary-portal?tab=profile` | ✅ ملفي نشط |
-| `/beneficiary-portal?tab=reports` | ✅ المزيد نشط |
-| الضغط على أي زر | ✅ تأثير scale خفيف |
-| التنقل بين الأزرار | ✅ المؤشر ينتقل بسلاسة |
+| الضغط على "العائلة" | تظهر 3 تبويبات فرعية (بياناتي، شجرة العائلة، البنكية) |
+| الضغط على "المزيد" | تظهر قائمة خيارات قابلة للنقر |
+| اختيار "التقارير" من المزيد | ينتقل إلى صفحة التقارير |
+| اختيار "تسجيل الخروج" | يتم تسجيل الخروج والتوجيه لصفحة الدخول |
 
----
-
-## 📝 التفاصيل التقنية
-
-### Dependencies المستخدمة:
-- `framer-motion` (موجود بالفعل: `^12.23.24`)
-- `react-router-dom` (موجود: `useLocation`)
-
-### الأداء:
-- `useMemo` لتجنب إعادة الحساب غير الضرورية
-- `memo` على المكون بأكمله
-- `AnimatePresence` مع `mode="wait"` لتجنب تداخل الـ animations
