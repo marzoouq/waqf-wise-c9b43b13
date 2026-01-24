@@ -61,13 +61,21 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
     })) as BeneficiaryRequest[];
   }, [rawRequests]);
 
-  // حساب الإحصائيات
+  // حساب الإحصائيات - استخدام الثوابت للفلترة
   const stats = useMemo(() => {
+    const pendingStatuses = ["معلق", "قيد المراجعة", "pending", "in_review"];
+    const approvedStatuses = ["معتمد", "موافق عليه", "approved"];
+    const rejectedStatuses = ["مرفوض", "rejected"];
+    
     const pending = requests.filter((r) => 
-      r.status === "معلق" || r.status === "قيد المراجعة"
+      pendingStatuses.includes(r.status || '')
     ).length;
-    const approved = requests.filter((r) => r.status === "معتمد").length;
-    const rejected = requests.filter((r) => r.status === "مرفوض").length;
+    const approved = requests.filter((r) => 
+      approvedStatuses.includes(r.status || '')
+    ).length;
+    const rejected = requests.filter((r) => 
+      rejectedStatuses.includes(r.status || '')
+    ).length;
     const overdue = requests.filter((r) => r.is_overdue).length;
 
     return {
@@ -79,22 +87,30 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
     };
   }, [requests]);
 
-  // فلترة الطلبات
+  // فلترة الطلبات - استخدام الثوابت للفلترة
   const filteredRequests = useMemo(() => {
     let result = requests;
+    
+    const pendingStatuses = ["معلق", "قيد المراجعة", "pending", "in_review"];
+    const approvedStatuses = ["معتمد", "موافق عليه", "approved"];
+    const rejectedStatuses = ["مرفوض", "rejected"];
 
     // فلترة حسب الحالة
     switch (activeFilter) {
       case "pending":
         result = result.filter((r) => 
-          r.status === "معلق" || r.status === "قيد المراجعة"
+          pendingStatuses.includes(r.status || '')
         );
         break;
       case "approved":
-        result = result.filter((r) => r.status === "معتمد");
+        result = result.filter((r) => 
+          approvedStatuses.includes(r.status || '')
+        );
         break;
       case "rejected":
-        result = result.filter((r) => r.status === "مرفوض");
+        result = result.filter((r) => 
+          rejectedStatuses.includes(r.status || '')
+        );
         break;
       case "overdue":
         result = result.filter((r) => r.is_overdue);

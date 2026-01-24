@@ -95,7 +95,7 @@ export function FinancialReportsTab() {
 
   // جلب الإفصاح السنوي المنشور
   const { data: disclosure, isLoading: disclosureLoading } = useQuery({
-    queryKey: ['annual-disclosure-latest'],
+    queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES ? [...QUERY_KEYS.ANNUAL_DISCLOSURES, 'latest'] : ['annual-disclosure-latest'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('annual_disclosures')

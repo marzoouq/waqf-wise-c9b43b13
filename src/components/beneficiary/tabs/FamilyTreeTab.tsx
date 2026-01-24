@@ -11,12 +11,24 @@ interface FamilyTreeTabProps {
 }
 
 export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
-  const { settings } = useVisibilitySettings();
+  const { settings, isLoading: settingsLoading } = useVisibilitySettings();
 
   const { data: familyMembers, isLoading } = useFamilyTree(
     beneficiaryId,
-    settings?.show_family_tree || false
+    settings?.show_family_tree ?? true
   );
+
+  // عرض حالة التحميل أثناء جلب الإعدادات
+  if (settingsLoading) {
+    return (
+      <Card>
+        <CardContent className="p-4 sm:p-6 text-center">
+          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-sm text-muted-foreground mt-2">جاري تحميل الإعدادات...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!settings?.show_family_tree) {
     return (
