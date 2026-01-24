@@ -15,6 +15,7 @@ export const test = base.extend<{
     
     // انتظار تحميل الخطوط العربية
     await page.evaluate(async () => {
+      // @ts-expect-error - document is available in browser context
       await document.fonts.ready;
     });
     
@@ -50,6 +51,7 @@ export const maskedOptions = (page: Page, selectors: string[] = []) => ({
 export async function waitForPageStability(page: Page, timeout = 1000) {
   await page.waitForLoadState('domcontentloaded');
   await page.evaluate(async () => {
+    // @ts-expect-error - document is available in browser context
     await document.fonts.ready;
   });
   await page.waitForTimeout(timeout);
@@ -58,7 +60,9 @@ export async function waitForPageStability(page: Page, timeout = 1000) {
 // دالة مساعدة لتفعيل الوضع الداكن
 export async function enableDarkMode(page: Page) {
   await page.evaluate(() => {
+    // @ts-expect-error - document is available in browser context
     document.documentElement.classList.remove('light');
+    // @ts-expect-error - document is available in browser context
     document.documentElement.classList.add('dark');
     localStorage.setItem('theme', 'dark');
   });
@@ -68,7 +72,9 @@ export async function enableDarkMode(page: Page) {
 // دالة مساعدة لتفعيل الوضع الفاتح
 export async function enableLightMode(page: Page) {
   await page.evaluate(() => {
+    // @ts-expect-error - document is available in browser context
     document.documentElement.classList.remove('dark');
+    // @ts-expect-error - document is available in browser context
     document.documentElement.classList.add('light');
     localStorage.setItem('theme', 'light');
   });

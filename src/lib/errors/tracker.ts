@@ -19,8 +19,7 @@ import {
   cleanUrl, 
   cleanErrorMessage,
   sanitizeAdditionalData,
-  createErrorKey,
-  isAuthRelatedUrl 
+  createErrorKey
 } from './tracker-utils';
 import type { 
   DeduplicationEntry, 

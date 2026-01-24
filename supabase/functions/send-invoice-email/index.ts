@@ -7,7 +7,7 @@ import {
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-interface SendInvoiceEmailRequest {
+interface _SendInvoiceEmailRequest {
   invoiceId: string;
   customerEmail: string;
   customerName: string;
