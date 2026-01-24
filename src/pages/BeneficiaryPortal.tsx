@@ -92,7 +92,7 @@ export default function BeneficiaryPortal() {
   return (
     <PageErrorBoundary pageName="بوابة المستفيد">
       <SidebarProvider defaultOpen={true}>
-        <div className="flex min-h-screen w-full bg-background overflow-x-hidden">
+        <div className="flex min-h-screen w-full bg-background overflow-x-hidden" dir="rtl">
           {/* Sidebar - يتحول تلقائياً بين Sheet (جوال) و fixed (ديسكتوب) */}
           <BeneficiarySidebar
             activeTab={activeTab}
