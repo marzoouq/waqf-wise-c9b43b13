@@ -55,24 +55,26 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to beneficiaries table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, _error } = await supabase.from('beneficiaries').select('*').limit(1);
+      const { data, error } = await supabase.from('beneficiaries').select('*').limit(1);
 
       // Should return empty or error due to RLS
+      void error;
       expect(data?.length || 0).toBe(0);
     });
 
     test('should deny access to audit_logs table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, _error } = await supabase.from('audit_logs').select('*').limit(1);
+      const { data, error } = await supabase.from('audit_logs').select('*').limit(1);
 
+      void error;
       expect(data?.length || 0).toBe(0);
     });
 
     test('should deny access to payment_vouchers without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data: _data } = await supabase.from('payment_vouchers').select('*').limit(1);
+      const { data } = await supabase.from('payment_vouchers').select('*').limit(1);
 
       expect(data?.length || 0).toBe(0);
     });
@@ -80,7 +82,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to user_roles without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data: _data } = await supabase.from('user_roles').select('*').limit(1);
+      const { data } = await supabase.from('user_roles').select('*').limit(1);
 
       expect(data?.length || 0).toBe(0);
     });
@@ -122,9 +124,10 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data: _beneficiaries, _error } = await supabase.from('beneficiaries').select('*').limit(10);
+      const { data: beneficiaries, error } = await supabase.from('beneficiaries').select('*').limit(10);
 
       // Admin should have access
+      void beneficiaries;
       expect(error).toBeNull();
       // Admin can see multiple beneficiaries
     });
@@ -140,8 +143,9 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data: _data, _error } = await supabase.from('beneficiaries').select('*').limit(5);
+      const { data, error } = await supabase.from('beneficiaries').select('*').limit(5);
 
+      void data;
       expect(error).toBeNull();
     });
   });
@@ -165,8 +169,9 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       const { error: adminAuthError } = await supabase.auth.signInWithPassword(TEST_USERS.admin);
       
       if (!adminAuthError) {
-        const { data: _adminData, error } = await supabase.from('audit_logs').select('*').limit(1);
+        const { data: adminData, error } = await supabase.from('audit_logs').select('*').limit(1);
         // Admin should have access
+        void adminData;
         expect(error).toBeNull();
       }
     });
@@ -181,7 +186,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data: _data } = await supabase.from('audit_logs').select('*').limit(1);
+      const { data } = await supabase.from('audit_logs').select('*').limit(1);
       
       expect(data?.length || 0).toBe(0);
     });
@@ -268,7 +273,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data: _data } = await supabase.from('distributions').select('*');
+      const { data } = await supabase.from('distributions').select('*');
 
       // Beneficiary should see only their distributions or none
       expect(data?.length || 0).toBeLessThanOrEqual(10);
