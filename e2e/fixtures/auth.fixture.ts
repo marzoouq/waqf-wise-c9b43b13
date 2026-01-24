@@ -37,15 +37,15 @@ export const test = base.extend<AuthFixtures>({
     await client.auth.signOut();
   },
 
-  loginAs: async ({ page }, use) => {
+  loginAs: async ({ _page }, use) => {
     const loginAs = async (_role: UserRole): Promise<boolean> => {
-      // Implementation can use page for navigation
-      void page;
       return false;
     };
     await use(loginAs);
   },
 
+  loginWithCredentials: async ({ _page }, use) => {
+    const loginWithCredentials = async (_email: string, _password: string): Promise<boolean> => {
   loginWithCredentials: async ({ page }, use) => {
     const loginWithCredentials = async (_email: string, _password: string): Promise<boolean> => {
       // Implementation can use page for navigation
@@ -55,15 +55,12 @@ export const test = base.extend<AuthFixtures>({
     await use(loginWithCredentials);
   },
 
-  logout: async ({ page }, use) => {
-    const logout = async (): Promise<void> => {
-      // Implementation can use page for navigation
-      void page;
-    };
+  logout: async ({ _page }, use) => {
+    const logout = async (): Promise<void> => {};
     await use(logout);
   },
 
-  isLoggedIn: async ({ page }, use) => {
+  isLoggedIn: async ({ _page }, use) => {
     const isLoggedIn = async (): Promise<boolean> => {
       // Implementation can use page for navigation
       void page;
@@ -83,6 +80,6 @@ export function isSupabaseConfigured(): boolean {
   return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 }
 
-export async function waitForAuth(_page: Page, _timeout = 10000): Promise<boolean> {
+export async function waitForAuth(_page: any, _timeout = 10000): Promise<boolean> {
   return false;
 }

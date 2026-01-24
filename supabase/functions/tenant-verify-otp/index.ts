@@ -1,3 +1,4 @@
+// eslint-disable @typescript-eslint/no-explicit-any
 /**
  * Tenant Verify OTP Edge Function
  * التحقق من رقم العقد وإنشاء جلسة للمستأجر

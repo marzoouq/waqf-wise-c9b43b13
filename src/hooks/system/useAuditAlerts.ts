@@ -2,6 +2,11 @@
  * useAuditAlerts Hook - تنبيهات التدقيق الذكية
  * @version 1.0.0
  */
+import { useQuery, _useMutation, _useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { QUERY_KEYS } from "@/lib/query-keys";
+import { toast } from "sonner";
+import { useEffect, _useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_KEYS } from "@/lib/query-keys";
@@ -39,6 +44,54 @@ export interface AuditAlert {
 //   isActive: boolean;
 // }
 
+// القواعس الافتراضية للتنبيهات
+const _DEFAULT_ALERT_RULES: AuditAlertRule[] = [
+  {
+    id: 'rule_mass_delete',
+    name: 'حذف جماعي',
+    type: 'mass_delete',
+    conditions: {
+      actionType: ['DELETE'],
+      minCount: 5,
+      timeWindowMinutes: 5,
+    },
+    severity: 'critical',
+    isActive: true,
+  },
+  {
+    id: 'rule_financial_change',
+    name: 'تغيير مالي',
+    type: 'financial_change',
+    conditions: {
+      tableName: ['payment_vouchers', 'journal_entries', 'journal_entry_lines', 'distributions', 'loans', 'bank_transfers'],
+      actionType: ['INSERT', 'UPDATE', 'DELETE'],
+    },
+    severity: 'high',
+    isActive: true,
+  },
+  {
+    id: 'rule_role_change',
+    name: 'تغيير الأدوار',
+    type: 'role_change',
+    conditions: {
+      tableName: ['user_roles', 'profiles'],
+      actionType: ['INSERT', 'UPDATE', 'DELETE'],
+    },
+    severity: 'high',
+    isActive: true,
+  },
+  {
+    id: 'rule_sensitive_data',
+    name: 'بيانات حساسة',
+    type: 'sensitive_data',
+    conditions: {
+      tableName: ['beneficiaries', 'bank_accounts', 'bank_transfer_details'],
+      actionType: ['UPDATE', 'DELETE'],
+    },
+    severity: 'medium',
+    isActive: true,
+  },
+];
 // القواعد الافتراضية للتنبيهات
 // const DEFAULT_ALERT_RULES: AuditAlertRule[] = [
 //   {

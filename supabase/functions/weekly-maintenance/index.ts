@@ -252,7 +252,7 @@ Deno.serve(async (req) => {
     ];
 
     for (const table of tablesToAnalyze) {
-      const { data: _data, error } = await supabase.rpc('analyze_table', { table_name: table });
+      const { data: _weeklyData, error } = await supabase.rpc('analyze_table', { table_name: table });
       performanceResults.push({
         operation: `analyze_${table}`,
         status: error ? 'error' : 'completed',

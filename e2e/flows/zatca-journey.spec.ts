@@ -152,7 +152,7 @@ test.describe('اختبار QR Code ZATCA', () => {
 
 // اختبار Edge Function zatca-submit
 test.describe('اختبار Edge Function ZATCA', () => {
-  test('التحقق من وجود وظيفة zatca-submit', async ({ request }) => {
+  test('التحقق من وجود وظيفة zatca-submit', async ({ _page, request }) => {
     // محاولة استدعاء الوظيفة في وضع الاختبار
     const response = await request.post(`${process.env.SUPABASE_URL || ''}/functions/v1/zatca-submit`, {
       headers: {

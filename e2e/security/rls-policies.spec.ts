@@ -55,7 +55,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to beneficiaries table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, error } = await supabase.from('beneficiaries').select('*').limit(1);
+      const { data, _error } = await supabase.from('beneficiaries').select('*').limit(1);
 
       // Should return empty or error due to RLS
       void error;
@@ -65,7 +65,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to audit_logs table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, error } = await supabase.from('audit_logs').select('*').limit(1);
+      const { data, _error } = await supabase.from('audit_logs').select('*').limit(1);
 
       void error;
       expect(data?.length || 0).toBe(0);
@@ -124,11 +124,10 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data: beneficiaries, error } = await supabase.from('beneficiaries').select('*').limit(10);
+      const { data: _beneficiaries, error: _error } = await supabase.from('beneficiaries').select('*').limit(10);
 
       // Admin should have access
-      void beneficiaries;
-      expect(error).toBeNull();
+      expect(_error).toBeNull();
       // Admin can see multiple beneficiaries
     });
 
@@ -143,10 +142,9 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
         return;
       }
 
-      const { data, error } = await supabase.from('beneficiaries').select('*').limit(5);
+      const { data: _data, error: _error } = await supabase.from('beneficiaries').select('*').limit(5);
 
-      void data;
-      expect(error).toBeNull();
+      expect(_error).toBeNull();
     });
   });
 
@@ -169,10 +167,9 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
       const { error: adminAuthError } = await supabase.auth.signInWithPassword(TEST_USERS.admin);
       
       if (!adminAuthError) {
-        const { data: adminData, error } = await supabase.from('audit_logs').select('*').limit(1);
+        const { data: _adminData, error: _error } = await supabase.from('audit_logs').select('*').limit(1);
         // Admin should have access
-        void adminData;
-        expect(error).toBeNull();
+        expect(_error).toBeNull();
       }
     });
 

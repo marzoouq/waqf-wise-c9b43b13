@@ -217,7 +217,7 @@ serve(async (req) => {
       type = 'info',
       actionUrl,
       channel = 'app',
-      priority: _priority = 'medium'
+      _priority = 'medium'
     }: NotificationRequest = body;
 
     if (!userId || !title || !message) {
