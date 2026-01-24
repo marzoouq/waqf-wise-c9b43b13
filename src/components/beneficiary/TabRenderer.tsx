@@ -85,7 +85,7 @@ interface TabConfig {
  */
 const TAB_CONFIGS: TabConfig[] = [
   // التبويبات الرئيسية (الشريط السفلي)
-  { key: "family-account", settingKey: "show_family_tree", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
+  { key: "family-account", settingKey: "show_profile", component: LazyFamilyAccountTab, requiresBeneficiaryId: true, requiresBeneficiary: true },
   { key: "more", settingKey: "show_overview", component: LazyMoreMenuTab, alwaysVisible: true },
   
   // التبويبات الفرعية (من قائمة "المزيد")
