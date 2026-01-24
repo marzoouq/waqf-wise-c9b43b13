@@ -3,7 +3,7 @@
  * تُستخدم للتحقق من صحة البيانات المالية في النظام
  */
 
-import { requireExists, requireNotNull } from './null-guards';
+import { requireExists } from './null-guards';
 
 /**
  * واجهة المبلغ المالي المُتحقق منه
