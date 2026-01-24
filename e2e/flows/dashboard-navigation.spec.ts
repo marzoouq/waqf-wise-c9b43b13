@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * Dashboard Navigation E2E Tests
@@ -60,7 +60,7 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(page: any) {
+  async function loginAsTestUser(page: Page) {
     await page.goto('/login');
     
     const emailInput = page.locator('input[type="email"]').first();
@@ -145,13 +145,13 @@ test.describe('Sidebar Navigation', () => {
 
     if (await collapseButton.isVisible()) {
       const sidebar = page.locator('aside, [class*="sidebar"]').first();
-      // Use `any` to avoid DOM lib typing requirements in Node context
-      const initialWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
+      // Use string evaluation to avoid DOM lib typing in Node context
+      const initialWidth = await sidebar.evaluate('el => el.getBoundingClientRect().width');
 
       await collapseButton.click();
       await page.waitForTimeout(500);
 
-      const newWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
+      const newWidth = await sidebar.evaluate('el => el.getBoundingClientRect().width');
 
       // Width should change (either collapsed or expanded)
       expect(newWidth).not.toBe(initialWidth);
