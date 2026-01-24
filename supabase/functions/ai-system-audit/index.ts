@@ -422,16 +422,19 @@ async function analyzeWithAI(systemData: Record<string, unknown>, categories: st
     console.log('[AI-SYSTEM-AUDIT] AI raw response length:', content.length);
     console.log('[AI-SYSTEM-AUDIT] AI response preview:', content.substring(0, 500));
 
+    // Helper function to normalize findings with category labels
+    const normalizeFinding = (f: Record<string, unknown>): Record<string, unknown> => ({
+      ...f,
+      categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
+      fixed: false
+    });
+
     // ✅ محاولة 1: parse مباشر (إذا كان الرد JSON صافي)
     try {
       const directParse = JSON.parse(content.trim());
       if (Array.isArray(directParse)) {
         console.log(`[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`);
-        return directParse.map((f: Record<string, unknown>) => ({
-          ...f,
-          categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
-          fixed: false
-        }));
+        return directParse.map(normalizeFinding) as AuditFinding[];
       }
     } catch (e) {
       console.log('[AI-SYSTEM-AUDIT] Direct parse failed, trying regex extraction...');
@@ -443,11 +446,7 @@ async function analyzeWithAI(systemData: Record<string, unknown>, categories: st
       try {
         const aiFindings = JSON.parse(jsonMatch[0]);
         console.log(`[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`);
-        return aiFindings.map((f: Record<string, unknown>) => ({
-          ...f,
-          categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
-          fixed: false
-        }));
+        return aiFindings.map(normalizeFinding) as AuditFinding[];
       } catch (parseError) {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse extracted JSON:', parseError);
       }
@@ -460,11 +459,7 @@ async function analyzeWithAI(systemData: Record<string, unknown>, categories: st
         const aiFindings = JSON.parse(codeBlockMatch[1].trim());
         if (Array.isArray(aiFindings)) {
           console.log(`[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`);
-          return aiFindings.map((f: Record<string, unknown>) => ({
-            ...f,
-            categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
-            fixed: false
-          }));
+          return aiFindings.map(normalizeFinding) as AuditFinding[];
         }
       } catch (e) {
         console.error('[AI-SYSTEM-AUDIT] Failed to parse code block JSON');
@@ -489,6 +484,15 @@ function buildAnalysisPrompt(systemData: Record<string, unknown>, categories: st
 
   prompt += '\n\nبيانات النظام:\n';
   
+  // Helper function to get tables without RLS
+  const getTablesWithoutRLS = (): Array<unknown> => {
+    if (!Array.isArray(systemData.tables)) return [];
+    const tables = systemData.tables as Array<Record<string, unknown>>;
+    return tables
+      .filter((t: Record<string, unknown>) => !t.has_rls)
+      .map((t: Record<string, unknown>) => t.table_name || '');
+  };
+
   // تحديد حجم البيانات المرسلة
   const dataToSend = {
     tables: Array.isArray(systemData.tables) ? (systemData.tables as Array<unknown>).slice(0, 50) : [],
@@ -497,7 +501,7 @@ function buildAnalysisPrompt(systemData: Record<string, unknown>, categories: st
     systemStats: systemData.systemStats,
     errorLogsCount: Array.isArray(systemData.errorLogs) ? (systemData.errorLogs as Array<unknown>).length : 0,
     rolesCount: Array.isArray(systemData.roles) ? (systemData.roles as Array<unknown>).length : 0,
-    tablesWithoutRLS: Array.isArray(systemData.tables) ? (systemData.tables as Array<Record<string, unknown>>).filter((t: Record<string, unknown>) => !t.has_rls)?.map((t: Record<string, unknown>) => t.table_name) || [] : []
+    tablesWithoutRLS: getTablesWithoutRLS()
   };
   
   prompt += JSON.stringify(dataToSend, null, 2);

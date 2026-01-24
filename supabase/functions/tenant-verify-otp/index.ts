@@ -19,6 +19,11 @@ function generateSessionToken(): string {
   return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+// استخراج رقم الهاتف النظيف من أي نوع
+function extractPhoneNumber(phoneValue: unknown): string {
+  return ((phoneValue as string | undefined) || "").replace(/\D/g, "");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -71,7 +76,7 @@ serve(async (req) => {
 
       // التحقق من تطابق رقم الهاتف مع المستأجر
       const tenant = directContract.tenants as Record<string, unknown>;
-      const tenantPhone = tenant?.phone ? String(tenant.phone).replace(/\D/g, "") : "";
+      const tenantPhone = extractPhoneNumber(tenant?.phone);
       
       if (!tenantPhone.includes(cleanPhone) && !cleanPhone.includes(tenantPhone.slice(-9))) {
         return new Response(

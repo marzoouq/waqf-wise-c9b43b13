@@ -98,6 +98,18 @@ serve(async (req) => {
           .select("id, unit_number, unit_name, unit_type")
           .eq("current_contract_id", contract.id);
 
+        // Helper function to extract property details
+        const getPropertyDetails = (contractData: Record<string, unknown>) => {
+          const props = contractData.properties as Record<string, unknown> | undefined;
+          return {
+            property_name: (props?.name as string) || "غير محدد",
+            property_location: props?.location,
+            property_type: props?.type,
+          };
+        };
+
+        const propertyDetails = getPropertyDetails(contract as Record<string, unknown>);
+
         if (units && units.length > 0) {
           // إضافة كل وحدة كعقد منفصل
           for (const unit of units) {
@@ -109,9 +121,7 @@ serve(async (req) => {
               end_date: contract.end_date,
               status: contract.status,
               property_id: contract.property_id,
-              property_name: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).name as string || "غير محدد" : "غير محدد",
-              property_location: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).location : undefined,
-              property_type: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).type : undefined,
+              ...propertyDetails,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -128,9 +138,7 @@ serve(async (req) => {
             end_date: contract.end_date,
             status: contract.status,
             property_id: contract.property_id,
-            property_name: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).name as string || "غير محدد" : "غير محدد",
-            property_location: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).location : undefined,
-            property_type: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).type : undefined,
+            ...propertyDetails,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,
@@ -170,11 +178,20 @@ serve(async (req) => {
         .eq("tenant_id", tenant.id)
         .order("created_at", { ascending: false });
 
+      // Helper function to extract request enrichment details
+      const getRequestDetails = (req: Record<string, unknown>) => ({
+        property_name: req.properties 
+          ? ((req.properties as Record<string, unknown>).name as string) || "غير محدد"
+          : "غير محدد",
+        unit_name: req.property_units 
+          ? ((req.property_units as Record<string, unknown>).unit_name || (req.property_units as Record<string, unknown>).unit_number || null)
+          : null,
+      });
+
       // إضافة اسم العقار والوحدة للطلبات
       const enrichedRequests = (requests || []).map((r: Record<string, unknown>) => ({
         ...r,
-        property_name: r.properties ? ((r.properties as Record<string, unknown>).name as string || "غير محدد") : "غير محدد",
-        unit_name: r.property_units ? ((r.property_units as Record<string, unknown>).unit_name || (r.property_units as Record<string, unknown>).unit_number || null) : null,
+        ...getRequestDetails(r),
       }));
 
       return new Response(
