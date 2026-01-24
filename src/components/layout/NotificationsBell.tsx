@@ -47,14 +47,14 @@ export const NotificationsBell = memo(function NotificationsBell() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="relative"
+          className="relative min-w-[44px] min-h-[44px] h-11 w-11 touch-manipulation"
           aria-label={`الإشعارات${unreadCount > 0 ? ` - ${unreadCount} غير مقروءة` : ''}`}
         >
           <Bell className="h-5 w-5" aria-hidden="true" />
           {unreadCount > 0 && (
             <Badge 
               variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              className="absolute -top-0.5 -right-0.5 h-5 w-5 flex items-center justify-center p-0 text-xs pointer-events-none"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>
