@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +24,12 @@ interface ArticleViewDialogProps {
   onRate: (id: string, helpful: boolean) => void;
 }
 
-export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: ArticleViewDialogProps) {
+export function ArticleViewDialog({
+  articleId,
+  open,
+  onOpenChange,
+  onRate,
+}: ArticleViewDialogProps) {
   const { article, isLoading } = useArticle(articleId || '');
 
   const handleShare = () => {
@@ -48,11 +59,11 @@ export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: Art
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-4">
                 <h2 className="text-2xl font-bold">{article.title}</h2>
-                <Badge variant={article.is_featured ? "default" : "outline"}>
+                <Badge variant={article.is_featured ? 'default' : 'outline'}>
                   {article.is_featured ? 'مميز' : article.status}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
@@ -80,9 +91,7 @@ export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: Art
 
             {/* Content */}
             <div className="prose prose-slate dark:prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {article.content}
-              </ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
             </div>
 
             <Separator />
@@ -128,9 +137,7 @@ export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: Art
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            لم يتم العثور على المقالة
-          </div>
+          <div className="text-center py-8 text-muted-foreground">لم يتم العثور على المقالة</div>
         )}
       </DialogContent>
     </Dialog>

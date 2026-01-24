@@ -1,16 +1,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, PieChart as PieChartIcon, DollarSign, TrendingUp, Wallet, Percent } from 'lucide-react';
+import {
+  Download,
+  PieChart as PieChartIcon,
+  DollarSign,
+  TrendingUp,
+  Wallet,
+  Percent,
+} from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/ui/use-toast';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--status-success))', 'hsl(var(--status-warning))', 'hsl(var(--status-error))', 'hsl(var(--chart-5))'];
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--status-success))',
+  'hsl(var(--status-warning))',
+  'hsl(var(--status-error))',
+  'hsl(var(--chart-5))',
+];
 
 export function FundsPerformanceReport() {
   const { toast } = useToast();
@@ -22,17 +54,17 @@ export function FundsPerformanceReport() {
 
     const { exportToPDF } = await import('@/lib/exportHelpers');
     const headers = ['اسم المصرف', 'الفئة', 'المخصص', 'المنفق', 'المستفيدون', 'نسبة الاستخدام'];
-    const data = fundPerformance.map(f => [
+    const data = fundPerformance.map((f) => [
       f.fund_name,
       f.category,
       `${f.allocated_amount.toLocaleString('ar-SA')} ريال`,
       `${f.spent_amount.toLocaleString('ar-SA')} ريال`,
       f.beneficiaries_count,
-      `${f.utilization_rate.toFixed(1)}%`
+      `${f.utilization_rate.toFixed(1)}%`,
     ]);
 
     exportToPDF('تقرير أداء المصارف', headers, data, 'funds_performance');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تقرير أداء المصارف بنجاح',
@@ -44,19 +76,19 @@ export function FundsPerformanceReport() {
     if (!fundPerformance) return;
 
     const { exportToExcel } = await import('@/lib/exportHelpers');
-    const data = fundPerformance.map(f => ({
+    const data = fundPerformance.map((f) => ({
       'اسم المصرف': f.fund_name,
-      'الفئة': f.category,
+      الفئة: f.category,
       'المبلغ المخصص': f.allocated_amount,
       'المبلغ المنفق': f.spent_amount,
       'المبلغ المتبقي': f.allocated_amount - f.spent_amount,
       'عدد المستفيدين': f.beneficiaries_count,
       'نسبة الاستخدام (%)': f.utilization_rate.toFixed(2),
-      'متوسط المستفيد': f.avg_per_beneficiary.toFixed(2)
+      'متوسط المستفيد': f.avg_per_beneficiary.toFixed(2),
     }));
 
     exportToExcel(data, 'funds_performance', 'أداء المصارف');
-    
+
     toast({
       title: 'تم التصدير',
       description: 'تم تصدير تقرير أداء المصارف بنجاح',
@@ -66,7 +98,6 @@ export function FundsPerformanceReport() {
   if (isLoading) {
     return <LoadingState message="جاري تحليل أداء المصارف..." />;
   }
-
 
   return (
     <div className="space-y-6">
@@ -187,7 +218,9 @@ export function FundsPerformanceReport() {
                     <TableCell className="font-medium">{fund.fund_name}</TableCell>
                     <TableCell>{fund.category}</TableCell>
                     <TableCell>{fund.allocated_amount.toLocaleString('ar-SA')} ريال</TableCell>
-                    <TableCell className="font-bold">{fund.spent_amount.toLocaleString('ar-SA')} ريال</TableCell>
+                    <TableCell className="font-bold">
+                      {fund.spent_amount.toLocaleString('ar-SA')} ريال
+                    </TableCell>
                     <TableCell>{fund.beneficiaries_count}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

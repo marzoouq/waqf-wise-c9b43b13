@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Bot, X, Maximize2, Minimize2 } from "lucide-react";
+import { useState } from 'react';
+import { Bot, X, Maximize2, Minimize2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { ChatbotInterface } from "./ChatbotInterface";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { ChatbotInterface } from './ChatbotInterface';
+import { cn } from '@/lib/utils';
 
 interface ChatbotSidePanelProps {
   open: boolean;
@@ -21,11 +21,11 @@ export function ChatbotSidePanel({ open, onOpenChange }: ChatbotSidePanelProps) 
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="left" 
+      <SheetContent
+        side="left"
         className={cn(
-          "p-0 flex flex-col transition-all duration-300",
-          isExpanded ? "w-full sm:w-full" : "w-[90vw] sm:w-[500px]"
+          'p-0 flex flex-col transition-all duration-300',
+          isExpanded ? 'w-full sm:w-full' : 'w-[90vw] sm:w-[500px]'
         )}
       >
         {/* Header */}
@@ -53,11 +53,7 @@ export function ChatbotSidePanel({ open, onOpenChange }: ChatbotSidePanelProps) 
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/10"
               >
-                {isExpanded ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
+                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
               </Button>
 
               {/* زر الإغلاق */}

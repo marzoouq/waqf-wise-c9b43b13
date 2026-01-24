@@ -21,14 +21,14 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
   const { isBeneficiary, isWaqfHeir } = useUserRole();
   const queryClient = useQueryClient();
   const [editPhoneOpen, setEditPhoneOpen] = useState(false);
-  
+
   // Check if current user is the beneficiary owner
   const isOwner = user?.id === beneficiary.user_id;
   const canEditPhone = (isBeneficiary || isWaqfHeir) && isOwner;
 
   const handlePhoneUpdateSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-    queryClient.invalidateQueries({ queryKey: ["beneficiary-profile"] });
+    queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
+    queryClient.invalidateQueries({ queryKey: ['beneficiary-profile'] });
   };
 
   const getStatusColor = (status: string) => {
@@ -60,7 +60,7 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .slice(0, 2)
       .toUpperCase();
@@ -90,7 +90,10 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
                   </h1>
                   {beneficiary.beneficiary_number && (
                     <p className="text-sm text-muted-foreground mt-1">
-                      رقم العضوية: <span className="font-mono font-semibold text-primary">{beneficiary.beneficiary_number}</span>
+                      رقم العضوية:{' '}
+                      <span className="font-mono font-semibold text-primary">
+                        {beneficiary.beneficiary_number}
+                      </span>
                     </p>
                   )}
                 </div>
@@ -103,19 +106,13 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 <Badge className={getCategoryColor(beneficiary.category)}>
                   {beneficiary.category}
                 </Badge>
-                <Badge className={getStatusColor(beneficiary.status)}>
-                  {beneficiary.status}
-                </Badge>
-                {beneficiary.tribe && (
-                  <Badge variant="outline">
-                    {beneficiary.tribe}
-                  </Badge>
-                )}
+                <Badge className={getStatusColor(beneficiary.status)}>{beneficiary.status}</Badge>
+                {beneficiary.tribe && <Badge variant="outline">{beneficiary.tribe}</Badge>}
               </div>
             </div>
 
@@ -125,7 +122,7 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
                 <User className="h-4 w-4" />
                 <span>رقم الهوية: {beneficiary.national_id}</span>
               </div>
-              
+
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
                 <span dir="ltr">{beneficiary.phone}</span>
@@ -160,7 +157,8 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    تاريخ الميلاد: {format(new Date(beneficiary.date_of_birth), 'dd MMMM yyyy', { locale: ar })}
+                    تاريخ الميلاد:{' '}
+                    {format(new Date(beneficiary.date_of_birth), 'dd MMMM yyyy', { locale: ar })}
                   </span>
                 </div>
               )}
@@ -178,7 +176,7 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
           </div>
         </div>
       </CardContent>
-      
+
       {/* Edit Phone Dialog */}
       <EditPhoneDialog
         open={editPhoneOpen}

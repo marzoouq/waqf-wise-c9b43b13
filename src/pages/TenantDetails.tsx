@@ -22,7 +22,10 @@ import {
   Receipt,
 } from 'lucide-react';
 
-const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
+const statusLabels: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' }
+> = {
   active: { label: 'نشط', variant: 'default' },
   inactive: { label: 'غير نشط', variant: 'secondary' },
   blacklisted: { label: 'محظور', variant: 'destructive' },
@@ -75,12 +78,10 @@ export default function TenantDetails() {
                 {statusLabels[tenant.status]?.label || tenant.status}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground">
-              رقم المستأجر: {tenant.tenant_number}
-            </p>
+            <p className="text-sm text-muted-foreground">رقم المستأجر: {tenant.tenant_number}</p>
           </div>
         </div>
-        
+
         {/* Balance Card - Mobile */}
         <Card className="bg-muted/50">
           <CardContent className="py-3 px-4">
@@ -143,9 +144,7 @@ export default function TenantDetails() {
                   </div>
                   <div>
                     <p className="text-muted-foreground">نوع الهوية</p>
-                    <p className="font-medium">
-                      {idTypeLabels[tenant.id_type] || tenant.id_type}
-                    </p>
+                    <p className="font-medium">{idTypeLabels[tenant.id_type] || tenant.id_type}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">رقم الهوية</p>
@@ -173,13 +172,17 @@ export default function TenantDetails() {
                 {tenant.phone && (
                   <div className="flex items-center gap-3">
                     <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span dir="ltr" className="truncate">{tenant.phone}</span>
+                    <span dir="ltr" className="truncate">
+                      {tenant.phone}
+                    </span>
                   </div>
                 )}
                 {tenant.email && (
                   <div className="flex items-center gap-3">
                     <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span dir="ltr" className="truncate">{tenant.email}</span>
+                    <span dir="ltr" className="truncate">
+                      {tenant.email}
+                    </span>
                   </div>
                 )}
                 {tenant.city && (
@@ -212,9 +215,7 @@ export default function TenantDetails() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-muted-foreground">الرقم الضريبي</p>
-                    <p className="font-medium font-mono text-xs">
-                      {tenant.tax_number || '-'}
-                    </p>
+                    <p className="font-medium font-mono text-xs">{tenant.tax_number || '-'}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">السجل التجاري</p>

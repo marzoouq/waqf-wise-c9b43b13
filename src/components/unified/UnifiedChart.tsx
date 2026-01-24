@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   LineChart,
   Line,
@@ -15,9 +15,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
-export type ChartType = "line" | "bar" | "area" | "pie";
+export type ChartType = 'line' | 'bar' | 'area' | 'pie';
 
 export interface ChartDataPoint {
   [key: string]: string | number;
@@ -45,17 +45,17 @@ interface UnifiedChartProps {
 }
 
 const DEFAULT_COLORS = [
-  "hsl(var(--primary))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
+  'hsl(var(--primary))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
 ];
 
 /**
  * مكون رسوم بيانية موحد
  * يدعم أنواع متعددة: خطي، أعمدة، مساحة، دائري
- * 
+ *
  * @example
  * <UnifiedChart
  *   title="الإيرادات الشهرية"
@@ -86,16 +86,27 @@ export function UnifiedChart({
     };
 
     switch (type) {
-      case "line":
+      case 'line':
         if (!series || series.length === 0) {
-          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+          return (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              لا توجد بيانات للعرض
+            </div>
+          );
         }
         return (
           <LineChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             {xAxisKey && <XAxis dataKey={xAxisKey} stroke="hsl(var(--muted-foreground))" />}
             <YAxis stroke="hsl(var(--muted-foreground))" />
-            {showTooltip && <Tooltip contentStyle={{ backgroundColor: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />}
+            {showTooltip && (
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                }}
+              />
+            )}
             {showLegend && <Legend />}
             {series.map((s, i) => (
               <Line
@@ -110,16 +121,27 @@ export function UnifiedChart({
           </LineChart>
         );
 
-      case "bar":
+      case 'bar':
         if (!series || series.length === 0) {
-          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+          return (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              لا توجد بيانات للعرض
+            </div>
+          );
         }
         return (
           <BarChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             {xAxisKey && <XAxis dataKey={xAxisKey} stroke="hsl(var(--muted-foreground))" />}
             <YAxis stroke="hsl(var(--muted-foreground))" />
-            {showTooltip && <Tooltip contentStyle={{ backgroundColor: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />}
+            {showTooltip && (
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                }}
+              />
+            )}
             {showLegend && <Legend />}
             {series.map((s, i) => (
               <Bar
@@ -132,16 +154,27 @@ export function UnifiedChart({
           </BarChart>
         );
 
-      case "area":
+      case 'area':
         if (!series || series.length === 0) {
-          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+          return (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              لا توجد بيانات للعرض
+            </div>
+          );
         }
         return (
           <AreaChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
             {xAxisKey && <XAxis dataKey={xAxisKey} stroke="hsl(var(--muted-foreground))" />}
             <YAxis stroke="hsl(var(--muted-foreground))" />
-            {showTooltip && <Tooltip contentStyle={{ backgroundColor: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />}
+            {showTooltip && (
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                }}
+              />
+            )}
             {showLegend && <Legend />}
             {series.map((s, i) => (
               <Area
@@ -157,13 +190,13 @@ export function UnifiedChart({
           </AreaChart>
         );
 
-      case "pie":
+      case 'pie':
         return (
           <PieChart>
             <Pie
               data={data}
-              dataKey={series && series[0] ? series[0].dataKey : "value"}
-              nameKey={xAxisKey || "name"}
+              dataKey={series && series[0] ? series[0].dataKey : 'value'}
+              nameKey={xAxisKey || 'name'}
               cx="50%"
               cy="50%"
               outerRadius={100}
@@ -173,7 +206,14 @@ export function UnifiedChart({
                 <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
               ))}
             </Pie>
-            {showTooltip && <Tooltip contentStyle={{ backgroundColor: "hsl(var(--background))", border: "1px solid hsl(var(--border))" }} />}
+            {showTooltip && (
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                }}
+              />
+            )}
             {showLegend && <Legend />}
           </PieChart>
         );

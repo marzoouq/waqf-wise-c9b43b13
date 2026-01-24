@@ -8,8 +8,8 @@
 export interface PropertyPerformance {
   name: string;
   'الإيرادات الكلية': number;
-  'المدفوع': number;
-  'المعلق': number;
+  المدفوع: number;
+  المعلق: number;
 }
 
 export interface RevenueDistribution {

@@ -3,8 +3,8 @@
  * Admin and system routes
  */
 
-import { Route } from "react-router-dom";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import {
   Users,
   RolesManagement,
@@ -29,158 +29,158 @@ import {
   LandingPageSettings,
   SupportManagement,
   PointOfSale,
-} from "./lazyPages";
+} from './lazyPages';
 
 export const adminRoutes = [
-  <Route 
+  <Route
     key="users"
-    path="/users" 
+    path="/users"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <Users />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="settings-roles"
     path="/settings/roles"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <RolesManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="settings-permissions"
-    path="/settings/permissions" 
+    path="/settings/permissions"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <PermissionsManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="audit-logs"
-    path="/audit-logs" 
+    path="/audit-logs"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <AuditLogs />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="system-monitoring"
-    path="/system-monitoring" 
+    path="/system-monitoring"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <SystemMonitoring />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="system-error-logs"
-    path="/system-error-logs" 
+    path="/system-error-logs"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <SystemErrorLogs />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="developer-dashboard"
-    path="/developer" 
+    path="/developer"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <DeveloperDashboard />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="security"
-    path="/security" 
+    path="/security"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <SecurityDashboard />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="performance"
-    path="/performance" 
+    path="/performance"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <PerformanceDashboard />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="db-performance"
-    path="/db-performance" 
+    path="/db-performance"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <DatabasePerformanceDashboard />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="db-health"
-    path="/db-health" 
+    path="/db-health"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <DatabaseHealthDashboard />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="integrations"
-    path="/integrations" 
+    path="/integrations"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <IntegrationsManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="ai-insights"
-    path="/ai-insights" 
+    path="/ai-insights"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <AIInsights />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="ai-system-audit"
-    path="/ai-audit" 
+    path="/ai-audit"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <AISystemAudit />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="edge-function-test"
-    path="/edge-test" 
+    path="/edge-test"
     element={
-      <ProtectedRoute requiredRoles={["admin"]}>
+      <ProtectedRoute requiredRoles={['admin']}>
         <EdgeFunctionTest />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="edge-functions-monitor"
-    path="/edge-monitor" 
+    path="/edge-monitor"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <EdgeFunctionsMonitor />
       </ProtectedRoute>
-    } 
+    }
   />,
   <Route
     key="comprehensive-test"
     path="/comprehensive-test"
     element={
-      <ProtectedRoute requiredRoles={["admin"]}>
+      <ProtectedRoute requiredRoles={['admin']}>
         <ComprehensiveTest />
       </ProtectedRoute>
     }
@@ -189,55 +189,55 @@ export const adminRoutes = [
     key="real-tests"
     path="/tests/real"
     element={
-      <ProtectedRoute requiredRoles={["admin"]}>
+      <ProtectedRoute requiredRoles={['admin']}>
         <RealTests />
       </ProtectedRoute>
     }
   />,
   <Route
     key="advanced-settings"
-    path="/advanced-settings" 
+    path="/advanced-settings"
     element={
       <ProtectedRoute requiredRole="admin">
         <AdvancedSettings />
       </ProtectedRoute>
-    } 
+    }
   />,
 
-  <Route 
+  <Route
     key="settings-landing-page"
-    path="/settings/landing-page" 
+    path="/settings/landing-page"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <LandingPageSettings />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="support-management"
-    path="/support-management" 
+    path="/support-management"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <SupportManagement />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="pos"
-    path="/pos" 
+    path="/pos"
     element={
-      <ProtectedRoute requiredRoles={["nazer", "accountant", "cashier"]}>
+      <ProtectedRoute requiredRoles={['nazer', 'accountant', 'cashier']}>
         <PointOfSale />
       </ProtectedRoute>
-    } 
+    }
   />,
-  <Route 
+  <Route
     key="connection-diagnostics"
-    path="/connection-diagnostics" 
+    path="/connection-diagnostics"
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+      <ProtectedRoute requiredRoles={['admin', 'nazer']}>
         <ConnectionDiagnostics />
       </ProtectedRoute>
-    } 
+    }
   />,
 ];

@@ -3,10 +3,10 @@
  * Database Health Score Card
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Activity, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface HealthScoreCardProps {
   score: number;
@@ -71,24 +71,23 @@ export function HealthScoreCard({ score, status, isLoading }: HealthScoreCardPro
   }
 
   return (
-    <Card className={cn("relative overflow-hidden", config.bgColor)}>
+    <Card className={cn('relative overflow-hidden', config.bgColor)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Icon className={cn("h-4 w-4", config.color)} />
+          <Icon className={cn('h-4 w-4', config.color)} />
           نتيجة الصحة
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between mb-2">
-          <span className={cn("text-3xl font-bold", config.color)}>{score}%</span>
-          <span className={cn("text-sm font-medium px-2 py-1 rounded", config.bgColor, config.color)}>
+          <span className={cn('text-3xl font-bold', config.color)}>{score}%</span>
+          <span
+            className={cn('text-sm font-medium px-2 py-1 rounded', config.bgColor, config.color)}
+          >
             {config.label}
           </span>
         </div>
-        <Progress 
-          value={score} 
-          className="h-2" 
-        />
+        <Progress value={score} className="h-2" />
         <p className="text-xs text-muted-foreground mt-2">
           {status === 'excellent' && 'قاعدة البيانات في حالة ممتازة'}
           {status === 'good' && 'قاعدة البيانات في حالة جيدة مع بعض التحسينات الممكنة'}

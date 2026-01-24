@@ -2,28 +2,25 @@
  * عرض ذكي لمستندات الإفصاح السنوي
  * يجمع بين الملخص والتفاصيل التفاعلية
  */
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  FileText, 
-  LayoutGrid, 
-  List,
-} from "lucide-react";
-import { useSmartDisclosureDocuments } from "@/hooks/reports/useSmartDisclosureDocuments";
-import { DocumentContentViewer, ExtractedContent } from "./DocumentContentViewer";
-import { DocumentCategorySummary } from "./DocumentCategorySummary";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { FileText, LayoutGrid, List } from 'lucide-react';
+import { useSmartDisclosureDocuments } from '@/hooks/reports/useSmartDisclosureDocuments';
+import { DocumentContentViewer, ExtractedContent } from './DocumentContentViewer';
+import { DocumentCategorySummary } from './DocumentCategorySummary';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface SmartDisclosureDocumentsProps {
   disclosureId?: string;
 }
 
 export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocumentsProps) {
-  const { documents, categorySummary, isLoading, error, refetch } = useSmartDisclosureDocuments(disclosureId);
+  const { documents, categorySummary, isLoading, error, refetch } =
+    useSmartDisclosureDocuments(disclosureId);
   const [viewMode, setViewMode] = useState<'summary' | 'details'>('summary');
 
   if (isLoading) {
@@ -130,13 +127,15 @@ export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocume
               {documents.map((doc) => (
                 <DocumentContentViewer
                   key={doc.id}
-                  content={(doc.extracted_content as unknown as ExtractedContent) || {
-                    type: doc.document_type,
-                    title: doc.document_name,
-                    items: [],
-                    summary: doc.content_summary || undefined,
-                    total: doc.total_amount || undefined
-                  }}
+                  content={
+                    (doc.extracted_content as unknown as ExtractedContent) || {
+                      type: doc.document_type,
+                      title: doc.document_name,
+                      items: [],
+                      summary: doc.content_summary || undefined,
+                      total: doc.total_amount || undefined,
+                    }
+                  }
                   documentName={doc.document_name}
                   onViewOriginal={() => handleViewOriginal(doc.file_path)}
                   onDownload={() => handleDownload(doc.file_path, doc.document_name)}
@@ -151,13 +150,15 @@ export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocume
                   .map((doc) => (
                     <DocumentContentViewer
                       key={doc.id}
-                      content={(doc.extracted_content as unknown as ExtractedContent) || {
-                        type: doc.document_type,
-                        title: doc.document_name,
-                        items: [],
-                        summary: doc.content_summary || undefined,
-                        total: doc.total_amount || undefined
-                      }}
+                      content={
+                        (doc.extracted_content as unknown as ExtractedContent) || {
+                          type: doc.document_type,
+                          title: doc.document_name,
+                          items: [],
+                          summary: doc.content_summary || undefined,
+                          total: doc.total_amount || undefined,
+                        }
+                      }
                       documentName={doc.document_name}
                       onViewOriginal={() => handleViewOriginal(doc.file_path)}
                       onDownload={() => handleDownload(doc.file_path, doc.document_name)}

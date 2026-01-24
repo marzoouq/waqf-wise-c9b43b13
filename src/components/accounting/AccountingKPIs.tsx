@@ -1,10 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { FileText, TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { useMemo } from "react";
-import type { JournalEntryLine } from "@/types/financial";
-import { matchesStatus } from "@/lib/constants";
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText, TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { useJournalEntries } from '@/hooks/accounting/useJournalEntries';
+import { useMemo } from 'react';
+import type { JournalEntryLine } from '@/types/financial';
+import { matchesStatus } from '@/lib/constants';
 
 interface KPICardProps {
   title: string;
@@ -12,15 +12,15 @@ interface KPICardProps {
   icon: React.ReactNode;
   trend?: string;
   trendUp?: boolean;
-  variant?: "default" | "success" | "warning" | "danger";
+  variant?: 'default' | 'success' | 'warning' | 'danger';
 }
 
-function KPICard({ title, value, icon, trend, trendUp, variant = "default" }: KPICardProps) {
+function KPICard({ title, value, icon, trend, trendUp, variant = 'default' }: KPICardProps) {
   const variantClasses = {
-    default: "bg-primary/10 text-primary",
-    success: "bg-success/10 text-success",
-    warning: "bg-warning/10 text-warning",
-    danger: "bg-destructive/10 text-destructive",
+    default: 'bg-primary/10 text-primary',
+    success: 'bg-success/10 text-success',
+    warning: 'bg-warning/10 text-warning',
+    danger: 'bg-destructive/10 text-destructive',
   };
 
   return (
@@ -32,20 +32,16 @@ function KPICard({ title, value, icon, trend, trendUp, variant = "default" }: KP
             <div className="flex items-baseline gap-2">
               <h3 className="text-xl sm:text-2xl font-bold">{value}</h3>
               {trend && (
-                <div className={`flex items-center gap-1 text-xs ${trendUp ? 'text-success' : 'text-destructive'}`}>
-                  {trendUp ? (
-                    <ArrowUp className="h-3 w-3" />
-                  ) : (
-                    <ArrowDown className="h-3 w-3" />
-                  )}
+                <div
+                  className={`flex items-center gap-1 text-xs ${trendUp ? 'text-success' : 'text-destructive'}`}
+                >
+                  {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                   <span>{trend}</span>
                 </div>
               )}
             </div>
           </div>
-          <div className={`p-3 rounded-lg ${variantClasses[variant]}`}>
-            {icon}
-          </div>
+          <div className={`p-3 rounded-lg ${variantClasses[variant]}`}>{icon}</div>
         </div>
       </CardContent>
     </Card>
@@ -57,16 +53,16 @@ export function AccountingKPIs() {
 
   const kpis = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // عدد القيود اليوم
-    const todayEntries = entries.filter(e => e.entry_date === today);
-    
+    const todayEntries = entries.filter((e) => e.entry_date === today);
+
     // إجمالي المدين والدائن من جميع القيود المرحلة
-    const postedEntries = entries.filter(e => matchesStatus(e.status, 'posted'));
+    const postedEntries = entries.filter((e) => matchesStatus(e.status, 'posted'));
     let totalDebit = 0;
     let totalCredit = 0;
-    
-    postedEntries.forEach(entry => {
+
+    postedEntries.forEach((entry) => {
       if (entry.journal_entry_lines) {
         (entry.journal_entry_lines as JournalEntryLine[]).forEach((line) => {
           totalDebit += line.debit_amount || 0;
@@ -74,16 +70,18 @@ export function AccountingKPIs() {
         });
       }
     });
-    
+
     // القيود المعلقة (مسودات)
-    const pendingCount = entries.filter(e => matchesStatus(e.status, 'draft')).length;
-    
+    const pendingCount = entries.filter((e) => matchesStatus(e.status, 'draft')).length;
+
     // حساب الاتجاه (مقارنة بالشهر الماضي)
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     const lastMonthStr = lastMonth.toISOString().split('T')[0];
-    const lastMonthEntries = entries.filter(e => e.entry_date >= lastMonthStr && e.entry_date < today);
-    const trend = todayEntries.length > lastMonthEntries.length ? "+12%" : "-5%";
+    const lastMonthEntries = entries.filter(
+      (e) => e.entry_date >= lastMonthStr && e.entry_date < today
+    );
+    const trend = todayEntries.length > lastMonthEntries.length ? '+12%' : '-5%';
     const trendUp = todayEntries.length > lastMonthEntries.length;
 
     return {
@@ -122,7 +120,7 @@ export function AccountingKPIs() {
         title="القيود المعلقة"
         value={kpis.pendingCount}
         icon={<Clock className="h-5 w-5" />}
-        variant={kpis.pendingCount > 10 ? "warning" : "default"}
+        variant={kpis.pendingCount > 10 ? 'warning' : 'default'}
       />
     </div>
   );

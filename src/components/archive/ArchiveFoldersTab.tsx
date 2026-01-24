@@ -2,13 +2,23 @@
  * Archive Folders Tab Component
  * تبويب المجلدات في الأرشيف
  */
-import { Database } from "@/integrations/supabase/types";
-import { Plus, Upload, FolderOpen, FileText, ChevronRight, Search, Eye, Download, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Folder } from "@/hooks/archive/useFolders";
+import { Database } from '@/integrations/supabase/types';
+import {
+  Plus,
+  Upload,
+  FolderOpen,
+  FileText,
+  ChevronRight,
+  Search,
+  Eye,
+  Download,
+  Trash2,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Folder } from '@/hooks/archive/useFolders';
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -102,7 +112,9 @@ export function ArchiveFoldersTab({
           ) : (
             <div className="col-span-full text-center py-12">
               <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">لا توجد مجلدات. أنشئ مجلداً جديداً لتنظيم مستنداتك</p>
+              <p className="text-muted-foreground">
+                لا توجد مجلدات. أنشئ مجلداً جديداً لتنظيم مستنداتك
+              </p>
             </div>
           )}
         </div>
@@ -131,7 +143,9 @@ export function ArchiveFoldersTab({
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium truncate">{doc.name}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">{doc.file_type}</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {doc.file_type}
+                          </Badge>
                           <span className="text-xs text-muted-foreground">{doc.file_size}</span>
                         </div>
                       </div>

@@ -1,21 +1,21 @@
 /**
  * مساعدات Supabase - نسخة محسّنة
  * @version 2.8.51
- * 
+ *
  * ملاحظة: استخدام type assertions ضروري هنا لتجنب مشاكل TypeScript العميقة
  * مع Supabase client. هذا نمط موصى به في وثائق Supabase.
  * @see https://supabase.com/docs/reference/javascript/typescript-support
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { AppError } from "@/types/errors";
+import { supabase } from '@/integrations/supabase/client';
+import type { AppError } from '@/types/errors';
 
 interface FetchOptions {
   select?: string;
-  filters?: Array<{ 
-    column: string; 
-    operator: 'eq' | 'gt' | 'lt' | 'gte' | 'lte' | 'neq' | 'like' | 'ilike'; 
-    value: unknown 
+  filters?: Array<{
+    column: string;
+    operator: 'eq' | 'gt' | 'lt' | 'gte' | 'lte' | 'neq' | 'like' | 'ilike';
+    value: unknown;
   }>;
   order?: { column: string; ascending?: boolean };
   limit?: number;
@@ -88,8 +88,8 @@ export async function fetchFromTable<T>(
 
     // الترتيب
     if (options.order) {
-      query = query.order(options.order.column, { 
-        ascending: options.order.ascending ?? true 
+      query = query.order(options.order.column, {
+        ascending: options.order.ascending ?? true,
       });
     }
 
@@ -159,9 +159,7 @@ export async function deleteFromTable(
   id: string
 ): Promise<{ error: AppError | null }> {
   try {
-    const { error } = await getTableQuery(tableName)
-      .delete()
-      .eq('id', id);
+    const { error } = await getTableQuery(tableName).delete().eq('id', id);
 
     return { error: error as AppError | null };
   } catch (error) {

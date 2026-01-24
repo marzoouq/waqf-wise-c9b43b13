@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSystemHealth } from "@/hooks/system";
-import { Database, HardDrive, Clock, Activity } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSystemHealth } from '@/hooks/system';
+import { Database, HardDrive, Clock, Activity } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function SystemHealthMonitor() {
   const { data: health, isLoading, isError, refetch } = useSystemHealth();
@@ -38,7 +38,7 @@ export function SystemHealthMonitor() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ErrorState 
+          <ErrorState
             title="خطأ في تحميل صحة النظام"
             message="فشل الاتصال بخدمة المراقبة"
             onRetry={refetch}
@@ -69,25 +69,34 @@ export function SystemHealthMonitor() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-status-success bg-status-success/10';
-      case 'degraded': return 'text-status-warning bg-status-warning/10';
-      case 'down': return 'text-status-error bg-status-error/10';
-      default: return 'text-muted-foreground bg-muted';
+      case 'healthy':
+        return 'text-status-success bg-status-success/10';
+      case 'degraded':
+        return 'text-status-warning bg-status-warning/10';
+      case 'down':
+        return 'text-status-error bg-status-error/10';
+      default:
+        return 'text-muted-foreground bg-muted';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'healthy': return 'سليم';
-      case 'degraded': return 'متدهور';
-      case 'down': return 'معطل';
-      default: return 'غير معروف';
+      case 'healthy':
+        return 'سليم';
+      case 'degraded':
+        return 'متدهور';
+      case 'down':
+        return 'معطل';
+      default:
+        return 'غير معروف';
     }
   };
 
-  const storagePercentage = health.storage.totalSpace > 0 
-    ? (health.storage.usedSpace / health.storage.totalSpace) * 100 
-    : 0;
+  const storagePercentage =
+    health.storage.totalSpace > 0
+      ? (health.storage.usedSpace / health.storage.totalSpace) * 100
+      : 0;
 
   return (
     <Card>
@@ -127,7 +136,8 @@ export function SystemHealthMonitor() {
           </div>
           <Progress value={storagePercentage} className="h-2" />
           <p className="text-xs text-muted-foreground text-left">
-            {(health.storage.usedSpace / 1024 / 1024).toFixed(2)} MB / {(health.storage.totalSpace / 1024 / 1024 / 1024).toFixed(2)} GB
+            {(health.storage.usedSpace / 1024 / 1024).toFixed(2)} MB /{' '}
+            {(health.storage.totalSpace / 1024 / 1024 / 1024).toFixed(2)} GB
           </p>
         </div>
 
@@ -142,9 +152,7 @@ export function SystemHealthMonitor() {
               </p>
             </div>
           </div>
-          <Badge className="bg-status-success/10 text-status-success">
-            نشط
-          </Badge>
+          <Badge className="bg-status-success/10 text-status-success">نشط</Badge>
         </div>
 
         {/* الأداء */}

@@ -9,7 +9,11 @@ import type { SupportStatistics } from '@/types/support';
 
 export function useSupportStats() {
   // إحصائيات عامة
-  const { data: overviewStats, isLoading: overviewLoading, error: overviewError } = useQuery({
+  const {
+    data: overviewStats,
+    isLoading: overviewLoading,
+    error: overviewError,
+  } = useQuery({
     queryKey: ['support-stats', 'overview'],
     queryFn: () => SupportService.getOverviewStats(),
     retry: 2,

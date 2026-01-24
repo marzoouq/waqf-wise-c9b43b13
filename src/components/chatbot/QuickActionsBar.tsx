@@ -1,9 +1,9 @@
-import { memo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { memo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface QuickAction {
   label: string;
@@ -47,14 +47,13 @@ export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickA
               </>
             ) : (
               <>
-                <ChevronDown className="h-3 w-3 ms-0.5" />
-                +{actions.length - 2}
+                <ChevronDown className="h-3 w-3 ms-0.5" />+{actions.length - 2}
               </>
             )}
           </Button>
         )}
       </div>
-      
+
       <div className="flex flex-wrap gap-1.5">
         {visibleActions.map((action) => (
           <Button
@@ -63,18 +62,15 @@ export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickA
             size="sm"
             onClick={() => navigate(action.link)}
             className={cn(
-              "h-6 px-2 text-[11px]",
-              "bg-background hover:bg-primary hover:text-primary-foreground",
-              "border-primary/30 hover:border-primary"
+              'h-6 px-2 text-[11px]',
+              'bg-background hover:bg-primary hover:text-primary-foreground',
+              'border-primary/30 hover:border-primary'
             )}
           >
             <span className="ms-1">{action.icon}</span>
             {action.label}
             {action.count !== undefined && (
-              <Badge 
-                variant="secondary" 
-                className="me-1 h-4 px-1 text-[9px] bg-primary/20"
-              >
+              <Badge variant="secondary" className="me-1 h-4 px-1 text-[9px] bg-primary/20">
                 {action.count}
               </Badge>
             )}

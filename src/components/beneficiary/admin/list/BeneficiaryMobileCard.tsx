@@ -1,17 +1,27 @@
-import { memo } from "react";
-import { MoreVertical, Eye, Edit, FileText, Activity, Key, Trash2, Phone, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { memo } from 'react';
+import {
+  MoreVertical,
+  Eye,
+  Edit,
+  FileText,
+  Activity,
+  Key,
+  Trash2,
+  Phone,
+  CreditCard,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Beneficiary } from "@/types/beneficiary";
-import { matchesStatus } from "@/lib/constants";
+} from '@/components/ui/dropdown-menu';
+import { Beneficiary } from '@/types/beneficiary';
+import { matchesStatus } from '@/lib/constants';
 
 interface BeneficiaryMobileCardProps {
   beneficiary: Beneficiary;
@@ -40,7 +50,7 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
       <CardContent className="p-3">
         <div className="flex items-start justify-between gap-2">
           {/* Avatar and Basic Info */}
-          <div 
+          <div
             className="flex items-start gap-3 flex-1 min-w-0"
             onClick={() => onViewProfile(beneficiary)}
             role="button"
@@ -52,9 +62,7 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate">
-                {beneficiary.full_name}
-              </h3>
+              <h3 className="font-semibold text-sm truncate">{beneficiary.full_name}</h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                   {beneficiary.beneficiary_number || 'قيد الإنشاء'}
@@ -62,15 +70,13 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
                 <Badge
                   className={
                     matchesStatus(beneficiary.status, 'active')
-                      ? "bg-success/10 text-success border border-success/30 text-[10px] px-1.5 py-0"
-                      : "bg-warning/10 text-warning border border-warning/30 text-[10px] px-1.5 py-0"
+                      ? 'bg-success/10 text-success border border-success/30 text-[10px] px-1.5 py-0'
+                      : 'bg-warning/10 text-warning border border-warning/30 text-[10px] px-1.5 py-0'
                   }
                 >
                   {beneficiary.status}
                 </Badge>
-                {beneficiary.can_login && (
-                  <Key className="h-3 w-3 text-primary" />
-                )}
+                {beneficiary.can_login && <Key className="h-3 w-3 text-primary" />}
               </div>
             </div>
           </div>
@@ -103,10 +109,10 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onEnableLogin(beneficiary)}>
                 <Key className="ms-2 h-4 w-4" />
-                {beneficiary.can_login ? "إدارة الحساب" : "تفعيل حساب الدخول"}
+                {beneficiary.can_login ? 'إدارة الحساب' : 'تفعيل حساب الدخول'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-destructive"
                 onClick={() => onDelete(beneficiary.id)}
               >
@@ -122,13 +128,17 @@ export const BeneficiaryMobileCard = memo(function BeneficiaryMobileCard({
           {beneficiary.phone && (
             <div className="flex items-center gap-1">
               <Phone className="h-3 w-3" />
-              <span className="font-mono" dir="ltr">{beneficiary.phone}</span>
+              <span className="font-mono" dir="ltr">
+                {beneficiary.phone}
+              </span>
             </div>
           )}
           {beneficiary.national_id && (
             <div className="flex items-center gap-1">
               <CreditCard className="h-3 w-3" />
-              <span className="font-mono" dir="ltr">{beneficiary.national_id}</span>
+              <span className="font-mono" dir="ltr">
+                {beneficiary.national_id}
+              </span>
             </div>
           )}
           {beneficiary.category && (

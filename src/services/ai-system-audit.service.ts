@@ -73,7 +73,7 @@ export const AUDIT_CATEGORIES = [
   { id: 'navigation', label: 'التنقلات', icon: 'Navigation' },
   { id: 'tables', label: 'الجداول', icon: 'Table' },
   { id: 'database', label: 'قاعدة البيانات', icon: 'Database' },
-  { id: 'tabs', label: 'التبويبات', icon: 'Tabs' }
+  { id: 'tabs', label: 'التبويبات', icon: 'Tabs' },
 ] as const;
 
 export class AISystemAuditService {
@@ -85,14 +85,16 @@ export class AISystemAuditService {
     categories?: string[]
   ): Promise<{ success: boolean; auditId?: string; error?: string }> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { data, error } = await supabase.functions.invoke('ai-system-audit', {
         body: {
           auditType,
-          categories: categories || AUDIT_CATEGORIES.map(c => c.id),
-          userId: user?.id
-        }
+          categories: categories || AUDIT_CATEGORIES.map((c) => c.id),
+          userId: user?.id,
+        },
       });
 
       if (error) throw error;
@@ -157,7 +159,9 @@ export class AISystemAuditService {
    */
   static async approveFix(fixId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       // تحديث حالة الإصلاح
       const { data: fix, error: fetchError } = await supabase
@@ -176,7 +180,7 @@ export class AISystemAuditService {
         .update({
           status: 'applied',
           approved_by: user?.id,
-          applied_at: new Date().toISOString()
+          applied_at: new Date().toISOString(),
         })
         .eq('id', fixId);
 
@@ -195,13 +199,15 @@ export class AISystemAuditService {
    */
   static async rejectFix(fixId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       const { error } = await supabase
         .from('pending_system_fixes')
         .update({
           status: 'rejected',
-          approved_by: user?.id
+          approved_by: user?.id,
         })
         .eq('id', fixId);
 
@@ -236,7 +242,7 @@ export class AISystemAuditService {
         .from('pending_system_fixes')
         .update({
           status: 'rolled_back',
-          rolled_back_at: new Date().toISOString()
+          rolled_back_at: new Date().toISOString(),
         })
         .eq('id', fixId);
 
@@ -262,7 +268,7 @@ export class AISystemAuditService {
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.functions.invoke('send-slack-alert', {
-        body: { title, message, severity, fields, actionUrl }
+        body: { title, message, severity, fields, actionUrl },
       });
 
       if (error) throw error;
@@ -279,14 +285,16 @@ export class AISystemAuditService {
    */
   static async deleteAudit(auditId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from('ai_system_audits')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: user?.id,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         })
         .eq('id', auditId);
 

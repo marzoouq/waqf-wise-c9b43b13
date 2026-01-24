@@ -3,10 +3,10 @@
  * يستخدم AccountingService لإنشاء القيود التلقائية
  * @version 2.8.69
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { invalidateAccountingQueries } from "@/lib/query-invalidation";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { invalidateAccountingQueries } from '@/lib/query-invalidation';
 
 interface AutoJournalEntryParams {
   triggerEvent: 'payment_receipt' | 'payment_voucher' | 'loan_approved';
@@ -35,9 +35,9 @@ export function useAutoJournalEntry() {
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ",
-        description: error.message || "فشل إنشاء القيد المحاسبي",
-        variant: "destructive",
+        title: 'خطأ',
+        description: error.message || 'فشل إنشاء القيد المحاسبي',
+        variant: 'destructive',
       });
     },
   });

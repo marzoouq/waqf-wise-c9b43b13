@@ -1,12 +1,22 @@
 /**
  * Export Helpers - أدوات التصدير الموحدة مع هوية الوقف
  * تدعم الخطوط العربية (Amiri) في جميع ملفات PDF
- * 
+ *
  * @version 2.9.75 - إصلاح تنسيق الأرقام
  */
 
-import { logger as _logger } from "./logger";
-import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS, processArabicText, processArabicHeaders, processArabicTableData, formatCurrencyForPDF } from "./pdf/arabic-pdf-utils";
+import { logger as _logger } from './logger';
+import {
+  loadArabicFontToPDF,
+  addWaqfHeader,
+  addWaqfFooter,
+  getDefaultTableStyles,
+  WAQF_COLORS,
+  processArabicText,
+  processArabicHeaders,
+  processArabicTableData,
+  formatCurrencyForPDF,
+} from './pdf/arabic-pdf-utils';
 
 export const exportToPDF = async (
   title: string,
@@ -16,14 +26,14 @@ export const exportToPDF = async (
 ) => {
   const [jsPDFModule, autoTableModule] = await Promise.all([
     import('jspdf'),
-    import('jspdf-autotable')
+    import('jspdf-autotable'),
   ]);
-  
+
   const jsPDF = jsPDFModule.default;
   const autoTable = autoTableModule.default;
-  
+
   const doc = new jsPDF();
-  
+
   // تحميل الخط العربي باستخدام النظام الموحد
   const fontName = await loadArabicFontToPDF(doc);
 
@@ -53,9 +63,9 @@ export const exportToPDF = async (
 export const exportToExcel = async (
   data: Record<string, unknown>[],
   filename: string,
-  sheetName: string = "Sheet1"
+  sheetName: string = 'Sheet1'
 ) => {
-  const { exportToExcel: excelExport } = await import("@/lib/excel-helper");
+  const { exportToExcel: excelExport } = await import('@/lib/excel-helper');
   await excelExport(data, filename, sheetName);
 };
 
@@ -70,13 +80,13 @@ export const exportToCSV = (
   // إنشاء محتوى CSV
   const csvContent = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell ?? ''}"`).join(','))
+    ...rows.map((row) => row.map((cell) => `"${cell ?? ''}"`).join(',')),
   ].join('\n');
-  
+
   // إضافة BOM للدعم العربي
   const BOM = '\uFEFF';
   const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-  
+
   // تحميل الملف
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
@@ -92,9 +102,9 @@ export const exportFinancialStatementToPDF = async (
   filename: string
 ) => {
   const { default: jsPDF } = await import('jspdf');
-  
+
   const doc = new jsPDF();
-  
+
   // تحميل الخط العربي باستخدام النظام الموحد
   const fontName = await loadArabicFontToPDF(doc);
 
@@ -106,19 +116,19 @@ export const exportFinancialStatementToPDF = async (
   doc.setFontSize(11);
   sections.forEach((section) => {
     // عنوان القسم
-    doc.setFont(fontName, "bold");
+    doc.setFont(fontName, 'bold');
     doc.setTextColor(...WAQF_COLORS.primary);
     doc.text(processArabicText(section.title), 20, yPosition);
     yPosition += 7;
 
     // عناصر القسم
-    doc.setFont(fontName, "normal");
+    doc.setFont(fontName, 'normal');
     doc.setTextColor(...WAQF_COLORS.text);
     section.items.forEach((item) => {
       const amountText = processArabicText(formatCurrencyForPDF(item.amount));
       doc.text(processArabicText(item.label), 30, yPosition);
       doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
-        align: "right",
+        align: 'right',
       });
       yPosition += 6;
     });
@@ -140,13 +150,13 @@ export const exportFinancialStatementToPDF = async (
   doc.line(20, yPosition, doc.internal.pageSize.width - 20, yPosition);
   yPosition += 7;
 
-  doc.setFont(fontName, "bold");
+  doc.setFont(fontName, 'bold');
   doc.setTextColor(...WAQF_COLORS.primary);
   totals.forEach((total) => {
     const amountText = processArabicText(formatCurrencyForPDF(total.amount));
     doc.text(processArabicText(total.label), 20, yPosition);
     doc.text(amountText, doc.internal.pageSize.width - 30, yPosition, {
-      align: "right",
+      align: 'right',
     });
     yPosition += 7;
   });

@@ -1,7 +1,7 @@
 /**
  * Query Optimization Utilities
  * Helpers for optimizing Supabase queries
- * 
+ *
  * @note QUERY_CONFIG و CACHE_TIMES متوفرة في @/infrastructure/react-query
  * @version 3.0.0
  */
@@ -12,10 +12,8 @@
  */
 export const createOptimizedSelect = (fields: Record<string, string[]>): string => {
   return Object.entries(fields)
-    .map(([table, columns]) => 
-      table === 'main' 
-        ? columns.join(', ')
-        : `${table}(${columns.join(', ')})`
+    .map(([table, columns]) =>
+      table === 'main' ? columns.join(', ') : `${table}(${columns.join(', ')})`
     )
     .join(', ');
 };
@@ -27,7 +25,7 @@ export const createDateRangeFilter = (days: number) => {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
-  
+
   return {
     start: startDate.toISOString().split('T')[0],
     end: endDate.toISOString().split('T')[0],

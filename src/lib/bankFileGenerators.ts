@@ -16,23 +16,18 @@ export interface BankTransferRecord {
  * تصدير ملف CSV للبنوك المحلية (الراجحي، الأهلي، الرياض)
  */
 export function generateCSVFile(records: BankTransferRecord[]): string {
-  const headers = [
-    'اسم المستفيد',
-    'رقم الحساب',
-    'الآيبان',
-    'المبلغ',
-    'المرجع',
-    'البيان'
-  ].join(',');
+  const headers = ['اسم المستفيد', 'رقم الحساب', 'الآيبان', 'المبلغ', 'المرجع', 'البيان'].join(',');
 
-  const rows = records.map(record => [
-    record.beneficiary_name,
-    record.account_number,
-    record.iban || '',
-    record.amount.toFixed(2),
-    record.reference,
-    record.description || ''
-  ].join(','));
+  const rows = records.map((record) =>
+    [
+      record.beneficiary_name,
+      record.account_number,
+      record.iban || '',
+      record.amount.toFixed(2),
+      record.reference,
+      record.description || '',
+    ].join(',')
+  );
 
   return [headers, ...rows].join('\n');
 }
@@ -53,7 +48,7 @@ export function generateMT940File(
   };
 
   const lines: string[] = [];
-  
+
   // Header
   lines.push(':20:TRANSFER' + formatDate(date));
   lines.push(':25:' + accountNumber);
@@ -62,7 +57,9 @@ export function generateMT940File(
 
   // Transactions
   records.forEach((record) => {
-    lines.push(':61:' + formatDate(date) + 'C' + record.amount.toFixed(2).replace('.', ',') + 'NTRF');
+    lines.push(
+      ':61:' + formatDate(date) + 'C' + record.amount.toFixed(2).replace('.', ',') + 'NTRF'
+    );
     lines.push(':86:' + record.reference + ' ' + record.beneficiary_name);
   });
 

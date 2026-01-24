@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LucideIcon } from 'lucide-react';
 
 interface SettingItem {
   label: string;
@@ -37,9 +37,7 @@ export function SettingsCategoryCard({
             <CardTitle className="text-base group-hover:text-primary transition-colors">
               {title}
             </CardTitle>
-            <CardDescription className="text-xs mt-1">
-              {description}
-            </CardDescription>
+            <CardDescription className="text-xs mt-1">{description}</CardDescription>
           </div>
         </div>
       </CardHeader>

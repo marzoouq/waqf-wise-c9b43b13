@@ -3,12 +3,12 @@
  * Active Connections Chart
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Clock } from "lucide-react";
-import type { ConnectionStats } from "@/services/monitoring/db-performance.service";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Clock } from 'lucide-react';
+import type { ConnectionStats } from '@/services/monitoring/db-performance.service';
 
 interface ConnectionsChartProps {
   connections: ConnectionStats[];
@@ -30,10 +30,15 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
     );
   }
 
-  const chartData = connections.map(conn => ({
-    name: conn.state === 'active' ? 'نشط' : 
-          conn.state === 'idle' ? 'خامل' : 
-          conn.state === 'idle in transaction' ? 'خامل في معاملة' : conn.state,
+  const chartData = connections.map((conn) => ({
+    name:
+      conn.state === 'active'
+        ? 'نشط'
+        : conn.state === 'idle'
+          ? 'خامل'
+          : conn.state === 'idle in transaction'
+            ? 'خامل في معاملة'
+            : conn.state,
     value: conn.count,
     maxIdleHours: Math.floor(conn.max_idle_seconds / 3600),
     originalState: conn.state,
@@ -47,7 +52,7 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
   ];
 
   const totalConnections = chartData.reduce((sum, c) => sum + c.value, 0);
-  const idleConn = connections.find(c => c.state === 'idle');
+  const idleConn = connections.find((c) => c.state === 'idle');
   const maxIdleHours = idleConn ? Math.floor(idleConn.max_idle_seconds / 3600) : 0;
 
   return (
@@ -57,9 +62,7 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
           <span>الاتصالات النشطة</span>
           <Badge variant="outline">{totalConnections} اتصال</Badge>
         </CardTitle>
-        <CardDescription>
-          توزيع الاتصالات حسب الحالة
-        </CardDescription>
+        <CardDescription>توزيع الاتصالات حسب الحالة</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col lg:flex-row items-center gap-6">
@@ -78,7 +81,7 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 formatter={(value: number) => [value, 'اتصال']}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
@@ -87,7 +90,7 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
                   direction: 'rtl',
                 }}
               />
-              <Legend 
+              <Legend
                 verticalAlign="bottom"
                 formatter={(value) => <span className="text-sm">{value}</span>}
               />
@@ -108,10 +111,13 @@ export function ConnectionsChart({ connections, isLoading }: ConnectionsChartPro
 
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
           {chartData.map((conn, index) => (
-            <div key={conn.originalState} className="flex items-center justify-between p-2 rounded bg-muted/50">
+            <div
+              key={conn.originalState}
+              className="flex items-center justify-between p-2 rounded bg-muted/50"
+            >
               <div className="flex items-center gap-2">
-                <div 
-                  className="w-3 h-3 rounded-full" 
+                <div
+                  className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
                 <span>{conn.name}</span>

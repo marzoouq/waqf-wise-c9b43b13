@@ -1,7 +1,7 @@
 /**
  * Rental Payments Hook - خطاف دفعات الإيجار
  * @version 2.8.30
- * 
+ *
  * تم تقسيم هذا الملف من 518 سطر إلى:
  * - RentalPaymentService (خدمة قاعدة البيانات)
  * - useRentalPaymentArchiving (أرشفة PDF)
@@ -9,34 +9,34 @@
  * - useRentalPayments (هذا الملف - الـ hook الرئيسي)
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/hooks/ui/use-toast";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { useEffect, useMemo } from "react";
-import { logger } from "@/lib/logger";
-import { RealtimeService } from "@/services/realtime.service";
-import { RentalPaymentService, type RentalPayment } from "@/services/rental-payment.service";
-import { useRentalPaymentArchiving } from "./useRentalPaymentArchiving";
-import { filterRelevantPayments } from "@/lib/rental-payment-filters";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
-import type { RentalPaymentInsert } from "@/types/payments";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/hooks/ui/use-toast';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { useEffect, useMemo } from 'react';
+import { logger } from '@/lib/logger';
+import { RealtimeService } from '@/services/realtime.service';
+import { RentalPaymentService, type RentalPayment } from '@/services/rental-payment.service';
+import { useRentalPaymentArchiving } from './useRentalPaymentArchiving';
+import { filterRelevantPayments } from '@/lib/rental-payment-filters';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
+import type { RentalPaymentInsert } from '@/types/payments';
 
 // Re-export RentalPayment type for backward compatibility
-export type { RentalPayment } from "@/services/rental-payment.service";
+export type { RentalPayment } from '@/services/rental-payment.service';
 
 // Re-export filter function for backward compatibility
-export { filterRelevantPayments } from "@/lib/rental-payment-filters";
+export { filterRelevantPayments } from '@/lib/rental-payment-filters';
 
 const RELATED_QUERY_KEYS = [
   QUERY_KEYS.RENTAL_PAYMENTS,
   QUERY_KEYS.RENTAL_PAYMENTS_COLLECTED,
   QUERY_KEYS.RENTAL_PAYMENTS_WITH_FREQUENCY,
-  QUERY_KEYS.JOURNAL_ENTRIES
+  QUERY_KEYS.JOURNAL_ENTRIES,
 ];
 
 export const useRentalPayments = (
-  contractId?: string, 
-  _showAllPayments: boolean = false, 
+  contractId?: string,
+  _showAllPayments: boolean = false,
   _daysThreshold: number = 90,
   _showNextOnly: boolean = true
 ) => {
@@ -56,14 +56,16 @@ export const useRentalPayments = (
 
   // Fetch payments using service
   const { data: allPayments = [], isLoading } = useQuery({
-    queryKey: contractId ? QUERY_KEYS.RENTAL_PAYMENTS_BY_CONTRACT(contractId) : QUERY_KEYS.RENTAL_PAYMENTS,
+    queryKey: contractId
+      ? QUERY_KEYS.RENTAL_PAYMENTS_BY_CONTRACT(contractId)
+      : QUERY_KEYS.RENTAL_PAYMENTS,
     queryFn: () => RentalPaymentService.getAll({ contractId }),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // Apply filtering logic
   const payments = useMemo(
-    () => allPayments ? filterRelevantPayments(allPayments) : [],
+    () => (allPayments ? filterRelevantPayments(allPayments) : []),
     [allPayments]
   );
 
@@ -74,9 +76,7 @@ export const useRentalPayments = (
 
   // Invalidate all related queries
   const invalidateRelatedQueries = () => {
-    RELATED_QUERY_KEYS.forEach(key => 
-      queryClient.invalidateQueries({ queryKey: [key] })
-    );
+    RELATED_QUERY_KEYS.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
   };
 
   // Add payment mutation
@@ -95,8 +95,8 @@ export const useRentalPayments = (
     onSuccess: () => {
       invalidateRelatedQueries();
       toast({
-        title: "تم إضافة الدفعة",
-        description: "تم إضافة الدفعة وإنشاء القيد المحاسبي",
+        title: 'تم إضافة الدفعة',
+        description: 'تم إضافة الدفعة وإنشاء القيد المحاسبي',
       });
     },
     onError: createMutationErrorHandler({ context: 'add_rental_payment' }),
@@ -122,15 +122,15 @@ export const useRentalPayments = (
     onSuccess: () => {
       invalidateRelatedQueries();
       toast({
-        title: "تم تحديث الدفعة",
-        description: "تم تحديث الدفعة والقيد المحاسبي",
+        title: 'تم تحديث الدفعة',
+        description: 'تم تحديث الدفعة والقيد المحاسبي',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الدفعة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تحديث الدفعة',
+        variant: 'destructive',
       });
       logger.error(error, { context: 'update_rental_payment', severity: 'medium' });
     },
@@ -143,25 +143,22 @@ export const useRentalPayments = (
     onSuccess: () => {
       invalidateRelatedQueries();
       toast({
-        title: "تم الحذف",
-        description: "تم حذف الدفعة بنجاح (حذف لين)",
+        title: 'تم الحذف',
+        description: 'تم حذف الدفعة بنجاح (حذف لين)',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حذف الدفعة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء حذف الدفعة',
+        variant: 'destructive',
       });
       logger.error(error, { context: 'delete_rental_payment', severity: 'medium' });
     },
   });
 
   // Process invoice and receipt creation + archiving
-  const processInvoiceAndReceipt = async (
-    data: RentalPayment, 
-    paymentMethod?: string
-  ) => {
+  const processInvoiceAndReceipt = async (data: RentalPayment, paymentMethod?: string) => {
     try {
       const result = await RentalPaymentService.createInvoiceAndReceipt({
         rentalPaymentId: data.id,
@@ -173,28 +170,28 @@ export const useRentalPayments = (
         tenantId: data.contracts?.tenant_id_number,
         tenantEmail: data.contracts?.tenant_email,
         tenantPhone: data.contracts?.tenant_phone,
-        propertyName: data.contracts?.properties?.name
+        propertyName: data.contracts?.properties?.name,
       });
 
       if (result.success && result.invoice_id && result.receipt_id) {
-        logger.info('تم إصدار الفاتورة وسند القبض بنجاح', { 
+        logger.info('تم إصدار الفاتورة وسند القبض بنجاح', {
           context: 'rental_invoice_receipt_created',
-          metadata: { invoice_id: result.invoice_id, receipt_id: result.receipt_id }
+          metadata: { invoice_id: result.invoice_id, receipt_id: result.receipt_id },
         });
 
         // Archive documents
         await archiveInvoiceAndReceipt({
           invoiceId: result.invoice_id,
           receiptId: result.receipt_id,
-          tenantName: data.contracts?.tenant_name
+          tenantName: data.contracts?.tenant_name,
         });
       }
     } catch (error) {
       logger.error(error, { context: 'rental_invoice_generation', severity: 'high' });
       toast({
-        title: "تحذير",
-        description: "تم تسجيل الدفعة لكن فشل إصدار الفاتورة وسند القبض",
-        variant: "destructive",
+        title: 'تحذير',
+        description: 'تم تسجيل الدفعة لكن فشل إصدار الفاتورة وسند القبض',
+        variant: 'destructive',
       });
     }
   };

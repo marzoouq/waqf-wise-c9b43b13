@@ -18,11 +18,7 @@ interface TicketRatingDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function TicketRatingDialog({
-  ticketId,
-  open,
-  onOpenChange,
-}: TicketRatingDialogProps) {
+export function TicketRatingDialog({ ticketId, open, onOpenChange }: TicketRatingDialogProps) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [responseSpeed, setResponseSpeed] = useState(0);
@@ -56,13 +52,13 @@ export function TicketRatingDialog({
     setFeedback('');
   };
 
-  const RatingStars = ({ 
-    value, 
-    onChange, 
-    label 
-  }: { 
-    value: number; 
-    onChange: (val: number) => void; 
+  const RatingStars = ({
+    value,
+    onChange,
+    label,
+  }: {
+    value: number;
+    onChange: (val: number) => void;
     label: string;
   }) => (
     <div className="space-y-2">
@@ -79,7 +75,7 @@ export function TicketRatingDialog({
           >
             <Star
               className={`h-8 w-8 ${
-                star <= (label === 'التقييم العام' ? (hoveredRating || value) : value)
+                star <= (label === 'التقييم العام' ? hoveredRating || value : value)
                   ? 'fill-warning text-warning'
                   : 'text-muted-foreground/30'
               }`}
@@ -95,29 +91,15 @@ export function TicketRatingDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>تقييم خدمة الدعم</DialogTitle>
-          <DialogDescription>
-            نود معرفة رأيك في جودة الخدمة المقدمة
-          </DialogDescription>
+          <DialogDescription>نود معرفة رأيك في جودة الخدمة المقدمة</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          <RatingStars
-            value={rating}
-            onChange={setRating}
-            label="التقييم العام"
-          />
+          <RatingStars value={rating} onChange={setRating} label="التقييم العام" />
 
-          <RatingStars
-            value={responseSpeed}
-            onChange={setResponseSpeed}
-            label="سرعة الاستجابة"
-          />
+          <RatingStars value={responseSpeed} onChange={setResponseSpeed} label="سرعة الاستجابة" />
 
-          <RatingStars
-            value={solutionQuality}
-            onChange={setSolutionQuality}
-            label="جودة الحل"
-          />
+          <RatingStars value={solutionQuality} onChange={setSolutionQuality} label="جودة الحل" />
 
           <RatingStars
             value={staffFriendliness}
@@ -146,10 +128,7 @@ export function TicketRatingDialog({
             >
               إلغاء
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={rating === 0 || addRating.isPending}
-            >
+            <Button onClick={handleSubmit} disabled={rating === 0 || addRating.isPending}>
               {addRating.isPending ? 'جاري الإرسال...' : 'إرسال التقييم'}
             </Button>
           </div>

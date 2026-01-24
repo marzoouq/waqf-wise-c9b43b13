@@ -1,26 +1,35 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { AuthService } from "@/services";
-import { toast } from "sonner";
-import { Eye, EyeOff, Lock } from "lucide-react";
-import { getErrorMessage } from "@/types/errors";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AuthService } from '@/services';
+import { toast } from 'sonner';
+import { Eye, EyeOff, Lock } from 'lucide-react';
+import { getErrorMessage } from '@/types/errors';
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
-  newPassword: z.string()
-    .min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "يجب أن تحتوي على حرف كبير وصغير ورقم"),
-  confirmPassword: z.string()
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "كلمات المرور غير متطابقة",
-  path: ["confirmPassword"],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'كلمة المرور الحالية مطلوبة'),
+    newPassword: z
+      .string()
+      .min(8, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل')
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'يجب أن تحتوي على حرف كبير وصغير ورقم'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['confirmPassword'],
+  });
 
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
@@ -53,15 +62,15 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
         throw new Error(result.error);
       }
 
-      toast.success("تم تغيير كلمة المرور بنجاح", {
-        description: "يمكنك الآن استخدام كلمة المرور الجديدة في المرة القادمة",
+      toast.success('تم تغيير كلمة المرور بنجاح', {
+        description: 'يمكنك الآن استخدام كلمة المرور الجديدة في المرة القادمة',
       });
 
       reset();
       onOpenChange(false);
     } catch (error) {
       const message = getErrorMessage(error);
-      toast.error("خطأ في تغيير كلمة المرور", {
+      toast.error('خطأ في تغيير كلمة المرور', {
         description: message,
       });
     } finally {
@@ -77,9 +86,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
             <Lock className="h-5 w-5" />
             تغيير كلمة المرور
           </DialogTitle>
-          <DialogDescription>
-            قم بتغيير كلمة المرور المؤقتة إلى كلمة مرور خاصة بك
-          </DialogDescription>
+          <DialogDescription>قم بتغيير كلمة المرور المؤقتة إلى كلمة مرور خاصة بك</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -89,8 +96,8 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
             <div className="relative">
               <Input
                 id="currentPassword"
-                type={showCurrentPassword ? "text" : "password"}
-                {...register("currentPassword")}
+                type={showCurrentPassword ? 'text' : 'password'}
+                {...register('currentPassword')}
                 disabled={isLoading}
               />
               <button
@@ -98,11 +105,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showCurrentPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.currentPassword && (
@@ -116,8 +119,8 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
             <div className="relative">
               <Input
                 id="newPassword"
-                type={showNewPassword ? "text" : "password"}
-                {...register("newPassword")}
+                type={showNewPassword ? 'text' : 'password'}
+                {...register('newPassword')}
                 disabled={isLoading}
               />
               <button
@@ -125,11 +128,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
                 onClick={() => setShowNewPassword(!showNewPassword)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showNewPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.newPassword && (
@@ -146,8 +145,8 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
             <div className="relative">
               <Input
                 id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                {...register("confirmPassword")}
+                type={showConfirmPassword ? 'text' : 'password'}
+                {...register('confirmPassword')}
                 disabled={isLoading}
               />
               <button
@@ -155,11 +154,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.confirmPassword && (
@@ -177,7 +172,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
               إلغاء
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "جاري التحديث..." : "تغيير كلمة المرور"}
+              {isLoading ? 'جاري التحديث...' : 'تغيير كلمة المرور'}
             </Button>
           </div>
         </form>

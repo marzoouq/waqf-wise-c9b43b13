@@ -2,7 +2,7 @@
  * أنواع قوالب القيود التلقائية
  */
 
-import type { Json } from "@/integrations/supabase/types";
+import type { Json } from '@/integrations/supabase/types';
 
 export interface AccountMapping {
   account_code: string;
@@ -64,11 +64,11 @@ export interface AutoJournalTemplateUpdate {
 export function parseAutoJournalTemplate(raw: AutoJournalTemplateRaw): AutoJournalTemplate {
   return {
     ...raw,
-    debit_accounts: Array.isArray(raw.debit_accounts) 
-      ? (raw.debit_accounts as unknown as AccountMapping[]) 
+    debit_accounts: Array.isArray(raw.debit_accounts)
+      ? (raw.debit_accounts as unknown as AccountMapping[])
       : [],
-    credit_accounts: Array.isArray(raw.credit_accounts) 
-      ? (raw.credit_accounts as unknown as AccountMapping[]) 
+    credit_accounts: Array.isArray(raw.credit_accounts)
+      ? (raw.credit_accounts as unknown as AccountMapping[])
       : [],
     is_active: raw.is_active ?? false,
     priority: raw.priority ?? 100,

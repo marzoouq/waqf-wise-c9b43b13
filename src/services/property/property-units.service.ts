@@ -19,18 +19,18 @@ export class PropertyUnitsService {
    */
   private static async validateTenantExists(tenantId: string | null | undefined): Promise<boolean> {
     if (!tenantId) return true; // null/undefined مقبول
-    
+
     const { data, error } = await supabase
       .from('tenants')
       .select('id')
       .eq('id', tenantId)
       .maybeSingle();
-    
+
     if (error) {
       productionLogger.error('Error validating tenant', { tenantId, error });
       return false;
     }
-    
+
     return !!data;
   }
 
@@ -43,12 +43,12 @@ export class PropertyUnitsService {
       .select('id')
       .eq('id', propertyId)
       .maybeSingle();
-    
+
     if (error) {
       productionLogger.error('Error validating property', { propertyId, error });
       return false;
     }
-    
+
     return !!data;
   }
   /**
@@ -56,11 +56,8 @@ export class PropertyUnitsService {
    */
   static async getUnits(propertyId?: string): Promise<PropertyUnitRow[]> {
     try {
-      let query = supabase
-        .from('property_units')
-        .select('*')
-        .order('unit_number');
-      
+      let query = supabase.from('property_units').select('*').order('unit_number');
+
       if (propertyId) {
         query = query.eq('property_id', propertyId);
       }
@@ -99,8 +96,8 @@ export class PropertyUnitsService {
       }
 
       const numbers = units
-        .map(u => parseInt(u.unit_number.replace(/\D/g, ''), 10))
-        .filter(n => !isNaN(n));
+        .map((u) => parseInt(u.unit_number.replace(/\D/g, ''), 10))
+        .filter((n) => !isNaN(n));
 
       if (numbers.length === 0) {
         return '101';
@@ -136,18 +133,14 @@ export class PropertyUnitsService {
       }
 
       const { data, error } = await withRetry(async () => {
-        return await supabase
-          .from('property_units')
-          .insert([unit])
-          .select()
-          .maybeSingle();
+        return await supabase.from('property_units').insert([unit]).select().maybeSingle();
       }, SUPABASE_RETRY_OPTIONS);
 
       // ✅ Idempotency: معالجة خطأ التكرار كـ success
       if (error && isUniqueViolation(error)) {
-        productionLogger.info('[Idempotency] وحدة موجودة مسبقاً', { 
-          property_id: unit.property_id, 
-          unit_number: unit.unit_number 
+        productionLogger.info('[Idempotency] وحدة موجودة مسبقاً', {
+          property_id: unit.property_id,
+          unit_number: unit.unit_number,
         });
         // جلب الوحدة الموجودة
         const { data: existing } = await supabase
@@ -160,7 +153,7 @@ export class PropertyUnitsService {
       }
 
       if (error) throw error;
-      if (!data) throw new Error("فشل في إنشاء الوحدة");
+      if (!data) throw new Error('فشل في إنشاء الوحدة');
 
       // ⚠️ Fallback: Trigger update_property_units_count_trigger يقوم بنفس العمل
       // هذا الكود للتوافق مع الأنظمة التي قد لا يعمل فيها الـ trigger
@@ -186,7 +179,10 @@ export class PropertyUnitsService {
   /**
    * تحديث وحدة مع التحقق من FK
    */
-  static async updateUnit(unitId: string, updates: Partial<PropertyUnitUpdate>): Promise<PropertyUnitRow> {
+  static async updateUnit(
+    unitId: string,
+    updates: Partial<PropertyUnitUpdate>
+  ): Promise<PropertyUnitRow> {
     try {
       // ✅ FK Validation - التحقق من وجود المستأجر إذا تم تحديثه
       if (updates.current_tenant_id !== undefined && updates.current_tenant_id !== null) {
@@ -206,7 +202,7 @@ export class PropertyUnitsService {
       }, SUPABASE_RETRY_OPTIONS);
 
       if (error) throw error;
-      if (!data) throw new Error("الوحدة غير موجودة");
+      if (!data) throw new Error('الوحدة غير موجودة');
       return data;
     } catch (error) {
       productionLogger.error('Error updating property unit', error);
@@ -225,10 +221,7 @@ export class PropertyUnitsService {
         .eq('id', unitId)
         .maybeSingle();
 
-      const { error } = await supabase
-        .from('property_units')
-        .delete()
-        .eq('id', unitId);
+      const { error } = await supabase.from('property_units').delete().eq('id', unitId);
 
       if (error) throw error;
 
@@ -258,15 +251,17 @@ export class PropertyUnitsService {
     try {
       const [unitsResult, contractsResult] = await Promise.all([
         supabase
-          .from("property_units")
-          .select("id, unit_number, unit_type, floor_number, area, annual_rent, occupancy_status, current_contract_id")
-          .eq("property_id", propertyId)
-          .order("unit_number"),
+          .from('property_units')
+          .select(
+            'id, unit_number, unit_type, floor_number, area, annual_rent, occupancy_status, current_contract_id'
+          )
+          .eq('property_id', propertyId)
+          .order('unit_number'),
         supabase
-          .from("contracts")
-          .select("id, tenant_name, monthly_rent")
-          .eq("property_id", propertyId)
-          .eq("status", "نشط")
+          .from('contracts')
+          .select('id, tenant_name, monthly_rent')
+          .eq('property_id', propertyId)
+          .eq('status', 'نشط'),
       ]);
 
       if (unitsResult.error) throw unitsResult.error;
@@ -274,7 +269,7 @@ export class PropertyUnitsService {
 
       return {
         units: unitsResult.data || [],
-        contracts: contractsResult.data || []
+        contracts: contractsResult.data || [],
       };
     } catch (error) {
       productionLogger.error('Error fetching property units and contracts', error);

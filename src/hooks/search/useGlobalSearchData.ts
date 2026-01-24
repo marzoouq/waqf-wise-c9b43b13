@@ -76,16 +76,23 @@ export function useGlobalSearchData(searchQuery: string) {
     });
 
     // إضافة القروض
-    loans.forEach((l: { id: string; loan_number: string; loan_amount: number; beneficiaries: { full_name: string } | null }) => {
-      results.push({
-        id: l.id,
-        type: 'loan',
-        title: l.loan_number,
-        subtitle: `${l.loan_amount?.toLocaleString('ar-SA')} ر.س - ${l.beneficiaries?.full_name || 'غير معروف'}`,
-        url: `/loans`,
-        icon: DollarSign,
-      });
-    });
+    loans.forEach(
+      (l: {
+        id: string;
+        loan_number: string;
+        loan_amount: number;
+        beneficiaries: { full_name: string } | null;
+      }) => {
+        results.push({
+          id: l.id,
+          type: 'loan',
+          title: l.loan_number,
+          subtitle: `${l.loan_amount?.toLocaleString('ar-SA')} ر.س - ${l.beneficiaries?.full_name || 'غير معروف'}`,
+          url: `/loans`,
+          icon: DollarSign,
+        });
+      }
+    );
 
     // إضافة المستندات
     documents.forEach((d) => {

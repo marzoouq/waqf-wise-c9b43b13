@@ -1,8 +1,8 @@
 /**
  * مكون Footer للصفحة الخفيفة
  */
-import { Link } from "react-router-dom";
-import { Building2 } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Building2 } from 'lucide-react';
 
 export function LightFooter() {
   return (
@@ -14,13 +14,22 @@ export function LightFooter() {
             <span className="font-semibold text-foreground">منصة الوقف</span>
           </div>
           <nav className="flex items-center gap-4 text-sm font-medium" aria-label="روابط التذييل">
-            <Link to="/privacy" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
+            <Link
+              to="/privacy"
+              className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
+            >
               سياسة الخصوصية
             </Link>
-            <Link to="/terms" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
+            <Link
+              to="/terms"
+              className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
+            >
               الشروط والأحكام
             </Link>
-            <Link to="/contact" className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded">
+            <Link
+              to="/contact"
+              className="text-foreground/70 hover:text-foreground transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
+            >
               اتصل بنا
             </Link>
           </nav>

@@ -1,18 +1,18 @@
-import { useProperties } from "@/hooks/property/useProperties";
-import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
+import { useProperties } from '@/hooks/property/useProperties';
+import { usePropertyUnits } from '@/hooks/property/usePropertyUnits';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Building2, Home, MapPin } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/utils";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { getUnitTypeLabel, matchesStatus } from "@/lib/constants";
+} from '@/components/ui/accordion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Building2, Home, MapPin } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatCurrency } from '@/lib/utils';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { getUnitTypeLabel, matchesStatus } from '@/lib/constants';
 
 export function PropertyAccordionView() {
   const { properties, isLoading, error, refetch } = useProperties();
@@ -28,7 +28,13 @@ export function PropertyAccordionView() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل العقارات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل العقارات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   if (!properties || properties.length === 0) {
@@ -44,8 +50,8 @@ export function PropertyAccordionView() {
   return (
     <Accordion type="single" collapsible className="space-y-3">
       {properties.map((property) => (
-        <AccordionItem 
-          key={property.id} 
+        <AccordionItem
+          key={property.id}
           value={property.id}
           className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
         >
@@ -65,7 +71,7 @@ export function PropertyAccordionView() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 me-4">
                 <Badge variant="secondary" className="gap-1 whitespace-nowrap">
                   <Home className="h-3 w-3" />
@@ -79,10 +85,10 @@ export function PropertyAccordionView() {
               </div>
             </div>
           </AccordionTrigger>
-          
+
           <AccordionContent className="px-4 pb-4">
-            <PropertyUnitsSection 
-              propertyId={property.id} 
+            <PropertyUnitsSection
+              propertyId={property.id}
               propertyName={property.name}
               totalUnits={property.units}
               occupiedUnits={property.occupied}
@@ -103,7 +109,7 @@ interface PropertyUnitsSectionProps {
 
 function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSectionProps) {
   const { units, isLoading } = usePropertyUnits(propertyId);
-  
+
   if (isLoading) {
     return (
       <div className="py-8">
@@ -114,7 +120,7 @@ function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSection
       </div>
     );
   }
-  
+
   if (!units || units.length === 0) {
     return (
       <div className="py-8 text-center">
@@ -124,8 +130,8 @@ function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSection
     );
   }
 
-  const availableUnits = units.filter(u => matchesStatus(u.occupancy_status, 'vacant')).length;
-  const occupiedCount = units.filter(u => matchesStatus(u.occupancy_status, 'occupied')).length;
+  const availableUnits = units.filter((u) => matchesStatus(u.occupancy_status, 'vacant')).length;
+  const occupiedCount = units.filter((u) => matchesStatus(u.occupancy_status, 'occupied')).length;
 
   return (
     <div className="space-y-4 pt-4 border-t">
@@ -139,17 +145,13 @@ function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSection
         </Card>
         <Card className="bg-gradient-to-br from-success-light to-success-light/50 border-success">
           <CardContent className="pt-6 text-center">
-            <div className="text-2xl md:text-3xl font-bold text-success">
-              {occupiedCount}
-            </div>
+            <div className="text-2xl md:text-3xl font-bold text-success">{occupiedCount}</div>
             <div className="text-xs text-success-foreground mt-1">مشغول</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-warning-light to-warning-light/50 border-warning">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl md:text-3xl font-bold text-warning">
-              {availableUnits}
-            </div>
+            <div className="text-2xl md:text-3xl font-bold text-warning">{availableUnits}</div>
             <div className="text-xs text-warning-foreground mt-1">متاح</div>
           </CardContent>
         </Card>
@@ -158,8 +160,15 @@ function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSection
       {/* شبكة الوحدات */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {units.map((unit) => (
-          <Card key={unit.id} className="hover:shadow-md transition-all duration-200 border-s-4" 
-                style={{ borderInlineStartColor: matchesStatus(unit.occupancy_status, 'occupied') ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}>
+          <Card
+            key={unit.id}
+            className="hover:shadow-md transition-all duration-200 border-s-4"
+            style={{
+              borderInlineStartColor: matchesStatus(unit.occupancy_status, 'occupied')
+                ? 'hsl(var(--primary))'
+                : 'hsl(var(--muted))',
+            }}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -168,18 +177,22 @@ function PropertyUnitsSection({ propertyId, propertyName }: PropertyUnitsSection
                     {unit.unit_name || `وحدة ${unit.unit_number}`}
                   </span>
                 </div>
-                <Badge 
-                  variant={matchesStatus(unit.occupancy_status, 'occupied') ? 'default' : 'secondary'}
+                <Badge
+                  variant={
+                    matchesStatus(unit.occupancy_status, 'occupied') ? 'default' : 'secondary'
+                  }
                   className="text-xs"
                 >
                   {unit.occupancy_status}
                 </Badge>
               </div>
-              
+
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-muted-foreground">
                   <span>النوع:</span>
-                  <span className="font-medium text-foreground">{getUnitTypeLabel(unit.unit_type)}</span>
+                  <span className="font-medium text-foreground">
+                    {getUnitTypeLabel(unit.unit_type)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>الطابق:</span>

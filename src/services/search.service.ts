@@ -10,7 +10,14 @@ import { abortableFetch } from '@/lib/utils/abortable-fetch';
 const escapeWildcards = (query: string): string => query.replace(/[%_]/g, '\\$&');
 
 interface SearchFilters {
-  [key: string]: string | number | boolean | null | undefined | { gte: string; lte: string } | string[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | { gte: string; lte: string }
+    | string[];
 }
 
 interface SearchHistoryItem {
@@ -40,15 +47,13 @@ export const SearchService = {
    * حفظ سجل البحث العام (من useGlobalSearch)
    */
   async saveGlobalSearchHistory(userId: string, data: SearchHistoryData): Promise<void> {
-    const { error } = await supabase
-      .from('search_history')
-      .insert({
-        user_id: userId,
-        search_query: data.query,
-        search_type: 'global',
-        results_count: data.resultsCount,
-      });
-    
+    const { error } = await supabase.from('search_history').insert({
+      user_id: userId,
+      search_query: data.query,
+      search_type: 'global',
+      results_count: data.resultsCount,
+    });
+
     if (error) throw error;
   },
   /**
@@ -61,7 +66,7 @@ export const SearchService = {
       .eq('search_type', searchType)
       .order('created_at', { ascending: false })
       .limit(limit);
-    
+
     if (error) throw error;
     return data as SearchHistoryItem[];
   },
@@ -71,13 +76,15 @@ export const SearchService = {
    */
   async searchBeneficiaries(query: string) {
     if (!query || query.length < 2) return [];
-    
+
     const { data, error } = await supabase
       .from('beneficiaries')
       .select('id, full_name, national_id, phone, category')
-      .or(`full_name.ilike.%${escapeWildcards(query)}%,national_id.ilike.%${escapeWildcards(query)}%,phone.ilike.%${escapeWildcards(query)}%`)
+      .or(
+        `full_name.ilike.%${escapeWildcards(query)}%,national_id.ilike.%${escapeWildcards(query)}%,phone.ilike.%${escapeWildcards(query)}%`
+      )
       .limit(5);
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -87,13 +94,13 @@ export const SearchService = {
    */
   async searchProperties(query: string) {
     if (!query || query.length < 2) return [];
-    
+
     const { data, error } = await supabase
       .from('properties')
       .select('id, name, location, status')
       .or(`name.ilike.%${escapeWildcards(query)}%,location.ilike.%${escapeWildcards(query)}%`)
       .limit(5);
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -103,13 +110,13 @@ export const SearchService = {
    */
   async searchLoans(query: string) {
     if (!query || query.length < 2) return [];
-    
+
     const { data, error } = await supabase
       .from('loans')
       .select('id, loan_number, loan_amount, beneficiaries(full_name)')
       .or(`loan_number.ilike.%${escapeWildcards(query)}%`)
       .limit(5);
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -119,13 +126,13 @@ export const SearchService = {
    */
   async searchDocuments(query: string) {
     if (!query || query.length < 2) return [];
-    
+
     const { data, error } = await supabase
       .from('documents')
       .select('id, name, category, file_type')
       .ilike('name', `%${escapeWildcards(query)}%`)
       .limit(5);
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -139,18 +146,18 @@ export const SearchService = {
     filters: SearchFilters,
     resultsCount: number
   ) {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { error } = await supabase
-      .from('search_history')
-      .insert({
-        user_id: user?.id,
-        search_query: query,
-        search_type: searchType,
-        filters,
-        results_count: resultsCount,
-      });
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase.from('search_history').insert({
+      user_id: user?.id,
+      search_query: query,
+      search_type: searchType,
+      filters,
+      results_count: resultsCount,
+    });
+
     if (error) throw error;
   },
 
@@ -167,13 +174,15 @@ export const SearchService = {
     // Build query string for REST API to avoid TypeScript depth issues
     const session = await supabase.auth.getSession();
     const token = session.data.session?.access_token || '';
-    
+
     let url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/${tableName}?select=${encodeURIComponent(columns)}`;
-    
+
     // Apply text search
     if (query) {
       const searchColumns = ['full_name', 'national_id', 'phone', 'email', 'notes'];
-      const orConditions = searchColumns.map(col => `${col}.ilike.%${escapeWildcards(query)}%`).join(',');
+      const orConditions = searchColumns
+        .map((col) => `${col}.ilike.%${escapeWildcards(query)}%`)
+        .join(',');
       url += `&or=(${encodeURIComponent(orConditions)})`;
     }
 
@@ -192,9 +201,9 @@ export const SearchService = {
 
     return abortableFetch<unknown[]>(url, {
       headers: {
-        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
       timeout: 15000, // 15 ثانية للبحث
     });
@@ -204,7 +213,9 @@ export const SearchService = {
    * جلب عمليات البحث الأخيرة
    */
   async getRecentSearches(searchType: string): Promise<RecentSearch[]> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return [];
 
     const { data, error } = await supabase
@@ -224,8 +235,10 @@ export const SearchService = {
    * ⚠️ الحذف الفيزيائي ممنوع
    */
   async deleteSearch(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('search_history')
       .update({
@@ -242,7 +255,9 @@ export const SearchService = {
    * مسح جميع عمليات البحث (Soft Delete)
    */
   async clearAllSearches(searchType: string, reason: string = 'مسح السجل'): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
     const { error } = await supabase

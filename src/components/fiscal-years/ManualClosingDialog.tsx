@@ -3,18 +3,18 @@
  * Manual Fiscal Year Closing Dialog
  */
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, AlertCircle } from "lucide-react";
-import type { FiscalYear } from "@/hooks/accounting/useFiscalYears";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle } from 'lucide-react';
+import type { FiscalYear } from '@/hooks/accounting/useFiscalYears';
 
 interface ManualClosingDialogProps {
   open: boolean;
@@ -22,11 +22,7 @@ interface ManualClosingDialogProps {
   fiscalYear: FiscalYear;
 }
 
-export function ManualClosingDialog({
-  open,
-  onOpenChange,
-  fiscalYear,
-}: ManualClosingDialogProps) {
+export function ManualClosingDialog({ open, onOpenChange, fiscalYear }: ManualClosingDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading] = useState(false);
 
@@ -35,9 +31,7 @@ export function ManualClosingDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>إقفال يدوي للسنة المالية: {fiscalYear.name}</DialogTitle>
-          <DialogDescription>
-            إقفال يدوي مع التحكم الكامل في كل خطوة
-          </DialogDescription>
+          <DialogDescription>إقفال يدوي مع التحكم الكامل في كل خطوة</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -48,26 +42,26 @@ export function ManualClosingDialog({
                 key={step}
                 className={`flex-1 ${
                   step < currentStep
-                    ? "border-primary"
+                    ? 'border-primary'
                     : step === currentStep
-                    ? "border-primary"
-                    : "border-muted"
-                } ${step !== 4 ? "border-s-2" : ""}`}
+                      ? 'border-primary'
+                      : 'border-muted'
+                } ${step !== 4 ? 'border-s-2' : ''}`}
               >
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto ${
                     step <= currentStep
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {step}
                 </div>
                 <p className="text-xs text-center mt-2">
-                  {step === 1 && "مراجعة"}
-                  {step === 2 && "قيد الإقفال"}
-                  {step === 3 && "رقبة الوقف"}
-                  {step === 4 && "تأكيد"}
+                  {step === 1 && 'مراجعة'}
+                  {step === 2 && 'قيد الإقفال'}
+                  {step === 3 && 'رقبة الوقف'}
+                  {step === 4 && 'تأكيد'}
                 </p>
               </div>
             ))}
@@ -91,9 +85,7 @@ export function ManualClosingDialog({
                 </Button>
               )}
               {currentStep < 4 && (
-                <Button onClick={() => setCurrentStep(currentStep + 1)}>
-                  التالي
-                </Button>
+                <Button onClick={() => setCurrentStep(currentStep + 1)}>التالي</Button>
               )}
               {currentStep === 4 && (
                 <Button disabled={loading}>

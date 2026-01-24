@@ -1,21 +1,21 @@
-import { Plus, Eye, Edit, Trash2, MoreVertical, FileText } from "lucide-react";
-import { matchesStatus } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
-import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
-import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Card, CardContent } from "@/components/ui/card";
+import { Plus, Eye, Edit, Trash2, MoreVertical, FileText } from 'lucide-react';
+import { matchesStatus } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
+import { AddInvoiceDialog } from '@/components/invoices/AddInvoiceDialog';
+import { ViewInvoiceDialog } from '@/components/invoices/ViewInvoiceDialog';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -23,14 +23,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { format, arLocale as ar } from "@/lib/date";
-import { Pagination } from "@/components/ui/pagination";
-import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
-import { InvoicesStatsCards } from "@/components/invoices/InvoicesStatsCards";
-import { InvoicesFilters } from "@/components/invoices/InvoicesFilters";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { useInvoicesPage } from "@/hooks/payments/useInvoicesPage";
+} from '@/components/ui/table';
+import { format, arLocale as ar } from '@/lib/date';
+import { Pagination } from '@/components/ui/pagination';
+import InvoiceStatusBadge from '@/components/invoices/InvoiceStatusBadge';
+import { InvoicesStatsCards } from '@/components/invoices/InvoicesStatsCards';
+import { InvoicesFilters } from '@/components/invoices/InvoicesFilters';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
+import { useInvoicesPage } from '@/hooks/payments/useInvoicesPage';
 
 const Invoices = () => {
   const {
@@ -75,8 +78,8 @@ const Invoices = () => {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الفواتير" 
+      <ErrorState
+        title="فشل تحميل الفواتير"
         message="حدث خطأ أثناء تحميل بيانات الفواتير"
         onRetry={refetch}
         fullScreen
@@ -94,17 +97,26 @@ const Invoices = () => {
           actions={
             <div className="flex gap-2">
               <ExportButton
-                data={invoices?.map(inv => ({
-                  "رقم الفاتورة": inv.invoice_number,
-                  "التاريخ": format(new Date(inv.invoice_date), "dd/MM/yyyy"),
-                  "العميل": inv.customer_name,
-                  "المبلغ الإجمالي": inv.total_amount.toFixed(2),
-                  "الضريبة": inv.tax_amount.toFixed(2),
-                  "الحالة": inv.status,
-                })) || []}
+                data={
+                  invoices?.map((inv) => ({
+                    'رقم الفاتورة': inv.invoice_number,
+                    التاريخ: format(new Date(inv.invoice_date), 'dd/MM/yyyy'),
+                    العميل: inv.customer_name,
+                    'المبلغ الإجمالي': inv.total_amount.toFixed(2),
+                    الضريبة: inv.tax_amount.toFixed(2),
+                    الحالة: inv.status,
+                  })) || []
+                }
                 filename="invoices"
                 title="الفواتير"
-                headers={["رقم الفاتورة", "التاريخ", "العميل", "المبلغ الإجمالي", "الضريبة", "الحالة"]}
+                headers={[
+                  'رقم الفاتورة',
+                  'التاريخ',
+                  'العميل',
+                  'المبلغ الإجمالي',
+                  'الضريبة',
+                  'الحالة',
+                ]}
                 size="sm"
               />
               <Button size="sm" onClick={handleAddNew}>
@@ -117,7 +129,7 @@ const Invoices = () => {
         />
 
         <InvoicesStatsCards stats={statistics} />
-        
+
         <InvoicesFilters
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -130,7 +142,7 @@ const Invoices = () => {
         />
 
         {/* Empty State */}
-        {(!filteredInvoices || filteredInvoices.length === 0) ? (
+        {!filteredInvoices || filteredInvoices.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
@@ -157,14 +169,19 @@ const Invoices = () => {
                   </div>
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xs text-muted-foreground">
-                      {format(new Date(invoice.invoice_date), "dd MMM yyyy", { locale: ar })}
+                      {format(new Date(invoice.invoice_date), 'dd MMM yyyy', { locale: ar })}
                     </span>
                     <span className="font-semibold text-primary">
                       {Number(invoice.total_amount).toFixed(2)} ريال
                     </span>
                   </div>
                   <div className="flex gap-2 pt-2 border-t">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewInvoice(invoice.id)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleViewInvoice(invoice.id)}
+                    >
                       <Eye className="h-4 w-4 ms-1" />
                       معاينة
                     </Button>
@@ -194,7 +211,9 @@ const Invoices = () => {
                   <TableRow>
                     <TableHead className="text-xs sm:text-sm">رقم الفاتورة</TableHead>
                     <TableHead className="text-xs sm:text-sm">التاريخ</TableHead>
-                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">العميل</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                      العميل
+                    </TableHead>
                     <TableHead className="text-center text-xs sm:text-sm">المبلغ</TableHead>
                     <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
                     <TableHead className="text-end text-xs sm:text-sm">الإجراءات</TableHead>
@@ -203,11 +222,15 @@ const Invoices = () => {
                 <TableBody>
                   {paginatedInvoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell className="font-mono text-xs sm:text-sm font-semibold">{invoice.invoice_number}</TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        {format(new Date(invoice.invoice_date), "dd MMM yyyy", { locale: ar })}
+                      <TableCell className="font-mono text-xs sm:text-sm font-semibold">
+                        {invoice.invoice_number}
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{invoice.customer_name}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        {format(new Date(invoice.invoice_date), 'dd MMM yyyy', { locale: ar })}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                        {invoice.customer_name}
+                      </TableCell>
                       <TableCell className="text-center font-mono text-xs sm:text-sm font-semibold">
                         {Number(invoice.total_amount).toFixed(2)}
                       </TableCell>
@@ -217,7 +240,9 @@ const Invoices = () => {
                       <TableCell className="text-xs sm:text-sm">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
@@ -257,8 +282,17 @@ const Invoices = () => {
           />
         )}
 
-        <AddInvoiceDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} isEdit={isEditMode} invoiceToEdit={selectedInvoice} />
-        <ViewInvoiceDialog invoiceId={selectedInvoiceId} open={viewDialogOpen} onOpenChange={setViewDialogOpen} />
+        <AddInvoiceDialog
+          open={addDialogOpen}
+          onOpenChange={setAddDialogOpen}
+          isEdit={isEditMode}
+          invoiceToEdit={selectedInvoice}
+        />
+        <ViewInvoiceDialog
+          invoiceId={selectedInvoiceId}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+        />
         <DeleteConfirmDialog
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}

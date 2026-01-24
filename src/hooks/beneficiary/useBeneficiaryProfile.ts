@@ -3,10 +3,10 @@
  * Hook محسّن لجلب بيانات المستفيد باستخدام React Query
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { BeneficiaryService } from "@/services";
-import { Beneficiary } from "@/types/beneficiary";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { BeneficiaryService } from '@/services';
+import { Beneficiary } from '@/types/beneficiary';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface Payment {
   id: string;

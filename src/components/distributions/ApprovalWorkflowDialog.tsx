@@ -1,15 +1,21 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { useDistributionApprovals } from "@/hooks/distributions/useDistributionApprovals";
-import { Distribution } from "@/hooks/distributions/useDistributions";
-import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/auth/useUserRole";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { useDistributionApprovals } from '@/hooks/distributions/useDistributionApprovals';
+import { Distribution } from '@/hooks/distributions/useDistributions';
+import { CheckCircle2, XCircle, Clock, User } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/auth/useUserRole';
 
 interface ApprovalWorkflowDialogProps {
   distribution: Distribution | null;
@@ -24,8 +30,9 @@ export function ApprovalWorkflowDialog({
 }: ApprovalWorkflowDialogProps) {
   const { user } = useAuth();
   const { primaryRole } = useUserRole();
-  const { approvals, addApproval, getCurrentLevel, checkAllApproved, hasRejection } = useDistributionApprovals(distribution?.id);
-  const [notes, setNotes] = useState("");
+  const { approvals, addApproval, getCurrentLevel, checkAllApproved, hasRejection } =
+    useDistributionApprovals(distribution?.id);
+  const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentLevel = getCurrentLevel();
@@ -34,33 +41,33 @@ export function ApprovalWorkflowDialog({
 
   const canApprove = () => {
     if (!distribution || isRejected || allApproved) return false;
-    
+
     // المستوى 1: محاسب
-    if (currentLevel === 1 && primaryRole === "accountant") return true;
+    if (currentLevel === 1 && primaryRole === 'accountant') return true;
     // المستوى 2: مدير مالي (admin)
-    if (currentLevel === 2 && primaryRole === "admin") return true;
+    if (currentLevel === 2 && primaryRole === 'admin') return true;
     // المستوى 3: ناظر
-    if (currentLevel === 3 && primaryRole === "nazer") return true;
-    
+    if (currentLevel === 3 && primaryRole === 'nazer') return true;
+
     return false;
   };
 
-  const handleApprove = async (status: "موافق" | "مرفوض") => {
+  const handleApprove = async (status: 'موافق' | 'مرفوض') => {
     if (!distribution || !user) return;
-    
+
     setIsSubmitting(true);
     try {
       await addApproval({
         distribution_id: distribution.id,
         level: currentLevel,
         approver_id: user.id,
-        approver_name: user.email || "مستخدم",
+        approver_name: user.email || 'مستخدم',
         status,
         notes,
         approved_at: new Date().toISOString(),
       });
-      
-      setNotes("");
+
+      setNotes('');
       onOpenChange(false);
     } finally {
       setIsSubmitting(false);
@@ -69,28 +76,35 @@ export function ApprovalWorkflowDialog({
 
   const getLevelTitle = (level: number) => {
     switch (level) {
-      case 1: return "مراجعة المحاسب";
-      case 2: return "اعتماد المدير المالي";
-      case 3: return "موافقة الناظر";
-      default: return `المستوى ${level}`;
+      case 1:
+        return 'مراجعة المحاسب';
+      case 2:
+        return 'اعتماد المدير المالي';
+      case 3:
+        return 'موافقة الناظر';
+      default:
+        return `المستوى ${level}`;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "موافق": return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case "مرفوض": return <XCircle className="h-5 w-5 text-destructive" />;
-      default: return <Clock className="h-5 w-5 text-muted-foreground" />;
+      case 'موافق':
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
+      case 'مرفوض':
+        return <XCircle className="h-5 w-5 text-destructive" />;
+      default:
+        return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      "معلق": "secondary",
-      "موافق": "default",
-      "مرفوض": "destructive",
+    const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
+      معلق: 'secondary',
+      موافق: 'default',
+      مرفوض: 'destructive',
     };
-    return <Badge variant={variants[status] || "default"}>{status}</Badge>;
+    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
   };
 
   return (
@@ -109,7 +123,9 @@ export function ApprovalWorkflowDialog({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">حالة التوزيع</p>
-                <p className="text-lg font-bold">{getStatusBadge(distribution?.status || "مسودة")}</p>
+                <p className="text-lg font-bold">
+                  {getStatusBadge(distribution?.status || 'مسودة')}
+                </p>
               </div>
               <div className="text-left">
                 <p className="text-sm text-muted-foreground">المبلغ القابل للتوزيع</p>
@@ -126,28 +142,30 @@ export function ApprovalWorkflowDialog({
             {[1, 2, 3].map((level) => {
               const approval = approvals.find((a) => a.level === level);
               const isActive = currentLevel === level;
-              
+
               return (
-                <Card 
-                  key={level} 
+                <Card
+                  key={level}
                   className={`p-4 ${isActive && !allApproved && !isRejected ? 'border-primary' : ''}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="mt-1">
-                      {approval ? getStatusIcon(approval.status) : <User className="h-5 w-5 text-muted-foreground" />}
+                      {approval ? (
+                        getStatusIcon(approval.status)
+                      ) : (
+                        <User className="h-5 w-5 text-muted-foreground" />
+                      )}
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-semibold">{getLevelTitle(level)}</h4>
                         {approval && getStatusBadge(approval.status)}
                       </div>
-                      
+
                       {approval && (
                         <div className="space-y-1 text-sm">
-                          <p className="text-muted-foreground">
-                            الموافق: {approval.approver_name}
-                          </p>
+                          <p className="text-muted-foreground">الموافق: {approval.approver_name}</p>
                           {approval.approved_at && (
                             <p className="text-muted-foreground">
                               التاريخ: {new Date(approval.approved_at).toLocaleDateString('ar-SA')}
@@ -160,11 +178,9 @@ export function ApprovalWorkflowDialog({
                           )}
                         </div>
                       )}
-                      
+
                       {!approval && (
-                        <p className="text-sm text-muted-foreground">
-                          في انتظار الموافقة
-                        </p>
+                        <p className="text-sm text-muted-foreground">في انتظار الموافقة</p>
                       )}
                     </div>
                   </div>
@@ -187,10 +203,10 @@ export function ApprovalWorkflowDialog({
                     rows={3}
                   />
                 </div>
-                
+
                 <div className="flex gap-3">
                   <Button
-                    onClick={() => handleApprove("موافق")}
+                    onClick={() => handleApprove('موافق')}
                     disabled={isSubmitting}
                     className="flex-1"
                   >
@@ -198,7 +214,7 @@ export function ApprovalWorkflowDialog({
                     موافقة
                   </Button>
                   <Button
-                    onClick={() => handleApprove("مرفوض")}
+                    onClick={() => handleApprove('مرفوض')}
                     disabled={isSubmitting}
                     variant="destructive"
                     className="flex-1"
@@ -220,7 +236,7 @@ export function ApprovalWorkflowDialog({
               </div>
             </Card>
           )}
-          
+
           {isRejected && (
             <Card className="p-4 bg-destructive-light border-destructive/30">
               <div className="flex items-center gap-2 text-destructive">

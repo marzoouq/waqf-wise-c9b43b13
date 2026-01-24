@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BeneficiaryService } from "@/services/beneficiary.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { BeneficiaryService } from '@/services/beneficiary.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BeneficiaryAttachment {
   id: string;
@@ -45,21 +45,28 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       documentType: string;
       description?: string;
     }) => {
-      if (!beneficiaryId) throw new Error("Beneficiary ID is required");
-      return await BeneficiaryService.uploadDocument(beneficiaryId, file, documentType, description);
+      if (!beneficiaryId) throw new Error('Beneficiary ID is required');
+      return await BeneficiaryService.uploadDocument(
+        beneficiaryId,
+        file,
+        documentType,
+        description
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || '') });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || ''),
+      });
       toast({
-        title: "تم رفع المستند",
-        description: "تم رفع المستند بنجاح",
+        title: 'تم رفع المستند',
+        description: 'تم رفع المستند بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ في الرفع",
+        title: 'خطأ في الرفع',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -70,17 +77,19 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       return await BeneficiaryService.deleteDocument(attachmentId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || '') });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || ''),
+      });
       toast({
-        title: "تم الحذف",
-        description: "تم حذف المستند بنجاح",
+        title: 'تم الحذف',
+        description: 'تم حذف المستند بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ في الحذف",
+        title: 'خطأ في الحذف',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

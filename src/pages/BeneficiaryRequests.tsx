@@ -3,14 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/beneficiary/useMyBeneficiaryRequests';
+import {
+  useMyBeneficiaryRequests,
+  BeneficiaryRequest,
+} from '@/hooks/beneficiary/useMyBeneficiaryRequests';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 
@@ -29,14 +44,14 @@ const getStatusIcon = (status: string) => {
 
 const getStatusBadge = (status: string) => {
   const labels: Record<string, string> = {
-    'pending': 'معلق',
-    'approved': 'موافق',
-    'rejected': 'مرفوض',
+    pending: 'معلق',
+    approved: 'موافق',
+    rejected: 'مرفوض',
   };
   const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-    'pending': 'secondary',
-    'approved': 'default',
-    'rejected': 'destructive',
+    pending: 'secondary',
+    approved: 'default',
+    rejected: 'destructive',
   };
   return <Badge variant={variants[status] || 'secondary'}>{labels[status] || status}</Badge>;
 };
@@ -67,8 +82,8 @@ export default function BeneficiaryRequests() {
 
   if (error) {
     return (
-      <ErrorState 
-        title="فشل تحميل الطلبات" 
+      <ErrorState
+        title="فشل تحميل الطلبات"
         message="حدث خطأ أثناء تحميل طلباتك"
         onRetry={() => window.location.reload()}
         fullScreen
@@ -83,12 +98,13 @@ export default function BeneficiaryRequests() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">طلباتي</h1>
-            <p className="text-muted-foreground mt-1">
-              تقديم وإدارة الطلبات الخاصة بك
-            </p>
+            <p className="text-muted-foreground mt-1">تقديم وإدارة الطلبات الخاصة بك</p>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={(open) => open ? openDialog() : closeDialog()}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => (open ? openDialog() : closeDialog())}
+          >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 ms-2" />
@@ -230,9 +246,7 @@ export default function BeneficiaryRequests() {
 
                           {request.decision_notes && (
                             <div className="mt-3 p-3 bg-muted rounded-lg">
-                              <p className="text-xs text-muted-foreground mb-1">
-                                ملاحظات المراجع:
-                              </p>
+                              <p className="text-xs text-muted-foreground mb-1">ملاحظات المراجع:</p>
                               <p className="text-sm">{request.decision_notes}</p>
                             </div>
                           )}

@@ -3,9 +3,9 @@
  * Live Performance Chart - Real-time performance visualization
  */
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   LineChart,
   Line,
@@ -16,24 +16,24 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-} from "recharts";
-import { Activity, Clock, TrendingUp, Users, Database, Zap } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { useLivePerformance } from "@/hooks/monitoring/useLivePerformance";
+} from 'recharts';
+import { Activity, Clock, TrendingUp, Users, Database, Zap } from 'lucide-react';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
+import { useLivePerformance } from '@/hooks/monitoring/useLivePerformance';
 
 // استخراج الأنماط خارج المكون لتحسين الأداء
 const TOOLTIP_STYLE_RTL = {
-  backgroundColor: "hsl(var(--card))",
-  border: "1px solid hsl(var(--border))",
-  borderRadius: "8px",
-  direction: "rtl" as const,
+  backgroundColor: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '8px',
+  direction: 'rtl' as const,
 } as const;
 
 const TOOLTIP_STYLE = {
-  backgroundColor: "hsl(var(--card))",
-  border: "1px solid hsl(var(--border))",
-  borderRadius: "8px",
+  backgroundColor: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '8px',
 } as const;
 
 interface PerformanceMetric {
@@ -57,7 +57,7 @@ export function LivePerformanceChart() {
       const now = new Date();
       const newMetric: PerformanceMetric = {
         timestamp: now.toISOString(),
-        time: format(now, "HH:mm", { locale: ar }),
+        time: format(now, 'HH:mm', { locale: ar }),
         requests: Math.floor(Math.random() * 50) + (initialData?.requests || 10),
         errors: Math.floor(Math.random() * 3),
         responseTime: Math.floor(Math.random() * 200) + 100,

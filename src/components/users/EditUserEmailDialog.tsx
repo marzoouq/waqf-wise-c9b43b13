@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { useToast } from "@/hooks/ui/use-toast";
-import { EdgeFunctionService } from "@/services/edge-function.service";
-import { Mail, Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { useToast } from '@/hooks/ui/use-toast';
+import { EdgeFunctionService } from '@/services/edge-function.service';
+import { Mail, Loader2 } from 'lucide-react';
 
 interface EditUserEmailDialogProps {
   open: boolean;
@@ -26,7 +26,7 @@ export function EditUserEmailDialog({
   onSuccess,
 }: EditUserEmailDialogProps) {
   const { toast } = useToast();
-  const [newEmail, setNewEmail] = useState("");
+  const [newEmail, setNewEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -37,18 +37,18 @@ export function EditUserEmailDialog({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
       toast({
-        title: "خطأ",
-        description: "يرجى إدخال بريد إلكتروني صحيح",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يرجى إدخال بريد إلكتروني صحيح',
+        variant: 'destructive',
       });
       return;
     }
 
     if (newEmail === user.email) {
       toast({
-        title: "تنبيه",
-        description: "البريد الإلكتروني الجديد مطابق للبريد الحالي",
-        variant: "destructive",
+        title: 'تنبيه',
+        description: 'البريد الإلكتروني الجديد مطابق للبريد الحالي',
+        variant: 'destructive',
       });
       return;
     }
@@ -57,13 +57,13 @@ export function EditUserEmailDialog({
 
     try {
       // استدعاء Edge Function لتحديث البريد
-      const result = await EdgeFunctionService.invoke<{ error?: string }>("update-user-email", {
+      const result = await EdgeFunctionService.invoke<{ error?: string }>('update-user-email', {
         userId: userId,
         newEmail: newEmail.trim().toLowerCase(),
       });
 
       if (!result.success) {
-        throw new Error(result.error || "فشل في تحديث البريد");
+        throw new Error(result.error || 'فشل في تحديث البريد');
       }
 
       if (result.data?.error) {
@@ -71,22 +71,23 @@ export function EditUserEmailDialog({
       }
 
       toast({
-        title: "تم بنجاح",
+        title: 'تم بنجاح',
         description: `تم تحديث البريد الإلكتروني إلى ${newEmail}`,
       });
 
-      setNewEmail("");
+      setNewEmail('');
       onOpenChange(false);
       onSuccess?.();
     } catch (error: unknown) {
       if (import.meta.env.DEV) {
-        console.error("Error updating email:", error);
+        console.error('Error updating email:', error);
       }
-      const message = error instanceof Error ? error.message : "حدث خطأ أثناء تحديث البريد الإلكتروني";
+      const message =
+        error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث البريد الإلكتروني';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -95,7 +96,7 @@ export function EditUserEmailDialog({
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      setNewEmail("");
+      setNewEmail('');
     }
     onOpenChange(newOpen);
   };
@@ -105,13 +106,13 @@ export function EditUserEmailDialog({
       open={open}
       onOpenChange={handleOpenChange}
       title="تعديل البريد الإلكتروني"
-      description={`تغيير البريد الإلكتروني للمستخدم: ${user?.full_name || ""}`}
+      description={`تغيير البريد الإلكتروني للمستخدم: ${user?.full_name || ''}`}
       size="sm"
     >
       <div className="space-y-4">
         <div className="space-y-2">
           <Label>البريد الإلكتروني الحالي</Label>
-          <Input value={user?.email || ""} disabled className="bg-muted" />
+          <Input value={user?.email || ''} disabled className="bg-muted" />
         </div>
 
         <div className="space-y-2">
@@ -134,17 +135,14 @@ export function EditUserEmailDialog({
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             إلغاء
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!newEmail || isLoading}
-          >
+          <Button onClick={handleSubmit} disabled={!newEmail || isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                 جاري التحديث...
               </>
             ) : (
-              "حفظ التغييرات"
+              'حفظ التغييرات'
             )}
           </Button>
         </div>

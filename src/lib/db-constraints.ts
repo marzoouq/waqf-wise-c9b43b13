@@ -1,7 +1,7 @@
 /**
  * تعريف جميع CHECK constraints من قاعدة البيانات
  * يُستخدم للتحقق من توافق الكود مع قيود قاعدة البيانات
- * 
+ *
  * ⚠️ مهم: هذه القيم مستخرجة من pg_constraint في قاعدة البيانات
  * تأكد من تحديثها عند تغيير الـ constraints في الـ migrations
  */
@@ -16,30 +16,30 @@ export const DB_CONSTRAINTS = {
     severity: ['low', 'medium', 'high', 'critical'] as const,
     status: ['active', 'acknowledged', 'resolved'] as const,
   },
-  
+
   // جدول audit_logs - يقبل 'info' (لأنه للتوثيق العام)
   audit_logs: {
     severity: ['info', 'warning', 'error', 'critical'] as const,
   },
-  
+
   // جدول system_error_logs - لا يقبل 'info'
   system_error_logs: {
     severity: ['low', 'medium', 'high', 'critical'] as const,
     status: ['new', 'investigating', 'resolved', 'ignored'] as const,
   },
-  
+
   // جدول contracts
   contracts: {
     status: ['مسودة', 'نشط', 'منتهي', 'ملغي', 'متأخر'] as const,
     contract_type: ['إيجار', 'بيع', 'صيانة', 'خدمات'] as const,
   },
-  
+
   // جدول properties
   properties: {
     property_type: ['سكني', 'تجاري', 'صناعي', 'زراعي', 'أرض'] as const,
     status: ['نشط', 'معلق', 'للبيع', 'للإيجار', 'قيد الصيانة'] as const,
   },
-  
+
   // جدول beneficiaries
   beneficiaries: {
     status: ['نشط', 'معلق', 'غير نشط'] as const,
@@ -48,12 +48,12 @@ export const DB_CONSTRAINTS = {
     verification_status: ['pending', 'verified', 'rejected'] as const,
     eligibility_status: ['eligible', 'ineligible', 'pending_review'] as const,
   },
-  
+
   // جدول distributions
   distributions: {
     status: ['draft', 'pending', 'approved', 'distributed', 'cancelled'] as const,
   },
-  
+
   // جدول payment_vouchers
   payment_vouchers: {
     status: ['pending', 'approved', 'rejected', 'cancelled', 'paid'] as const,
@@ -66,37 +66,39 @@ export const DB_CONSTRAINTS = {
 // =====================================================
 
 // System Alerts
-export type SystemAlertSeverity = typeof DB_CONSTRAINTS.system_alerts.severity[number];
-export type SystemAlertStatus = typeof DB_CONSTRAINTS.system_alerts.status[number];
+export type SystemAlertSeverity = (typeof DB_CONSTRAINTS.system_alerts.severity)[number];
+export type SystemAlertStatus = (typeof DB_CONSTRAINTS.system_alerts.status)[number];
 
 // Audit Logs
-export type AuditLogSeverity = typeof DB_CONSTRAINTS.audit_logs.severity[number];
+export type AuditLogSeverity = (typeof DB_CONSTRAINTS.audit_logs.severity)[number];
 
 // System Error Logs
-export type SystemErrorLogSeverity = typeof DB_CONSTRAINTS.system_error_logs.severity[number];
-export type SystemErrorLogStatus = typeof DB_CONSTRAINTS.system_error_logs.status[number];
+export type SystemErrorLogSeverity = (typeof DB_CONSTRAINTS.system_error_logs.severity)[number];
+export type SystemErrorLogStatus = (typeof DB_CONSTRAINTS.system_error_logs.status)[number];
 
 // Contracts
-export type ContractStatus = typeof DB_CONSTRAINTS.contracts.status[number];
-export type ContractType = typeof DB_CONSTRAINTS.contracts.contract_type[number];
+export type ContractStatus = (typeof DB_CONSTRAINTS.contracts.status)[number];
+export type ContractType = (typeof DB_CONSTRAINTS.contracts.contract_type)[number];
 
 // Properties
-export type PropertyType = typeof DB_CONSTRAINTS.properties.property_type[number];
-export type PropertyStatus = typeof DB_CONSTRAINTS.properties.status[number];
+export type PropertyType = (typeof DB_CONSTRAINTS.properties.property_type)[number];
+export type PropertyStatus = (typeof DB_CONSTRAINTS.properties.status)[number];
 
 // Beneficiaries
-export type BeneficiaryStatus = typeof DB_CONSTRAINTS.beneficiaries.status[number];
-export type BeneficiaryGender = typeof DB_CONSTRAINTS.beneficiaries.gender[number];
-export type BeneficiaryMaritalStatus = typeof DB_CONSTRAINTS.beneficiaries.marital_status[number];
-export type BeneficiaryVerificationStatus = typeof DB_CONSTRAINTS.beneficiaries.verification_status[number];
-export type BeneficiaryEligibilityStatus = typeof DB_CONSTRAINTS.beneficiaries.eligibility_status[number];
+export type BeneficiaryStatus = (typeof DB_CONSTRAINTS.beneficiaries.status)[number];
+export type BeneficiaryGender = (typeof DB_CONSTRAINTS.beneficiaries.gender)[number];
+export type BeneficiaryMaritalStatus = (typeof DB_CONSTRAINTS.beneficiaries.marital_status)[number];
+export type BeneficiaryVerificationStatus =
+  (typeof DB_CONSTRAINTS.beneficiaries.verification_status)[number];
+export type BeneficiaryEligibilityStatus =
+  (typeof DB_CONSTRAINTS.beneficiaries.eligibility_status)[number];
 
 // Distributions
-export type DistributionStatus = typeof DB_CONSTRAINTS.distributions.status[number];
+export type DistributionStatus = (typeof DB_CONSTRAINTS.distributions.status)[number];
 
 // Payment Vouchers
-export type PaymentVoucherStatus = typeof DB_CONSTRAINTS.payment_vouchers.status[number];
-export type PaymentMethod = typeof DB_CONSTRAINTS.payment_vouchers.payment_method[number];
+export type PaymentVoucherStatus = (typeof DB_CONSTRAINTS.payment_vouchers.status)[number];
+export type PaymentMethod = (typeof DB_CONSTRAINTS.payment_vouchers.payment_method)[number];
 
 // =====================================================
 // دوال التحقق
@@ -132,16 +134,16 @@ export function getSafeSeverity(
   requestedSeverity: string
 ): SystemAlertSeverity | SystemErrorLogSeverity {
   const allowedValues = DB_CONSTRAINTS[table].severity;
-  
+
   if (allowedValues.includes(requestedSeverity as unknown as SystemAlertSeverity)) {
     return requestedSeverity as SystemAlertSeverity | SystemErrorLogSeverity;
   }
-  
+
   // تحويل 'info' إلى 'low' تلقائياً
   if (requestedSeverity === 'info') {
     return 'low';
   }
-  
+
   return 'low';
 }
 
@@ -152,10 +154,10 @@ export function getSafeSeverity(
 export const SEVERITY_RULES = {
   // الجداول التي لا تقبل 'info'
   tablesWithoutInfo: ['system_alerts', 'system_error_logs'] as const,
-  
+
   // الجداول التي تقبل 'info'
   tablesWithInfo: ['audit_logs'] as const,
-  
+
   // القيم الممنوعة لكل جدول
   forbiddenValues: {
     system_alerts: { severity: ['info'] },
@@ -179,7 +181,7 @@ export const DEPRECATED_COLUMNS = {
     correctName: 'location',
     reason: 'تم توحيد أسماء الأعمدة - استخدم location بدلاً من address',
   },
-  
+
   // أمثلة إضافية للأعمدة المتغيرة
   property_type: {
     tables: ['properties'],
@@ -193,38 +195,123 @@ export const DEPRECATED_COLUMNS = {
  */
 export const TABLE_COLUMNS = {
   properties: [
-    'id', 'name', 'type', 'location', 'units', 'occupied', 'monthly_revenue',
-    'status', 'description', 'created_at', 'updated_at', 'waqf_unit_id',
-    'total_units', 'occupied_units', 'available_units', 'occupancy_percentage',
-    'tax_percentage', 'shop_count', 'apartment_count', 'revenue_type', 'floors'
+    'id',
+    'name',
+    'type',
+    'location',
+    'units',
+    'occupied',
+    'monthly_revenue',
+    'status',
+    'description',
+    'created_at',
+    'updated_at',
+    'waqf_unit_id',
+    'total_units',
+    'occupied_units',
+    'available_units',
+    'occupancy_percentage',
+    'tax_percentage',
+    'shop_count',
+    'apartment_count',
+    'revenue_type',
+    'floors',
   ] as const,
-  
+
   beneficiaries: [
-    'id', 'full_name', 'national_id', 'phone', 'email', 'category', 'family_name',
-    'relationship', 'status', 'notes', 'created_at', 'updated_at', 'user_id',
-    'tribe', 'priority_level', 'marital_status', 'nationality', 'city', 'address',
-    'date_of_birth', 'gender', 'bank_name', 'bank_account_number', 'iban',
-    'monthly_income', 'family_size', 'is_head_of_family', 'parent_beneficiary_id',
-    'tags', 'number_of_sons', 'number_of_daughters', 'number_of_wives',
-    'employment_status', 'housing_type', 'notification_preferences',
-    'last_notification_at', 'can_login', 'username', 'last_login_at',
-    'login_enabled_at', 'beneficiary_number', 'beneficiary_type', 'account_balance',
-    'total_received', 'pending_requests', 'family_id', 'verification_status',
-    'verified_at', 'verified_by', 'last_activity_at', 'total_payments',
-    'pending_amount', 'verification_documents', 'verification_notes',
-    'last_verification_date', 'verification_method', 'risk_score',
-    'eligibility_status', 'eligibility_notes', 'last_review_date',
-    'next_review_date', 'social_status_details', 'income_sources',
-    'disabilities', 'medical_conditions'
+    'id',
+    'full_name',
+    'national_id',
+    'phone',
+    'email',
+    'category',
+    'family_name',
+    'relationship',
+    'status',
+    'notes',
+    'created_at',
+    'updated_at',
+    'user_id',
+    'tribe',
+    'priority_level',
+    'marital_status',
+    'nationality',
+    'city',
+    'address',
+    'date_of_birth',
+    'gender',
+    'bank_name',
+    'bank_account_number',
+    'iban',
+    'monthly_income',
+    'family_size',
+    'is_head_of_family',
+    'parent_beneficiary_id',
+    'tags',
+    'number_of_sons',
+    'number_of_daughters',
+    'number_of_wives',
+    'employment_status',
+    'housing_type',
+    'notification_preferences',
+    'last_notification_at',
+    'can_login',
+    'username',
+    'last_login_at',
+    'login_enabled_at',
+    'beneficiary_number',
+    'beneficiary_type',
+    'account_balance',
+    'total_received',
+    'pending_requests',
+    'family_id',
+    'verification_status',
+    'verified_at',
+    'verified_by',
+    'last_activity_at',
+    'total_payments',
+    'pending_amount',
+    'verification_documents',
+    'verification_notes',
+    'last_verification_date',
+    'verification_method',
+    'risk_score',
+    'eligibility_status',
+    'eligibility_notes',
+    'last_review_date',
+    'next_review_date',
+    'social_status_details',
+    'income_sources',
+    'disabilities',
+    'medical_conditions',
   ] as const,
-  
+
   contracts: [
-    'id', 'contract_number', 'property_id', 'tenant_name', 'tenant_phone',
-    'tenant_id_number', 'tenant_email', 'contract_type', 'start_date', 'end_date',
-    'monthly_rent', 'security_deposit', 'payment_frequency', 'status',
-    'is_renewable', 'auto_renew', 'renewal_notice_days', 'terms_and_conditions',
-    'notes', 'created_at', 'updated_at', 'created_by', 'units_count',
-    'tenant_id', 'tax_percentage'
+    'id',
+    'contract_number',
+    'property_id',
+    'tenant_name',
+    'tenant_phone',
+    'tenant_id_number',
+    'tenant_email',
+    'contract_type',
+    'start_date',
+    'end_date',
+    'monthly_rent',
+    'security_deposit',
+    'payment_frequency',
+    'status',
+    'is_renewable',
+    'auto_renew',
+    'renewal_notice_days',
+    'terms_and_conditions',
+    'notes',
+    'created_at',
+    'updated_at',
+    'created_by',
+    'units_count',
+    'tenant_id',
+    'tax_percentage',
   ] as const,
 } as const;
 
@@ -237,7 +324,7 @@ export const COLUMN_RULES = {
   forbiddenColumns: {
     properties: ['address', 'property_type'],
   },
-  
+
   // التصحيحات المقترحة
   corrections: {
     properties: {

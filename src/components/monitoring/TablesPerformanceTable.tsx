@@ -3,12 +3,19 @@
  * Tables Performance Table
  */
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
-import type { TableScanStats } from "@/services/monitoring/db-performance.service";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import type { TableScanStats } from '@/services/monitoring/db-performance.service';
 
 interface TablesPerformanceTableProps {
   tables: TableScanStats[];
@@ -37,18 +44,20 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
   };
 
   const getStatusBadge = (pct: number) => {
-    if (pct >= 90) return (
-      <Badge variant="destructive" className="gap-1">
-        <XCircle className="w-3 h-3" />
-        حرج
-      </Badge>
-    );
-    if (pct >= 70) return (
-      <Badge variant="outline" className="gap-1 border-warning text-warning">
-        <AlertTriangle className="w-3 h-3" />
-        تحذير
-      </Badge>
-    );
+    if (pct >= 90)
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <XCircle className="w-3 h-3" />
+          حرج
+        </Badge>
+      );
+    if (pct >= 70)
+      return (
+        <Badge variant="outline" className="gap-1 border-warning text-warning">
+          <AlertTriangle className="w-3 h-3" />
+          تحذير
+        </Badge>
+      );
     return (
       <Badge variant="outline" className="gap-1 border-success text-success">
         <CheckCircle className="w-3 h-3" />
@@ -61,9 +70,7 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">الجداول الأكثر استخداماً</CardTitle>
-        <CardDescription>
-          تفاصيل Sequential Scans و Index Scans لكل جدول
-        </CardDescription>
+        <CardDescription>تفاصيل Sequential Scans و Index Scans لكل جدول</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -84,19 +91,20 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
                   <TableCell className="font-mono text-sm">
                     {table.table_name.replace('public.', '')}
                   </TableCell>
-                  <TableCell className="font-medium">
-                    {formatNumber(table.seq_scan)}
-                  </TableCell>
+                  <TableCell className="font-medium">{formatNumber(table.seq_scan)}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatNumber(table.idx_scan)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full rounded-full ${
-                            table.seq_pct >= 90 ? 'bg-destructive' :
-                            table.seq_pct >= 70 ? 'bg-warning' : 'bg-success'
+                            table.seq_pct >= 90
+                              ? 'bg-destructive'
+                              : table.seq_pct >= 70
+                                ? 'bg-warning'
+                                : 'bg-success'
                           }`}
                           style={{ width: `${Math.min(table.seq_pct, 100)}%` }}
                         />
@@ -109,9 +117,7 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
                       {formatNumber(table.dead_rows)}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {getStatusBadge(table.seq_pct)}
-                  </TableCell>
+                  <TableCell>{getStatusBadge(table.seq_pct)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -119,9 +125,7 @@ export function TablesPerformanceTable({ tables, isLoading }: TablesPerformanceT
         </div>
 
         {tables.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            لا توجد بيانات متاحة
-          </div>
+          <div className="text-center py-8 text-muted-foreground">لا توجد بيانات متاحة</div>
         )}
       </CardContent>
     </Card>

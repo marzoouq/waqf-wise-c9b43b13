@@ -4,9 +4,13 @@
  * @version 2.9.13
  */
 
-import React, { createContext, useContext, ReactNode } from "react";
-import { useRolesManagement, type UserWithRoles, type RoleAuditLog } from "@/hooks/users/useRolesManagement";
-import type { AppRole } from "@/types/roles";
+import React, { createContext, useContext, ReactNode } from 'react';
+import {
+  useRolesManagement,
+  type UserWithRoles,
+  type RoleAuditLog,
+} from '@/hooks/users/useRolesManagement';
+import type { AppRole } from '@/types/roles';
 
 interface RolesContextValue {
   // البيانات
@@ -14,13 +18,13 @@ interface RolesContextValue {
   filteredUsers: UserWithRoles[];
   auditLogs: RoleAuditLog[];
   isLoading: boolean;
-  
+
   // الفلترة
   searchQuery: string;
   setSearchQuery: (term: string) => void;
   roleFilter: string;
   setRoleFilter: (role: string) => void;
-  
+
   // Dialog إضافة دور
   addRoleDialogOpen: boolean;
   selectedUser: UserWithRoles | null;
@@ -28,11 +32,11 @@ interface RolesContextValue {
   setNewRole: (role: AppRole) => void;
   openAddRoleDialog: (user: UserWithRoles) => void;
   closeAddRoleDialog: () => void;
-  
+
   // Dialog سجل التغييرات
   auditDialogOpen: boolean;
   setAuditDialogOpen: (open: boolean) => void;
-  
+
   // العمليات
   addRole: () => void;
   removeRole: (userId: string, role: string) => void;
@@ -71,39 +75,35 @@ export function RolesProvider({ children }: { children: ReactNode }) {
     filteredUsers,
     auditLogs,
     isLoading,
-    
+
     searchQuery,
     setSearchQuery,
     roleFilter,
     setRoleFilter,
-    
+
     addRoleDialogOpen,
     selectedUser,
     newRole,
     setNewRole,
     openAddRoleDialog,
     closeAddRoleDialog,
-    
+
     auditDialogOpen,
     setAuditDialogOpen,
-    
+
     addRole,
     removeRole,
     isAddingRole,
     isRemovingRole,
   };
 
-  return (
-    <RolesContext.Provider value={value}>
-      {children}
-    </RolesContext.Provider>
-  );
+  return <RolesContext.Provider value={value}>{children}</RolesContext.Provider>;
 }
 
 export function useRolesContext() {
   const context = useContext(RolesContext);
   if (!context) {
-    throw new Error("useRolesContext must be used within RolesProvider");
+    throw new Error('useRolesContext must be used within RolesProvider');
   }
   return context;
 }

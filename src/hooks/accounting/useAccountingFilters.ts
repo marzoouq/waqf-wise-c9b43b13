@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 
 interface UseAccountingFiltersProps<T extends Record<string, unknown>> {
   data: T[];
@@ -14,32 +14,30 @@ export function useAccountingFilters<T extends Record<string, unknown>>({
   dateField,
   statusField,
   statusOptions = [
-    { value: "all", label: "الكل" },
-    { value: "draft", label: "مسودة" },
-    { value: "posted", label: "مرحّل" },
-    { value: "cancelled", label: "ملغي" },
+    { value: 'all', label: 'الكل' },
+    { value: 'draft', label: 'مسودة' },
+    { value: 'posted', label: 'مرحّل' },
+    { value: 'cancelled', label: 'ملغي' },
   ],
 }: UseAccountingFiltersProps<T>) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
       // Search filter
       const matchesSearch =
-        searchQuery === "" ||
+        searchQuery === '' ||
         searchFields.some((field) => {
           const value = item[field];
-          if (typeof value === "string") {
+          if (typeof value === 'string') {
             return value.toLowerCase().includes(searchQuery.toLowerCase());
           }
-          if (typeof value === "object" && value !== null) {
+          if (typeof value === 'object' && value !== null) {
             return Object.values(value).some(
-              (v) =>
-                typeof v === "string" &&
-                v.toLowerCase().includes(searchQuery.toLowerCase())
+              (v) => typeof v === 'string' && v.toLowerCase().includes(searchQuery.toLowerCase())
             );
           }
           return false;
@@ -47,9 +45,7 @@ export function useAccountingFilters<T extends Record<string, unknown>>({
 
       // Status filter
       const matchesStatus =
-        !statusField ||
-        statusFilter === "all" ||
-        item[statusField] === statusFilter;
+        !statusField || statusFilter === 'all' || item[statusField] === statusFilter;
 
       // Date filter
       const matchesDate =

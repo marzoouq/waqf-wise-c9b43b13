@@ -3,12 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, CheckCircle } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useApprovalWorkflows } from '@/hooks/requests/useApprovalWorkflows';
 import { ROLE_LABELS } from '@/types/roles';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -29,7 +24,7 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
 export function ApprovalWorkflowBuilder() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { workflows, isLoading, error, refetch, createWorkflow } = useApprovalWorkflows();
 
   const handleCreateWorkflow = async (data: Parameters<typeof createWorkflow>[0]) => {
@@ -55,7 +50,13 @@ export function ApprovalWorkflowBuilder() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل مسارات الموافقات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل مسارات الموافقات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -83,7 +84,7 @@ export function ApprovalWorkflowBuilder() {
             {workflows.map((workflow) => (
               <Card key={workflow.id} className="border-2">
                 <CardHeader className="pb-3">
-                 <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-base">{workflow.workflow_name}</CardTitle>
@@ -97,8 +98,10 @@ export function ApprovalWorkflowBuilder() {
                         </Badge>
                         {workflow.conditions && Object.keys(workflow.conditions).length > 0 && (
                           <span className="text-xs">
-                            {workflow.conditions.min_amount && `من ${workflow.conditions.min_amount} ريال`}
-                            {workflow.conditions.max_amount && ` - إلى ${workflow.conditions.max_amount} ريال`}
+                            {workflow.conditions.min_amount &&
+                              `من ${workflow.conditions.min_amount} ريال`}
+                            {workflow.conditions.max_amount &&
+                              ` - إلى ${workflow.conditions.max_amount} ريال`}
                           </span>
                         )}
                       </CardDescription>

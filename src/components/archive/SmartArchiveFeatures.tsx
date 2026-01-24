@@ -1,18 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import {
-  FileSearch,
-  ScanText,
-  FolderTree,
-  Tag,
-  Clock,
-  Zap,
-  Search,
-} from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useSmartArchive } from "@/hooks/archive/useSmartArchive";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { FileSearch, ScanText, FolderTree, Tag, Clock, Zap, Search } from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useSmartArchive } from '@/hooks/archive/useSmartArchive';
 
 export function SmartArchiveFeatures() {
   const { toast } = useToast();
@@ -28,35 +20,35 @@ export function SmartArchiveFeatures() {
   const features = [
     {
       icon: ScanText,
-      title: "المسح الضوئي الذكي (OCR)",
-      description: "استخراج النص من المستندات الممسوحة ضوئياً",
+      title: 'المسح الضوئي الذكي (OCR)',
+      description: 'استخراج النص من المستندات الممسوحة ضوئياً',
       action: handleOCRScan,
-      color: "text-info",
-      bg: "bg-info-light",
+      color: 'text-info',
+      bg: 'bg-info-light',
     },
     {
       icon: Tag,
-      title: "التصنيف التلقائي",
-      description: "تصنيف المستندات تلقائياً باستخدام AI",
-      action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-secondary-foreground",
-      bg: "bg-secondary",
+      title: 'التصنيف التلقائي',
+      description: 'تصنيف المستندات تلقائياً باستخدام AI',
+      action: () => toast({ title: 'قريباً', description: 'هذه الميزة قيد التطوير' }),
+      color: 'text-secondary-foreground',
+      bg: 'bg-secondary',
     },
     {
       icon: FolderTree,
-      title: "التنظيم الذكي",
-      description: "تنظيم الملفات حسب النوع والتاريخ",
-      action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-success",
-      bg: "bg-success-light",
+      title: 'التنظيم الذكي',
+      description: 'تنظيم الملفات حسب النوع والتاريخ',
+      action: () => toast({ title: 'قريباً', description: 'هذه الميزة قيد التطوير' }),
+      color: 'text-success',
+      bg: 'bg-success-light',
     },
     {
       icon: Clock,
-      title: "سياسات الاحتفاظ",
-      description: "إدارة دورة حياة المستندات",
-      action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-warning",
-      bg: "bg-warning-light",
+      title: 'سياسات الاحتفاظ',
+      description: 'إدارة دورة حياة المستندات',
+      action: () => toast({ title: 'قريباً', description: 'هذه الميزة قيد التطوير' }),
+      color: 'text-warning',
+      bg: 'bg-warning-light',
     },
   ];
 

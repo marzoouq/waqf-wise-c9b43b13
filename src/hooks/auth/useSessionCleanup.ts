@@ -14,17 +14,15 @@ const LAST_ACTIVE_KEY = 'waqf_last_active_timestamp';
  * تنظيف كامل للجلسة والبيانات المؤقتة
  * ✅ محسّن: تنظيف شامل يشمل caches و service workers
  */
-export const cleanupSession = async (options?: { keepTheme?: boolean; scope?: 'local' | 'global' }) => {
-  const keysToKeep = options?.keepTheme ? [
-    'theme',
-    'vite-ui-theme',
-    'language',
-    'i18nextLng',
-  ] : [];
+export const cleanupSession = async (options?: {
+  keepTheme?: boolean;
+  scope?: 'local' | 'global';
+}) => {
+  const keysToKeep = options?.keepTheme ? ['theme', 'vite-ui-theme', 'language', 'i18nextLng'] : [];
 
   // حفظ القيم التي نريد الاحتفاظ بها
   const savedValues: Record<string, string> = {};
-  keysToKeep.forEach(key => {
+  keysToKeep.forEach((key) => {
     const value = localStorage.getItem(key);
     if (value) savedValues[key] = value;
   });
@@ -37,7 +35,7 @@ export const cleanupSession = async (options?: { keepTheme?: boolean; scope?: 'l
       keysToRemove.push(key);
     }
   }
-  keysToRemove.forEach(key => localStorage.removeItem(key));
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
 
   // تنظيف sessionStorage
   sessionStorage.clear();
@@ -51,11 +49,11 @@ export const cleanupSession = async (options?: { keepTheme?: boolean; scope?: 'l
   try {
     if ('caches' in window) {
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
     }
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map(reg => reg.unregister()));
+      await Promise.all(registrations.map((reg) => reg.unregister()));
     }
   } catch (e) {
     if (import.meta.env.DEV) {
@@ -81,10 +79,12 @@ export const checkPendingCleanup = async () => {
   const pendingCleanup = localStorage.getItem(SESSION_CLEANUP_KEY);
   if (pendingCleanup === 'true') {
     localStorage.removeItem(SESSION_CLEANUP_KEY);
-    
+
     // ✅ التحقق من وجود جلسة نشطة قبل التنظيف
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         // لا ننظف إذا كانت هناك جلسة صالحة - فقط نزيل العلامة
         if (import.meta.env.DEV) {
@@ -97,7 +97,7 @@ export const checkPendingCleanup = async () => {
         console.warn('خطأ في التحقق من الجلسة', err);
       }
     }
-    
+
     await cleanupSession({ keepTheme: true });
     return true;
   }
@@ -129,14 +129,17 @@ export function useSessionCleanup() {
   }, [updateLastActive]);
 
   // معالج pagehide للأجهزة المحمولة
-  const handlePageHide = useCallback((event: PageTransitionEvent) => {
-    if (event.persisted) {
-      // الصفحة في bfcache، لا نفعل شيء
-      return;
-    }
-    // فقط تحديث وقت آخر نشاط
-    updateLastActive();
-  }, [updateLastActive]);
+  const handlePageHide = useCallback(
+    (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        // الصفحة في bfcache، لا نفعل شيء
+        return;
+      }
+      // فقط تحديث وقت آخر نشاط
+      updateLastActive();
+    },
+    [updateLastActive]
+  );
 
   useEffect(() => {
     // التحقق من وجود تنظيف معلق عند بدء التطبيق
@@ -146,7 +149,7 @@ export function useSessionCleanup() {
         productionLogger.debug('Cleaned up pending session from previous visit');
       }
     };
-    
+
     init();
 
     // إضافة المستمعين
@@ -168,9 +171,9 @@ export function useSessionCleanup() {
   const forceCleanup = useCallback(async () => {
     if (cleanupTriggered.current) return;
     cleanupTriggered.current = true;
-    
+
     await cleanupSession({ keepTheme: true });
-    
+
     cleanupTriggered.current = false;
   }, []);
 

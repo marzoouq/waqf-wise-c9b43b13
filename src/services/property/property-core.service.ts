@@ -23,10 +23,7 @@ export class PropertyCoreService {
    */
   static async getAll(filters?: PropertyFilters): Promise<PropertyRow[]> {
     try {
-      let query = supabase
-        .from('properties')
-        .select('*')
-        .is('deleted_at', null);
+      let query = supabase.from('properties').select('*').is('deleted_at', null);
 
       if (filters?.type && filters.type !== 'all') {
         query = query.eq('type', filters.type);
@@ -73,7 +70,9 @@ export class PropertyCoreService {
   /**
    * إضافة عقار جديد
    */
-  static async create(property: Omit<PropertyInsert, 'id' | 'created_at' | 'updated_at'>): Promise<PropertyRow> {
+  static async create(
+    property: Omit<PropertyInsert, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<PropertyRow> {
     try {
       const { data, error } = await supabase
         .from('properties')
@@ -116,7 +115,9 @@ export class PropertyCoreService {
    */
   static async delete(id: string, reason?: string): Promise<void> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('properties')
         .update({
@@ -164,12 +165,10 @@ export class PropertyCoreService {
    */
   static async getVacant(): Promise<PropertyRow[]> {
     try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*');
+      const { data, error } = await supabase.from('properties').select('*');
 
       if (error) throw error;
-      return (data || []).filter(p => (p.occupied || 0) < (p.units || 0));
+      return (data || []).filter((p) => (p.occupied || 0) < (p.units || 0));
     } catch (error) {
       productionLogger.error('Error fetching vacant properties', error);
       throw error;
@@ -179,7 +178,9 @@ export class PropertyCoreService {
   /**
    * جلب العقارات غير المربوطة بأقلام الوقف
    */
-  static async getUnlinkedToWaqf(): Promise<{ id: string; name: string; location: string; type: string; waqf_unit_id: string | null }[]> {
+  static async getUnlinkedToWaqf(): Promise<
+    { id: string; name: string; location: string; type: string; waqf_unit_id: string | null }[]
+  > {
     try {
       const { data, error } = await supabase
         .from('properties')

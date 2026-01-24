@@ -2,17 +2,17 @@
  * Archive Documents Tab Component
  * تبويب المستندات في الأرشيف
  */
-import { useState } from "react";
-import { Database } from "@/integrations/supabase/types";
-import { Plus, Upload, FileText, Search, Eye, Download, Trash2, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
-import { format, arLocale as ar } from "@/lib/date";
-import { StorageService } from "@/services/storage.service";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { Database } from '@/integrations/supabase/types';
+import { Plus, Upload, FileText, Search, Eye, Download, Trash2, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { UnifiedDataTable, Column } from '@/components/unified/UnifiedDataTable';
+import { format, arLocale as ar } from '@/lib/date';
+import { StorageService } from '@/services/storage.service';
+import { toast } from 'sonner';
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -43,29 +43,29 @@ export function ArchiveDocumentsTab({
 
   const handleDownload = async (doc: Document) => {
     if (!doc.file_path) {
-      toast.error("لا يوجد ملف مرتبط بهذا المستند");
+      toast.error('لا يوجد ملف مرتبط بهذا المستند');
       return;
     }
 
     setDownloadingId(doc.id);
     try {
-      const blob = await StorageService.downloadFile("documents", doc.file_path);
+      const blob = await StorageService.downloadFile('documents', doc.file_path);
       if (blob) {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = doc.name || "document";
+        a.download = doc.name || 'document';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        toast.success("تم تنزيل الملف بنجاح");
+        toast.success('تم تنزيل الملف بنجاح');
       } else {
-        toast.error("فشل في تنزيل الملف");
+        toast.error('فشل في تنزيل الملف');
       }
     } catch (error) {
-      console.error("Download error:", error);
-      toast.error("حدث خطأ أثناء تنزيل الملف");
+      console.error('Download error:', error);
+      toast.error('حدث خطأ أثناء تنزيل الملف');
     } finally {
       setDownloadingId(null);
     }
@@ -117,13 +117,13 @@ export function ArchiveDocumentsTab({
         </Button>
         {documents.length > 0 && (
           <ExportButton
-            data={documents.map(doc => ({
+            data={documents.map((doc) => ({
               'اسم المستند': doc.name,
-              'الفئة': doc.category,
-              'النوع': doc.file_type,
-              'الحجم': doc.file_size || '-',
+              الفئة: doc.category,
+              النوع: doc.file_type,
+              الحجم: doc.file_size || '-',
               'تاريخ الرفع': format(new Date(doc.uploaded_at), 'yyyy/MM/dd', { locale: ar }),
-              'الوصف': doc.description || '-',
+              الوصف: doc.description || '-',
             }))}
             filename="المستندات"
             title="قائمة المستندات"
@@ -182,7 +182,7 @@ export function ArchiveDocumentsTab({
                 handleDownload(doc);
               }}
               disabled={downloadingId === doc.id || !doc.file_path}
-              title={doc.file_path ? "تنزيل" : "لا يوجد ملف"}
+              title={doc.file_path ? 'تنزيل' : 'لا يوجد ملف'}
             >
               {downloadingId === doc.id ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

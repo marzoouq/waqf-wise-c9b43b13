@@ -1,51 +1,43 @@
-import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LoadingStateProps {
   message?: string;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   fullScreen?: boolean;
   className?: string;
 }
 
 const sizeClasses = {
-  sm: "h-4 w-4",
-  md: "h-8 w-8",
-  lg: "h-12 w-12",
+  sm: 'h-4 w-4',
+  md: 'h-8 w-8',
+  lg: 'h-12 w-12',
 };
 
-export function LoadingState({ 
-  message = "جاري التحميل...", 
-  size = "md",
+export function LoadingState({
+  message = 'جاري التحميل...',
+  size = 'md',
   fullScreen = false,
-  className 
+  className,
 }: LoadingStateProps) {
   const content = (
-    <div className={cn("text-center space-y-4 animate-in fade-in duration-300", className)}>
+    <div className={cn('text-center space-y-4 animate-in fade-in duration-300', className)}>
       <div className="flex justify-center">
-        <Loader2 className={cn("animate-spin text-primary", sizeClasses[size])} />
+        <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
       </div>
-      {message && (
-        <p className="text-sm text-muted-foreground">{message}</p>
-      )}
+      {message && <p className="text-sm text-muted-foreground">{message}</p>}
     </div>
   );
 
   if (fullScreen) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        {content}
-      </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">{content}</div>
     );
   }
 
-  return (
-    <div className="flex items-center justify-center py-12">
-      {content}
-    </div>
-  );
+  return <div className="flex items-center justify-center py-12">{content}</div>;
 }
 
 // Skeleton loading states for different components
@@ -53,8 +45,8 @@ export function TableLoadingSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
-        <div 
-          key={`table-row-${i}`} 
+        <div
+          key={`table-row-${i}`}
           className="h-12 bg-muted/50 animate-pulse rounded-md"
           style={{ animationDelay: `${i * 0.1}s` }}
         />

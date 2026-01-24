@@ -1,10 +1,16 @@
-import { useMemo } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Calculator, Calendar, Banknote, CheckCircle2 } from "lucide-react";
-import type { ContractFormValues } from "../contractSchema";
+import { useMemo } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Calculator, Calendar, Banknote, CheckCircle2 } from 'lucide-react';
+import type { ContractFormValues } from '../contractSchema';
 
 interface Props {
   form: UseFormReturn<ContractFormValues>;
@@ -26,11 +32,11 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
     }
 
     const durationInMonths = durationUnit === 'سنوات' ? durationValue * 12 : durationValue;
-    
+
     const start = new Date(startDate);
     const end = new Date(start);
     end.setMonth(start.getMonth() + durationInMonths);
-    
+
     const endDate = end.toISOString().split('T')[0];
     const monthlyRent = totalAmount / durationInMonths;
     const paymentsCount = paymentFrequency === 'شهري' ? durationInMonths : 1;
@@ -49,7 +55,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
         <Calculator className="h-4 w-4" />
         معلومات العقد الأساسية
       </h3>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -64,7 +70,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
             </FormItem>
           )}
         />
-        
+
         <div className="space-y-2">
           <FormLabel>مدة العقد *</FormLabel>
           <div className="flex gap-2">
@@ -92,11 +98,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
               name="duration_unit"
               render={({ field }) => (
                 <FormItem>
-                  <Select 
-                    value={field.value} 
-                    onValueChange={field.onChange}
-                    disabled={isEditing}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isEditing}>
                     <FormControl>
                       <SelectTrigger className="w-24">
                         <SelectValue />
@@ -111,12 +113,10 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
               )}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            مثال: 3 سنوات أو 18 شهر
-          </p>
+          <p className="text-xs text-muted-foreground">مثال: 3 سنوات أو 18 شهر</p>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -134,14 +134,12 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
                   disabled={isEditing}
                 />
               </FormControl>
-              <p className="text-xs text-muted-foreground">
-                💡 إجمالي المبلغ لكامل مدة العقد
-              </p>
+              <p className="text-xs text-muted-foreground">💡 إجمالي المبلغ لكامل مدة العقد</p>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="payment_frequency"
@@ -177,7 +175,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
           )}
         />
       </div>
-      
+
       <FormField
         control={form.control}
         name="security_deposit"
@@ -202,7 +200,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
           </FormItem>
         )}
       />
-      
+
       {/* الحسابات التلقائية */}
       {!isEditing && calculations && (
         <div className="bg-success/10 border border-success/30 rounded-lg p-3 space-y-2">
@@ -213,9 +211,7 @@ export function DurationAndAmountFields({ form, isEditing }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
             <div>
               <span className="text-muted-foreground">تاريخ النهاية:</span>
-              <p className="font-semibold text-success-foreground">
-                {calculations.endDate}
-              </p>
+              <p className="font-semibold text-success-foreground">{calculations.endDate}</p>
             </div>
             <div>
               <span className="text-muted-foreground">الإيجار الشهري:</span>

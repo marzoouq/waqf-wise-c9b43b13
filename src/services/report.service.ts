@@ -1,22 +1,22 @@
 /**
  * Report Service - خدمة التقارير (Facade)
  * @version 2.9.69
- * 
+ *
  * هذا الملف يعمل كـ Facade للتوافق مع الكود القديم
  * الخدمات الفعلية موجودة في مجلد report/
  */
 
-import { 
-  ReportTemplateService, 
-  FinancialReportService, 
+import {
+  ReportTemplateService,
+  FinancialReportService,
   AnalysisService,
   type CashFlowData,
   type PropertyWithContracts,
   type OperationRecord,
 } from './report/index';
 import { DisclosureService } from './disclosure.service';
-import type { ReportTemplate, ReportFilters } from "@/types/reports/index";
-import { supabase } from "@/integrations/supabase/client";
+import type { ReportTemplate, ReportFilters } from '@/types/reports/index';
+import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 // Re-export types
@@ -119,14 +119,14 @@ export const CustomReportsService = {
       .select('*')
       .order('created_at', { ascending: false });
     if (error) throw error;
-    
+
     const favorites = getFavorites();
-    
-    return (data || []).map(t => ({
+
+    return (data || []).map((t) => ({
       id: t.id,
       name: t.template_name,
       report_type: t.report_type,
-      fields: Array.isArray(t.columns) ? t.columns as string[] : [],
+      fields: Array.isArray(t.columns) ? (t.columns as string[]) : [],
       is_favorite: favorites.includes(t.id),
       is_public: false,
       description: '',
@@ -135,19 +135,27 @@ export const CustomReportsService = {
     }));
   },
 
-  async createCustomTemplate(template: Omit<CustomReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>): Promise<CustomReportTemplate> {
+  async createCustomTemplate(
+    template: Omit<CustomReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>
+  ): Promise<CustomReportTemplate> {
     const { data, error } = await supabase
       .from('report_templates')
-      .insert([{ template_name: template.name, report_type: template.report_type, columns: template.fields }])
+      .insert([
+        {
+          template_name: template.name,
+          report_type: template.report_type,
+          columns: template.fields,
+        },
+      ])
       .select()
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء قالب التقرير');
-    return { 
-      id: data.id, 
-      name: data.template_name, 
-      report_type: data.report_type, 
-      fields: Array.isArray(data.columns) ? data.columns as string[] : [],
+    return {
+      id: data.id,
+      name: data.template_name,
+      report_type: data.report_type,
+      fields: Array.isArray(data.columns) ? (data.columns as string[]) : [],
       is_favorite: false,
       is_public: false,
       description: '',
@@ -165,7 +173,7 @@ export const CustomReportsService = {
 
   async deleteCustomTemplate(id: string): Promise<void> {
     const { data: userData } = await supabase.auth.getUser();
-    
+
     // Soft Delete بدلاً من الحذف الفيزيائي
     const { error } = await supabase
       .from('report_templates')
@@ -176,10 +184,10 @@ export const CustomReportsService = {
       })
       .eq('id', id);
     if (error) throw error;
-    
+
     // Remove from favorites if exists
     const favorites = getFavorites();
-    saveFavorites(favorites.filter(f => f !== id));
+    saveFavorites(favorites.filter((f) => f !== id));
   },
 
   async toggleFavorite(id: string, isFavorite: boolean): Promise<void> {
@@ -189,7 +197,7 @@ export const CustomReportsService = {
         saveFavorites([...favorites, id]);
       }
     } else {
-      saveFavorites(favorites.filter(f => f !== id));
+      saveFavorites(favorites.filter((f) => f !== id));
     }
   },
 
@@ -197,43 +205,59 @@ export const CustomReportsService = {
     return this.executeDirectReport(template.report_type, template.fields, template.sort_by);
   },
 
-  async executeDirectReport(reportType: string, selectedFields: string[], sortBy?: string): Promise<ReportResult> {
+  async executeDirectReport(
+    reportType: string,
+    selectedFields: string[],
+    sortBy?: string
+  ): Promise<ReportResult> {
     const tableName = reportType as 'beneficiaries' | 'properties' | 'distributions';
     const validTables = ['beneficiaries', 'properties', 'distributions'];
-    
+
     if (!validTables.includes(tableName)) {
-      return { data: [], total: 0, totalCount: 0, columns: [], generatedAt: new Date().toISOString() };
+      return {
+        data: [],
+        total: 0,
+        totalCount: 0,
+        columns: [],
+        generatedAt: new Date().toISOString(),
+      };
     }
 
     // Build select string from fields
     const selectFields = selectedFields.length > 0 ? selectedFields.join(', ') : '*';
-    
+
     let query = supabase.from(tableName).select(selectFields, { count: 'exact' });
-    
+
     // Apply sorting if specified
     if (sortBy && selectedFields.includes(sortBy)) {
       query = query.order(sortBy, { ascending: true });
     }
-    
+
     // Limit results
     query = query.limit(1000);
-    
+
     const { data, error, count } = await query;
-    
+
     if (error) {
       productionLogger.error('Error executing report:', error);
-      return { data: [], total: 0, totalCount: 0, columns: [], generatedAt: new Date().toISOString() };
+      return {
+        data: [],
+        total: 0,
+        totalCount: 0,
+        columns: [],
+        generatedAt: new Date().toISOString(),
+      };
     }
-    
+
     // Build columns from field labels
     const fieldLabels = FIELD_LABELS[tableName] || {};
-    const columns: ReportColumn[] = selectedFields.map(field => ({
+    const columns: ReportColumn[] = selectedFields.map((field) => ({
       key: field,
       label: fieldLabels[field] || field,
     }));
-    
+
     const resultData = (data || []) as unknown as Record<string, unknown>[];
-    
+
     return {
       data: resultData,
       total: resultData.length,
@@ -245,33 +269,71 @@ export const CustomReportsService = {
 
   getReportFields() {
     return {
-      beneficiaries: ['full_name', 'national_id', 'phone', 'email', 'status', 'category', 'total_received', 'account_balance', 'created_at'],
-      properties: ['name', 'location', 'property_type', 'status', 'monthly_rent', 'total_units', 'occupied_units', 'created_at'],
-      distributions: ['distribution_date', 'total_amount', 'status', 'distribution_month', 'beneficiaries_count', 'created_at'],
+      beneficiaries: [
+        'full_name',
+        'national_id',
+        'phone',
+        'email',
+        'status',
+        'category',
+        'total_received',
+        'account_balance',
+        'created_at',
+      ],
+      properties: [
+        'name',
+        'location',
+        'property_type',
+        'status',
+        'monthly_rent',
+        'total_units',
+        'occupied_units',
+        'created_at',
+      ],
+      distributions: [
+        'distribution_date',
+        'total_amount',
+        'status',
+        'distribution_month',
+        'beneficiaries_count',
+        'created_at',
+      ],
     };
   },
 
-  async getTrialBalance(): Promise<{ account_code: string; account_name: string; debit: number; credit: number; balance: number }[]> {
+  async getTrialBalance(): Promise<
+    { account_code: string; account_name: string; debit: number; credit: number; balance: number }[]
+  > {
     const { data, error } = await supabase
       .from('accounts')
       .select('code, name_ar, current_balance, account_nature')
       .eq('is_active', true)
       .order('code');
-    
+
     if (error) {
       productionLogger.error('Error fetching trial balance:', error);
       return [];
     }
-    
-    return (data || []).map(account => {
+
+    return (data || []).map((account) => {
       const balance = account.current_balance || 0;
       const isDebitNature = ['asset', 'expense'].includes(account.account_nature);
-      
+
       return {
         account_code: account.code,
         account_name: account.name_ar,
-        debit: isDebitNature && balance > 0 ? balance : (!isDebitNature && balance < 0 ? Math.abs(balance) : 0),
-        credit: !isDebitNature && balance > 0 ? balance : (isDebitNature && balance < 0 ? Math.abs(balance) : 0),
+        debit:
+          isDebitNature && balance > 0
+            ? balance
+            : !isDebitNature && balance < 0
+              ? Math.abs(balance)
+              : 0,
+        credit:
+          !isDebitNature && balance > 0
+            ? balance
+            : isDebitNature && balance < 0
+              ? Math.abs(balance)
+              : 0,
         balance,
       };
     });
@@ -283,22 +345,25 @@ export const CustomReportsService = {
       .select('*')
       .eq('status', 'unpaid')
       .order('due_date');
-    
+
     if (error) {
       productionLogger.error('Error fetching aging report:', error);
-      return { items: [], summary: { current: 0, '1-30': 0, '31-60': 0, '61-90': 0, 'over90': 0, total: 0 } };
+      return {
+        items: [],
+        summary: { current: 0, '1-30': 0, '31-60': 0, '61-90': 0, over90: 0, total: 0 },
+      };
     }
-    
+
     const today = new Date();
-    const summary = { current: 0, '1-30': 0, '31-60': 0, '61-90': 0, 'over90': 0, total: 0 };
-    
-    (data || []).forEach(invoice => {
+    const summary = { current: 0, '1-30': 0, '31-60': 0, '61-90': 0, over90: 0, total: 0 };
+
+    (data || []).forEach((invoice) => {
       const dueDate = new Date(invoice.due_date);
       const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
       const amount = invoice.total_amount || 0;
-      
+
       summary.total += amount;
-      
+
       if (daysOverdue <= 0) {
         summary.current += amount;
       } else if (daysOverdue <= 30) {
@@ -311,7 +376,7 @@ export const CustomReportsService = {
         summary['over90'] += amount;
       }
     });
-    
+
     return { items: data || [], summary };
   },
 };
@@ -323,7 +388,7 @@ export class ReportService {
   // ==================== Template Methods ====================
   static createTemplate = ReportTemplateService.createTemplate;
   static getTemplates = ReportTemplateService.getTemplates;
-  static generateReport = (templateId: string, customFilters?: ReportFilters) => 
+  static generateReport = (templateId: string, customFilters?: ReportFilters) =>
     ReportTemplateService.generateReport(templateId, customFilters);
   static deleteTemplate = ReportTemplateService.deleteTemplate;
   static saveCustomReport = ReportTemplateService.saveCustomReport;
@@ -347,7 +412,7 @@ export class ReportService {
   static getPropertiesReport = FinancialReportService.getPropertiesReport;
   static getLinkedOperations = FinancialReportService.getLinkedOperations;
   static getPropertiesWithContracts = FinancialReportService.getPropertiesWithContracts;
-  
+
   static async getUnlinkedOperations(): Promise<OperationRecord[]> {
     // Get journal entries without linked operations
     const { data, error } = await supabase
@@ -356,13 +421,13 @@ export class ReportService {
       .is('reference_type', null)
       .order('entry_date', { ascending: false })
       .limit(100);
-    
+
     if (error) {
       productionLogger.error('Error fetching unlinked operations:', error);
       return [];
     }
-    
-    return (data || []).map(entry => ({
+
+    return (data || []).map((entry) => ({
       id: entry.id,
       type: 'journal_entry',
       number: entry.entry_number || '',

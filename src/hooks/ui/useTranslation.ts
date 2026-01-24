@@ -30,8 +30,8 @@ export function useTranslation() {
    * الحصول على ترجمة نص
    */
   const t = (key: string, fallback?: string): string => {
-    const translation = translations.find(t => t.key === key);
-    
+    const translation = translations.find((t) => t.key === key);
+
     if (!translation) {
       return fallback || key;
     }
@@ -44,11 +44,11 @@ export function useTranslation() {
    */
   const tWithVars = (key: string, vars: Record<string, string | number>): string => {
     let text = t(key);
-    
+
     Object.entries(vars).forEach(([key, value]) => {
       text = text.replace(`{{${key}}}`, String(value));
     });
-    
+
     return text;
   };
 

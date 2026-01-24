@@ -4,11 +4,11 @@
  * يستخدم DashboardService + RealtimeService
  * @version 2.9.2
  */
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { DashboardService, RealtimeService } from "@/services";
-import type { PropertyPerformance } from "@/types/dashboard";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { DashboardService, RealtimeService } from '@/services';
+import type { PropertyPerformance } from '@/types/dashboard';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
 export function usePropertiesPerformance() {
   const queryClient = useQueryClient();
@@ -22,10 +22,14 @@ export function usePropertiesPerformance() {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToChanges(
       ['rental_payments', 'contracts'],
-      () => { queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_PERFORMANCE }); }
+      () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_PERFORMANCE });
+      }
     );
 
-    return () => { subscription.unsubscribe(); };
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [queryClient]);
 
   return query;

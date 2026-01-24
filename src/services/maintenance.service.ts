@@ -3,10 +3,10 @@
  * @version 2.8.25
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import { MAINTENANCE_OPEN_STATUSES, matchesStatus } from "@/lib/constants";
-import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import { MAINTENANCE_OPEN_STATUSES, matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 
 type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['Row'];
 type MaintenanceRequestInsert = Database['public']['Tables']['maintenance_requests']['Insert'];
@@ -26,8 +26,14 @@ export interface ProviderRating {
 }
 
 export class MaintenanceService {
-  static async getRequests(filters?: { status?: string; propertyId?: string }): Promise<MaintenanceRequest[]> {
-    let query = supabase.from('maintenance_requests').select('*').order('created_at', { ascending: false });
+  static async getRequests(filters?: {
+    status?: string;
+    propertyId?: string;
+  }): Promise<MaintenanceRequest[]> {
+    let query = supabase
+      .from('maintenance_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (filters?.status) query = query.eq('status', filters.status);
     if (filters?.propertyId) query = query.eq('property_id', filters.propertyId);
     const { data, error } = await query;
@@ -36,16 +42,28 @@ export class MaintenanceService {
   }
 
   static async createRequest(request: MaintenanceRequestInsert): Promise<MaintenanceRequest> {
-    const { data, error } = await supabase.from('maintenance_requests').insert(request).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .insert(request)
+      .select()
+      .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء طلب الصيانة");
+    if (!data) throw new Error('فشل في إنشاء طلب الصيانة');
     return data;
   }
 
-  static async updateRequest(id: string, updates: Partial<MaintenanceRequest>): Promise<MaintenanceRequest> {
-    const { data, error } = await supabase.from('maintenance_requests').update(updates).eq('id', id).select().maybeSingle();
+  static async updateRequest(
+    id: string,
+    updates: Partial<MaintenanceRequest>
+  ): Promise<MaintenanceRequest> {
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error("طلب الصيانة غير موجود");
+    if (!data) throw new Error('طلب الصيانة غير موجود');
     return data;
   }
 
@@ -59,14 +77,21 @@ export class MaintenanceService {
   }
 
   static async addProvider(provider: MaintenanceProviderInsert): Promise<MaintenanceProvider> {
-    const { data, error } = await supabase.from('maintenance_providers').insert(provider).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('maintenance_providers')
+      .insert(provider)
+      .select()
+      .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error("فشل في إضافة مقدم الخدمة");
+    if (!data) throw new Error('فشل في إضافة مقدم الخدمة');
     return data;
   }
 
   static async getSchedule(propertyId: string) {
-    const { data, error } = await supabase.from('maintenance_schedules').select('*').eq('property_id', propertyId);
+    const { data, error } = await supabase
+      .from('maintenance_schedules')
+      .select('*')
+      .eq('property_id', propertyId);
     if (error) throw error;
     return data || [];
   }
@@ -76,8 +101,10 @@ export class MaintenanceService {
     const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
     return {
       total: requests.length,
-      pending: requests.filter(r => openStatuses.includes(r.status as typeof MAINTENANCE_OPEN_STATUSES[number])).length,
-      completed: requests.filter(r => matchesStatus(r.status, 'completed')).length,
+      pending: requests.filter((r) =>
+        openStatuses.includes(r.status as (typeof MAINTENANCE_OPEN_STATUSES)[number])
+      ).length,
+      completed: requests.filter((r) => matchesStatus(r.status, 'completed')).length,
       totalCost: requests.reduce((s, r) => s + (r.actual_cost || 0), 0),
     };
   }
@@ -88,10 +115,12 @@ export class MaintenanceService {
   static async getRequestsWithProperties() {
     const { data, error } = await supabase
       .from('maintenance_requests')
-      .select(`
+      .select(
+        `
         *,
         properties(name, location)
-      `)
+      `
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -110,7 +139,7 @@ export class MaintenanceService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء طلب الصيانة");
+    if (!data) throw new Error('فشل في إنشاء طلب الصيانة');
     return data;
   }
 
@@ -122,14 +151,16 @@ export class MaintenanceService {
       .from('maintenance_requests')
       .update(updates)
       .eq('id', id)
-      .select(`
+      .select(
+        `
         *,
         properties(name, location)
-      `)
+      `
+      )
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("طلب الصيانة غير موجود");
+    if (!data) throw new Error('طلب الصيانة غير موجود');
     return data;
   }
 
@@ -143,7 +174,7 @@ export class MaintenanceService {
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: userId || null,
-        deletion_reason: 'حذف بواسطة المستخدم'
+        deletion_reason: 'حذف بواسطة المستخدم',
       } as Record<string, unknown>)
       .eq('id', id);
 
@@ -153,7 +184,10 @@ export class MaintenanceService {
   /**
    * تحديث مقدم خدمة
    */
-  static async updateProvider(id: string, updates: Partial<MaintenanceProvider>): Promise<MaintenanceProvider> {
+  static async updateProvider(
+    id: string,
+    updates: Partial<MaintenanceProvider>
+  ): Promise<MaintenanceProvider> {
     const { data, error } = await supabase
       .from('maintenance_providers')
       .update(updates)
@@ -162,7 +196,7 @@ export class MaintenanceService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("مقدم الخدمة غير موجود");
+    if (!data) throw new Error('مقدم الخدمة غير موجود');
     return data;
   }
 
@@ -175,7 +209,7 @@ export class MaintenanceService {
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: userId || null,
-        deletion_reason: 'حذف بواسطة المستخدم'
+        deletion_reason: 'حذف بواسطة المستخدم',
       } as Record<string, unknown>)
       .eq('id', id);
 
@@ -185,17 +219,21 @@ export class MaintenanceService {
   /**
    * تقييم مقدم خدمة
    */
-  static async rateProvider(rating: ProviderRating): Promise<{ id: string; rating: number; provider_id: string; rated_by?: string }> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+  static async rateProvider(
+    rating: ProviderRating
+  ): Promise<{ id: string; rating: number; provider_id: string; rated_by?: string }> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { data, error } = await supabase
-      .from("provider_ratings")
+      .from('provider_ratings')
       .insert([{ ...rating, rated_by: user?.id }])
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إضافة التقييم");
+    if (!data) throw new Error('فشل في إضافة التقييم');
     return data as { id: string; rating: number; provider_id: string; rated_by?: string };
   }
 
@@ -205,7 +243,8 @@ export class MaintenanceService {
   static async getSchedules(): Promise<MaintenanceSchedule[]> {
     const { data, error } = await supabase
       .from('maintenance_schedules')
-      .select(`
+      .select(
+        `
         *,
         properties:property_id (
           id,
@@ -217,7 +256,8 @@ export class MaintenanceService {
           unit_number,
           unit_name
         )
-      `)
+      `
+      )
       .order('next_maintenance_date', { ascending: true });
 
     if (error) throw error;
@@ -235,14 +275,17 @@ export class MaintenanceService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إضافة جدول الصيانة");
+    if (!data) throw new Error('فشل في إضافة جدول الصيانة');
     return data;
   }
 
   /**
    * تحديث جدول صيانة
    */
-  static async updateSchedule(id: string, updates: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule> {
+  static async updateSchedule(
+    id: string,
+    updates: Partial<MaintenanceSchedule>
+  ): Promise<MaintenanceSchedule> {
     const { data, error } = await supabase
       .from('maintenance_schedules')
       .update(updates)
@@ -251,7 +294,7 @@ export class MaintenanceService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("جدول الصيانة غير موجود");
+    if (!data) throw new Error('جدول الصيانة غير موجود');
     return data;
   }
 
@@ -259,10 +302,7 @@ export class MaintenanceService {
    * حذف جدول صيانة
    */
   static async deleteSchedule(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('maintenance_schedules')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('maintenance_schedules').delete().eq('id', id);
 
     if (error) throw error;
   }
@@ -271,25 +311,33 @@ export class MaintenanceService {
    * جلب تقرير تكاليف الصيانة حسب العقار
    */
   static async getCostAnalysis() {
-    const { data, error } = await supabase
-      .from('maintenance_requests')
-      .select(`
+    const { data, error } = await supabase.from('maintenance_requests').select(`
         id,
         estimated_cost,
         actual_cost,
         status,
         properties!inner(id, name)
       `);
-    
+
     if (error) throw error;
 
-    const propertyData: Record<string, { property_id: string; property_name: string; total_cost: number; completed_count: number; pending_count: number; avg_cost: number }> = {};
-    
+    const propertyData: Record<
+      string,
+      {
+        property_id: string;
+        property_name: string;
+        total_cost: number;
+        completed_count: number;
+        pending_count: number;
+        avg_cost: number;
+      }
+    > = {};
+
     (data || []).forEach((req) => {
       const property = req.properties as unknown as { id: string; name: string };
       const propertyId = property.id;
       const propertyName = property.name;
-      
+
       if (!propertyData[propertyId]) {
         propertyData[propertyId] = {
           property_id: propertyId,
@@ -297,7 +345,7 @@ export class MaintenanceService {
           total_cost: 0,
           completed_count: 0,
           pending_count: 0,
-          avg_cost: 0
+          avg_cost: 0,
         };
       }
 
@@ -306,15 +354,15 @@ export class MaintenanceService {
       const openStatuses = [...MAINTENANCE_OPEN_STATUSES];
       if (matchesStatus(req.status, 'completed')) {
         propertyData[propertyId].completed_count += 1;
-      } else if (openStatuses.includes(req.status as typeof MAINTENANCE_OPEN_STATUSES[number])) {
+      } else if (openStatuses.includes(req.status as (typeof MAINTENANCE_OPEN_STATUSES)[number])) {
         propertyData[propertyId].pending_count += 1;
       }
     });
 
     return Object.values(propertyData)
-      .map(item => ({
+      .map((item) => ({
         ...item,
-        avg_cost: item.completed_count > 0 ? item.total_cost / item.completed_count : 0
+        avg_cost: item.completed_count > 0 ? item.total_cost / item.completed_count : 0,
       }))
       .sort((a, b) => b.total_cost - a.total_cost);
   }
@@ -326,19 +374,22 @@ export class MaintenanceService {
     const { data, error } = await supabase
       .from('maintenance_requests')
       .select('category, estimated_cost, actual_cost, status');
-    
+
     if (error) throw error;
 
-    const typeData = (data || []).reduce((acc, req) => {
-      const category = req.category || 'غير محدد';
-      if (!acc[category]) {
-        acc[category] = { name: category, value: 0, count: 0 };
-      }
-      const cost = Number(req.actual_cost || req.estimated_cost || 0);
-      acc[category].value += cost;
-      acc[category].count += 1;
-      return acc;
-    }, {} as Record<string, { name: string; value: number; count: number }>);
+    const typeData = (data || []).reduce(
+      (acc, req) => {
+        const category = req.category || 'غير محدد';
+        if (!acc[category]) {
+          acc[category] = { name: category, value: 0, count: 0 };
+        }
+        const cost = Number(req.actual_cost || req.estimated_cost || 0);
+        acc[category].value += cost;
+        acc[category].count += 1;
+        return acc;
+      },
+      {} as Record<string, { name: string; value: number; count: number }>
+    );
 
     return Object.values(typeData);
   }

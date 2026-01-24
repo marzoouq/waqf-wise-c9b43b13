@@ -1,10 +1,10 @@
-import { RefObject, memo } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageBubble } from "./MessageBubble";
-import { WelcomeMessage } from "./WelcomeMessage";
-import { TypingIndicator } from "./TypingIndicator";
-import { ChatMessage } from "@/hooks/ai/useChatbot";
-import { cn } from "@/lib/utils";
+import { RefObject, memo } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { MessageBubble } from './MessageBubble';
+import { WelcomeMessage } from './WelcomeMessage';
+import { TypingIndicator } from './TypingIndicator';
+import { ChatMessage } from '@/hooks/ai/useChatbot';
+import { cn } from '@/lib/utils';
 
 interface MessagesSectionProps {
   conversations: ChatMessage[];
@@ -24,7 +24,7 @@ export const MessagesSection = memo(function MessagesSection({
   compact = false,
 }: MessagesSectionProps) {
   return (
-    <ScrollArea ref={scrollRef} className={cn("flex-1", compact ? "p-4 bg-muted/30" : "p-4")}>
+    <ScrollArea ref={scrollRef} className={cn('flex-1', compact ? 'p-4 bg-muted/30' : 'p-4')}>
       <div className="space-y-4 pb-4">
         {/* رسالة ترحيبية */}
         {conversations.length === 0 && !isLoading && <WelcomeMessage compact={compact} />}

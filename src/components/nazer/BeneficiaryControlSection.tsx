@@ -1,25 +1,25 @@
 /**
  * قسم التحكم بعرض المستفيدين - محسّن ومُقسّم
  * يسمح للناظر بإخفاء/إظهار أقسام معينة للمستفيدين والورثة
- * 
+ *
  * التحسينات:
  * - تقسيم المكونات الكبيرة لتحسين الأداء
  * - استخدام CSS Variables بدلاً من Tailwind المباشر
- * 
+ *
  * @version 2.8.91
  */
-import { useState, useMemo } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
-import { 
-  SettingsCategoryCard, 
-  SettingsSearchFilter, 
+import { useState, useMemo } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useVisibilitySettings } from '@/hooks/governance/useVisibilitySettings';
+import {
+  SettingsCategoryCard,
+  SettingsSearchFilter,
   BulkActionsBar,
   SETTING_CATEGORIES,
   TOTAL_SETTINGS,
-} from "./control";
+} from './control';
 
 interface VisibilityPanelProps {
   targetRole: 'beneficiary' | 'waqf_heir';
@@ -29,14 +29,14 @@ interface VisibilityPanelProps {
 function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
   const { settings, isLoading, updateSettings, isUpdating } = useVisibilitySettings(targetRole);
   const [pendingChanges, setPendingChanges] = useState<Record<string, boolean>>({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedCategories, setExpandedCategories] = useState<string[]>(
-    SETTING_CATEGORIES.map(c => c.id)
+    SETTING_CATEGORIES.map((c) => c.id)
   );
 
   const handleToggle = (key: string, value: boolean) => {
-    setPendingChanges(prev => ({ ...prev, [key]: value }));
+    setPendingChanges((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSaveAll = async () => {
@@ -51,59 +51,60 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
 
   const getSettingValue = (key: string): boolean => {
     if (key in pendingChanges) return pendingChanges[key];
-    return settings?.[key as keyof typeof settings] as boolean ?? true;
+    return (settings?.[key as keyof typeof settings] as boolean) ?? true;
   };
 
   const isChanged = (key: string): boolean => key in pendingChanges;
 
   // تفعيل/إلغاء الكل لفئة معينة
   const handleBulkAction = (categoryId: string, enable: boolean) => {
-    const category = SETTING_CATEGORIES.find(c => c.id === categoryId);
+    const category = SETTING_CATEGORIES.find((c) => c.id === categoryId);
     if (!category) return;
-    
+
     const changes: Record<string, boolean> = {};
-    category.settings.forEach(s => {
+    category.settings.forEach((s) => {
       changes[s.key] = enable;
     });
-    setPendingChanges(prev => ({ ...prev, ...changes }));
+    setPendingChanges((prev) => ({ ...prev, ...changes }));
   };
 
   // تفعيل/إلغاء الكل
   const handleBulkActionAll = (enable: boolean) => {
     const changes: Record<string, boolean> = {};
-    SETTING_CATEGORIES.forEach(cat => {
-      cat.settings.forEach(s => {
+    SETTING_CATEGORIES.forEach((cat) => {
+      cat.settings.forEach((s) => {
         changes[s.key] = enable;
       });
     });
-    setPendingChanges(prev => ({ ...prev, ...changes }));
+    setPendingChanges((prev) => ({ ...prev, ...changes }));
   };
 
   // فلترة الفئات والإعدادات
   const filteredCategories = useMemo(() => {
-    return SETTING_CATEGORIES
-      .filter(cat => selectedCategory === "all" || cat.id === selectedCategory)
-      .map(cat => ({
+    return SETTING_CATEGORIES.filter(
+      (cat) => selectedCategory === 'all' || cat.id === selectedCategory
+    )
+      .map((cat) => ({
         ...cat,
-        settings: cat.settings.filter(s => 
-          s.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.description?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        settings: cat.settings.filter(
+          (s) =>
+            s.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            s.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
       }))
-      .filter(cat => cat.settings.length > 0);
+      .filter((cat) => cat.settings.length > 0);
   }, [searchQuery, selectedCategory]);
 
   const totalEnabled = useMemo(() => {
-    return SETTING_CATEGORIES.reduce((acc, cat) => 
-      acc + cat.settings.filter(s => getSettingValue(s.key)).length, 0
+    return SETTING_CATEGORIES.reduce(
+      (acc, cat) => acc + cat.settings.filter((s) => getSettingValue(s.key)).length,
+      0
     );
   }, [settings, pendingChanges]);
 
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => 
-      prev.includes(categoryId) 
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
+    setExpandedCategories((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
     );
   };
 
@@ -123,11 +124,11 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
         onSearchChange={setSearchQuery}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
-        categories={SETTING_CATEGORIES.map(c => ({ 
-          id: c.id, 
-          title: c.title, 
-          icon: c.icon, 
-          iconColor: c.iconColor 
+        categories={SETTING_CATEGORIES.map((c) => ({
+          id: c.id,
+          title: c.title,
+          icon: c.icon,
+          iconColor: c.iconColor,
         }))}
         totalSettings={TOTAL_SETTINGS}
       />
@@ -149,7 +150,8 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
       {/* نتائج البحث */}
       {searchQuery && (
         <div className="text-sm text-muted-foreground">
-          تم العثور على {filteredCategories.reduce((acc, cat) => acc + cat.settings.length, 0)} نتيجة
+          تم العثور على {filteredCategories.reduce((acc, cat) => acc + cat.settings.length, 0)}{' '}
+          نتيجة
         </div>
       )}
 

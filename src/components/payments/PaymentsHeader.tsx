@@ -1,7 +1,7 @@
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ExportButton } from "@/components/shared/ExportButton";
-import type { Payment } from "@/types/payments";
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ExportButton } from '@/components/shared/ExportButton';
+import type { Payment } from '@/types/payments';
 
 interface PaymentsHeaderProps {
   onAddPayment: () => void;
@@ -20,7 +20,7 @@ export function PaymentsHeader({ onAddPayment, payments }: PaymentsHeaderProps) 
           data={payments}
           filename="payments"
           title="سندات القبض والصرف"
-          headers={["payment_number", "payment_type", "payment_date", "payer_name", "amount"]}
+          headers={['payment_number', 'payment_type', 'payment_date', 'payer_name', 'amount']}
         />
         <Button onClick={onAddPayment} className="gap-2">
           <Plus className="h-4 w-4" />

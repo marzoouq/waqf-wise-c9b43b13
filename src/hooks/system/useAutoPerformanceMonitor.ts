@@ -1,5 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { autoPerformanceMonitor, PerformanceStats } from '@/services/monitoring/auto-performance-monitor.service';
+import {
+  autoPerformanceMonitor,
+  PerformanceStats,
+} from '@/services/monitoring/auto-performance-monitor.service';
 
 /**
  * Hook لمراقبة الأداء التلقائي
@@ -11,7 +14,7 @@ export function useAutoPerformanceMonitor() {
     min: 0,
     count: 0,
     slowCount: 0,
-    threshold: 200
+    threshold: 200,
   });
 
   const refreshStats = useCallback(() => {
@@ -41,6 +44,6 @@ export function useAutoPerformanceMonitor() {
     clearMetrics: () => {
       autoPerformanceMonitor.clearMetrics();
       refreshStats();
-    }
+    },
   };
 }

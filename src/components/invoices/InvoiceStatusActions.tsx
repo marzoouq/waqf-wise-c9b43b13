@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { useInvoices } from "@/hooks/payments/useInvoices";
-import { toast } from "sonner";
-import { CheckCircle, Send, XCircle } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { useInvoices } from '@/hooks/payments/useInvoices';
+import { toast } from 'sonner';
+import { CheckCircle, Send, XCircle } from 'lucide-react';
 
 interface InvoiceStatusActionsProps {
   invoice: {
@@ -19,12 +19,12 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
     try {
       await updateInvoice({
         id: invoice.id,
-        invoice: { status: "sent" }
+        invoice: { status: 'sent' },
       });
-      toast.success("تم إصدار الفاتورة");
+      toast.success('تم إصدار الفاتورة');
       onStatusChanged?.();
     } catch {
-      toast.error("فشل في إصدار الفاتورة");
+      toast.error('فشل في إصدار الفاتورة');
     }
   };
 
@@ -32,12 +32,12 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
     try {
       await updateInvoice({
         id: invoice.id,
-        invoice: { status: "paid" }
+        invoice: { status: 'paid' },
       });
-      toast.success("تم تسجيل الدفع");
+      toast.success('تم تسجيل الدفع');
       onStatusChanged?.();
     } catch {
-      toast.error("فشل في تسجيل الدفع");
+      toast.error('فشل في تسجيل الدفع');
     }
   };
 
@@ -45,30 +45,30 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
     try {
       await updateInvoice({
         id: invoice.id,
-        invoice: { status: "cancelled" }
+        invoice: { status: 'cancelled' },
       });
-      toast.warning("تم إلغاء الفاتورة");
+      toast.warning('تم إلغاء الفاتورة');
       onStatusChanged?.();
     } catch {
-      toast.error("فشل في إلغاء الفاتورة");
+      toast.error('فشل في إلغاء الفاتورة');
     }
   };
 
   return (
     <div className="flex gap-2 flex-wrap">
-      {invoice.status === "draft" && (
+      {invoice.status === 'draft' && (
         <Button size="sm" onClick={handleIssue}>
           <Send className="h-4 w-4 ms-2" />
           إصدار الفاتورة
         </Button>
       )}
-      {invoice.status === "sent" && (
+      {invoice.status === 'sent' && (
         <Button size="sm" variant="default" onClick={handleMarkPaid}>
           <CheckCircle className="h-4 w-4 ms-2" />
           تسجيل الدفع
         </Button>
       )}
-      {(invoice.status === "draft" || invoice.status === "sent") && (
+      {(invoice.status === 'draft' || invoice.status === 'sent') && (
         <Button size="sm" variant="destructive" onClick={handleCancel}>
           <XCircle className="h-4 w-4 ms-2" />
           إلغاء

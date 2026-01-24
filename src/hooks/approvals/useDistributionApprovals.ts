@@ -2,10 +2,10 @@
  * useDistributionApprovals Hook
  * Hook لموافقات التوزيعات
  */
-import { useQuery } from "@tanstack/react-query";
-import { ApprovalService } from "@/services/approval.service";
-import { DistributionForApproval } from "@/types/approvals";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { ApprovalService } from '@/services/approval.service';
+import { DistributionForApproval } from '@/types/approvals';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useDistributionApprovals() {
   return useQuery<DistributionForApproval[]>({

@@ -1,4 +1,10 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Users, Building2, DollarSign, Calendar } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
@@ -30,7 +36,13 @@ export function InteractiveDashboard() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل البيانات" message={(error as Error).message} onRetry={handleRefresh} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل البيانات"
+        message={(error as Error).message}
+        onRetry={handleRefresh}
+      />
+    );
   }
 
   return (
@@ -49,7 +61,10 @@ export function InteractiveDashboard() {
             </SelectContent>
           </Select>
 
-          <Select value={chartType} onValueChange={(v) => setChartType(v as 'bar' | 'line' | 'pie')}>
+          <Select
+            value={chartType}
+            onValueChange={(v) => setChartType(v as 'bar' | 'line' | 'pie')}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="نوع الرسم" />
             </SelectTrigger>
@@ -103,10 +118,12 @@ export function InteractiveDashboard() {
           description="تحليل المدفوعات خلال الفترة المحددة"
           type={chartType === 'pie' ? 'pie' : chartType}
           data={paymentsStats || []}
-          series={chartType !== 'pie' ? [
-            { dataKey: "total", name: "المجموع", color: "hsl(var(--chart-1))" }
-          ] : undefined}
-          xAxisKey={chartType !== 'pie' ? "month" : undefined}
+          series={
+            chartType !== 'pie'
+              ? [{ dataKey: 'total', name: 'المجموع', color: 'hsl(var(--chart-1))' }]
+              : undefined
+          }
+          xAxisKey={chartType !== 'pie' ? 'month' : undefined}
           height={300}
         />
 
@@ -126,9 +143,7 @@ export function InteractiveDashboard() {
         description="توزيع العقارات حسب حالتها"
         type="bar"
         data={propertiesStats || []}
-        series={[
-          { dataKey: "value", name: "العدد", color: "hsl(var(--chart-2))" }
-        ]}
+        series={[{ dataKey: 'value', name: 'العدد', color: 'hsl(var(--chart-2))' }]}
         xAxisKey="name"
         height={300}
       />

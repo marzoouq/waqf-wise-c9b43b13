@@ -24,7 +24,11 @@ export interface AgingCategoryData {
 }
 
 export function useLoansAgingReport() {
-  const { data: agingData, isLoading, error } = useQuery<LoanAgingData[]>({
+  const {
+    data: agingData,
+    isLoading,
+    error,
+  } = useQuery<LoanAgingData[]>({
     queryKey: QUERY_KEYS.LOANS_AGING,
     queryFn: () => LoansService.getAgingReport(),
   });
@@ -34,14 +38,17 @@ export function useLoansAgingReport() {
     queryFn: async (): Promise<AgingCategoryData[]> => {
       if (!agingData) return [];
 
-      const categories = agingData.reduce((acc, loan) => {
-        if (!acc[loan.aging_category]) {
-          acc[loan.aging_category] = { category: loan.aging_category, count: 0, amount: 0 };
-        }
-        acc[loan.aging_category].count += 1;
-        acc[loan.aging_category].amount += loan.remaining_balance;
-        return acc;
-      }, {} as Record<string, AgingCategoryData>);
+      const categories = agingData.reduce(
+        (acc, loan) => {
+          if (!acc[loan.aging_category]) {
+            acc[loan.aging_category] = { category: loan.aging_category, count: 0, amount: 0 };
+          }
+          acc[loan.aging_category].count += 1;
+          acc[loan.aging_category].amount += loan.remaining_balance;
+          return acc;
+        },
+        {} as Record<string, AgingCategoryData>
+      );
 
       return Object.values(categories);
     },

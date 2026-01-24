@@ -1,36 +1,40 @@
-import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
-import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
-import { useBulkSelection } from "@/hooks/ui/useBulkSelection";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format, arLocale as ar } from "@/lib/date";
-import { type Contract } from "@/hooks/property/useContracts";
-import { ExportButton } from "@/components/shared/ExportButton";
-import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
-import { usePrint } from "@/hooks/ui/usePrint";
-import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
-import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
-import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert";
-import { ContractActionsMenu } from "@/components/contracts/ContractActionsMenu";
-import { UnitHandoverDialog } from "@/components/contracts/UnitHandoverDialog";
-import { ContractNotificationDialog } from "@/components/contracts/ContractNotificationDialog";
-import { CancelAutoRenewDialog } from "@/components/contracts/CancelAutoRenewDialog";
-import { RentAdjustmentDialog } from "@/components/contracts/RentAdjustmentDialog";
-import { UnilateralTerminationDialog } from "@/components/contracts/UnilateralTerminationDialog";
-import { EarlyTerminationDialog } from "@/components/contracts/EarlyTerminationDialog";
-import { ContractsStatsCards } from "@/components/contracts/ContractsStatsCards";
-import { ContractsFilterTabs } from "@/components/contracts/ContractsFilterTabs";
-import { useContractsStats } from "@/hooks/contracts/useContractsStats";
-import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { PaginationControls } from "@/components/ui/pagination-controls";
-import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
-import { useDeleteConfirmation } from "@/hooks/shared";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { AdvancedFiltersDialog, type FilterConfig, type FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
-import { toast } from "sonner";
-import { differenceInDays } from "date-fns";
-import { matchesStatus } from "@/lib/constants";
+import { useState, useMemo } from 'react';
+import { Search } from 'lucide-react';
+import { useContractsPaginated } from '@/hooks/property/useContractsPaginated';
+import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { format, arLocale as ar } from '@/lib/date';
+import { type Contract } from '@/hooks/property/useContracts';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
+import { usePrint } from '@/hooks/ui/usePrint';
+import { ContractPrintTemplate } from '@/components/contracts/ContractPrintTemplate';
+import { ContractStatusBadge } from '@/components/contracts/ContractStatusBadge';
+import { ContractExpiryAlert } from '@/components/contracts/ContractExpiryAlert';
+import { ContractActionsMenu } from '@/components/contracts/ContractActionsMenu';
+import { UnitHandoverDialog } from '@/components/contracts/UnitHandoverDialog';
+import { ContractNotificationDialog } from '@/components/contracts/ContractNotificationDialog';
+import { CancelAutoRenewDialog } from '@/components/contracts/CancelAutoRenewDialog';
+import { RentAdjustmentDialog } from '@/components/contracts/RentAdjustmentDialog';
+import { UnilateralTerminationDialog } from '@/components/contracts/UnilateralTerminationDialog';
+import { EarlyTerminationDialog } from '@/components/contracts/EarlyTerminationDialog';
+import { ContractsStatsCards } from '@/components/contracts/ContractsStatsCards';
+import { ContractsFilterTabs } from '@/components/contracts/ContractsFilterTabs';
+import { useContractsStats } from '@/hooks/contracts/useContractsStats';
+import { UnifiedDataTable } from '@/components/unified/UnifiedDataTable';
+import { PaginationControls } from '@/components/ui/pagination-controls';
+import { PAGE_SIZE_OPTIONS } from '@/lib/pagination.types';
+import { useDeleteConfirmation } from '@/hooks/shared';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import {
+  AdvancedFiltersDialog,
+  type FilterConfig,
+  type FiltersRecord,
+} from '@/components/shared/AdvancedFiltersDialog';
+import { toast } from 'sonner';
+import { differenceInDays } from 'date-fns';
+import { matchesStatus } from '@/lib/constants';
 
 // تعريف الفلاتر
 const contractsFilterConfigs: FilterConfig[] = [
@@ -62,22 +66,24 @@ interface Props {
 }
 
 export const ContractsTab = ({ onEdit }: Props) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
-  const [activeTabFilter, setActiveTabFilter] = useState("all");
-  
+  const [activeTabFilter, setActiveTabFilter] = useState('all');
+
   // حالات الحوارات الجديدة
   const [handoverContract, setHandoverContract] = useState<Contract | null>(null);
   const [notificationContract, setNotificationContract] = useState<Contract | null>(null);
   const [cancelAutoRenewContract, setCancelAutoRenewContract] = useState<Contract | null>(null);
   const [rentAdjustmentContract, setRentAdjustmentContract] = useState<Contract | null>(null);
   const [rentAdjustmentType, setRentAdjustmentType] = useState<'increase' | 'decrease'>('increase');
-  const [terminationRequestContract, setTerminationRequestContract] = useState<Contract | null>(null);
+  const [terminationRequestContract, setTerminationRequestContract] = useState<Contract | null>(
+    null
+  );
   const [earlyTerminationContract, setEarlyTerminationContract] = useState<Contract | null>(null);
-  
-  const { 
-    contracts, 
-    isLoading, 
+
+  const {
+    contracts,
+    isLoading,
     deleteContract,
     pagination,
     goToPage,
@@ -87,9 +93,9 @@ export const ContractsTab = ({ onEdit }: Props) => {
     canGoNext,
     canGoPrev,
   } = useContractsPaginated();
-  
+
   const { printWithData } = usePrint();
-  
+
   // إحصائيات العقود
   const stats = useContractsStats(contracts as Contract[]);
 
@@ -123,35 +129,35 @@ export const ContractsTab = ({ onEdit }: Props) => {
   // البحث والفلترة المحلية
   const filteredContracts = useMemo(() => {
     let result = contracts || [];
-    
+
     // فلترة بالتبويب
     const now = new Date();
     switch (activeTabFilter) {
-      case "active":
-        result = result.filter(c => matchesStatus(c.status, 'active'));
+      case 'active':
+        result = result.filter((c) => matchesStatus(c.status, 'active'));
         break;
-      case "draft":
-        result = result.filter(c => matchesStatus(c.status, 'draft'));
+      case 'draft':
+        result = result.filter((c) => matchesStatus(c.status, 'draft'));
         break;
-      case "renewal":
-        result = result.filter(c => {
+      case 'renewal':
+        result = result.filter((c) => {
           if (!matchesStatus(c.status, 'active')) return false;
           const endDate = new Date(c.end_date);
           const daysUntilExpiry = differenceInDays(endDate, now);
           return daysUntilExpiry <= 60 && daysUntilExpiry > 0;
         });
         break;
-      case "autoRenew":
+      case 'autoRenew':
         result = result.filter((c) => {
           const autoRenewEnabled = (c as { auto_renew_enabled?: boolean }).auto_renew_enabled;
           return Boolean(autoRenewEnabled) && matchesStatus(c.status, 'active');
         });
         break;
-      case "expired":
-        result = result.filter(c => c.status === "منتهي" || c.status === "expired");
+      case 'expired':
+        result = result.filter((c) => c.status === 'منتهي' || c.status === 'expired');
         break;
     }
-    
+
     // فلترة بالبحث
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -162,23 +168,23 @@ export const ContractsTab = ({ onEdit }: Props) => {
           c.properties?.name?.toLowerCase().includes(query)
       );
     }
-    
+
     // فلترة بالفلاتر المتقدمة
     if (advancedFilters.status) {
-      result = result.filter(c => c.status === advancedFilters.status);
+      result = result.filter((c) => c.status === advancedFilters.status);
     }
     if (advancedFilters.contract_type) {
-      result = result.filter(c => c.contract_type === advancedFilters.contract_type);
+      result = result.filter((c) => c.contract_type === advancedFilters.contract_type);
     }
     if (advancedFilters.start_date) {
       const startDate = new Date(String(advancedFilters.start_date));
-      result = result.filter(c => new Date(c.start_date) >= startDate);
+      result = result.filter((c) => new Date(c.start_date) >= startDate);
     }
     if (advancedFilters.end_date) {
       const endDate = new Date(String(advancedFilters.end_date));
-      result = result.filter(c => new Date(c.end_date) <= endDate);
+      result = result.filter((c) => new Date(c.end_date) <= endDate);
     }
-    
+
     return result;
   }, [contracts, searchQuery, advancedFilters, activeTabFilter]);
 
@@ -207,32 +213,32 @@ export const ContractsTab = ({ onEdit }: Props) => {
 
   const handleBulkExport = () => {
     const selectedData = (filteredContracts as Contract[])
-      .filter(c => selectedIds.includes(c.id))
-      .map(c => ({
+      .filter((c) => selectedIds.includes(c.id))
+      .map((c) => ({
         'رقم العقد': c.contract_number,
-        'العقار': c.properties?.name || '-',
-        'المستأجر': c.tenant_name,
-        'النوع': c.contract_type,
+        العقار: c.properties?.name || '-',
+        المستأجر: c.tenant_name,
+        النوع: c.contract_type,
         'تاريخ البداية': format(new Date(c.start_date), 'yyyy/MM/dd'),
         'تاريخ النهاية': format(new Date(c.end_date), 'yyyy/MM/dd'),
         'الإيجار الشهري': Number(c.monthly_rent).toLocaleString(),
-        'الحالة': c.status,
+        الحالة: c.status,
       }));
     return selectedData;
   };
 
-  const exportData = filteredContracts.map(c => ({
+  const exportData = filteredContracts.map((c) => ({
     'رقم العقد': c.contract_number,
-    'العقار': c.properties?.name || '-',
-    'المستأجر': c.tenant_name,
+    العقار: c.properties?.name || '-',
+    المستأجر: c.tenant_name,
     'رقم الهوية': c.tenant_id_number,
-    'الهاتف': c.tenant_phone,
-    'النوع': c.contract_type,
+    الهاتف: c.tenant_phone,
+    النوع: c.contract_type,
     'تاريخ البداية': format(new Date(c.start_date), 'yyyy/MM/dd'),
     'تاريخ النهاية': format(new Date(c.end_date), 'yyyy/MM/dd'),
     'الإيجار الشهري': Number(c.monthly_rent).toLocaleString(),
-    'التأمين': Number(c.security_deposit || 0).toLocaleString(),
-    'الحالة': c.status,
+    التأمين: Number(c.security_deposit || 0).toLocaleString(),
+    الحالة: c.status,
   }));
 
   return (
@@ -261,7 +267,19 @@ export const ContractsTab = ({ onEdit }: Props) => {
           data={exportData}
           filename="العقود"
           title="العقود"
-          headers={['رقم العقد', 'العقار', 'المستأجر', 'رقم الهوية', 'الهاتف', 'النوع', 'تاريخ البداية', 'تاريخ النهاية', 'الإيجار الشهري', 'التأمين', 'الحالة']}
+          headers={[
+            'رقم العقد',
+            'العقار',
+            'المستأجر',
+            'رقم الهوية',
+            'الهاتف',
+            'النوع',
+            'تاريخ البداية',
+            'تاريخ النهاية',
+            'الإيجار الشهري',
+            'التأمين',
+            'الحالة',
+          ]}
         />
       </div>
 
@@ -296,7 +314,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
         title="العقود"
         columns={[
           {
-            key: "select",
+            key: 'select',
             label: (
               <Checkbox
                 checked={isAllSelected}
@@ -314,65 +332,65 @@ export const ContractsTab = ({ onEdit }: Props) => {
             ),
           },
           {
-            key: "contract_number",
-            label: "رقم العقد",
-            render: (value: string) => <span className="font-medium">{value}</span>
+            key: 'contract_number',
+            label: 'رقم العقد',
+            render: (value: string) => <span className="font-medium">{value}</span>,
           },
           {
-            key: "properties",
-            label: "العقار",
+            key: 'properties',
+            label: 'العقار',
             hideOnTablet: true,
-            render: (_: unknown, row: Contract) => row.properties?.name || '-'
+            render: (_: unknown, row: Contract) => row.properties?.name || '-',
           },
           {
-            key: "tenant_name",
-            label: "المستأجر"
+            key: 'tenant_name',
+            label: 'المستأجر',
           },
           {
-            key: "contract_type",
-            label: "النوع",
-            hideOnMobile: true
+            key: 'contract_type',
+            label: 'النوع',
+            hideOnMobile: true,
           },
           {
-            key: "start_date",
-            label: "تاريخ البداية",
-            hideOnTablet: true,
-            render: (value: string) => (
-              <span className="whitespace-nowrap">
-                {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
-              </span>
-            )
-          },
-          {
-            key: "end_date",
-            label: "تاريخ النهاية",
+            key: 'start_date',
+            label: 'تاريخ البداية',
             hideOnTablet: true,
             render: (value: string) => (
               <span className="whitespace-nowrap">
                 {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
               </span>
-            )
+            ),
           },
           {
-            key: "monthly_rent",
-            label: "الإيجار الشهري",
+            key: 'end_date',
+            label: 'تاريخ النهاية',
+            hideOnTablet: true,
+            render: (value: string) => (
+              <span className="whitespace-nowrap">
+                {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
+              </span>
+            ),
+          },
+          {
+            key: 'monthly_rent',
+            label: 'الإيجار الشهري',
             render: (value: number) => (
               <span className="font-bold text-primary whitespace-nowrap">
                 {Number(value).toLocaleString()} ر.س
               </span>
-            )
+            ),
           },
           {
-            key: "status",
-            label: "الحالة",
+            key: 'status',
+            label: 'الحالة',
             render: (_: unknown, row: Contract) => (
-              <ContractStatusBadge 
+              <ContractStatusBadge
                 startDate={row.start_date}
                 endDate={row.end_date}
                 status={row.status}
               />
-            )
-          }
+            ),
+          },
         ]}
         data={filteredContracts as Contract[]}
         loading={isLoading}

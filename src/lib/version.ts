@@ -1,10 +1,10 @@
 /**
  * Application Version Information
  * معلومات إصدار التطبيق
- * 
+ *
  * @version 3.1.0
  * @date 2025-12-24
- * 
+ *
  * @changelog 3.1.0
  * - إضافة قسم "أدوات المطور" في القائمة الجانبية (7 صفحات)
  * - إصلاح صلاحيات الناظر في القائمة الجانبية وإدارة النظام
@@ -134,30 +134,56 @@ export const ARCHITECTURE_STATUS = {
 export const DATABASE_FUNCTIONS_SUMMARY = {
   // دوال استرجاع البيانات
   dataRetrieval: [
-    'get_dashboard_stats', 'get_beneficiary_statistics', 'get_distribution_summary',
-    'get_financial_report', 'get_property_stats', 'get_fund_balance',
-    'get_loan_summary', 'get_approval_stats', 'get_user_permissions',
+    'get_dashboard_stats',
+    'get_beneficiary_statistics',
+    'get_distribution_summary',
+    'get_financial_report',
+    'get_property_stats',
+    'get_fund_balance',
+    'get_loan_summary',
+    'get_approval_stats',
+    'get_user_permissions',
   ],
   // دوال التحديث التلقائي (Triggers)
   updateTriggers: [
-    'update_updated_at_column', 'update_account_balance', 'update_distribution_totals',
-    'update_beneficiary_totals', 'update_property_occupancy', 'update_fund_balance',
-    'update_loan_balance', 'update_contract_status', 'update_payment_status',
+    'update_updated_at_column',
+    'update_account_balance',
+    'update_distribution_totals',
+    'update_beneficiary_totals',
+    'update_property_occupancy',
+    'update_fund_balance',
+    'update_loan_balance',
+    'update_contract_status',
+    'update_payment_status',
   ],
   // دوال الصلاحيات
   permissions: [
-    'is_admin', 'is_nazer', 'is_accountant', 'is_beneficiary_manager',
-    'has_permission', 'check_user_role', 'get_user_role', 'can_approve',
+    'is_admin',
+    'is_nazer',
+    'is_accountant',
+    'is_beneficiary_manager',
+    'has_permission',
+    'check_user_role',
+    'get_user_role',
+    'can_approve',
   ],
   // دوال الحسابات
   calculations: [
-    'calculate_account_balance', 'calculate_distribution_share', 'calculate_loan_interest',
-    'calculate_property_revenue', 'calculate_fund_performance', 'calculate_beneficiary_share',
+    'calculate_account_balance',
+    'calculate_distribution_share',
+    'calculate_loan_interest',
+    'calculate_property_revenue',
+    'calculate_fund_performance',
+    'calculate_beneficiary_share',
   ],
   // دوال الأتمتة
   automation: [
-    'auto_approve_distribution', 'auto_create_journal_entry', 'auto_generate_voucher',
-    'auto_update_fiscal_year', 'auto_archive_old_records', 'auto_cleanup_sessions',
+    'auto_approve_distribution',
+    'auto_create_journal_entry',
+    'auto_generate_voucher',
+    'auto_update_fiscal_year',
+    'auto_archive_old_records',
+    'auto_cleanup_sessions',
   ],
 } as const;
 
@@ -166,20 +192,29 @@ export const DATABASE_FUNCTIONS_SUMMARY = {
  */
 export const DATABASE_VIEWS_SUMMARY = {
   statistics: [
-    'beneficiary_statistics', 'distribution_statistics', 'property_statistics',
-    'fund_statistics', 'loan_statistics', 'payment_statistics',
+    'beneficiary_statistics',
+    'distribution_statistics',
+    'property_statistics',
+    'fund_statistics',
+    'loan_statistics',
+    'payment_statistics',
   ],
   reports: [
-    'journal_entries_with_lines', 'general_ledger', 'accounts_hierarchy',
-    'distributions_summary', 'beneficiaries_overview', 'pending_approvals_view',
+    'journal_entries_with_lines',
+    'general_ledger',
+    'accounts_hierarchy',
+    'distributions_summary',
+    'beneficiaries_overview',
+    'pending_approvals_view',
   ],
   dashboards: [
-    'dashboard_kpis', 'financial_dashboard', 'property_dashboard',
-    'beneficiary_dashboard', 'approval_dashboard',
+    'dashboard_kpis',
+    'financial_dashboard',
+    'property_dashboard',
+    'beneficiary_dashboard',
+    'approval_dashboard',
   ],
-  security: [
-    'beneficiaries_masked', 'payment_vouchers_masked', 'unmatched_bank_transactions',
-  ],
+  security: ['beneficiaries_masked', 'payment_vouchers_masked', 'unmatched_bank_transactions'],
 } as const;
 
 /**
@@ -195,7 +230,7 @@ export function getVersionString(): string {
 export function isNewerVersion(currentVersion: string, compareVersion: string): boolean {
   const current = currentVersion.split('.').map(Number);
   const compare = compareVersion.split('.').map(Number);
-  
+
   for (let i = 0; i < Math.max(current.length, compare.length); i++) {
     const c = current[i] || 0;
     const v = compare[i] || 0;

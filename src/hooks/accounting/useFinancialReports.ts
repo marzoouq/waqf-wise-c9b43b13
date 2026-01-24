@@ -1,7 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services";
-import type { TrialBalanceAccount, BalanceSheetData, IncomeStatementData } from "@/services/accounting.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services';
+import type {
+  TrialBalanceAccount,
+  BalanceSheetData,
+  IncomeStatementData,
+} from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { TrialBalanceAccount, BalanceSheetData, IncomeStatementData };
 

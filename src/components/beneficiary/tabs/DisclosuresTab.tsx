@@ -4,7 +4,7 @@
  * @version 2.8.67
  */
 
-import { EnhancedDisclosuresTab } from "@/components/disclosure/EnhancedDisclosuresTab";
+import { EnhancedDisclosuresTab } from '@/components/disclosure/EnhancedDisclosuresTab';
 
 export function DisclosuresTab() {
   return <EnhancedDisclosuresTab />;

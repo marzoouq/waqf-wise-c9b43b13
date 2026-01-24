@@ -49,7 +49,7 @@ export async function loadErrorTrackerSettings(): Promise<ErrorTrackerSettings> 
     const result: ErrorTrackerSettings = { ...DEFAULT_SETTINGS };
 
     if (settings && settings.length > 0) {
-      settings.forEach(setting => {
+      settings.forEach((setting) => {
         const value = Number(setting.setting_value);
         switch (setting.setting_key) {
           case 'error_tracker_dedup_window_minutes':
@@ -104,7 +104,7 @@ export async function updateErrorTrackerSetting(
   };
 
   const settingKey = settingKeyMap[key];
-  
+
   const { error } = await supabase
     .from('system_settings')
     .update({ setting_value: String(value), updated_at: new Date().toISOString() })

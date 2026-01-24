@@ -3,10 +3,10 @@
  * Hook لعرض وترحيل القيد المحاسبي
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { useToast } from "@/hooks/ui/use-toast";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { useToast } from '@/hooks/ui/use-toast';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface JournalEntryLine {
   id: string;
@@ -39,15 +39,15 @@ export function useViewJournalEntry(entryId: string, enabled: boolean) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم الترحيل بنجاح",
-        description: "تم ترحيل القيد المحاسبي بنجاح",
+        title: 'تم الترحيل بنجاح',
+        description: 'تم ترحيل القيد المحاسبي بنجاح',
       });
     },
     onError: () => {
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء ترحيل القيد",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء ترحيل القيد',
+        variant: 'destructive',
       });
     },
   });

@@ -80,17 +80,20 @@ export class AccountService {
   /**
    * تحديث حساب
    */
-  static async updateAccount(id: string, updates: {
-    code?: string;
-    name_ar?: string;
-    name_en?: string | null;
-    parent_id?: string | null;
-    account_type?: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
-    account_nature?: 'debit' | 'credit';
-    description?: string | null;
-    is_active?: boolean;
-    is_header?: boolean;
-  }) {
+  static async updateAccount(
+    id: string,
+    updates: {
+      code?: string;
+      name_ar?: string;
+      name_en?: string | null;
+      parent_id?: string | null;
+      account_type?: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+      account_nature?: 'debit' | 'credit';
+      description?: string | null;
+      is_active?: boolean;
+      is_header?: boolean;
+    }
+  ) {
     try {
       const { data, error } = await supabase
         .from('accounts')
@@ -119,7 +122,7 @@ export class AccountService {
           deleted_at: new Date().toISOString(),
           deleted_by: userId || null,
           deletion_reason: 'حذف بواسطة المستخدم',
-          is_active: false // تعطيل الحساب أيضاً
+          is_active: false, // تعطيل الحساب أيضاً
         } as Record<string, unknown>)
         .eq('id', id);
 
@@ -209,9 +212,9 @@ export class AccountService {
   static async getAccountDistribution(): Promise<{ name: string; value: number; count: number }[]> {
     try {
       const { data: accounts, error } = await supabase
-        .from("accounts")
-        .select("account_type")
-        .eq("is_active", true);
+        .from('accounts')
+        .select('account_type')
+        .eq('is_active', true);
 
       if (error) throw error;
 
@@ -260,11 +263,11 @@ export class AccountService {
    */
   static async getAccountsForLedger() {
     const { data, error } = await supabase
-      .from("accounts")
-      .select("id, code, name_ar")
-      .eq("is_active", true)
-      .eq("is_header", false)
-      .order("code");
+      .from('accounts')
+      .select('id, code, name_ar')
+      .eq('is_active', true)
+      .eq('is_header', false)
+      .order('code');
 
     if (error) throw error;
     return data || [];

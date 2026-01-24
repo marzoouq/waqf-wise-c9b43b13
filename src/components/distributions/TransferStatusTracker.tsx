@@ -9,13 +9,16 @@ interface TransferStatusTrackerProps {
   transferFileId: string;
 }
 
-const statusConfig: Record<string, {
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  bgColor: string;
-  label: string;
-  variant: 'default' | 'secondary' | 'outline' | 'destructive';
-}> = {
+const statusConfig: Record<
+  string,
+  {
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+    bgColor: string;
+    label: string;
+    variant: 'default' | 'secondary' | 'outline' | 'destructive';
+  }
+> = {
   completed: {
     icon: CheckCircle2,
     color: 'text-success',
@@ -47,19 +50,13 @@ const statusConfig: Record<string, {
 };
 
 export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerProps) {
-  const { 
-    transfers, 
-    loading, 
-    autoRefresh, 
-    setAutoRefresh, 
-    stats, 
-    progress 
-  } = useTransferStatusTracker(transferFileId);
+  const { transfers, loading, autoRefresh, setAutoRefresh, stats, progress } =
+    useTransferStatusTracker(transferFileId);
 
   const exportReport = () => {
     const csv = [
       ['الاسم', 'IBAN', 'المبلغ', 'الحالة', 'رقم المرجع', 'تاريخ المعالجة', 'سبب الفشل'],
-      ...transfers.map(t => [
+      ...transfers.map((t) => [
         t.beneficiary_name,
         t.iban,
         t.amount,
@@ -69,7 +66,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
         t.error_message || '-',
       ]),
     ]
-      .map(row => row.join(','))
+      .map((row) => row.join(','))
       .join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -105,9 +102,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground mb-1">قيد المعالجة</div>
-          <div className="text-2xl font-bold text-info">
-            {stats.processing + stats.pending}
-          </div>
+          <div className="text-2xl font-bold text-info">{stats.processing + stats.pending}</div>
         </Card>
       </div>
 
@@ -122,11 +117,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
               </p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setAutoRefresh(!autoRefresh)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}>
                 <RefreshCw className={`h-4 w-4 ms-2 ${autoRefresh ? 'animate-spin' : ''}`} />
                 {autoRefresh ? 'إيقاف التحديث' : 'تحديث تلقائي'}
               </Button>
@@ -147,7 +138,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
       <Card className="p-6">
         <h3 className="font-semibold mb-4">تفاصيل التحويلات</h3>
         <div className="space-y-2">
-          {transfers.map(transfer => {
+          {transfers.map((transfer) => {
             const config = statusConfig[transfer.status] || statusConfig.pending;
             const Icon = config.icon;
 

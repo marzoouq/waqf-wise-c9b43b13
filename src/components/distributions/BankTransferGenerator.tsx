@@ -1,13 +1,23 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/ui/use-toast";
-import { DistributionService } from "@/services";
-import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { BankFileFormat, DistributionDetail, GeneratedTransferFile } from "@/types/bank-transfer";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/ui/use-toast';
+import { DistributionService } from '@/services';
+import { Download, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import type {
+  BankFileFormat,
+  DistributionDetail,
+  GeneratedTransferFile,
+} from '@/types/bank-transfer';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface BankTransferGeneratorProps {
   distributionId: string;
@@ -17,7 +27,7 @@ interface BankTransferGeneratorProps {
 export function BankTransferGenerator({ distributionId, onSuccess }: BankTransferGeneratorProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [fileFormat, setFileFormat] = useState<BankFileFormat>("CSV");
+  const [fileFormat, setFileFormat] = useState<BankFileFormat>('CSV');
   const [generatedFile, setGeneratedFile] = useState<GeneratedTransferFile | null>(null);
 
   const handleGenerate = async () => {
@@ -33,7 +43,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
       });
 
       toast({
-        title: "تم بنجاح",
+        title: 'تم بنجاح',
         description: `تم توليد ملف التحويل ${transferFile.file_number}`,
       });
 
@@ -41,9 +51,9 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
     } catch (error) {
       productionLogger.error('Error generating transfer file', error);
       toast({
-        title: "خطأ",
-        description: "فشل توليد ملف التحويل",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل توليد ملف التحويل',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -53,8 +63,8 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
   const handleDownload = () => {
     if (!generatedFile) return;
 
-    const blob = new Blob([generatedFile.fileContent], { 
-      type: fileFormat === "CSV" ? "text/csv" : "text/plain" 
+    const blob = new Blob([generatedFile.fileContent], {
+      type: fileFormat === 'CSV' ? 'text/csv' : 'text/plain',
     });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -66,8 +76,8 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
     URL.revokeObjectURL(url);
 
     toast({
-      title: "تم التنزيل",
-      description: "تم تنزيل ملف التحويل البنكي",
+      title: 'تم التنزيل',
+      description: 'تم تنزيل ملف التحويل البنكي',
     });
   };
 
@@ -78,14 +88,15 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
           <FileText className="h-5 w-5" />
           توليد ملف التحويل البنكي
         </CardTitle>
-        <CardDescription>
-          تصدير التحويلات بصيغة متوافقة مع الأنظمة البنكية
-        </CardDescription>
+        <CardDescription>تصدير التحويلات بصيغة متوافقة مع الأنظمة البنكية</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">صيغة الملف</label>
-          <Select value={fileFormat} onValueChange={(value: BankFileFormat) => setFileFormat(value)}>
+          <Select
+            value={fileFormat}
+            onValueChange={(value: BankFileFormat) => setFileFormat(value)}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -126,11 +137,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
                 <Download className="ms-2 h-4 w-4" />
                 تنزيل الملف
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setGeneratedFile(null)}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => setGeneratedFile(null)} className="flex-1">
                 توليد جديد
               </Button>
             </div>
@@ -143,10 +150,13 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 
 // دوال مساعدة لتوليد محتوى الملفات
 function generateCSV(details: DistributionDetail[]): string {
-  const headers = "اسم المستفيد,رقم الآيبان,البنك,المبلغ,البيان\n";
-  const rows = details.map(d => 
-    `"${d.beneficiaries?.full_name || ''}","${d.beneficiaries?.iban || ''}","${d.beneficiaries?.bank_name || ''}",${d.allocated_amount},"${d.notes || ''}"`
-  ).join("\n");
+  const headers = 'اسم المستفيد,رقم الآيبان,البنك,المبلغ,البيان\n';
+  const rows = details
+    .map(
+      (d) =>
+        `"${d.beneficiaries?.full_name || ''}","${d.beneficiaries?.iban || ''}","${d.beneficiaries?.bank_name || ''}",${d.allocated_amount},"${d.notes || ''}"`
+    )
+    .join('\n');
   return headers + rows;
 }
 
@@ -175,7 +185,7 @@ function _generateISO20022(details: DistributionDetail[]): string {
 
 function _generateSWIFT(details: DistributionDetail[]): string {
   // SWIFT MT940 format
-  let swift = ":20:Transfer File\n";
+  let swift = ':20:Transfer File\n';
   swift += `:25:Waqf Account\n`;
   details.forEach((d) => {
     swift += `:61:${d.allocated_amount}SAR\n`;
@@ -196,7 +206,7 @@ function _generateSEPA(details: DistributionDetail[]): string {
   const totalAmount = details.reduce((sum, d) => sum + d.allocated_amount, 0);
   xml += `      <CtrlSum>${totalAmount.toFixed(2)}</CtrlSum>\n`;
   xml += '    </GrpHdr>\n';
-  
+
   details.forEach((d, i) => {
     xml += '    <PmtInf>\n';
     xml += `      <PmtInfId>PMT${i + 1}</PmtInfId>\n`;
@@ -215,7 +225,7 @@ function _generateSEPA(details: DistributionDetail[]): string {
     xml += '      </Amt>\n';
     xml += '    </PmtInf>\n';
   });
-  
+
   xml += '  </CstmrDrctDbtInitn>\n';
   xml += '</Document>';
   return xml;
@@ -226,7 +236,7 @@ function _generateACH(details: DistributionDetail[]): string {
   let ach = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '').substring(2);
-  
+
   // File Header
   ach += '101 ';
   ach += '123456789 '; // Immediate Destination
@@ -238,7 +248,7 @@ function _generateACH(details: DistributionDetail[]): string {
   ach += '10'; // Blocking Factor
   ach += '1'; // Format Code
   ach += 'WAQF SYSTEM        \n';
-  
+
   details.forEach((d, i) => {
     // Entry Detail Record
     ach += '6'; // Record Type
@@ -250,7 +260,7 @@ function _generateACH(details: DistributionDetail[]): string {
     ach += (d.beneficiaries?.full_name || '').padEnd(22).substring(0, 22);
     ach += '  0\n';
   });
-  
+
   return ach;
 }
 
@@ -259,14 +269,14 @@ function _generateBACS(details: DistributionDetail[]): string {
   let bacs = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
-  
+
   // Header Record
   bacs += 'VOL1';
   bacs += '01';
   bacs += 'WAQFSYS ';
   bacs += dateStr;
   bacs += '\n';
-  
+
   details.forEach((d, i) => {
     // Standard 18 Record
     bacs += '99'; // Destination Sort Code
@@ -279,7 +289,7 @@ function _generateBACS(details: DistributionDetail[]): string {
     bacs += `REF${i + 1}`.padEnd(18);
     bacs += '\n';
   });
-  
+
   return bacs;
 }
 
@@ -289,7 +299,7 @@ function _generateNCB(details: DistributionDetail[]): string {
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
   const timeStr = today.toTimeString().substring(0, 8).replace(/:/g, '');
-  
+
   // Header
   ncb += 'H|'; // Record Type
   ncb += 'WAQF|'; // Company ID
@@ -298,7 +308,7 @@ function _generateNCB(details: DistributionDetail[]): string {
   ncb += `${details.length}|`;
   const totalAmount = details.reduce((sum, d) => sum + d.allocated_amount, 0);
   ncb += totalAmount.toFixed(2) + '|\n';
-  
+
   // Detail Records
   details.forEach((d, i) => {
     ncb += 'D|'; // Record Type
@@ -309,12 +319,12 @@ function _generateNCB(details: DistributionDetail[]): string {
     ncb += 'SAR|';
     ncb += (d.notes || 'توزيع الوقف') + '|\n';
   });
-  
+
   // Trailer
   ncb += 'T|';
   ncb += `${details.length}|`;
   ncb += totalAmount.toFixed(2) + '|\n';
-  
+
   return ncb;
 }
 
@@ -323,7 +333,7 @@ function _generateAlRajhi(details: DistributionDetail[]): string {
   let rajhi = '';
   const today = new Date();
   const batchId = `WAQF${Date.now()}`;
-  
+
   // File Header
   rajhi += `BATCH_ID=${batchId}\n`;
   rajhi += `DATE=${today.toISOString().split('T')[0]}\n`;
@@ -333,7 +343,7 @@ function _generateAlRajhi(details: DistributionDetail[]): string {
   rajhi += `TOTAL_AMOUNT=${totalAmount.toFixed(2)}\n`;
   rajhi += `CURRENCY=SAR\n`;
   rajhi += '---\n';
-  
+
   // Detail Records (CSV-like for Rajhi)
   rajhi += 'SEQ,IBAN,BENEFICIARY_NAME,AMOUNT,PURPOSE\n';
   details.forEach((d, i) => {
@@ -343,6 +353,6 @@ function _generateAlRajhi(details: DistributionDetail[]): string {
     rajhi += `${d.allocated_amount.toFixed(2)},`;
     rajhi += `"${d.notes || 'توزيع الوقف'}"\n`;
   });
-  
+
   return rajhi;
 }

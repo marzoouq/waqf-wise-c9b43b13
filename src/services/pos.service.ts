@@ -3,8 +3,8 @@
  * @version 2.8.25
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 export interface POSDailyStats {
   total_collections: number;
@@ -94,28 +94,30 @@ export class POSService {
    * جلب إحصائيات اليوم
    */
   static async getDailyStats(date: Date = new Date()): Promise<POSDailyStats> {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    const { data, error } = await supabase.rpc("get_pos_daily_stats", {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    const { data, error } = await supabase.rpc('get_pos_daily_stats', {
       p_date: formattedDate,
     });
 
     if (error) throw error;
-    return (data?.[0] as POSDailyStats) || {
-      total_collections: 0,
-      total_payments: 0,
-      net_amount: 0,
-      transactions_count: 0,
-      cash_amount: 0,
-      card_amount: 0,
-      transfer_amount: 0,
-    };
+    return (
+      (data?.[0] as POSDailyStats) || {
+        total_collections: 0,
+        total_payments: 0,
+        net_amount: 0,
+        transactions_count: 0,
+        cash_amount: 0,
+        card_amount: 0,
+        transfer_amount: 0,
+      }
+    );
   }
 
   /**
    * جلب إحصائيات الوردية
    */
   static async getShiftStats(shiftId: string): Promise<Record<string, number> | null> {
-    const { data, error } = await supabase.rpc("get_shift_stats", {
+    const { data, error } = await supabase.rpc('get_shift_stats', {
       p_shift_id: shiftId,
     });
 
@@ -127,8 +129,8 @@ export class POSService {
    * جلب التسوية اليومية
    */
   static async getDailySettlement(date: Date = new Date()): Promise<Record<string, number> | null> {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    const { data, error } = await supabase.rpc("get_pos_daily_stats", {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    const { data, error } = await supabase.rpc('get_pos_daily_stats', {
       p_date: formattedDate,
     });
 
@@ -205,7 +207,7 @@ export class POSService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في بدء الوردية");
+    if (!data) throw new Error('فشل في بدء الوردية');
     return data as CashierShift;
   }
 
@@ -229,7 +231,7 @@ export class POSService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("الوردية غير موجودة");
+    if (!data) throw new Error('الوردية غير موجودة');
     return data as CashierShift;
   }
 
@@ -253,7 +255,7 @@ export class POSService {
    */
   static async getTodayTransactions(): Promise<POSTransaction[]> {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const { data, error } = await supabase
       .from('pos_transactions')
       .select('*')
@@ -307,14 +309,18 @@ export class POSService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء العملية");
+    if (!data) throw new Error('فشل في إنشاء العملية');
     return data as POSTransaction;
   }
 
   /**
    * إلغاء عملية
    */
-  static async voidTransaction(transactionId: string, userId: string, reason: string): Promise<POSTransaction> {
+  static async voidTransaction(
+    transactionId: string,
+    userId: string,
+    reason: string
+  ): Promise<POSTransaction> {
     const { data, error } = await supabase
       .from('pos_transactions')
       .update({
@@ -328,7 +334,7 @@ export class POSService {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("العملية غير موجودة");
+    if (!data) throw new Error('العملية غير موجودة');
     return data as POSTransaction;
   }
 
@@ -338,7 +344,8 @@ export class POSService {
   static async getPendingRentals(): Promise<PendingRental[]> {
     const { data, error } = await supabase
       .from('rental_payments')
-      .select(`
+      .select(
+        `
         id,
         contract_id,
         amount_due,
@@ -352,7 +359,8 @@ export class POSService {
           property_id,
           properties!inner(name)
         )
-      `)
+      `
+      )
       .in('status', ['معلق', 'متأخر'])
       .order('due_date', { ascending: true });
 
@@ -377,7 +385,7 @@ export class POSService {
       const today = new Date();
       const dueDate = new Date(item.due_date);
       const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-      
+
       return {
         id: item.id,
         contract_id: item.contract_id,
@@ -472,9 +480,9 @@ export class POSService {
    */
   static async settleShift(shiftId: string): Promise<void> {
     const { error } = await supabase
-      .from("cashier_shifts")
-      .update({ status: "مغلقة" })
-      .eq("id", shiftId);
+      .from('cashier_shifts')
+      .update({ status: 'مغلقة' })
+      .eq('id', shiftId);
 
     if (error) throw error;
   }
@@ -483,7 +491,7 @@ export class POSService {
    * جلب تقرير الورديات
    */
   static async getShiftsReport(startDate: string, endDate: string): Promise<ShiftReportItem[]> {
-    const { data, error } = await supabase.rpc("get_shifts_report", {
+    const { data, error } = await supabase.rpc('get_shifts_report', {
       p_start_date: startDate,
       p_end_date: endDate,
     });

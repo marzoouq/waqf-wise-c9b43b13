@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, DollarSign, FileArchive, Home, AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
-import { useBeneficiaryIntegrationStats } from "@/hooks/beneficiary/useBeneficiaryProfileData";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, DollarSign, FileArchive, Home, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { useBeneficiaryIntegrationStats } from '@/hooks/beneficiary/useBeneficiaryProfileData';
 
 interface BeneficiaryIntegrationPanelProps {
   beneficiaryId: string;
@@ -15,38 +15,42 @@ export function BeneficiaryIntegrationPanel({ beneficiaryId }: BeneficiaryIntegr
 
   const integrations = [
     {
-      title: "المدفوعات",
-      description: "عرض سجل المدفوعات والتوزيعات",
+      title: 'المدفوعات',
+      description: 'عرض سجل المدفوعات والتوزيعات',
       icon: DollarSign,
       count: stats?.paymentsCount || 0,
       onClick: () => navigate(`/payments?beneficiary=${beneficiaryId}`),
-      color: "text-success",
+      color: 'text-success',
     },
     {
-      title: "الطلبات",
-      description: "عرض طلبات المستفيد وحالتها",
+      title: 'الطلبات',
+      description: 'عرض طلبات المستفيد وحالتها',
       icon: AlertCircle,
       count: stats?.requestsCount || 0,
-      badge: stats?.activeRequestsCount ? { label: `${stats.activeRequestsCount} نشط`, variant: "destructive" as const } : undefined,
+      badge: stats?.activeRequestsCount
+        ? { label: `${stats.activeRequestsCount} نشط`, variant: 'destructive' as const }
+        : undefined,
       onClick: () => navigate(`/requests?beneficiary=${beneficiaryId}`),
-      color: "text-primary",
+      color: 'text-primary',
     },
     {
-      title: "المستندات",
-      description: "المرفقات والوثائق",
+      title: 'المستندات',
+      description: 'المرفقات والوثائق',
       icon: FileArchive,
       count: stats?.documentsCount || 0,
       onClick: () => navigate(`/archive?beneficiary=${beneficiaryId}`),
-      color: "text-accent",
+      color: 'text-accent',
     },
     {
-      title: "العائلة",
-      description: stats?.familyName || "لا ينتمي لعائلة",
+      title: 'العائلة',
+      description: stats?.familyName || 'لا ينتمي لعائلة',
       icon: Home,
       count: stats?.isHeadOfFamily ? 1 : 0,
-      badge: stats?.isHeadOfFamily ? { label: "رب الأسرة", variant: "default" as const } : undefined,
+      badge: stats?.isHeadOfFamily
+        ? { label: 'رب الأسرة', variant: 'default' as const }
+        : undefined,
       onClick: () => stats?.familyName && navigate(`/families?search=${stats.familyName}`),
-      color: "text-warning",
+      color: 'text-warning',
       disabled: !stats?.familyName,
     },
   ];
@@ -58,9 +62,7 @@ export function BeneficiaryIntegrationPanel({ beneficiaryId }: BeneficiaryIntegr
           <FileText className="h-5 w-5 text-primary" />
           البيانات المرتبطة
         </CardTitle>
-        <CardDescription>
-          الوصول السريع لجميع بيانات المستفيد عبر الأنظمة
-        </CardDescription>
+        <CardDescription>الوصول السريع لجميع بيانات المستفيد عبر الأنظمة</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -92,7 +94,7 @@ export function BeneficiaryIntegrationPanel({ beneficiaryId }: BeneficiaryIntegr
                         {integration.description}
                       </p>
                       <Badge variant="secondary" className="text-xs">
-                        {integration.count} {integration.title === "العائلة" ? "" : "عنصر"}
+                        {integration.count} {integration.title === 'العائلة' ? '' : 'عنصر'}
                       </Badge>
                     </div>
                   </div>

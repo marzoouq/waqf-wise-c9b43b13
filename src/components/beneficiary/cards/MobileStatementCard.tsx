@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, DollarSign, FileText, CreditCard } from "lucide-react";
-import { formatDate } from "@/lib/date";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, DollarSign, FileText, CreditCard } from 'lucide-react';
+import { formatDate } from '@/lib/date';
 
 interface MobileStatementCardProps {
   payment: {
@@ -17,7 +17,7 @@ interface MobileStatementCardProps {
 }
 
 export function MobileStatementCard({ payment, masked = false }: MobileStatementCardProps) {
-  const formattedAmount = payment.amount.toLocaleString("ar-SA");
+  const formattedAmount = payment.amount.toLocaleString('ar-SA');
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -26,13 +26,13 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
           <div className="space-y-1 flex-1">
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              <p className="font-mono text-sm font-semibold">{payment.reference_number || "—"}</p>
+              <p className="font-mono text-sm font-semibold">{payment.reference_number || '—'}</p>
             </div>
             <p className="text-xs text-muted-foreground line-clamp-1">
-              {payment.description || "—"}
+              {payment.description || '—'}
             </p>
           </div>
-          <Badge 
+          <Badge
             variant={payment.status === 'مدفوع' ? 'default' : 'secondary'}
             className="shrink-0"
           >
@@ -46,9 +46,7 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
               <Calendar className="h-3 w-3" />
               التاريخ
             </div>
-            <p className="text-sm font-medium">
-              {formatDate(payment.payment_date, "dd/MM/yyyy")}
-            </p>
+            <p className="text-sm font-medium">{formatDate(payment.payment_date, 'dd/MM/yyyy')}</p>
           </div>
 
           <div className="space-y-1">
@@ -57,7 +55,7 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
               المبلغ
             </div>
             <p className="text-sm font-bold">
-              {masked ? `${formattedAmount} ر.س` : formattedAmount + " ر.س"}
+              {masked ? `${formattedAmount} ر.س` : formattedAmount + ' ر.س'}
             </p>
           </div>
         </div>

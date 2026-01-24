@@ -3,10 +3,10 @@
  * @version 2.8.61
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { JournalApproval, PaymentForApproval } from "@/types";
-import { DistributionForApproval, RequestWithBeneficiary } from "@/types/approvals";
-import type { Json } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import { JournalApproval, PaymentForApproval } from '@/types';
+import { DistributionForApproval, RequestWithBeneficiary } from '@/types/approvals';
+import type { Json } from '@/integrations/supabase/types';
 import { matchesStatus } from '@/lib/constants';
 
 export interface ApprovalItem {
@@ -40,9 +40,11 @@ export interface RequestApproval {
 export class ApprovalService {
   // ==================== إحصائيات عامة ====================
   static async getOverviewStats(): Promise<ApprovalsStats> {
-    const { data: journalApprovals } = await supabase.from("approvals").select("status");
-    const { data: distributionApprovals } = await supabase.from("distribution_approvals").select("status");
-    const { data: requestApprovals } = await supabase.from("request_approvals").select("status");
+    const { data: journalApprovals } = await supabase.from('approvals').select('status');
+    const { data: distributionApprovals } = await supabase
+      .from('distribution_approvals')
+      .select('status');
+    const { data: requestApprovals } = await supabase.from('request_approvals').select('status');
 
     const allApprovals = [
       ...(journalApprovals || []),
@@ -69,8 +71,9 @@ export class ApprovalService {
 
   static async getJournalApprovalsWithEntries(): Promise<JournalApproval[]> {
     const { data, error } = await supabase
-      .from("approvals")
-      .select(`
+      .from('approvals')
+      .select(
+        `
         *,
         journal_entry:journal_entries(
           id,
@@ -79,8 +82,9 @@ export class ApprovalService {
           description,
           status
         )
-      `)
-      .order("created_at", { ascending: false });
+      `
+      )
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data as unknown as JournalApproval[];
@@ -88,7 +92,10 @@ export class ApprovalService {
 
   // ==================== موافقات التوزيعات ====================
   static async getDistributionApprovals(status?: string): Promise<ApprovalItem[]> {
-    let query = supabase.from('distribution_approvals').select('*').order('created_at', { ascending: false });
+    let query = supabase
+      .from('distribution_approvals')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     const { data, error } = await query;
     if (error) throw error;
@@ -97,12 +104,14 @@ export class ApprovalService {
 
   static async getDistributionApprovalsWithDetails(): Promise<DistributionForApproval[]> {
     const { data, error } = await supabase
-      .from("distributions")
-      .select(`
+      .from('distributions')
+      .select(
+        `
         *,
         distribution_approvals(*)
-      `)
-      .order("created_at", { ascending: false });
+      `
+      )
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data as unknown as DistributionForApproval[];
@@ -110,7 +119,10 @@ export class ApprovalService {
 
   // ==================== موافقات المدفوعات ====================
   static async getPaymentApprovals(status?: string): Promise<ApprovalItem[]> {
-    let query = supabase.from('payment_approvals').select('*').order('created_at', { ascending: false });
+    let query = supabase
+      .from('payment_approvals')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     const { data, error } = await query;
     if (error) throw error;
@@ -119,14 +131,16 @@ export class ApprovalService {
 
   static async getPaymentApprovalsWithDetails(): Promise<PaymentForApproval[]> {
     const { data, error } = await supabase
-      .from("payments")
-      .select(`
+      .from('payments')
+      .select(
+        `
         *,
         beneficiaries(full_name, national_id),
         payment_approvals(*)
-      `)
-      .in("status", ["pending", "معلق"])
-      .order("created_at", { ascending: false });
+      `
+      )
+      .in('status', ['pending', 'معلق'])
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return (data || []) as unknown as PaymentForApproval[];
@@ -139,14 +153,14 @@ export class ApprovalService {
     approverId?: string
   ): Promise<void> {
     const { error } = await supabase
-      .from("payment_approvals")
+      .from('payment_approvals')
       .update({
         status,
         notes,
         approved_at: new Date().toISOString(),
-        approver_id: approverId
+        approver_id: approverId,
       })
-      .eq("id", approvalId);
+      .eq('id', approvalId);
 
     if (error) throw error;
   }
@@ -154,14 +168,16 @@ export class ApprovalService {
   // ==================== موافقات الطلبات ====================
   static async getRequestApprovals(): Promise<RequestWithBeneficiary[]> {
     const { data, error } = await supabase
-      .from("beneficiary_requests")
-      .select(`
+      .from('beneficiary_requests')
+      .select(
+        `
         *,
         beneficiaries(full_name, national_id),
         request_types(name_ar, name_en)
-      `)
-      .in("status", ["قيد المراجعة", "معلق"])
-      .order("created_at", { ascending: false });
+      `
+      )
+      .in('status', ['قيد المراجعة', 'معلق'])
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data as unknown as RequestWithBeneficiary[];
@@ -169,7 +185,10 @@ export class ApprovalService {
 
   // ==================== موافقات القروض ====================
   static async getLoanApprovals(status?: string): Promise<ApprovalItem[]> {
-    let query = supabase.from('loan_approvals').select('*').order('created_at', { ascending: false });
+    let query = supabase
+      .from('loan_approvals')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     const { data, error } = await query;
     if (error) throw error;
@@ -177,8 +196,16 @@ export class ApprovalService {
   }
 
   // ==================== عمليات الموافقة/الرفض ====================
-  static async approveItem(type: string, id: string, approverName: string, notes?: string): Promise<void> {
-    const tableMap: Record<string, 'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'> = {
+  static async approveItem(
+    type: string,
+    id: string,
+    approverName: string,
+    notes?: string
+  ): Promise<void> {
+    const tableMap: Record<
+      string,
+      'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'
+    > = {
       journal: 'approvals',
       distribution: 'distribution_approvals',
       loan: 'loan_approvals',
@@ -186,18 +213,29 @@ export class ApprovalService {
     };
     const table = tableMap[type];
     if (!table) throw new Error('Invalid type');
-    
-    const { error } = await supabase.from(table).update({
-      status: 'موافق',
-      approver_name: approverName,
-      notes,
-      approved_at: new Date().toISOString(),
-    }).eq('id', id);
+
+    const { error } = await supabase
+      .from(table)
+      .update({
+        status: 'موافق',
+        approver_name: approverName,
+        notes,
+        approved_at: new Date().toISOString(),
+      })
+      .eq('id', id);
     if (error) throw error;
   }
 
-  static async rejectItem(type: string, id: string, approverName: string, notes?: string): Promise<void> {
-    const tableMap: Record<string, 'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'> = {
+  static async rejectItem(
+    type: string,
+    id: string,
+    approverName: string,
+    notes?: string
+  ): Promise<void> {
+    const tableMap: Record<
+      string,
+      'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'
+    > = {
       journal: 'approvals',
       distribution: 'distribution_approvals',
       loan: 'loan_approvals',
@@ -205,13 +243,16 @@ export class ApprovalService {
     };
     const table = tableMap[type];
     if (!table) throw new Error('Invalid type');
-    
-    const { error } = await supabase.from(table).update({
-      status: 'مرفوض',
-      approver_name: approverName,
-      notes,
-      approved_at: new Date().toISOString(),
-    }).eq('id', id);
+
+    const { error } = await supabase
+      .from(table)
+      .update({
+        status: 'مرفوض',
+        approver_name: approverName,
+        notes,
+        approved_at: new Date().toISOString(),
+      })
+      .eq('id', id);
     if (error) throw error;
   }
 
@@ -224,28 +265,33 @@ export class ApprovalService {
     ]);
     const all = [...journals, ...distributions, ...loans, ...payments];
     return {
-      pending: all.filter(a => a.status === 'معلق').length,
-      approved: all.filter(a => a.status === 'موافق').length,
-      rejected: all.filter(a => a.status === 'مرفوض').length,
+      pending: all.filter((a) => a.status === 'معلق').length,
+      approved: all.filter((a) => a.status === 'موافق').length,
+      rejected: all.filter((a) => a.status === 'مرفوض').length,
     };
   }
 
   static async getApprovalWorkflows() {
-    const { data, error } = await supabase.from('approval_workflows').select('*').eq('is_active', true);
+    const { data, error } = await supabase
+      .from('approval_workflows')
+      .select('*')
+      .eq('is_active', true);
     if (error) throw error;
     return data || [];
   }
 
   // ==================== الموافقات المعلقة الموحدة ====================
-  static async getPendingApprovals(): Promise<{
-    id: string;
-    type: 'distribution' | 'request' | 'journal' | 'payment';
-    title: string;
-    amount?: number;
-    date: Date;
-    priority: 'high' | 'medium' | 'low';
-    description: string;
-  }[]> {
+  static async getPendingApprovals(): Promise<
+    {
+      id: string;
+      type: 'distribution' | 'request' | 'journal' | 'payment';
+      title: string;
+      amount?: number;
+      date: Date;
+      priority: 'high' | 'medium' | 'low';
+      description: string;
+    }[]
+  > {
     const allApprovals: {
       id: string;
       type: 'distribution' | 'request' | 'journal' | 'payment';
@@ -265,7 +311,9 @@ export class ApprovalService {
         .limit(5),
       supabase
         .from('request_approvals')
-        .select(`id, created_at, beneficiary_requests(request_number, amount, priority, beneficiaries(full_name))`)
+        .select(
+          `id, created_at, beneficiary_requests(request_number, amount, priority, beneficiaries(full_name))`
+        )
         .eq('status', 'معلق')
         .eq('level', 3)
         .limit(5),
@@ -273,7 +321,7 @@ export class ApprovalService {
         .from('approvals')
         .select(`id, created_at, journal_entries(entry_number, description)`)
         .in('status', ['pending', 'معلق'])
-        .limit(5)
+        .limit(5),
     ]);
 
     if (distApprovalsResult.error) throw distApprovalsResult.error;
@@ -320,7 +368,7 @@ export class ApprovalService {
             amount: app.distributions.total_amount,
             date: new Date(app.created_at),
             priority: 'high',
-            description: `توزيع لـ ${app.distributions.beneficiaries_count} مستفيد`
+            description: `توزيع لـ ${app.distributions.beneficiaries_count} مستفيد`,
           });
         }
       });
@@ -336,7 +384,7 @@ export class ApprovalService {
             amount: app.beneficiary_requests.amount,
             date: new Date(app.created_at),
             priority: app.beneficiary_requests.priority === 'عاجلة' ? 'high' : 'medium',
-            description: `من ${app.beneficiary_requests.beneficiaries.full_name}`
+            description: `من ${app.beneficiary_requests.beneficiaries.full_name}`,
           });
         }
       });
@@ -351,7 +399,7 @@ export class ApprovalService {
             title: `قيد ${app.journal_entries.entry_number}`,
             date: new Date(app.created_at),
             priority: 'medium',
-            description: app.journal_entries.description
+            description: app.journal_entries.description,
           });
         }
       });
@@ -371,11 +419,11 @@ export class ApprovalService {
   // ==================== موافقات الطلبات الخاصة ====================
   static async getRequestApprovalsByRequestId(requestId: string): Promise<RequestApproval[]> {
     const { data, error } = await supabase
-      .from("request_approvals")
-      .select("*")
-      .eq("request_id", requestId)
-      .order("level", { ascending: true });
-    
+      .from('request_approvals')
+      .select('*')
+      .eq('request_id', requestId)
+      .order('level', { ascending: true });
+
     if (error) throw error;
     return (data || []) as RequestApproval[];
   }
@@ -391,15 +439,15 @@ export class ApprovalService {
   }): Promise<RequestApproval> {
     // التحقق من وجود موافقة سابقة
     const { data: existing } = await supabase
-      .from("request_approvals")
-      .select("id")
-      .eq("request_id", approval.request_id)
-      .eq("level", approval.level)
+      .from('request_approvals')
+      .select('id')
+      .eq('request_id', approval.request_id)
+      .eq('level', approval.level)
       .maybeSingle();
 
     if (existing?.id) {
       const { data, error } = await supabase
-        .from("request_approvals")
+        .from('request_approvals')
         .update({
           status: approval.status,
           notes: approval.notes,
@@ -407,33 +455,36 @@ export class ApprovalService {
           approver_id: approval.approver_id,
           approver_name: approval.approver_name,
         })
-        .eq("id", existing.id)
+        .eq('id', existing.id)
         .select()
         .maybeSingle();
       if (error) throw error;
-      if (!data) throw new Error("الموافقة غير موجودة");
+      if (!data) throw new Error('الموافقة غير موجودة');
       return data as RequestApproval;
     }
 
     const { data, error } = await supabase
-      .from("request_approvals")
+      .from('request_approvals')
       .insert([approval])
       .select()
       .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء الموافقة");
+    if (!data) throw new Error('فشل في إنشاء الموافقة');
     return data as RequestApproval;
   }
 
-  static async updateRequestApproval(id: string, updates: Partial<RequestApproval>): Promise<RequestApproval> {
+  static async updateRequestApproval(
+    id: string,
+    updates: Partial<RequestApproval>
+  ): Promise<RequestApproval> {
     const { data, error } = await supabase
-      .from("request_approvals")
+      .from('request_approvals')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error("الموافقة غير موجودة");
+    if (!data) throw new Error('الموافقة غير موجودة');
     return data as RequestApproval;
   }
 
@@ -442,9 +493,9 @@ export class ApprovalService {
    */
   static async getUserRole(userId: string): Promise<string | null> {
     const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
       .maybeSingle();
 
     if (error) throw error;
@@ -455,7 +506,9 @@ export class ApprovalService {
   static async getAllWorkflows() {
     const { data, error } = await supabase
       .from('approval_workflows')
-      .select('id, workflow_name, entity_type, approval_levels, conditions, is_active, created_at, created_by, updated_at')
+      .select(
+        'id, workflow_name, entity_type, approval_levels, conditions, is_active, created_at, created_by, updated_at'
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -508,10 +561,8 @@ export class ApprovalService {
     performed_by_name: string;
     notes?: string;
   }): Promise<void> {
-    const { error } = await supabase
-      .from('approval_history')
-      .insert(data);
-    
+    const { error } = await supabase.from('approval_history').insert(data);
+
     if (error) throw error;
   }
 
@@ -538,16 +589,14 @@ export class ApprovalService {
     if (statusError) throw statusError;
     if (!statusData) throw new Error('فشل إنشاء حالة الموافقة');
 
-    const steps = params.approvalLevels.map(level => ({
+    const steps = params.approvalLevels.map((level) => ({
       approval_status_id: statusData.id,
       level: level.level,
       approver_role: level.role,
       action: 'pending',
     }));
 
-    const { error: stepsError } = await supabase
-      .from('approval_steps')
-      .insert(steps);
+    const { error: stepsError } = await supabase.from('approval_steps').insert(steps);
 
     if (stepsError) throw stepsError;
 
@@ -625,9 +674,11 @@ export class ApprovalService {
   static async getSimpleApprovals() {
     const { data, error } = await supabase
       .from('approvals')
-      .select('id, journal_entry_id, approver_name, status, notes, approved_at, created_at, updated_at')
+      .select(
+        'id, journal_entry_id, approver_name, status, notes, approved_at, created_at, updated_at'
+      )
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -638,13 +689,11 @@ export class ApprovalService {
     status: 'approved' | 'rejected';
     notes?: string;
   }) {
-    const { error } = await supabase
-      .from('approvals')
-      .insert({
-        ...approvalData,
-        approved_at: new Date().toISOString(),
-      });
-    
+    const { error } = await supabase.from('approvals').insert({
+      ...approvalData,
+      approved_at: new Date().toISOString(),
+    });
+
     if (error) throw error;
   }
 }

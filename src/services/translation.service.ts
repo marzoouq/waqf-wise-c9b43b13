@@ -17,9 +17,7 @@ export const TranslationService = {
    * جلب جميع الترجمات
    */
   async fetchAll(): Promise<Translation[]> {
-    const { data, error } = await supabase
-      .from('translations')
-      .select('key, ar, en, fr');
+    const { data, error } = await supabase.from('translations').select('key, ar, en, fr');
 
     if (error) throw error;
     return data || [];
@@ -50,7 +48,7 @@ export const TranslationService = {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("فشل في إنشاء الترجمة");
+    if (!data) throw new Error('فشل في إنشاء الترجمة');
     return data;
   },
 
@@ -66,7 +64,7 @@ export const TranslationService = {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) throw new Error("الترجمة غير موجودة");
+    if (!data) throw new Error('الترجمة غير موجودة');
     return data;
   },
 
@@ -75,8 +73,10 @@ export const TranslationService = {
    * ⚠️ الحذف الفيزيائي ممنوع
    */
   async delete(key: string, reason: string = 'تم الإلغاء'): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('translations')
       .update({

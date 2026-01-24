@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react';
-import { DistributionEngine, DistributionParams, DistributionResult, DistributionSummary } from '@/lib/distribution-engine';
+import {
+  DistributionEngine,
+  DistributionParams,
+  DistributionResult,
+  DistributionSummary,
+} from '@/lib/distribution-engine';
 import { useToast } from '@/hooks/ui/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 
@@ -23,7 +28,7 @@ export function useDistributionEngine() {
       setIsCalculating(true);
       try {
         const result = DistributionEngine.calculate(params);
-        
+
         const simulation: SimulationResult = {
           results: result.results,
           summary: result.summary,
@@ -67,7 +72,7 @@ export function useDistributionEngine() {
         for (const pattern of patterns) {
           const params = { ...baseParams, pattern };
           const result = DistributionEngine.calculate(params);
-          
+
           results.push({
             results: result.results,
             summary: result.summary,
@@ -112,7 +117,7 @@ export function useDistributionEngine() {
   const getRecommendation = useCallback(
     (beneficiaries: DistributionParams['beneficiaries']): DistributionParams['pattern'] => {
       // إذا كان هناك أنواع مستفيدين واضحة (ولد/بنت/زوجة)
-      const hasShariahTypes = beneficiaries.some(b => {
+      const hasShariahTypes = beneficiaries.some((b) => {
         const type = b.beneficiary_type?.toLowerCase() || '';
         return type.includes('ولد') || type.includes('بنت') || type.includes('زوجة');
       });
@@ -122,8 +127,8 @@ export function useDistributionEngine() {
       }
 
       // إذا كان هناك تباين كبير في الدخل أو حجم الأسرة
-      const hasIncomeData = beneficiaries.some(b => b.monthly_income && b.monthly_income > 0);
-      const hasFamilySizeData = beneficiaries.some(b => (b.family_size || 0) > 1);
+      const hasIncomeData = beneficiaries.some((b) => b.monthly_income && b.monthly_income > 0);
+      const hasFamilySizeData = beneficiaries.some((b) => (b.family_size || 0) > 1);
 
       if (hasIncomeData || hasFamilySizeData) {
         return 'need_based';

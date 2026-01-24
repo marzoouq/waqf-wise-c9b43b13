@@ -3,9 +3,9 @@
  * @version 2.8.45 - مع تصدير في index.ts
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { SystemService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { SystemService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface SystemHealthStats {
   totalErrors: number;

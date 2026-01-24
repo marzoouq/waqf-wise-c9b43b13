@@ -1,13 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { AuthService } from "@/services/auth.service";
-import { useAuth } from "@/contexts/AuthContext";
-import { usePushNotifications } from "@/hooks/notifications/usePushNotifications";
+import { useState, useEffect, useCallback } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import {
+  Bell,
+  Mail,
+  MessageSquare,
+  Smartphone,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+} from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { AuthService } from '@/services/auth.service';
+import { useAuth } from '@/contexts/AuthContext';
+import { usePushNotifications } from '@/hooks/notifications/usePushNotifications';
 
 interface NotificationChannel {
   id: string;
@@ -21,14 +29,14 @@ interface NotificationChannel {
 export function MultiChannelNotifications() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const { 
-    isSupported: isPushSupported, 
-    permission: pushPermission, 
+  const {
+    isSupported: isPushSupported,
+    permission: pushPermission,
     isSubscribed: isPushSubscribed,
     isLoading: isPushLoading,
     requestPermission,
     subscribe: subscribePush,
-    unsubscribe: unsubscribePush
+    unsubscribe: unsubscribePush,
   } = usePushNotifications();
 
   const getPushStatus = useCallback((): 'active' | 'pending' | 'disabled' | 'denied' => {
@@ -45,7 +53,7 @@ export function MultiChannelNotifications() {
       icon: <Bell className="h-5 w-5" />,
       enabled: true,
       description: 'إشعارات فورية داخل النظام',
-      status: 'active'
+      status: 'active',
     },
     {
       id: 'email',
@@ -53,7 +61,7 @@ export function MultiChannelNotifications() {
       icon: <Mail className="h-5 w-5" />,
       enabled: false,
       description: 'إرسال إشعارات عبر البريد الإلكتروني',
-      status: 'pending'
+      status: 'pending',
     },
     {
       id: 'sms',
@@ -61,36 +69,36 @@ export function MultiChannelNotifications() {
       icon: <MessageSquare className="h-5 w-5" />,
       enabled: false,
       description: 'إرسال إشعارات عبر الرسائل القصيرة',
-      status: 'pending'
+      status: 'pending',
     },
     {
       id: 'push',
       name: 'الإشعارات الفورية (Push)',
       icon: <Smartphone className="h-5 w-5" />,
       enabled: isPushSubscribed,
-      description: !isPushSupported 
+      description: !isPushSupported
         ? 'المتصفح لا يدعم الإشعارات الفورية'
         : pushPermission === 'denied'
-        ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
-        : 'إشعارات فورية على هذا الجهاز',
-      status: getPushStatus()
-    }
+          ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
+          : 'إشعارات فورية على هذا الجهاز',
+      status: getPushStatus(),
+    },
   ]);
 
   // تحديث حالة Push عند تغيرها
   useEffect(() => {
-    setChannels(prev => 
-      prev.map(c => 
-        c.id === 'push' 
-          ? { 
-              ...c, 
+    setChannels((prev) =>
+      prev.map((c) =>
+        c.id === 'push'
+          ? {
+              ...c,
               enabled: isPushSubscribed,
               status: getPushStatus(),
-              description: !isPushSupported 
+              description: !isPushSupported
                 ? 'المتصفح لا يدعم الإشعارات الفورية'
                 : pushPermission === 'denied'
-                ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
-                : 'إشعارات فورية على هذا الجهاز'
+                  ? 'تم رفض الإذن - قم بتفعيله من إعدادات المتصفح'
+                  : 'إشعارات فورية على هذا الجهاز',
             }
           : c
       )
@@ -98,26 +106,26 @@ export function MultiChannelNotifications() {
   }, [getPushStatus, isPushSupported, isPushSubscribed, pushPermission]);
 
   const toggleChannel = async (channelId: string) => {
-    const channel = channels.find(c => c.id === channelId);
-    
+    const channel = channels.find((c) => c.id === channelId);
+
     if (!channel) return;
 
     // معالجة خاصة لـ Push Notifications
     if (channelId === 'push') {
       if (!isPushSupported) {
         toast({
-          title: "غير مدعوم",
-          description: "المتصفح الحالي لا يدعم الإشعارات الفورية",
-          variant: "destructive"
+          title: 'غير مدعوم',
+          description: 'المتصفح الحالي لا يدعم الإشعارات الفورية',
+          variant: 'destructive',
         });
         return;
       }
 
       if (pushPermission === 'denied') {
         toast({
-          title: "الإذن مرفوض",
-          description: "يرجى السماح بالإشعارات من إعدادات المتصفح ثم تحديث الصفحة",
-          variant: "destructive"
+          title: 'الإذن مرفوض',
+          description: 'يرجى السماح بالإشعارات من إعدادات المتصفح ثم تحديث الصفحة',
+          variant: 'destructive',
         });
         return;
       }
@@ -140,19 +148,15 @@ export function MultiChannelNotifications() {
     // القنوات الأخرى (email, sms) - قريباً
     if (!channel.enabled && channel.status === 'pending') {
       toast({
-        title: "قريباً",
+        title: 'قريباً',
         description: `قناة ${channel.name} ستكون متاحة قريباً`,
-        variant: "default"
+        variant: 'default',
       });
       return;
     }
 
-    setChannels(prev => 
-      prev.map(c => 
-        c.id === channelId 
-          ? { ...c, enabled: !c.enabled }
-          : c
-      )
+    setChannels((prev) =>
+      prev.map((c) => (c.id === channelId ? { ...c, enabled: !c.enabled } : c))
     );
 
     // حفظ الإعدادات
@@ -164,16 +168,16 @@ export function MultiChannelNotifications() {
         });
 
         toast({
-          title: "تم الحفظ",
+          title: 'تم الحفظ',
           description: `تم ${!channel.enabled ? 'تفعيل' : 'إيقاف'} ${channel.name}`,
         });
       }
     } catch (error) {
       productionLogger.error('Error updating notification preferences:', error);
       toast({
-        title: "خطأ",
-        description: "فشل حفظ الإعدادات",
-        variant: "destructive"
+        title: 'خطأ',
+        description: 'فشل حفظ الإعدادات',
+        variant: 'destructive',
       });
     }
   };
@@ -198,17 +202,16 @@ export function MultiChannelNotifications() {
         );
       case 'denied':
         return (
-          <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
+          <Badge
+            variant="destructive"
+            className="bg-destructive/10 text-destructive border-destructive/20"
+          >
             <XCircle className="h-3 w-3 ms-1" />
             مرفوض
           </Badge>
         );
       case 'disabled':
-        return (
-          <Badge variant="secondary">
-            غير مدعوم
-          </Badge>
-        );
+        return <Badge variant="secondary">غير مدعوم</Badge>;
       case 'pending':
         // التفريق بين Push (جاهز للتفعيل) والقنوات الأخرى (قريباً)
         if (channel.id === 'push') {
@@ -226,11 +229,7 @@ export function MultiChannelNotifications() {
           </Badge>
         );
       default:
-        return (
-          <Badge variant="secondary">
-            معطّل
-          </Badge>
-        );
+        return <Badge variant="secondary">معطّل</Badge>;
     }
   };
 
@@ -239,28 +238,22 @@ export function MultiChannelNotifications() {
       <Card>
         <CardHeader>
           <CardTitle>قنوات الإشعارات</CardTitle>
-          <CardDescription>
-            إدارة قنوات إرسال الإشعارات المختلفة
-          </CardDescription>
+          <CardDescription>إدارة قنوات إرسال الإشعارات المختلفة</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {channels.map((channel) => (
-            <div 
+            <div
               key={channel.id}
               className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
             >
               <div className="flex items-center gap-4 flex-1">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  {channel.icon}
-                </div>
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">{channel.icon}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium">{channel.name}</h4>
                     {getStatusBadge(channel)}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {channel.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{channel.description}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -268,7 +261,7 @@ export function MultiChannelNotifications() {
                   checked={channel.enabled}
                   onCheckedChange={() => toggleChannel(channel.id)}
                   disabled={
-                    channel.status === 'disabled' || 
+                    channel.status === 'disabled' ||
                     (channel.id === 'push' && (isPushLoading || pushPermission === 'denied'))
                   }
                 />
@@ -297,7 +290,8 @@ export function MultiChannelNotifications() {
           </p>
           {pushPermission === 'denied' && (
             <p className="text-destructive">
-              • <strong>تنبيه:</strong> تم رفض إذن الإشعارات. لتفعيلها، اذهب لإعدادات المتصفح → الإشعارات → السماح لهذا الموقع
+              • <strong>تنبيه:</strong> تم رفض إذن الإشعارات. لتفعيلها، اذهب لإعدادات المتصفح →
+              الإشعارات → السماح لهذا الموقع
             </p>
           )}
         </CardContent>

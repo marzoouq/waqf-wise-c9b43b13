@@ -3,9 +3,9 @@
  * يجلب تفاصيل قرار حوكمي محدد
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { GovernanceService } from "@/services/governance.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { GovernanceService } from '@/services/governance.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useGovernanceDecisionDetails(decisionId: string | undefined) {
   const {

@@ -5,30 +5,30 @@
  * - دعم رفع وحذف ومعاينة وتحميل المرفقات
  */
 
-import { useState } from "react";
-import { useRequestAttachments } from "@/hooks/requests/useRequestAttachments";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Paperclip, 
-  Upload, 
-  Trash2, 
-  FileText, 
-  Download, 
+import { useState } from 'react';
+import { useRequestAttachments } from '@/hooks/requests/useRequestAttachments';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Paperclip,
+  Upload,
+  Trash2,
+  FileText,
+  Download,
   Eye,
   File,
   Image,
   FileSpreadsheet,
-  Loader2
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { formatBytes } from "@/lib/utils";
-import { useDeleteConfirmation } from "@/hooks/shared/useDeleteConfirmation";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { toast } from "sonner";
+  Loader2,
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { formatBytes } from '@/lib/utils';
+import { useDeleteConfirmation } from '@/hooks/shared/useDeleteConfirmation';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { toast } from 'sonner';
 
 interface RequestAttachmentsUploaderProps {
   requestId: string;
@@ -45,9 +45,9 @@ const FILE_TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const getFileIcon = (fileType: string) => {
-  if (fileType.includes("pdf")) return FILE_TYPE_ICONS.pdf;
-  if (fileType.includes("image")) return FILE_TYPE_ICONS.image;
-  if (fileType.includes("word") || fileType.includes("document")) return FILE_TYPE_ICONS.document;
+  if (fileType.includes('pdf')) return FILE_TYPE_ICONS.pdf;
+  if (fileType.includes('image')) return FILE_TYPE_ICONS.image;
+  if (fileType.includes('word') || fileType.includes('document')) return FILE_TYPE_ICONS.document;
   return FILE_TYPE_ICONS.default;
 };
 
@@ -57,9 +57,9 @@ export function RequestAttachmentsUploader({
   inline = false,
 }: RequestAttachmentsUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
-  
+
   const { attachments, isLoading, uploadAttachment, deleteAttachment, isUploading } =
     useRequestAttachments(requestId);
 
@@ -72,10 +72,10 @@ export function RequestAttachmentsUploader({
     itemName,
   } = useDeleteConfirmation({
     onDelete: deleteAttachment,
-    successMessage: "تم حذف المرفق بنجاح",
-    errorMessage: "حدث خطأ أثناء حذف المرفق",
-    title: "حذف المرفق",
-    description: "هل أنت متأكد من حذف هذا المرفق؟",
+    successMessage: 'تم حذف المرفق بنجاح',
+    errorMessage: 'حدث خطأ أثناء حذف المرفق',
+    title: 'حذف المرفق',
+    description: 'هل أنت متأكد من حذف هذا المرفق؟',
   });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,19 +101,19 @@ export function RequestAttachmentsUploader({
         description: description || undefined,
       });
       setSelectedFile(null);
-      setDescription("");
-      toast.success("تم رفع المرفق بنجاح");
+      setDescription('');
+      toast.success('تم رفع المرفق بنجاح');
     } catch {
-      toast.error("حدث خطأ أثناء رفع المرفق");
+      toast.error('حدث خطأ أثناء رفع المرفق');
     }
   };
 
   const handlePreview = (filePath: string) => {
-    window.open(filePath, "_blank");
+    window.open(filePath, '_blank');
   };
 
   const handleDownload = (filePath: string, fileName: string) => {
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = filePath;
     link.download = fileName;
     link.click();
@@ -129,19 +129,20 @@ export function RequestAttachmentsUploader({
             <Upload className="h-5 w-5" />
             رفع مرفق جديد
           </CardTitle>
-          <CardDescription>
-            الملفات المدعومة: PDF, Word, صور (حد أقصى 10 ميغابايت)
-          </CardDescription>
+          <CardDescription>الملفات المدعومة: PDF, Word, صور (حد أقصى 10 ميغابايت)</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* منطقة السحب والإفلات */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-              isDragOver 
-                ? 'border-primary bg-primary/5' 
+              isDragOver
+                ? 'border-primary bg-primary/5'
                 : 'border-muted-foreground/25 hover:border-primary/50'
             }`}
-            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragOver(true);
+            }}
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
@@ -150,9 +151,7 @@ export function RequestAttachmentsUploader({
                 {getFileIcon(selectedFile.type)}
                 <div className="text-start">
                   <p className="font-medium text-sm">{selectedFile.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatBytes(selectedFile.size)}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{formatBytes(selectedFile.size)}</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -166,9 +165,7 @@ export function RequestAttachmentsUploader({
             ) : (
               <div>
                 <Paperclip className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground mb-2">
-                  اسحب الملف هنا أو
-                </p>
+                <p className="text-sm text-muted-foreground mb-2">اسحب الملف هنا أو</p>
                 <Label htmlFor="file-upload" className="cursor-pointer">
                   <Button variant="outline" size="sm" asChild>
                     <span>اختر ملف</span>
@@ -200,11 +197,7 @@ export function RequestAttachmentsUploader({
 
           {/* زر الرفع */}
           {selectedFile && (
-            <Button
-              onClick={handleUpload}
-              disabled={isUploading}
-              className="w-full"
-            >
+            <Button onClick={handleUpload} disabled={isUploading} className="w-full">
               {isUploading ? (
                 <>
                   <Loader2 className="h-4 w-4 ms-2 animate-spin" />
@@ -241,9 +234,7 @@ export function RequestAttachmentsUploader({
             <div className="text-center py-8 border rounded-lg bg-muted/20">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
               <p className="text-muted-foreground text-sm">لا توجد مرفقات</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                ارفع المستندات الداعمة لطلبك
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">ارفع المستندات الداعمة لطلبك</p>
             </div>
           ) : (
             <ScrollArea className="max-h-[300px]">
@@ -256,21 +247,19 @@ export function RequestAttachmentsUploader({
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {getFileIcon(attachment.file_type)}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {attachment.file_name}
-                        </p>
+                        <p className="font-medium text-sm truncate">{attachment.file_name}</p>
                         {attachment.description && (
                           <p className="text-xs text-muted-foreground truncate">
                             {attachment.description}
                           </p>
                         )}
                         <p className="text-xs text-muted-foreground">
-                          {formatBytes(attachment.file_size)} •{" "}
-                          {new Date(attachment.uploaded_at).toLocaleDateString("ar-SA")}
+                          {formatBytes(attachment.file_size)} •{' '}
+                          {new Date(attachment.uploaded_at).toLocaleDateString('ar-SA')}
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"

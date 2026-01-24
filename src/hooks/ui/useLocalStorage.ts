@@ -11,7 +11,7 @@ function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T
   }
 
   const trimmed = value.trim();
-  
+
   // إذا كانت القيمة فارغة
   if (!trimmed) {
     return defaultValue;
@@ -23,14 +23,13 @@ function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T
   } catch {
     // إذا فشل التحليل، تحقق إن كانت قيمة نصية بسيطة صالحة
     // مثل: ar, en, true, false, أرقام
-    const isSimpleValue = /^[a-zA-Z0-9_-]+$/.test(trimmed) || 
-                          /^-?\d+(\.\d+)?$/.test(trimmed);
-    
+    const isSimpleValue = /^[a-zA-Z0-9_-]+$/.test(trimmed) || /^-?\d+(\.\d+)?$/.test(trimmed);
+
     if (isSimpleValue) {
       // قيمة بسيطة صالحة - إرجاعها بدون تحذير
       return trimmed as unknown as T;
     }
-    
+
     // قيمة غير صالحة - تسجيل تحذير ومسح
     productionLogger.warn(`[useLocalStorage] Invalid value for key "${key}", resetting`);
     try {
@@ -45,7 +44,7 @@ function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T
 /**
  * Hook لتخزين البيانات في LocalStorage
  * مع مزامنة تلقائية بين التبويبات
- * 
+ *
  * @example
  * const [theme, setTheme] = useLocalStorage('theme', 'light');
  */
@@ -62,7 +61,7 @@ export function useLocalStorage<T>(
     try {
       const item = window.localStorage.getItem(key);
       if (!item) return initialValue;
-      
+
       return safeParseJson<T>(item, initialValue, key);
     } catch (error) {
       productionLogger.warn(`Error reading localStorage key "${key}"`, error);
@@ -86,7 +85,7 @@ export function useLocalStorage<T>(
         const newValue = value instanceof Function ? value(storedValue) : value;
         window.localStorage.setItem(key, JSON.stringify(newValue));
         setStoredValue(newValue);
-        
+
         // إرسال حدث لمزامنة التبويبات الأخرى
         window.dispatchEvent(new Event('local-storage'));
       } catch (error) {

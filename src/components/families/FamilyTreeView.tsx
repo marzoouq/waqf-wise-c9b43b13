@@ -6,9 +6,22 @@ import { Users, Trash2, User, UserPlus } from 'lucide-react';
 import { useFamilyMembers } from '@/hooks/beneficiary/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useDeleteConfirmation } from '@/hooks/shared';
@@ -52,7 +65,8 @@ interface MemberFormData {
  * يعرض أفراد العائلة بشكل هرمي
  */
 export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
-  const { members, isLoading, addMember, removeMember, error, refetch } = useFamilyMembers(familyId);
+  const { members, isLoading, addMember, removeMember, error, refetch } =
+    useFamilyMembers(familyId);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [formData, setFormData] = useState<MemberFormData>({
     beneficiary_id: '',
@@ -96,7 +110,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
         priority_level: formData.priority_level,
         is_active: true,
       });
-      
+
       toast.success('تم إضافة الفرد بنجاح');
       setIsAddDialogOpen(false);
       setFormData({
@@ -120,19 +134,20 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل أفراد العائلة" message={error.message} onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في تحميل أفراد العائلة" message={error.message} onRetry={refetch} />
+    );
   }
 
-  // تصنيف الأفراد حسب العلاقة  
+  // تصنيف الأفراد حسب العلاقة
   const membersTyped = members as unknown as MemberWithBeneficiary[];
-  const head = membersTyped.find(m => m.beneficiary?.is_head_of_family);
-  const sons = membersTyped.filter(m => m.relationship_to_head === 'ابن');
-  const daughters = membersTyped.filter(m => m.relationship_to_head === 'بنت');
-  const wives = membersTyped.filter(m => m.relationship_to_head === 'زوجة');
+  const head = membersTyped.find((m) => m.beneficiary?.is_head_of_family);
+  const sons = membersTyped.filter((m) => m.relationship_to_head === 'ابن');
+  const daughters = membersTyped.filter((m) => m.relationship_to_head === 'بنت');
+  const wives = membersTyped.filter((m) => m.relationship_to_head === 'زوجة');
   const others = membersTyped.filter(
-    m =>
-      !['ابن', 'بنت', 'زوجة'].includes(m.relationship_to_head) &&
-      !m.beneficiary?.is_head_of_family
+    (m) =>
+      !['ابن', 'بنت', 'زوجة'].includes(m.relationship_to_head) && !m.beneficiary?.is_head_of_family
   );
 
   return (
@@ -144,9 +159,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
             <Users className="h-6 w-6" />
             شجرة عائلة {familyName}
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            إجمالي الأفراد: {members.length}
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">إجمالي الأفراد: {members.length}</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -158,9 +171,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>إضافة فرد للعائلة</DialogTitle>
-              <DialogDescription>
-                اختر مستفيد وحدد علاقته برب الأسرة
-              </DialogDescription>
+              <DialogDescription>اختر مستفيد وحدد علاقته برب الأسرة</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -266,20 +277,14 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
                 >
                   <div>
                     <p className="font-medium">{wife.beneficiary?.full_name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {wife.beneficiary?.national_id}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{wife.beneficiary?.national_id}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      أولوية {wife.priority_level}
-                    </Badge>
+                    <Badge variant="secondary">أولوية {wife.priority_level}</Badge>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        handleRemoveMember(wife.id, wife.beneficiary?.full_name || '')
-                      }
+                      onClick={() => handleRemoveMember(wife.id, wife.beneficiary?.full_name || '')}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -309,20 +314,14 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
                 >
                   <div>
                     <p className="font-medium">{son.beneficiary?.full_name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {son.beneficiary?.national_id}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{son.beneficiary?.national_id}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      أولوية {son.priority_level}
-                    </Badge>
+                    <Badge variant="secondary">أولوية {son.priority_level}</Badge>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        handleRemoveMember(son.id, son.beneficiary?.full_name || '')
-                      }
+                      onClick={() => handleRemoveMember(son.id, son.beneficiary?.full_name || '')}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -357,9 +356,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      أولوية {daughter.priority_level}
-                    </Badge>
+                    <Badge variant="secondary">أولوية {daughter.priority_level}</Badge>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -400,9 +397,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      أولوية {other.priority_level}
-                    </Badge>
+                    <Badge variant="secondary">أولوية {other.priority_level}</Badge>
                     <Button
                       variant="ghost"
                       size="sm"

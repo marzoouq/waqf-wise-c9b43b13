@@ -26,23 +26,17 @@ export function LazyLoadWrapper({
   const { ref, shouldLoad } = useLazyLoad();
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{ minHeight: shouldLoad ? 'auto' : height }}
-    >
-      {shouldLoad ? (
-        children
-      ) : (
-        placeholder || (
-          <div 
-            className="flex items-center justify-center bg-muted/20 rounded-lg animate-pulse"
-            style={{ height }}
-          >
-            <span className="text-muted-foreground text-sm">جاري التحميل...</span>
-          </div>
-        )
-      )}
+    <div ref={ref} className={className} style={{ minHeight: shouldLoad ? 'auto' : height }}>
+      {shouldLoad
+        ? children
+        : placeholder || (
+            <div
+              className="flex items-center justify-center bg-muted/20 rounded-lg animate-pulse"
+              style={{ height }}
+            >
+              <span className="text-muted-foreground text-sm">جاري التحميل...</span>
+            </div>
+          )}
     </div>
   );
 }

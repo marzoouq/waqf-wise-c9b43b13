@@ -1,12 +1,23 @@
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { FileText, Download, CheckCircle, XCircle, Clock, User, Calendar, DollarSign, Building2, LucideIcon } from "lucide-react";
-import { format, arLocale as ar } from "@/lib/date";
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import {
+  FileText,
+  Download,
+  CheckCircle,
+  XCircle,
+  Clock,
+  User,
+  Calendar,
+  DollarSign,
+  Building2,
+  LucideIcon,
+} from 'lucide-react';
+import { format, arLocale as ar } from '@/lib/date';
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 interface VoucherBeneficiary {
   full_name: string;
@@ -40,29 +51,38 @@ interface VoucherDetailsDialogProps {
   voucher: Voucher | null;
 }
 
-export function VoucherDetailsDialog({
-  open,
-  onOpenChange,
-  voucher,
-}: VoucherDetailsDialogProps) {
+export function VoucherDetailsDialog({ open, onOpenChange, voucher }: VoucherDetailsDialogProps) {
   if (!voucher) return null;
 
   const getStatusConfig = (status: string) => {
-    const configs: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }> = {
-      draft: { label: "مسودة", variant: "secondary", icon: Clock },
-      approved: { label: "معتمد", variant: "default", icon: CheckCircle, className: "bg-info text-info-foreground" },
-      paid: { label: "مدفوع", variant: "default", icon: CheckCircle, className: "bg-success text-success-foreground" },
-      cancelled: { label: "ملغي", variant: "outline", icon: XCircle },
-      rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
+    const configs: Record<
+      string,
+      { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }
+    > = {
+      draft: { label: 'مسودة', variant: 'secondary', icon: Clock },
+      approved: {
+        label: 'معتمد',
+        variant: 'default',
+        icon: CheckCircle,
+        className: 'bg-info text-info-foreground',
+      },
+      paid: {
+        label: 'مدفوع',
+        variant: 'default',
+        icon: CheckCircle,
+        className: 'bg-success text-success-foreground',
+      },
+      cancelled: { label: 'ملغي', variant: 'outline', icon: XCircle },
+      rejected: { label: 'مرفوض', variant: 'destructive', icon: XCircle },
     };
     return configs[status] || configs.draft;
   };
 
   const getVoucherTypeLabel = (type: string) => {
     const types: Record<string, string> = {
-      payment: "سند صرف",
-      receipt: "سند قبض",
-      journal: "قيد يومية",
+      payment: 'سند صرف',
+      receipt: 'سند قبض',
+      journal: 'قيد يومية',
     };
     return types[type] || type;
   };
@@ -98,7 +118,10 @@ export function VoucherDetailsDialog({
                   </p>
                 </div>
               </div>
-              <Badge variant={config.variant} className={`${config.className || ""} text-base px-4 py-2`}>
+              <Badge
+                variant={config.variant}
+                className={`${config.className || ''} text-base px-4 py-2`}
+              >
                 <StatusIcon className="ms-1 h-4 w-4" />
                 {config.label}
               </Badge>
@@ -123,7 +146,7 @@ export function VoucherDetailsDialog({
                   <span>تاريخ الإنشاء</span>
                 </div>
                 <p className="text-lg font-medium">
-                  {format(new Date(voucher.created_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
+                  {format(new Date(voucher.created_at), 'dd MMMM yyyy - HH:mm', { locale: ar })}
                 </p>
               </div>
             </div>
@@ -175,9 +198,7 @@ export function VoucherDetailsDialog({
                   </p>
                 )}
                 {voucher.bank_iban && (
-                  <p className="text-sm text-muted-foreground">
-                    IBAN: {voucher.bank_iban}
-                  </p>
+                  <p className="text-sm text-muted-foreground">IBAN: {voucher.bank_iban}</p>
                 )}
               </div>
             )}
@@ -208,7 +229,9 @@ export function VoucherDetailsDialog({
                   <p className="mt-1 text-foreground">{voucher.approved_by}</p>
                   {voucher.approved_at && (
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(voucher.approved_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
+                      {format(new Date(voucher.approved_at), 'dd MMMM yyyy - HH:mm', {
+                        locale: ar,
+                      })}
                     </p>
                   )}
                 </div>
@@ -220,7 +243,7 @@ export function VoucherDetailsDialog({
                   <p className="mt-1 text-foreground">{voucher.paid_by}</p>
                   {voucher.paid_at && (
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(voucher.paid_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
+                      {format(new Date(voucher.paid_at), 'dd MMMM yyyy - HH:mm', { locale: ar })}
                     </p>
                   )}
                 </div>

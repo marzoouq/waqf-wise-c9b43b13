@@ -1,19 +1,21 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
-import { useToast } from "@/hooks/ui/use-toast";
-import { z } from "zod";
-import { BeneficiaryService } from "@/services/beneficiary.service";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/hooks/ui/use-toast';
+import { z } from 'zod';
+import { BeneficiaryService } from '@/services/beneficiary.service';
 
 const importSchema = z.object({
-  full_name: z.string().min(3, "الاسم قصير جداً"),
-  national_id: z.string().regex(/^\d{10}$/, "الهوية يجب أن تكون 10 أرقام"),
-  phone: z.string().min(10, "رقم الجوال غير صحيح"),
-  gender: z.enum(["ذكر", "أنثى"], { errorMap: () => ({ message: "الجنس يجب أن يكون ذكر أو أنثى" }) }),
-  relationship: z.string().min(2, "صلة القرابة مطلوبة"),
-  category: z.string().default("الدرجة الأولى"),
-  nationality: z.string().default("سعودي"),
+  full_name: z.string().min(3, 'الاسم قصير جداً'),
+  national_id: z.string().regex(/^\d{10}$/, 'الهوية يجب أن تكون 10 أرقام'),
+  phone: z.string().min(10, 'رقم الجوال غير صحيح'),
+  gender: z.enum(['ذكر', 'أنثى'], {
+    errorMap: () => ({ message: 'الجنس يجب أن يكون ذكر أو أنثى' }),
+  }),
+  relationship: z.string().min(2, 'صلة القرابة مطلوبة'),
+  category: z.string().default('الدرجة الأولى'),
+  nationality: z.string().default('سعودي'),
 });
 
 type ImportRow = z.infer<typeof importSchema>;
@@ -37,8 +39,8 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
     reader.onload = async (e) => {
       try {
         // Dynamic import for excel-helper
-        const { readExcelBuffer } = await import("@/lib/excel-helper");
-        
+        const { readExcelBuffer } = await import('@/lib/excel-helper');
+
         const jsonData = await readExcelBuffer(e.target?.result as ArrayBuffer);
 
         const errors: string[] = [];
@@ -58,7 +60,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
             validData.push(validated);
           } catch (err) {
             if (err instanceof z.ZodError) {
-              errors.push(`الصف ${index + 2}: ${err.errors.map(e => e.message).join(', ')}`);
+              errors.push(`الصف ${index + 2}: ${err.errors.map((e) => e.message).join(', ')}`);
             }
           }
         });
@@ -68,23 +70,23 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
 
         if (validData.length > 0) {
           toast({
-            title: "تم تحليل الملف بنجاح",
+            title: 'تم تحليل الملف بنجاح',
             description: `تم التحقق من ${validData.length} سجل`,
           });
         }
 
         if (errors.length > 0) {
           toast({
-            title: "تحذير",
+            title: 'تحذير',
             description: `وجدت ${errors.length} خطأ في البيانات`,
-            variant: "destructive",
+            variant: 'destructive',
           });
         }
       } catch {
         toast({
-          title: "خطأ في قراءة الملف",
-          description: "تأكد من صحة تنسيق ملف Excel",
-          variant: "destructive",
+          title: 'خطأ في قراءة الملف',
+          description: 'تأكد من صحة تنسيق ملف Excel',
+          variant: 'destructive',
         });
       }
     };
@@ -97,7 +99,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
 
     setImporting(true);
     try {
-      const records = previewData.map(row => ({
+      const records = previewData.map((row) => ({
         full_name: row.full_name!,
         national_id: row.national_id!,
         phone: row.phone!,
@@ -109,7 +111,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
       await BeneficiaryService.importBeneficiaries(records);
 
       toast({
-        title: "تم الاستيراد بنجاح",
+        title: 'تم الاستيراد بنجاح',
         description: `تم إضافة ${previewData.length} مستفيد`,
       });
 
@@ -119,9 +121,9 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
       onSuccess();
     } catch (err) {
       toast({
-        title: "خطأ في الاستيراد",
-        description: err instanceof Error ? err.message : "حدث خطأ غير متوقع",
-        variant: "destructive",
+        title: 'خطأ في الاستيراد',
+        description: err instanceof Error ? err.message : 'حدث خطأ غير متوقع',
+        variant: 'destructive',
       });
     } finally {
       setImporting(false);
@@ -146,15 +148,13 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
 
           <div className="space-y-4">
             <div>
-              <label 
-                htmlFor="file-upload" 
+              <label
+                htmlFor="file-upload"
                 className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary transition-colors"
               >
                 <div className="text-center">
                   <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    اضغط لاختيار ملف Excel
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">اضغط لاختيار ملف Excel</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     يجب أن يحتوي على: الاسم الكامل، رقم الهوية، رقم الجوال، الجنس، صلة القرابة
                   </p>
@@ -234,11 +234,8 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
               <Button variant="outline" onClick={() => setOpen(false)}>
                 إلغاء
               </Button>
-              <Button 
-                onClick={handleImport} 
-                disabled={previewData.length === 0 || importing}
-              >
-                {importing ? "جاري الاستيراد..." : `استيراد ${previewData.length} سجل`}
+              <Button onClick={handleImport} disabled={previewData.length === 0 || importing}>
+                {importing ? 'جاري الاستيراد...' : `استيراد ${previewData.length} سجل`}
               </Button>
             </div>
           </div>

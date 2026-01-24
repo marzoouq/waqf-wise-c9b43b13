@@ -4,9 +4,9 @@
  * يستخدم FiscalYearService + RealtimeService
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { QUERY_CONFIG } from "@/infrastructure/react-query";
-import { FiscalYearService } from "@/services";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { QUERY_CONFIG } from '@/infrastructure/react-query';
+import { FiscalYearService } from '@/services';
 
 export interface ActiveFiscalYear {
   id: string;
@@ -22,8 +22,8 @@ export interface ActiveFiscalYear {
   updated_at: string;
 }
 
-export const ACTIVE_FISCAL_YEAR_QUERY_KEY = ["fiscal-year", "active"] as const;
-export const FISCAL_YEARS_QUERY_KEY = ["fiscal-years", "all"] as const;
+export const ACTIVE_FISCAL_YEAR_QUERY_KEY = ['fiscal-year', 'active'] as const;
+export const FISCAL_YEARS_QUERY_KEY = ['fiscal-years', 'all'] as const;
 
 /**
  * جلب السنة المالية النشطة مع Realtime
@@ -62,9 +62,9 @@ export function useFiscalYearsList() {
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  const closedYearsCount = query.data?.filter(fy => fy.is_closed).length || 0;
-  const publishedYearsCount = query.data?.filter(fy => fy.is_published).length || 0;
-  const activeFiscalYear = query.data?.find(fy => fy.is_active) || null;
+  const closedYearsCount = query.data?.filter((fy) => fy.is_closed).length || 0;
+  const publishedYearsCount = query.data?.filter((fy) => fy.is_published).length || 0;
+  const activeFiscalYear = query.data?.find((fy) => fy.is_active) || null;
 
   return {
     fiscalYears: query.data || [],

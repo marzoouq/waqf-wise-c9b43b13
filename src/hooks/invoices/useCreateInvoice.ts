@@ -4,13 +4,13 @@
  * @version 2.8.65
  */
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { format } from "@/lib/date";
-import { generateZATCAQRData, formatZATCACurrency } from "@/lib/zatca";
-import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
-import { InvoiceService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { format } from '@/lib/date';
+import { generateZATCAQRData, formatZATCACurrency } from '@/lib/zatca';
+import { validateZATCAInvoice, formatValidationErrors } from '@/lib/validateZATCAInvoice';
+import { InvoiceService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface InvoiceLine {
   id: string;
@@ -53,9 +53,15 @@ export function useCreateInvoice(onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({ formData, lines, nextInvoiceNumber, orgSettings, ocrImageUrl }: CreateInvoiceParams) => {
+    mutationFn: async ({
+      formData,
+      lines,
+      nextInvoiceNumber,
+      orgSettings,
+      ocrImageUrl,
+    }: CreateInvoiceParams) => {
       if (lines.length === 0) {
-        throw new Error("يجب إضافة بند واحد على الأقل");
+        throw new Error('يجب إضافة بند واحد على الأقل');
       }
 
       const subtotal = lines.reduce((sum, line) => sum + line.subtotal, 0);
@@ -66,9 +72,9 @@ export function useCreateInvoice(onSuccess?: () => void) {
       const validationResult = validateZATCAInvoice({
         invoice_number: nextInvoiceNumber,
         invoice_date: formData.invoice_date,
-        seller_vat_number: orgSettings?.vat_registration_number || "",
+        seller_vat_number: orgSettings?.vat_registration_number || '',
         customer_name: formData.customer_name,
-        lines: lines.map(line => ({
+        lines: lines.map((line) => ({
           description: line.description,
           quantity: line.quantity,
           unit_price: line.unit_price,
@@ -91,7 +97,7 @@ export function useCreateInvoice(onSuccess?: () => void) {
           const [hours, minutes] = formData.invoice_time.split(':');
           invoiceDate.setHours(parseInt(hours), parseInt(minutes));
         }
-        
+
         qrCodeData = generateZATCAQRData({
           sellerName: orgSettings.organization_name_ar,
           sellerVatNumber: orgSettings.vat_registration_number,
@@ -101,32 +107,30 @@ export function useCreateInvoice(onSuccess?: () => void) {
         });
       }
 
-      const invoice = await InvoiceService.create(
-        {
-          invoice_number: nextInvoiceNumber,
-          invoice_date: formData.invoice_date,
-          invoice_time: formData.invoice_time || format(new Date(), "HH:mm"),
-          due_date: formData.due_date || null,
-          customer_name: formData.customer_name,
-          customer_email: formData.customer_email || null,
-          customer_phone: formData.customer_phone || null,
-          customer_address: formData.customer_address || null,
-          customer_city: formData.customer_city || null,
-          customer_vat_number: formData.customer_vat_number || null,
-          customer_commercial_registration: formData.customer_commercial_registration || null,
-          subtotal,
-          tax_amount: taxAmount,
-          tax_rate: 15,
-          total_amount: totalAmount,
-          notes: formData.notes || null,
-          qr_code_data: qrCodeData,
-          status: "draft",
-          source_image_url: ocrImageUrl,
-          ocr_extracted: !!ocrImageUrl,
-          ocr_confidence_score: ocrImageUrl ? 85 : null,
-          ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
-        }
-      );
+      const invoice = await InvoiceService.create({
+        invoice_number: nextInvoiceNumber,
+        invoice_date: formData.invoice_date,
+        invoice_time: formData.invoice_time || format(new Date(), 'HH:mm'),
+        due_date: formData.due_date || null,
+        customer_name: formData.customer_name,
+        customer_email: formData.customer_email || null,
+        customer_phone: formData.customer_phone || null,
+        customer_address: formData.customer_address || null,
+        customer_city: formData.customer_city || null,
+        customer_vat_number: formData.customer_vat_number || null,
+        customer_commercial_registration: formData.customer_commercial_registration || null,
+        subtotal,
+        tax_amount: taxAmount,
+        tax_rate: 15,
+        total_amount: totalAmount,
+        notes: formData.notes || null,
+        qr_code_data: qrCodeData,
+        status: 'draft',
+        source_image_url: ocrImageUrl,
+        ocr_extracted: !!ocrImageUrl,
+        ocr_confidence_score: ocrImageUrl ? 85 : null,
+        ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
+      });
 
       // إضافة أسطر الفاتورة بعد إنشائها
       const invoiceLines = lines.map((line, index) => ({
@@ -149,7 +153,7 @@ export function useCreateInvoice(onSuccess?: () => void) {
       return invoice;
     },
     onSuccess: () => {
-      toast.success("تم إنشاء الفاتورة بنجاح");
+      toast.success('تم إنشاء الفاتورة بنجاح');
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NEXT_INVOICE_NUMBER });
       onSuccess?.();

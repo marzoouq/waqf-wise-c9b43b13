@@ -2,22 +2,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bell, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
-import { formatRelative } from "@/lib/date";
+import { formatRelative } from '@/lib/date';
 import { useAdminAlerts } from '@/hooks/system/useAdminAlerts';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { matchesStatus } from '@/lib/constants';
 
 export function AdminAlertsPanel() {
-  const { 
-    alerts, 
-    activeAlerts, 
-    isLoading, 
-    acknowledge, 
-    resolve, 
-    isAcknowledging, 
+  const {
+    alerts,
+    activeAlerts,
+    isLoading,
+    acknowledge,
+    resolve,
+    isAcknowledging,
     isResolving,
     error,
-    refetch
+    refetch,
   } = useAdminAlerts();
 
   const getSeverityIcon = (severity: string) => {
@@ -34,7 +34,7 @@ export function AdminAlertsPanel() {
   };
 
   const getSeverityBadge = (severity: string) => {
-    const variants: Record<string, "destructive" | "default" | "secondary"> = {
+    const variants: Record<string, 'destructive' | 'default' | 'secondary'> = {
       critical: 'destructive',
       high: 'destructive',
       medium: 'default',
@@ -48,11 +48,7 @@ export function AdminAlertsPanel() {
       low: 'منخفض',
     };
 
-    return (
-      <Badge variant={variants[severity] || 'default'}>
-        {labels[severity] || severity}
-      </Badge>
-    );
+    return <Badge variant={variants[severity] || 'default'}>{labels[severity] || severity}</Badge>;
   };
 
   if (isLoading) {
@@ -72,7 +68,13 @@ export function AdminAlertsPanel() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل تنبيهات النظام" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل تنبيهات النظام"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -96,10 +98,7 @@ export function AdminAlertsPanel() {
           </div>
         ) : (
           alerts.map((alert) => (
-            <div
-              key={alert.id}
-              className="border rounded-lg p-4 space-y-3 bg-card"
-            >
+            <div key={alert.id} className="border rounded-lg p-4 space-y-3 bg-card">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1">
                   {getSeverityIcon(alert.severity)}
@@ -108,12 +107,9 @@ export function AdminAlertsPanel() {
                       <h4 className="font-semibold">{alert.title}</h4>
                       {getSeverityBadge(alert.severity)}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {alert.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{alert.description}</p>
                     <p className="text-xs text-muted-foreground">
-                      منذ{' '}
-                      {formatRelative(alert.created_at)}
+                      منذ {formatRelative(alert.created_at)}
                     </p>
                   </div>
                 </div>
@@ -130,21 +126,13 @@ export function AdminAlertsPanel() {
                     >
                       اعتراف
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => resolve(alert.id)}
-                      disabled={isResolving}
-                    >
+                    <Button size="sm" onClick={() => resolve(alert.id)} disabled={isResolving}>
                       حل
                     </Button>
                   </>
                 )}
                 {matchesStatus(alert.status, 'acknowledged') && (
-                  <Button
-                    size="sm"
-                    onClick={() => resolve(alert.id)}
-                    disabled={isResolving}
-                  >
+                  <Button size="sm" onClick={() => resolve(alert.id)} disabled={isResolving}>
                     حل
                   </Button>
                 )}

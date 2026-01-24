@@ -3,9 +3,9 @@
  * @version 2.8.12
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import { productionLogger } from "@/lib/logger/production-logger";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
+import type { Database } from '@/integrations/supabase/types';
 
 type Fund = Database['public']['Tables']['funds']['Row'];
 type FundInsert = Database['public']['Tables']['funds']['Insert'];
@@ -39,18 +39,28 @@ export class FundService {
   }
 
   static async update(id: string, updates: Partial<FundInsert>): Promise<Fund | null> {
-    const { data, error } = await supabase.from('funds').update(updates).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('funds')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async delete(id: string, reason?: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from('funds').update({
-      deleted_at: new Date().toISOString(),
-      deleted_by: user?.id || null,
-      deletion_reason: reason || 'تم أرشفة الصندوق',
-    }).eq('id', id);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('funds')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason || 'تم أرشفة الصندوق',
+      })
+      .eq('id', id);
     if (error) throw error;
   }
 
@@ -63,31 +73,56 @@ export class FundService {
   }
 
   static async createDisclosure(disclosure: Partial<AnnualDisclosure>): Promise<AnnualDisclosure> {
-    const { data, error } = await supabase.from('annual_disclosures').insert(disclosure as never).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('annual_disclosures')
+      .insert(disclosure as never)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء الإفصاح');
     return data;
   }
 
   static async publishDisclosure(id: string): Promise<AnnualDisclosure | null> {
-    const { data, error } = await supabase.from('annual_disclosures').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('annual_disclosures')
+      .update({ status: 'published', published_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async getDistributionSettings() {
-    const { data, error } = await supabase.from('waqf_distribution_settings').select('*').eq('is_active', true).maybeSingle();
+    const { data, error } = await supabase
+      .from('waqf_distribution_settings')
+      .select('*')
+      .eq('is_active', true)
+      .maybeSingle();
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   }
 
-  static async updateDistributionSettings(id: string | undefined, updates: Record<string, unknown>) {
+  static async updateDistributionSettings(
+    id: string | undefined,
+    updates: Record<string, unknown>
+  ) {
     if (id) {
-      const { data, error } = await supabase.from('waqf_distribution_settings').update(updates as never).eq('id', id).select().maybeSingle();
+      const { data, error } = await supabase
+        .from('waqf_distribution_settings')
+        .update(updates as never)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
       if (error) throw error;
       return data;
     } else {
-      const { data, error } = await supabase.from('waqf_distribution_settings').insert([updates as never]).select().maybeSingle();
+      const { data, error } = await supabase
+        .from('waqf_distribution_settings')
+        .insert([updates as never])
+        .select()
+        .maybeSingle();
       if (error) throw error;
       return data;
     }
@@ -99,26 +134,42 @@ export class FundService {
   }
 
   static async getWaqfUnits() {
-    const { data, error } = await supabase.from('waqf_units').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('waqf_units')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   }
 
   static async getWaqfUnitById(id: string) {
-    const { data, error } = await supabase.from('waqf_units').select('*').eq('id', id).maybeSingle();
+    const { data, error } = await supabase
+      .from('waqf_units')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async createWaqfUnit(unit: Record<string, unknown>) {
-    const { data, error } = await supabase.from('waqf_units').insert([unit as never]).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('waqf_units')
+      .insert([unit as never])
+      .select()
+      .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('فشل إنشاء قلم الوقف');
     return data;
   }
 
   static async updateWaqfUnit(id: string, updates: Record<string, unknown>) {
-    const { data, error } = await supabase.from('waqf_units').update(updates as never).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('waqf_units')
+      .update(updates as never)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
@@ -132,7 +183,9 @@ export class FundService {
       .is('deleted_at', null);
 
     if (propertiesCount && propertiesCount > 0) {
-      throw new Error(`لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${propertiesCount} عقار نشط. يرجى إلغاء ربط العقارات أولاً.`);
+      throw new Error(
+        `لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${propertiesCount} عقار نشط. يرجى إلغاء ربط العقارات أولاً.`
+      );
     }
 
     // التحقق من وجود صناديق مرتبطة
@@ -143,15 +196,22 @@ export class FundService {
       .is('deleted_at', null);
 
     if (fundsCount && fundsCount > 0) {
-      throw new Error(`لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${fundsCount} صندوق نشط. يرجى إلغاء ربط الصناديق أولاً.`);
+      throw new Error(
+        `لا يمكن أرشفة قلم الوقف لأنه مرتبط بـ ${fundsCount} صندوق نشط. يرجى إلغاء ربط الصناديق أولاً.`
+      );
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from('waqf_units').update({
-      deleted_at: new Date().toISOString(),
-      deleted_by: user?.id || null,
-      deletion_reason: reason || 'تم أرشفة قلم الوقف',
-    }).eq('id', id);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('waqf_units')
+      .update({
+        deleted_at: new Date().toISOString(),
+        deleted_by: user?.id || null,
+        deletion_reason: reason || 'تم أرشفة قلم الوقف',
+      })
+      .eq('id', id);
     if (error) throw error;
   }
 
@@ -160,15 +220,24 @@ export class FundService {
     if (!unit) throw new Error('قلم الوقف غير موجود');
 
     const [properties, funds] = await Promise.all([
-      supabase.from('properties').select('id, name, type, monthly_revenue, status').eq('waqf_unit_id', id),
-      supabase.from('funds').select('id, name, allocated_amount, spent_amount, category').eq('waqf_unit_id', id)
+      supabase
+        .from('properties')
+        .select('id, name, type, monthly_revenue, status')
+        .eq('waqf_unit_id', id),
+      supabase
+        .from('funds')
+        .select('id, name, allocated_amount, spent_amount, category')
+        .eq('waqf_unit_id', id),
     ]);
 
     return { ...unit, properties: properties.data || [], funds: funds.data || [] };
   }
 
   static async getBudgets(fiscalYearId?: string) {
-    let query = supabase.from('budgets').select('*, accounts(name_ar, code)').order('created_at', { ascending: false });
+    let query = supabase
+      .from('budgets')
+      .select('*, accounts(name_ar, code)')
+      .order('created_at', { ascending: false });
     if (fiscalYearId) query = query.eq('fiscal_year_id', fiscalYearId);
     const { data, error } = await query;
     if (error) throw error;
@@ -176,7 +245,10 @@ export class FundService {
   }
 
   static async getReserves() {
-    const { data, error } = await supabase.from('waqf_reserves').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('waqf_reserves')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   }
@@ -184,7 +256,9 @@ export class FundService {
   static async getApprovedDistributions() {
     const { data, error } = await supabase
       .from('distributions')
-      .select(`id, distribution_date, total_amount, status, distribution_details!inner(beneficiary_id, allocated_amount, beneficiaries!inner(full_name, bank_account_number, iban))`)
+      .select(
+        `id, distribution_date, total_amount, status, distribution_details!inner(beneficiary_id, allocated_amount, beneficiaries!inner(full_name, bank_account_number, iban))`
+      )
       .eq('status', 'معتمد')
       .order('distribution_date', { ascending: false });
     if (error) throw error;
@@ -202,7 +276,10 @@ export class FundService {
   }
 
   static async getDistributionApprovals(distributionId?: string) {
-    let query = supabase.from('distribution_approvals').select('*').order('level', { ascending: true });
+    let query = supabase
+      .from('distribution_approvals')
+      .select('*')
+      .order('level', { ascending: true });
     if (distributionId) query = query.eq('distribution_id', distributionId);
     const { data, error } = await query;
     if (error) throw error;
@@ -218,18 +295,32 @@ export class FundService {
       .maybeSingle();
 
     if (existing) {
-      const { data, error } = await supabase.from('distribution_approvals').update(approval as never).eq('id', existing.id).select().maybeSingle();
+      const { data, error } = await supabase
+        .from('distribution_approvals')
+        .update(approval as never)
+        .eq('id', existing.id)
+        .select()
+        .maybeSingle();
       if (error) throw error;
       return data;
     }
 
-    const { data, error } = await supabase.from('distribution_approvals').insert([approval as never]).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('distribution_approvals')
+      .insert([approval as never])
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async updateDistributionApproval(id: string, updates: Record<string, unknown>) {
-    const { data, error } = await supabase.from('distribution_approvals').update(updates as never).eq('id', id).select().maybeSingle();
+    const { data, error } = await supabase
+      .from('distribution_approvals')
+      .update(updates as never)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
     if (error) throw error;
     return data;
   }

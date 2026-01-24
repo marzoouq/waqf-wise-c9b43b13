@@ -3,13 +3,13 @@
  * Database Health Alerts Panel
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertTriangle, CheckCircle, RefreshCw, XCircle, Info } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { HealthAlert } from "@/services/monitoring/db-health.service";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertTriangle, CheckCircle, RefreshCw, XCircle, Info } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { HealthAlert } from '@/services/monitoring/db-health.service';
 
 interface HealthAlertsPanelProps {
   alerts: HealthAlert[];
@@ -18,7 +18,12 @@ interface HealthAlertsPanelProps {
   lastUpdated: Date | null;
 }
 
-export function HealthAlertsPanel({ alerts, isLoading, onRefresh, lastUpdated }: HealthAlertsPanelProps) {
+export function HealthAlertsPanel({
+  alerts,
+  isLoading,
+  onRefresh,
+  lastUpdated,
+}: HealthAlertsPanelProps) {
   const getAlertIcon = (type: HealthAlert['type']) => {
     switch (type) {
       case 'critical':
@@ -92,8 +97,8 @@ export function HealthAlertsPanel({ alerts, isLoading, onRefresh, lastUpdated }:
           <ScrollArea className="h-[300px]">
             <div className="space-y-3">
               {alerts.map((alert) => (
-                <div 
-                  key={alert.id} 
+                <div
+                  key={alert.id}
                   className="p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-start gap-3">
@@ -106,7 +111,8 @@ export function HealthAlertsPanel({ alerts, isLoading, onRefresh, lastUpdated }:
                       <p className="text-sm text-muted-foreground">{alert.message}</p>
                       {alert.value !== undefined && alert.threshold !== undefined && (
                         <div className="mt-1 text-xs text-muted-foreground">
-                          القيمة: {alert.value.toLocaleString()} | الحد: {alert.threshold.toLocaleString()}
+                          القيمة: {alert.value.toLocaleString()} | الحد:{' '}
+                          {alert.threshold.toLocaleString()}
                         </div>
                       )}
                     </div>

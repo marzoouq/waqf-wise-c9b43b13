@@ -1,12 +1,12 @@
 /**
  * Fiscal Year Service - خدمة السنوات المالية
  * @version 2.7.0
- * 
+ *
  * إدارة السنوات المالية وإغلاقها ونشرها
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 type FiscalYear = Database['public']['Tables']['fiscal_years']['Row'];
 type FiscalYearInsert = Database['public']['Tables']['fiscal_years']['Insert'];
@@ -111,36 +111,34 @@ export class FiscalYearService {
     if (!fy) throw new Error('فشل إنشاء السنة المالية');
 
     // 2. إنشاء سجل الإقفال
-    const { error: closingError } = await supabase
-      .from('fiscal_year_closings')
-      .insert({
-        fiscal_year_id: fy.id,
-        closing_date: closingData.closing_date,
-        closing_type: 'manual',
-        total_revenues: closingData.total_revenues,
-        rental_revenues: closingData.total_revenues,
-        other_revenues: 0,
-        total_expenses: closingData.total_expenses,
-        administrative_expenses: 0,
-        maintenance_expenses: 0,
-        development_expenses: 0,
-        other_expenses: closingData.total_expenses,
-        nazer_percentage: 10,
-        nazer_share: closingData.nazer_share,
-        waqif_percentage: 5,
-        waqif_share: closingData.waqif_share,
-        total_beneficiary_distributions: closingData.beneficiary_distributions,
-        heirs_count: 14,
-        total_vat_collected: 0,
-        total_vat_paid: 0,
-        net_vat: 0,
-        zakat_amount: 0,
-        net_income: closingData.total_revenues - closingData.total_expenses,
-        waqf_corpus: closingData.waqf_corpus,
-        opening_balance: 0,
-        closing_balance: closingData.waqf_corpus,
-        notes: closingData.notes || 'سنة تاريخية مؤرشفة',
-      });
+    const { error: closingError } = await supabase.from('fiscal_year_closings').insert({
+      fiscal_year_id: fy.id,
+      closing_date: closingData.closing_date,
+      closing_type: 'manual',
+      total_revenues: closingData.total_revenues,
+      rental_revenues: closingData.total_revenues,
+      other_revenues: 0,
+      total_expenses: closingData.total_expenses,
+      administrative_expenses: 0,
+      maintenance_expenses: 0,
+      development_expenses: 0,
+      other_expenses: closingData.total_expenses,
+      nazer_percentage: 10,
+      nazer_share: closingData.nazer_share,
+      waqif_percentage: 5,
+      waqif_share: closingData.waqif_share,
+      total_beneficiary_distributions: closingData.beneficiary_distributions,
+      heirs_count: 14,
+      total_vat_collected: 0,
+      total_vat_paid: 0,
+      net_vat: 0,
+      zakat_amount: 0,
+      net_income: closingData.total_revenues - closingData.total_expenses,
+      waqf_corpus: closingData.waqf_corpus,
+      opening_balance: 0,
+      closing_balance: closingData.waqf_corpus,
+      notes: closingData.notes || 'سنة تاريخية مؤرشفة',
+    });
 
     if (closingError) throw closingError;
 
@@ -202,20 +200,24 @@ export class FiscalYearService {
     // جلب الإيرادات من القيود
     const { data: revenueData } = await supabase
       .from('journal_entry_lines')
-      .select(`
+      .select(
+        `
         credit_amount,
         journal_entries!inner(entry_date, status, fiscal_year_id)
-      `)
+      `
+      )
       .eq('journal_entries.fiscal_year_id', id)
       .eq('journal_entries.status', 'posted');
 
     // جلب المصروفات
     const { data: expenseData } = await supabase
       .from('journal_entry_lines')
-      .select(`
+      .select(
+        `
         debit_amount,
         journal_entries!inner(entry_date, status, fiscal_year_id)
-      `)
+      `
+      )
       .eq('journal_entries.fiscal_year_id', id)
       .eq('journal_entries.status', 'posted');
 
@@ -224,10 +226,10 @@ export class FiscalYearService {
     const netIncome = totalRevenues - totalExpenses;
 
     // حساب الحصص
-    const nazerShare = netIncome * 0.10;
+    const nazerShare = netIncome * 0.1;
     const waqifShare = netIncome * 0.05;
     const beneficiaryShare = netIncome * 0.85;
-    const waqfCorpus = netIncome * 0.00; // يحسب بعد التوزيع
+    const waqfCorpus = netIncome * 0.0; // يحسب بعد التوزيع
 
     return {
       totalRevenues,
@@ -261,10 +263,7 @@ export class FiscalYearService {
   /**
    * نشر السنة المالية للمستفيدين
    */
-  static async publish(
-    id: string,
-    notifyHeirs: boolean = true
-  ): Promise<FiscalYearClosureResult> {
+  static async publish(id: string, notifyHeirs: boolean = true): Promise<FiscalYearClosureResult> {
     const { data, error } = await supabase.functions.invoke('publish-fiscal-year', {
       body: { fiscalYearId: id, notifyHeirs },
     });
@@ -304,7 +303,7 @@ export class FiscalYearService {
     publishedAt?: string;
   }> {
     const fiscalYear = await this.getById(fiscalYearId);
-    
+
     return {
       isPublished: fiscalYear?.is_published || false,
       publishedAt: fiscalYear?.published_at || undefined,
@@ -316,11 +315,11 @@ export class FiscalYearService {
    */
   static async getActiveFiscalYears() {
     const { data, error } = await supabase
-      .from("fiscal_years")
-      .select("*")
-      .eq("is_active", true)
-      .order("start_date", { ascending: false });
-    
+      .from('fiscal_years')
+      .select('*')
+      .eq('is_active', true)
+      .order('start_date', { ascending: false });
+
     if (error) throw error;
     return data || [];
   }
@@ -329,10 +328,10 @@ export class FiscalYearService {
    * جلب معاينة إغلاق السنة المالية
    */
   static async getClosingPreview(fiscalYearId: string) {
-    const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-      body: { fiscal_year_id: fiscalYearId, preview_only: true }
+    const { data, error } = await supabase.functions.invoke('auto-close-fiscal-year', {
+      body: { fiscal_year_id: fiscalYearId, preview_only: true },
     });
-    
+
     if (error) throw error;
     return data;
   }

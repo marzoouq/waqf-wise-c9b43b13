@@ -1,24 +1,24 @@
-import { memo } from "react";
-import { 
-  Users, 
-  UsersRound, 
-  Building2, 
-  Wallet, 
-  AlertCircle, 
-  TrendingUp, 
-  TrendingDown, 
+import { memo } from 'react';
+import {
+  Users,
+  UsersRound,
+  Building2,
+  Wallet,
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
   Clock,
   Home,
   CreditCard,
-  PieChart
-} from "lucide-react";
-import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
-import { formatCurrency, formatNumber } from "@/lib/utils";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedSectionHeader } from "@/components/unified/UnifiedSectionHeader";
-import { ReportRefreshIndicator } from "@/components/reports/ReportRefreshIndicator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+  PieChart,
+} from 'lucide-react';
+import { useUnifiedKPIs } from '@/hooks/dashboard/useUnifiedKPIs';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
+import { UnifiedSectionHeader } from '@/components/unified/UnifiedSectionHeader';
+import { ReportRefreshIndicator } from '@/components/reports/ReportRefreshIndicator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 type KPIVariant = 'admin' | 'nazer' | 'accountant' | 'default';
 
@@ -36,12 +36,20 @@ interface UnifiedDashboardKPIsProps {
  */
 export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
   variant = 'default',
-  title = "الإحصائيات",
-  description = "نظرة شاملة على النظام",
+  title = 'الإحصائيات',
+  description = 'نظرة شاملة على النظام',
   showRefreshIndicator = true,
-  className
+  className,
 }: UnifiedDashboardKPIsProps) {
-  const { data: kpis, isLoading, isError, error, isRefetching, refresh, lastUpdated } = useUnifiedKPIs();
+  const {
+    data: kpis,
+    isLoading,
+    isError,
+    error,
+    isRefetching,
+    refresh,
+    lastUpdated,
+  } = useUnifiedKPIs();
 
   if (isError) {
     return (
@@ -60,7 +68,7 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
         <UnifiedSectionHeader title={title} description={description} />
         <UnifiedStatsGrid columns={4}>
           {[...Array(8)].map((_, i) => (
-            <UnifiedKPICard 
+            <UnifiedKPICard
               key={`skeleton-${i}`}
               title="جاري التحميل..."
               value="..."
@@ -77,121 +85,121 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
   const getKPICards = () => {
     const baseCards = [
       {
-        title: "إجمالي المستفيدين",
+        title: 'إجمالي المستفيدين',
         value: formatNumber(kpis.totalBeneficiaries),
         icon: Users,
-        variant: "default" as const,
+        variant: 'default' as const,
         trend: `${kpis.activeBeneficiaries} نشط`,
-        show: true
+        show: true,
       },
       {
-        title: "العائلات",
+        title: 'العائلات',
         value: formatNumber(kpis.totalFamilies),
         icon: UsersRound,
-        variant: "default" as const,
-        trend: "مسجلة في النظام",
-        show: variant === 'admin' || variant === 'default'
+        variant: 'default' as const,
+        trend: 'مسجلة في النظام',
+        show: variant === 'admin' || variant === 'default',
       },
       {
-        title: "العقارات",
+        title: 'العقارات',
         value: formatNumber(kpis.totalProperties),
         icon: Building2,
-        variant: "success" as const,
+        variant: 'success' as const,
         trend: `${kpis.occupiedProperties} مؤجر`,
-        show: true
+        show: true,
       },
       {
-        title: "العقارات النشطة",
+        title: 'العقارات النشطة',
         value: formatNumber(kpis.activeProperties),
         icon: Home,
-        variant: "warning" as const,
-        subtitle: "العقارات المسجلة",
-        show: variant === 'nazer'
+        variant: 'warning' as const,
+        subtitle: 'العقارات المسجلة',
+        show: variant === 'nazer',
       },
       {
-        title: "الأقلام النشطة",
+        title: 'الأقلام النشطة',
         value: formatNumber(kpis.activeFunds),
         icon: Wallet,
-        variant: "warning" as const,
+        variant: 'warning' as const,
         trend: `من ${kpis.totalFunds} إجمالي`,
-        show: variant === 'admin' || variant === 'default'
+        show: variant === 'admin' || variant === 'default',
       },
       {
-        title: "الميزانية المتاحة",
+        title: 'الميزانية المتاحة',
         value: kpis.availableBudget > 0 ? formatCurrency(kpis.availableBudget) : '—',
         icon: Wallet,
-        variant: "success" as const,
-        subtitle: kpis.availableBudget === 0 ? "غير متاح" : undefined,
-        show: variant === 'nazer' || variant === 'accountant'
+        variant: 'success' as const,
+        subtitle: kpis.availableBudget === 0 ? 'غير متاح' : undefined,
+        show: variant === 'nazer' || variant === 'accountant',
       },
       {
-        title: "الطلبات المعلقة",
+        title: 'الطلبات المعلقة',
         value: formatNumber(kpis.pendingRequests),
         icon: Clock,
-        variant: "default" as const,
+        variant: 'default' as const,
         trend: `${kpis.overdueRequests} متأخر`,
-        show: variant === 'admin' || variant === 'default'
+        show: variant === 'admin' || variant === 'default',
       },
       {
-        title: "الطلبات المتأخرة",
+        title: 'الطلبات المتأخرة',
         value: formatNumber(kpis.overdueRequests),
         icon: AlertCircle,
-        variant: "danger" as const,
-        trend: "يحتاج معالجة عاجلة",
-        show: variant === 'admin' && kpis.overdueRequests > 0
+        variant: 'danger' as const,
+        trend: 'يحتاج معالجة عاجلة',
+        show: variant === 'admin' && kpis.overdueRequests > 0,
       },
       {
-        title: "القروض المستحقة",
+        title: 'القروض المستحقة',
         value: formatNumber(kpis.pendingLoans),
         icon: CreditCard,
-        variant: "danger" as const,
-        subtitle: "القروض النشطة",
-        show: variant === 'nazer' || variant === 'accountant'
+        variant: 'danger' as const,
+        subtitle: 'القروض النشطة',
+        show: variant === 'nazer' || variant === 'accountant',
       },
       {
-        title: "إجمالي المحصّل",
+        title: 'إجمالي المحصّل',
         value: kpis.totalRevenue > 0 ? formatCurrency(kpis.totalRevenue) : '—',
         icon: TrendingUp,
-        variant: "success" as const,
+        variant: 'success' as const,
         trend: variant === 'admin' ? `مصروفات: ${formatCurrency(kpis.totalExpenses)}` : undefined,
-        subtitle: kpis.totalRevenue === 0 ? "غير متاح" : "من التحصيل الفعلي",
-        show: true
+        subtitle: kpis.totalRevenue === 0 ? 'غير متاح' : 'من التحصيل الفعلي',
+        show: true,
       },
       {
-        title: "صافي الدخل",
+        title: 'صافي الدخل',
         value: formatCurrency(kpis.netIncome),
         icon: kpis.netIncome >= 0 ? TrendingUp : TrendingDown,
-        variant: kpis.netIncome >= 0 ? "success" as const : "danger" as const,
-        trend: "بعد خصم المصروفات",
-        show: variant === 'admin' || variant === 'accountant'
+        variant: kpis.netIncome >= 0 ? ('success' as const) : ('danger' as const),
+        trend: 'بعد خصم المصروفات',
+        show: variant === 'admin' || variant === 'accountant',
       },
       {
-        title: "الإيراد الشهري من العقود",
+        title: 'الإيراد الشهري من العقود',
         value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn) : '—',
         icon: PieChart,
-        variant: "default" as const,
-        subtitle: kpis.monthlyReturn === 0 ? "غير متاح" : "من العقود النشطة",
-        show: variant === 'nazer'
+        variant: 'default' as const,
+        subtitle: kpis.monthlyReturn === 0 ? 'غير متاح' : 'من العقود النشطة',
+        show: variant === 'nazer',
       },
       {
-        title: "الإيراد السنوي المتوقع",
+        title: 'الإيراد السنوي المتوقع',
         value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn * 12) : '—',
         icon: TrendingUp,
-        variant: "success" as const,
-        subtitle: kpis.monthlyReturn === 0 ? "غير متاح" : "تقدير سنوي",
-        show: variant === 'nazer'
+        variant: 'success' as const,
+        subtitle: kpis.monthlyReturn === 0 ? 'غير متاح' : 'تقدير سنوي',
+        show: variant === 'nazer',
       },
       {
-        title: "إجمالي الأصول",
+        title: 'إجمالي الأصول',
         value: kpis.totalAssets > 0 ? formatCurrency(kpis.totalAssets) : '—',
         icon: Building2,
-        variant: "default" as const,
-        subtitle: kpis.totalAssets === 0 ? "غير متاح" : undefined,
-        show: variant === 'nazer'
-      }
+        variant: 'default' as const,
+        subtitle: kpis.totalAssets === 0 ? 'غير متاح' : undefined,
+        show: variant === 'nazer',
+      },
     ];
 
-    return baseCards.filter(card => card.show);
+    return baseCards.filter((card) => card.show);
   };
 
   const cards = getKPICards();
@@ -208,10 +216,10 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
           />
         )}
       </div>
-      
+
       <UnifiedStatsGrid columns={4}>
         {cards.map((card) => (
-          <UnifiedKPICard 
+          <UnifiedKPICard
             key={card.title}
             title={card.title}
             value={card.value}

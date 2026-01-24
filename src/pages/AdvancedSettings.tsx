@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -38,12 +41,7 @@ export default function AdvancedSettings() {
     refetch,
   } = useBackup();
 
-  const {
-    failedLogins,
-    sensitiveOperations,
-    twoFaUsers,
-    totalUsers,
-  } = useSecurityStats();
+  const { failedLogins, sensitiveOperations, twoFaUsers, totalUsers } = useSecurityStats();
 
   // Get active schedules count
   const activeSchedulesCount = backupSchedules?.filter((s) => s.is_active).length || 0;
@@ -80,19 +78,31 @@ export default function AdvancedSettings() {
         <Tabs defaultValue="notifications" className="space-y-6">
           <ScrollArea className="w-full">
             <TabsList className="inline-flex w-full min-w-max md:grid md:grid-cols-4 h-auto p-1">
-              <TabsTrigger value="notifications" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+              <TabsTrigger
+                value="notifications"
+                className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+              >
                 <Bell className="h-4 w-4" />
                 <span className="hidden sm:inline">الإشعارات</span>
               </TabsTrigger>
-              <TabsTrigger value="reports" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+              <TabsTrigger
+                value="reports"
+                className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+              >
                 <Calendar className="h-4 w-4" />
                 <span className="hidden sm:inline">التقارير المجدولة</span>
               </TabsTrigger>
-              <TabsTrigger value="backup" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+              <TabsTrigger
+                value="backup"
+                className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+              >
                 <Database className="h-4 w-4" />
                 <span className="hidden sm:inline">النسخ الاحتياطي</span>
               </TabsTrigger>
-              <TabsTrigger value="security" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+              <TabsTrigger
+                value="security"
+                className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+              >
                 <Shield className="h-4 w-4" />
                 <span className="hidden sm:inline">الأمان</span>
               </TabsTrigger>
@@ -106,9 +116,7 @@ export default function AdvancedSettings() {
             <Card>
               <CardHeader>
                 <CardTitle>قنوات الإشعارات</CardTitle>
-                <CardDescription>
-                  إدارة طرق استقبال الإشعارات
-                </CardDescription>
+                <CardDescription>إدارة طرق استقبال الإشعارات</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -159,9 +167,7 @@ export default function AdvancedSettings() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">إشعارات فورية (Push)</h4>
-                          <p className="text-sm text-muted-foreground">
-                            تنبيهات فورية على الأجهزة
-                          </p>
+                          <p className="text-sm text-muted-foreground">تنبيهات فورية على الأجهزة</p>
                         </div>
                         <Badge variant="default">مفعّل</Badge>
                       </div>
@@ -180,9 +186,7 @@ export default function AdvancedSettings() {
             <Card>
               <CardHeader>
                 <CardTitle>نظام النسخ الاحتياطي التلقائي</CardTitle>
-                <CardDescription>
-                  جدولة وإدارة النسخ الاحتياطية للبيانات
-                </CardDescription>
+                <CardDescription>جدولة وإدارة النسخ الاحتياطية للبيانات</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
@@ -206,14 +210,12 @@ export default function AdvancedSettings() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">آخر نسخة</span>
-                          <Badge variant={lastSuccessfulBackup ? "default" : "secondary"}>
-                            {lastSuccessfulBackup ? "نجح" : "لا يوجد"}
+                          <Badge variant={lastSuccessfulBackup ? 'default' : 'secondary'}>
+                            {lastSuccessfulBackup ? 'نجح' : 'لا يوجد'}
                           </Badge>
                         </div>
                         <p className="text-sm font-bold">{lastBackupDate}</p>
-                        <p className="text-xs text-muted-foreground">
-                          حجم: {lastBackupSize}
-                        </p>
+                        <p className="text-xs text-muted-foreground">حجم: {lastBackupSize}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -227,7 +229,7 @@ export default function AdvancedSettings() {
                         </div>
                         <p className="text-sm font-bold">{nextBackupDate}</p>
                         <p className="text-xs text-muted-foreground">
-                          {nextSchedule?.backup_type || "نسخة كاملة"}
+                          {nextSchedule?.backup_type || 'نسخة كاملة'}
                         </p>
                       </div>
                     </CardContent>
@@ -236,7 +238,7 @@ export default function AdvancedSettings() {
 
                 <div className="space-y-4">
                   <h4 className="font-medium">الجداول المجدولة</h4>
-                  
+
                   {backupSchedules?.map((schedule) => (
                     <Card key={schedule.id}>
                       <CardContent className="pt-6">
@@ -251,8 +253,8 @@ export default function AdvancedSettings() {
                               <Badge variant="outline">{schedule.retention_days} يوم احتفاظ</Badge>
                             </div>
                           </div>
-                          <Badge variant={schedule.is_active ? "default" : "secondary"}>
-                            {schedule.is_active ? "نشط" : "غير نشط"}
+                          <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
+                            {schedule.is_active ? 'نشط' : 'غير نشط'}
                           </Badge>
                         </div>
                       </CardContent>
@@ -262,7 +264,9 @@ export default function AdvancedSettings() {
                   {(!backupSchedules || backupSchedules.length === 0) && (
                     <Card>
                       <CardContent className="pt-6">
-                        <p className="text-center text-muted-foreground">لا توجد جداول نسخ احتياطي</p>
+                        <p className="text-center text-muted-foreground">
+                          لا توجد جداول نسخ احتياطي
+                        </p>
                       </CardContent>
                     </Card>
                   )}
@@ -275,7 +279,7 @@ export default function AdvancedSettings() {
                     ) : (
                       <Download className="h-4 w-4 ms-2" />
                     )}
-                    {isCreatingBackup ? "جاري الإنشاء..." : "تنزيل نسخة احتياطية"}
+                    {isCreatingBackup ? 'جاري الإنشاء...' : 'تنزيل نسخة احتياطية'}
                   </Button>
                   <Button variant="outline" onClick={() => setRestoreDialogOpen(true)}>
                     <Upload className="h-4 w-4 ms-2" />
@@ -294,9 +298,7 @@ export default function AdvancedSettings() {
             <Card>
               <CardHeader>
                 <CardTitle>الأمان والحماية</CardTitle>
-                <CardDescription>
-                  إعدادات الأمان المتقدمة
-                </CardDescription>
+                <CardDescription>إعدادات الأمان المتقدمة</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
@@ -323,9 +325,7 @@ export default function AdvancedSettings() {
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <h4 className="font-medium">تسجيل العمليات (Audit Logs)</h4>
-                      <p className="text-sm text-muted-foreground">
-                        تسجيل جميع العمليات الحساسة
-                      </p>
+                      <p className="text-sm text-muted-foreground">تسجيل جميع العمليات الحساسة</p>
                     </div>
                     <Badge variant="default">مفعّل</Badge>
                   </div>
@@ -333,9 +333,7 @@ export default function AdvancedSettings() {
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <h4 className="font-medium">أمان على مستوى الصفوف (RLS)</h4>
-                      <p className="text-sm text-muted-foreground">
-                        سياسات أمان لجميع الجداول
-                      </p>
+                      <p className="text-sm text-muted-foreground">سياسات أمان لجميع الجداول</p>
                     </div>
                     <Badge variant="default">مفعّل</Badge>
                   </div>
@@ -364,7 +362,9 @@ export default function AdvancedSettings() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">مستخدمون بـ 2FA</p>
-                      <p className="text-2xl font-bold">{twoFaUsers}/{totalUsers}</p>
+                      <p className="text-2xl font-bold">
+                        {twoFaUsers}/{totalUsers}
+                      </p>
                     </div>
                   </div>
                 </div>

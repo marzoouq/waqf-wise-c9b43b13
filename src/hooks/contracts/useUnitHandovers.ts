@@ -42,7 +42,7 @@ export function useUnitHandovers(contractId?: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: contractId 
+    queryKey: contractId
       ? PROPERTIES_KEYS.UNIT_HANDOVERS_BY_CONTRACT(contractId)
       : PROPERTIES_KEYS.UNIT_HANDOVERS,
     queryFn: async () => {
@@ -102,10 +102,7 @@ export function useUnitHandovers(contractId?: string) {
 
   // تحديث نموذج استلام
   const updateHandover = useMutation({
-    mutationFn: async ({
-      id,
-      ...updates
-    }: Partial<UnitHandover> & { id: string }) => {
+    mutationFn: async ({ id, ...updates }: Partial<UnitHandover> & { id: string }) => {
       const { data, error } = await supabase
         .from('unit_handovers')
         .update(updates)
@@ -135,7 +132,7 @@ export function useUnitHandovers(contractId?: string) {
         .update({
           deleted_at: new Date().toISOString(),
           deleted_by: user?.user?.id || null,
-          deletion_reason: 'حذف بواسطة المستخدم'
+          deletion_reason: 'حذف بواسطة المستخدم',
         })
         .eq('id', id);
 
@@ -162,10 +159,7 @@ export function useUnitHandovers(contractId?: string) {
       signatureType: 'landlord' | 'tenant';
       signed: boolean;
     }) => {
-      const field =
-        signatureType === 'landlord'
-          ? 'landlord_signature'
-          : 'tenant_signature';
+      const field = signatureType === 'landlord' ? 'landlord_signature' : 'tenant_signature';
 
       const { data, error } = await supabase
         .from('unit_handovers')

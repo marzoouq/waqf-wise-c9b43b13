@@ -1,9 +1,9 @@
-import { useVouchersStats } from "@/hooks/dashboard/useVouchersStats";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Receipt, TrendingUp, Clock, CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { useVouchersStats } from '@/hooks/dashboard/useVouchersStats';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Receipt, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function VouchersStatsCard() {
   const { data: stats, isLoading, error, refetch } = useVouchersStats();
@@ -22,7 +22,13 @@ export function VouchersStatsCard() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل إحصائيات السندات" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل إحصائيات السندات"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -34,7 +40,9 @@ export function VouchersStatsCard() {
             سندات الدفع
           </span>
           <Link to="/payment-vouchers">
-            <Button variant="ghost" size="sm">عرض الكل</Button>
+            <Button variant="ghost" size="sm">
+              عرض الكل
+            </Button>
           </Link>
         </CardTitle>
       </CardHeader>

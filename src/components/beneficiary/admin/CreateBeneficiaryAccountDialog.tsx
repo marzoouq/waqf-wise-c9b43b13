@@ -1,25 +1,42 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/ui/use-toast";
-import { BeneficiaryService } from "@/services/beneficiary.service";
-import { UserPlus, Copy, Eye, EyeOff } from "lucide-react";
-import { Beneficiary } from "@/types/beneficiary";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLeakedPassword } from "@/hooks/auth/useLeakedPassword";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/ui/use-toast';
+import { BeneficiaryService } from '@/services/beneficiary.service';
+import { UserPlus, Copy, Eye, EyeOff } from 'lucide-react';
+import { Beneficiary } from '@/types/beneficiary';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useLeakedPassword } from '@/hooks/auth/useLeakedPassword';
 
-const accountSchema = z.object({
-  password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "كلمات المرور غير متطابقة",
-  path: ["confirmPassword"],
-});
+const accountSchema = z
+  .object({
+    password: z.string().min(8, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['confirmPassword'],
+  });
 
 type AccountFormValues = z.infer<typeof accountSchema>;
 
@@ -30,32 +47,34 @@ interface CreateBeneficiaryAccountDialogProps {
   onSuccess?: () => void;
 }
 
-export function CreateBeneficiaryAccountDialog({ 
-  open, 
-  onOpenChange, 
+export function CreateBeneficiaryAccountDialog({
+  open,
+  onOpenChange,
   beneficiary,
-  onSuccess 
+  onSuccess,
 }: CreateBeneficiaryAccountDialogProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [createdAccount, setCreatedAccount] = useState<{ email: string; password: string } | null>(null);
+  const [createdAccount, setCreatedAccount] = useState<{ email: string; password: string } | null>(
+    null
+  );
   const [showPassword, setShowPassword] = useState(false);
   const { checkPasswordQuick } = useLeakedPassword();
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
-      password: "",
-      confirmPassword: "",
+      password: '',
+      confirmPassword: '',
     },
   });
 
   const onSubmit = async (data: AccountFormValues) => {
     if (!beneficiary.email) {
       toast({
-        title: "خطأ",
-        description: "المستفيد لا يملك بريد إلكتروني",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'المستفيد لا يملك بريد إلكتروني',
+        variant: 'destructive',
       });
       return;
     }
@@ -66,9 +85,9 @@ export function CreateBeneficiaryAccountDialog({
       const isLeaked = await checkPasswordQuick(data.password);
       if (isLeaked) {
         toast({
-          title: "كلمة مرور غير آمنة",
-          description: "هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.",
-          variant: "destructive",
+          title: 'كلمة مرور غير آمنة',
+          description: 'هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.',
+          variant: 'destructive',
         });
         setIsLoading(false);
         return;
@@ -85,17 +104,17 @@ export function CreateBeneficiaryAccountDialog({
       });
 
       toast({
-        title: "تم إنشاء الحساب بنجاح",
-        description: "يمكن للمستفيد الآن تسجيل الدخول",
+        title: 'تم إنشاء الحساب بنجاح',
+        description: 'يمكن للمستفيد الآن تسجيل الدخول',
       });
 
       onSuccess?.();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء الحساب";
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحساب';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -105,8 +124,8 @@ export function CreateBeneficiaryAccountDialog({
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "تم النسخ",
-      description: "تم نسخ المعلومات إلى الحافظة",
+      title: 'تم النسخ',
+      description: 'تم نسخ المعلومات إلى الحافظة',
     });
   };
 
@@ -124,9 +143,7 @@ export function CreateBeneficiaryAccountDialog({
             <UserPlus className="h-5 w-5 text-primary" />
             إنشاء حساب للمستفيد
           </DialogTitle>
-          <DialogDescription>
-            إنشاء حساب دخول للمستفيد: {beneficiary.full_name}
-          </DialogDescription>
+          <DialogDescription>إنشاء حساب دخول للمستفيد: {beneficiary.full_name}</DialogDescription>
         </DialogHeader>
 
         {!createdAccount ? (
@@ -135,7 +152,9 @@ export function CreateBeneficiaryAccountDialog({
               <Alert>
                 <AlertDescription className="text-sm">
                   <div className="space-y-1">
-                    <p><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+                    <p>
+                      <strong>البريد الإلكتروني:</strong> {beneficiary.email}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-2">
                       سيتم إنشاء حساب بهذا البريد الإلكتروني. تأكد من صحة البريد قبل المتابعة.
                     </p>
@@ -151,9 +170,9 @@ export function CreateBeneficiaryAccountDialog({
                     <FormLabel>كلمة المرور *</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input 
-                          type={showPassword ? "text" : "password"}
-                          placeholder="أدخل كلمة المرور" 
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="أدخل كلمة المرور"
                           {...field}
                         />
                         <Button
@@ -171,9 +190,7 @@ export function CreateBeneficiaryAccountDialog({
                         </Button>
                       </div>
                     </FormControl>
-                    <FormDescription>
-                      يجب أن تكون 8 أحرف على الأقل
-                    </FormDescription>
+                    <FormDescription>يجب أن تكون 8 أحرف على الأقل</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -186,9 +203,9 @@ export function CreateBeneficiaryAccountDialog({
                   <FormItem>
                     <FormLabel>تأكيد كلمة المرور *</FormLabel>
                     <FormControl>
-                      <Input 
-                        type={showPassword ? "text" : "password"}
-                        placeholder="أعد إدخال كلمة المرور" 
+                      <Input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="أعد إدخال كلمة المرور"
                         {...field}
                       />
                     </FormControl>
@@ -212,9 +229,7 @@ export function CreateBeneficiaryAccountDialog({
             <Alert className="bg-success-light border-success">
               <AlertDescription>
                 <div className="space-y-3">
-                  <p className="font-semibold text-success-foreground">
-                    ✅ تم إنشاء الحساب بنجاح!
-                  </p>
+                  <p className="font-semibold text-success-foreground">✅ تم إنشاء الحساب بنجاح!</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between p-2 bg-background rounded border">
                       <div>
@@ -247,16 +262,15 @@ export function CreateBeneficiaryAccountDialog({
                     ⚠️ احفظ هذه المعلومات الآن! لن تتمكن من رؤية كلمة المرور مرة أخرى.
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    📧 تم إرسال رسالة تأكيد إلى البريد الإلكتروني. يمكن للمستفيد تسجيل الدخول مباشرة من صفحة تسجيل الدخول: <span className="font-mono">/auth</span>
+                    📧 تم إرسال رسالة تأكيد إلى البريد الإلكتروني. يمكن للمستفيد تسجيل الدخول مباشرة
+                    من صفحة تسجيل الدخول: <span className="font-mono">/auth</span>
                   </p>
                 </div>
               </AlertDescription>
             </Alert>
 
             <DialogFooter>
-              <Button onClick={handleClose}>
-                إغلاق
-              </Button>
+              <Button onClick={handleClose}>إغلاق</Button>
             </DialogFooter>
           </div>
         )}

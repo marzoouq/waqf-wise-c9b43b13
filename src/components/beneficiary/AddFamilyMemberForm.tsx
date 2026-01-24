@@ -1,23 +1,36 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus } from "lucide-react";
-import { commonValidation } from "@/lib/validationSchemas";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserPlus } from 'lucide-react';
+import { commonValidation } from '@/lib/validationSchemas';
 
 const addFamilyMemberSchema = z.object({
-  member_name: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
-  relationship: z.string().min(1, "نوع القرابة مطلوب"),
-  national_id: z.string().min(10, "رقم الهوية يجب أن يكون 10 أرقام"),
-  date_of_birth: commonValidation.dateString("تاريخ الميلاد غير صحيح"),
-  gender: z.string().min(1, "الجنس مطلوب"),
-  reason: z.string().min(10, "يجب ذكر سبب الإضافة"),
-  description: z.string().min(20, "يجب إضافة وصف تفصيلي"),
+  member_name: z.string().min(3, 'الاسم يجب أن يكون 3 أحرف على الأقل'),
+  relationship: z.string().min(1, 'نوع القرابة مطلوب'),
+  national_id: z.string().min(10, 'رقم الهوية يجب أن يكون 10 أرقام'),
+  date_of_birth: commonValidation.dateString('تاريخ الميلاد غير صحيح'),
+  gender: z.string().min(1, 'الجنس مطلوب'),
+  reason: z.string().min(10, 'يجب ذكر سبب الإضافة'),
+  description: z.string().min(20, 'يجب إضافة وصف تفصيلي'),
 });
 
 type AddFamilyMemberFormValues = z.infer<typeof addFamilyMemberSchema>;
@@ -31,13 +44,13 @@ export function AddFamilyMemberForm({ onSubmit, isLoading }: AddFamilyMemberForm
   const form = useForm<AddFamilyMemberFormValues>({
     resolver: zodResolver(addFamilyMemberSchema),
     defaultValues: {
-      member_name: "",
-      relationship: "",
-      national_id: "",
-      date_of_birth: "",
-      gender: "",
-      reason: "",
-      description: "",
+      member_name: '',
+      relationship: '',
+      national_id: '',
+      date_of_birth: '',
+      gender: '',
+      reason: '',
+      description: '',
     },
   });
 
@@ -174,11 +187,7 @@ export function AddFamilyMemberForm({ onSubmit, isLoading }: AddFamilyMemberForm
                 <FormItem>
                   <FormLabel>تفاصيل إضافية *</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="أضف أي تفاصيل إضافية مهمة..."
-                      rows={3}
-                      {...field}
-                    />
+                    <Textarea placeholder="أضف أي تفاصيل إضافية مهمة..." rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

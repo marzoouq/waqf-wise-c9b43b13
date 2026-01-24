@@ -6,7 +6,7 @@
  * تتبع نمط Component → Hook → Service → Supabase
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export interface DiagnosticResult {
   status: 'success' | 'error' | 'warning';
@@ -36,7 +36,7 @@ export const DiagnosticsService = {
     } catch (error) {
       return {
         status: 'error',
-        details: error instanceof Error ? error.message : 'فشل الاتصال بالخادم'
+        details: error instanceof Error ? error.message : 'فشل الاتصال بالخادم',
       };
     }
   },
@@ -60,7 +60,7 @@ export const DiagnosticsService = {
     } catch (error) {
       return {
         status: 'error',
-        details: error instanceof Error ? error.message : 'فشل الاستعلام'
+        details: error instanceof Error ? error.message : 'فشل الاستعلام',
       };
     }
   },
@@ -81,12 +81,12 @@ export const DiagnosticsService = {
       return {
         status: 'success',
         details: data.session ? `جلسة نشطة: ${latency}ms` : `لا يوجد جلسة: ${latency}ms`,
-        latency
+        latency,
       };
     } catch (error) {
       return {
         status: 'error',
-        details: error instanceof Error ? error.message : 'فشل فحص المصادقة'
+        details: error instanceof Error ? error.message : 'فشل فحص المصادقة',
       };
     }
   },
@@ -126,7 +126,7 @@ export const DiagnosticsService = {
     try {
       const start = Date.now();
       const { error } = await supabase.functions.invoke('test-auth', {
-        body: { test: true }
+        body: { test: true },
       });
       const latency = Date.now() - start;
 
@@ -138,7 +138,7 @@ export const DiagnosticsService = {
     } catch (error) {
       return {
         status: 'warning',
-        details: error instanceof Error ? error.message : 'تعذر اختبار الوظائف'
+        details: error instanceof Error ? error.message : 'تعذر اختبار الوظائف',
       };
     }
   },
@@ -182,18 +182,19 @@ export const DiagnosticsService = {
       return { status: 'error', details: 'الجهاز غير متصل بالإنترنت' };
     }
 
-    const connection = (navigator as { connection?: { effectiveType?: string; downlink?: number } }).connection;
+    const connection = (navigator as { connection?: { effectiveType?: string; downlink?: number } })
+      .connection;
     if (connection) {
       const effectiveType = connection.effectiveType;
       if (effectiveType === '2g' || effectiveType === 'slow-2g') {
         return {
           status: 'warning',
-          details: `اتصال بطيء: ${effectiveType} - ${connection.downlink} Mbps`
+          details: `اتصال بطيء: ${effectiveType} - ${connection.downlink} Mbps`,
         };
       }
       return {
         status: 'success',
-        details: `نوع الاتصال: ${effectiveType} - ${connection.downlink} Mbps`
+        details: `نوع الاتصال: ${effectiveType} - ${connection.downlink} Mbps`,
       };
     }
 

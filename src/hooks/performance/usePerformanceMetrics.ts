@@ -1,14 +1,14 @@
 /**
  * Hook for PerformanceDashboard data fetching
  * يجلب مقاييس الأداء الحقيقية من المتصفح وقاعدة البيانات
- * 
+ *
  * ✅ محسّن للقياس الدقيق باستخدام Performance APIs الحديثة
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 export interface LatestMetrics {
   pageLoad: number;
@@ -52,8 +52,11 @@ function getBrowserPerformanceMetrics(): LatestMetrics {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     if (navigation) {
       // DOM Content Loaded (أول تفاعل ممكن)
-      metrics.domContentLoaded = Math.max(0, (navigation.domContentLoadedEventEnd - navigation.startTime) / 1000);
-      
+      metrics.domContentLoaded = Math.max(
+        0,
+        (navigation.domContentLoadedEventEnd - navigation.startTime) / 1000
+      );
+
       // Page Load الحقيقي (كل شيء اكتمل)
       // إذا لم يكتمل بعد، نستخدم الوقت الحالي
       if (navigation.loadEventEnd > 0) {
@@ -66,7 +69,7 @@ function getBrowserPerformanceMetrics(): LatestMetrics {
 
     // First Contentful Paint (FCP)
     const paintEntries = performance.getEntriesByType('paint');
-    const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+    const fcp = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
     if (fcp) {
       metrics.firstContentfulPaint = fcp.startTime / 1000;
     }
@@ -81,23 +84,26 @@ function getBrowserPerformanceMetrics(): LatestMetrics {
     // API Response Time - متوسط آخر 10 طلبات فقط
     const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
     const recentApiCalls = resources
-      .filter(r => 
-        (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest') &&
-        r.name.includes('supabase')
+      .filter(
+        (r) =>
+          (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest') &&
+          r.name.includes('supabase')
       )
       .slice(-10); // آخر 10 طلبات فقط
-    
+
     if (recentApiCalls.length > 0) {
-      const avgApiTime = recentApiCalls.reduce((sum, r) => sum + r.duration, 0) / recentApiCalls.length;
+      const avgApiTime =
+        recentApiCalls.reduce((sum, r) => sum + r.duration, 0) / recentApiCalls.length;
       metrics.apiResponse = avgApiTime / 1000;
     }
 
     // Memory Usage (Chrome only)
-    const perfWithMemory = performance as Performance & { 
-      memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } 
+    const perfWithMemory = performance as Performance & {
+      memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number };
     };
     if (perfWithMemory.memory) {
-      metrics.memoryUsage = (perfWithMemory.memory.usedJSHeapSize / perfWithMemory.memory.jsHeapSizeLimit) * 100;
+      metrics.memoryUsage =
+        (perfWithMemory.memory.usedJSHeapSize / perfWithMemory.memory.jsHeapSizeLimit) * 100;
     }
   } catch (error) {
     console.warn('[Performance] Error getting metrics:', error);
@@ -116,14 +122,14 @@ export function usePerformanceMetrics() {
     firstContentfulPaint: 0,
     largestContentfulPaint: 0,
   });
-  
+
   const metricsRef = useRef<LatestMetrics>(browserMetrics);
   const dbQueryTimeRef = useRef<number>(0);
 
   // تحديث المقاييس بشكل ذكي
   const updateMetrics = useCallback(() => {
     const newMetrics = getBrowserPerformanceMetrics();
-    
+
     // فقط تحديث إذا كانت القيم أكبر (لأن بعض المقاييس تكتمل لاحقاً)
     const updatedMetrics: LatestMetrics = {
       pageLoad: Math.max(metricsRef.current.pageLoad, newMetrics.pageLoad),
@@ -131,10 +137,16 @@ export function usePerformanceMetrics() {
       dbQuery: dbQueryTimeRef.current || metricsRef.current.dbQuery,
       memoryUsage: newMetrics.memoryUsage || metricsRef.current.memoryUsage,
       domContentLoaded: Math.max(metricsRef.current.domContentLoaded, newMetrics.domContentLoaded),
-      firstContentfulPaint: Math.max(metricsRef.current.firstContentfulPaint, newMetrics.firstContentfulPaint),
-      largestContentfulPaint: Math.max(metricsRef.current.largestContentfulPaint, newMetrics.largestContentfulPaint),
+      firstContentfulPaint: Math.max(
+        metricsRef.current.firstContentfulPaint,
+        newMetrics.firstContentfulPaint
+      ),
+      largestContentfulPaint: Math.max(
+        metricsRef.current.largestContentfulPaint,
+        newMetrics.largestContentfulPaint
+      ),
     };
-    
+
     metricsRef.current = updatedMetrics;
     setBrowserMetrics(updatedMetrics);
   }, []);
@@ -157,7 +169,7 @@ export function usePerformanceMetrics() {
 
     // تحديث دوري كل 5 ثوانٍ
     const interval = setInterval(updateMetrics, 5000);
-    
+
     return () => {
       clearInterval(interval);
       window.removeEventListener('load', initialMeasure);
@@ -170,11 +182,11 @@ export function usePerformanceMetrics() {
     queryFn: async () => {
       // قياس وقت استعلام قاعدة البيانات
       const startTime = performance.now();
-      
+
       const { data: slowQueries, error } = await supabase
-        .from("slow_query_log")
-        .select("id, query_text, execution_time_ms, created_at")
-        .order("execution_time_ms", { ascending: false })
+        .from('slow_query_log')
+        .select('id, query_text, execution_time_ms, created_at')
+        .order('execution_time_ms', { ascending: false })
         .limit(20);
 
       const dbQueryTime = (performance.now() - startTime) / 1000;

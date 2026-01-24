@@ -3,9 +3,9 @@
  * @version 2.8.51
  */
 
-import { supabase } from "@/integrations/supabase/client";
-import type { RentalPaymentInsert } from "@/types/payments";
-import type { Database } from "@/integrations/supabase/types";
+import { supabase } from '@/integrations/supabase/client';
+import type { RentalPaymentInsert } from '@/types/payments';
+import type { Database } from '@/integrations/supabase/types';
 
 // Types from database
 type InvoiceRow = Database['public']['Tables']['invoices']['Row'];
@@ -73,13 +73,13 @@ export class RentalPaymentService {
    */
   static async getAll(filters?: RentalPaymentFilters): Promise<RentalPayment[]> {
     let query = supabase
-      .from("rental_payments")
+      .from('rental_payments')
       .select(RENTAL_PAYMENT_SELECT)
-      .is("deleted_at", null) // استبعاد المحذوفة
-      .order("due_date", { ascending: false });
+      .is('deleted_at', null) // استبعاد المحذوفة
+      .order('due_date', { ascending: false });
 
     if (filters?.contractId) {
-      query = query.eq("contract_id", filters.contractId);
+      query = query.eq('contract_id', filters.contractId);
     }
 
     const { data, error } = await query;
@@ -92,9 +92,9 @@ export class RentalPaymentService {
    */
   static async getById(id: string): Promise<RentalPayment | null> {
     const { data, error } = await supabase
-      .from("rental_payments")
+      .from('rental_payments')
       .select(RENTAL_PAYMENT_SELECT)
-      .eq("id", id)
+      .eq('id', id)
       .maybeSingle();
 
     if (error) throw error;
@@ -104,11 +104,13 @@ export class RentalPaymentService {
   /**
    * إنشاء دفعة جديدة
    */
-  static async create(payment: Omit<RentalPaymentInsert, 'payment_number'>): Promise<RentalPayment> {
+  static async create(
+    payment: Omit<RentalPaymentInsert, 'payment_number'>
+  ): Promise<RentalPayment> {
     const paymentNumber = `RP-${Date.now().toString().slice(-8)}`;
-    
+
     const { data, error } = await supabase
-      .from("rental_payments")
+      .from('rental_payments')
       .insert([{ ...payment, payment_number: paymentNumber }])
       .select(RENTAL_PAYMENT_SELECT)
       .maybeSingle();
@@ -123,9 +125,9 @@ export class RentalPaymentService {
    */
   static async update(id: string, updates: Partial<RentalPayment>): Promise<RentalPayment | null> {
     const { data, error } = await supabase
-      .from("rental_payments")
+      .from('rental_payments')
       .update(updates)
-      .eq("id", id)
+      .eq('id', id)
       .select(RENTAL_PAYMENT_SELECT)
       .maybeSingle();
 
@@ -139,17 +141,19 @@ export class RentalPaymentService {
    */
   static async delete(id: string, reason: string = 'تم الإلغاء'): Promise<void> {
     // الحصول على معرف المستخدم الحالي
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     // Soft Delete بدلاً من الحذف الفيزيائي
     const { error } = await supabase
-      .from("rental_payments")
+      .from('rental_payments')
       .update({
         deleted_at: new Date().toISOString(),
         deleted_by: user?.id || null,
         deletion_reason: reason,
       })
-      .eq("id", id);
+      .eq('id', id);
 
     if (error) throw error;
   }
@@ -165,9 +169,9 @@ export class RentalPaymentService {
     contract_id: string;
   } | null> {
     const { data, error } = await supabase
-      .from("rental_payments")
-      .select("amount_paid, payment_date, invoice_id, receipt_id, contract_id")
-      .eq("id", id)
+      .from('rental_payments')
+      .select('amount_paid, payment_date, invoice_id, receipt_id, contract_id')
+      .eq('id', id)
       .maybeSingle();
 
     if (error) throw error;
@@ -189,32 +193,29 @@ export class RentalPaymentService {
     tenantPhone?: string;
     propertyName?: string;
   }): Promise<{ success: boolean; invoice_id?: string; receipt_id?: string }> {
-    const { data, error } = await supabase.rpc(
-      'create_rental_invoice_and_receipt',
-      {
-        p_rental_payment_id: params.rentalPaymentId,
-        p_contract_id: params.contractId,
-        p_amount: params.amount,
-        p_payment_date: params.paymentDate,
-        p_payment_method: params.paymentMethod,
-        p_tenant_name: params.tenantName,
-        p_tenant_id: params.tenantId,
-        p_tenant_email: params.tenantEmail,
-        p_tenant_phone: params.tenantPhone,
-        p_property_name: params.propertyName
-      }
-    );
+    const { data, error } = await supabase.rpc('create_rental_invoice_and_receipt', {
+      p_rental_payment_id: params.rentalPaymentId,
+      p_contract_id: params.contractId,
+      p_amount: params.amount,
+      p_payment_date: params.paymentDate,
+      p_payment_method: params.paymentMethod,
+      p_tenant_name: params.tenantName,
+      p_tenant_id: params.tenantId,
+      p_tenant_email: params.tenantEmail,
+      p_tenant_phone: params.tenantPhone,
+      p_property_name: params.propertyName,
+    });
 
     if (error) throw error;
-    
+
     if (data && data.length > 0 && data[0].success) {
       return {
         success: true,
         invoice_id: data[0].invoice_id,
-        receipt_id: data[0].receipt_id
+        receipt_id: data[0].receipt_id,
       };
     }
-    
+
     return { success: false };
   }
 
@@ -250,10 +251,7 @@ export class RentalPaymentService {
    * جلب إعدادات المنظمة
    */
   static async getOrganizationSettings(): Promise<OrganizationSettingsRecord | null> {
-    const { data, error } = await supabase
-      .from('organization_settings')
-      .select('*')
-      .maybeSingle();
+    const { data, error } = await supabase.from('organization_settings').select('*').maybeSingle();
 
     if (error) throw error;
     return data;

@@ -1,33 +1,38 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { LoansService } from "@/services";
-import { useToast } from "@/hooks/ui/use-toast";
-import { EmergencyAid } from "@/types/loans";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { LoansService } from '@/services';
+import { useToast } from '@/hooks/ui/use-toast';
+import { EmergencyAid } from '@/types/loans';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useEmergencyAid() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: emergencyAids = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: emergencyAids = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.EMERGENCY_AID,
     queryFn: () => LoansService.getEmergencyAids(),
   });
 
   const addEmergencyAid = useMutation({
-    mutationFn: (aid: Omit<EmergencyAid, 'id' | 'created_at' | 'updated_at'>) => 
+    mutationFn: (aid: Omit<EmergencyAid, 'id' | 'created_at' | 'updated_at'>) =>
       LoansService.createEmergencyAid(aid),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
-      toast({ title: "تم تقديم طلب الفزعة" });
+      toast({ title: 'تم تقديم طلب الفزعة' });
     },
   });
 
   const updateEmergencyAid = useMutation({
-    mutationFn: ({ id, ...updates }: Partial<EmergencyAid> & { id: string }) => 
+    mutationFn: ({ id, ...updates }: Partial<EmergencyAid> & { id: string }) =>
       LoansService.updateEmergencyAid(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
-      toast({ title: "تم التحديث" });
+      toast({ title: 'تم التحديث' });
     },
   });
 
@@ -35,10 +40,10 @@ export function useEmergencyAid() {
     mutationFn: (id: string) => LoansService.deleteEmergencyAid(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EMERGENCY_AID });
-      toast({ title: "تم حذف طلب الفزعة بنجاح" });
+      toast({ title: 'تم حذف طلب الفزعة بنجاح' });
     },
     onError: () => {
-      toast({ title: "فشل حذف الطلب", variant: "destructive" });
+      toast({ title: 'فشل حذف الطلب', variant: 'destructive' });
     },
   });
 

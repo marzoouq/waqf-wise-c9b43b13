@@ -70,13 +70,18 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
 
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (!isMounted) return;
 
         if (session?.user) {
           if (import.meta.env.DEV) {
-            productionLogger.debug('🔑 [useLightAuth] نتيجة:', { hasSession: true, userId: session.user.id });
+            productionLogger.debug('🔑 [useLightAuth] نتيجة:', {
+              hasSession: true,
+              userId: session.user.id,
+            });
           }
           // المستخدم مسجل دخوله - تحديد المسار من الـ cache
           const cachedRoles = getCachedRoles(session.user.id);
@@ -87,7 +92,7 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
           if (import.meta.env.DEV) {
             productionLogger.debug('🔑 [useLightAuth] المسار المحدد:', dashboard);
           }
-          
+
           setState({
             isLoggedIn: true,
             isLoading: false,

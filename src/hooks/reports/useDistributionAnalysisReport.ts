@@ -27,39 +27,47 @@ export function useDistributionAnalysisReport() {
   const queryClient = useQueryClient();
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
-  const { data: distributionTrends, isLoading, isRefetching, dataUpdatedAt, error } = useQuery({
+  const {
+    data: distributionTrends,
+    isLoading,
+    isRefetching,
+    dataUpdatedAt,
+    error,
+  } = useQuery({
     queryKey: QUERY_KEYS.DISTRIBUTION_ANALYSIS,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async (): Promise<DistributionTrendData[]> => {
       const distributions = await DistributionService.getAll();
 
       // تجميع البيانات حسب الشهر
-      const monthlyData = (distributions || []).reduce((acc, dist) => {
-        const month = new Date(dist.distribution_date).toLocaleDateString('ar-SA', { 
-          month: 'short', 
-          year: 'numeric' 
-        });
-        if (!acc[month]) {
-          acc[month] = { 
-            month, 
-            totalAmount: 0, 
-            beneficiariesCount: 0,
-            distributionsCount: 0,
-            avgPerBeneficiary: 0
-          };
-        }
-        acc[month].totalAmount += Number(dist.total_amount);
-        acc[month].beneficiariesCount += dist.beneficiaries_count;
-        acc[month].distributionsCount += 1;
-        return acc;
-      }, {} as Record<string, DistributionTrendData>);
+      const monthlyData = (distributions || []).reduce(
+        (acc, dist) => {
+          const month = new Date(dist.distribution_date).toLocaleDateString('ar-SA', {
+            month: 'short',
+            year: 'numeric',
+          });
+          if (!acc[month]) {
+            acc[month] = {
+              month,
+              totalAmount: 0,
+              beneficiariesCount: 0,
+              distributionsCount: 0,
+              avgPerBeneficiary: 0,
+            };
+          }
+          acc[month].totalAmount += Number(dist.total_amount);
+          acc[month].beneficiariesCount += dist.beneficiaries_count;
+          acc[month].distributionsCount += 1;
+          return acc;
+        },
+        {} as Record<string, DistributionTrendData>
+      );
 
       // حساب المتوسط لكل مستفيد
       return Object.values(monthlyData).map((item) => ({
         ...item,
-        avgPerBeneficiary: item.beneficiariesCount > 0 
-          ? item.totalAmount / item.beneficiariesCount 
-          : 0
+        avgPerBeneficiary:
+          item.beneficiariesCount > 0 ? item.totalAmount / item.beneficiariesCount : 0,
       }));
     },
   });
@@ -70,10 +78,13 @@ export function useDistributionAnalysisReport() {
     queryFn: async () => {
       const distributions = await DistributionService.getAll();
 
-      const statusCount = (distributions || []).reduce((acc, curr) => {
-        acc[curr.status] = (acc[curr.status] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const statusCount = (distributions || []).reduce(
+        (acc, curr) => {
+          acc[curr.status] = (acc[curr.status] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
     },
@@ -106,14 +117,18 @@ export function useDistributionAnalysisReport() {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_STATUS_STATS });
   };
 
-  const totals = distributionTrends ? {
-    totalAmount: distributionTrends.reduce((sum, d) => sum + d.totalAmount, 0),
-    totalBeneficiaries: distributionTrends.reduce((sum, d) => sum + d.beneficiariesCount, 0),
-    totalMonths: distributionTrends.length,
-    monthlyAverage: distributionTrends.length > 0 
-      ? distributionTrends.reduce((sum, d) => sum + d.totalAmount, 0) / distributionTrends.length 
-      : 0,
-  } : { totalAmount: 0, totalBeneficiaries: 0, totalMonths: 0, monthlyAverage: 0 };
+  const totals = distributionTrends
+    ? {
+        totalAmount: distributionTrends.reduce((sum, d) => sum + d.totalAmount, 0),
+        totalBeneficiaries: distributionTrends.reduce((sum, d) => sum + d.beneficiariesCount, 0),
+        totalMonths: distributionTrends.length,
+        monthlyAverage:
+          distributionTrends.length > 0
+            ? distributionTrends.reduce((sum, d) => sum + d.totalAmount, 0) /
+              distributionTrends.length
+            : 0,
+      }
+    : { totalAmount: 0, totalBeneficiaries: 0, totalMonths: 0, monthlyAverage: 0 };
 
   return {
     distributionTrends,

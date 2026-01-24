@@ -3,10 +3,10 @@
  * يجلب السندات مع تفاصيل العقود
  */
 
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { PaymentService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { PaymentService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface PaymentWithContract {
   id: string;

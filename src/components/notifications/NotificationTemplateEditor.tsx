@@ -84,10 +84,10 @@ export function NotificationTemplateEditor() {
       variables: formData.variables!,
     };
 
-    const updatedTemplates = editingTemplate 
-      ? templates.map(t => t.id === template.id ? template : t)
+    const updatedTemplates = editingTemplate
+      ? templates.map((t) => (t.id === template.id ? template : t))
       : [...templates, template];
-    
+
     setTemplates(updatedTemplates);
 
     toast({
@@ -122,7 +122,7 @@ export function NotificationTemplateEditor() {
     if (currentChannels.includes(channel)) {
       setFormData({
         ...formData,
-        channels: currentChannels.filter(c => c !== channel),
+        channels: currentChannels.filter((c) => c !== channel),
       });
     } else {
       setFormData({
@@ -135,7 +135,7 @@ export function NotificationTemplateEditor() {
   const extractVariables = (text: string): string[] => {
     const regex = /{{(\w+)}}/g;
     const matches = text.matchAll(regex);
-    return Array.from(new Set(Array.from(matches, m => m[1])));
+    return Array.from(new Set(Array.from(matches, (m) => m[1])));
   };
 
   const handleBodyChange = (value: string) => {
@@ -165,7 +165,7 @@ export function NotificationTemplateEditor() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="مثال: موافقة على التوزيع"
               />
             </div>
@@ -175,7 +175,7 @@ export function NotificationTemplateEditor() {
               <Input
                 id="title"
                 value={formData.title_ar}
-                onChange={e => setFormData({ ...formData, title_ar: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })}
                 placeholder="عنوان الإشعار"
               />
             </div>
@@ -185,14 +185,14 @@ export function NotificationTemplateEditor() {
               <Textarea
                 id="body"
                 value={formData.body_ar}
-                onChange={e => handleBodyChange(e.target.value)}
+                onChange={(e) => handleBodyChange(e.target.value)}
                 placeholder="محتوى الإشعار. استخدم {{variable}} للمتغيرات"
                 rows={4}
               />
               {formData.variables && formData.variables.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   <span className="text-sm text-muted-foreground">المتغيرات:</span>
-                  {formData.variables.map(variable => (
+                  {formData.variables.map((variable) => (
                     <Badge key={variable} variant="secondary">
                       {variable}
                     </Badge>
@@ -205,7 +205,7 @@ export function NotificationTemplateEditor() {
               <Label>قنوات الإرسال</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {(['app', 'email', 'sms', 'whatsapp', 'push'] as NotificationChannel[]).map(
-                  channel => {
+                  (channel) => {
                     const Icon = channelIcons[channel];
                     const isSelected = formData.channels?.includes(channel);
                     return (
@@ -231,7 +231,7 @@ export function NotificationTemplateEditor() {
             <div>
               <Label>الأولوية</Label>
               <div className="flex gap-2 mt-2">
-                {(['low', 'medium', 'high'] as const).map(priority => (
+                {(['low', 'medium', 'high'] as const).map((priority) => (
                   <Button
                     key={priority}
                     variant={formData.priority === priority ? 'default' : 'outline'}
@@ -271,7 +271,7 @@ export function NotificationTemplateEditor() {
       </div>
 
       <div className="grid gap-4">
-        {templates.map(template => (
+        {templates.map((template) => (
           <Card key={template.id} className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -282,8 +282,8 @@ export function NotificationTemplateEditor() {
                       template.priority === 'high'
                         ? 'destructive'
                         : template.priority === 'medium'
-                        ? 'default'
-                        : 'secondary'
+                          ? 'default'
+                          : 'secondary'
                     }
                   >
                     {template.priority === 'low' && 'منخفضة'}
@@ -294,7 +294,7 @@ export function NotificationTemplateEditor() {
                 <p className="text-sm text-muted-foreground mb-2">{template.title_ar}</p>
                 <p className="text-sm mb-3">{template.body_ar}</p>
                 <div className="flex items-center gap-2">
-                  {template.channels.map(channel => {
+                  {template.channels.map((channel) => {
                     const Icon = channelIcons[channel];
                     return (
                       <div

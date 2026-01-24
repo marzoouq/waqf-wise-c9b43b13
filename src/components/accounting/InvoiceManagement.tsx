@@ -1,41 +1,50 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Plus, FileText, Send, CheckCircle, ScanLine } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Plus, FileText, Send, CheckCircle, ScanLine } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { BatchInvoiceOCR } from "@/components/invoices/BatchInvoiceOCR";
-import { useInvoiceManagement } from "@/hooks/accounting/useInvoiceManagement";
-import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
+} from '@/components/ui/dialog';
+import { BatchInvoiceOCR } from '@/components/invoices/BatchInvoiceOCR';
+import { useInvoiceManagement } from '@/hooks/accounting/useInvoiceManagement';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function InvoiceManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showOCRDialog, setShowOCRDialog] = useState(false);
-  
-  const { invoices, isLoading, error, refetch, updateStatus } = useInvoiceManagement(selectedStatus);
+
+  const { invoices, isLoading, error, refetch, updateStatus } =
+    useInvoiceManagement(selectedStatus);
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      draft: { label: "مسودة", variant: "secondary" as const, className: "" },
-      sent: { label: "مرسلة", variant: "default" as const, className: "" },
-      paid: { label: "مدفوعة", variant: "default" as const, className: "bg-success/10 text-success" },
-      overdue: { label: "متأخرة", variant: "destructive" as const, className: "" },
+      draft: { label: 'مسودة', variant: 'secondary' as const, className: '' },
+      sent: { label: 'مرسلة', variant: 'default' as const, className: '' },
+      paid: {
+        label: 'مدفوعة',
+        variant: 'default' as const,
+        className: 'bg-success/10 text-success',
+      },
+      overdue: { label: 'متأخرة', variant: 'destructive' as const, className: '' },
     };
-    
+
     const config = variants[status as keyof typeof variants] || variants.draft;
-    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+    return (
+      <Badge variant={config.variant} className={config.className}>
+        {config.label}
+      </Badge>
+    );
   };
 
   if (isLoading) {
@@ -63,17 +72,22 @@ export function InvoiceManagement() {
       </div>
 
       <div className="flex gap-2 mb-4">
-        {["all", "draft", "sent", "paid", "overdue"].map((status) => (
+        {['all', 'draft', 'sent', 'paid', 'overdue'].map((status) => (
           <Button
             key={status}
-            variant={selectedStatus === status ? "default" : "outline"}
+            variant={selectedStatus === status ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedStatus(status)}
           >
-            {status === "all" ? "الكل" : 
-             status === "draft" ? "مسودة" :
-             status === "sent" ? "مرسلة" :
-             status === "paid" ? "مدفوعة" : "متأخرة"}
+            {status === 'all'
+              ? 'الكل'
+              : status === 'draft'
+                ? 'مسودة'
+                : status === 'sent'
+                  ? 'مرسلة'
+                  : status === 'paid'
+                    ? 'مدفوعة'
+                    : 'متأخرة'}
           </Button>
         ))}
       </div>
@@ -96,14 +110,14 @@ export function InvoiceManagement() {
                   <div>
                     <p className="text-muted-foreground">تاريخ الفاتورة</p>
                     <p className="font-medium">
-                      {new Date(invoice.invoice_date).toLocaleDateString("ar-SA")}
+                      {new Date(invoice.invoice_date).toLocaleDateString('ar-SA')}
                     </p>
                   </div>
                   {invoice.due_date && (
                     <div>
                       <p className="text-muted-foreground">تاريخ الاستحقاق</p>
                       <p className="font-medium">
-                        {new Date(invoice.due_date).toLocaleDateString("ar-SA")}
+                        {new Date(invoice.due_date).toLocaleDateString('ar-SA')}
                       </p>
                     </div>
                   )}
@@ -126,20 +140,17 @@ export function InvoiceManagement() {
                 </div>
               </div>
               <div className="flex gap-2">
-                {invoice.status === "draft" && (
-                  <Button
-                    size="sm"
-                    onClick={() => updateStatus(invoice.id, "sent")}
-                  >
+                {invoice.status === 'draft' && (
+                  <Button size="sm" onClick={() => updateStatus(invoice.id, 'sent')}>
                     <Send className="ms-2 h-4 w-4" />
                     إرسال
                   </Button>
                 )}
-                {invoice.status === "sent" && (
+                {invoice.status === 'sent' && (
                   <Button
                     size="sm"
                     className="bg-success hover:bg-success/90"
-                    onClick={() => updateStatus(invoice.id, "paid")}
+                    onClick={() => updateStatus(invoice.id, 'paid')}
                   >
                     <CheckCircle className="ms-2 h-4 w-4" />
                     تأكيد الدفع
@@ -164,10 +175,10 @@ export function InvoiceManagement() {
           </DialogHeader>
           <BatchInvoiceOCR
             onComplete={(results) => {
-              queryClient.invalidateQueries({ queryKey: ["invoices"] });
+              queryClient.invalidateQueries({ queryKey: ['invoices'] });
               setShowOCRDialog(false);
               toast({
-                title: "تم الاستيراد بنجاح",
+                title: 'تم الاستيراد بنجاح',
                 description: `تم استيراد ${results.length} فاتورة`,
               });
             }}

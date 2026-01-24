@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { NotificationService, RealtimeService, AuthService } from "@/services";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { NotificationService, RealtimeService, AuthService } from '@/services';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface Notification {
   id: string;
@@ -28,7 +28,12 @@ export const useNotifications = () => {
   const queryClient = useQueryClient();
 
   // Fetch notifications - get user inside query
-  const { data: notifications = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: notifications = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.NOTIFICATIONS,
     queryFn: async () => {
       const user = await AuthService.getCurrentUser();
@@ -51,23 +56,20 @@ export const useNotifications = () => {
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       const user = await AuthService.getCurrentUser();
-      if (!user) throw new Error("User not authenticated");
+      if (!user) throw new Error('User not authenticated');
       return NotificationService.markAllAsRead(user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
-      toast.success("تم تعليم جميع الإشعارات كمقروءة");
+      toast.success('تم تعليم جميع الإشعارات كمقروءة');
     },
   });
 
   // Real-time subscription for notifications
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      "notifications",
-      () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('notifications', () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -77,7 +79,7 @@ export const useNotifications = () => {
   // Subscribe to changes in related tables
   useEffect(() => {
     const subscription = RealtimeService.subscribeToChanges(
-      ["approvals", "payments", "journal_entries"],
+      ['approvals', 'payments', 'journal_entries'],
       (payload) => {
         if (payload.table === 'approvals') {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVALS });

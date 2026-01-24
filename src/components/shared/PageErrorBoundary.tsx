@@ -1,8 +1,8 @@
-import { Component, ErrorInfo, ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
-import { logger } from "@/lib/logger";
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -65,15 +65,13 @@ export class PageErrorBoundary extends Component<Props, State> {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              عذراً، حدث خطأ أثناء تحميل {this.props.pageName || 'هذه الصفحة'}.
-            </p>
-
-            {this.state.error?.message && (
-              <p className="text-xs text-muted-foreground">
-                السبب: {this.state.error.message}
+              <p className="text-muted-foreground">
+                عذراً، حدث خطأ أثناء تحميل {this.props.pageName || 'هذه الصفحة'}.
               </p>
-            )}
+
+              {this.state.error?.message && (
+                <p className="text-xs text-muted-foreground">السبب: {this.state.error.message}</p>
+              )}
 
               {import.meta.env.DEV && this.state.error && (
                 <details className="p-4 bg-muted rounded-lg">
@@ -93,7 +91,7 @@ export class PageErrorBoundary extends Component<Props, State> {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => window.location.href = "/"}
+                  onClick={() => (window.location.href = '/')}
                   className="flex-1"
                 >
                   <Home className="ms-2 h-4 w-4" />

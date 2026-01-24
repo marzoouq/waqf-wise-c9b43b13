@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useEffect } from "react";
-import { VoucherService, type VoucherData } from "@/services/voucher.service";
-import { RealtimeService } from "@/services/realtime.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useEffect } from 'react';
+import { VoucherService, type VoucherData } from '@/services/voucher.service';
+import { RealtimeService } from '@/services/realtime.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface PaymentVoucher {
   id: string;
@@ -59,17 +59,17 @@ export function usePaymentVouchers() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم إنشاء السند بنجاح",
-        description: "تم توليد رقم السند تلقائياً",
+        title: 'تم إنشاء السند بنجاح',
+        description: 'تم توليد رقم السند تلقائياً',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في الإنشاء",
+        variant: 'destructive',
+        title: 'خطأ في الإنشاء',
         description: error.message,
       });
-    }
+    },
   });
 
   const markVoucherAsPaid = useMutation({
@@ -81,17 +81,17 @@ export function usePaymentVouchers() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
-        title: "تم تحديث حالة السند",
-        description: "تم إنشاء القيد المحاسبي تلقائياً",
+        title: 'تم تحديث حالة السند',
+        description: 'تم إنشاء القيد المحاسبي تلقائياً',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في التحديث",
+        variant: 'destructive',
+        title: 'خطأ في التحديث',
         description: error.message,
       });
-    }
+    },
   });
 
   const deleteVoucher = useMutation({
@@ -101,16 +101,16 @@ export function usePaymentVouchers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       toast({
-        title: "تم حذف السند بنجاح",
+        title: 'تم حذف السند بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في الحذف",
+        variant: 'destructive',
+        title: 'خطأ في الحذف',
         description: error.message,
       });
-    }
+    },
   });
 
   const generateVouchersFromDistribution = useMutation({
@@ -121,17 +121,17 @@ export function usePaymentVouchers() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       toast({
-        title: "تم توليد السندات بنجاح",
+        title: 'تم توليد السندات بنجاح',
         description: `تم إنشاء ${result.count} سند من التوزيع`,
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في التوليد",
+        variant: 'destructive',
+        title: 'خطأ في التوليد',
         description: error.message,
       });
-    }
+    },
   });
 
   return {

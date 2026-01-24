@@ -4,10 +4,10 @@
  * @version 1.0.0
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
-const TENANT_SESSION_KEY = "tenant_session";
-const TENANT_DATA_KEY = "tenant_data";
+const TENANT_SESSION_KEY = 'tenant_session';
+const TENANT_DATA_KEY = 'tenant_data';
 
 export interface TenantData {
   id: string;
@@ -85,7 +85,7 @@ export interface CreateMaintenanceRequestData {
   images?: string[];
   preferredDate?: string;
   preferredTimeSlot?: string;
-  contactPreference?: "phone" | "email" | "whatsapp";
+  contactPreference?: 'phone' | 'email' | 'whatsapp';
   contactPhone?: string;
   contactEmail?: string;
   isUrgent?: boolean;
@@ -96,14 +96,16 @@ export class TenantPortalService {
   /**
    * إرسال رمز OTP
    */
-  static async sendOtp(phone: string): Promise<{ success: boolean; tenantName?: string; devOtp?: string; error?: string }> {
-    const { data, error } = await supabase.functions.invoke("tenant-send-otp", {
+  static async sendOtp(
+    phone: string
+  ): Promise<{ success: boolean; tenantName?: string; devOtp?: string; error?: string }> {
+    const { data, error } = await supabase.functions.invoke('tenant-send-otp', {
       body: { phone },
     });
 
     if (error) {
-      console.error("Error sending OTP:", error);
-      return { success: false, error: "فشل في إرسال رمز التحقق" };
+      console.error('Error sending OTP:', error);
+      return { success: false, error: 'فشل في إرسال رمز التحقق' };
     }
 
     return data;
@@ -112,14 +114,17 @@ export class TenantPortalService {
   /**
    * التحقق من رمز OTP
    */
-  static async verifyOtp(phone: string, otp: string): Promise<{ success: boolean; tenant?: TenantData; error?: string }> {
-    const { data, error } = await supabase.functions.invoke("tenant-verify-otp", {
+  static async verifyOtp(
+    phone: string,
+    otp: string
+  ): Promise<{ success: boolean; tenant?: TenantData; error?: string }> {
+    const { data, error } = await supabase.functions.invoke('tenant-verify-otp', {
       body: { phone, otp },
     });
 
     if (error) {
-      console.error("Error verifying OTP:", error);
-      return { success: false, error: "فشل في التحقق من الرمز" };
+      console.error('Error verifying OTP:', error);
+      return { success: false, error: 'فشل في التحقق من الرمز' };
     }
 
     if (data.success && data.sessionToken) {
@@ -149,25 +154,29 @@ export class TenantPortalService {
   /**
    * استدعاء API البوابة
    */
-  private static async callPortalApi<T>(action: string, method: "GET" | "POST" = "GET", body?: unknown): Promise<T> {
+  private static async callPortalApi<T>(
+    action: string,
+    method: 'GET' | 'POST' = 'GET',
+    body?: unknown
+  ): Promise<T> {
     const sessionToken = this.getSessionToken();
-    
+
     if (!sessionToken) {
-      throw new Error("غير مسجل الدخول");
+      throw new Error('غير مسجل الدخول');
     }
 
     // استخدام fetch مع query param للـ action
     const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tenant-portal`);
-    url.searchParams.set("action", action);
+    url.searchParams.set('action', action);
 
     const response = await fetch(url.toString(), {
       method,
       headers: {
-        "Content-Type": "application/json",
-        "x-tenant-session": sessionToken,
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        'Content-Type': 'application/json',
+        'x-tenant-session': sessionToken,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
-      body: method === "POST" ? JSON.stringify(body) : undefined,
+      body: method === 'POST' ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
@@ -175,9 +184,9 @@ export class TenantPortalService {
       if (response.status === 401) {
         // الجلسة منتهية
         this.logout();
-        throw new Error("انتهت صلاحية الجلسة");
+        throw new Error('انتهت صلاحية الجلسة');
       }
-      throw new Error(errorData.error || "حدث خطأ");
+      throw new Error(errorData.error || 'حدث خطأ');
     }
 
     return response.json();
@@ -187,42 +196,48 @@ export class TenantPortalService {
    * جلب الملف الشخصي والعقود
    */
   static async getProfile(): Promise<{ tenant: TenantData; contracts: TenantContract[] }> {
-    return this.callPortalApi("profile", "GET");
+    return this.callPortalApi('profile', 'GET');
   }
 
   /**
    * جلب طلبات الصيانة
    */
   static async getMaintenanceRequests(): Promise<{ requests: TenantMaintenanceRequest[] }> {
-    return this.callPortalApi("requests", "GET");
+    return this.callPortalApi('requests', 'GET');
   }
 
   /**
    * إنشاء طلب صيانة جديد
    */
-  static async createMaintenanceRequest(data: CreateMaintenanceRequestData): Promise<{ success: boolean; request: TenantMaintenanceRequest }> {
-    return this.callPortalApi("create-request", "POST", data);
+  static async createMaintenanceRequest(
+    data: CreateMaintenanceRequestData
+  ): Promise<{ success: boolean; request: TenantMaintenanceRequest }> {
+    return this.callPortalApi('create-request', 'POST', data);
   }
 
   /**
    * تقييم طلب صيانة
    */
-  static async rateRequest(requestId: string, rating: number, feedback?: string): Promise<{ success: boolean }> {
-    return this.callPortalApi("rate-request", "POST", { requestId, rating, feedback });
+  static async rateRequest(
+    requestId: string,
+    rating: number,
+    feedback?: string
+  ): Promise<{ success: boolean }> {
+    return this.callPortalApi('rate-request', 'POST', { requestId, rating, feedback });
   }
 
   /**
    * جلب الإشعارات
    */
   static async getNotifications(): Promise<{ notifications: TenantNotification[] }> {
-    return this.callPortalApi("notifications", "GET");
+    return this.callPortalApi('notifications', 'GET');
   }
 
   /**
    * تحديد إشعار كمقروء
    */
   static async markNotificationRead(notificationId: string): Promise<{ success: boolean }> {
-    return this.callPortalApi("mark-read", "POST", { notificationId });
+    return this.callPortalApi('mark-read', 'POST', { notificationId });
   }
 
   /**
@@ -232,14 +247,17 @@ export class TenantPortalService {
     try {
       const sessionToken = this.getSessionToken();
       if (sessionToken) {
-        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tenant-portal?action=logout`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-tenant-session": sessionToken,
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-        });
+        await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tenant-portal?action=logout`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-tenant-session': sessionToken,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+          }
+        );
       }
     } finally {
       sessionStorage.removeItem(TENANT_SESSION_KEY);

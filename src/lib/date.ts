@@ -58,7 +58,10 @@ const arLocale = { locale: ar };
  * @param date - التاريخ (string أو Date)
  * @param formatStr - صيغة التنسيق (افتراضي: dd/MM/yyyy)
  */
-export function formatDate(date: Date | string | null | undefined, formatStr: string = 'dd/MM/yyyy'): string {
+export function formatDate(
+  date: Date | string | null | undefined,
+  formatStr: string = 'dd/MM/yyyy'
+): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
   if (!isValid(d)) return '';
@@ -171,7 +174,7 @@ export {
   isBefore,
   isAfter,
   isValid,
-  
+
   // Date manipulation
   startOfMonth,
   endOfMonth,
@@ -185,11 +188,11 @@ export {
   subDays,
   subMonths,
   subYears,
-  
+
   // Date intervals
   eachDayOfInterval,
   eachMonthOfInterval,
-  
+
   // Date parts
   getYear,
   getMonth,
@@ -197,7 +200,7 @@ export {
   setYear,
   setMonth,
   setDate,
-  
+
   // Parsing
   parseISO,
 };

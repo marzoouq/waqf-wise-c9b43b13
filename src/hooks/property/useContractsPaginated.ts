@@ -2,14 +2,14 @@
  * useContractsPaginated - Hook للعقود مع Server-side Pagination
  * @version 2.9.10
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { toast } from "@/hooks/ui/use-toast";
-import { logger } from "@/lib/logger";
-import type { Contract, ContractInsert } from "@/types/contracts";
-import { ContractService } from "@/services/contract.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { toast } from '@/hooks/ui/use-toast';
+import { logger } from '@/lib/logger';
+import type { Contract, ContractInsert } from '@/types/contracts';
+import { ContractService } from '@/services/contract.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '@/lib/pagination.types';
 
 interface UseContractsPaginatedOptions {
   initialPage?: number;
@@ -24,52 +24,60 @@ export const useContractsPaginated = (options: UseContractsPaginatedOptions = {}
   const [pageSize, setPageSize] = useState(options.initialPageSize || DEFAULT_PAGE_SIZE);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [...QUERY_KEYS.CONTRACTS, 'paginated', page, pageSize, options.status, options.propertyId],
-    queryFn: () => ContractService.getPaginated(
-      { page, pageSize },
-      { status: options.status, propertyId: options.propertyId }
-    ),
+    queryKey: [
+      ...QUERY_KEYS.CONTRACTS,
+      'paginated',
+      page,
+      pageSize,
+      options.status,
+      options.propertyId,
+    ],
+    queryFn: () =>
+      ContractService.getPaginated(
+        { page, pageSize },
+        { status: options.status, propertyId: options.propertyId }
+      ),
     staleTime: 3 * 60 * 1000,
   });
 
   const addContract = useMutation({
-    mutationFn: (contract: ContractInsert & { unit_ids?: string[] }) => 
+    mutationFn: (contract: ContractInsert & { unit_ids?: string[] }) =>
       ContractService.create(contract),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
-        title: "تم إضافة العقد بنجاح",
-        description: "تم إنشاء العقد وجدول الدفعات",
+        title: 'تم إضافة العقد بنجاح',
+        description: 'تم إنشاء العقد وجدول الدفعات',
       });
     },
     onError: (error) => {
       logger.error(error, { context: 'add_contract', severity: 'medium' });
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إضافة العقد",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء إضافة العقد',
+        variant: 'destructive',
       });
     },
   });
 
   const updateContract = useMutation({
-    mutationFn: ({ id, ...contract }: Partial<Contract> & { id: string }) => 
+    mutationFn: ({ id, ...contract }: Partial<Contract> & { id: string }) =>
       ContractService.update(id, contract),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       toast({
-        title: "تم تحديث العقد",
-        description: "تم تحديث العقد بنجاح",
+        title: 'تم تحديث العقد',
+        description: 'تم تحديث العقد بنجاح',
       });
     },
     onError: (error) => {
       logger.error(error, { context: 'update_contract', severity: 'medium' });
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث العقد",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء تحديث العقد',
+        variant: 'destructive',
       });
     },
   });
@@ -79,16 +87,16 @@ export const useContractsPaginated = (options: UseContractsPaginatedOptions = {}
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       toast({
-        title: "تم حذف العقد",
-        description: "تم حذف العقد بنجاح",
+        title: 'تم حذف العقد',
+        description: 'تم حذف العقد بنجاح',
       });
     },
     onError: (error) => {
       logger.error(error, { context: 'delete_contract', severity: 'high' });
       toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء حذف العقد",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'حدث خطأ أثناء حذف العقد',
+        variant: 'destructive',
       });
     },
   });

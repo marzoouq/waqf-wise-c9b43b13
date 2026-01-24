@@ -1,23 +1,27 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FileText, Printer, Download } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { usePaymentVouchersList } from "@/hooks/distributions/useDistributionTabsData";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { LoadingState } from "@/components/shared/LoadingState";
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FileText, Printer, Download } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { usePaymentVouchersList } from '@/hooks/distributions/useDistributionTabsData';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { LoadingState } from '@/components/shared/LoadingState';
 
 export function PaymentVouchers() {
   const { data: vouchers, isLoading, error, refetch } = usePaymentVouchersList();
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      pending: { label: "معلق", variant: "secondary" as const, className: "" },
-      printed: { label: "مطبوع", variant: "default" as const, className: "" },
-      paid: { label: "مدفوع", variant: "default" as const, className: "bg-success/10 text-success" },
-      cancelled: { label: "ملغي", variant: "destructive" as const, className: "" },
+      pending: { label: 'معلق', variant: 'secondary' as const, className: '' },
+      printed: { label: 'مطبوع', variant: 'default' as const, className: '' },
+      paid: {
+        label: 'مدفوع',
+        variant: 'default' as const,
+        className: 'bg-success/10 text-success',
+      },
+      cancelled: { label: 'ملغي', variant: 'destructive' as const, className: '' },
     };
-    
+
     const config = variants[status as keyof typeof variants] || variants.pending;
     return (
       <Badge variant={config.variant} className={config.className}>
@@ -68,7 +72,7 @@ export function PaymentVouchers() {
                   <div>
                     <p className="text-muted-foreground">التاريخ</p>
                     <p className="font-medium">
-                      {new Date(voucher.created_at).toLocaleDateString("ar-SA")}
+                      {new Date(voucher.created_at).toLocaleDateString('ar-SA')}
                     </p>
                   </div>
                   <div>

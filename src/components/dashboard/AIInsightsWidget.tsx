@@ -1,10 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, ArrowLeft, LucideIcon } from "lucide-react";
-import { useAIInsights } from "@/hooks/ai/useAIInsights";
-import { useNavigate } from "react-router-dom";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Sparkles,
+  TrendingUp,
+  AlertTriangle,
+  Lightbulb,
+  ArrowLeft,
+  LucideIcon,
+} from 'lucide-react';
+import { useAIInsights } from '@/hooks/ai/useAIInsights';
+import { useNavigate } from 'react-router-dom';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,
@@ -43,10 +50,12 @@ export function AIInsightsWidget() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل الرؤى" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState title="خطأ في تحميل الرؤى" message={(error as Error).message} onRetry={refetch} />
+    );
   }
 
-  const activeInsights = insights?.filter(i => !i.is_dismissed).slice(0, 3) || [];
+  const activeInsights = insights?.filter((i) => !i.is_dismissed).slice(0, 3) || [];
 
   return (
     <Card>
@@ -55,24 +64,20 @@ export function AIInsightsWidget() {
           <Sparkles className="h-5 w-5 text-primary" />
           الرؤى الذكية
         </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/ai-insights')}
-        >
+        <Button variant="ghost" size="sm" onClick={() => navigate('/ai-insights')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
       </CardHeader>
       <CardContent>
         {activeInsights.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            لا توجد رؤى ذكية جديدة
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-4">لا توجد رؤى ذكية جديدة</p>
         ) : (
           <div className="space-y-3">
             {activeInsights.map((insight) => {
               const Icon = categoryIcons[insight.alert_type] || Sparkles;
-              const severityColor = severityColors[insight.severity as keyof typeof severityColors] || severityColors.info;
+              const severityColor =
+                severityColors[insight.severity as keyof typeof severityColors] ||
+                severityColors.info;
 
               return (
                 <div key={insight.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">

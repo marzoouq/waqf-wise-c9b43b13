@@ -18,13 +18,13 @@ interface HistoricalRentalDetailsCardProps {
   fiscalYearName?: string;
 }
 
-export function HistoricalRentalDetailsCard({ 
+export function HistoricalRentalDetailsCard({
   fiscalYearId,
-  fiscalYearName 
+  fiscalYearName,
 }: HistoricalRentalDetailsCardProps) {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [closingId, setClosingId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (fiscalYearId) {
       HistoricalRentalService.getClosingIdByFiscalYear(fiscalYearId)
@@ -34,7 +34,7 @@ export function HistoricalRentalDetailsCard({
         });
     }
   }, [fiscalYearId]);
-  
+
   const { monthlySummary, isLoading } = useHistoricalRentalMonthlySummary(closingId || undefined);
 
   // حساب الإجماليات
@@ -50,9 +50,7 @@ export function HistoricalRentalDetailsCard({
             <Building2 className="h-5 w-5 text-muted-foreground" />
             تفاصيل الإيرادات السكنية التاريخية
           </CardTitle>
-          <CardDescription>
-            لا توجد سنة مالية مغلقة لعرض تفاصيلها
-          </CardDescription>
+          <CardDescription>لا توجد سنة مالية مغلقة لعرض تفاصيلها</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -79,9 +77,7 @@ export function HistoricalRentalDetailsCard({
             <Building2 className="h-5 w-5 text-muted-foreground" />
             تفاصيل الإيرادات السكنية التاريخية
           </CardTitle>
-          <CardDescription>
-            لم يتم إدخال تفاصيل الإيجارات لهذه السنة المالية بعد
-          </CardDescription>
+          <CardDescription>لم يتم إدخال تفاصيل الإيجارات لهذه السنة المالية بعد</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -95,14 +91,10 @@ export function HistoricalRentalDetailsCard({
             <Building2 className="h-5 w-5 text-primary" />
             تفاصيل الإيرادات السكنية التاريخية
             {fiscalYearName && (
-              <span className="text-sm font-normal text-muted-foreground">
-                - {fiscalYearName}
-              </span>
+              <span className="text-sm font-normal text-muted-foreground">- {fiscalYearName}</span>
             )}
           </CardTitle>
-          <CardDescription>
-            انقر على أي شهر لعرض تفاصيل كل شقة ومستأجر
-          </CardDescription>
+          <CardDescription>انقر على أي شهر لعرض تفاصيل كل شقة ومستأجر</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* ملخص الإجماليات */}
@@ -116,30 +108,26 @@ export function HistoricalRentalDetailsCard({
                 {formatCurrency(totalCollected)}
               </div>
             </div>
-            
+
             <div className="bg-info/10 rounded-lg p-4 border border-info/20">
               <div className="flex items-center gap-2 text-info mb-1">
                 <Calendar className="h-4 w-4" />
                 <span className="text-sm font-medium">عدد الأشهر</span>
               </div>
-              <div className="text-2xl font-bold text-info">
-                {totalMonths} شهر
-              </div>
+              <div className="text-2xl font-bold text-info">{totalMonths} شهر</div>
             </div>
-            
+
             <div className="bg-warning/10 rounded-lg p-4 border border-warning/20">
               <div className="flex items-center gap-2 text-warning mb-1">
                 <TrendingUp className="h-4 w-4" />
                 <span className="text-sm font-medium">متوسط الشهر</span>
               </div>
-              <div className="text-2xl font-bold text-warning">
-                {formatCurrency(avgMonthly)}
-              </div>
+              <div className="text-2xl font-bold text-warning">{formatCurrency(avgMonthly)}</div>
             </div>
           </div>
 
           {/* جدول الملخص الشهري */}
-          <HistoricalRentalMonthlyTable 
+          <HistoricalRentalMonthlyTable
             monthlySummary={monthlySummary}
             onMonthClick={(monthDate) => setSelectedMonth(monthDate)}
           />
@@ -152,7 +140,7 @@ export function HistoricalRentalDetailsCard({
         onOpenChange={(open) => !open && setSelectedMonth(null)}
         fiscalYearClosingId={closingId || ''}
         monthDate={selectedMonth || ''}
-        monthlySummary={monthlySummary.find(m => m.month_date === selectedMonth)}
+        monthlySummary={monthlySummary.find((m) => m.month_date === selectedMonth)}
       />
     </>
   );

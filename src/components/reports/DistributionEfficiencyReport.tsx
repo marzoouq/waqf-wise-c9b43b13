@@ -1,7 +1,18 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { Clock, TrendingUp, Download, Award, AlertTriangle } from 'lucide-react';
 import type { DistributionReportData, MonthlyEfficiencyData } from '@/types/reports/index';
 
@@ -20,22 +31,26 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
       totalProcessed: distributions.length,
     };
 
-    distributions.forEach(dist => {
+    distributions.forEach((dist) => {
       // وقت الموافقة (من الإنشاء للموافقة)
       if (dist.approved_at && dist.created_at) {
-        const approvalTime = new Date(dist.approved_at).getTime() - new Date(dist.created_at).getTime();
+        const approvalTime =
+          new Date(dist.approved_at).getTime() - new Date(dist.created_at).getTime();
         metrics.avgApprovalTime += approvalTime / (1000 * 60 * 60); // بالساعات
       }
 
       // وقت المعالجة (من الموافقة للتنفيذ)
       if (dist.executed_at && dist.approved_at) {
-        const processingTime = new Date(dist.executed_at).getTime() - new Date(dist.approved_at).getTime();
+        const processingTime =
+          new Date(dist.executed_at).getTime() - new Date(dist.approved_at).getTime();
         metrics.avgProcessingTime += processingTime / (1000 * 60 * 60); // بالساعات
       }
 
       // حساب التسليم في الوقت المحدد
       if (dist.status === 'completed' || dist.status === 'مكتمل') {
-        const totalTime = new Date(dist.executed_at || dist.updated_at).getTime() - new Date(dist.created_at).getTime();
+        const totalTime =
+          new Date(dist.executed_at || dist.updated_at).getTime() -
+          new Date(dist.created_at).getTime();
         const totalDays = totalTime / (1000 * 60 * 60 * 24);
         if (totalDays <= 7) {
           metrics.onTimeDelivery++;
@@ -54,41 +69,46 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
   };
 
   const metrics = calculateMetrics();
-  const onTimePercentage = metrics.totalProcessed > 0
-    ? (metrics.onTimeDelivery / metrics.totalProcessed) * 100
-    : 0;
+  const onTimePercentage =
+    metrics.totalProcessed > 0 ? (metrics.onTimeDelivery / metrics.totalProcessed) * 100 : 0;
 
   // تحليل حسب الشهر
-  const monthlyEfficiency = distributions.reduce<Record<string, MonthlyEfficiencyData>>((acc, dist) => {
-    const month = new Date(dist.created_at).toLocaleDateString('ar-SA', { month: 'long' });
-    if (!acc[month]) {
-      acc[month] = {
-        month,
-        onTime: 0,
-        delayed: 0,
-        avgApprovalTime: 0,
-        count: 0,
-      };
-    }
-    
-    const totalTime = dist.executed_at
-      ? (new Date(dist.executed_at).getTime() - new Date(dist.created_at).getTime()) / (1000 * 60 * 60 * 24)
-      : 0;
-    
-    if (totalTime <= 7) {
-      acc[month].onTime++;
-    } else {
-      acc[month].delayed++;
-    }
+  const monthlyEfficiency = distributions.reduce<Record<string, MonthlyEfficiencyData>>(
+    (acc, dist) => {
+      const month = new Date(dist.created_at).toLocaleDateString('ar-SA', { month: 'long' });
+      if (!acc[month]) {
+        acc[month] = {
+          month,
+          onTime: 0,
+          delayed: 0,
+          avgApprovalTime: 0,
+          count: 0,
+        };
+      }
 
-    if (dist.approved_at) {
-      const approvalTime = (new Date(dist.approved_at).getTime() - new Date(dist.created_at).getTime()) / (1000 * 60 * 60);
-      acc[month].avgApprovalTime += approvalTime;
-    }
-    
-    acc[month].count++;
-    return acc;
-  }, {});
+      const totalTime = dist.executed_at
+        ? (new Date(dist.executed_at).getTime() - new Date(dist.created_at).getTime()) /
+          (1000 * 60 * 60 * 24)
+        : 0;
+
+      if (totalTime <= 7) {
+        acc[month].onTime++;
+      } else {
+        acc[month].delayed++;
+      }
+
+      if (dist.approved_at) {
+        const approvalTime =
+          (new Date(dist.approved_at).getTime() - new Date(dist.created_at).getTime()) /
+          (1000 * 60 * 60);
+        acc[month].avgApprovalTime += approvalTime;
+      }
+
+      acc[month].count++;
+      return acc;
+    },
+    {}
+  );
 
   const efficiencyChartData = Object.values(monthlyEfficiency).map((m) => ({
     ...m,
@@ -214,7 +234,10 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
           <h3 className="text-lg font-semibold mb-4">نقاط الاختناق</h3>
           <div className="space-y-4">
             {bottlenecks.map((bottleneck) => (
-              <div key={bottleneck.stage} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+              <div
+                key={bottleneck.stage}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+              >
                 <div className="flex-1">
                   <div className="font-medium">{bottleneck.stage}</div>
                   <div className="text-sm text-muted-foreground">
@@ -226,8 +249,8 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
                     bottleneck.impact === 'عالي'
                       ? 'destructive'
                       : bottleneck.impact === 'متوسط'
-                      ? 'default'
-                      : 'secondary'
+                        ? 'default'
+                        : 'secondary'
                   }
                 >
                   {bottleneck.impact}
@@ -258,17 +281,15 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
             <li className="flex items-start gap-2">
               <span className="text-info mt-1">•</span>
               <span>
-                نسبة التسليم في الموعد منخفضة ({onTimePercentage.toFixed(1)}%). يُنصح بمراجعة
-                مسارات الموافقات وتبسيطها.
+                نسبة التسليم في الموعد منخفضة ({onTimePercentage.toFixed(1)}%). يُنصح بمراجعة مسارات
+                الموافقات وتبسيطها.
               </span>
             </li>
           )}
           {metrics.avgProcessingTime > 24 && (
             <li className="flex items-start gap-2">
               <span className="text-info mt-1">•</span>
-              <span>
-                وقت المعالجة مرتفع. يُنصح بأتمتة التحويلات البنكية للتسريع.
-              </span>
+              <span>وقت المعالجة مرتفع. يُنصح بأتمتة التحويلات البنكية للتسريع.</span>
             </li>
           )}
           <li className="flex items-start gap-2">

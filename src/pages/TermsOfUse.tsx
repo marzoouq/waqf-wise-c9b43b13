@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { FileText, Scale, AlertTriangle, CheckCircle, XCircle, HelpCircle } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { LandingHeader } from '@/components/landing/LandingHeader';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { FileText, Scale, AlertTriangle, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 
 export default function TermsOfUse() {
   return (
@@ -23,7 +23,8 @@ export default function TermsOfUse() {
               <h2 className="text-xl font-semibold text-foreground m-0">القبول بالشروط</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              باستخدامك لمنصة الوقف، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة.
+              باستخدامك لمنصة الوقف، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق
+              على أي من هذه الشروط، يرجى عدم استخدام المنصة.
             </p>
           </section>
 
@@ -59,7 +60,8 @@ export default function TermsOfUse() {
               <h2 className="text-xl font-semibold text-foreground m-0">إخلاء المسؤولية</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نسعى لتوفير خدمة موثوقة، لكننا لا نضمن خلو المنصة من الأخطاء أو الانقطاعات. نحتفظ بالحق في تعديل أو إيقاف الخدمة في أي وقت.
+              نسعى لتوفير خدمة موثوقة، لكننا لا نضمن خلو المنصة من الأخطاء أو الانقطاعات. نحتفظ
+              بالحق في تعديل أو إيقاف الخدمة في أي وقت.
             </p>
           </section>
 
@@ -69,16 +71,14 @@ export default function TermsOfUse() {
               <h2 className="text-xl font-semibold text-foreground m-0">التعديلات</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إخطارك بأي تغييرات جوهرية عبر البريد الإلكتروني أو من خلال إشعار على المنصة.
+              نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إخطارك بأي تغييرات جوهرية عبر البريد
+              الإلكتروني أو من خلال إشعار على المنصة.
             </p>
           </section>
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
-            to="/" 
-            className="text-primary hover:text-primary/80 font-medium"
-          >
+          <Link to="/" className="text-primary hover:text-primary/80 font-medium">
             ← العودة للصفحة الرئيسية
           </Link>
         </div>

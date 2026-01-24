@@ -30,7 +30,11 @@ export function useEmergencyAidApprovals() {
   const queryClient = useQueryClient();
 
   // جلب الطلبات المعلقة
-  const { data: requests = [], isLoading, error } = useQuery({
+  const {
+    data: requests = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: QUERY_KEYS.EMERGENCY_APPROVALS,
     queryFn: async () => {
       const data = await LoansService.getPendingEmergencyRequests();
@@ -40,15 +44,7 @@ export function useEmergencyAidApprovals() {
 
   // موافقة على الطلب
   const approveMutation = useMutation({
-    mutationFn: async ({ 
-      id, 
-      amount, 
-      notes 
-    }: { 
-      id: string; 
-      amount: number; 
-      notes?: string;
-    }) => {
+    mutationFn: async ({ id, amount, notes }: { id: string; amount: number; notes?: string }) => {
       await LoansService.approveEmergencyRequest(id, amount, notes);
     },
     onSuccess: (_, variables) => {
@@ -70,13 +66,7 @@ export function useEmergencyAidApprovals() {
 
   // رفض الطلب
   const rejectMutation = useMutation({
-    mutationFn: async ({ 
-      id, 
-      reason 
-    }: { 
-      id: string; 
-      reason: string;
-    }) => {
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
       await LoansService.rejectEmergencyRequest(id, reason);
     },
     onSuccess: () => {

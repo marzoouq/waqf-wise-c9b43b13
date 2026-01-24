@@ -1,20 +1,20 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Download, FileText, FileSpreadsheet, Printer } from "lucide-react";
-import { toast } from "@/hooks/ui/use-toast";
+} from '@/components/ui/dropdown-menu';
+import { Download, FileText, FileSpreadsheet, Printer } from 'lucide-react';
+import { toast } from '@/hooks/ui/use-toast';
 
 interface ExportButtonProps<T extends object> {
   data: T[];
   filename: string;
   title: string;
   headers: string[];
-  variant?: "default" | "outline" | "ghost";
-  size?: "default" | "sm" | "lg" | "icon";
+  variant?: 'default' | 'outline' | 'ghost';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
 }
 
@@ -23,19 +23,19 @@ export const ExportButton = <T extends object>({
   filename,
   title,
   headers,
-  variant = "outline",
-  size = "sm",
+  variant = 'outline',
+  size = 'sm',
   className,
 }: ExportButtonProps<T>) => {
   // استخراج البيانات من الكائنات بناءً على مفاتيح الـ headers
   const extractDataForExport = () => {
-    return data.map(item => {
+    return data.map((item) => {
       const record = item as Record<string, unknown>;
       // البحث عن القيم باستخدام المفاتيح العربية (headers)
-      return headers.map(header => {
+      return headers.map((header) => {
         const value = record[header];
-        if (value === null || value === undefined) return "-";
-        if (typeof value === "boolean") return value ? "نعم" : "لا";
+        if (value === null || value === undefined) return '-';
+        if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
         return String(value);
       });
     });
@@ -44,19 +44,19 @@ export const ExportButton = <T extends object>({
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportPDF = async () => {
     try {
-      const { exportToPDF } = await import("@/lib/exportHelpers");
+      const { exportToPDF } = await import('@/lib/exportHelpers');
       const tableData = extractDataForExport();
       await exportToPDF(title, headers, tableData, filename);
       toast({
-        title: "تم التصدير",
-        description: "تم تصدير البيانات إلى PDF بنجاح",
+        title: 'تم التصدير',
+        description: 'تم تصدير البيانات إلى PDF بنجاح',
       });
     } catch (error) {
-      console.error("PDF Export Error:", error);
+      console.error('PDF Export Error:', error);
       toast({
-        title: "خطأ",
-        description: "فشل تصدير البيانات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تصدير البيانات',
+        variant: 'destructive',
       });
     }
   };
@@ -64,19 +64,19 @@ export const ExportButton = <T extends object>({
   // ✅ Dynamic import - يُحمّل فقط عند الضغط على زر التصدير
   const handleExportExcel = async () => {
     try {
-      const { exportToExcel } = await import("@/lib/exportHelpers");
+      const { exportToExcel } = await import('@/lib/exportHelpers');
       // Safe cast - T extends object so it's compatible with Record
       await exportToExcel(data as unknown as Record<string, unknown>[], filename, title);
       toast({
-        title: "تم التصدير",
-        description: "تم تصدير البيانات إلى Excel بنجاح",
+        title: 'تم التصدير',
+        description: 'تم تصدير البيانات إلى Excel بنجاح',
       });
     } catch (error) {
-      console.error("Excel Export Error:", error);
+      console.error('Excel Export Error:', error);
       toast({
-        title: "خطأ",
-        description: "فشل تصدير البيانات",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'فشل تصدير البيانات',
+        variant: 'destructive',
       });
     }
   };
@@ -87,9 +87,9 @@ export const ExportButton = <T extends object>({
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       toast({
-        title: "خطأ",
-        description: "يرجى السماح بالنوافذ المنبثقة للطباعة",
-        variant: "destructive",
+        title: 'خطأ',
+        description: 'يرجى السماح بالنوافذ المنبثقة للطباعة',
+        variant: 'destructive',
       });
       return;
     }
@@ -122,10 +122,10 @@ export const ExportButton = <T extends object>({
         </div>
         <table>
           <thead>
-            <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+            <tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr>
           </thead>
           <tbody>
-            ${tableData.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
+            ${tableData.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}
           </tbody>
         </table>
         <script>window.onload = function() { window.print(); }</script>
@@ -135,10 +135,10 @@ export const ExportButton = <T extends object>({
 
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-    
+
     toast({
-      title: "جاري الطباعة",
-      description: "تم فتح نافذة الطباعة",
+      title: 'جاري الطباعة',
+      description: 'تم فتح نافذة الطباعة',
     });
   };
 

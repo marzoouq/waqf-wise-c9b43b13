@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { LoansService } from "@/services";
-import type { Database } from "@/integrations/supabase/types";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { LoansService } from '@/services';
+import type { Database } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type Loan = Database['public']['Tables']['loans']['Row'] & {
   beneficiaries?: {
@@ -25,39 +25,39 @@ export function useLoans() {
   });
 
   const addLoan = useMutation({
-    mutationFn: (loan: Database['public']['Tables']['loans']['Insert']) => 
+    mutationFn: (loan: Database['public']['Tables']['loans']['Insert']) =>
       LoansService.create(loan),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       toast({
-        title: "تم إضافة القرض",
-        description: "تم إضافة القرض بنجاح",
+        title: 'تم إضافة القرض',
+        description: 'تم إضافة القرض بنجاح',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
   const updateLoan = useMutation({
-    mutationFn: ({ id, ...updates }: Partial<Loan> & { id: string }) => 
+    mutationFn: ({ id, ...updates }: Partial<Loan> & { id: string }) =>
       LoansService.update(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       toast({
-        title: "تم التحديث",
-        description: "تم تحديث القرض بنجاح",
+        title: 'تم التحديث',
+        description: 'تم تحديث القرض بنجاح',
       });
     },
     onError: (error) => {
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });

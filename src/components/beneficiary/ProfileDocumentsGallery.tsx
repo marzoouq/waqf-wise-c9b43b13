@@ -4,14 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { 
-  FileText, 
-  Download, 
-  Eye, 
-  CheckCircle, 
+import {
+  FileText,
+  Download,
+  Eye,
+  CheckCircle,
   Clock,
   Image as ImageIcon,
-  File
+  File,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -21,7 +21,12 @@ interface ProfileDocumentsGalleryProps {
 }
 
 export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalleryProps) {
-  const { data: documents, isLoading, error, refetch } = useBeneficiaryProfileDocuments(beneficiaryId);
+  const {
+    data: documents,
+    isLoading,
+    error,
+    refetch,
+  } = useBeneficiaryProfileDocuments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المستندات..." />;
@@ -31,8 +36,8 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
     return <ErrorState title="خطأ في التحميل" message="فشل تحميل المستندات" onRetry={refetch} />;
   }
 
-  const verifiedCount = documents?.filter(d => d.is_verified).length || 0;
-  const pendingCount = documents?.filter(d => !d.is_verified).length || 0;
+  const verifiedCount = documents?.filter((d) => d.is_verified).length || 0;
+  const pendingCount = documents?.filter((d) => !d.is_verified).length || 0;
 
   const getFileIcon = (fileType: string) => {
     if (fileType.includes('image') || fileType === 'صورة') {
@@ -76,9 +81,7 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">إجمالي المستندات</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {documents?.length || 0}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{documents?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -135,7 +138,7 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
                     <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                       {getFileIcon(doc.file_type)}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-foreground truncate mb-1">
                         {doc.file_name}
@@ -161,9 +164,7 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
                         {doc.file_size && ` • ${formatFileSize(doc.file_size)}`}
                       </p>
                       {doc.description && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {doc.description}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">{doc.description}</p>
                       )}
                     </div>
                   </div>

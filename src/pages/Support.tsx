@@ -3,16 +3,13 @@ import { matchesStatus } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+} from '@/components/layout/MobileOptimizedLayout';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { 
-  Ticket, 
-  Plus,
-  Clock,
-  MessageSquare,
-  Star
-} from 'lucide-react';
+import { Ticket, Plus, Clock, MessageSquare, Star } from 'lucide-react';
 import { useSupportTickets } from '@/hooks/support/useSupportTickets';
 import { CreateTicketDialog } from '@/components/support/CreateTicketDialog';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
@@ -68,9 +65,7 @@ export default function Support() {
         <Card>
           <CardHeader>
             <CardTitle>تذاكر الدعم الخاصة بي</CardTitle>
-            <CardDescription>
-              متابعة حالة جميع تذاكر الدعم الفني
-            </CardDescription>
+            <CardDescription>متابعة حالة جميع تذاكر الدعم الفني</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -153,10 +148,7 @@ export default function Support() {
           </CardContent>
         </Card>
 
-        <CreateTicketDialog
-          open={createDialogOpen}
-          onOpenChange={setCreateDialogOpen}
-        />
+        <CreateTicketDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
 
         <TicketDetailsDialog
           ticketId={selectedTicketId}

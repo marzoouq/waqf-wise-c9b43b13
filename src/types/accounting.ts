@@ -1,8 +1,8 @@
 // أنواع المحاسبة
 
-export type AccountType = "asset" | "liability" | "equity" | "revenue" | "expense";
-export type AccountNature = "debit" | "credit";
-export type EntryStatus = "draft" | "posted" | "cancelled";
+export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+export type AccountNature = 'debit' | 'credit';
+export type EntryStatus = 'draft' | 'posted' | 'cancelled';
 
 export interface Account {
   id: string;
@@ -93,7 +93,7 @@ export interface Invoice {
 }
 
 // استخدام النوع الموحد من invoice-line.ts
-export type { InvoiceLine } from "./invoice-line";
+export type { InvoiceLine } from './invoice-line';
 
 export interface Approval {
   id: string;

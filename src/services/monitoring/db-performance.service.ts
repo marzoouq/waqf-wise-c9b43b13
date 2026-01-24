@@ -3,14 +3,23 @@
  * Database Performance Monitoring Service
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 // الـ schemas النظامية التي يجب استبعادها
 const SYSTEM_SCHEMAS = [
-  'auth', 'realtime', 'storage', 'net', 'vault',
-  'supabase_functions', 'supabase_migrations', 'extensions',
-  'graphql', 'graphql_public', 'pgsodium', 'pgsodium_masks',
+  'auth',
+  'realtime',
+  'storage',
+  'net',
+  'vault',
+  'supabase_functions',
+  'supabase_migrations',
+  'extensions',
+  'graphql',
+  'graphql_public',
+  'pgsodium',
+  'pgsodium_masks',
 ];
 
 export interface TableScanStats {
@@ -57,7 +66,7 @@ class DBPerformanceService {
   async getPerformanceStats(): Promise<DBPerformanceStats> {
     try {
       const { data, error } = await supabase.functions.invoke('db-performance-stats');
-      
+
       if (error) {
         productionLogger.error('[DBPerformanceService] Edge function error:', error);
         throw error;
@@ -87,7 +96,7 @@ class DBPerformanceService {
    */
   async getSequentialScansStats(): Promise<TableScanStats[]> {
     const { data, error } = await supabase.rpc('get_table_scan_stats' as never);
-    
+
     if (error) {
       productionLogger.error('[DBPerformanceService] Seq scan error:', error);
       return [];
@@ -101,7 +110,7 @@ class DBPerformanceService {
    */
   async getCacheHitRatio(): Promise<number> {
     const { data, error } = await supabase.rpc('get_cache_hit_ratio' as never);
-    
+
     if (error) {
       productionLogger.error('[DBPerformanceService] Cache hit error:', error);
       return 0;
@@ -116,7 +125,7 @@ class DBPerformanceService {
    */
   async getConnectionStats(): Promise<ConnectionStats[]> {
     const { data, error } = await supabase.rpc('get_connection_stats' as never);
-    
+
     if (error) {
       productionLogger.error('[DBPerformanceService] Connection stats error:', error);
       return [];
@@ -144,12 +153,12 @@ class DBPerformanceService {
 
     // تحذير Sequential Scans عالية - فقط للجداول الكبيرة (أكثر من 5000 scan)
     stats.sequentialScans
-      .filter(table => {
+      .filter((table) => {
         // استبعاد الجداول النظامية (احتياطي إضافي)
         const schema = table.schema_name || 'public';
         return !SYSTEM_SCHEMAS.includes(schema);
       })
-      .forEach(table => {
+      .forEach((table) => {
         // فقط إذا كانت النسبة عالية + عدد الـ scans كبير
         if (table.seq_pct > 90 && table.seq_scan > 5000) {
           alerts.push({
@@ -175,8 +184,9 @@ class DBPerformanceService {
     }
 
     // تحذير اتصالات خاملة طويلة جداً (أكثر من 48 ساعة بدلاً من 24)
-    const idleConn = stats.connections.find(c => c.state === 'idle');
-    if (idleConn && idleConn.max_idle_seconds > 172800) { // 48 ساعة
+    const idleConn = stats.connections.find((c) => c.state === 'idle');
+    if (idleConn && idleConn.max_idle_seconds > 172800) {
+      // 48 ساعة
       alerts.push({
         id: 'long-idle-connections',
         type: 'warning',

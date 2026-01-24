@@ -14,13 +14,8 @@ interface RecentSearchesProps {
 }
 
 export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesProps) {
-  const { 
-    recentSearches, 
-    deleteSearch, 
-    clearAllSearches, 
-    isDeleting, 
-    isClearing 
-  } = useRecentSearches(searchType);
+  const { recentSearches, deleteSearch, clearAllSearches, isDeleting, isClearing } =
+    useRecentSearches(searchType);
 
   if (recentSearches.length === 0) {
     return null;

@@ -36,7 +36,7 @@ export function useIntersectionObserver({
 
   useEffect(() => {
     const element = ref.current;
-    
+
     if (!element || frozen || typeof IntersectionObserver === 'undefined') {
       return;
     }

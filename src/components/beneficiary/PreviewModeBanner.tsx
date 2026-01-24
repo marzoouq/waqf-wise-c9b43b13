@@ -2,10 +2,10 @@
  * شعار وضع المعاينة - يظهر للناظر عند معاينة لوحة المستفيد
  */
 
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Eye, ArrowRight, X } from "lucide-react";
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Eye, ArrowRight, X } from 'lucide-react';
 
 interface PreviewModeBannerProps {
   beneficiaryName?: string;
@@ -18,7 +18,7 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
 
   const handleClose = () => {
     // إزالة معاملات المعاينة
-    setSearchParams(params => {
+    setSearchParams((params) => {
       params.delete('preview');
       params.delete('beneficiary_id');
       return params;
@@ -39,9 +39,9 @@ export function PreviewModeBanner({ beneficiaryName, onClose }: PreviewModeBanne
           أنت تشاهد لوحة المستفيد{beneficiaryName && `: ${beneficiaryName}`}
         </span>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleBackToNazer}
             className="border-warning/50 hover:bg-warning/20 dark:border-warning/50 dark:hover:bg-warning/20"
           >

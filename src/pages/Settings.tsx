@@ -1,26 +1,41 @@
-import { useState } from "react";
-import { APP_VERSION } from "@/lib/version";
-import { useNavigate } from "react-router-dom";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { ProfileDialog } from "@/components/settings/ProfileDialog";
-import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
-import { SecuritySettingsDialog } from "@/components/settings/SecuritySettingsDialog";
-import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDialog";
-import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
-import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
-import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
-import { PaymentSettingsDialog } from "@/components/settings/PaymentSettingsDialog";
-import OrganizationSettingsDialog from "@/components/settings/OrganizationSettingsDialog";
-import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
-import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
-import { LanguageSelector } from "@/components/settings/LanguageSelector";
-import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
-import { BiometricSettings } from "@/components/settings/BiometricSettings";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useUserRole } from "@/hooks/auth/useUserRole";
-import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
+import { useState } from 'react';
+import { APP_VERSION } from '@/lib/version';
+import { useNavigate } from 'react-router-dom';
+import {
+  User,
+  Bell,
+  Shield,
+  Database,
+  Palette,
+  Globe,
+  Settings as SettingsIcon,
+  Building2,
+  Calendar,
+  Eye,
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { ProfileDialog } from '@/components/settings/ProfileDialog';
+import { NotificationsSettingsDialog } from '@/components/settings/NotificationsSettingsDialog';
+import { SecuritySettingsDialog } from '@/components/settings/SecuritySettingsDialog';
+import { DatabaseSettingsDialog } from '@/components/settings/DatabaseSettingsDialog';
+import { AppearanceSettingsDialog } from '@/components/settings/AppearanceSettingsDialog';
+import { LanguageSettingsDialog } from '@/components/settings/LanguageSettingsDialog';
+import { SystemSettingsDialog } from '@/components/settings/SystemSettingsDialog';
+import { PaymentSettingsDialog } from '@/components/settings/PaymentSettingsDialog';
+import OrganizationSettingsDialog from '@/components/settings/OrganizationSettingsDialog';
+import { PushNotificationsSettings } from '@/components/settings/PushNotificationsSettings';
+import { LeakedPasswordCheck } from '@/components/settings/LeakedPasswordCheck';
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
+import { RolesSettingsDialog } from '@/components/settings/RolesSettingsDialog';
+import { BiometricSettings } from '@/components/settings/BiometricSettings';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useUserRole } from '@/hooks/auth/useUserRole';
+import {
+  MobileOptimizedLayout,
+  MobileOptimizedHeader,
+  MobileOptimizedGrid,
+} from '@/components/layout/MobileOptimizedLayout';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -39,43 +54,43 @@ const Settings = () => {
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
-      case "الملف الشخصي":
+      case 'الملف الشخصي':
         setProfileDialogOpen(true);
         break;
-      case "الإشعارات":
+      case 'الإشعارات':
         setNotificationsDialogOpen(true);
         break;
-      case "الأمان والخصوصية":
+      case 'الأمان والخصوصية':
         setSecurityDialogOpen(true);
         break;
-      case "قاعدة البيانات":
+      case 'قاعدة البيانات':
         setDatabaseDialogOpen(true);
         break;
-      case "المظهر":
+      case 'المظهر':
         setAppearanceDialogOpen(true);
         break;
-      case "اللغة والمنطقة":
+      case 'اللغة والمنطقة':
         setLanguageDialogOpen(true);
         break;
-      case "إعدادات النظام":
+      case 'إعدادات النظام':
         setSystemSettingsDialogOpen(true);
         break;
-      case "إعدادات المنشأة":
+      case 'إعدادات المنشأة':
         setOrganizationDialogOpen(true);
         break;
-      case "إعدادات الدفعات":
+      case 'إعدادات الدفعات':
         setPaymentSettingsDialogOpen(true);
         break;
-      case "الأدوار والصلاحيات":
+      case 'الأدوار والصلاحيات':
         setRolesDialogOpen(true);
         break;
-      case "إعدادات الشفافية":
-        navigate("/transparency-settings");
+      case 'إعدادات الشفافية':
+        navigate('/transparency-settings');
         break;
       default:
         toast({
           title: `إعدادات ${sectionTitle}`,
-          description: "هذه الميزة قيد التطوير",
+          description: 'هذه الميزة قيد التطوير',
         });
     }
   };
@@ -83,137 +98,135 @@ const Settings = () => {
   const settingsSections = [
     {
       id: 1,
-      title: "إعدادات المنشأة",
-      description: "معلومات المنشأة للفواتير الضريبية",
+      title: 'إعدادات المنشأة',
+      description: 'معلومات المنشأة للفواتير الضريبية',
       icon: Building2,
-      color: "bg-primary/10 text-primary",
+      color: 'bg-primary/10 text-primary',
     },
     {
       id: 2,
-      title: "الملف الشخصي",
-      description: "إدارة معلومات الحساب والبيانات الشخصية",
+      title: 'الملف الشخصي',
+      description: 'إدارة معلومات الحساب والبيانات الشخصية',
       icon: User,
-      color: "bg-success/10 text-success",
+      color: 'bg-success/10 text-success',
     },
     {
       id: 3,
-      title: "الإشعارات",
-      description: "تخصيص إعدادات التنبيهات والإشعارات",
+      title: 'الإشعارات',
+      description: 'تخصيص إعدادات التنبيهات والإشعارات',
       icon: Bell,
-      color: "bg-warning/10 text-warning-foreground",
+      color: 'bg-warning/10 text-warning-foreground',
     },
     {
       id: 4,
-      title: "الأمان والخصوصية",
-      description: "إدارة كلمة المرور والمصادقة الثنائية",
+      title: 'الأمان والخصوصية',
+      description: 'إدارة كلمة المرور والمصادقة الثنائية',
       icon: Shield,
-      color: "bg-destructive/10 text-destructive",
+      color: 'bg-destructive/10 text-destructive',
     },
     {
       id: 5,
-      title: "قاعدة البيانات",
-      description: "إعدادات النسخ الاحتياطي والاستعادة",
+      title: 'قاعدة البيانات',
+      description: 'إعدادات النسخ الاحتياطي والاستعادة',
       icon: Database,
-      color: "bg-warning/10 text-warning",
+      color: 'bg-warning/10 text-warning',
     },
     {
       id: 6,
-      title: "المظهر",
-      description: "تخصيص الألوان والثيم",
+      title: 'المظهر',
+      description: 'تخصيص الألوان والثيم',
       icon: Palette,
-      color: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
+      color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
     },
     {
       id: 7,
-      title: "اللغة والمنطقة",
-      description: "إعدادات اللغة والمنطقة الزمنية",
+      title: 'اللغة والمنطقة',
+      description: 'إعدادات اللغة والمنطقة الزمنية',
       icon: Globe,
-      color: "bg-success/10 text-success",
+      color: 'bg-success/10 text-success',
     },
     {
       id: 8,
-      title: "إعدادات النظام",
-      description: "إدارة الإعدادات العامة والمتقدمة",
+      title: 'إعدادات النظام',
+      description: 'إدارة الإعدادات العامة والمتقدمة',
       icon: SettingsIcon,
-      color: "bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300",
+      color: 'bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300',
     },
     {
       id: 9,
-      title: "إعدادات الدفعات",
-      description: "تخصيص عرض الدفعات والإيجارات",
+      title: 'إعدادات الدفعات',
+      description: 'تخصيص عرض الدفعات والإيجارات',
       icon: Calendar,
-      color: "bg-info/10 text-info",
+      color: 'bg-info/10 text-info',
     },
     {
       id: 10,
-      title: "الأدوار والصلاحيات",
-      description: "عرض وإدارة أدوار المستخدمين",
+      title: 'الأدوار والصلاحيات',
+      description: 'عرض وإدارة أدوار المستخدمين',
       icon: Shield,
-      color: "bg-primary/10 text-primary",
+      color: 'bg-primary/10 text-primary',
     },
     {
       id: 11,
-      title: "إعدادات الشفافية",
-      description: "التحكم في ما يراه المستفيدون من الدرجة الأولى",
+      title: 'إعدادات الشفافية',
+      description: 'التحكم في ما يراه المستفيدون من الدرجة الأولى',
       icon: Eye,
-      color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
-      requiredRole: "nazer",
+      color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+      requiredRole: 'nazer',
     },
   ];
 
   return (
     <PageErrorBoundary pageName="الإعدادات">
       <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="الإعدادات"
-        description="إدارة إعدادات النظام والتفضيلات الشخصية"
-        icon={<SettingsIcon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-        actions={<LanguageSelector />}
-      />
+        <MobileOptimizedHeader
+          title="الإعدادات"
+          description="إدارة إعدادات النظام والتفضيلات الشخصية"
+          icon={<SettingsIcon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={<LanguageSelector />}
+        />
 
-      {/* Settings Grid */}
-      <MobileOptimizedGrid cols={3}>
-        {settingsSections
-          .filter((section) => {
-            // إخفاء قسم الشفافية إذا لم يكن الناظر أو المشرف
-            if (section.requiredRole === "nazer" && !isNazer && !isAdmin) {
-              return false;
-            }
-            // إخفاء دليل المطور إذا لم يكن مشرف
-            if (section.requiredRole === "admin" && !isAdmin) {
-              return false;
-            }
-            return true;
-          })
-          .map((section) => {
-          const Icon = section.icon;
-          return (
-            <Card
-              key={section.id}
-              onClick={() => handleSectionClick(section.title)}
-              className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
-            >
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${section.color} flex-shrink-0`}>
-                      <Icon className="h-6 w-6" />
+        {/* Settings Grid */}
+        <MobileOptimizedGrid cols={3}>
+          {settingsSections
+            .filter((section) => {
+              // إخفاء قسم الشفافية إذا لم يكن الناظر أو المشرف
+              if (section.requiredRole === 'nazer' && !isNazer && !isAdmin) {
+                return false;
+              }
+              // إخفاء دليل المطور إذا لم يكن مشرف
+              if (section.requiredRole === 'admin' && !isAdmin) {
+                return false;
+              }
+              return true;
+            })
+            .map((section) => {
+              const Icon = section.icon;
+              return (
+                <Card
+                  key={section.id}
+                  onClick={() => handleSectionClick(section.title)}
+                  className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
+                >
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      <div className={`p-3 rounded-lg ${section.color} flex-shrink-0`}>
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                          {section.title}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-2">{section.description}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                        {section.title}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {section.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
-      </MobileOptimizedGrid>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+        </MobileOptimizedGrid>
 
-      {/* System Info */}
+        {/* System Info */}
         <Card className="shadow-soft">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">معلومات النظام</CardTitle>
@@ -234,7 +247,9 @@ const Settings = () => {
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">البيئة</p>
-                <p className="font-medium">{import.meta.env.MODE === 'production' ? 'إنتاج' : 'تطوير'}</p>
+                <p className="font-medium">
+                  {import.meta.env.MODE === 'production' ? 'إنتاج' : 'تطوير'}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">React Query</p>
@@ -248,30 +263,18 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        <ProfileDialog
-          open={profileDialogOpen}
-          onOpenChange={setProfileDialogOpen}
-        />
+        <ProfileDialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen} />
         <NotificationsSettingsDialog
           open={notificationsDialogOpen}
           onOpenChange={setNotificationsDialogOpen}
         />
-        <SecuritySettingsDialog
-          open={securityDialogOpen}
-          onOpenChange={setSecurityDialogOpen}
-        />
-        <DatabaseSettingsDialog
-          open={databaseDialogOpen}
-          onOpenChange={setDatabaseDialogOpen}
-        />
+        <SecuritySettingsDialog open={securityDialogOpen} onOpenChange={setSecurityDialogOpen} />
+        <DatabaseSettingsDialog open={databaseDialogOpen} onOpenChange={setDatabaseDialogOpen} />
         <AppearanceSettingsDialog
           open={appearanceDialogOpen}
           onOpenChange={setAppearanceDialogOpen}
         />
-        <LanguageSettingsDialog
-          open={languageDialogOpen}
-          onOpenChange={setLanguageDialogOpen}
-        />
+        <LanguageSettingsDialog open={languageDialogOpen} onOpenChange={setLanguageDialogOpen} />
         <SystemSettingsDialog
           open={systemSettingsDialogOpen}
           onOpenChange={setSystemSettingsDialogOpen}
@@ -284,19 +287,16 @@ const Settings = () => {
           open={paymentSettingsDialogOpen}
           onOpenChange={setPaymentSettingsDialogOpen}
         />
-        <RolesSettingsDialog
-          open={rolesDialogOpen}
-          onOpenChange={setRolesDialogOpen}
-        />
+        <RolesSettingsDialog open={rolesDialogOpen} onOpenChange={setRolesDialogOpen} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <BiometricSettings />
-        <PushNotificationsSettings />
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LeakedPasswordCheck />
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <BiometricSettings />
+          <PushNotificationsSettings />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LeakedPasswordCheck />
+        </div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

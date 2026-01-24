@@ -1,10 +1,10 @@
-import { useContracts } from "@/hooks/property/useContracts";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { EyeOff } from "lucide-react";
-import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
-import { format, arLocale as ar } from "@/lib/date";
-import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
+import { useContracts } from '@/hooks/property/useContracts';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { EyeOff } from 'lucide-react';
+import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
+import { format, arLocale as ar } from '@/lib/date';
+import { useFiscalYearPublishInfo } from '@/hooks/fiscal-years';
 
 interface Contract {
   id: string;
@@ -36,58 +36,54 @@ export function ContractsTable() {
 
   const columns: Column<Contract>[] = [
     {
-      key: "contract_number",
-      label: "رقم العقد",
-      render: (value: string) => <span className="font-medium">{value}</span>
+      key: 'contract_number',
+      label: 'رقم العقد',
+      render: (value: string) => <span className="font-medium">{value}</span>,
     },
     {
-      key: "tenant_name",
-      label: "اسم المستأجر"
+      key: 'tenant_name',
+      label: 'اسم المستأجر',
     },
     {
-      key: "properties",
-      label: "العقار",
+      key: 'properties',
+      label: 'العقار',
       hideOnMobile: true,
-      render: (_: unknown, row: Contract) => row.properties?.name ?? 'غير محدد'
+      render: (_: unknown, row: Contract) => row.properties?.name ?? 'غير محدد',
     },
     {
-      key: "start_date",
-      label: "تاريخ البدء",
+      key: 'start_date',
+      label: 'تاريخ البدء',
       hideOnTablet: true,
       render: (value: string) => (
         <span className="whitespace-nowrap text-xs sm:text-sm">
           {format(new Date(value), 'dd/MM/yyyy', { locale: ar })}
         </span>
-      )
+      ),
     },
     {
-      key: "end_date",
-      label: "تاريخ الانتهاء",
+      key: 'end_date',
+      label: 'تاريخ الانتهاء',
       hideOnTablet: true,
       render: (value: string) => (
         <span className="whitespace-nowrap text-xs sm:text-sm">
           {format(new Date(value), 'dd/MM/yyyy', { locale: ar })}
         </span>
-      )
+      ),
     },
     {
-      key: "monthly_rent",
-      label: "الإيجار الشهري",
+      key: 'monthly_rent',
+      label: 'الإيجار الشهري',
       render: (value: number) => (
-        <span className="font-bold whitespace-nowrap">
-          {(value || 0).toLocaleString()} ر.س
-        </span>
-      )
+        <span className="font-bold whitespace-nowrap">{(value || 0).toLocaleString()} ر.س</span>
+      ),
     },
     {
-      key: "status",
-      label: "الحالة",
+      key: 'status',
+      label: 'الحالة',
       render: (value: string) => (
-        <Badge variant={value === 'نشط' ? 'default' : 'secondary'}>
-          {value}
-        </Badge>
-      )
-    }
+        <Badge variant={value === 'نشط' ? 'default' : 'secondary'}>{value}</Badge>
+      ),
+    },
   ];
 
   return (

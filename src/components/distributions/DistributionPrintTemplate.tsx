@@ -1,8 +1,12 @@
-import { PrintHeader } from "@/components/shared/PrintHeader";
-import { PrintFooter } from "@/components/shared/PrintFooter";
-import type { Distribution } from "@/types/distributions";
+import { PrintHeader } from '@/components/shared/PrintHeader';
+import { PrintFooter } from '@/components/shared/PrintFooter';
+import type { Distribution } from '@/types/distributions';
 
-interface PrintDistribution extends Pick<Distribution, 'id' | 'month' | 'distribution_date' | 'total_amount' | 'beneficiaries_count' | 'status'> {
+interface PrintDistribution
+  extends Pick<
+    Distribution,
+    'id' | 'month' | 'distribution_date' | 'total_amount' | 'beneficiaries_count' | 'status'
+  > {
   nazer_share?: number;
   charity_share?: number;
   maintenance_share?: number;
@@ -20,7 +24,10 @@ interface DistributionPrintTemplateProps {
   details?: DistributionDetail[];
 }
 
-export const DistributionPrintTemplate = ({ distribution, details }: DistributionPrintTemplateProps) => {
+export const DistributionPrintTemplate = ({
+  distribution,
+  details,
+}: DistributionPrintTemplateProps) => {
   return (
     <div className="print-template" style={{ display: 'none' }}>
       <style>{`
@@ -39,10 +46,10 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
           .total-row { background-color: #fef9c3 !important; font-weight: bold; }
         }
       `}</style>
-      
-      <PrintHeader 
-        title="سند توزيع غلة الوقف" 
-        subtitle={`شهر: ${distribution.month} | الحالة: ${distribution.status}`} 
+
+      <PrintHeader
+        title="سند توزيع غلة الوقف"
+        subtitle={`شهر: ${distribution.month} | الحالة: ${distribution.status}`}
       />
 
       <div className="summary-grid">
@@ -70,7 +77,9 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
 
       {details && details.length > 0 && (
         <>
-          <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#166534' }}>تفاصيل التوزيع</h3>
+          <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#166534' }}>
+            تفاصيل التوزيع
+          </h3>
           <table className="details-table">
             <thead>
               <tr>
@@ -86,12 +95,14 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
                   <td>{detail.beneficiary_name}</td>
                   <td>{detail.beneficiary_type}</td>
                   <td>{detail.allocated_amount.toLocaleString()} ر.س</td>
-                  <td>{detail.iban || "-"}</td>
+                  <td>{detail.iban || '-'}</td>
                 </tr>
               ))}
               <tr className="total-row">
                 <td colSpan={2}>الإجمالي</td>
-                <td>{details.reduce((sum, d) => sum + d.allocated_amount, 0).toLocaleString()} ر.س</td>
+                <td>
+                  {details.reduce((sum, d) => sum + d.allocated_amount, 0).toLocaleString()} ر.س
+                </td>
                 <td></td>
               </tr>
             </tbody>

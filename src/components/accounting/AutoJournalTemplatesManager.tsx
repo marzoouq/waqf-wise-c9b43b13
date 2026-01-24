@@ -51,7 +51,8 @@ const triggerEventLabels: Record<string, string> = {
 };
 
 export function AutoJournalTemplatesManager() {
-  const { templates, isLoading, error, refetch, toggleActive, deleteTemplate } = useAutoJournalTemplates();
+  const { templates, isLoading, error, refetch, toggleActive, deleteTemplate } =
+    useAutoJournalTemplates();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<DialogTemplate | null>(null);
 
@@ -88,8 +89,8 @@ export function AutoJournalTemplatesManager() {
 
   const columns: Column<Template>[] = [
     {
-      key: "trigger_event",
-      label: "الحدث المُشغل",
+      key: 'trigger_event',
+      label: 'الحدث المُشغل',
       render: (_, template) => (
         <Badge variant="outline" className="text-xs">
           {triggerEventLabels[template.trigger_event] || template.trigger_event}
@@ -97,15 +98,15 @@ export function AutoJournalTemplatesManager() {
       ),
     },
     {
-      key: "template_name",
-      label: "اسم القالب",
+      key: 'template_name',
+      label: 'اسم القالب',
       render: (_, template) => (
         <span className="font-medium text-xs sm:text-sm">{template.template_name}</span>
       ),
     },
     {
-      key: "debit_accounts",
-      label: "الحسابات المدينة",
+      key: 'debit_accounts',
+      label: 'الحسابات المدينة',
       render: (_, template) => (
         <div className="flex flex-wrap gap-1">
           {(template.debit_accounts as AccountEntry[]).map((acc, idx) => (
@@ -118,8 +119,8 @@ export function AutoJournalTemplatesManager() {
       hideOnMobile: true,
     },
     {
-      key: "credit_accounts",
-      label: "الحسابات الدائنة",
+      key: 'credit_accounts',
+      label: 'الحسابات الدائنة',
       render: (_, template) => (
         <div className="flex flex-wrap gap-1">
           {(template.credit_accounts as AccountEntry[]).map((acc, idx) => (
@@ -132,15 +133,13 @@ export function AutoJournalTemplatesManager() {
       hideOnMobile: true,
     },
     {
-      key: "priority",
-      label: "الأولوية",
-      render: (_, template) => (
-        <span className="text-xs sm:text-sm">{template.priority}</span>
-      ),
+      key: 'priority',
+      label: 'الأولوية',
+      render: (_, template) => <span className="text-xs sm:text-sm">{template.priority}</span>,
     },
     {
-      key: "is_active",
-      label: "الحالة",
+      key: 'is_active',
+      label: 'الحالة',
       render: (_, template) => (
         <Switch
           checked={template.is_active}
@@ -163,7 +162,13 @@ export function AutoJournalTemplatesManager() {
   }
 
   if (error) {
-    return <ErrorState title="خطأ في تحميل قوالب القيود" message={(error as Error).message} onRetry={refetch} />;
+    return (
+      <ErrorState
+        title="خطأ في تحميل قوالب القيود"
+        message={(error as Error).message}
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
@@ -194,11 +199,7 @@ export function AutoJournalTemplatesManager() {
             emptyMessage="لا توجد قوالب"
             actions={(template) => (
               <div className="flex gap-2 justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(template)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => handleEdit(template)}>
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button
@@ -216,8 +217,9 @@ export function AutoJournalTemplatesManager() {
             <div className="flex items-start gap-2">
               <Settings className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div className="text-sm text-muted-foreground">
-                <strong>ملاحظة:</strong> القيود التلقائية يتم إنشاؤها عند حدوث الأحداث المحددة في النظام.
-                يمكنك تخصيص الحسابات المدينة والدائنة لكل حدث، وتحديد النسب المئوية أو المبالغ الثابتة.
+                <strong>ملاحظة:</strong> القيود التلقائية يتم إنشاؤها عند حدوث الأحداث المحددة في
+                النظام. يمكنك تخصيص الحسابات المدينة والدائنة لكل حدث، وتحديد النسب المئوية أو
+                المبالغ الثابتة.
               </div>
             </div>
           </div>

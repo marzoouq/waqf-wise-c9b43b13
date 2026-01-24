@@ -3,9 +3,9 @@
  * @version 2.8.65
  */
 
-import { useState, useEffect } from "react";
-import { MessageService, Recipient } from "@/services/message.service";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useState, useEffect } from 'react';
+import { MessageService, Recipient } from '@/services/message.service';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export function useRecipients(userId: string | undefined, isOpen: boolean) {
   const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -15,10 +15,10 @@ export function useRecipients(userId: string | undefined, isOpen: boolean) {
   useEffect(() => {
     const fetchRecipients = async () => {
       if (!isOpen || !userId) return;
-      
+
       setLoadingRecipients(true);
       setError(null);
-      
+
       try {
         const recipientsList = await MessageService.getRecipients(userId);
         setRecipients(recipientsList);
@@ -27,7 +27,7 @@ export function useRecipients(userId: string | undefined, isOpen: boolean) {
           context: 'useRecipients',
           severity: 'medium',
         });
-        setError("حدث خطأ أثناء تحميل قائمة المستلمين");
+        setError('حدث خطأ أثناء تحميل قائمة المستلمين');
       } finally {
         setLoadingRecipients(false);
       }

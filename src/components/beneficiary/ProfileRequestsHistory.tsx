@@ -13,7 +13,12 @@ interface ProfileRequestsHistoryProps {
 }
 
 export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistoryProps) {
-  const { data: requests, isLoading, error, refetch } = useBeneficiaryProfileRequests(beneficiaryId);
+  const {
+    data: requests,
+    isLoading,
+    error,
+    refetch,
+  } = useBeneficiaryProfileRequests(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الطلبات..." />;
@@ -23,9 +28,9 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
     return <ErrorState title="خطأ في تحميل الطلبات" message={error.message} onRetry={refetch} />;
   }
 
-  const pendingCount = requests?.filter(r => r.status === 'قيد المراجعة').length || 0;
-  const approvedCount = requests?.filter(r => r.status === 'معتمد').length || 0;
-  const rejectedCount = requests?.filter(r => r.status === 'مرفوض').length || 0;
+  const pendingCount = requests?.filter((r) => r.status === 'قيد المراجعة').length || 0;
+  const approvedCount = requests?.filter((r) => r.status === 'معتمد').length || 0;
+  const rejectedCount = requests?.filter((r) => r.status === 'مرفوض').length || 0;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -40,7 +45,9 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
     }
   };
 
-  const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusVariant = (
+    status: string
+  ): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (status) {
       case 'معتمد':
         return 'default';
@@ -123,16 +130,13 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
                       <div className="flex items-center gap-2 mb-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <h4 className="font-semibold text-foreground">
-                          {(request as { request_types?: { name_ar?: string } }).request_types?.name_ar || 'طلب'}
+                          {(request as { request_types?: { name_ar?: string } }).request_types
+                            ?.name_ar || 'طلب'}
                         </h4>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {request.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mb-2">{request.description}</p>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span>
-                          {format(new Date(request.created_at), 'PPP', { locale: ar })}
-                        </span>
+                        <span>{format(new Date(request.created_at), 'PPP', { locale: ar })}</span>
                         {request.request_number && (
                           <>
                             <span>•</span>
@@ -141,7 +145,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="text-left space-y-2">
                       {request.amount && (
                         <div className="text-lg font-bold text-primary">

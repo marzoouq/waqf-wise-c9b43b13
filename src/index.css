@@ -61,13 +61,13 @@
     --heir-wife: 330 70% 50%;
     --heir-son: 210 80% 50%;
     --heir-daughter: 280 60% 55%;
-    
+
     /* ألوان الحالة */
     --status-success: 150 60% 45%;
     --status-warning: 38 92% 50%;
     --status-error: 0 72% 51%;
     --status-info: 210 100% 50%;
-    
+
     /* ألوان الأدوار */
     --role-nazer: 270 60% 50%;
     --role-admin: 210 80% 50%;
@@ -109,13 +109,13 @@
     --gradient-warning: linear-gradient(135deg, hsl(38 92% 45%), hsl(43 90% 55%));
     --gradient-destructive: linear-gradient(135deg, hsl(0 72% 46%), hsl(0 72% 56%));
     --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.05));
-    
+
     /* الظلال */
     --shadow-soft: 0 2px 8px hsl(150 30% 20% / 0.08);
     --shadow-medium: 0 4px 16px hsl(150 30% 20% / 0.12);
     --shadow-strong: 0 8px 32px hsl(150 30% 20% / 0.16);
     --shadow-glow: 0 0 20px hsl(150 45% 35% / 0.3);
-    
+
     /* الانتقالات */
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -173,7 +173,7 @@
     --border: 150 20% 25%;
     --input: 150 20% 25%;
     --ring: 150 50% 50%;
-    
+
     /* ألوان الأدوار - الوضع الداكن */
     --role-nazer: 270 55% 60%;
     --role-admin: 210 75% 60%;
@@ -207,21 +207,23 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    font-feature-settings: "liga" 1, "calt" 1;
+    font-feature-settings:
+      'liga' 1,
+      'calt' 1;
   }
-  
+
   /* تحسين التمرير على الجوال - إيقاف smooth scroll */
   @media (max-width: 1024px) {
     html {
       scroll-behavior: auto;
     }
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Cairo', system-ui, sans-serif;
@@ -230,9 +232,10 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
-  
+
   /* تحسين التمرير على iOS */
-  main, .scroll-container {
+  main,
+  .scroll-container {
     -webkit-overflow-scrolling: touch;
   }
 
@@ -265,7 +268,11 @@
 }
 
 /* Smooth transitions on all interactive elements */
-button, a, input, select, textarea {
+button,
+a,
+input,
+select,
+textarea {
   transition: var(--transition-smooth);
 }
 
@@ -313,15 +320,15 @@ a:hover {
 }
 
 /* RTL Support improvements */
-[dir="rtl"] {
+[dir='rtl'] {
   text-align: right;
 }
 
-[dir="rtl"] .text-left {
+[dir='rtl'] .text-left {
   text-align: right !important;
 }
 
-[dir="rtl"] .text-right {
+[dir='rtl'] .text-right {
   text-align: left !important;
 }
 
@@ -411,7 +418,7 @@ select {
   padding-left: 36px;
 }
 
-[dir="rtl"] select {
+[dir='rtl'] select {
   background-position: right 12px center;
   padding-right: 36px;
   padding-left: 12px;
@@ -473,13 +480,14 @@ table {
     box-shadow: none !important;
     text-shadow: none !important;
   }
-  
+
   @page {
     size: A4;
     margin: 1.5cm;
   }
 
-  html, body {
+  html,
+  body {
     height: auto !important;
     overflow: visible !important;
     print-color-adjust: exact;
@@ -487,8 +495,15 @@ table {
   }
 
   /* إزالة أي قيود على الارتفاع والتمرير */
-  body, #root, main, .overflow-auto, .overflow-y-auto, .overflow-x-auto,
-  [class*="overflow-"], [class*="max-h-"], [class*="h-screen"] {
+  body,
+  #root,
+  main,
+  .overflow-auto,
+  .overflow-y-auto,
+  .overflow-x-auto,
+  [class*='overflow-'],
+  [class*='max-h-'],
+  [class*='h-screen'] {
     overflow: visible !important;
     max-height: none !important;
     height: auto !important;
@@ -625,9 +640,10 @@ table {
   }
 
   /* منع تمدد وسائط/رسومات خارج حدود الصفحة */
-  img, svg, canvas {
+  img,
+  svg,
+  canvas {
     max-width: 100% !important;
     height: auto !important;
   }
-
 }

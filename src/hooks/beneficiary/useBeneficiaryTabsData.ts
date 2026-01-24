@@ -4,11 +4,11 @@
  * Provides data fetching for beneficiary portal tabs using services
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BeneficiaryService } from "@/services/beneficiary.service";
-import { StorageService } from "@/services/storage.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { BeneficiaryService } from '@/services/beneficiary.service';
+import { StorageService } from '@/services/storage.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { toast } from 'sonner';
 
 // Hook for approvals log tab
 export function useApprovalsLog(enabled: boolean = true) {
@@ -31,7 +31,7 @@ export function useBeneficiaryBankAccounts(enabled: boolean = true) {
 // Hook for beneficiary documents
 export function useBeneficiaryDocuments(beneficiaryId: string) {
   const queryClient = useQueryClient();
-  
+
   const query = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_DOCUMENTS(beneficiaryId),
     queryFn: () => BeneficiaryService.getDocuments(beneficiaryId),
@@ -42,17 +42,17 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
     mutationFn: (documentId: string) => BeneficiaryService.deleteDocument(documentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_DOCUMENTS() });
-      toast.success("تم حذف المستند بنجاح");
+      toast.success('تم حذف المستند بنجاح');
     },
     onError: () => {
-      toast.error("فشل حذف المستند");
+      toast.error('فشل حذف المستند');
     },
   });
 
   const viewDocument = async (filePath: string) => {
     const signedUrl = await StorageService.getSignedUrl('beneficiary-documents', filePath, 3600);
     if (signedUrl) {
-      window.open(signedUrl, "_blank");
+      window.open(signedUrl, '_blank');
     }
   };
 
@@ -88,7 +88,7 @@ export function useDistributionChartData() {
     queryKey: QUERY_KEYS.DISTRIBUTION_PIE_CHART,
     queryFn: () => BeneficiaryService.getDistributionChartData(),
   });
-  
+
   return {
     data: query.data,
     isLoading: query.isLoading,

@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { ReportService, type ReportTemplate } from "@/services/report.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { ReportService, type ReportTemplate } from '@/services/report.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useReports(reportType?: string) {
   const { toast } = useToast();
@@ -23,14 +23,14 @@ export function useReports(reportType?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORT_TEMPLATES() });
       toast({
-        title: "تم إنشاء القالب بنجاح",
-        description: "يمكنك الآن استخدام هذا القالب لتوليد التقارير",
+        title: 'تم إنشاء القالب بنجاح',
+        description: 'يمكنك الآن استخدام هذا القالب لتوليد التقارير',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في إنشاء القالب",
+        variant: 'destructive',
+        title: 'خطأ في إنشاء القالب',
         description: error.message,
       });
     },
@@ -43,14 +43,14 @@ export function useReports(reportType?: string) {
     },
     onSuccess: (result) => {
       toast({
-        title: "تم توليد التقرير بنجاح",
+        title: 'تم توليد التقرير بنجاح',
         description: `التقرير يحتوي على ${result.data.length} سجل`,
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في توليد التقرير",
+        variant: 'destructive',
+        title: 'خطأ في توليد التقرير',
         description: error.message,
       });
     },
@@ -63,13 +63,13 @@ export function useReports(reportType?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORT_TEMPLATES() });
       toast({
-        title: "تم حذف القالب بنجاح",
+        title: 'تم حذف القالب بنجاح',
       });
     },
     onError: (error: Error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في الحذف",
+        variant: 'destructive',
+        title: 'خطأ في الحذف',
         description: error.message,
       });
     },

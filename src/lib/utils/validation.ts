@@ -7,12 +7,12 @@
  */
 export function isValidSaudiId(id: string): boolean {
   const cleaned = id.replace(/\D/g, '');
-  
+
   if (cleaned.length !== 10) return false;
-  
+
   // التحقق من أن الرقم يبدأ بـ 1 أو 2
   if (!['1', '2'].includes(cleaned[0])) return false;
-  
+
   return true;
 }
 
@@ -21,12 +21,12 @@ export function isValidSaudiId(id: string): boolean {
  */
 export function isValidIqamaNumber(iqama: string): boolean {
   const cleaned = iqama.replace(/\D/g, '');
-  
+
   if (cleaned.length !== 10) return false;
-  
+
   // رقم الإقامة يجب أن يبدأ بـ 3 أو 4
   if (!['3', '4'].includes(cleaned[0])) return false;
-  
+
   return true;
 }
 
@@ -35,11 +35,11 @@ export function isValidIqamaNumber(iqama: string): boolean {
  */
 export function isValidSaudiPhone(phone: string): boolean {
   const cleaned = phone.replace(/\D/g, '');
-  
+
   // يجب أن يبدأ بـ 05 ويكون طوله 10 أرقام
   if (cleaned.length !== 10) return false;
   if (!cleaned.startsWith('05')) return false;
-  
+
   return true;
 }
 
@@ -56,11 +56,11 @@ export function isValidEmail(email: string): boolean {
  */
 export function isValidSaudiIban(iban: string): boolean {
   const cleaned = iban.replace(/\s/g, '');
-  
+
   // الآيبان السعودي يبدأ بـ SA ويتكون من 24 حرف
   if (cleaned.length !== 24) return false;
   if (!cleaned.startsWith('SA')) return false;
-  
+
   return true;
 }
 

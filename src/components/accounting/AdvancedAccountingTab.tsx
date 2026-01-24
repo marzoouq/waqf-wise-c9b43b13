@@ -1,10 +1,10 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Zap, GitBranch, TrendingUp, Settings, FileCheck } from "lucide-react";
-import { AutoJournalTemplates } from "./AutoJournalTemplates";
-import { ApprovalWorkflowManager } from "./ApprovalWorkflowManager";
-import { FinancialAnalyticsDashboard } from "./FinancialAnalyticsDashboard";
-import { BudgetManagement } from "./BudgetManagement";
-import { InvoiceManagement } from "./InvoiceManagement";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Zap, GitBranch, TrendingUp, Settings, FileCheck } from 'lucide-react';
+import { AutoJournalTemplates } from './AutoJournalTemplates';
+import { ApprovalWorkflowManager } from './ApprovalWorkflowManager';
+import { FinancialAnalyticsDashboard } from './FinancialAnalyticsDashboard';
+import { BudgetManagement } from './BudgetManagement';
+import { InvoiceManagement } from './InvoiceManagement';
 
 export function AdvancedAccountingTab() {
   return (

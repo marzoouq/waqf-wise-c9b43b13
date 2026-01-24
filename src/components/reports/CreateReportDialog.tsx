@@ -2,27 +2,27 @@
  * Dialog لإنشاء تقرير مخصص جديد
  */
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2 } from "lucide-react";
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2 } from 'lucide-react';
 
 interface CreateReportDialogProps {
   open: boolean;
@@ -37,40 +37,40 @@ interface CreateReportDialogProps {
 }
 
 const REPORT_TYPE_LABELS: Record<string, string> = {
-  beneficiaries: "المستفيدون",
-  properties: "العقارات",
-  distributions: "التوزيعات",
+  beneficiaries: 'المستفيدون',
+  properties: 'العقارات',
+  distributions: 'التوزيعات',
 };
 
 const FIELD_LABELS: Record<string, Record<string, string>> = {
   beneficiaries: {
-    full_name: "الاسم الكامل",
-    national_id: "رقم الهوية",
-    phone: "الهاتف",
-    email: "البريد الإلكتروني",
-    status: "الحالة",
-    category: "الفئة",
-    total_received: "إجمالي المستلم",
-    account_balance: "رصيد الحساب",
-    created_at: "تاريخ التسجيل",
+    full_name: 'الاسم الكامل',
+    national_id: 'رقم الهوية',
+    phone: 'الهاتف',
+    email: 'البريد الإلكتروني',
+    status: 'الحالة',
+    category: 'الفئة',
+    total_received: 'إجمالي المستلم',
+    account_balance: 'رصيد الحساب',
+    created_at: 'تاريخ التسجيل',
   },
   properties: {
-    name: "اسم العقار",
-    location: "الموقع",
-    property_type: "نوع العقار",
-    status: "الحالة",
-    monthly_rent: "الإيجار الشهري",
-    total_units: "عدد الوحدات",
-    occupied_units: "الوحدات المؤجرة",
-    created_at: "تاريخ الإضافة",
+    name: 'اسم العقار',
+    location: 'الموقع',
+    property_type: 'نوع العقار',
+    status: 'الحالة',
+    monthly_rent: 'الإيجار الشهري',
+    total_units: 'عدد الوحدات',
+    occupied_units: 'الوحدات المؤجرة',
+    created_at: 'تاريخ الإضافة',
   },
   distributions: {
-    distribution_date: "تاريخ التوزيع",
-    total_amount: "المبلغ الإجمالي",
-    status: "الحالة",
-    distribution_month: "شهر التوزيع",
-    beneficiaries_count: "عدد المستفيدين",
-    created_at: "تاريخ الإنشاء",
+    distribution_date: 'تاريخ التوزيع',
+    total_amount: 'المبلغ الإجمالي',
+    status: 'الحالة',
+    distribution_month: 'شهر التوزيع',
+    beneficiaries_count: 'عدد المستفيدين',
+    created_at: 'تاريخ الإنشاء',
   },
 };
 
@@ -80,8 +80,8 @@ export function CreateReportDialog({
   onSubmit,
   reportFields,
 }: CreateReportDialogProps) {
-  const [name, setName] = useState("");
-  const [reportType, setReportType] = useState<string>("");
+  const [name, setName] = useState('');
+  const [reportType, setReportType] = useState<string>('');
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [isPublic, setIsPublic] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,9 +90,7 @@ export function CreateReportDialog({
 
   const handleFieldToggle = (field: string) => {
     setSelectedFields((prev) =>
-      prev.includes(field)
-        ? prev.filter((f) => f !== field)
-        : [...prev, field]
+      prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field]
     );
   };
 
@@ -116,8 +114,8 @@ export function CreateReportDialog({
         is_public: isPublic,
       });
       // Reset form
-      setName("");
-      setReportType("");
+      setName('');
+      setReportType('');
       setSelectedFields([]);
       setIsPublic(false);
       onOpenChange(false);
@@ -169,15 +167,8 @@ export function CreateReportDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>الحقول المطلوبة</Label>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSelectAll}
-                  type="button"
-                >
-                  {selectedFields.length === availableFields.length
-                    ? "إلغاء الكل"
-                    : "تحديد الكل"}
+                <Button variant="ghost" size="sm" onClick={handleSelectAll} type="button">
+                  {selectedFields.length === availableFields.length ? 'إلغاء الكل' : 'تحديد الكل'}
                 </Button>
               </div>
               <ScrollArea className="h-48 rounded-md border p-3">
@@ -217,9 +208,7 @@ export function CreateReportDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={
-              !name.trim() || !reportType || selectedFields.length === 0 || isLoading
-            }
+            disabled={!name.trim() || !reportType || selectedFields.length === 0 || isLoading}
           >
             {isLoading ? (
               <>
@@ -227,7 +216,7 @@ export function CreateReportDialog({
                 جاري الحفظ...
               </>
             ) : (
-              "إنشاء التقرير"
+              'إنشاء التقرير'
             )}
           </Button>
         </DialogFooter>

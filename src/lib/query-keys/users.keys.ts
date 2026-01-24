@@ -10,15 +10,17 @@ export const USERS_KEYS = {
   USERS: ['users'] as const,
   USER: (id: string) => ['user', id] as const,
   USER_STATS: ['user-stats'] as const,
-  
+
   // Profiles
   PROFILES: ['profiles'] as const,
-  PROFILE: (userId?: string) => userId ? ['profile', userId] : ['profile'] as const,
+  PROFILE: (userId?: string) => (userId ? ['profile', userId] : (['profile'] as const)),
   USERS_PROFILES_CACHE: ['users-profiles-cache'] as const,
-  
+
   // Sessions & Permissions
-  ACTIVE_SESSIONS: (userId?: string) => userId ? ['active-sessions', userId] : ['active-sessions'] as const,
-  USER_PERMISSIONS: (userId?: string) => userId ? ['user-permissions', userId] : ['user-permissions'] as const,
+  ACTIVE_SESSIONS: (userId?: string) =>
+    userId ? ['active-sessions', userId] : (['active-sessions'] as const),
+  USER_PERMISSIONS: (userId?: string) =>
+    userId ? ['user-permissions', userId] : (['user-permissions'] as const),
   USER_PERMISSIONS_OVERRIDES: (userId?: string) => ['user-permissions-overrides', userId] as const,
   ALL_PERMISSIONS: ['all-permissions'] as const,
   ROLE_PERMISSIONS: (role?: string) => ['role-permissions', role] as const,
@@ -32,7 +34,7 @@ export const USERS_KEYS = {
   SECURITY_ALERTS: ['security-alerts'] as const,
   SECURITY_EVENTS: ['security-events'] as const,
   LOGIN_ATTEMPTS: ['login-attempts'] as const,
-  
+
   // Roles Overview
   ROLES_OVERVIEW: ['roles-overview'] as const,
 } as const;

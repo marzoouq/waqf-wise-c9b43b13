@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { BankReconciliationDialog } from "@/components/accounting/BankReconciliationDialog";
-import { AccountingHeader } from "@/components/accounting/AccountingHeader";
-import { AccountingTabs } from "@/components/accounting/AccountingTabs";
-import { AccountingKPIs } from "@/components/accounting/AccountingKPIs";
-import { AccountingBreadcrumb } from "@/components/accounting/AccountingBreadcrumb";
-import { useAccountingTabs } from "@/hooks/accounting/useAccountingTabs";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { useState } from 'react';
+import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';
+import { BankReconciliationDialog } from '@/components/accounting/BankReconciliationDialog';
+import { AccountingHeader } from '@/components/accounting/AccountingHeader';
+import { AccountingTabs } from '@/components/accounting/AccountingTabs';
+import { AccountingKPIs } from '@/components/accounting/AccountingKPIs';
+import { AccountingBreadcrumb } from '@/components/accounting/AccountingBreadcrumb';
+import { useAccountingTabs } from '@/hooks/accounting/useAccountingTabs';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 
 const Accounting = () => {
   const [bankDialogOpen, setBankDialogOpen] = useState(false);
@@ -19,16 +19,13 @@ const Accounting = () => {
         <AccountingHeader onBankReconciliation={() => setBankDialogOpen(true)} />
         <AccountingKPIs />
 
-        <AccountingTabs 
+        <AccountingTabs
           activeTab={activeTab}
           onTabChange={handleTabChange}
           isLoading={isLoadingTab}
         />
 
-        <BankReconciliationDialog
-          open={bankDialogOpen}
-          onOpenChange={setBankDialogOpen}
-        />
+        <BankReconciliationDialog open={bankDialogOpen} onOpenChange={setBankDialogOpen} />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );

@@ -3,10 +3,10 @@
  * يجلب بيانات الموافقات المعلقة للمحاسب
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { JournalApproval } from "@/types/approvals";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { JournalApproval } from '@/types/approvals';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useAccountantDashboardData() {
   const {

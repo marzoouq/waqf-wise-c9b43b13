@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import { Database } from "@/integrations/supabase/types";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSystemSettings } from "@/hooks/system/useSystemSettings";
-import { DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { useToast } from "@/hooks/ui/use-toast";
+import { useState, useEffect } from 'react';
+import { Database } from '@/integrations/supabase/types';
+import { ResponsiveDialog } from '@/components/shared/ResponsiveDialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSystemSettings } from '@/hooks/system/useSystemSettings';
+import { DollarSign, Bell, Shield, Globe, Save, RotateCcw } from 'lucide-react';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface SystemSettingsDialogProps {
   open: boolean;
@@ -27,7 +27,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
   useEffect(() => {
     if (settings.length > 0 && Object.keys(editedSettings).length === 0) {
       const initial: Record<string, string> = {};
-      settings.forEach(s => {
+      settings.forEach((s) => {
         initial[s.setting_key] = s.setting_value;
       });
       setEditedSettings(initial);
@@ -36,20 +36,20 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
   const validateSettings = () => {
     const errors: string[] = [];
-    
+
     const threshold = Number(editedSettings['payment_approval_threshold']);
     if (threshold && (threshold < 0 || threshold > 1000000)) {
-      errors.push("حد الموافقة على المدفوعات يجب أن يكون بين 0 و 1,000,000");
+      errors.push('حد الموافقة على المدفوعات يجب أن يكون بين 0 و 1,000,000');
     }
 
     const passLength = Number(editedSettings['password_min_length']);
     if (passLength && (passLength < 6 || passLength > 20)) {
-      errors.push("الحد الأدنى لطول كلمة المرور يجب أن يكون بين 6 و 20");
+      errors.push('الحد الأدنى لطول كلمة المرور يجب أن يكون بين 6 و 20');
     }
 
     const sessionTimeout = Number(editedSettings['session_timeout_minutes']);
     if (sessionTimeout && (sessionTimeout < 5 || sessionTimeout > 1440)) {
-      errors.push("مهلة الجلسة يجب أن تكون بين 5 و 1440 دقيقة");
+      errors.push('مهلة الجلسة يجب أن تكون بين 5 و 1440 دقيقة');
     }
 
     return errors;
@@ -59,9 +59,9 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
     const errors = validateSettings();
     if (errors.length > 0) {
       toast({
-        title: "خطأ في التحقق",
-        description: errors.join(", "),
-        variant: "destructive",
+        title: 'خطأ في التحقق',
+        description: errors.join(', '),
+        variant: 'destructive',
       });
       return;
     }
@@ -79,15 +79,15 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
       await Promise.all(promises);
 
       toast({
-        title: "تم الحفظ",
-        description: "تم حفظ الإعدادات بنجاح",
+        title: 'تم الحفظ',
+        description: 'تم حفظ الإعدادات بنجاح',
       });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء حفظ الإعدادات';
       toast({
-        title: "خطأ",
+        title: 'خطأ',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsSaving(false);
@@ -96,22 +96,22 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
   const handleReset = () => {
     const initial: Record<string, string> = {};
-    settings.forEach(s => {
+    settings.forEach((s) => {
       initial[s.setting_key] = s.setting_value;
     });
     setEditedSettings(initial);
     toast({
-      title: "تم الاستعادة",
-      description: "تم استعادة القيم الأصلية",
+      title: 'تم الاستعادة',
+      description: 'تم استعادة القيم الأصلية',
     });
   };
 
   const updateValue = (key: string, value: string) => {
-    setEditedSettings(prev => ({ ...prev, [key]: value }));
+    setEditedSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const getSettingsByCategory = (category: string) => {
-    return settings.filter(s => s.category === category);
+    return settings.filter((s) => s.category === category);
   };
 
   const renderSetting = (setting: Database['public']['Tables']['system_settings']['Row']) => {
@@ -120,32 +120,36 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
     if (setting.setting_type === 'boolean') {
       return (
-        <div key={setting.id} className={`flex items-center justify-between p-4 rounded-lg transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}>
+        <div
+          key={setting.id}
+          className={`flex items-center justify-between p-4 rounded-lg transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}
+        >
           <div className="flex-1">
             <Label htmlFor={setting.setting_key} className="text-base font-medium">
               {setting.description}
             </Label>
-            <p className="text-sm text-muted-foreground mt-1">
-              المفتاح: {setting.setting_key}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">المفتاح: {setting.setting_key}</p>
           </div>
           <Switch
             id={setting.setting_key}
             checked={value === 'true'}
-            onCheckedChange={(checked) => updateValue(setting.setting_key, checked ? 'true' : 'false')}
+            onCheckedChange={(checked) =>
+              updateValue(setting.setting_key, checked ? 'true' : 'false')
+            }
           />
         </div>
       );
     }
 
     return (
-      <div key={setting.id} className={`p-4 rounded-lg space-y-2 transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}>
+      <div
+        key={setting.id}
+        className={`p-4 rounded-lg space-y-2 transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}
+      >
         <Label htmlFor={setting.setting_key} className="text-base font-medium">
           {setting.description}
         </Label>
-        <p className="text-sm text-muted-foreground">
-          المفتاح: {setting.setting_key}
-        </p>
+        <p className="text-sm text-muted-foreground">المفتاح: {setting.setting_key}</p>
         <Input
           id={setting.setting_key}
           type={setting.setting_type === 'number' ? 'number' : 'text'}
@@ -154,9 +158,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           className="mt-2"
         />
         {hasChanged && (
-          <p className="text-xs text-primary mt-1">
-            القيمة الأصلية: {setting.setting_value}
-          </p>
+          <p className="text-xs text-primary mt-1">القيمة الأصلية: {setting.setting_value}</p>
         )}
       </div>
     );
@@ -164,12 +166,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
   if (isLoading) {
     return (
-      <ResponsiveDialog 
-        open={open} 
-        onOpenChange={onOpenChange}
-        title="إعدادات النظام"
-        size="xl"
-      >
+      <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="إعدادات النظام" size="xl">
         <LoadingState message="جاري تحميل الإعدادات..." />
       </ResponsiveDialog>
     );
@@ -177,20 +174,19 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
   if (error) {
     return (
-      <ResponsiveDialog 
-        open={open} 
-        onOpenChange={onOpenChange}
-        title="إعدادات النظام"
-        size="xl"
-      >
-        <ErrorState title="خطأ في تحميل الإعدادات" message={(error as Error).message} onRetry={refetch} />
+      <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="إعدادات النظام" size="xl">
+        <ErrorState
+          title="خطأ في تحميل الإعدادات"
+          message={(error as Error).message}
+          onRetry={refetch}
+        />
       </ResponsiveDialog>
     );
   }
 
   return (
-    <ResponsiveDialog 
-      open={open} 
+    <ResponsiveDialog
+      open={open}
       onOpenChange={onOpenChange}
       title="إعدادات النظام"
       description="إدارة جميع إعدادات النظام والتفضيلات"
@@ -220,9 +216,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           <Card>
             <CardHeader>
               <CardTitle>الإعدادات المالية</CardTitle>
-              <CardDescription>
-                إدارة الإعدادات المالية والمحاسبية للنظام
-              </CardDescription>
+              <CardDescription>إدارة الإعدادات المالية والمحاسبية للنظام</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {getSettingsByCategory('financial').map(renderSetting)}
@@ -234,9 +228,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           <Card>
             <CardHeader>
               <CardTitle>إعدادات الإشعارات</CardTitle>
-              <CardDescription>
-                التحكم في إشعارات النظام والتنبيهات
-              </CardDescription>
+              <CardDescription>التحكم في إشعارات النظام والتنبيهات</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {getSettingsByCategory('notifications').map(renderSetting)}
@@ -248,9 +240,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           <Card>
             <CardHeader>
               <CardTitle>إعدادات الأمان</CardTitle>
-              <CardDescription>
-                إدارة إعدادات الأمان والخصوصية
-              </CardDescription>
+              <CardDescription>إدارة إعدادات الأمان والخصوصية</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {getSettingsByCategory('security').map(renderSetting)}
@@ -262,9 +252,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           <Card>
             <CardHeader>
               <CardTitle>الإعدادات العامة</CardTitle>
-              <CardDescription>
-                إعدادات النظام العامة والتفضيلات
-              </CardDescription>
+              <CardDescription>إعدادات النظام العامة والتفضيلات</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {getSettingsByCategory('general').map(renderSetting)}
@@ -280,7 +268,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
         </Button>
         <Button onClick={handleSave} disabled={isSaving}>
           <Save className="h-4 w-4 ms-2" />
-          {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+          {isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
         </Button>
       </div>
     </ResponsiveDialog>

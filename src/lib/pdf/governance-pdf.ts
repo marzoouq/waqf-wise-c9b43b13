@@ -1,7 +1,7 @@
 /**
  * توليد PDF للائحة التنفيذية
  * Governance Regulations PDF Generator
- * 
+ *
  * @version 2.9.42 - إصلاح الخط العربي
  */
 
@@ -11,7 +11,7 @@ import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS } from '
 export async function generateGovernancePDF(): Promise<void> {
   // Dynamic import for jsPDF
   const { default: jsPDF } = await import('jspdf');
-  
+
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -24,8 +24,8 @@ export async function generateGovernancePDF(): Promise<void> {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 20;
-  const contentWidth = pageWidth - (margin * 2);
-  
+  const contentWidth = pageWidth - margin * 2;
+
   // إضافة ترويسة الوقف
   let yPosition = addWaqfHeader(pdf, fontName, 'اللائحة التنفيذية لوقف مرزوق علي الثبيتي');
   yPosition += 5;
@@ -38,7 +38,7 @@ export async function generateGovernancePDF(): Promise<void> {
     'تاريخ التأسيس: 30/03/1445هـ',
     'تاريخ التنفيذ: 30/6/1446هـ',
   ];
-  waqfInfo.forEach(info => {
+  waqfInfo.forEach((info) => {
     pdf.text(info, pageWidth - margin, yPosition, { align: 'right' });
     yPosition += 6;
   });
@@ -47,7 +47,12 @@ export async function generateGovernancePDF(): Promise<void> {
   // القيم الأساسية
   pdf.setFontSize(12);
   pdf.setTextColor(0, 0, 0);
-  pdf.text('القيم الأساسية: الأمانة - النزاهة - الشفافية - العدالة', pageWidth - margin, yPosition, { align: 'right' });
+  pdf.text(
+    'القيم الأساسية: الأمانة - النزاهة - الشفافية - العدالة',
+    pageWidth - margin,
+    yPosition,
+    { align: 'right' }
+  );
   yPosition += 12;
 
   // محتوى اللائحة
@@ -124,17 +129,12 @@ export async function generateGovernancePDF(): Promise<void> {
   for (let i = 1; i <= totalPages; i++) {
     pdf.setPage(i);
     addWaqfFooter(pdf, fontName);
-    
+
     // رقم الصفحة
     pdf.setFont(fontName, 'normal');
     pdf.setFontSize(8);
     pdf.setTextColor(...WAQF_COLORS.muted);
-    pdf.text(
-      `صفحة ${i} من ${totalPages}`,
-      pageWidth / 2,
-      pageHeight - 8,
-      { align: 'center' }
-    );
+    pdf.text(`صفحة ${i} من ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
   }
 
   // تحميل الملف

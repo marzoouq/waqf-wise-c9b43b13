@@ -3,19 +3,26 @@
  * يعرض بيانات أقلام الوقف من جدول waqf_units
  */
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { Building2, MapPin, TrendingUp, Pencil, Trash2 } from "lucide-react";
-import { useWaqfUnits, type WaqfUnit } from "@/hooks/distributions/useWaqfUnits";
-import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { LoadingState } from '@/components/shared/LoadingState';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { Building2, MapPin, TrendingUp, Pencil, Trash2 } from 'lucide-react';
+import { useWaqfUnits, type WaqfUnit } from '@/hooks/distributions/useWaqfUnits';
+import { WaqfUnitDialog } from '@/components/waqf/WaqfUnitDialog';
 
 interface WaqfUnitData {
   id: string;
@@ -74,18 +81,22 @@ export function WaqfUnitsTab({ waqfUnits, isLoading }: WaqfUnitsTabProps) {
 
   const getTypeBadge = (type: string) => {
     const typeColors: Record<string, string> = {
-      'عقار': 'bg-primary/10 text-primary',
-      'نقدي': 'bg-success/10 text-success',
-      'أسهم': 'bg-warning/10 text-warning',
-      'مشروع': 'bg-secondary/10 text-secondary',
+      عقار: 'bg-primary/10 text-primary',
+      نقدي: 'bg-success/10 text-success',
+      أسهم: 'bg-warning/10 text-warning',
+      مشروع: 'bg-secondary/10 text-secondary',
     };
     return <Badge className={typeColors[type] || 'bg-muted'}>{type}</Badge>;
   };
 
   const getStatusBadge = (isActive: boolean) => {
-    return isActive 
-      ? <Badge variant="default" className="bg-success">نشط</Badge>
-      : <Badge variant="secondary">غير نشط</Badge>;
+    return isActive ? (
+      <Badge variant="default" className="bg-success">
+        نشط
+      </Badge>
+    ) : (
+      <Badge variant="secondary">غير نشط</Badge>
+    );
   };
 
   return (
@@ -106,8 +117,12 @@ export function WaqfUnitsTab({ waqfUnits, isLoading }: WaqfUnitsTabProps) {
                   <TableHead className="whitespace-nowrap">الكود</TableHead>
                   <TableHead className="whitespace-nowrap">الاسم</TableHead>
                   <TableHead className="whitespace-nowrap">النوع</TableHead>
-                  <TableHead className="whitespace-nowrap hidden sm:table-cell">قيمة الاقتناء</TableHead>
-                  <TableHead className="whitespace-nowrap hidden md:table-cell">القيمة الحالية</TableHead>
+                  <TableHead className="whitespace-nowrap hidden sm:table-cell">
+                    قيمة الاقتناء
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap hidden md:table-cell">
+                    القيمة الحالية
+                  </TableHead>
                   <TableHead className="whitespace-nowrap">العائد السنوي</TableHead>
                   <TableHead className="whitespace-nowrap">الحالة</TableHead>
                   <TableHead className="whitespace-nowrap text-center">الإجراءات</TableHead>
@@ -173,19 +188,25 @@ export function WaqfUnitsTab({ waqfUnits, isLoading }: WaqfUnitsTabProps) {
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
             <div className="text-center">
               <p className="text-2xl font-bold text-primary">
-                {waqfUnits.reduce((sum, u) => sum + Number(u.acquisition_value || 0), 0).toLocaleString('ar-SA')}
+                {waqfUnits
+                  .reduce((sum, u) => sum + Number(u.acquisition_value || 0), 0)
+                  .toLocaleString('ar-SA')}
               </p>
               <p className="text-xs text-muted-foreground">إجمالي قيمة الاقتناء</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-success">
-                {waqfUnits.reduce((sum, u) => sum + Number(u.current_value || 0), 0).toLocaleString('ar-SA')}
+                {waqfUnits
+                  .reduce((sum, u) => sum + Number(u.current_value || 0), 0)
+                  .toLocaleString('ar-SA')}
               </p>
               <p className="text-xs text-muted-foreground">إجمالي القيمة الحالية</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-warning">
-                {waqfUnits.reduce((sum, u) => sum + Number(u.annual_return || 0), 0).toLocaleString('ar-SA')}
+                {waqfUnits
+                  .reduce((sum, u) => sum + Number(u.annual_return || 0), 0)
+                  .toLocaleString('ar-SA')}
               </p>
               <p className="text-xs text-muted-foreground">إجمالي العائد السنوي</p>
             </div>

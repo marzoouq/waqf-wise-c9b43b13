@@ -20,7 +20,7 @@ describe('LoadingState', () => {
 
   it('renders with different sizes', () => {
     const { container, rerender } = render(<LoadingState size="sm" />);
-    
+
     // Find the loader icon by class
     const smallLoader = container.querySelector('.animate-spin');
     expect(smallLoader).toHaveClass('h-4');

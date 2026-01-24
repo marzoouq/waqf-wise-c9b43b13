@@ -4,11 +4,11 @@
  * @version 1.1.0
  */
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MonitoringService, SecurityService } from "@/services";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
-import { supabase } from "@/integrations/supabase/client";
-import { useCallback } from "react";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { MonitoringService, SecurityService } from '@/services';
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
+import { supabase } from '@/integrations/supabase/client';
+import { useCallback } from 'react';
 
 export interface SecurityMetrics {
   rlsEnabledTables: number;
@@ -66,10 +66,7 @@ export function useDeveloperDashboardData() {
   const queryClient = useQueryClient();
 
   // جلب تغطية RLS من قاعدة البيانات
-  const {
-    data: rlsCoverage,
-    isLoading: rlsLoading,
-  } = useQuery({
+  const { data: rlsCoverage, isLoading: rlsLoading } = useQuery({
     queryKey: ['rls-coverage'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_rls_coverage');
@@ -83,49 +80,35 @@ export function useDeveloperDashboardData() {
   });
 
   // جلب الأحداث الأمنية
-  const {
-    data: securityEvents = [],
-    isLoading: securityLoading,
-  } = useQuery({
+  const { data: securityEvents = [], isLoading: securityLoading } = useQuery({
     queryKey: QUERY_KEYS.SECURITY_EVENTS,
     queryFn: () => SecurityService.getSecurityEvents(20),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب محاولات الدخول
-  const {
-    data: loginAttempts = [],
-    isLoading: loginLoading,
-  } = useQuery({
+  const { data: loginAttempts = [], isLoading: loginLoading } = useQuery({
     queryKey: QUERY_KEYS.LOGIN_ATTEMPTS,
     queryFn: () => SecurityService.getLoginAttempts(50),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب إحصائيات النظام
-  const {
-    data: systemStats,
-    isLoading: statsLoading,
-  } = useQuery({
+  const { data: systemStats, isLoading: statsLoading } = useQuery({
     queryKey: QUERY_KEYS.SYSTEM_STATS,
     queryFn: () => MonitoringService.getSystemStats(),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب الأخطاء الأخيرة
-  const {
-    data: recentErrors = [],
-    isLoading: errorsLoading,
-  } = useQuery({
+  const { data: recentErrors = [], isLoading: errorsLoading } = useQuery({
     queryKey: QUERY_KEYS.RECENT_ERRORS,
     queryFn: () => MonitoringService.getRecentErrors(10),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب التنبيهات النشطة
-  const {
-    data: activeAlerts = [],
-  } = useQuery({
+  const { data: activeAlerts = [] } = useQuery({
     queryKey: QUERY_KEYS.ACTIVE_ALERTS,
     queryFn: () => MonitoringService.getActiveAlerts(),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
@@ -137,24 +120,26 @@ export function useDeveloperDashboardData() {
     totalTables: rlsCoverage?.total_tables || 0,
     rlsCoverage: rlsCoverage?.coverage || 0,
     openSecurityIssues: securityEvents.filter((e: { resolved?: boolean }) => !e.resolved).length,
-    criticalIssues: securityEvents.filter((e: { severity?: string; resolved?: boolean }) => 
-      e.severity === 'critical' && !e.resolved
+    criticalIssues: securityEvents.filter(
+      (e: { severity?: string; resolved?: boolean }) => e.severity === 'critical' && !e.resolved
     ).length,
     lastSecurityScan: securityEvents[0]?.created_at || null,
     failedLoginAttempts: loginAttempts.filter((a: { success?: boolean }) => !a.success).length,
-    suspiciousActivities: securityEvents.filter((e: { event_type?: string }) => 
-      e.event_type === 'suspicious_activity'
+    suspiciousActivities: securityEvents.filter(
+      (e: { event_type?: string }) => e.event_type === 'suspicious_activity'
     ).length,
   };
 
   // حساب مقاييس صحة النظام
-  const healthPercentage = systemStats && systemStats.totalHealthChecks > 0
-    ? Math.round((systemStats.healthyChecks / systemStats.totalHealthChecks) * 100)
-    : 95;
+  const healthPercentage =
+    systemStats && systemStats.totalHealthChecks > 0
+      ? Math.round((systemStats.healthyChecks / systemStats.totalHealthChecks) * 100)
+      : 95;
 
-  const fixSuccessRate = systemStats && systemStats.totalFixAttempts > 0
-    ? Math.round((systemStats.successfulFixes / systemStats.totalFixAttempts) * 100)
-    : 0;
+  const fixSuccessRate =
+    systemStats && systemStats.totalFixAttempts > 0
+      ? Math.round((systemStats.successfulFixes / systemStats.totalFixAttempts) * 100)
+      : 0;
 
   const systemHealthMetrics: SystemHealthMetrics = {
     totalErrors: systemStats?.totalErrors || 0,

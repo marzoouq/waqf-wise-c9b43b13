@@ -1,7 +1,7 @@
 /**
  * Route Prefetching Utilities
  * تحميل مسبق للمسارات لتحسين الأداء
- * 
+ *
  * @version 2.0.0 - تحسينات المرحلة الثالثة
  * - Smart Prefetching based on user behavior
  * - Network-aware prefetching
@@ -19,12 +19,12 @@ const PREFETCH_ROUTES = {
   dashboard: { loader: () => import('@/pages/Dashboard'), priority: 'high' as const },
   nazer: { loader: () => import('@/pages/NazerDashboard'), priority: 'high' as const },
   beneficiary: { loader: () => import('@/pages/BeneficiaryPortal'), priority: 'high' as const },
-  
+
   // أولوية متوسطة - يُحمّل عند الخمول
   properties: { loader: () => import('@/pages/Properties'), priority: 'medium' as const },
   beneficiaries: { loader: () => import('@/pages/Beneficiaries'), priority: 'medium' as const },
   accounting: { loader: () => import('@/pages/Accounting'), priority: 'medium' as const },
-  
+
   // أولوية منخفضة - يُحمّل فقط على اتصالات سريعة
   payments: { loader: () => import('@/pages/Payments'), priority: 'low' as const },
   reports: { loader: () => import('@/pages/Reports'), priority: 'low' as const },
@@ -47,20 +47,20 @@ const CACHE_TTL = 10 * 60 * 1000; // 10 دقائق
  */
 function shouldPrefetch(priority: Priority): boolean {
   const { isOnline, isSlowConnection, saveData, downlink } = getNetworkInfo();
-  
+
   // لا تحمّل إذا كنا offline أو في وضع توفير البيانات
   if (!isOnline || saveData) return false;
-  
+
   // على الاتصالات البطيئة، حمّل فقط الأولوية العالية
   if (isSlowConnection) {
     return priority === 'high';
   }
-  
+
   // على الاتصالات المتوسطة (أقل من 1.5 Mbps)
   if (downlink < 1.5) {
     return priority !== 'low';
   }
-  
+
   return true;
 }
 
@@ -70,7 +70,7 @@ function shouldPrefetch(priority: Priority): boolean {
 function isCached(route: RouteKey): boolean {
   const cached = loadedRoutes.get(route);
   if (!cached) return false;
-  
+
   return Date.now() - cached.loadedAt < CACHE_TTL;
 }
 
@@ -80,15 +80,16 @@ function isCached(route: RouteKey): boolean {
 export function prefetchRoute(route: RouteKey): void {
   // التحقق من الـ cache
   if (isCached(route)) return;
-  
+
   const routeConfig = PREFETCH_ROUTES[route];
   if (!routeConfig) return;
-  
+
   // التحقق من إمكانية التحميل
   if (!shouldPrefetch(routeConfig.priority)) return;
-  
+
   const executePrefetch = () => {
-    routeConfig.loader()
+    routeConfig
+      .loader()
       .then(() => {
         loadedRoutes.set(route, {
           loadedAt: Date.now(),
@@ -103,8 +104,8 @@ export function prefetchRoute(route: RouteKey): void {
 
   // تحميل في الخلفية عند الخمول
   if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(executePrefetch, { 
-      timeout: routeConfig.priority === 'high' ? 1000 : 3000 
+    window.requestIdleCallback(executePrefetch, {
+      timeout: routeConfig.priority === 'high' ? 1000 : 3000,
     });
   } else {
     // fallback للمتصفحات القديمة
@@ -178,7 +179,7 @@ export function useRolePrefetch(role?: string) {
  */
 export function prefetchCommonRoutes(): void {
   if (!shouldPrefetch('low')) return;
-  
+
   if ('requestIdleCallback' in window) {
     window.requestIdleCallback(
       () => {

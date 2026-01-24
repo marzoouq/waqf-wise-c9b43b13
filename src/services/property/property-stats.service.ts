@@ -64,7 +64,7 @@ export class PropertyStatsService {
       const occupiedUnits = properties.reduce((sum, p) => sum + (p.occupied || 0), 0);
       const monthlyRevenue = properties.reduce((sum, p) => {
         if (p.revenue_type === 'سنوي') {
-          return sum + ((p.monthly_revenue || 0) / 12);
+          return sum + (p.monthly_revenue || 0) / 12;
         }
         return sum + (p.monthly_revenue || 0);
       }, 0);
@@ -93,7 +93,7 @@ export class PropertyStatsService {
       const units = property.units || 1;
       const occupied = property.occupied || 0;
       const occupancyRate = units > 0 ? occupied / units : 0;
-      return total + (monthlyRevenue * occupancyRate);
+      return total + monthlyRevenue * occupancyRate;
     }, 0);
   }
 
@@ -102,19 +102,18 @@ export class PropertyStatsService {
    */
   static async getPropertiesStats(): Promise<PropertiesFullStats> {
     try {
-      const [
-        propertiesResult,
-        unitsResult,
-        contractsResult,
-        maintenanceResult,
-        fiscalYearResult,
-      ] = await Promise.all([
-        supabase.from("properties").select("*").is("deleted_at", null),
-        supabase.from("property_units").select("*").is("deleted_at", null),
-        supabase.from("contracts").select("*").eq("status", "نشط").is("deleted_at", null),
-        supabase.from("maintenance_requests").select("*").in("status", [...MAINTENANCE_OPEN_STATUSES]).is("deleted_at", null),
-        supabase.from("fiscal_years").select("*").eq("is_active", true).maybeSingle(),
-      ]);
+      const [propertiesResult, unitsResult, contractsResult, maintenanceResult, fiscalYearResult] =
+        await Promise.all([
+          supabase.from('properties').select('*').is('deleted_at', null),
+          supabase.from('property_units').select('*').is('deleted_at', null),
+          supabase.from('contracts').select('*').eq('status', 'نشط').is('deleted_at', null),
+          supabase
+            .from('maintenance_requests')
+            .select('*')
+            .in('status', [...MAINTENANCE_OPEN_STATUSES])
+            .is('deleted_at', null),
+          supabase.from('fiscal_years').select('*').eq('is_active', true).maybeSingle(),
+        ]);
 
       if (propertiesResult.error) throw propertiesResult.error;
       if (unitsResult.error) throw unitsResult.error;
@@ -131,15 +130,15 @@ export class PropertyStatsService {
       // جلب المدفوعات الفعلية مع فلتر الحذف
       let paymentsQuery = supabase
         .from(COLLECTION_SOURCE.TABLE)
-        .select("amount")
-        .eq("voucher_type", COLLECTION_SOURCE.TYPE)
-        .eq("status", COLLECTION_SOURCE.STATUS)
-        .is("deleted_at", null);
+        .select('amount')
+        .eq('voucher_type', COLLECTION_SOURCE.TYPE)
+        .eq('status', COLLECTION_SOURCE.STATUS)
+        .is('deleted_at', null);
 
       if (fiscalYear) {
         paymentsQuery = paymentsQuery
-          .gte("created_at", fiscalYear.start_date)
-          .lte("created_at", fiscalYear.end_date);
+          .gte('created_at', fiscalYear.start_date)
+          .lte('created_at', fiscalYear.end_date);
       }
 
       const { data: payments, error: paymentsError } = await paymentsQuery;
@@ -150,60 +149,68 @@ export class PropertyStatsService {
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
       const { data: expiringContracts, error: expiringError } = await supabase
-        .from("contracts")
-        .select("*")
-        .eq("status", "نشط")
-        .lte("end_date", thirtyDaysFromNow.toISOString().split('T')[0]);
+        .from('contracts')
+        .select('*')
+        .eq('status', 'نشط')
+        .lte('end_date', thirtyDaysFromNow.toISOString().split('T')[0]);
 
       if (expiringError) throw expiringError;
 
       const totalProperties = properties?.length || 0;
-      const activeProperties = properties?.filter(p => matchesStatus(p.status, 'نشط', 'active')).length || 0;
-      
+      const activeProperties =
+        properties?.filter((p) => matchesStatus(p.status, 'نشط', 'active')).length || 0;
+
       const totalUnits = units?.length || 0;
-      
+
       // حساب الوحدات المشغولة بناءً على الوحدات المرتبطة بعقود نشطة
-      const contractUnitIds = contracts?.map(c => c.unit_id).filter(Boolean) || [];
+      const contractUnitIds = contracts?.map((c) => c.unit_id).filter(Boolean) || [];
       const occupiedFromContracts = contractUnitIds.length;
-      
+
       // الوحدات المشغولة من جدول الوحدات (كـ fallback)
-      const occupiedFromUnits = units?.filter(u => 
-        u.occupancy_status === 'مشغول' || 
-        u.status === 'مشغول' ||
-        u.occupancy_status === 'occupied'
-      ).length || 0;
-      
+      const occupiedFromUnits =
+        units?.filter(
+          (u) =>
+            u.occupancy_status === 'مشغول' ||
+            u.status === 'مشغول' ||
+            u.occupancy_status === 'occupied'
+        ).length || 0;
+
       // استخدام الأكبر بين العقود أو حالة الوحدات
-      const occupiedUnits = Math.max(occupiedFromContracts, occupiedFromUnits, contracts?.length || 0);
+      const occupiedUnits = Math.max(
+        occupiedFromContracts,
+        occupiedFromUnits,
+        contracts?.length || 0
+      );
       const vacantUnits = Math.max(0, totalUnits - occupiedUnits);
       const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
       // حساب إجمالي المحصّل من سندات القبض
-      const totalCollected = payments?.reduce((sum, p) => sum + (Number((p as { amount: number }).amount) || 0), 0) || 0;
+      const totalCollected =
+        payments?.reduce((sum, p) => sum + (Number((p as { amount: number }).amount) || 0), 0) || 0;
       const totalTax = 0; // يمكن حسابها لاحقاً من بيانات الضريبة
       const totalNetRevenue = totalCollected; // الصافي = المحصل (بدون ضريبة حالياً)
 
       // حساب الإيراد السنوي المتوقع من العقود النشطة (مصدر الحقيقة الموحد)
-      const expectedAnnualRevenue = contracts?.reduce((sum, c) => {
-        const monthlyRent = Number(c.monthly_rent) || 0;
-        const frequency = c.payment_frequency;
-        // إذا كان سنوي، الإيراد هو نفسه، وإلا نضرب × 12
-        return sum + (frequency === 'سنوي' ? monthlyRent : monthlyRent * 12);
-      }, 0) || 0;
+      const expectedAnnualRevenue =
+        contracts?.reduce((sum, c) => {
+          const monthlyRent = Number(c.monthly_rent) || 0;
+          const frequency = c.payment_frequency;
+          // إذا كان سنوي، الإيراد هو نفسه، وإلا نضرب × 12
+          return sum + (frequency === 'سنوي' ? monthlyRent : monthlyRent * 12);
+        }, 0) || 0;
 
       // نسبة التحصيل
-      const collectionRate = expectedAnnualRevenue > 0 
-        ? Math.round((totalCollected / expectedAnnualRevenue) * 100) 
-        : 0;
+      const collectionRate =
+        expectedAnnualRevenue > 0 ? Math.round((totalCollected / expectedAnnualRevenue) * 100) : 0;
 
       // جلب رقبة الوقف
       let carryForwardWaqfCorpus = 0;
       if (fiscalYear) {
         const { data: waqfReserve } = await supabase
-          .from("waqf_reserves")
-          .select("current_balance")
-          .eq("fiscal_year_id", fiscalYear.id)
-          .eq("reserve_type", "احتياطي")
+          .from('waqf_reserves')
+          .select('current_balance')
+          .eq('fiscal_year_id', fiscalYear.id)
+          .eq('reserve_type', 'احتياطي')
           .maybeSingle();
 
         carryForwardWaqfCorpus = waqfReserve?.current_balance || 0;
@@ -221,9 +228,9 @@ export class PropertyStatsService {
         monthlyCollected: 0,
         totalTax,
         totalNetRevenue,
-        fiscalYearName: fiscalYear?.name || "غير محدد",
+        fiscalYearName: fiscalYear?.name || 'غير محدد',
         carryForwardWaqfCorpus,
-        carryForwardSourceYear: "2024-2025",
+        carryForwardSourceYear: '2024-2025',
         maintenanceRequests: maintenance?.length || 0,
         expiringContracts: expiringContracts?.length || 0,
         occupiedProperties: contracts?.length || occupiedUnits,

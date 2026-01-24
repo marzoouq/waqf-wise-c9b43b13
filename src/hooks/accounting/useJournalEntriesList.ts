@@ -3,9 +3,9 @@
  * Hook لقائمة القيود المحاسبية
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { AccountingService } from "@/services/accounting.service";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { useQuery } from '@tanstack/react-query';
+import { AccountingService } from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type JournalEntry = {
   id: string;
@@ -18,7 +18,12 @@ export type JournalEntry = {
 };
 
 export function useJournalEntriesList() {
-  const { data: entries, isLoading, error, refetch } = useQuery({
+  const {
+    data: entries,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.JOURNAL_ENTRIES,
     queryFn: async () => {
       const data = await AccountingService.getJournalEntries();

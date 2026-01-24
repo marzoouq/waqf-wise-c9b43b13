@@ -3,13 +3,13 @@
  * يستخدم ApprovalService
  * @version 2.8.44
  */
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/ui/use-toast";
-import { useEffect } from "react";
-import { createMutationErrorHandler } from "@/lib/errors";
-import { ApprovalService, RealtimeService } from "@/services";
-import { QUERY_KEYS } from "@/lib/query-keys";
-import { matchesStatus } from "@/lib/constants";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/ui/use-toast';
+import { useEffect } from 'react';
+import { createMutationErrorHandler } from '@/lib/errors';
+import { ApprovalService, RealtimeService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
+import { matchesStatus } from '@/lib/constants';
 
 export interface RequestApproval {
   id: string;
@@ -30,34 +30,36 @@ export function useRequestApprovals(requestId?: string) {
 
   // Real-time subscription
   useEffect(() => {
-    const subscription = RealtimeService.subscribeToTable(
-      'request_approvals',
-      () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_APPROVALS() });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
-      }
-    );
+    const subscription = RealtimeService.subscribeToTable('request_approvals', () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_APPROVALS() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
+    });
 
     return () => {
       subscription.unsubscribe();
     };
   }, [queryClient]);
 
-  const { data: approvals = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: approvals = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: QUERY_KEYS.REQUEST_APPROVALS(requestId),
     queryFn: () => ApprovalService.getRequestApprovalsByRequestId(requestId!),
     enabled: !!requestId,
   });
 
   const addApproval = useMutation({
-    mutationFn: (approval: Omit<RequestApproval, "id" | "created_at" | "updated_at">) =>
+    mutationFn: (approval: Omit<RequestApproval, 'id' | 'created_at' | 'updated_at'>) =>
       ApprovalService.upsertRequestApproval(approval),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_APPROVALS() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
-        title: "تمت الموافقة بنجاح",
-        description: "تم تسجيل الموافقة على الطلب",
+        title: 'تمت الموافقة بنجاح',
+        description: 'تم تسجيل الموافقة على الطلب',
       });
     },
     onError: createMutationErrorHandler({
@@ -73,8 +75,8 @@ export function useRequestApprovals(requestId?: string) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_APPROVALS() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث حالة الموافقة",
+        title: 'تم التحديث بنجاح',
+        description: 'تم تحديث حالة الموافقة',
       });
     },
     onError: createMutationErrorHandler({

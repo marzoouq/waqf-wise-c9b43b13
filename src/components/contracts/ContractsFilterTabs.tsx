@@ -1,6 +1,6 @@
-import { memo } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { memo } from 'react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 interface ContractsFilterTabsProps {
   activeFilter: string;
@@ -21,12 +21,12 @@ export const ContractsFilterTabs = memo(function ContractsFilterTabs({
   counts,
 }: ContractsFilterTabsProps) {
   const tabs = [
-    { key: "all", label: "جميع العقود", count: counts.all },
-    { key: "active", label: "العقود النشطة", count: counts.active },
-    { key: "draft", label: "العقود المسودة", count: counts.draft },
-    { key: "renewal", label: "جاهز للتجديد", count: counts.renewal, highlight: counts.renewal > 0 },
-    { key: "autoRenew", label: "المتجددة تلقائياً", count: counts.autoRenew },
-    { key: "expired", label: "المنتهية", count: counts.expired },
+    { key: 'all', label: 'جميع العقود', count: counts.all },
+    { key: 'active', label: 'العقود النشطة', count: counts.active },
+    { key: 'draft', label: 'العقود المسودة', count: counts.draft },
+    { key: 'renewal', label: 'جاهز للتجديد', count: counts.renewal, highlight: counts.renewal > 0 },
+    { key: 'autoRenew', label: 'المتجددة تلقائياً', count: counts.autoRenew },
+    { key: 'expired', label: 'المنتهية', count: counts.expired },
   ];
 
   return (
@@ -41,7 +41,7 @@ export const ContractsFilterTabs = memo(function ContractsFilterTabs({
             >
               {tab.label}
               <Badge
-                variant={tab.highlight ? "destructive" : "secondary"}
+                variant={tab.highlight ? 'destructive' : 'secondary'}
                 className="h-5 min-w-5 px-1.5 text-[10px] sm:text-xs"
               >
                 {tab.count}

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Filter, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Filter, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 export type FilterValue = string | number | null | undefined;
 export type FiltersRecord = Record<string, FilterValue>;
@@ -27,7 +27,7 @@ export type FiltersRecord = Record<string, FilterValue>;
 export interface FilterConfig {
   key: string;
   label: string;
-  type: "select" | "text" | "number" | "date" | "dateRange";
+  type: 'select' | 'text' | 'number' | 'date' | 'dateRange';
   options?: Array<{ value: string; label: string }>;
 }
 
@@ -48,7 +48,7 @@ export function AdvancedFiltersDialog({
   const [localFilters, setLocalFilters] = useState<FiltersRecord>(activeFilters);
 
   const activeFilterCount = Object.values(activeFilters).filter(
-    (v) => v !== null && v !== undefined && v !== ""
+    (v) => v !== null && v !== undefined && v !== ''
   ).length;
 
   const handleApply = () => {
@@ -85,19 +85,17 @@ export function AdvancedFiltersDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>فلاتر متقدمة</DialogTitle>
-          <DialogDescription>
-            حدد المعايير لتصفية البيانات بدقة
-          </DialogDescription>
+          <DialogDescription>حدد المعايير لتصفية البيانات بدقة</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           {filters.map((filter) => (
             <div key={filter.key} className="grid gap-2">
               <Label htmlFor={filter.key}>{filter.label}</Label>
-              
-              {filter.type === "select" && filter.options && (
+
+              {filter.type === 'select' && filter.options && (
                 <Select
-                  value={String(localFilters[filter.key] || "")}
+                  value={String(localFilters[filter.key] || '')}
                   onValueChange={(value) => handleFilterChange(filter.key, value)}
                 >
                   <SelectTrigger id={filter.key}>
@@ -113,31 +111,31 @@ export function AdvancedFiltersDialog({
                 </Select>
               )}
 
-              {filter.type === "text" && (
+              {filter.type === 'text' && (
                 <Input
                   id={filter.key}
                   type="text"
-                  value={String(localFilters[filter.key] ?? "")}
+                  value={String(localFilters[filter.key] ?? '')}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                   placeholder={`أدخل ${filter.label}`}
                 />
               )}
 
-              {filter.type === "number" && (
+              {filter.type === 'number' && (
                 <Input
                   id={filter.key}
                   type="number"
-                  value={localFilters[filter.key] ?? ""}
+                  value={localFilters[filter.key] ?? ''}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                   placeholder={`أدخل ${filter.label}`}
                 />
               )}
 
-              {filter.type === "date" && (
+              {filter.type === 'date' && (
                 <Input
                   id={filter.key}
                   type="date"
-                  value={String(localFilters[filter.key] ?? "")}
+                  value={String(localFilters[filter.key] ?? '')}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                 />
               )}
