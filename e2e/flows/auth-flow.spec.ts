@@ -342,6 +342,7 @@ test.describe('Form Accessibility', () => {
     // Tab to first input
     await page.keyboard.press('Tab');
 
+    // @ts-expect-error - document is available in browser context
     const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
     expect(['INPUT', 'BUTTON', 'A']).toContain(focusedElement);
 
@@ -350,6 +351,7 @@ test.describe('Form Accessibility', () => {
     await page.keyboard.press('Tab');
 
     // Should still be in the form area
+    // @ts-expect-error - document is available in browser context
     const stillFocused = await page.evaluate(() => document.activeElement?.tagName);
     expect(['INPUT', 'BUTTON', 'A']).toContain(stillFocused);
   });

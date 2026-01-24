@@ -145,12 +145,14 @@ test.describe('Sidebar Navigation', () => {
 
     if (await collapseButton.isVisible()) {
       const sidebar = page.locator('aside, [class*="sidebar"]').first();
-      const initialWidth = await sidebar.evaluate((el) => el.getBoundingClientRect().width);
+      // @ts-expect-error - getBoundingClientRect is available in browser context
+      const initialWidth = await sidebar.evaluate((el: HTMLElement) => el.getBoundingClientRect().width);
 
       await collapseButton.click();
       await page.waitForTimeout(500);
 
-      const newWidth = await sidebar.evaluate((el) => el.getBoundingClientRect().width);
+      // @ts-expect-error - getBoundingClientRect is available in browser context
+      const newWidth = await sidebar.evaluate((el: HTMLElement) => el.getBoundingClientRect().width);
 
       // Width should change (either collapsed or expanded)
       expect(newWidth).not.toBe(initialWidth);

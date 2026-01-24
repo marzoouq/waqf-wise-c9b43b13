@@ -169,10 +169,8 @@ test.describe('Theme Transition Visual Tests', () => {
     await page.goto('/');
     await waitForPageStability(page);
     
-    // Check if dark mode persists
-    const isDark = await page.evaluate(() => {
-      return document.documentElement.classList.contains('dark');
-    });
+    // Check if dark mode persists using string eval to avoid TypeScript DOM issues
+    const isDark = await page.evaluate(`document.documentElement.classList.contains('dark')`) as boolean;
     
     if (isDark) {
       await expect(page).toHaveScreenshot('theme-persisted-dark.png', {
