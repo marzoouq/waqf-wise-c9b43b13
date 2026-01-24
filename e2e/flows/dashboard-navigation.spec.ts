@@ -10,8 +10,8 @@ const TEST_USER = {
   password: process.env.TEST_USER_PASSWORD || 'Test123!',
 };
 
-// Dashboard routes by role
-const ROLE_DASHBOARDS = {
+// Dashboard routes by role (reserved for future tests)
+const _ROLE_DASHBOARDS = {
   admin: '/dashboard',
   nazer: '/nazer-dashboard',
   accountant: '/accountant-dashboard',
@@ -60,7 +60,7 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(page: any) {
+  async function loginAsTestUser(page: Page) {
     await page.goto('/login');
     
     const emailInput = page.locator('input[type="email"]').first();

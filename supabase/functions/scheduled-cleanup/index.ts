@@ -10,12 +10,14 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { 
-  corsHeaders, 
   handleCors, 
   jsonResponse, 
   errorResponse, 
   unauthorizedResponse 
 } from '../_shared/cors.ts';
+
+// Reserved for future CORS needs
+// import { corsHeaders } from '../_shared/cors.ts';
 
 interface CleanupDetails {
   health_checks: number;

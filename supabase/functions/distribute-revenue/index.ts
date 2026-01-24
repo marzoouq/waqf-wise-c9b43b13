@@ -38,7 +38,7 @@ function checkRateLimit(userId: string): boolean {
   return true;
 }
 
-interface DistributionRequest {
+interface _DistributionRequest {
   totalAmount: number;
   fiscalYearId: string;
   distributionDate: string;

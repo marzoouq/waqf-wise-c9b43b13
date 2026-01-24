@@ -5,7 +5,10 @@
  * @version 1.0.0
  */
 
-import { checkUXSystemsHealth, detectDeviceCapabilities, collectUXMetrics, FEATURES } from './ux-integration';
+import { detectDeviceCapabilities, collectUXMetrics, FEATURES } from './ux-integration';
+
+// Reserved for future health checks
+// import { checkUXSystemsHealth } from './ux-integration';
 
 // ==================== Verification Types ====================
 

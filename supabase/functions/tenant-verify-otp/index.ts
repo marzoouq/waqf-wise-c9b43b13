@@ -12,6 +12,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface Tenant {
+  id: string;
+  full_name: string;
+  phone: string;
+  email: string;
+}
+
+interface _ContractWithTenant {
+  id: string;
+  tenant_id: string;
+  tenants: Tenant;
+}
+
 // توليد توكن جلسة آمن
 function generateSessionToken(): string {
   const array = new Uint8Array(32);
@@ -70,7 +83,7 @@ serve(async (req) => {
       }
 
       // التحقق من تطابق رقم الهاتف مع المستأجر
-      const tenant = directContract.tenants as any;
+      const tenant = directContract.tenants as Tenant;
       const tenantPhone = tenant?.phone?.replace(/\D/g, "") || "";
       
       if (!tenantPhone.includes(cleanPhone) && !cleanPhone.includes(tenantPhone.slice(-9))) {

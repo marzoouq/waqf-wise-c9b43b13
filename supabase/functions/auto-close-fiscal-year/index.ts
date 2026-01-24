@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   try {
     // ✅ Health Check Support / Test Mode - يجب فحصه أولاً قبل أي شيء
     let bodyText = '';
-    let parsedBody: any = null;
+    let parsedBody: Record<string, unknown> | null = null;
     
     try {
       bodyText = await req.clone().text();
@@ -155,8 +155,8 @@ Deno.serve(async (req) => {
 
     console.log('Financial summary:', summary);
 
-    // 3. حساب الإيرادات والمصروفات التفصيلية
-    const { data: revenues } = await supabase
+    // 3. حساب الإيرادات والمصروفات التفصيلية (لأغراض التوثيق)
+    await supabase
       .from('journal_entry_lines')
       .select(`
         account_id,
@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
       `)
       .eq('accounts.account_type', 'revenue');
 
-    const { data: expenses } = await supabase
+    await supabase
       .from('journal_entry_lines')
       .select(`
         account_id,

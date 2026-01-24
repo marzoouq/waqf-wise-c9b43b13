@@ -50,7 +50,7 @@ export function EligibilityAssessmentDialog({
         max_score: 100,
       });
     }
-  }, [open, beneficiary?.id, latestAssessment]);
+  }, [open, beneficiary?.id, beneficiary, latestAssessment]);
 
   // تشغيل التقييم عند الفتح
   useEffect(() => {
@@ -68,7 +68,7 @@ export function EligibilityAssessmentDialog({
         // معالجة الخطأ تتم في الـ hook
       });
     }
-  }, [open, beneficiary?.id]);
+  }, [open, beneficiary, runAssessment]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
