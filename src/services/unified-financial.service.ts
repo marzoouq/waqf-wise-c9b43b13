@@ -104,7 +104,7 @@ export class UnifiedFinancialService {
         .from('financial_summary')
         .select('*')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (summaryError) {
         // fallback إلى الطريقة التقليدية

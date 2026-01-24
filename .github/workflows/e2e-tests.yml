@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 2 * * *' # يومياً الساعة 2 صباحاً
 
+# Security: Restrict default permissions to minimum required
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   test:
     timeout-minutes: 60

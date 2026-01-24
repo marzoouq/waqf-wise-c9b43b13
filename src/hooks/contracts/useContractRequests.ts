@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { matchesStatus } from '@/lib/constants';
+import { PROPERTIES_KEYS } from '@/lib/query-keys';
 
 export interface TerminationRequest {
   id: string;
@@ -46,7 +47,9 @@ export function useContractRequests(contractId?: string) {
     isLoading: isLoadingTermination,
     refetch: refetchTermination,
   } = useQuery({
-    queryKey: ['termination-requests', contractId],
+    queryKey: contractId 
+      ? PROPERTIES_KEYS.TERMINATION_REQUESTS_BY_CONTRACT(contractId)
+      : PROPERTIES_KEYS.TERMINATION_REQUESTS,
     queryFn: async () => {
       let query = supabase
         .from('contract_termination_requests')
@@ -69,7 +72,9 @@ export function useContractRequests(contractId?: string) {
     isLoading: isLoadingRentAdjustment,
     refetch: refetchRentAdjustment,
   } = useQuery({
-    queryKey: ['rent-adjustment-requests', contractId],
+    queryKey: contractId 
+      ? PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS_BY_CONTRACT(contractId)
+      : PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS,
     queryFn: async () => {
       let query = supabase
         .from('rent_adjustment_requests')
@@ -108,7 +113,7 @@ export function useContractRequests(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['termination-requests'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.TERMINATION_REQUESTS });
       toast.success('تم تقديم طلب الفسخ بنجاح');
     },
     onError: (error) => {
@@ -145,7 +150,7 @@ export function useContractRequests(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['rent-adjustment-requests'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS });
       toast.success('تم تقديم طلب تعديل الإيجار بنجاح');
     },
     onError: (error) => {
@@ -180,7 +185,7 @@ export function useContractRequests(contractId?: string) {
       return data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['termination-requests'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.TERMINATION_REQUESTS });
       toast.success(
         data.status === 'approved'
           ? 'تمت الموافقة على طلب الفسخ'
@@ -222,7 +227,7 @@ export function useContractRequests(contractId?: string) {
       return data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['rent-adjustment-requests'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.RENT_ADJUSTMENT_REQUESTS });
       
       const messages = {
         approved: 'تمت الموافقة على طلب تعديل الإيجار',

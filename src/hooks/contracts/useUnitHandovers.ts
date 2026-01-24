@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { PROPERTIES_KEYS } from '@/lib/query-keys';
 
 export interface UnitHandover {
   id: string;
@@ -41,7 +42,9 @@ export function useUnitHandovers(contractId?: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ['unit-handovers', contractId],
+    queryKey: contractId 
+      ? PROPERTIES_KEYS.UNIT_HANDOVERS_BY_CONTRACT(contractId)
+      : PROPERTIES_KEYS.UNIT_HANDOVERS,
     queryFn: async () => {
       let query = supabase
         .from('unit_handovers')
@@ -88,7 +91,7 @@ export function useUnitHandovers(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.UNIT_HANDOVERS });
       toast.success('تم حفظ نموذج الاستلام بنجاح');
     },
     onError: (error) => {
@@ -114,7 +117,7 @@ export function useUnitHandovers(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.UNIT_HANDOVERS });
       toast.success('تم تحديث النموذج بنجاح');
     },
     onError: (error) => {
@@ -139,7 +142,7 @@ export function useUnitHandovers(contractId?: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.UNIT_HANDOVERS });
       toast.success('تم أرشفة النموذج بنجاح');
     },
     onError: (error) => {
@@ -175,7 +178,7 @@ export function useUnitHandovers(contractId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unit-handovers'] });
+      queryClient.invalidateQueries({ queryKey: PROPERTIES_KEYS.UNIT_HANDOVERS });
       toast.success('تم تحديث التوقيع');
     },
     onError: (error) => {

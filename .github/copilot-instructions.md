@@ -23,23 +23,23 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 ```
 src/
 ├── components/     # UI components only - NO business logic (600+ in 44 folders)
-├── hooks/          # 170+ hooks in 36 feature folders (see src/hooks/README.md)
-├── services/       # 42 services for ALL data operations (see src/services/README.md)
+├── hooks/          # 170+ hooks in 36 feature folders (see ../src/hooks/README.md)
+├── services/       # 42 services for ALL data operations (see ../src/services/README.md)
 │   ├── beneficiary/    # Facade pattern: core, documents, analytics, tabs
 │   ├── accounting/     # Facade pattern: core, reports, reconciliation
 │   ├── property/       # Facade pattern: core, contracts, units, maintenance
 │   └── ...             # Other services (single-file or facade)
 ├── types/          # TypeScript types - NEVER use `any`
 ├── lib/            # Utilities organized by concern:
-│   ├── query-keys/         # 9 files: accounting, beneficiary, dashboard, etc.
-│   ├── query-invalidation.ts  # Batched cache invalidation helpers
+│   ├── query-keys/         # 9 files: accounting, beneficiary, dashboard, etc. (../src/lib/query-keys/)
+│   ├── query-invalidation.ts  # Batched cache invalidation helpers (../src/lib/query-invalidation.ts)
 │   ├── errors/             # Error handling utilities
 │   ├── pdf/                # PDF generators
 │   ├── banking/            # Banking integrations
 │   └── utils/              # General utilities
 ├── pages/          # Route pages - use hooks for data
-├── routes/         # Route definitions in 7 files (see src/routes/README.md)
-├── infrastructure/ # react-query config (QUERY_CONFIG, CACHE_TIMES)
+├── routes/         # Route definitions in 7 files (see ../src/routes/README.md)
+├── infrastructure/ # react-query config (QUERY_CONFIG, CACHE_TIMES) (../src/infrastructure/react-query/)
 └── contexts/       # AuthContext (single source of truth for auth)
 supabase/
 └── functions/      # 55+ Edge Functions (secured with service_role)
@@ -283,15 +283,16 @@ const createWrapper = () => ({ children }) => (
 
 ## Files to Reference
 
-- `docs/ARCHITECTURE_RULES.md` - Strict coding rules
-- `docs/ARCHITECTURE_DECISIONS.md` - All ADRs (Architecture Decision Records)
-- `src/services/README.md` - Service layer documentation  
-- `src/hooks/README.md` - Hooks organization
-- `src/routes/README.md` - Routing structure
-- `src/lib/query-keys/` - All query keys (400+ in 9 files)
-- `src/lib/query-invalidation.ts` - Batched cache invalidation
-- `src/lib/errors/index.ts` - Error handling utilities
-- `src/infrastructure/react-query/` - Query config & cache times
+- `../docs/ARCHITECTURE_RULES.md` - Strict coding rules
+- `../docs/ARCHITECTURE_DECISIONS.md` - All ADRs (Architecture Decision Records)
+- `../src/services/README.md` - Service layer documentation  
+- `../src/hooks/README.md` - Hooks organization
+- `../src/routes/README.md` - Routing structure
+- `../src/lib/query-keys/` - All query keys (400+ in 9 files)
+- `../src/lib/query-invalidation.ts` - Batched cache invalidation
+- `../src/lib/errors/index.ts` - Error handling utilities
+- `../src/infrastructure/react-query/` - Query config & cache times
+- `../README.md` - Project overview
 
 ---
 
