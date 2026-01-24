@@ -5,7 +5,7 @@
  */
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -65,8 +65,7 @@ interface WeeklyStats {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function generateWeeklyReport(supabase: any): Promise<WeeklyStats> {
+async function generateWeeklyReport(supabase: SupabaseClient): Promise<WeeklyStats> {
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   
@@ -155,8 +154,7 @@ async function generateWeeklyReport(supabase: any): Promise<WeeklyStats> {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function sendReportNotification(supabase: any, report: WeeklyStats) {
+async function sendReportNotification(supabase: SupabaseClient, report: WeeklyStats) {
   // إرسال إشعار للمديرين
   const { data: admins } = await supabase
     .from("user_roles")

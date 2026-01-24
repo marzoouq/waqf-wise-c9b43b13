@@ -9,7 +9,7 @@
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -109,9 +109,9 @@ serve(async (req) => {
               end_date: contract.end_date,
               status: contract.status,
               property_id: contract.property_id,
-              property_name: (contract as any).properties?.name || "غير محدد",
-              property_location: (contract as any).properties?.location,
-              property_type: (contract as any).properties?.type,
+              property_name: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).name as string || "غير محدد" : "غير محدد",
+              property_location: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).location : undefined,
+              property_type: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).type : undefined,
               unit_id: unit.id,
               unit_name: unit.unit_name || unit.unit_number || "الوحدة الرئيسية",
               unit_number: unit.unit_number,
@@ -128,9 +128,9 @@ serve(async (req) => {
             end_date: contract.end_date,
             status: contract.status,
             property_id: contract.property_id,
-            property_name: (contract as any).properties?.name || "غير محدد",
-            property_location: (contract as any).properties?.location,
-            property_type: (contract as any).properties?.type,
+            property_name: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).name as string || "غير محدد" : "غير محدد",
+            property_location: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).location : undefined,
+            property_type: (contract as Record<string, unknown>).properties ? ((contract as Record<string, unknown>).properties as Record<string, unknown>).type : undefined,
             unit_id: null,
             unit_name: "العقار كامل",
             unit_number: null,
@@ -171,10 +171,10 @@ serve(async (req) => {
         .order("created_at", { ascending: false });
 
       // إضافة اسم العقار والوحدة للطلبات
-      const enrichedRequests = (requests || []).map((r: any) => ({
+      const enrichedRequests = (requests || []).map((r: Record<string, unknown>) => ({
         ...r,
-        property_name: r.properties?.name || "غير محدد",
-        unit_name: r.property_units?.unit_name || r.property_units?.unit_number || null,
+        property_name: r.properties ? ((r.properties as Record<string, unknown>).name as string || "غير محدد") : "غير محدد",
+        unit_name: r.property_units ? ((r.property_units as Record<string, unknown>).unit_name || (r.property_units as Record<string, unknown>).unit_number || null) : null,
       }));
 
       return new Response(

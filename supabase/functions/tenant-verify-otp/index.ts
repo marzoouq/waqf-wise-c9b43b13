@@ -70,8 +70,8 @@ serve(async (req) => {
       }
 
       // التحقق من تطابق رقم الهاتف مع المستأجر
-      const tenant = directContract.tenants as any;
-      const tenantPhone = tenant?.phone?.replace(/\D/g, "") || "";
+      const tenant = directContract.tenants as Record<string, unknown>;
+      const tenantPhone = tenant?.phone ? String(tenant.phone).replace(/\D/g, "") : "";
       
       if (!tenantPhone.includes(cleanPhone) && !cleanPhone.includes(tenantPhone.slice(-9))) {
         return new Response(

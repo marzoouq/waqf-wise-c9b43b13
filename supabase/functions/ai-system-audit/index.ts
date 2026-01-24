@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -200,7 +200,7 @@ serve(async (req) => {
     };
 
     // تنفيذ الإصلاحات الآمنة تلقائياً (معطل حالياً لعدم وجود execute_sql)
-    const autoFixResults: any[] = [];
+    const autoFixResults: unknown[] = [];
     
     // حفظ الإصلاحات المعلقة
     const pendingFixes = findings.filter(f => !f.autoFixable && f.fixSql);
@@ -258,8 +258,8 @@ serve(async (req) => {
   }
 });
 
-async function gatherSystemData(supabase: any, categories: string[]) {
-  const data: Record<string, any> = {};
+async function gatherSystemData(supabase: SupabaseClient, categories: string[]) {
+  const data: Record<string, unknown> = {};
 
   console.log('[AI-SYSTEM-AUDIT] Gathering system data for categories:', categories);
 
@@ -343,7 +343,7 @@ async function gatherSystemData(supabase: any, categories: string[]) {
   return data;
 }
 
-async function analyzeWithAI(systemData: any, categories: string[], apiKey?: string): Promise<AuditFinding[]> {
+async function analyzeWithAI(systemData: Record<string, unknown>, categories: string[], apiKey?: string): Promise<AuditFinding[]> {
   // إذا لم يتوفر API key، استخدم التحليل المحلي المحسن
   if (!apiKey) {
     console.log('[AI-SYSTEM-AUDIT] No LOVABLE_API_KEY, using enhanced local analysis');
@@ -427,9 +427,9 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
       const directParse = JSON.parse(content.trim());
       if (Array.isArray(directParse)) {
         console.log(`[AI-SYSTEM-AUDIT] Direct parse successful, found ${directParse.length} issues`);
-        return directParse.map((f: any) => ({
+        return directParse.map((f: Record<string, unknown>) => ({
           ...f,
-          categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+          categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
           fixed: false
         }));
       }
@@ -443,9 +443,9 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
       try {
         const aiFindings = JSON.parse(jsonMatch[0]);
         console.log(`[AI-SYSTEM-AUDIT] Regex extraction successful, found ${aiFindings.length} issues`);
-        return aiFindings.map((f: any) => ({
+        return aiFindings.map((f: Record<string, unknown>) => ({
           ...f,
-          categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+          categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
           fixed: false
         }));
       } catch (parseError) {
@@ -460,9 +460,9 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
         const aiFindings = JSON.parse(codeBlockMatch[1].trim());
         if (Array.isArray(aiFindings)) {
           console.log(`[AI-SYSTEM-AUDIT] Code block extraction successful, found ${aiFindings.length} issues`);
-          return aiFindings.map((f: any) => ({
+          return aiFindings.map((f: Record<string, unknown>) => ({
             ...f,
-            categoryLabel: CATEGORY_LABELS[f.category] || f.category,
+            categoryLabel: CATEGORY_LABELS[f.category as string] || f.category,
             fixed: false
           }));
         }
@@ -480,7 +480,7 @@ async function analyzeWithAI(systemData: any, categories: string[], apiKey?: str
   }
 }
 
-function buildAnalysisPrompt(systemData: any, categories: string[]): string {
+function buildAnalysisPrompt(systemData: Record<string, unknown>, categories: string[]): string {
   let prompt = 'قم بفحص النظام وتحديد المشاكل في الفئات التالية:\n\n';
   
   categories.forEach(cat => {
@@ -491,13 +491,13 @@ function buildAnalysisPrompt(systemData: any, categories: string[]): string {
   
   // تحديد حجم البيانات المرسلة
   const dataToSend = {
-    tables: systemData.tables?.slice(0, 50),
-    rlsPolicies: systemData.rlsPolicies?.slice(0, 100),
-    indexes: systemData.indexes?.slice(0, 100),
+    tables: Array.isArray(systemData.tables) ? (systemData.tables as Array<unknown>).slice(0, 50) : [],
+    rlsPolicies: Array.isArray(systemData.rlsPolicies) ? (systemData.rlsPolicies as Array<unknown>).slice(0, 100) : [],
+    indexes: Array.isArray(systemData.indexes) ? (systemData.indexes as Array<unknown>).slice(0, 100) : [],
     systemStats: systemData.systemStats,
-    errorLogsCount: systemData.errorLogs?.length || 0,
-    rolesCount: systemData.roles?.length || 0,
-    tablesWithoutRLS: systemData.tables?.filter((t: any) => !t.has_rls)?.map((t: any) => t.table_name) || []
+    errorLogsCount: Array.isArray(systemData.errorLogs) ? (systemData.errorLogs as Array<unknown>).length : 0,
+    rolesCount: Array.isArray(systemData.roles) ? (systemData.roles as Array<unknown>).length : 0,
+    tablesWithoutRLS: Array.isArray(systemData.tables) ? (systemData.tables as Array<Record<string, unknown>>).filter((t: Record<string, unknown>) => !t.has_rls)?.map((t: Record<string, unknown>) => t.table_name) || [] : []
   };
   
   prompt += JSON.stringify(dataToSend, null, 2);
@@ -505,7 +505,7 @@ function buildAnalysisPrompt(systemData: any, categories: string[]): string {
   return prompt;
 }
 
-function performEnhancedLocalAnalysis(systemData: any, categories: string[]): AuditFinding[] {
+function performEnhancedLocalAnalysis(systemData: Record<string, unknown>, categories: string[]): AuditFinding[] {
   const findings: AuditFinding[] = [];
   let idCounter = 1;
 
@@ -514,10 +514,10 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
   // فحص قاعدة البيانات
   if (categories.includes('database') || categories.includes('tables')) {
     // فحص الجداول بدون RLS
-    if (systemData.tables && systemData.tables.length > 0) {
-      const tablesWithoutRLS = systemData.tables.filter((t: any) => !t.has_rls);
+    if (systemData.tables && Array.isArray(systemData.tables) && systemData.tables.length > 0) {
+      const tablesWithoutRLS = systemData.tables.filter((t: Record<string, unknown>) => !t.has_rls);
       
-      tablesWithoutRLS.forEach((table: any) => {
+      tablesWithoutRLS.forEach((table: Record<string, unknown>) => {
         findings.push({
           id: `db-${idCounter++}`,
           category: 'database',
@@ -534,10 +534,10 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
       });
 
       // فحص الجداول الكبيرة بدون فهارس كافية
-      const largeTables = systemData.tables.filter((t: any) => t.row_count > 10000);
-      if (systemData.indexes) {
-        largeTables.forEach((table: any) => {
-          const tableIndexes = systemData.indexes.filter((i: any) => i.table_name === table.table_name);
+      const largeTables = systemData.tables.filter((t: Record<string, unknown>) => (t.row_count as number) > 10000);
+      if (systemData.indexes && Array.isArray(systemData.indexes)) {
+        largeTables.forEach((table: Record<string, unknown>) => {
+          const tableIndexes = (systemData.indexes as Array<Record<string, unknown>>).filter((i: Record<string, unknown>) => i.table_name === table.table_name);
           if (tableIndexes.length < 2) {
             findings.push({
               id: `perf-${idCounter++}`,
@@ -562,7 +562,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
           categoryLabel: 'قاعدة البيانات',
           severity: 'success',
           title: 'جميع الجداول محمية بـ RLS',
-          description: `جميع الجداول (${systemData.tables.length}) لديها سياسات RLS مفعلة`,
+          description: `جميع الجداول (${(systemData.tables as Array<unknown>).length}) لديها سياسات RLS مفعلة`,
           autoFixable: false,
           fixed: false
         });
@@ -570,10 +570,10 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
     }
 
     // فحص إحصائيات النظام
-    if (systemData.systemStats) {
-      const stats = systemData.systemStats;
+    if (systemData.systemStats && typeof systemData.systemStats === 'object') {
+      const stats = systemData.systemStats as Record<string, number>;
       
-      if (stats.tables_without_rls > 0) {
+      if ((stats.tables_without_rls as number) > 0) {
         findings.push({
           id: `stats-${idCounter++}`,
           category: 'database',
@@ -588,7 +588,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
       }
 
       // معلومات عن حجم قاعدة البيانات
-      const dbSizeMB = Math.round(stats.database_size / (1024 * 1024));
+      const dbSizeMB = Math.round((stats.database_size as number) / (1024 * 1024));
       findings.push({
         id: `info-${idCounter++}`,
         category: 'database',
@@ -603,9 +603,9 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
   }
 
   // فحص الأخطاء المتكررة
-  if (systemData.errorLogs && systemData.errorLogs.length > 0) {
-    const errorCounts = systemData.errorLogs.reduce((acc: any, log: any) => {
-      const key = log.error_type || log.message?.slice(0, 50) || 'unknown';
+  if (systemData.errorLogs && Array.isArray(systemData.errorLogs) && systemData.errorLogs.length > 0) {
+    const errorCounts = (systemData.errorLogs as Array<Record<string, unknown>>).reduce((acc: Record<string, number>, log: Record<string, unknown>) => {
+      const key = (log.error_type as string) || (typeof log.message === 'string' ? log.message.slice(0, 50) : 'unknown');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {});
@@ -641,8 +641,8 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
   }
 
   // فحص الأدوار
-  if (categories.includes('roles') && systemData.roles) {
-    const usersWithoutRoles = systemData.roles?.filter((r: any) => !r.role) || [];
+  if (categories.includes('roles') && systemData.roles && Array.isArray(systemData.roles)) {
+    const usersWithoutRoles = (systemData.roles as Array<Record<string, unknown>>).filter((r: Record<string, unknown>) => !r.role) || [];
     if (usersWithoutRoles.length > 0) {
       findings.push({
         id: `role-${idCounter++}`,
@@ -693,7 +693,7 @@ function performEnhancedLocalAnalysis(systemData: any, categories: string[]): Au
   return findings;
 }
 
-async function savePendingFixes(supabase: any, auditId: string, findings: AuditFinding[]) {
+async function savePendingFixes(supabase: SupabaseClient, auditId: string, findings: AuditFinding[]) {
   const fixes = findings.map(f => ({
     audit_id: auditId,
     fix_type: f.category,
@@ -713,7 +713,7 @@ async function savePendingFixes(supabase: any, auditId: string, findings: AuditF
   }
 }
 
-function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): string {
+function generateAIAnalysisSummary(findings: AuditFinding[], summary: Record<string, number>): string {
   const total = findings.length;
   const issues = total - summary.success;
   
@@ -735,7 +735,7 @@ function generateAIAnalysisSummary(findings: AuditFinding[], summary: any): stri
   return analysis;
 }
 
-async function sendSlackNotification(supabase: any, auditId: string, summary: any, criticalFindings: AuditFinding[]) {
+async function sendSlackNotification(supabase: SupabaseClient, auditId: string, summary: Record<string, number>, criticalFindings: AuditFinding[]) {
   try {
     const slackWebhookUrl = Deno.env.get('SLACK_WEBHOOK_URL');
     if (!slackWebhookUrl) {
