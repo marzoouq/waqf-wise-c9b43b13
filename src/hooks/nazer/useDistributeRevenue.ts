@@ -68,7 +68,7 @@ export function useDistributeRevenue(onClose: () => void) {
 
       setPreviewShares(sharesWithNames);
       setIsPreviewMode(true);
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "خطأ غير معروف";
       toast.error("خطأ في حساب التوزيع: " + errorMessage);
     }

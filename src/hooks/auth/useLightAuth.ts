@@ -105,7 +105,7 @@ export function useLightAuth(): LightAuthState & { redirectPath: string | null }
           });
           setRedirectPath(null);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (import.meta.env.DEV) {
           productionLogger.debug('🔑 [useLightAuth] خطأ:', error);
         }

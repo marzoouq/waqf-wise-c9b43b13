@@ -189,7 +189,7 @@ export const useRentalPayments = (
           tenantName: data.contracts?.tenant_name
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'rental_invoice_generation', severity: 'high' });
       toast({
         title: "تحذير",

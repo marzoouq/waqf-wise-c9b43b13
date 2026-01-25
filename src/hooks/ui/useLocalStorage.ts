@@ -64,7 +64,7 @@ export function useLocalStorage<T>(
       if (!item) return initialValue;
       
       return safeParseJson<T>(item, initialValue, key);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.warn(`Error reading localStorage key "${key}"`, error);
       return initialValue;
     }
@@ -89,7 +89,7 @@ export function useLocalStorage<T>(
         
         // إرسال حدث لمزامنة التبويبات الأخرى
         window.dispatchEvent(new Event('local-storage'));
-      } catch (error) {
+      } catch (error: unknown) {
         productionLogger.warn(`Error setting localStorage key "${key}"`, error);
       }
     },
@@ -109,7 +109,7 @@ export function useLocalStorage<T>(
       window.localStorage.removeItem(key);
       setStoredValue(initialValue);
       window.dispatchEvent(new Event('local-storage'));
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.warn(`Error removing localStorage key "${key}"`, error);
     }
   }, [initialValue, key]);

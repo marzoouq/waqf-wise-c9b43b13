@@ -37,7 +37,7 @@ export function useBeneficiarySession({ beneficiaryId, enabled = true }: UseBene
       if (newSessionId) {
         sessionIdRef.current = newSessionId;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) {
         console.error("Error updating beneficiary session:", error);
       }
@@ -50,7 +50,7 @@ export function useBeneficiarySession({ beneficiaryId, enabled = true }: UseBene
 
     try {
       await BeneficiaryService.endSession(sessionIdRef.current);
-    } catch (error) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) {
         console.error("Error ending beneficiary session:", error);
       }

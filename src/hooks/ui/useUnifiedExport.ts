@@ -111,7 +111,7 @@ export function useUnifiedExport() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}.pdf`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'export_pdf', severity: 'low' });
       toast.error("فشل التصدير", {
         description: getErrorMessage(error),
@@ -131,7 +131,7 @@ export function useUnifiedExport() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}.xlsx`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'export_excel', severity: 'low' });
       toast.error("فشل التصدير", {
         description: getErrorMessage(error),
@@ -151,7 +151,7 @@ export function useUnifiedExport() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'export_multi_sheet_excel', severity: 'low' });
       toast.error("فشل التصدير", {
         description: getErrorMessage(error),
@@ -223,7 +223,7 @@ export function useUnifiedExport() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير القائمة المالية إلى ${config.filename}.pdf`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'export_financial_statement', severity: 'low' });
       toast.error("فشل التصدير", {
         description: getErrorMessage(error),
@@ -257,7 +257,7 @@ export function useUnifiedExport() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}.csv`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'export_csv', severity: 'low' });
       toast.error("فشل التصدير", {
         description: getErrorMessage(error),

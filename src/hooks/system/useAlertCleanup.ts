@@ -45,7 +45,7 @@ export function useAlertCleanup() {
 
         // حفظ وقت آخر تنظيف
         localStorage.setItem(CLEANUP_KEY, now.toString());
-      } catch (error) {
+      } catch (error: unknown) {
         if (import.meta.env.DEV) {
           console.error('Alert cleanup failed', error);
         }

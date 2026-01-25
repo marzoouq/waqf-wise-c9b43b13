@@ -136,7 +136,7 @@ export function useJournalEntries() {
       
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       return result.data?.id;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'create_auto_entry', severity: 'high' });
       throw error;
     }

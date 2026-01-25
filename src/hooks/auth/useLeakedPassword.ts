@@ -60,7 +60,7 @@ export function useLeakedPassword() {
       }
 
       return isLeaked;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'check_leaked_password', severity: 'medium' });
       return false;
     } finally {
@@ -94,7 +94,7 @@ export function useLeakedPassword() {
         const [hashSuffix] = line.split(':');
         return hashSuffix === suffix;
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'check_leaked_password_quick', severity: 'low' });
       return false;
     }

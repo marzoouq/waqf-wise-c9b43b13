@@ -55,7 +55,7 @@ export function usePropertyAI() {
       setAnalysis(result.data?.analysis || "");
       toast.success("تم التحليل بنجاح!");
       return result.data?.analysis;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error("AI Analysis Error:", error);
       toast.error("حدث خطأ أثناء التحليل");
       return null;

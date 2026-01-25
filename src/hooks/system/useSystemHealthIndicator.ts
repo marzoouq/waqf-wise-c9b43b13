@@ -100,7 +100,7 @@ export function useSystemHealthIndicator() {
           networkOnline: true,
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (!mountedRef.current) return;
       
       const responseTime = Math.round(performance.now() - startTime);

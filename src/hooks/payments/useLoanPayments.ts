@@ -92,7 +92,7 @@ export function useLoanPayments(loanId?: string) {
 
           // Update payment with journal entry ID
           await LoansService.updateLoanPaymentJournalEntry(paymentData.id, entryId);
-        } catch (error) {
+        } catch (error: unknown) {
           logger.error(error, { context: 'loan_payment_journal_entry', severity: 'medium' });
         }
       }
