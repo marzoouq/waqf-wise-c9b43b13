@@ -78,10 +78,16 @@ export function createOptimistic<TData, TVariables, TError = Error>(
       // 2. حفظ البيانات القديمة
       const previous = queryClient.getQueryData<TData>(config.queryKey);
 
-      // 3. تحديث متفائل
-      queryClient.setQueryData<TData>(config.queryKey, (old) =>
-        config.updater(old, variables)
-      );
+      // 3. تحديث متفائل مع حماية من الأخطاء
+      try {
+        queryClient.setQueryData<TData>(config.queryKey, (old) =>
+          config.updater(old, variables)
+        );
+      } catch (error) {
+        console.error('[Optimistic Update] Updater failed:', error);
+        // إرجاع السياق بدون تحديث في حالة الخطأ
+        return { previous };
+      }
 
       // 4. إرجاع السياق للتراجع
       return { previous };
