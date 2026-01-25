@@ -10,9 +10,9 @@ import type jsPDF from "jspdf";
 import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS, getDefaultTableStyles, processArabicText, formatCurrencyForPDF } from "./arabic-pdf-utils";
 import { logger } from "@/lib/logger";
 
-// Type extension for jsPDF with autoTable
+// Type extension for jsPDF with autoTable - using centralized definition
 interface JsPDFWithAutoTable extends jsPDF {
-  lastAutoTable?: { finalY: number };
+  lastAutoTable?: { finalY: number; pageNumber: number; pageCount: number };
 }
 
 interface Payment {

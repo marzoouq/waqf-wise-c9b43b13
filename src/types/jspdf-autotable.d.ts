@@ -1,9 +1,10 @@
 /**
  * Type definitions for jspdf-autotable
  * Provides type safety for autoTable method on jsPDF
+ * Note: Using type-only reference to avoid bundling jspdf at build time
  */
 
-import 'jspdf';
+/// <reference types="jspdf" />
 
 declare module 'jspdf' {
   interface AutoTableOptions {

@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
 import type { jsPDF } from "jspdf";
 
-type JsPDFWithAutoTable = jsPDF & { lastAutoTable?: { finalY: number } };
+type JsPDFWithAutoTable = jsPDF & { lastAutoTable?: { finalY: number; pageNumber: number; pageCount: number } };
 
 type TabValue = "events" | "sessions" | "attempts";
 
