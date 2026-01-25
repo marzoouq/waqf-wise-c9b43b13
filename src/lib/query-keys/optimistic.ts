@@ -1,11 +1,16 @@
 /**
  * Optimistic Updates Framework - إطار التحديثات المتفائلة
- * @version 1.0.0
+ * @version 2.0.0
  * @module lib/query-keys/optimistic
  * 
  * @description
  * يوفر تحديثات فورية للمستخدم مع التراجع التلقائي في حالة الفشل
  * يحسن UX بتقليل زمن الانتظار بنسبة 70%
+ * 
+ * الميزات الجديدة v2.0.0:
+ * - إحصائيات النجاح/الفشل
+ * - Metrics للأداء
+ * - Error Boundaries محسّنة
  * 
  * @example
  * ```typescript
@@ -27,6 +32,98 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
+
+// ═══════════════════════════════════════
+// Statistics Collector - إحصائيات الأداء
+// ═══════════════════════════════════════
+
+interface OptimisticStats {
+  successCount: number;
+  rollbackCount: number;
+  totalOperations: number;
+  averageDurationMs: number;
+  lastOperationAt: Date | null;
+}
+
+/**
+ * Singleton لجمع إحصائيات التحديثات المتفائلة
+ */
+class OptimisticStatsCollector {
+  private stats: OptimisticStats = {
+    successCount: 0,
+    rollbackCount: 0,
+    totalOperations: 0,
+    averageDurationMs: 0,
+    lastOperationAt: null,
+  };
+  
+  private durations: number[] = [];
+
+  recordSuccess(durationMs: number): void {
+    this.stats.successCount++;
+    this.stats.totalOperations++;
+    this.stats.lastOperationAt = new Date();
+    this.recordDuration(durationMs);
+    this.logStats('success');
+  }
+
+  recordRollback(durationMs: number): void {
+    this.stats.rollbackCount++;
+    this.stats.totalOperations++;
+    this.stats.lastOperationAt = new Date();
+    this.recordDuration(durationMs);
+    this.logStats('rollback');
+  }
+
+  private recordDuration(durationMs: number): void {
+    this.durations.push(durationMs);
+    // حفظ آخر 100 قياس فقط
+    if (this.durations.length > 100) {
+      this.durations.shift();
+    }
+    this.stats.averageDurationMs = 
+      this.durations.reduce((a, b) => a + b, 0) / this.durations.length;
+  }
+
+  private logStats(type: 'success' | 'rollback'): void {
+    const successRate = this.stats.totalOperations > 0
+      ? ((this.stats.successCount / this.stats.totalOperations) * 100).toFixed(2)
+      : '0.00';
+    
+    logger.info(`[Optimistic Stats] ${type === 'success' ? '✅' : '❌'}`, {
+      total: this.stats.totalOperations,
+      success: this.stats.successCount,
+      rollbacks: this.stats.rollbackCount,
+      successRate: `${successRate}%`,
+      avgDuration: `${this.stats.averageDurationMs.toFixed(2)}ms`,
+    });
+  }
+
+  getStats(): OptimisticStats {
+    return { ...this.stats };
+  }
+
+  reset(): void {
+    this.stats = {
+      successCount: 0,
+      rollbackCount: 0,
+      totalOperations: 0,
+      averageDurationMs: 0,
+      lastOperationAt: null,
+    };
+    this.durations = [];
+  }
+}
+
+/** Singleton instance */
+const statsCollector = new OptimisticStatsCollector();
+
+/** الحصول على إحصائيات التحديثات المتفائلة */
+export const getOptimisticStats = (): OptimisticStats => statsCollector.getStats();
+
+/** إعادة تعيين الإحصائيات (للاختبارات) */
+export const resetOptimisticStats = (): void => statsCollector.reset();
 
 /**
  * تكوين التحديث المتفائل
@@ -70,21 +167,31 @@ export function createOptimistic<TData, TVariables, TError = Error>(
   queryClient: QueryClient,
   config: OptimisticConfig<TData, TVariables>
 ): OptimisticHandlers<TData, TVariables, TError> {
+  let operationStartTime: number = 0;
+
   return {
     async onMutate(variables: TVariables): Promise<OptimisticContext<TData>> {
+      // 0. بدء قياس الأداء
+      operationStartTime = performance.now();
+
       // 1. إلغاء الاستعلامات الجارية
       await queryClient.cancelQueries({ queryKey: config.queryKey });
 
       // 2. حفظ البيانات القديمة
       const previous = queryClient.getQueryData<TData>(config.queryKey);
 
-      // 3. تحديث متفائل مع حماية من الأخطاء
+      // 3. تحديث متفائل مع Error Boundary
       try {
         queryClient.setQueryData<TData>(config.queryKey, (old) =>
           config.updater(old, variables)
         );
+        
+        logger.debug('[Optimistic Update] Applied:', {
+          queryKey: config.queryKey,
+          duration: `${(performance.now() - operationStartTime).toFixed(2)}ms`,
+        });
       } catch (error) {
-        console.error('[Optimistic Update] Updater failed:', error);
+        logger.error('[Optimistic Update] Updater failed:', error);
         // إرجاع السياق بدون تحديث في حالة الخطأ
         return { previous };
       }
@@ -94,20 +201,41 @@ export function createOptimistic<TData, TVariables, TError = Error>(
     },
 
     onError(_error: TError, _variables: TVariables, context: OptimisticContext<TData> | undefined) {
+      const duration = performance.now() - operationStartTime;
+      
       // التراجع عن التحديث
       if (context?.previous !== undefined) {
         queryClient.setQueryData(config.queryKey, context.previous);
       }
 
+      // تسجيل الإحصائيات
+      statsCollector.recordRollback(duration);
+
       if (config.rollbackMessage) {
         toast.error(config.rollbackMessage);
       }
+      
+      logger.warn('[Optimistic Update] Rolled back:', {
+        queryKey: config.queryKey,
+        duration: `${duration.toFixed(2)}ms`,
+        error: _error,
+      });
     },
 
     onSuccess() {
+      const duration = performance.now() - operationStartTime;
+      
+      // تسجيل الإحصائيات
+      statsCollector.recordSuccess(duration);
+
       if (config.successMessage) {
         toast.success(config.successMessage);
       }
+      
+      logger.debug('[Optimistic Update] Success:', {
+        queryKey: config.queryKey,
+        duration: `${duration.toFixed(2)}ms`,
+      });
     },
 
     onSettled() {
