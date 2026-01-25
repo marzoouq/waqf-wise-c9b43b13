@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * Dashboard Navigation E2E Tests
@@ -60,19 +60,19 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(page: any) {
-    await page.goto('/login');
+  async function loginAsTestUser(testPage: Page) {
+    await testPage.goto('/login');
     
-    const emailInput = page.locator('input[type="email"]').first();
-    const passwordInput = page.locator('input[type="password"]').first();
+    const emailInput = testPage.locator('input[type="email"]').first();
+    const passwordInput = testPage.locator('input[type="password"]').first();
 
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await passwordInput.fill(TEST_USER.password);
-      await page.locator('button[type="submit"]').first().click();
+      await testPage.locator('button[type="submit"]').first().click();
 
       try {
-        await page.waitForURL(/\/(dashboard|redirect|nazer|accountant|home)/, {
+        await testPage.waitForURL(/\/(dashboard|redirect|nazer|accountant|home)/, {
           timeout: 10000,
         });
         return true;
@@ -145,13 +145,13 @@ test.describe('Sidebar Navigation', () => {
 
     if (await collapseButton.isVisible()) {
       const sidebar = page.locator('aside, [class*="sidebar"]').first();
-      // Use `any` to avoid DOM lib typing requirements in Node context
-      const initialWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
+      // Use string evaluation to avoid DOM lib typing in Node context
+      const initialWidth = await sidebar.evaluate('el => el.getBoundingClientRect().width');
 
       await collapseButton.click();
       await page.waitForTimeout(500);
 
-      const newWidth = await sidebar.evaluate((el: any) => el.getBoundingClientRect().width);
+      const newWidth = await sidebar.evaluate('el => el.getBoundingClientRect().width');
 
       // Width should change (either collapsed or expanded)
       expect(newWidth).not.toBe(initialWidth);

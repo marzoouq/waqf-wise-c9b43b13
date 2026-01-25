@@ -204,17 +204,22 @@ jobs:
     if: always()
     steps:
       - name: Security Summary
+        continue-on-error: true
+        shell: bash
         run: |
-          echo "# 🔐 Security Check Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| TypeScript Check | ${{ needs.typescript-check.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ESLint Security | ${{ needs.eslint-security.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security Tests | ${{ needs.security-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Secrets Scan | ${{ needs.secrets-scan.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Analysis | ${{ needs.code-analysis.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          {
+            echo "# 🔐 Security Check Summary"
+            echo ""
+            echo "| Check | Status |"
+            echo "|-------|--------|"
+            echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |"
+            echo "| TypeScript Check | ${{ needs.typescript-check.result }} |"
+            echo "| ESLint Security | ${{ needs.eslint-security.result }} |"
+            echo "| Security Tests | ${{ needs.security-tests.result }} |"
+            echo "| Secrets Scan | ${{ needs.secrets-scan.result }} |"
+            echo "| Code Analysis | ${{ needs.code-analysis.result }} |"
+            echo ""
+            echo "**Triggered by:** ${{ github.actor }}"
+            echo "**Commit:** ${{ github.sha }}"
+          } >> "$SUMMARY_FILE"
