@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { smartInvalidate } from "@/lib/query-keys/smart-invalidation";
 
 export function useBeneficiaries() {
   const queryClient = useQueryClient();
@@ -30,8 +31,9 @@ export function useBeneficiaries() {
     mutationFn: async (beneficiary: Omit<Beneficiary, "id" | "created_at" | "updated_at">) => {
       return BeneficiaryService.create(beneficiary);
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+    onSuccess: async (data) => {
+      // ✅ Smart Invalidation - يبطل المفاتيح المرتبطة تلقائياً
+      await smartInvalidate(queryClient, 'BENEFICIARIES', data);
       addActivity({
         action: `تم إضافة مستفيد جديد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
@@ -49,8 +51,9 @@ export function useBeneficiaries() {
     mutationFn: async ({ id, ...updates }: Partial<Beneficiary> & { id: string }) => {
       return BeneficiaryService.update(id, updates);
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+    onSuccess: async (data) => {
+      // ✅ Smart Invalidation
+      await smartInvalidate(queryClient, 'BENEFICIARIES', data);
       addActivity({
         action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
@@ -68,8 +71,9 @@ export function useBeneficiaries() {
     mutationFn: async (id: string) => {
       return BeneficiaryService.delete(id);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+    onSuccess: async () => {
+      // ✅ Smart Invalidation
+      await smartInvalidate(queryClient, 'BENEFICIARIES');
       showSuccess("تم الحذف بنجاح", "تم حذف المستفيد بنجاح");
     },
     onError: (error: unknown) => {
