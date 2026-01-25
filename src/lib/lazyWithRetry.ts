@@ -4,6 +4,8 @@
  * 
  * Standard pattern used by Netflix, Airbnb, Spotify
  * https://web.dev/articles/code-splitting-with-dynamic-imports
+ * 
+ * @version 2.0.0 - إضافة cache busting وتحسين معالجة الأخطاء
  */
 
 import React, { lazy, ComponentType } from 'react';
@@ -17,10 +19,13 @@ export interface LazyRetryOptions {
   retries?: number;
   interval?: number;
   onError?: (error: Error, attempt: number) => void;
+  /** تفعيل cache busting عند فشل المحاولة الأولى */
+  cacheBusting?: boolean;
 }
 
 const SESSION_KEY = 'chunk_load_failures';
 const MAX_FAILURES_BEFORE_HARD_RELOAD = 3;
+const VERSION_KEY = 'app_chunk_version';
 
 /**
  * Get current failure count from session storage
@@ -61,7 +66,29 @@ function resetFailureCount(): void {
  * Force reload with cache bypass
  */
 function forceReload(): void {
-  window.location.reload();
+  // إضافة timestamp للـ URL لتجاوز الـ cache
+  const url = new URL(window.location.href);
+  url.searchParams.set('_cb', Date.now().toString());
+  window.location.href = url.toString();
+}
+
+/**
+ * محاولة تنظيف cache الوحدات قبل إعادة المحاولة
+ */
+async function clearModuleCache(): Promise<void> {
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      const modulesCaches = cacheNames.filter(name => 
+        name.includes('workbox') || 
+        name.includes('module') || 
+        name.includes('chunk')
+      );
+      await Promise.all(modulesCaches.map(name => caches.delete(name)));
+    }
+  } catch {
+    // تجاهل الأخطاء
+  }
 }
 
 /**
@@ -78,7 +105,8 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
   const {
     retries = 3,
     interval = 1500,
-    onError
+    onError,
+    cacheBusting = true
   } = options;
 
   return lazy(async () => {
@@ -86,6 +114,11 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
 
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
+        // ✅ v2.0.0: تنظيف الـ cache قبل المحاولة الثانية
+        if (attempt > 0 && cacheBusting) {
+          await clearModuleCache();
+        }
+        
         const result = await componentImport();
         
         // Success - reset failure count
@@ -109,10 +142,15 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
           onError(lastError, attempt + 1);
         }
         
-        // Don't retry if it's definitely a version update (404)
-        if (errorInfo.shouldReload && attempt === 0) {
-          // Skip retries, go straight to reload logic
-          break;
+        // ✅ v2.0.0: معالجة أفضل لحالة تحديث الإصدار
+        if (errorInfo.shouldReload) {
+          // تنظيف الـ cache قبل إعادة المحاولة
+          await clearModuleCache();
+          
+          // إذا كانت المحاولة الأخيرة، أعد التحميل
+          if (attempt === retries - 1) {
+            break;
+          }
         }
         
         // Don't wait after the last attempt

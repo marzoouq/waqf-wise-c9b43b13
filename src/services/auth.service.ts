@@ -11,9 +11,12 @@
  * - PermissionsService: إدارة الصلاحيات
  * - TwoFactorService: المصادقة الثنائية
  * - UserService: إدارة المستخدمين
+ * 
+ * @version 2.0.0 - إضافة withRetry لجميع الاستعلامات الحرجة
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { withRetry, SUPABASE_RETRY_OPTIONS } from "@/lib/retry-helper";
 
 export interface BeneficiaryEmailResult {
   email: string;
@@ -146,41 +149,50 @@ export class AuthService {
 
   /**
    * جلب ملف المستخدم مع الأدوار
+   * ✅ v2.0.0: مع withRetry لمعالجة أخطاء الشبكة
    */
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
-    const [profileRes, rolesRes] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('id, email, full_name, avatar_url, created_at')
-        .eq('user_id', userId)
-        .maybeSingle(),
-      supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .is('deleted_at', null), // استبعاد السجلات المحذوفة
-    ]);
+    return withRetry(async () => {
+      const [profileRes, rolesRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('id, email, full_name, avatar_url, created_at')
+          .eq('user_id', userId)
+          .maybeSingle(),
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .is('deleted_at', null), // استبعاد السجلات المحذوفة
+      ]);
 
-    if (profileRes.error || !profileRes.data) return null;
+      if (profileRes.error || !profileRes.data) return null;
 
-    return {
-      ...profileRes.data,
-      roles: (rolesRes.data || []).map(r => r.role),
-    };
+      return {
+        ...profileRes.data,
+        roles: (rolesRes.data || []).map(r => r.role),
+      };
+    }, SUPABASE_RETRY_OPTIONS);
   }
 
   /**
    * جلب أدوار المستخدم
+   * ✅ v2.0.0: مع withRetry لمعالجة أخطاء الشبكة
    */
   static async getUserRoles(userId: string): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .is('deleted_at', null); // استبعاد السجلات المحذوفة
-    
-    if (error) throw error;
-    return (data || []).map(r => r.role);
+    return withRetry(async () => {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .is('deleted_at', null); // استبعاد السجلات المحذوفة
+      
+      if (error) throw error;
+      return (data || []).map(r => r.role);
+    }, {
+      ...SUPABASE_RETRY_OPTIONS,
+      maxRetries: 3,
+    });
   }
 
   /**

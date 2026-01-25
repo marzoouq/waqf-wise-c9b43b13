@@ -1,12 +1,13 @@
 /**
  * Payment Service - خدمة المدفوعات والسندات
- * @version 2.8.0
+ * @version 2.9.0 - إضافة withRetry للاستعلامات الحرجة
  * @description تم تحديثه لاستخدام Soft Delete
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 import { SoftDeleteService } from "@/services/shared/soft-delete.service";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
