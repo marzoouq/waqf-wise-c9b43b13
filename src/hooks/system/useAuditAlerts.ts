@@ -93,7 +93,7 @@ const _DEFAULT_ALERT_RULES: AuditAlertRule[] = [
  */
 export const useAuditAlerts = () => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'alerts'],
+    queryKey: QUERY_KEYS.AUDIT_ALERTS,
     queryFn: async (): Promise<AuditAlert[]> => {
       const now = new Date();
       const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -334,7 +334,7 @@ export const useRealtimeAuditAlerts = (onAlert?: (alert: AuditAlert) => void) =>
             onAlert?.(alert);
 
             // تحديث الكاش
-            queryClient.invalidateQueries({ queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'alerts'] });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUDIT_ALERTS });
           }
         }
       )

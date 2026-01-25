@@ -1,10 +1,11 @@
 /**
  * useAgingReport Hook
  * Hook لتقرير أعمار الديون
- * @version 2.9.69
+ * @version 2.9.70
  */
 import { useQuery } from '@tanstack/react-query';
 import { CustomReportsService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface AgingItem {
   id: string;
@@ -34,7 +35,7 @@ function getAgeCategory(daysPastDue: number): string {
 
 export function useAgingReport() {
   const { data: agingResult, isLoading, error, refetch } = useQuery({
-    queryKey: ['aging_report'],
+    queryKey: QUERY_KEYS.AGING_REPORT,
     queryFn: () => CustomReportsService.getAgingReport(),
   });
 

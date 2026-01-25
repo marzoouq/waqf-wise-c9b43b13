@@ -1,6 +1,6 @@
 /**
  * Available Users for Messaging Hook
- * @version 2.8.67
+ * @version 2.8.68
  * 
  * يستخدم MessageService.getRecipients لجلب المستلمين المتاحين
  * حسب دور المستخدم الحالي (المستفيدين يرون الناظر/المشرف فقط)
@@ -23,7 +23,7 @@ export function useAvailableUsers() {
   const { user } = useAuth();
   
   return useQuery({
-    queryKey: [...QUERY_KEYS.AVAILABLE_USERS, user?.id],
+    queryKey: QUERY_KEYS.AVAILABLE_USERS(user?.id),
     queryFn: async (): Promise<AvailableUser[]> => {
       // استخدام الدالة الصحيحة التي تصفي المستلمين حسب دور المستخدم
       const recipients = await MessageService.getRecipients(user!.id);
