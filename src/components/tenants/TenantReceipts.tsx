@@ -116,7 +116,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
       window.open(pdfUrl, '_blank');
 
       toast.success('تم فتح سند القبض');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating receipt:', error);
       toast.error('حدث خطأ أثناء توليد السند');
     } finally {
@@ -143,7 +143,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
       doc.save(`سند_قبض_${receipt.payment_number}.pdf`);
 
       toast.success('تم تحميل السند');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error downloading receipt:', error);
       toast.error('حدث خطأ أثناء التحميل');
     } finally {

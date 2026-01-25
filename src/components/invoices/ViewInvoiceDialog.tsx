@@ -44,8 +44,8 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
       try {
         await generateInvoicePDF(invoice, invoiceLines, orgSettings);
         toast.success("تم تصدير الفاتورة بنجاح");
-      } catch (error) {
-        logger.error(error, { context: 'generate_invoice_pdf', severity: 'medium' });
+      } catch (error: unknown) {
+        logger.error(error as Error, { context: 'generate_invoice_pdf', severity: 'medium' });
         toast.error("حدث خطأ أثناء تصدير الفاتورة");
       } finally {
         setIsExporting(false);
@@ -70,8 +70,8 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
 
       if (!result.success) throw new Error(result.error);
       toast.success("تم إرسال الفاتورة بنجاح");
-    } catch (error) {
-      logger.error(error, { context: 'send_invoice_email', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'send_invoice_email', severity: 'medium' });
       toast.error("فشل إرسال البريد");
     }
   };

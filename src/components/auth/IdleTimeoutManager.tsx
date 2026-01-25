@@ -59,7 +59,7 @@ export function IdleTimeoutManager() {
       sessionStorage.clear();
       await signOut();
       navigate('/login', { replace: true });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.warn('تحذير أثناء الخروج التلقائي - تم التجاوز', { error });
       await AuthService.logout();
       navigate('/login', { replace: true });

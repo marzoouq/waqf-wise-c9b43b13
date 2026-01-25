@@ -45,7 +45,7 @@ export function BeneficiaryAttachmentsDialog({
 
       queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary.id] });
       setUploadedFiles([]);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error uploading files', error);
       toast({
         title: "خطأ في الرفع",
@@ -67,7 +67,7 @@ export function BeneficiaryAttachmentsDialog({
       });
 
       queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary?.id] });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error deleting attachment', error);
       toast({
         title: "خطأ",

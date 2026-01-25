@@ -59,7 +59,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
 
       reset();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       const message = getErrorMessage(error);
       toast.error("خطأ في تغيير كلمة المرور", {
         description: message,

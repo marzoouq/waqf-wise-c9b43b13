@@ -213,7 +213,7 @@ export function FinancialReportsTab() {
       // لا توجد سنة سابقة متوفرة هنا، نمرر null
       await generateDisclosurePDF(disclosure, beneficiaries || [], null);
       toast.success("تم تحميل ملف PDF بنجاح");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating PDF:', error);
       toast.error("حدث خطأ أثناء توليد التقرير");
     } finally {

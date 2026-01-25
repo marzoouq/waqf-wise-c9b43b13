@@ -104,8 +104,8 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
         notes: "",
       });
       setAcquisitionDate(undefined);
-    } catch (error) {
-      logger.error(error, { context: 'submit_waqf_unit', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'submit_waqf_unit', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }

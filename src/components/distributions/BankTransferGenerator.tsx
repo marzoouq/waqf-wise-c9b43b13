@@ -38,7 +38,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
       });
 
       onSuccess?.();
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error generating transfer file', error);
       toast({
         title: "خطأ",

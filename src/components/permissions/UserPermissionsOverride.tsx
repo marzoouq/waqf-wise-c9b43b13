@@ -81,7 +81,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
       });
       setIsDialogOpen(false);
       setSelectedPermission(null);
-    } catch (error) {
+    } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "فشل إضافة استثناء الصلاحية";
       toast({
         title: "خطأ",
@@ -98,7 +98,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
         title: "تم الحذف",
         description: "تم إزالة استثناء الصلاحية بنجاح",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "فشل إزالة استثناء الصلاحية";
       toast({
         title: "خطأ",

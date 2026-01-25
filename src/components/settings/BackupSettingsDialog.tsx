@@ -70,7 +70,7 @@ export function BackupSettingsDialog({
       toast.success("تم حفظ إعدادات النسخ الاحتياطي");
       onUpdate();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving backup settings:", error);
       toast.error("فشل في حفظ الإعدادات");
     } finally {

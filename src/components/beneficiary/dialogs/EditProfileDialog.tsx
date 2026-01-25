@@ -200,7 +200,7 @@ export function EditProfileDialog({
       toast.success("تم تحديث الملف الشخصي بنجاح");
       onOpenChange(false);
       onSuccess?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating profile:", error);
       const errorMessage = error instanceof Error ? error.message : "فشل تحديث الملف الشخصي";
       toast.error(errorMessage);

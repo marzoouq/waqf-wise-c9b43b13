@@ -54,7 +54,7 @@ export function EditEmailDialog({
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_STATS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiaryId) });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "فشل تحديث البريد الإلكتروني";
       toast({
         title: "خطأ",

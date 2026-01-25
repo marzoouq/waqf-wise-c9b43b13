@@ -61,7 +61,7 @@ export function UpdateNotification({ onDismiss }: UpdateNotificationProps) {
       await clearAllCaches();
       localStorage.removeItem('waqf_app_version');
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating:', error);
       window.location.reload();
     }

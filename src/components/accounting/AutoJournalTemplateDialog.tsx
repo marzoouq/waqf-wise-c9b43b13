@@ -92,7 +92,7 @@ export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Prop
         await createTemplate(formData);
       }
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error saving template', error);
     }
   };

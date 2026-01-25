@@ -88,7 +88,7 @@ export function IntegrationSettingsDialog({
       toast.success("تم حفظ إعدادات التكامل");
       onUpdate();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving integration settings:", error);
       toast.error("فشل في حفظ الإعدادات");
     } finally {

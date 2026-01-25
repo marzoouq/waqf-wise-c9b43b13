@@ -82,7 +82,7 @@ export function PaymentVoucherDialog({
         referenceNumber: "",
         notes: "",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating voucher:', error);
       toast({
         title: "خطأ",

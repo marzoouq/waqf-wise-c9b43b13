@@ -79,8 +79,8 @@ export function CreateBeneficiaryAccountsButton() {
           description: "لا يوجد مستفيدين مفعل لهم خاصية تسجيل الدخول",
         });
       }
-    } catch (error) {
-      logger.error(error, { context: 'fetch_eligible_beneficiaries' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'fetch_eligible_beneficiaries' });
       toast({
         title: "خطأ في جلب البيانات",
         description: "حدث خطأ أثناء جلب المستفيدين",
@@ -150,8 +150,8 @@ export function CreateBeneficiaryAccountsButton() {
 
       setShowDialog(false);
       setShowSelectionDialog(false);
-    } catch (error) {
-      logger.error(error, { context: 'create_beneficiary_accounts' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'create_beneficiary_accounts' });
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحسابات';
       toast({
         title: "خطأ في إنشاء الحسابات",

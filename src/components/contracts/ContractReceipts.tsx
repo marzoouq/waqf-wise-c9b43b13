@@ -72,7 +72,7 @@ export function ContractReceipts({ contractId, tenantName }: ContractReceiptsPro
       window.open(pdfUrl, '_blank');
 
       toast.success('تم فتح سند القبض');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating receipt:', error);
       toast.error('حدث خطأ أثناء توليد السند');
     } finally {

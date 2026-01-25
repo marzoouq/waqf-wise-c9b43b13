@@ -54,7 +54,7 @@ export function ChartOfAccounts() {
       toast.success('تم إضافة الحساب بنجاح');
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error((error as Error).message || 'فشل إضافة الحساب');
     }
   };

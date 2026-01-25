@@ -31,7 +31,7 @@ export function AlertsPanel() {
   const handleResolve = async (alertId: string) => {
     try {
       await resolveAlert(alertId);
-    } catch (error) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) {
         console.error('Error resolving alert:', error);
       }
@@ -47,7 +47,7 @@ export function AlertsPanel() {
       } else {
         toast.error('فشل في توليد التنبيهات');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error('حدث خطأ أثناء توليد التنبيهات');
       if (import.meta.env.DEV) {
         console.error('Error generating alerts:', error);

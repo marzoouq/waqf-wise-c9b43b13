@@ -172,7 +172,7 @@ export function ZATCAComplianceChecker() {
       const warningChecks = checkResults.filter(c => c.status === 'warning').length;
       const score = ((passedChecks + warningChecks * 0.5) / checkResults.length) * 100;
       setComplianceScore(score);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error performing compliance checks:', error);
     } finally {
       setIsLoading(false);

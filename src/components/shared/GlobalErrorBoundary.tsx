@@ -152,7 +152,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       localStorage.removeItem('waqf_app_version');
       sessionStorage.clear();
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error clearing cache:', error);
       window.location.reload();
     }

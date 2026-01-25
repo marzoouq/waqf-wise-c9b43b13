@@ -170,7 +170,7 @@ export function PropertyUnitDialog({
       queryClient.invalidateQueries({ queryKey: ["property-units", propertyId] });
       onOpenChange(false);
       form.reset();
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ غير متوقع";
       toast({
         variant: "destructive",

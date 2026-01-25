@@ -99,7 +99,7 @@ export function BudgetsContent() {
       await exportToExcel(exportData, `budgets-${format(new Date(), "yyyyMMdd")}`, "الميزانيات");
       
       toast.success("تم تصدير الميزانيات بنجاح");
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("فشل تصدير الميزانيات");
       productionLogger.error("Excel export error", error);
     }
