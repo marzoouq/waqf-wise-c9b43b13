@@ -86,4 +86,8 @@ export const ACCOUNTING_KEYS = {
   // Accounting Link
   ACCOUNTING_LINK_LINKED: ['accounting-link', 'linked'] as const,
   ACCOUNTING_LINK_UNLINKED: ['accounting-link', 'unlinked'] as const,
+
+  // Reports - Aging
+  AGING_REPORT: ['aging-report'] as const,
+  AGING_SUMMARY: ['aging-summary'] as const,
 } as const;

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { toast } from 'sonner';
 import { POSService } from '@/services/pos.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface PaymentInput {
   shiftId: string;
@@ -36,7 +37,8 @@ export function useQuickPayment() {
       });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['pos'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS_TRANSACTIONS });
       toast.success(`تم الصرف بنجاح - رقم العملية: ${data.transaction_number}`);
     },
     onError: (error: Error) => {

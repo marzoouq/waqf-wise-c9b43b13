@@ -53,7 +53,7 @@ export interface EnhancedAuditFilters {
  */
 export const useAuditLogsEnhanced = (filters?: EnhancedAuditFilters) => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'enhanced', filters],
+    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'enhanced', filters] as const,
     queryFn: async (): Promise<EnhancedAuditLog[]> => {
       let query = supabase
         .from("audit_logs")
@@ -100,7 +100,7 @@ export const useAuditLogsEnhanced = (filters?: EnhancedAuditFilters) => {
  */
 export const useAuditLogsStats = (dateRange?: { start: string; end: string }) => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'stats', dateRange],
+    queryKey: QUERY_KEYS.AUDIT_LOGS_STATS(dateRange),
     queryFn: async (): Promise<AuditLogsStats> => {
       let query = supabase
         .from("audit_logs")
@@ -142,7 +142,7 @@ export const useAuditLogsStats = (dateRange?: { start: string; end: string }) =>
  */
 export const useAuditLogDetails = (logId: string | null) => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'details', logId],
+    queryKey: logId ? QUERY_KEYS.AUDIT_LOG_DETAILS(logId) : ['audit-log-details', null],
     queryFn: async (): Promise<EnhancedAuditLog | null> => {
       if (!logId) return null;
 
@@ -164,7 +164,7 @@ export const useAuditLogDetails = (logId: string | null) => {
  */
 export const useAuditLogTables = () => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'tables'],
+    queryKey: QUERY_KEYS.AUDIT_LOG_TABLES,
     queryFn: async (): Promise<string[]> => {
       const { data, error } = await supabase
         .from("audit_logs")
@@ -186,7 +186,7 @@ export const useAuditLogTables = () => {
  */
 export const useAuditLogUsers = () => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.AUDIT_LOGS, 'users'],
+    queryKey: QUERY_KEYS.AUDIT_LOG_USERS,
     queryFn: async (): Promise<Array<{ email: string; count: number }>> => {
       const { data, error } = await supabase
         .from("audit_logs")

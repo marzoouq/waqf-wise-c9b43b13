@@ -66,4 +66,11 @@ export const PROPERTIES_KEYS = {
   
   // Collections
   COLLECTION_STATS: ['collection-stats'] as const,
+
+  // POS (Point of Sale)
+  POS: ['pos'] as const,
+  POS_TRANSACTIONS: ['pos-transactions'] as const,
+  POS_CATEGORIES: ['pos-categories'] as const,
+  POS_SALES: ['pos-sales'] as const,
+  POS_SHIFTS: ['pos-shifts'] as const,
 } as const;

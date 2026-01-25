@@ -111,7 +111,20 @@ export const SYSTEM_KEYS = {
   AI_SYSTEM_AUDITS: ['ai-system-audits'] as const,
   PENDING_SYSTEM_FIXES: ['pending-system-fixes'] as const,
   DOCUMENTS_GROWTH_CHART: ['documents-growth-chart'] as const,
-  ACTIVE_SESSIONS: (userId?: string) => ['active-sessions', userId] as const,
+  ACTIVE_SESSIONS: (userId?: string) => userId ? ['active-sessions', userId] as const : ['active-sessions'] as const,
+
+  // Audit Logs Enhanced
+  AUDIT_ALERTS: ['audit-alerts'] as const,
+  AUDIT_LOGS_STATS: (dateRange?: { start: string; end: string }) => 
+    ['audit-logs-stats', dateRange] as const,
+  AUDIT_LOGS_ENHANCED: (filters?: Record<string, unknown>) => 
+    ['audit-logs-enhanced', filters] as const,
+  AUDIT_LOG_DETAILS: (logId: string) => ['audit-log-details', logId] as const,
+  AUDIT_LOG_TABLES: ['audit-log-tables'] as const,
+  AUDIT_LOG_USERS: ['audit-log-users'] as const,
+
+  // Users/Messages
+  AVAILABLE_USERS: (userId?: string) => ['available-users', userId] as const,
 
   // Saved Filters (Factory Pattern)
   SAVED_FILTERS: (type: string) => ['saved-filters', type] as const,
