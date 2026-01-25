@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface AlertsCardProps {
   beneficiaryId: string;
@@ -27,7 +28,7 @@ export function AlertsCard({ beneficiaryId }: AlertsCardProps) {
   const navigate = useNavigate();
 
   const { data: alerts, isLoading } = useQuery({
-    queryKey: ['beneficiary-alerts', beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_ALERTS(beneficiaryId),
     queryFn: async () => {
       // جلب الطلبات المعلقة للمستفيد
       const { data: pendingRequests } = await supabase

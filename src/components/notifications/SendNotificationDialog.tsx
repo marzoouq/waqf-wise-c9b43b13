@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 const notificationSchema = z.object({
   title: z.string().min(3, "العنوان يجب أن يكون 3 أحرف على الأقل"),
@@ -72,7 +73,7 @@ export function SendNotificationDialog({ open, onOpenChange }: SendNotificationD
 
   // جلب قائمة المستفيدين الذين لديهم user_id
   const { data: beneficiaries } = useQuery({
-    queryKey: ["beneficiaries-with-users"],
+    queryKey: QUERY_KEYS.BENEFICIARIES_WITH_USERS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beneficiaries")
@@ -137,7 +138,7 @@ export function SendNotificationDialog({ open, onOpenChange }: SendNotificationD
         title: "تم الإرسال بنجاح ✓",
         description: `تم إرسال الإشعار إلى ${data.count} مستخدم`,
       });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
       form.reset();
       onOpenChange(false);
     },

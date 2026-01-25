@@ -5,6 +5,7 @@
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { RequestService } from '@/services/request.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -53,7 +54,7 @@ const formatFileSize = (bytes: number | null) => {
 
 export const RequestAttachments = memo(({ requestId }: RequestAttachmentsProps) => {
   const { data: attachments = [], isLoading } = useQuery<Attachment[]>({
-    queryKey: ['request-attachments', requestId],
+    queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId),
     queryFn: () => RequestService.getAttachments(requestId),
     enabled: !!requestId,
   });

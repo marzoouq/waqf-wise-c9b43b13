@@ -8,10 +8,11 @@ import { TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { ArchiveService } from "@/services/archive.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function DocumentsGrowthChart() {
   const { data: growthData, isLoading } = useQuery({
-    queryKey: ["documents-growth-chart"],
+    queryKey: QUERY_KEYS.DOCUMENTS_GROWTH_CHART,
     queryFn: () => ArchiveService.getDocumentsGrowth(),
     staleTime: 5 * 60 * 1000,
   });

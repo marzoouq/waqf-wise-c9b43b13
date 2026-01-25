@@ -108,6 +108,10 @@ export const SYSTEM_KEYS = {
   LIVE_PERFORMANCE: ['live-performance'] as const,
   LIVE_METRICS: ['live-metrics'] as const,
   RLS_COVERAGE: ['rls-coverage'] as const,
+  AI_SYSTEM_AUDITS: ['ai-system-audits'] as const,
+  PENDING_SYSTEM_FIXES: ['pending-system-fixes'] as const,
+  DOCUMENTS_GROWTH_CHART: ['documents-growth-chart'] as const,
+  ACTIVE_SESSIONS: (userId?: string) => ['active-sessions', userId] as const,
 
   // Saved Filters (Factory Pattern)
   SAVED_FILTERS: (type: string) => ['saved-filters', type] as const,

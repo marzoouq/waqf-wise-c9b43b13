@@ -30,7 +30,7 @@ export interface FiscalYearOption {
  */
 export function useFiscalYearOptions() {
   return useQuery({
-    queryKey: ['fiscal-year-options'],
+    queryKey: QUERY_KEYS.FISCAL_YEAR_OPTIONS,
     queryFn: async (): Promise<FiscalYearOption[]> => {
       const { data, error } = await supabase
         .from('fiscal_years')

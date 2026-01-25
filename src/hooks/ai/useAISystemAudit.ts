@@ -9,6 +9,7 @@ import {
   AUDIT_CATEGORIES
 } from '@/services/ai-system-audit.service';
 import { toastSuccess, toastError } from '@/hooks/ui/use-toast';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useAISystemAudit() {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export function useAISystemAudit() {
     isLoading: isLoadingAudits,
     refetch: refetchAudits 
   } = useQuery({
-    queryKey: ['ai-system-audits'],
+    queryKey: QUERY_KEYS.AI_SYSTEM_AUDITS,
     queryFn: () => AISystemAuditService.getAudits(20),
     staleTime: 30000
   });
@@ -32,7 +33,7 @@ export function useAISystemAudit() {
     isLoading: isLoadingFixes,
     refetch: refetchFixes 
   } = useQuery({
-    queryKey: ['pending-system-fixes'],
+    queryKey: QUERY_KEYS.PENDING_SYSTEM_FIXES,
     queryFn: () => AISystemAuditService.getPendingFixes(),
     staleTime: 30000
   });
@@ -82,8 +83,8 @@ export function useAISystemAudit() {
     onSuccess: (result) => {
       if (result.success) {
         toastSuccess('تم تطبيق الإصلاح بنجاح');
-        queryClient.invalidateQueries({ queryKey: ['pending-system-fixes'] });
-        queryClient.invalidateQueries({ queryKey: ['ai-system-audits'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_SYSTEM_FIXES });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_SYSTEM_AUDITS });
       } else {
         toastError(result.error || 'فشل في تطبيق الإصلاح');
       }
@@ -96,7 +97,7 @@ export function useAISystemAudit() {
     onSuccess: (result) => {
       if (result.success) {
         toastSuccess('تم رفض الإصلاح');
-        queryClient.invalidateQueries({ queryKey: ['pending-system-fixes'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_SYSTEM_FIXES });
       } else {
         toastError(result.error || 'فشل في رفض الإصلاح');
       }
@@ -109,8 +110,8 @@ export function useAISystemAudit() {
     onSuccess: (result) => {
       if (result.success) {
         toastSuccess('تم التراجع عن الإصلاح');
-        queryClient.invalidateQueries({ queryKey: ['pending-system-fixes'] });
-        queryClient.invalidateQueries({ queryKey: ['ai-system-audits'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_SYSTEM_FIXES });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_SYSTEM_AUDITS });
       } else {
         toastError(result.error || 'فشل في التراجع عن الإصلاح');
       }
@@ -123,7 +124,7 @@ export function useAISystemAudit() {
     onSuccess: (result) => {
       if (result.success) {
         toastSuccess('تم حذف التقرير');
-        queryClient.invalidateQueries({ queryKey: ['ai-system-audits'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_SYSTEM_AUDITS });
       } else {
         toastError(result.error || 'فشل في حذف التقرير');
       }

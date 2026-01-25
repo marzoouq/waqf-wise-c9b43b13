@@ -46,6 +46,7 @@ export const ACCOUNTING_KEYS = {
   FISCAL_YEAR_CLOSINGS: ['fiscal-year-closings'] as const,
   FISCAL_YEAR_SUMMARY: (fiscalYearId: string) => ['fiscal-year-summary', fiscalYearId] as const,
   CLOSING_PREVIEW: (fiscalYearId: string) => ['closing-preview', fiscalYearId] as const,
+  FISCAL_YEAR_OPTIONS: ['fiscal-year-options'] as const,
 
   // Bank
   BANK_ACCOUNTS: ['bank_accounts'] as const,
