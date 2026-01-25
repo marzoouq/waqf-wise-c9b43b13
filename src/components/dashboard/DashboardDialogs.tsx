@@ -8,6 +8,7 @@ import { PropertyService } from "@/services/property.service";
 import { DistributionService } from "@/services/distribution.service";
 import { BeneficiaryCoreService } from "@/services/beneficiary";
 import type { Beneficiary } from "@/types/beneficiary";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface DashboardDialogsProps {
   beneficiaryDialogOpen: boolean;
@@ -41,7 +42,7 @@ export function DashboardDialogs({
         title: "تم الإضافة",
         description: "تم إضافة المستفيد بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       setBeneficiaryDialogOpen(false);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "خطأ غير معروف";
@@ -60,7 +61,7 @@ export function DashboardDialogs({
         title: "تم الإضافة",
         description: "تم إضافة العقار بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       setPropertyDialogOpen(false);
     } catch (error: unknown) {
       console.error("Error saving property:", error);
@@ -86,7 +87,7 @@ export function DashboardDialogs({
         title: "تم الإنشاء",
         description: "تم إنشاء التوزيع بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       setDistributionDialogOpen(false);
     } catch (error: unknown) {
       console.error("Error creating distribution:", error);

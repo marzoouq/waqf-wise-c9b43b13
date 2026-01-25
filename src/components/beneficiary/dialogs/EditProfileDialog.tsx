@@ -189,7 +189,7 @@ export function EditProfileDialog({
 
       // إبطال الكاش لإعادة جلب البيانات المحدثة - مع userId الصحيح
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id) });
-      await queryClient.invalidateQueries({ queryKey: ['preview-beneficiary', beneficiary.id] });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_STATISTICS(beneficiary.id) });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary.id) });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(beneficiary.id) });
       

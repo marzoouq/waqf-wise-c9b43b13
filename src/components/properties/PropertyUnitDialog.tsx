@@ -33,6 +33,7 @@ import { PropertyService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
@@ -73,7 +74,7 @@ export function PropertyUnitDialog({
 
   // جلب الرقم التالي للوحدة عند إضافة وحدة جديدة
   const { data: nextUnitNumber, isLoading: isLoadingNextNumber } = useQuery({
-    queryKey: ['next-unit-number', propertyId],
+    queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId),
     queryFn: () => PropertyService.getNextUnitNumber(propertyId),
     enabled: open && !unit && !!propertyId,
     staleTime: 0,
@@ -167,7 +168,7 @@ export function PropertyUnitDialog({
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["property-units", propertyId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId) });
       onOpenChange(false);
       form.reset();
     } catch (error: unknown) {

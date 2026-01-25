@@ -15,6 +15,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
 import { RentalPaymentService } from '@/services/rental-payment.service';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface ContractReceiptsProps {
   contractId: string;
@@ -35,7 +36,7 @@ export function ContractReceipts({ contractId, tenantName }: ContractReceiptsPro
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
 
   const { data: payments, isLoading, error, refetch } = useQuery({
-    queryKey: ['contract-receipts', contractId],
+    queryKey: QUERY_KEYS.RENTAL_PAYMENTS_BY_CONTRACT(contractId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('rental_payments')

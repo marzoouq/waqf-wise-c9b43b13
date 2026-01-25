@@ -6,6 +6,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
 import { NotificationService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ContactFormData {
   name: string;
@@ -33,7 +34,7 @@ export function useContactForm() {
         title: "تم الإرسال",
         description: "تم إرسال رسالتك بنجاح، سنتواصل معك قريباً",
       });
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
     },
     onError: (error) => {
       if (import.meta.env.DEV) {

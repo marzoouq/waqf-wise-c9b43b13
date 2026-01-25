@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface AnnualShareCardProps {
   beneficiaryId: string;
@@ -26,7 +27,7 @@ type DistributionRow = {
 
 export function AnnualShareCard({ beneficiaryId }: AnnualShareCardProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['beneficiary-annual-share', beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_HEIR_DISTRIBUTIONS(beneficiaryId),
     queryFn: async () => {
       const currentYear = new Date().getFullYear(); // 2026
 

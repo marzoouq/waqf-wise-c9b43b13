@@ -12,6 +12,7 @@ import { InvoiceStatusActions } from "./InvoiceStatusActions";
 import { format } from "@/lib/date";
 import { useInvoiceDetails } from "@/hooks/invoices/useInvoiceDetails";
 import { EdgeFunctionService } from "@/services/edge-function.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -124,8 +125,8 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
           <InvoiceStatusActions 
             invoice={invoice} 
             onStatusChanged={() => {
-              queryClient.invalidateQueries({ queryKey: ["invoice", invoiceId] });
-              queryClient.invalidateQueries({ queryKey: ["invoices"] });
+              queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICE(invoiceId || '') });
+              queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
             }}
           />
         </div>
