@@ -17247,7 +17247,7 @@ export type Database = {
       }
       regenerate_payment_schedule: {
         Args: { p_contract_id: string }
-        Returns: number
+        Returns: undefined
       }
       reset_performance_stats: { Args: never; Returns: Json }
       run_full_cleanup: { Args: never; Returns: Json }
