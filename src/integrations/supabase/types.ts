@@ -1489,6 +1489,13 @@ export type Database = {
             foreignKeyName: "bank_transfer_details_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -1872,6 +1879,13 @@ export type Database = {
             foreignKeyName: "beneficiaries_parent_beneficiary_id_fkey"
             columns: ["parent_beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiaries_parent_beneficiary_id_fkey"
+            columns: ["parent_beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -1944,6 +1958,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_activity_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -2043,6 +2064,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_attachments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -2169,6 +2197,13 @@ export type Database = {
             foreignKeyName: "beneficiary_changes_log_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_changes_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -2286,6 +2321,13 @@ export type Database = {
             foreignKeyName: "beneficiary_requests_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -2371,6 +2413,13 @@ export type Database = {
             foreignKeyName: "beneficiary_sessions_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_sessions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -2431,6 +2480,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_tags_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -4085,6 +4141,13 @@ export type Database = {
             foreignKeyName: "disclosure_beneficiaries_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disclosure_beneficiaries_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -4303,6 +4366,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -4822,6 +4892,13 @@ export type Database = {
             foreignKeyName: "documents_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -4967,6 +5044,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eligibility_assessments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5123,6 +5207,13 @@ export type Database = {
             foreignKeyName: "emergency_aid_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -5256,6 +5347,13 @@ export type Database = {
             foreignKeyName: "emergency_aid_requests_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -5378,6 +5476,13 @@ export type Database = {
             foreignKeyName: "families_contact_person_id_fkey"
             columns: ["contact_person_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "families_contact_person_id_fkey"
+            columns: ["contact_person_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -5407,6 +5512,13 @@ export type Database = {
             columns: ["head_of_family_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "families_head_of_family_id_fkey"
+            columns: ["head_of_family_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5485,6 +5597,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5579,6 +5698,13 @@ export type Database = {
             foreignKeyName: "family_relationships_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_relationships_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -5615,6 +5741,13 @@ export type Database = {
             columns: ["related_to_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_relationships_related_to_id_fkey"
+            columns: ["related_to_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -6985,6 +7118,13 @@ export type Database = {
             foreignKeyName: "governance_votes_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_votes_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -7115,6 +7255,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -7408,6 +7555,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "identity_verifications_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -8824,6 +8978,13 @@ export type Database = {
             foreignKeyName: "loans_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -9402,6 +9563,13 @@ export type Database = {
             foreignKeyName: "messages_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -9642,6 +9810,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: true
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_settings_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: true
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -10363,6 +10538,13 @@ export type Database = {
             foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -10558,6 +10740,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -10845,6 +11034,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -13437,6 +13633,13 @@ export type Database = {
             foreignKeyName: "support_tickets_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -15240,6 +15443,74 @@ export type Database = {
           },
         ]
       }
+      beneficiaries_secure: {
+        Row: {
+          account_balance: number | null
+          beneficiary_number: string | null
+          category: string | null
+          created_at: string | null
+          email: string | null
+          family_id: string | null
+          family_name: string | null
+          full_name: string | null
+          gender: string | null
+          iban: string | null
+          id: string | null
+          marital_status: string | null
+          national_id: string | null
+          phone: string | null
+          status: string | null
+          total_received: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_balance?: number | null
+          beneficiary_number?: string | null
+          category?: string | null
+          created_at?: string | null
+          email?: never
+          family_id?: string | null
+          family_name?: string | null
+          full_name?: string | null
+          gender?: string | null
+          iban?: never
+          id?: string | null
+          marital_status?: string | null
+          national_id?: never
+          phone?: never
+          status?: string | null
+          total_received?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_balance?: number | null
+          beneficiary_number?: string | null
+          category?: string | null
+          created_at?: string | null
+          email?: never
+          family_id?: string | null
+          family_name?: string | null
+          full_name?: string | null
+          gender?: string | null
+          iban?: never
+          id?: string | null
+          marital_status?: string | null
+          national_id?: never
+          phone?: never
+          status?: string | null
+          total_received?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiaries_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiary_account_statement: {
         Row: {
           account_balance: number | null
@@ -15264,6 +15535,30 @@ export type Database = {
           national_id?: string | null
           pending_amount?: never
           total_received?: never
+        }
+        Relationships: []
+      }
+      beneficiary_audit_trail: {
+        Row: {
+          action_type: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          table_name: string | null
+        }
+        Insert: {
+          action_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          table_name?: string | null
+        }
+        Update: {
+          action_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          table_name?: string | null
         }
         Relationships: []
       }
@@ -15394,6 +15689,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -15647,6 +15949,13 @@ export type Database = {
             foreignKeyName: "loans_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -15801,6 +16110,13 @@ export type Database = {
             foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
             referencedRelation: "beneficiary_account_statement"
             referencedColumns: ["beneficiary_id"]
           },
@@ -15923,6 +16239,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries_secure"
             referencedColumns: ["id"]
           },
           {
@@ -16379,15 +16702,24 @@ export type Database = {
         Returns: boolean
       }
       check_overdue_requests: { Args: never; Returns: undefined }
-      check_rate_limit: {
-        Args: {
-          p_email: string
-          p_ip_address: string
-          p_max_attempts?: number
-          p_time_window_minutes?: number
-        }
-        Returns: boolean
-      }
+      check_rate_limit:
+        | {
+            Args: {
+              p_email: string
+              p_ip_address: string
+              p_max_attempts?: number
+              p_time_window_minutes?: number
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_max_per_hour?: number
+              p_table_name: string
+              p_user_id: string
+            }
+            Returns: boolean
+          }
       check_units_availability: {
         Args: { unit_ids: string[] }
         Returns: boolean
@@ -17210,6 +17542,10 @@ export type Database = {
       log_view_access: {
         Args: { _filters?: Json; _view_name: string }
         Returns: undefined
+      }
+      mask_sensitive_data: {
+        Args: { input_text: string; show_chars?: number }
+        Returns: string
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
       notify_overdue_invoices: { Args: never; Returns: undefined }
