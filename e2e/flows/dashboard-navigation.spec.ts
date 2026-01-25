@@ -60,19 +60,19 @@ test.describe('Dashboard Access Control', () => {
 
 test.describe('Sidebar Navigation', () => {
   // Helper to login before tests
-  async function loginAsTestUser(_page: any) {
-    await _page.goto('/login');
+  async function loginAsTestUser(testPage: Page) {
+    await testPage.goto('/login');
     
-    const emailInput = _page.locator('input[type="email"]').first();
-    const passwordInput = _page.locator('input[type="password"]').first();
+    const emailInput = testPage.locator('input[type="email"]').first();
+    const passwordInput = testPage.locator('input[type="password"]').first();
 
     if (await emailInput.isVisible()) {
       await emailInput.fill(TEST_USER.email);
       await passwordInput.fill(TEST_USER.password);
-      await page.locator('button[type="submit"]').first().click();
+      await testPage.locator('button[type="submit"]').first().click();
 
       try {
-        await page.waitForURL(/\/(dashboard|redirect|nazer|accountant|home)/, {
+        await testPage.waitForURL(/\/(dashboard|redirect|nazer|accountant|home)/, {
           timeout: 10000,
         });
         return true;
