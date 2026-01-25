@@ -82,14 +82,13 @@ export class LazyErrorBoundary extends Component<Props, State> {
     if (isChunkLoadError(error) && chunkErrorInfo.canRetry && this.state.retryCount < MAX_AUTO_RETRIES) {
       this.setState({ isRetrying: true });
       this.retryTimeout = setTimeout(() => {
-        this.setState({
+        this.setState(prev => ({
           hasError: false,
           error: null,
           errorType: null,
-          retryCount: this.state.retryCount + 1,
-          isRetrying: false,
-          isOnline: this.state.isOnline
-        });
+          retryCount: prev.retryCount + 1,
+          isRetrying: false
+        }));
       }, 1500);
     }
   }

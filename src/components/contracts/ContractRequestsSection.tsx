@@ -41,7 +41,7 @@ const terminationStatusConfig = {
   cancelled: { label: 'ملغى', variant: 'outline' as const, icon: FileX },
 };
 
-const adjustmentStatusConfig: Record<string, { label: string; variant: 'secondary' | 'default' | 'destructive' | 'outline'; icon: typeof Clock }> = {
+const adjustmentStatusConfig = {
   pending: { label: 'قيد المراجعة', variant: 'secondary' as const, icon: Clock },
   approved: { label: 'موافق', variant: 'default' as const, icon: CheckCircle },
   rejected: { label: 'مرفوض', variant: 'destructive' as const, icon: XCircle },

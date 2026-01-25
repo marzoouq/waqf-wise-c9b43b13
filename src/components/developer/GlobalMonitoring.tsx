@@ -6,7 +6,7 @@ import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
  * مكون عام لمراقبة الأداء والأخطاء على كامل التطبيق
  * يعمل للناظر والمشرفين فقط
  */
-export function GlobalMonitoring(): null {
+export function GlobalMonitoring() {
   const { isAdmin, isNazer, isLoading } = useUserRole();
 
   // تفعيل الميزات للناظر والمشرفين فقط بعد اكتمال التحميل

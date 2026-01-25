@@ -56,14 +56,7 @@ export function CustomReportBuilder() {
 
   // الحصول على الحقول المتاحة حسب نوع التقرير
   const getAvailableFields = (type: string): string[] => {
-    const fields = REPORT_FIELDS as Record<string, string[] | { label: string }[]>;
-    const fieldList = fields[type];
-    if (!fieldList) return [];
-    // Check if it's an array of strings or objects
-    if (typeof fieldList[0] === 'string') {
-      return fieldList as string[];
-    }
-    return (fieldList as { label: string }[]).map((f: { label: string }) => f.label);
+    return REPORT_FIELDS[type]?.map(f => f.label) || [];
   };
 
   const handleFieldToggle = (field: string) => {

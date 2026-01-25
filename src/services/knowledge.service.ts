@@ -197,15 +197,13 @@ export class KnowledgeService {
     
     const { data: current } = await supabase
       .from('kb_articles')
-      .select('helpful_count, not_helpful_count')
+      .select(column)
       .eq('id', id)
       .maybeSingle();
 
-    const currentValue = current ? (current[column] as number) || 0 : 0;
-
     const { error } = await supabase
       .from('kb_articles')
-      .update({ [column]: currentValue + 1 })
+      .update({ [column]: ((current?.[column] as number) || 0) + 1 })
       .eq('id', id);
 
     if (error) throw error;

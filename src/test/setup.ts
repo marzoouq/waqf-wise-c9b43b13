@@ -6,7 +6,7 @@ import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
 
 // Make vi globally available
-(globalThis as Record<string, unknown>).vi = vi;
+globalThis.vi = vi;
 
 // Basic DOM polyfills and environment shims for Vitest
 // Ensure `window.matchMedia` exists (some components check it)
@@ -14,10 +14,10 @@ if (typeof window.matchMedia !== 'function') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     configurable: true,
-    value: (query: string): MediaQueryList => ({
+    value: (query: string) => ({
       matches: false,
       media: query,
-      onchange: null as ((this: MediaQueryList, ev: MediaQueryListEvent) => unknown) | null,
+      onchange: null,
       addListener: () => {},
       removeListener: () => {},
       addEventListener: () => {},
@@ -52,7 +52,7 @@ if (typeof globalWithObservers.IntersectionObserver === 'undefined') {
     observe() { return; }
     unobserve() { return; }
     disconnect() { return; }
-    takeRecords(): IntersectionObserverEntry[] { return []; }
+    takeRecords() { return []; }
   }
   globalWithObservers.IntersectionObserver = MockIntersectionObserver as unknown as GenericCtor;
 }
@@ -120,8 +120,8 @@ const createMockQueryBuilder = <T>(data: T[] = []) => {
     limit: (_count?: number) => builder,
     range: (_from?: number, _to?: number) => builder,
     count: (_options?: { count?: string; head?: boolean }) => builder,
-        single: async () => ({ data: data[0] || null, error: null as Error | null }),
-        maybeSingle: async () => ({ data: data[0] || null, error: null as Error | null }),
+    single: async () => ({ data: data[0] || null, error: null }),
+    maybeSingle: async () => ({ data: data[0] || null, error: null }),
     throwOnError: () => builder,
     then: async <TResult>(
       onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
@@ -201,7 +201,7 @@ vi.mock('sonner', () => {
   });
   return {
     toast: toastFn,
-    Toaster: (): null => null,
+    Toaster: () => null,
   };
 });
 
@@ -210,10 +210,10 @@ vi.mock('@/contexts/AuthContext', async () => {
   return {
     AuthProvider: ({ children }: { children: React.ReactNode }) => children,
     useAuth: () => ({
-      user: null as null,
-      profile: null as null,
+      user: null,
+      profile: null,
       isLoading: false,
-      roles: [] as string[],
+      roles: [],
       rolesLoading: false,
       signIn: vi.fn(),
       signInWithGoogle: vi.fn(),

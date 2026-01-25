@@ -8,7 +8,7 @@ import { fullServiceWorkerCleanup } from '@/lib/sw-cleanup';
  * يقوم بحذف جميع SWs و caches عند التحميل
  * (PWA معطّل في هذا المشروع)
  */
-export function UpdateNotifier(): null {
+export function UpdateNotifier() {
   const hasCleanedUp = useRef(false);
 
   useEffect(() => {

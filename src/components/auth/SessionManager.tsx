@@ -8,7 +8,7 @@ import { useSessionCleanup, checkPendingCleanup } from '@/hooks/auth/useSessionC
 import { useAuth } from '@/contexts/AuthContext';
 import { productionLogger } from '@/lib/logger/production-logger';
 
-export function SessionManager(): null {
+export function SessionManager() {
   const { user, isLoading } = useAuth();
   const { updateLastActive } = useSessionCleanup();
 

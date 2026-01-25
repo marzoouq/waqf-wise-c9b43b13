@@ -90,7 +90,7 @@ describe('Tenant Service', () => {
         status: 'active',
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
-        deleted_at: null as string | null,
+        deleted_at: null,
       };
 
       expect(mockTenant).toHaveProperty('id');
