@@ -22,7 +22,7 @@ export class AccountService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching accounts', error);
       throw error;
     }
@@ -41,7 +41,7 @@ export class AccountService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching account by code', error);
       throw error;
     }
@@ -71,7 +71,7 @@ export class AccountService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء الحساب');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating account', error);
       throw error;
     }
@@ -101,7 +101,7 @@ export class AccountService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating account', error);
       throw error;
     }
@@ -124,7 +124,7 @@ export class AccountService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error soft-deleting account', error);
       throw error;
     }
@@ -144,7 +144,7 @@ export class AccountService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching active leaf accounts', error);
       throw error;
     }
@@ -163,7 +163,7 @@ export class AccountService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching chart of accounts', error);
       throw error;
     }
@@ -182,7 +182,7 @@ export class AccountService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching account', error);
       throw error;
     }
@@ -197,7 +197,7 @@ export class AccountService {
       if (!account) throw new Error('الحساب غير موجود');
 
       return { ...account, balance: account.current_balance || 0 };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching account with balance', error);
       throw error;
     }
@@ -234,7 +234,7 @@ export class AccountService {
         value: count,
         count: count,
       }));
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching account distribution', error);
       throw error;
     }

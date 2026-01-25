@@ -62,8 +62,9 @@ export default function IntegrationsManagement() {
 
       queryClient.invalidateQueries({ queryKey });
       toast.success(`تم ${!currentStatus ? "تفعيل" : "تعطيل"} التكامل بنجاح`);
-    } catch (error) {
-      console.error("Error toggling integration:", error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل في تحديث حالة التكامل';
+      console.error("Error toggling integration:", errorMessage);
       toast.error("فشل في تحديث حالة التكامل");
     }
   };

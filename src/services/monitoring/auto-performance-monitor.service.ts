@@ -43,7 +43,7 @@ class AutoPerformanceMonitor {
     try {
       const result = await operation();
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       success = false;
       throw error;
     } finally {
@@ -91,7 +91,7 @@ class AutoPerformanceMonitor {
       });
 
       console.warn(`[Performance Alert] ${metric.operation}: ${metric.duration.toFixed(0)}ms`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[Performance] فشل إرسال التنبيه:', error);
     }
   }

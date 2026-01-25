@@ -33,7 +33,7 @@ export class DistributionBeneficiaryService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching heir distributions', error);
       throw error;
     }
@@ -65,7 +65,7 @@ export class DistributionBeneficiaryService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching beneficiary distributions', error);
       throw error;
     }
@@ -97,7 +97,7 @@ export class DistributionBeneficiaryService {
       }
       
       return filtered;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error selecting beneficiaries', error);
       throw error;
     }
@@ -117,7 +117,7 @@ export class DistributionBeneficiaryService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching family members', error);
       throw error;
     }
@@ -135,7 +135,7 @@ export class DistributionBeneficiaryService {
       
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching disclosure beneficiaries', error);
       throw error;
     }

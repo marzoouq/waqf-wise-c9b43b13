@@ -97,7 +97,7 @@ class RealtimeManager {
             channelInfo.listeners.forEach(cb => {
               try {
                 cb(payload);
-              } catch (error) {
+              } catch (error: unknown) {
                 console.error(`[RealtimeManager] Listener error for ${table}:`, error);
               }
             });

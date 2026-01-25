@@ -94,8 +94,9 @@ export async function cleanupAlerts(): Promise<CleanupStats> {
     }
 
     return stats;
-  } catch (error) {
-    stats.errors.push(`Unexpected error: ${error}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    stats.errors.push(`Unexpected error: ${errorMessage}`);
     return stats;
   }
 }
@@ -126,7 +127,7 @@ export function cleanupLocalStorageErrors(): number {
     localStorage.setItem(errorLogsKey, JSON.stringify(trimmedLogs));
     
     return logs.length - trimmedLogs.length;
-  } catch (error) {
+  } catch (error: unknown) {
     productionLogger.error('Error cleaning localStorage', error);
     return 0;
   }

@@ -47,7 +47,7 @@ export class BudgetService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching budgets', error);
       throw error;
     }
@@ -75,7 +75,7 @@ export class BudgetService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching budgets with accounts', error);
       throw error;
     }
@@ -95,7 +95,7 @@ export class BudgetService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء الميزانية');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating budget', error);
       throw error;
     }
@@ -115,7 +115,7 @@ export class BudgetService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating budget', error);
       throw error;
     }
@@ -137,7 +137,7 @@ export class BudgetService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error soft-deleting budget', error);
       throw error;
     }
@@ -176,7 +176,7 @@ export class BudgetService {
           })
           .eq('id', budget.id);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error calculating budget variances', error);
       throw error;
     }
