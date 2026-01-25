@@ -55,7 +55,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to beneficiaries table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, _error } = await supabase.from('beneficiaries').select('*').limit(1);
+      const { data, error } = await supabase.from('beneficiaries').select('*').limit(1);
 
       // Should return empty or error due to RLS
       void error;
@@ -65,7 +65,7 @@ test.describe('RLS Security Tests - Real Database Connection', () => {
     test('should deny access to audit_logs table without auth', async () => {
       test.skip(skipIfNoSupabase, 'Supabase not configured');
 
-      const { data, _error } = await supabase.from('audit_logs').select('*').limit(1);
+      const { data, error } = await supabase.from('audit_logs').select('*').limit(1);
 
       void error;
       expect(data?.length || 0).toBe(0);

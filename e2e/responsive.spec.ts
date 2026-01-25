@@ -2,7 +2,7 @@
  * E2E Tests - Responsive Design
  * @version 1.0.0
  */
-import { test, expect, _devices } from '@playwright/test';
+import { test, expect, devices as _devices } from '@playwright/test';
 
 test.describe('Responsive Design', () => {
   test('should work on mobile viewport', async ({ page }) => {
