@@ -15,8 +15,7 @@ import { useSecurityDashboardData } from "@/hooks/security/useSecurityDashboardD
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import type { jsPDF } from "jspdf";
 
 type JsPDFWithAutoTable = jsPDF & { lastAutoTable?: { finalY: number } };
 
@@ -66,8 +65,17 @@ export default function SecurityDashboard() {
     setSearchParams({ tab: value });
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     try {
+      // Dynamic imports to avoid blocking initial page load
+      const [jsPDFModule, autoTableModule] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
+      
+      const jsPDF = jsPDFModule.default;
+      const autoTable = autoTableModule.default;
+
       const doc = new jsPDF({
         orientation: "landscape",
         unit: "mm",
