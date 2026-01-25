@@ -1,6 +1,6 @@
 /**
  * Beneficiary Analytics Service - خدمة تحليلات المستفيدين
- * @version 2.8.82
+ * @version 2.8.83
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -42,7 +42,7 @@ export class BeneficiaryAnalyticsService {
       });
 
       return { transactions, balance };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching statements', error);
       throw error;
     }
@@ -61,7 +61,7 @@ export class BeneficiaryAnalyticsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching payments history', error);
       throw error;
     }
@@ -92,7 +92,7 @@ export class BeneficiaryAnalyticsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching properties', error);
       throw error;
     }
@@ -111,7 +111,7 @@ export class BeneficiaryAnalyticsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching emergency aid', error);
       throw error;
     }
@@ -127,7 +127,7 @@ export class BeneficiaryAnalyticsService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching beneficiary statistics via RPC', error);
       throw error;
     }
@@ -154,7 +154,7 @@ export class BeneficiaryAnalyticsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching yearly distributions', error);
       throw error;
     }

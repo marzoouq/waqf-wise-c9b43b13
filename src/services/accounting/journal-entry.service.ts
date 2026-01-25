@@ -1,6 +1,7 @@
 /**
  * Journal Entry Service - خدمة القيود المحاسبية
  * إدارة القيود اليومية والموافقات
+ * @version 1.0.1
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +37,7 @@ export class JournalEntryService {
       }
 
       return `JV-${year}-${nextNumber.toString().padStart(3, '0')}`;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error generating entry number', error);
       throw error;
     }
@@ -63,7 +64,7 @@ export class JournalEntryService {
         if (error) throw error;
         return data || [];
       }, SUPABASE_RETRY_OPTIONS);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching journal entries with lines', error);
       throw error;
     }
@@ -99,7 +100,7 @@ export class JournalEntryService {
         if (error) throw error;
         return data || [];
       }, SUPABASE_RETRY_OPTIONS);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching journal entries', error);
       throw error;
     }
@@ -120,7 +121,7 @@ export class JournalEntryService {
         if (error) throw error;
         return data;
       }, SUPABASE_RETRY_OPTIONS);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching journal entry', error);
       throw error;
     }
@@ -166,7 +167,7 @@ export class JournalEntryService {
       if (linesError) throw linesError;
 
       return journalEntry;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating journal entry', error);
       throw error;
     }
@@ -195,7 +196,7 @@ export class JournalEntryService {
       await this.updateAccountBalances(id);
 
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error posting journal entry', error);
       throw error;
     }
@@ -215,7 +216,7 @@ export class JournalEntryService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error cancelling journal entry', error);
       throw error;
     }
@@ -254,7 +255,7 @@ export class JournalEntryService {
             .eq('id', line.account_id);
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating account balances', error);
       throw error;
     }
@@ -285,7 +286,7 @@ export class JournalEntryService {
       }
 
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error approving journal entry', error);
       throw error;
     }
@@ -304,7 +305,7 @@ export class JournalEntryService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching journal entry lines', error);
       throw error;
     }
@@ -323,7 +324,7 @@ export class JournalEntryService {
       
       if (error) throw error;
       return (data || []) as JournalEntryRow[];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching recent journal entries', error);
       throw error;
     }

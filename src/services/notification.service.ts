@@ -79,7 +79,7 @@ export class NotificationService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error sending notification', error, {
         context: 'notification_service',
       });
@@ -110,7 +110,7 @@ export class NotificationService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error sending bulk notifications', error, {
         context: 'notification_service',
       });
@@ -238,7 +238,7 @@ export class NotificationService {
 
       if (error) throw error;
       return (data || []) as SystemAlert[];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching system alerts', error);
       return [];
     }
@@ -260,7 +260,7 @@ export class NotificationService {
         .eq('id', alertId);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error resolving alert', error);
       throw error;
     }
@@ -280,7 +280,7 @@ export class NotificationService {
 
       if (error) throw error;
       return (data || []) as UserNotification[];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching user notifications', error);
       return [];
     }
@@ -297,7 +297,7 @@ export class NotificationService {
         .eq('id', notificationId);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error marking notification as read', error);
       throw error;
     }
@@ -315,7 +315,7 @@ export class NotificationService {
         .eq('is_read', false);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error marking all notifications as read', error);
       throw error;
     }
@@ -341,7 +341,7 @@ export class NotificationService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error saving push subscription', error);
       return { success: false };
     }
@@ -359,7 +359,7 @@ export class NotificationService {
 
       if (error) throw error;
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error deactivating push subscription', error);
       return { success: false };
     }
@@ -395,7 +395,7 @@ export class NotificationService {
 
         await this.sendBulk(notifications);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error sending contact notifications', error);
       throw error;
     }
@@ -463,7 +463,7 @@ export class NotificationService {
       productionLogger.info(`Broadcast notification sent to ${users.length} users (${params.targetType})`);
 
       return { success: true, recipientCount: users.length };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error sending broadcast notification', error, {
         context: 'notification_service',
       });
@@ -486,7 +486,7 @@ export class NotificationService {
 
       if (error) throw error;
       return data || 0;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error counting target users', error);
       return 0;
     }
@@ -514,7 +514,7 @@ export class NotificationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching broadcast history', error);
       return [];
     }
