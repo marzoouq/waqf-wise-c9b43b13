@@ -1,0 +1,105 @@
+# Jscrambler Code Integrity Workflow
+# Protects production code from tampering and reverse engineering
+# 
+# REQUIRED SECRETS (configure in GitHub Settings > Secrets):
+# - JSCRAMBLER_APPLICATION_ID: Your Jscrambler application ID
+# - JSCRAMBLER_ACCESS_KEY: Your Jscrambler access key
+# - JSCRAMBLER_SECRET_KEY: Your Jscrambler secret key
+
+name: Jscrambler Code Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check-secrets:
+    name: Validate Jscrambler Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      secrets-configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Check if Jscrambler secrets are configured
+        id: check
+        run: |
+          if [[ -n "${{ secrets.JSCRAMBLER_APPLICATION_ID }}" ]] && \
+             [[ -n "${{ secrets.JSCRAMBLER_ACCESS_KEY }}" ]] && \
+             [[ -n "${{ secrets.JSCRAMBLER_SECRET_KEY }}" ]]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
+            echo "✅ Jscrambler secrets are configured"
+          else
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Jscrambler secrets are not configured - skipping protection"
+          fi
+
+  protect:
+    name: Protect Code with Jscrambler
+    runs-on: ubuntu-latest
+    needs: check-secrets
+    if: needs.check-secrets.outputs.secrets-configured == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Install Jscrambler CLI
+        run: npm install -g jscrambler
+
+      - name: Protect code with Jscrambler
+        run: |
+          jscrambler \
+            --access-key ${{ secrets.JSCRAMBLER_ACCESS_KEY }} \
+            --secret-key ${{ secrets.JSCRAMBLER_SECRET_KEY }} \
+            --application-id ${{ secrets.JSCRAMBLER_APPLICATION_ID }} \
+            --config jscrambler.json \
+            -o dist/
+        env:
+          JSCRAMBLER_ACCESS_KEY: ${{ secrets.JSCRAMBLER_ACCESS_KEY }}
+          JSCRAMBLER_SECRET_KEY: ${{ secrets.JSCRAMBLER_SECRET_KEY }}
+          JSCRAMBLER_APPLICATION_ID: ${{ secrets.JSCRAMBLER_APPLICATION_ID }}
+
+      - name: Upload protected artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: protected-build
+          path: dist/
+          retention-days: 7
+
+  skip-notice:
+    name: Jscrambler Skipped
+    runs-on: ubuntu-latest
+    needs: check-secrets
+    if: needs.check-secrets.outputs.secrets-configured == 'false'
+    steps:
+      - name: Notice
+        run: |
+          echo "::notice::Jscrambler protection skipped - secrets not configured"
+          echo ""
+          echo "To enable Jscrambler protection, configure the following secrets:"
+          echo "  - JSCRAMBLER_APPLICATION_ID"
+          echo "  - JSCRAMBLER_ACCESS_KEY"
+          echo "  - JSCRAMBLER_SECRET_KEY"
+          echo ""
+          echo "See docs/JSCRAMBLER_SETUP.md for setup instructions"
