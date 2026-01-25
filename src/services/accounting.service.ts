@@ -579,8 +579,8 @@ export class AccountingService {
       journal_entry_id: entry.id,
       reference_number: entry.entry_number,
       created_at: entry.created_at,
-      beneficiary_id: null,
-      contract_number: null,
+      beneficiary_id: null as string | null,
+      contract_number: null as string | null,
     }));
   }
 

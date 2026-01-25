@@ -149,7 +149,7 @@ describe('KPI Service', () => {
     });
 
     it('should return empty arrays on query failure', () => {
-      const fallbackData = {
+      const fallbackData: Record<string, unknown[]> = {
         beneficiaries: [],
         contracts: [],
         properties: [],

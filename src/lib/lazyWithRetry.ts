@@ -185,7 +185,7 @@ const {
       forceReload();
       
       // Return a dummy component while reloading
-      return { default: (() => null) as unknown as T };
+      return { default: ((): null => null) as unknown as T };
     }
 
     // Throw the last error to be caught by Error Boundary

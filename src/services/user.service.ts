@@ -111,7 +111,7 @@ export class UserService {
   /**
    * جلب صلاحيات المستخدم
    */
-  static async getUserPermissions(userId: string) {
+  static async getUserPermissions(userId: string): Promise<{ rolePermissions: unknown[] | null; userPermissions: unknown[] | null } | unknown[]> {
     // Get user's roles (excluding soft-deleted)
     const { data: userRoles, error: rolesError } = await supabase
       .from("user_roles")

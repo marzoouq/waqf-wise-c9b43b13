@@ -19,7 +19,7 @@ const THRESHOLDS = {
 const shownWarnings = new Map<string, number>();
 const WARN_COOLDOWN_MS = 120000; // تحذير واحد كل دقيقتين لكل نوع
 
-export function BackgroundMonitor() {
+export function BackgroundMonitor(): null {
   const { isAdmin, isNazer, isLoading } = useUserRole();
   const shouldMonitor = !isLoading && (isAdmin || isNazer);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);

@@ -82,4 +82,4 @@ export async function restoreDeleted(
   return restoreRecord(tableName as SoftDeletableTableName, recordId);
 }
 
-export const excludeDeleted = { deleted_at: null } as const;
+export const excludeDeleted: { deleted_at: null } = { deleted_at: null };
