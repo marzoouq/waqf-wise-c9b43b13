@@ -1,0 +1,52 @@
+{
+  "$schema": "https://docs.jscrambler.com/latest/schemas/jscrambler.schema.json",
+  "filesSrc": [
+    "dist/**/*.js",
+    "dist/**/*.html"
+  ],
+  "filesDest": "dist/",
+  "areSubscribersOrdered": false,
+  "bail": true,
+  "languageSpecifications": {
+    "es2022": true
+  },
+  "sourceMaps": false,
+  "jscramblerVersion": "8.*",
+  "params": [
+    {
+      "name": "whitespaceRemoval"
+    },
+    {
+      "name": "identifiersRenaming",
+      "options": {
+        "mode": "SAFEST"
+      }
+    },
+    {
+      "name": "dotToBracketNotation"
+    },
+    {
+      "name": "stringConcealing"
+    },
+    {
+      "name": "functionReordering"
+    },
+    {
+      "name": "propertyKeysObfuscation",
+      "options": {
+        "encoding": ["hexadecimal"]
+      }
+    },
+    {
+      "name": "duplicateLiteralsRemoval"
+    },
+    {
+      "name": "booleanToAnything"
+    }
+  ],
+  "excludeList": [
+    "node_modules/**",
+    "**/*.min.js",
+    "**/vendor/**"
+  ]
+}
