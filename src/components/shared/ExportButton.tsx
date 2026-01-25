@@ -51,7 +51,7 @@ export const ExportButton = <T extends object>({
         title: "تم التصدير",
         description: "تم تصدير البيانات إلى PDF بنجاح",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("PDF Export Error:", error);
       toast({
         title: "خطأ",
@@ -71,7 +71,7 @@ export const ExportButton = <T extends object>({
         title: "تم التصدير",
         description: "تم تصدير البيانات إلى Excel بنجاح",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Excel Export Error:", error);
       toast({
         title: "خطأ",

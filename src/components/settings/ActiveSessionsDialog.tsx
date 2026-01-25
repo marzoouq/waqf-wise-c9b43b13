@@ -60,7 +60,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
     try {
       await endSession(sessionId);
       setSessionToEnd(null);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error ending session:', error);
     }
   };
@@ -69,7 +69,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
     try {
       await endAllOtherSessions();
       setShowEndAllDialog(false);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error ending all sessions:', error);
     }
   };

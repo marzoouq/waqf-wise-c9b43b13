@@ -75,8 +75,8 @@ export function LoanPaymentDialog({
         notes: "",
       });
       setPaymentDate(new Date());
-    } catch (error) {
-      logger.error(error, { context: 'submit_loan_payment', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'submit_loan_payment', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }

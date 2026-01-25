@@ -110,7 +110,7 @@ export function UploadDocumentDialog({
       form.reset();
       setSelectedFile(null);
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('[UploadDocument] فشل الرفع', error);
       // Error handled by hook toast
     }

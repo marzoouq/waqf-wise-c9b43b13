@@ -53,7 +53,7 @@ export function PushNotificationsSetup() {
       } else {
         toast.error('تم رفض إذن الإشعارات');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error as Error, { context: 'PushNotifications.enable' });
       toast.error('فشل تفعيل الإشعارات الفورية');
     }
@@ -71,7 +71,7 @@ export function PushNotificationsSetup() {
 
       setIsEnabled(false);
       toast.success('تم إيقاف الإشعارات الفورية');
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error as Error, { context: 'PushNotifications.disable' });
       toast.error('فشل إيقاف الإشعارات الفورية');
     }

@@ -40,7 +40,7 @@ export function FinancialAnalyticsDashboard() {
         periodStart: startDate.toISOString().split('T')[0],
         periodEnd: endDate.toISOString().split('T')[0],
       });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error calculating KPIs', error);
     } finally {
       setIsCalculating(false);

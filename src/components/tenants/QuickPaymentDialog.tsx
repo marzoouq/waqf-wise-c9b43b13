@@ -118,7 +118,7 @@ export function QuickPaymentDialog({
         resetForm();
       }, 1500);
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error recording payment:', error);
       toast.error('حدث خطأ أثناء تسجيل الدفعة');
     } finally {

@@ -63,7 +63,7 @@ export function ArchiveDocumentsTab({
       } else {
         toast.error("فشل في تنزيل الملف");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Download error:", error);
       toast.error("حدث خطأ أثناء تنزيل الملف");
     } finally {

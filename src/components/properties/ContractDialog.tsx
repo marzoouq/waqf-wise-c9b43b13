@@ -79,7 +79,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       const { data: { publicUrl } } = supabase.storage.from('archive-documents').getPublicUrl(fileName);
       setUploadedFileUrl(publicUrl);
       toast({ title: "تم رفع الملف بنجاح" });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error uploading file:', error);
       toast({ title: "خطأ في رفع الملف", variant: "destructive" });
       setContractFile(null);
@@ -171,7 +171,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       }
       onOpenChange(false);
       form.reset(getDefaultValues());
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving contract:', error);
       const supabaseError = error as { code?: string; message?: string };
       

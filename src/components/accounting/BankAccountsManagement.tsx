@@ -104,8 +104,8 @@ export function BankAccountsManagement() {
         await addBankAccount(formData);
       }
       setDialogOpen(false);
-    } catch (error) {
-      logger.error(error, { context: 'save_bank_account', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'save_bank_account', severity: 'medium' });
     }
   };
 

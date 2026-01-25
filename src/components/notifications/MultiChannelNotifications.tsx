@@ -131,7 +131,7 @@ export function MultiChannelNotifications() {
           }
           await subscribePush();
         }
-      } catch (error) {
+      } catch (error: unknown) {
         productionLogger.error('Error toggling push notifications:', error);
       }
       return;
@@ -168,7 +168,7 @@ export function MultiChannelNotifications() {
           description: `تم ${!channel.enabled ? 'تفعيل' : 'إيقاف'} ${channel.name}`,
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating notification preferences:', error);
       toast({
         title: "خطأ",

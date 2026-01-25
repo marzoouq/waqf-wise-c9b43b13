@@ -62,7 +62,7 @@ export function DashboardDialogs({
       });
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       setPropertyDialogOpen(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving property:", error);
       toast({
         title: "خطأ",
@@ -88,7 +88,7 @@ export function DashboardDialogs({
       });
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
       setDistributionDialogOpen(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating distribution:", error);
       toast({
         title: "خطأ",

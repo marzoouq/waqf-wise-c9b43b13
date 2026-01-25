@@ -59,9 +59,9 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       setStep("verify");
       
       toast.success("تم إنشاء رمز المصادقة الثنائية");
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("حدث خطأ أثناء تفعيل المصادقة الثنائية");
-      logger.error(error, { context: 'enable_2fa', severity: 'medium' });
+      logger.error(error as Error, { context: 'enable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
@@ -82,9 +82,9 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       onOpenChange(false);
       setStep("enable");
       setCode("");
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("حدث خطأ أثناء التحقق من الرمز");
-      logger.error(error, { context: 'verify_2fa_code', severity: 'medium' });
+      logger.error(error as Error, { context: 'verify_2fa_code', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
@@ -98,9 +98,9 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       await invalidate2FAStatus();
       toast.success("تم إلغاء تفعيل المصادقة الثنائية");
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("حدث خطأ أثناء إلغاء التفعيل");
-      logger.error(error, { context: 'disable_2fa', severity: 'medium' });
+      logger.error(error as Error, { context: 'disable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }

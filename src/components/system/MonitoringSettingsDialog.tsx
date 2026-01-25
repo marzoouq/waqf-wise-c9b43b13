@@ -48,7 +48,7 @@ export function MonitoringSettingsDialog({
       localStorage.setItem("monitoring_settings", JSON.stringify(settings));
       toast.success("تم حفظ إعدادات المراقبة");
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving monitoring settings:", error);
       toast.error("فشل في حفظ الإعدادات");
     } finally {

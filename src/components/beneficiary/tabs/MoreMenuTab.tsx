@@ -54,7 +54,7 @@ export function MoreMenuTab() {
       await supabase.auth.signOut();
       toast.success("تم تسجيل الخروج بنجاح");
       navigate("/auth");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Logout error:', error);
       toast.error("حدث خطأ أثناء تسجيل الخروج");
     } finally {
@@ -136,7 +136,7 @@ export function MoreMenuTab() {
       } else if (item.tab) {
         setSearchParams({ tab: item.tab });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Navigation error:', error);
       toast.error('حدث خطأ أثناء التنقل');
     }

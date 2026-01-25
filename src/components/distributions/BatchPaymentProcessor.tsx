@@ -99,7 +99,7 @@ export function BatchPaymentProcessor({
       });
 
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       // فشل الدفعة
       setBatches(prev => {
         const updated = [...prev];

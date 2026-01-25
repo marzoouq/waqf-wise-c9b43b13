@@ -145,7 +145,7 @@ export const PullToRefresh = memo(function PullToRefresh({
           setState('idle');
           setPullDistance(0);
         }, 1000);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Refresh failed:', error);
         setState('idle');
         setPullDistance(0);

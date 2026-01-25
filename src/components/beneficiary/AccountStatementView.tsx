@@ -92,7 +92,7 @@ export function AccountStatementView({
 
       doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
       toast.success("تم تصدير كشف الحساب بنجاح");
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("فشل تصدير كشف الحساب");
       productionLogger.error("PDF export error", error);
     }

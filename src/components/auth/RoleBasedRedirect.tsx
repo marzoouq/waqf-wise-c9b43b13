@@ -42,7 +42,7 @@ export function RoleBasedRedirect() {
           if (data && data.length > 0) {
             setDirectRoles(data.map(r => r.role as AppRole));
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error fetching roles directly:', error);
         }
       }

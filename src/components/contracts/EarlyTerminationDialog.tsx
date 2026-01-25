@@ -197,7 +197,7 @@ export function EarlyTerminationDialog({
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
       queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error terminating contract:', error);
       toast.error('حدث خطأ أثناء إنهاء العقد');
     } finally {

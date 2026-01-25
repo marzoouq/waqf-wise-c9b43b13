@@ -56,7 +56,7 @@ export function DatabaseSettingsDialog({
     try {
       setIsExporting(true);
       await createBackup({});
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Backup error:', error);
     } finally {
       setIsExporting(false);
@@ -125,7 +125,7 @@ export function DatabaseSettingsDialog({
       setShowRestoreConfirm(false);
       setConfirmText("");
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Restore error:', error);
     }
   };

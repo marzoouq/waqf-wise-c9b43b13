@@ -32,7 +32,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
     try {
       const result = await autoMatch({ statementId });
       setSuggestions(result.suggestions);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error auto-matching', error);
     } finally {
       setIsMatching(false);
@@ -47,7 +47,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
         notes: `مطابقة مقترحة بثقة ${(suggestion.confidence * 100).toFixed(0)}%`,
       });
       setSuggestions(suggestions.filter(s => s !== suggestion));
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error accepting suggestion', error);
     }
   };

@@ -57,7 +57,7 @@ export default function AuthenticatedRedirect() {
         } catch { /* تجاهل أخطاء localStorage */ }
         
         navigate(targetDashboard, { replace: true });
-      } catch (error) {
+      } catch (error: unknown) {
         if (mounted) {
           console.error('Error checking session:', error);
           navigate('/login', { replace: true });

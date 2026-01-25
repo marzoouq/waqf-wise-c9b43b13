@@ -71,8 +71,8 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
         notes: "",
       });
       setStartDate(new Date());
-    } catch (error) {
-      logger.error(error, { context: 'submit_loan', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error as Error, { context: 'submit_loan', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }

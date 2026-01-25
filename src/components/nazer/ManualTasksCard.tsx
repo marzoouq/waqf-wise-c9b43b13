@@ -41,7 +41,7 @@ export function ManualTasksCard() {
       } else {
         throw new Error(result.error || "فشل في التشغيل");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
       setDailyNotifications({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في تشغيل الإشعارات: ${errorMsg}`);
@@ -58,7 +58,7 @@ export function ManualTasksCard() {
       } else {
         throw new Error(result.error || "فشل في التشغيل");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
       setWeeklyReport({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في إنشاء التقرير: ${errorMsg}`);
@@ -75,7 +75,7 @@ export function ManualTasksCard() {
       } else {
         throw new Error(result.error || "فشل في التشغيل");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : "خطأ غير معروف";
       setSmartAlerts({ running: false, success: false, error: errorMsg });
       toast.error(`فشل في توليد التنبيهات: ${errorMsg}`);

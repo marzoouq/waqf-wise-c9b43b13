@@ -69,7 +69,7 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
           newResults[i].error = result.error;
           toast.error(`فشل معالجة ${files[i].name}`);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         newResults[i].status = 'error';
         newResults[i].error = error instanceof Error ? error.message : 'خطأ غير معروف';
         toast.error(`خطأ في معالجة ${files[i].name}`);
