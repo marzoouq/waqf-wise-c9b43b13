@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const tokenRefreshLock = useRef(false);
 
   // جلب أدوار المستخدم باستخدام AuthService
+  // ✅ v2.0.0: تحسين معالجة الأخطاء مع retry داخلي
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
     // ✅ استخدام الـ cache المؤقت في الذاكرة فقط
     if (rolesCache.current.length > 0) {
@@ -56,12 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         })
         .catch((err) => {
-          productionLogger.debug('تجاهل خطأ تحديث الأدوار في الخلفية', err);
+          // ✅ v2.0.0: تسجيل محسّن للأخطاء
+          if (import.meta.env.DEV) {
+            productionLogger.debug('تجاهل خطأ تحديث الأدوار في الخلفية', err);
+          }
         });
       return rolesCache.current;
     }
 
-    // ✅ جلب الأدوار باستخدام AuthService
+    // ✅ جلب الأدوار باستخدام AuthService (مع withRetry مدمج)
     setRolesLoading(true);
     try {
       const fetchedRoles = await AuthService.getUserRoles(userId);
@@ -70,7 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRolesLoading(false);
       return fetchedRoles;
     } catch (err) {
-      productionLogger.error('Exception fetching user roles', err);
+      // ✅ v2.0.0: لا نسجل خطأ إذا كان بسبب عدم وجود أدوار (مستخدم جديد)
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (!errorMessage.includes('no rows') && !errorMessage.includes('0 rows')) {
+        productionLogger.error('Exception fetching user roles after retries', err);
+      }
       setRolesLoading(false);
       return [];
     }

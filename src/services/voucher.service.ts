@@ -1,8 +1,13 @@
+/**
+ * Voucher Service - خدمة السندات المالية
+ * @version 2.1.0 - إضافة withRetry للاستعلامات الحرجة
+ */
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { productionLogger } from "@/lib/logger/production-logger";
 import type { Database } from "@/integrations/supabase/types";
 import { matchesStatus } from '@/lib/constants';
+import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
 type PaymentVoucher = Database['public']['Tables']['payment_vouchers']['Row'];

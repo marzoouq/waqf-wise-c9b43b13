@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabErrorBoundary } from "./common/TabErrorBoundary";
-import { lazyWithRetryNamed } from "@/lib/lazy-with-retry";
+import { lazyWithRetryNamed } from "@/lib/lazyWithRetry";
 import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 
 // Lazy loaded tab components with retry support
