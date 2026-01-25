@@ -1,1 +1,13 @@
-{\n  "name": "waqf-wise-c9b43b13",\n  "version": "0.1.0",\n  "private": true,\n  "scripts": {\n    "test": "echo \"Error: no test specified\" && exit 1"\n  },\n  "devDependencies": {\n    "typescript": "^5.9.3"\n  }\n}
+{
+  "name": "waqf-wise-c9b43b13",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
