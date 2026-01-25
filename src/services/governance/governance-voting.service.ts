@@ -1,6 +1,6 @@
 /**
  * Governance Voting Service - خدمة التصويت
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +38,7 @@ export class GovernanceVotingService {
         .eq('id', decisionId);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error closing voting', error);
       throw error;
     }
@@ -57,7 +57,7 @@ export class GovernanceVotingService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching votes', error);
       throw error;
     }
@@ -77,7 +77,7 @@ export class GovernanceVotingService {
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching user vote', error);
       throw error;
     }
@@ -122,7 +122,7 @@ export class GovernanceVotingService {
       if (error) throw error;
       if (!data) throw new Error('فشل تسجيل الصوت');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error casting vote', error);
       throw error;
     }
@@ -227,7 +227,7 @@ export class GovernanceVotingService {
           vote: vote?.vote
         };
       });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching eligible voters', error);
       throw error;
     }

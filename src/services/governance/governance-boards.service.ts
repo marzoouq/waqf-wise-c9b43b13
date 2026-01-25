@@ -1,6 +1,6 @@
 /**
  * Governance Boards Service - خدمة مجالس الحوكمة
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +26,7 @@ export class GovernanceBoardsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching governance boards', error);
       throw error;
     }
@@ -45,7 +45,7 @@ export class GovernanceBoardsService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching governance board', error);
       throw error;
     }
@@ -65,7 +65,7 @@ export class GovernanceBoardsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching board members', error);
       throw error;
     }
@@ -94,7 +94,7 @@ export class GovernanceBoardsService {
       );
       
       return boardsWithCount;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching boards with member count', error);
       throw error;
     }
@@ -114,7 +114,7 @@ export class GovernanceBoardsService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء المجلس');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating governance board', error);
       throw error;
     }
@@ -135,7 +135,7 @@ export class GovernanceBoardsService {
       if (error) throw error;
       if (!data) throw new Error('المجلس غير موجود');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating governance board', error);
       throw error;
     }
@@ -152,7 +152,7 @@ export class GovernanceBoardsService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error deleting governance board', error);
       throw error;
     }
@@ -172,7 +172,7 @@ export class GovernanceBoardsService {
       if (error) throw error;
       if (!data) throw new Error('فشل إضافة العضو');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error adding board member', error);
       throw error;
     }
@@ -193,7 +193,7 @@ export class GovernanceBoardsService {
       if (error) throw error;
       if (!data) throw new Error('العضو غير موجود');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating board member', error);
       throw error;
     }
@@ -210,7 +210,7 @@ export class GovernanceBoardsService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error removing board member', error);
       throw error;
     }
@@ -244,7 +244,7 @@ export class GovernanceBoardsService {
         activeBoards: activeBoards || 0,
         totalMembers: totalMembers || 0,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching boards stats', error);
       throw error;
     }
