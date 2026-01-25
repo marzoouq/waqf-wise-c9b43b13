@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { getErrorMessage } from '@/types/errors';
 
 export class GovernanceSettingsService {
   /**
@@ -22,8 +23,8 @@ export class GovernanceSettingsService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
-      productionLogger.error('Error fetching visibility settings', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching visibility settings', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -72,8 +73,8 @@ export class GovernanceSettingsService {
       if (error) throw error;
       if (!data) throw new Error("فشل في إنشاء إعدادات الرؤية");
       return data;
-    } catch (error) {
-      productionLogger.error('Error creating default visibility settings', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error creating default visibility settings', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -93,8 +94,8 @@ export class GovernanceSettingsService {
       if (error) throw error;
       if (!data) throw new Error("إعدادات الرؤية غير موجودة");
       return data;
-    } catch (error) {
-      productionLogger.error('Error updating visibility settings', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error updating visibility settings', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -113,8 +114,8 @@ export class GovernanceSettingsService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
-      productionLogger.error('Error fetching organization settings', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching organization settings', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -146,8 +147,8 @@ export class GovernanceSettingsService {
         if (!data) throw new Error("فشل في إنشاء إعدادات المنظمة");
         return data;
       }
-    } catch (error) {
-      productionLogger.error('Error updating organization settings', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error updating organization settings', { error: getErrorMessage(error) });
       throw error;
     }
   }

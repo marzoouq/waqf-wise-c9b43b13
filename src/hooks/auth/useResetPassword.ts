@@ -67,8 +67,7 @@ export function useResetPassword(beneficiary: BeneficiaryInfo, onSuccess?: () =>
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      productionLogger.warn('Error:', error);
+    } catch (_error) {
       toast.error('حدث خطأ غير متوقع');
     } finally {
       setIsLoading(false);

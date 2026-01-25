@@ -5,6 +5,7 @@ import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { TrendingUp, DollarSign, Users, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 import { DistributionService } from '@/services';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { getErrorMessage } from '@/types/errors';
 import { Distribution, MonthlyDistributionData, PatternDistributionData } from '@/types/distributions';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
@@ -21,8 +22,8 @@ export function DistributionsDashboard() {
     try {
       const data = await DistributionService.getAll();
       setDistributions(data || []);
-    } catch (error) {
-      productionLogger.error('Error loading distributions', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error loading distributions', { error: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }

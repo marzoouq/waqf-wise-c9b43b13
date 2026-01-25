@@ -160,7 +160,7 @@ export function DistributionDialog({
         title: "تمت المحاكاة بنجاح",
         description: `سيتم توزيع ${data.summary.total_distributed.toLocaleString()} ر.س على ${data.summary.beneficiaries_count} مستفيد`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Distribution simulation failed', error);
       toast({
         title: "خطأ في المحاكاة",

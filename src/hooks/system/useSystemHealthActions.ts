@@ -5,6 +5,7 @@
 
 import { SystemService, EdgeFunctionService } from "@/services";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { getErrorMessage } from "@/types/errors";
 import { toast } from "sonner";
 
 export function useSystemHealthActions(refetch: () => void) {
@@ -14,9 +15,9 @@ export function useSystemHealthActions(refetch: () => void) {
       await SystemService.bulkResolveOldAlerts();
       toast.success("تم حل جميع التنبيهات القديمة بنجاح");
       refetch();
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("فشل في حل التنبيهات");
-      productionLogger.error("فشل في حل التنبيهات:", error);
+      productionLogger.error("فشل في حل التنبيهات:", { error: getErrorMessage(error) });
     }
   };
 
@@ -26,9 +27,9 @@ export function useSystemHealthActions(refetch: () => void) {
       await SystemService.cleanupResolvedErrors();
       toast.success("تم مسح الأخطاء القديمة بنجاح");
       refetch();
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("فشل في مسح الأخطاء");
-      productionLogger.error("فشل في مسح الأخطاء:", error);
+      productionLogger.error("فشل في مسح الأخطاء:", { error: getErrorMessage(error) });
     }
   };
 
@@ -45,9 +46,9 @@ export function useSystemHealthActions(refetch: () => void) {
 
       toast.success(`تم التنظيف بنجاح! تم إصلاح ${result.data?.fixed || 0} مشكلة`);
       refetch();
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("فشل التنظيف الفوري");
-      productionLogger.error("فشل التنظيف الفوري:", error);
+      productionLogger.error("فشل التنظيف الفوري:", { error: getErrorMessage(error) });
     }
   };
 

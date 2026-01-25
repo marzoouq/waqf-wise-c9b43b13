@@ -53,10 +53,7 @@ export function AutomaticClosingDialog({
       } else {
         throw new Error(result.data?.error || "فشل الإقفال");
       }
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Error confirming closing:", error);
-      }
+    } catch (_error) {
       toast.error("حدث خطأ أثناء إقفال السنة المالية");
     } finally {
       setConfirming(false);
