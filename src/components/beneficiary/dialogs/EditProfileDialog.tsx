@@ -178,7 +178,7 @@ export function EditProfileDialog({
         })
         .eq("id", beneficiary.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       

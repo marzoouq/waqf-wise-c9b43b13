@@ -10,14 +10,14 @@ import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useUnlinkedProperties() {
   return useQuery<UnlinkedProperty[]>({
-    queryKey: ['unlinked-properties'],
+    queryKey: QUERY_KEYS.UNLINKED_PROPERTIES,
     queryFn: () => WaqfService.getUnlinkedProperties(),
   });
 }
 
 export function useWaqfUnitProperties(waqfUnitId: string | undefined) {
   return useQuery<WaqfProperty[]>({
-    queryKey: ['waqf-unit-properties', waqfUnitId],
+    queryKey: QUERY_KEYS.WAQF_UNIT_PROPERTIES(waqfUnitId),
     queryFn: () => WaqfService.getWaqfUnitProperties(waqfUnitId!),
     enabled: !!waqfUnitId,
   });
@@ -30,8 +30,8 @@ export function useLinkProperty() {
     mutationFn: ({ propertyId, waqfUnitId }: { propertyId: string; waqfUnitId: string }) =>
       WaqfService.linkProperty(propertyId, waqfUnitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unlinked-properties'] });
-      queryClient.invalidateQueries({ queryKey: ['waqf-unit-properties'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNLINKED_PROPERTIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNIT_PROPERTIES(undefined) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS });
       toast.success("تم ربط العقار بنجاح");
@@ -48,8 +48,8 @@ export function useUnlinkProperty() {
   return useMutation({
     mutationFn: (propertyId: string) => WaqfService.unlinkProperty(propertyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['unlinked-properties'] });
-      queryClient.invalidateQueries({ queryKey: ['waqf-unit-properties'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNLINKED_PROPERTIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNIT_PROPERTIES(undefined) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS });
       toast.success("تم إلغاء ربط العقار");

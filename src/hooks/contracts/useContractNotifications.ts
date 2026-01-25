@@ -107,9 +107,10 @@ export function useContractNotifications(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على الإشعار');
       return data;
     },
     onSuccess: () => {
@@ -142,9 +143,10 @@ export function useContractNotifications(contractId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على الإشعار');
       return data;
     },
     onSuccess: () => {

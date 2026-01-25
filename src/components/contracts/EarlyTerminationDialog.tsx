@@ -1,6 +1,7 @@
 /**
  * حوار إنهاء العقد المبكر
  * @description يحسب المبالغ المستحقة تلقائياً مع إمكانية التعديل اليدوي
+ * ✅ يتبع نمط Component → Hook → Service → Supabase
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -28,11 +29,13 @@ import {
   Calendar,
   Edit2
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { ContractService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { differenceInDays, differenceInMonths, parseISO, format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { getErrorMessage } from '@/types/errors';
 
 interface Contract {
   id: string;
@@ -148,58 +151,23 @@ export function EarlyTerminationDialog({
         ? parseFloat(manualAmount) 
         : calculation.finalSettlement;
 
-      // 1. تحديث حالة العقد
-      const { error: contractError } = await supabase
-        .from('contracts')
-        .update({ 
-          status: 'منتهي',
-          notes: `${contract.notes || ''}\n\n--- إنهاء مبكر ---\nتاريخ الإنهاء: ${terminationDate}\nالتسوية: ${formatCurrency(Math.abs(finalAmount))} ${finalAmount > 0 ? '(استرداد للمستأجر)' : '(مستحق على المستأجر)'}\n${notes ? 'ملاحظات: ' + notes : ''}`
-        })
-        .eq('id', contract.id);
-
-      if (contractError) throw contractError;
-
-      // 2. تسجيل قيد في tenant_ledger
-      // أولاً نجد tenant_id من العقد
-      const { data: contractData } = await supabase
-        .from('contracts')
-        .select('tenant_id')
-        .eq('id', contract.id)
-        .maybeSingle();
-
-      if (contractData?.tenant_id && finalAmount !== 0) {
-        await supabase.from('tenant_ledger').insert({
-          tenant_id: contractData.tenant_id,
-          contract_id: contract.id,
-          transaction_type: finalAmount > 0 ? 'refund' : 'charge',
-          transaction_date: terminationDate,
-          credit_amount: finalAmount > 0 ? Math.abs(finalAmount) : 0,
-          debit_amount: finalAmount < 0 ? Math.abs(finalAmount) : 0,
-          description: `تسوية إنهاء مبكر للعقد ${contract.contract_number}`,
-          reference_type: 'early_termination',
-          reference_id: contract.id,
-        });
-      }
-
-      // 3. تحرير الوحدات
-      await supabase
-        .from('property_units')
-        .update({
-          current_contract_id: null,
-          current_tenant_id: null,
-          occupancy_status: 'شاغر',
-          updated_at: new Date().toISOString()
-        })
-        .eq('current_contract_id', contract.id);
+      // ✅ استخدام الخدمة بدلاً من الاستدعاء المباشر
+      await ContractService.earlyTerminate({
+        contractId: contract.id,
+        terminationDate,
+        finalAmount,
+        notes,
+        existingNotes: contract.notes,
+      });
 
       toast.success('تم إنهاء العقد بنجاح وتسجيل التسوية');
-      queryClient.invalidateQueries({ queryKey: ['contracts'] });
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
-      queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER });
       onOpenChange(false);
     } catch (error: unknown) {
-      console.error('Error terminating contract:', error);
-      toast.error('حدث خطأ أثناء إنهاء العقد');
+      const errorMessage = getErrorMessage(error);
+      toast.error(`حدث خطأ أثناء إنهاء العقد: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }

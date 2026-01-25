@@ -44,7 +44,7 @@ export function useUpdateAvailability() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['agent-availability'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AGENT_AVAILABILITY('') });
       toast.success('تم تحديث حالة التوافر');
     },
     onError: (error: Error) => {

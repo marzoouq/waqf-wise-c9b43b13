@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { SettingsService, type SavedFilter } from '@/services/settings.service';
 import type { Json } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { SavedFilter };
 
@@ -20,7 +21,7 @@ export function useSavedFilters(filterType: string) {
 
   // جلب الفلاتر المحفوظة
   const { data: filters = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['saved-filters', filterType],
+    queryKey: QUERY_KEYS.SAVED_FILTERS(filterType),
     queryFn: async () => {
       if (!user) return [];
       return SettingsService.getSavedFilters(user.id, filterType);
@@ -36,7 +37,7 @@ export function useSavedFilters(filterType: string) {
       toast.success('تم الحفظ', { description: 'تم حفظ الفلتر بنجاح' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_FILTERS(filterType) });
     },
     onError: () => {
       toast.error('خطأ', { description: 'فشل حفظ الفلتر' });
@@ -50,7 +51,7 @@ export function useSavedFilters(filterType: string) {
       toast.success('تم التحديث', { description: 'تم تحديث الفلتر بنجاح' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_FILTERS(filterType) });
     },
   });
 
@@ -61,7 +62,7 @@ export function useSavedFilters(filterType: string) {
       toast.success('تم الحذف', { description: 'تم حذف الفلتر بنجاح' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_FILTERS(filterType) });
     },
   });
 
@@ -71,7 +72,7 @@ export function useSavedFilters(filterType: string) {
       await SettingsService.toggleFilterFavorite(id, isFavorite);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_FILTERS(filterType) });
     },
   });
 

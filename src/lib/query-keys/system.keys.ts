@@ -104,6 +104,7 @@ export const SYSTEM_KEYS = {
   // Live Performance & Monitoring
   LIVE_PERFORMANCE: ['live-performance'] as const,
   LIVE_METRICS: ['live-metrics'] as const,
+  RLS_COVERAGE: ['rls-coverage'] as const,
 
   // Saved Filters (Factory Pattern)
   SAVED_FILTERS: (type: string) => ['saved-filters', type] as const,

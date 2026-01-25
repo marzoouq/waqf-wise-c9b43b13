@@ -70,7 +70,7 @@ export function useDeveloperDashboardData() {
     data: rlsCoverage,
     isLoading: rlsLoading,
   } = useQuery({
-    queryKey: ['rls-coverage'],
+    queryKey: QUERY_KEYS.RLS_COVERAGE,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_rls_coverage');
       if (error) {
@@ -207,7 +207,7 @@ export function useDeveloperDashboardData() {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_STATS });
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RECENT_ERRORS });
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_ALERTS });
-    queryClient.invalidateQueries({ queryKey: ['rls-coverage'] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RLS_COVERAGE });
   }, [queryClient]);
 
   return {
