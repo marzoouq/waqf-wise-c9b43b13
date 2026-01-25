@@ -174,7 +174,7 @@ describe('Auth Service', () => {
         full_name: 'أحمد محمد',
         email: 'ahmed@example.com',
         phone: '0501234567',
-        avatar_url: null,
+        avatar_url: null as string | null,
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
       };

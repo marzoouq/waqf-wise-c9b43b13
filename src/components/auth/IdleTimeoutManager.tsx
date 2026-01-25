@@ -15,7 +15,7 @@ import { productionLogger } from "@/lib/logger/production-logger";
  * 
  * ✅ آمن: يتحقق من وجود المستخدم قبل أي عملية
  */
-export function IdleTimeoutManager() {
+export function IdleTimeoutManager(): null {
   const { user, signOut, isLoading: authLoading } = useAuth();
   const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();

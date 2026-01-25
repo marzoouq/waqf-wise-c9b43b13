@@ -67,8 +67,8 @@ describe('TabRenderer Type Safety', () => {
 
   describe('Visibility Logic', () => {
     it('should return true when alwaysVisible is true', () => {
-      const alwaysVisible = true;
-      const settings = null;
+      const alwaysVisible: boolean = true;
+      const settings: Partial<VisibilitySettings> | null = null;
       
       const isVisible = alwaysVisible === true || settings?.['show_overview'] === true;
       
@@ -88,9 +88,9 @@ describe('TabRenderer Type Safety', () => {
 
     it('should return false when alwaysVisible is false and settings is null', () => {
       const alwaysVisible: boolean = false;
-      const settings = null;
+      const settings: Partial<VisibilitySettings> | null = null;
       
-      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_profile'] === true;
+      const isVisible = (alwaysVisible as boolean) === true || settings?.['show_overview'] === true;
       
       expect(isVisible).toBe(false);
     });

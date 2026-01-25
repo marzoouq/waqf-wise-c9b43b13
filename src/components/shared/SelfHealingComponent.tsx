@@ -95,8 +95,8 @@ export class SelfHealingComponent extends Component<Props, State> {
     
     this.setState((prevState) => ({
       hasError: false,
-      error: null,
-      errorInfo: null,
+      error: null as Error | null,
+      errorInfo: null as React.ErrorInfo | null,
       retryCount: prevState.retryCount + 1,
       isRetrying: false,
     }));
