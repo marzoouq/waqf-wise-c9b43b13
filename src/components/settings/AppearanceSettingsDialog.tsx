@@ -21,12 +21,10 @@ const accentColors: Record<string, { primary: string; primaryForeground: string 
   teal: { primary: "173 80% 40%", primaryForeground: "0 0% 100%" },
 };
 
-// خيارات الخطوط
+// خيارات الخطوط - استخدام خطوط النظام فقط لتجنب تحميل خطوط خارجية
 const fontOptions = [
-  { value: "cairo", label: "Cairo", family: "'Cairo', sans-serif" },
-  { value: "tajawal", label: "Tajawal", family: "'Tajawal', sans-serif" },
-  { value: "noto-kufi", label: "Noto Kufi Arabic", family: "'Noto Kufi Arabic', sans-serif" },
-  { value: "ibm-plex", label: "IBM Plex Sans Arabic", family: "'IBM Plex Sans Arabic', sans-serif" },
+  { value: "cairo", label: "Cairo (افتراضي)", family: "'Cairo', system-ui, sans-serif" },
+  { value: "system", label: "خط النظام", family: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
 ];
 
 const applyAccentColor = (colorName: string) => {
