@@ -60,4 +60,10 @@ export const PROPERTIES_KEYS = {
   WAQF_RESERVES: ['waqf-reserves'] as const,
   UNLINKED_PROPERTIES: ['unlinked-properties'] as const,
   WAQF_UNIT_PROPERTIES: (waqfUnitId?: string) => ['waqf-unit-properties', waqfUnitId] as const,
+  
+  // Saved Filters
+  SAVED_FILTERS: (key: string) => ['saved-filters', key] as const,
+  
+  // Collections
+  COLLECTION_STATS: ['collection-stats'] as const,
 } as const;

@@ -21,6 +21,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { useBeneficiaryDashboardRealtime } from "@/hooks/dashboard/useBeneficiaryDashboardRealtime";
 import { useQueryClient } from "@tanstack/react-query";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
@@ -61,8 +62,8 @@ export default function BeneficiaryPortal() {
 
   // إعادة جلب البيانات عند حدوث خطأ (استخدام React Query بدلاً من reload)
   const handleRetry = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['beneficiary'] });
-    queryClient.invalidateQueries({ queryKey: ['preview-beneficiary'] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY('') });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PREVIEW_BENEFICIARY });
     refetch?.();
   }, [queryClient, refetch]);
 

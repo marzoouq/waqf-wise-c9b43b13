@@ -5,6 +5,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { TenantService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface TenantContract {
   id: string;
@@ -27,7 +28,7 @@ export interface TenantContract {
 
 export function useTenantContracts(tenantId: string) {
   const { data: contracts = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['tenant-contracts', tenantId],
+    queryKey: QUERY_KEYS.TENANT_CONTRACTS(tenantId),
     queryFn: () => TenantService.getContractsDetailed(tenantId) as Promise<TenantContract[]>,
     enabled: !!tenantId,
   });

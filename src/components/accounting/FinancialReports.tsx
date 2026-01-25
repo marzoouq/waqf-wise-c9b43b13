@@ -9,6 +9,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { Badge } from '@/components/ui/badge';
 import { useFinancialReportsData } from '@/hooks/accounting/useFinancialReportsData';
 import { AccountingService } from '@/services/accounting.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 /**
  * مكون التقارير المالية
@@ -29,7 +30,7 @@ export function FinancialReports() {
 
   // جلب الميزانية العمومية
   const { data: balanceSheet, isLoading: isLoadingBalance } = useQuery({
-    queryKey: ['balance-sheet'],
+    queryKey: QUERY_KEYS.BALANCE_SHEET,
     queryFn: () => AccountingService.getBalanceSheet(),
   });
 

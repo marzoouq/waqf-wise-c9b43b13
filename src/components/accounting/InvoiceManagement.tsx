@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function InvoiceManagement() {
   const { toast } = useToast();
@@ -164,7 +165,7 @@ export function InvoiceManagement() {
           </DialogHeader>
           <BatchInvoiceOCR
             onComplete={(results) => {
-              queryClient.invalidateQueries({ queryKey: ["invoices"] });
+              queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
               setShowOCRDialog(false);
               toast({
                 title: "تم الاستيراد بنجاح",

@@ -22,6 +22,8 @@ export const BENEFICIARY_KEYS = {
   BENEFICIARY_EMERGENCY_AID: (beneficiaryId?: string) => ['beneficiary-emergency-aid', beneficiaryId] as const,
   BENEFICIARY_ID: (userId?: string) => ['beneficiary-id', userId] as const,
   BENEFICIARY_LOANS: (beneficiaryId?: string) => ['beneficiary-loans', beneficiaryId] as const,
+  BENEFICIARY_ALERTS: (beneficiaryId: string) => ['beneficiary-alerts', beneficiaryId] as const,
+  BENEFICIARIES_WITH_USERS: ['beneficiaries-with-users'] as const,
 
   // Beneficiary Timeline & Family
   BENEFICIARY_TIMELINE: (beneficiaryId: string) => ['beneficiary-timeline', beneficiaryId] as const,
@@ -33,6 +35,7 @@ export const BENEFICIARY_KEYS = {
   BENEFICIARY_PROFILE: (userId?: string) => ['beneficiary-profile', userId] as const,
   BENEFICIARY_DOCUMENTS: (beneficiaryId?: string) => ['beneficiary-documents', beneficiaryId] as const,
   BENEFICIARY_PROFILE_PAYMENTS: (beneficiaryId?: string) => ['beneficiary-payments', beneficiaryId] as const,
+  PREVIEW_BENEFICIARY: ['preview-beneficiary'] as const,
   // ✅ تم تغيير المفتاح ليكون مختلفاً (كان يتشابه مع BENEFICIARY_REQUESTS)
   BENEFICIARY_PORTAL_REQUESTS: (beneficiaryId?: string) => ['beneficiary-portal-requests', beneficiaryId] as const,
   FAMILY_TREE: (beneficiaryId: string) => ['family-tree', beneficiaryId] as const,

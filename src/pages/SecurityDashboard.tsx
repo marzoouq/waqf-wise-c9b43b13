@@ -15,6 +15,7 @@ import { useSecurityDashboardData } from "@/hooks/security/useSecurityDashboardD
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import type { jsPDF } from "jspdf";
 
 type JsPDFWithAutoTable = jsPDF & { lastAutoTable?: { finalY: number; pageNumber: number; pageCount: number } };
@@ -40,7 +41,7 @@ export default function SecurityDashboard() {
 
   // جلب الجلسات النشطة من profiles
   const { data: activeSessions = [], isLoading: sessionsLoading } = useQuery({
-    queryKey: ["active-sessions"],
+    queryKey: QUERY_KEYS.ACTIVE_SESSIONS(),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")

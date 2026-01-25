@@ -11,6 +11,7 @@ import { EditPhoneDialog } from './EditPhoneDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/auth/useUserRole';
 import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface ProfileHeaderProps {
   beneficiary: Beneficiary;
@@ -27,8 +28,8 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
   const canEditPhone = (isBeneficiary || isWaqfHeir) && isOwner;
 
   const handlePhoneUpdateSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-    queryClient.invalidateQueries({ queryKey: ["beneficiary-profile"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_PROFILE() });
   };
 
   const getStatusColor = (status: string) => {

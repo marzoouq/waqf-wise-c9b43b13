@@ -5,33 +5,34 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { SupportService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import type { SupportStatistics } from '@/types/support';
 
 export function useSupportStats() {
   // إحصائيات عامة
   const { data: overviewStats, isLoading: overviewLoading, error: overviewError } = useQuery({
-    queryKey: ['support-stats', 'overview'],
+    queryKey: QUERY_KEYS.SUPPORT_STATS_OVERVIEW,
     queryFn: () => SupportService.getOverviewStats(),
     retry: 2,
   });
 
   // التذاكر المتأخرة
   const { data: overdueTickets, error: overdueError } = useQuery({
-    queryKey: ['support-stats', 'overdue'],
+    queryKey: QUERY_KEYS.SUPPORT_STATS_OVERDUE,
     queryFn: () => SupportService.getOverdueTickets(),
     retry: 2,
   });
 
   // التذاكر الحديثة
   const { data: recentTickets, error: recentError } = useQuery({
-    queryKey: ['support-stats', 'recent'],
+    queryKey: QUERY_KEYS.SUPPORT_STATS_RECENT,
     queryFn: () => SupportService.getRecentTickets(10),
     retry: 2,
   });
 
   // إحصائيات تاريخية
   const { data: historicalStats, error: historicalError } = useQuery({
-    queryKey: ['support-stats', 'historical'],
+    queryKey: QUERY_KEYS.SUPPORT_STATS_HISTORICAL,
     queryFn: () => SupportService.getHistoricalStats(30) as Promise<SupportStatistics[]>,
     retry: 2,
   });

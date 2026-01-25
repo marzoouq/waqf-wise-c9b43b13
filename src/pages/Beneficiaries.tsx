@@ -19,6 +19,7 @@ import { BeneficiariesDialogs } from "@/components/beneficiary/admin/Beneficiari
 import { PAGINATION } from "@/lib/constants";
 import { useDeleteConfirmation } from "@/hooks/shared";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;
 
@@ -175,7 +176,7 @@ const Beneficiaries = () => {
             selectedBeneficiary={selectedBeneficiary}
             onSaveBeneficiary={handleSaveBeneficiary}
             onAdvancedSearch={handleAdvancedSearch}
-            onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ["beneficiaries"] })}
+            onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES })}
           />
 
           <DeleteConfirmDialog

@@ -8,6 +8,10 @@ export const SUPPORT_KEYS = {
   SUPPORT_TICKET: (id: string) => ['support-ticket', id] as const,
   TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
   SUPPORT_STATS: ['support-stats'] as const,
+  SUPPORT_STATS_OVERVIEW: ['support-stats', 'overview'] as const,
+  SUPPORT_STATS_OVERDUE: ['support-stats', 'overdue'] as const,
+  SUPPORT_STATS_RECENT: ['support-stats', 'recent'] as const,
+  SUPPORT_STATS_HISTORICAL: ['support-stats', 'historical'] as const,
   SUPPORT_ESCALATIONS: ['support-escalations'] as const,
   
   // Agent
