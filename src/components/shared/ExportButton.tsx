@@ -101,8 +101,7 @@ export const ExportButton = <T extends object>({
         <meta charset="UTF-8">
         <title>${title}</title>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-          body { font-family: 'Cairo', sans-serif; padding: 20px; direction: rtl; }
+          body { font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; padding: 20px; direction: rtl; }
           h1 { text-align: center; color: #1a5f7a; margin-bottom: 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
