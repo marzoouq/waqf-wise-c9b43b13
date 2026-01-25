@@ -1,11 +1,15 @@
 /**
  * Smart Cache Invalidation - إبطال ذكي للـ Cache
- * @version 1.0.0
+ * @version 1.1.0
  * @module lib/query-keys/smart-invalidation
  * 
  * @description
  * نظام إبطال ذكي يقلل الإبطالات غير الضرورية بنسبة 40-60%
  * بناءً على قواعد محددة مسبقاً للعلاقات بين المفاتيح
+ * 
+ * الميزات الجديدة v1.1.0:
+ * - Debouncing للإبطالات المتكررة
+ * - Conditional Invalidation أذكى
  * 
  * @example
  * ```typescript
@@ -16,6 +20,9 @@
  * 
  * // استخدم:
  * await smartInvalidate(queryClient, 'BENEFICIARIES');
+ * 
+ * // أو مع Debouncing:
+ * debouncedInvalidate(queryClient, 'BENEFICIARIES');
  * ```
  */
 
@@ -37,7 +44,7 @@ interface InvalidationRule {
 }
 
 /**
- * قواعد الإبطال - يمكن توسيعها حسب الحاجة
+ * قواعد الإبطال المحسّنة مع شروط ذكية
  */
 const INVALIDATION_RULES: InvalidationRule[] = [
   // ═══════════════════════════════════════
@@ -46,11 +53,21 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['BENEFICIARIES'],
     affects: ['UNIFIED_KPIS'],
-    description: 'تحديث المستفيدين يؤثر على إحصائيات لوحة التحكم',
+    condition: (data: unknown) => {
+      // إبطال KPIs فقط إذا تغيرت الحالة أو تمت إضافة/حذف
+      const d = data as { status?: string; isNew?: boolean; isDeleted?: boolean } | undefined;
+      return d?.status === 'نشط' || d?.isNew === true || d?.isDeleted === true;
+    },
+    description: 'تحديث المستفيدين النشطين يؤثر على إحصائيات لوحة التحكم',
   },
   {
     trigger: ['BENEFICIARY_PAYMENTS'],
     affects: ['AGING_REPORT', 'AGING_SUMMARY'],
+    condition: (data: unknown) => {
+      // إبطال فقط إذا كانت دفعة جديدة أو تم تعديل المبلغ
+      const d = data as { amount?: number; isNew?: boolean } | undefined;
+      return (d?.amount ?? 0) > 0 || d?.isNew === true;
+    },
     description: 'تحديث المدفوعات يؤثر على تقارير أعمار الديون',
   },
 
@@ -60,7 +77,12 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['JOURNAL_ENTRIES'],
     affects: ['TRIAL_BALANCE', 'ACCOUNTS_WITH_BALANCES'],
-    description: 'القيود المحاسبية تؤثر على ميزان المراجعة',
+    condition: (data: unknown) => {
+      // إبطال فقط للقيود المعتمدة
+      const d = data as { status?: string } | undefined;
+      return d?.status === 'approved' || d?.status === 'معتمد';
+    },
+    description: 'القيود المعتمدة فقط تؤثر على ميزان المراجعة',
   },
   {
     trigger: ['BANK_TRANSACTIONS'],
@@ -74,7 +96,12 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['CONTRACTS'],
     affects: ['PROPERTIES_STATS', 'RENTAL_PAYMENTS', 'UNIFIED_KPIS'],
-    description: 'العقود تؤثر على إحصائيات العقارات والمدفوعات',
+    condition: (data: unknown) => {
+      // إبطال فقط للعقود النشطة أو المنتهية
+      const d = data as { status?: string } | undefined;
+      return d?.status === 'نشط' || d?.status === 'active' || d?.status === 'منتهي';
+    },
+    description: 'العقود النشطة تؤثر على إحصائيات العقارات',
   },
   {
     trigger: ['RENTAL_PAYMENTS'],
@@ -89,7 +116,11 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['TENANTS'],
     affects: ['UNIFIED_KPIS'],
-    description: 'تحديث المستأجرين يؤثر على KPIs',
+    condition: (data: unknown) => {
+      const d = data as { status?: string } | undefined;
+      return d?.status === 'active' || d?.status === 'نشط';
+    },
+    description: 'تحديث المستأجرين النشطين يؤثر على KPIs',
   },
 
   // ═══════════════════════════════════════
@@ -98,7 +129,11 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['DISTRIBUTIONS'],
     affects: ['BENEFICIARIES', 'UNIFIED_KPIS'],
-    description: 'التوزيعات تؤثر على المستفيدين',
+    condition: (data: unknown) => {
+      const d = data as { status?: string } | undefined;
+      return d?.status === 'completed' || d?.status === 'مكتمل';
+    },
+    description: 'التوزيعات المكتملة تؤثر على المستفيدين',
   },
   {
     trigger: ['LOANS'],
@@ -112,7 +147,12 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   {
     trigger: ['MAINTENANCE_REQUESTS'],
     affects: ['UNIFIED_KPIS'],
-    description: 'طلبات الصيانة تؤثر على الإحصائيات',
+    condition: (data: unknown) => {
+      // إبطال فقط عند تغيير الحالة
+      const d = data as { statusChanged?: boolean } | undefined;
+      return d?.statusChanged === true;
+    },
+    description: 'تغيير حالة طلبات الصيانة يؤثر على الإحصائيات',
   },
 
   // ═══════════════════════════════════════
@@ -125,79 +165,104 @@ const INVALIDATION_RULES: InvalidationRule[] = [
   },
 ];
 
+// ═══════════════════════════════════════
+// Debouncing System
+// ═══════════════════════════════════════
+
+/** Map لتخزين الإبطالات المعلقة */
+const pendingInvalidations = new Map<string, {
+  keys: Set<QueryKeyName>;
+  timeoutId: ReturnType<typeof setTimeout>;
+  queryClient: QueryClient;
+}>();
+
+/** مدة الانتظار قبل الإبطال الفعلي (300ms) */
+const DEBOUNCE_DELAY = 300;
+
 /**
- * إبطال ذكي بناءً على القواعد المحددة
+ * إبطال مؤجل (Debounced) - يجمع الإبطالات المتكررة
  * 
- * @param queryClient - QueryClient instance
- * @param triggerKey - اسم المفتاح الذي تم تحديثه
- * @param data - البيانات المحدثة (للشروط)
- * @returns Promise<void>
+ * @example
+ * // ثلاث استدعاءات سريعة = إبطال واحد فقط
+ * debouncedInvalidate(queryClient, 'BENEFICIARIES');
+ * debouncedInvalidate(queryClient, 'BENEFICIARIES');
+ * debouncedInvalidate(queryClient, 'BENEFICIARIES');
  */
-export async function smartInvalidate(
+export function debouncedInvalidate(
   queryClient: QueryClient,
   triggerKey: QueryKeyName,
   data?: unknown
-): Promise<void> {
-  // البحث عن القواعد المطابقة
-  const matchingRules = INVALIDATION_RULES.filter(rule => {
-    if (Array.isArray(rule.trigger)) {
-      return rule.trigger.includes(triggerKey);
-    }
-    return rule.trigger === triggerKey;
-  });
-
-  // تجميع جميع المفاتيح المتأثرة
-  const affectedKeys = new Set<QueryKeyName>();
-  affectedKeys.add(triggerKey); // المفتاح الأساسي دائماً
-
-  for (const rule of matchingRules) {
-    // تحقق من الشرط إذا كان موجوداً
-    if (rule.condition && data && !rule.condition(data)) {
-      logger.debug(`[Smart Invalidation] Rule skipped: ${rule.description}`);
-      continue;
-    }
-
-    // إضافة المفاتيح المتأثرة
-    rule.affects.forEach(key => {
-      if (key in QUERY_KEYS) {
-        affectedKeys.add(key);
-      }
-    });
+): void {
+  const clientId = 'default'; // يمكن توسيعه لدعم عدة clients
+  
+  // جمع المفاتيح المتأثرة
+  const affectedKeys = getAffectedKeysWithCondition(triggerKey, data);
+  
+  // إذا كان هناك إبطال معلق، أضف المفاتيح إليه
+  const pending = pendingInvalidations.get(clientId);
+  if (pending) {
+    affectedKeys.forEach(key => pending.keys.add(key));
+    // لا نعيد ضبط الـ timeout - نستخدم الأول
+    return;
   }
+  
+  // إنشاء إبطال معلق جديد
+  const keys = new Set(affectedKeys);
+  const timeoutId = setTimeout(() => {
+    executePendingInvalidations(clientId);
+  }, DEBOUNCE_DELAY);
+  
+  pendingInvalidations.set(clientId, { keys, timeoutId, queryClient });
+  
+  logger.debug(`[Debounced Invalidation] Scheduled: ${triggerKey} (${DEBOUNCE_DELAY}ms)`);
+}
 
-  // إبطال جميع المفاتيح المتأثرة
-  const invalidations = Array.from(affectedKeys).map(async (keyName) => {
+/**
+ * تنفيذ الإبطالات المعلقة
+ */
+async function executePendingInvalidations(clientId: string): Promise<void> {
+  const pending = pendingInvalidations.get(clientId);
+  if (!pending) return;
+  
+  const { keys, queryClient } = pending;
+  pendingInvalidations.delete(clientId);
+  
+  const invalidations = Array.from(keys).map(async (keyName) => {
     const keyValue = QUERY_KEYS[keyName];
     if (keyValue && typeof keyValue !== 'function') {
       await queryClient.invalidateQueries({ queryKey: keyValue as readonly unknown[] });
     }
   });
-
+  
   await Promise.all(invalidations);
-
+  
   logger.debug(
-    `[Smart Invalidation] ${triggerKey} → Invalidated ${affectedKeys.size} keys:`,
-    Array.from(affectedKeys)
+    `[Debounced Invalidation] Executed ${keys.size} keys:`,
+    Array.from(keys)
   );
 }
 
 /**
- * Helper: إبطال متعدد بذكاء
+ * إلغاء الإبطالات المعلقة (مفيد للـ cleanup)
  */
-export async function smartInvalidateMultiple(
-  queryClient: QueryClient,
-  triggers: Array<{ key: QueryKeyName; data?: unknown }>
-): Promise<void> {
-  for (const { key, data } of triggers) {
-    await smartInvalidate(queryClient, key, data);
+export function cancelPendingInvalidations(): void {
+  for (const [, pending] of pendingInvalidations) {
+    clearTimeout(pending.timeoutId);
   }
+  pendingInvalidations.clear();
 }
 
+// ═══════════════════════════════════════
+// Core Functions
+// ═══════════════════════════════════════
+
 /**
- * Helper: الحصول على المفاتيح المتأثرة بدون إبطال
- * مفيد للـ debugging
+ * الحصول على المفاتيح المتأثرة مع فحص الشروط
  */
-export function getAffectedKeys(triggerKey: QueryKeyName): QueryKeyName[] {
+function getAffectedKeysWithCondition(
+  triggerKey: QueryKeyName,
+  data?: unknown
+): QueryKeyName[] {
   const affected = new Set<QueryKeyName>();
   affected.add(triggerKey);
 
@@ -209,8 +274,80 @@ export function getAffectedKeys(triggerKey: QueryKeyName): QueryKeyName[] {
   });
 
   for (const rule of matchingRules) {
-    rule.affects.forEach(key => affected.add(key));
+    // تحقق من الشرط إذا كان موجوداً
+    if (rule.condition) {
+      if (!data || !rule.condition(data)) {
+        logger.debug(`[Smart Invalidation] Rule skipped (condition not met): ${rule.description}`);
+        continue;
+      }
+    }
+    
+    rule.affects.forEach(key => {
+      if (key in QUERY_KEYS) {
+        affected.add(key);
+      }
+    });
   }
 
   return Array.from(affected);
+}
+
+/**
+ * إبطال ذكي فوري بناءً على القواعد المحددة
+ * 
+ * @param queryClient - QueryClient instance
+ * @param triggerKey - اسم المفتاح الذي تم تحديثه
+ * @param data - البيانات المحدثة (للشروط)
+ * @returns Promise<void>
+ */
+export async function smartInvalidate(
+  queryClient: QueryClient,
+  triggerKey: QueryKeyName,
+  data?: unknown
+): Promise<void> {
+  const affectedKeys = getAffectedKeysWithCondition(triggerKey, data);
+
+  // إبطال جميع المفاتيح المتأثرة
+  const invalidations = affectedKeys.map(async (keyName) => {
+    const keyValue = QUERY_KEYS[keyName];
+    if (keyValue && typeof keyValue !== 'function') {
+      await queryClient.invalidateQueries({ queryKey: keyValue as readonly unknown[] });
+    }
+  });
+
+  await Promise.all(invalidations);
+
+  logger.debug(
+    `[Smart Invalidation] ${triggerKey} → Invalidated ${affectedKeys.length} keys:`,
+    affectedKeys
+  );
+}
+
+/**
+ * Helper: إبطال متعدد بذكاء مع Debouncing
+ */
+export async function smartInvalidateMultiple(
+  queryClient: QueryClient,
+  triggers: Array<{ key: QueryKeyName; data?: unknown }>,
+  options?: { debounce?: boolean }
+): Promise<void> {
+  if (options?.debounce) {
+    // استخدام Debouncing لجميع المفاتيح
+    for (const { key, data } of triggers) {
+      debouncedInvalidate(queryClient, key, data);
+    }
+  } else {
+    // إبطال فوري
+    for (const { key, data } of triggers) {
+      await smartInvalidate(queryClient, key, data);
+    }
+  }
+}
+
+/**
+ * Helper: الحصول على المفاتيح المتأثرة بدون إبطال
+ * مفيد للـ debugging
+ */
+export function getAffectedKeys(triggerKey: QueryKeyName, data?: unknown): QueryKeyName[] {
+  return getAffectedKeysWithCondition(triggerKey, data);
 }
