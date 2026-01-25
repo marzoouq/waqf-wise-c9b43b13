@@ -254,5 +254,108 @@ describe('Optimistic Updates', () => {
       expect(stats.totalOperations).toBe(0);
       expect(stats.averageDurationMs).toBe(0);
     });
+
+    it('should preserve context for rollback in concurrent scenario', async () => {
+      const queryKey = ['concurrent-rollback'] as const;
+      queryClient.setQueryData(queryKey, [{ id: '1', value: 'original' }]);
+
+      const handlers = createOptimistic<{ id: string; value: string }[], { id: string; value: string }>(queryClient, {
+        queryKey,
+        updater: (old, update) => 
+          old?.map(item => item.id === update.id ? { ...item, value: update.value } : item) || [],
+      });
+
+      // تحديث أول
+      const context1 = await handlers.onMutate({ id: '1', value: 'first' });
+      // تحديث ثاني قبل انتهاء الأول
+      const context2 = await handlers.onMutate({ id: '1', value: 'second' });
+
+      // التراجع عن الثاني
+      handlers.onError(new Error('second failed'), { id: '1', value: 'second' }, context2);
+
+      // يجب أن تعود للحالة قبل التحديث الثاني
+      const data = queryClient.getQueryData<{ id: string; value: string }[]>(queryKey);
+      expect(data?.[0].value).toBe('first');
+    });
+
+    it('should handle null updater result gracefully', async () => {
+      const queryKey = ['null-test'] as const;
+      queryClient.setQueryData(queryKey, ['item1']);
+
+      const handlers = createOptimistic<string[] | null, string>(queryClient, {
+        queryKey,
+        updater: () => null,
+      });
+
+      const context = await handlers.onMutate('item2');
+      
+      // يجب أن يحفظ البيانات القديمة
+      expect(context.previous).toEqual(['item1']);
+    });
+  });
+
+  // ═══════════════════════════════════════
+  // Timeout & Async Tests - اختبارات المهلة
+  // ═══════════════════════════════════════
+  describe('Timeout & Async Behavior', () => {
+    it('should complete within reasonable time', async () => {
+      const queryKey = ['timeout-test'] as const;
+      queryClient.setQueryData(queryKey, []);
+
+      const handlers = createOptimistic<string[], string>(queryClient, {
+        queryKey,
+        updater: (old, newItem) => [...(old || []), newItem],
+      });
+
+      const startTime = performance.now();
+      await handlers.onMutate('item1');
+      const duration = performance.now() - startTime;
+
+      // يجب أن يكتمل في أقل من 50ms
+      expect(duration).toBeLessThan(50);
+    });
+
+    it('should handle slow updater function', async () => {
+      const queryKey = ['slow-updater'] as const;
+      queryClient.setQueryData(queryKey, ['item1']);
+
+      const handlers = createOptimistic<string[], string>(queryClient, {
+        queryKey,
+        updater: (old, newItem) => {
+          // محاكاة عملية بطيئة (sync)
+          const start = Date.now();
+          while (Date.now() - start < 10) { /* busy wait */ }
+          return [...(old || []), newItem];
+        },
+      });
+
+      const context = await handlers.onMutate('item2');
+      
+      expect(context.previous).toEqual(['item1']);
+      const data = queryClient.getQueryData<string[]>(queryKey);
+      expect(data).toContain('item2');
+    });
+
+    it('should track timing accurately across multiple operations', async () => {
+      resetOptimisticStats();
+      const queryKey = ['timing-test'] as const;
+      queryClient.setQueryData(queryKey, []);
+
+      const handlers = createOptimistic<string[], string>(queryClient, {
+        queryKey,
+        updater: (old, newItem) => [...(old || []), newItem],
+      });
+
+      // 5 عمليات
+      for (let i = 0; i < 5; i++) {
+        await handlers.onMutate(`item${i}`);
+        handlers.onSuccess();
+      }
+
+      const stats = getOptimisticStats();
+      expect(stats.successCount).toBe(5);
+      expect(stats.averageDurationMs).toBeGreaterThan(0);
+      expect(stats.lastOperationAt).not.toBeNull();
+    });
   });
 });
