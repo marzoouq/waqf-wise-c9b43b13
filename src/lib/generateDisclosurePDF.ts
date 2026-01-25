@@ -77,12 +77,7 @@ const formatPercentage = (num: number): string => {
   return `${num.toFixed(1)}%`;
 };
 
-// Type Augmentation for jspdf-autotable
-declare module 'jspdf' {
-  interface jsPDF {
-    lastAutoTable?: { finalY: number };
-  }
-}
+// Type Augmentation removed - using centralized types from src/types/jspdf-autotable.d.ts
 
 interface ExpenseItem {
   name: string;
