@@ -73,13 +73,26 @@ export default tseslint.config(
       "src/services/realtime*.ts",
       "src/integrations/supabase/request-interceptor.ts",
       "src/hooks/system/**/*.ts",
-      "supabase/functions/**/*.ts"
     ],
     rules: {
       "no-console": "off",
       "@typescript-eslint/no-unused-vars": "warn",
       "react-hooks/rules-of-hooks": "off",
       "react-hooks/exhaustive-deps": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
+  // ═══════════════════════════════════════════════════════════════
+  // 📝 Edge Functions - تستخدم Deno runtime بقيود أنواع مختلفة
+  // Edge Functions use Deno runtime with different type constraints
+  // These functions run in a Deno environment which has different
+  // type handling than standard TypeScript/Node.js
+  // ═══════════════════════════════════════════════════════════════
+  {
+    files: ["supabase/functions/**/*.ts"],
+    rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },

@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { getErrorMessage } from "@/types/errors";
 import { 
   BankStatementInsert, 
   BankTransactionInsert,
@@ -61,8 +62,8 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return (data || []) as BankStatement[];
-    } catch (error) {
-      logger.error(error, { context: 'fetch_bank_statements', severity: 'low' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'fetch_bank_statements', severity: 'low', message: getErrorMessage(error) });
       return [];
     }
   }
@@ -79,8 +80,8 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return (data || []) as BankTransaction[];
-    } catch (error) {
-      logger.error(error, { context: 'fetch_bank_transactions', severity: 'low' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'fetch_bank_transactions', severity: 'low', message: getErrorMessage(error) });
       return [];
     }
   }

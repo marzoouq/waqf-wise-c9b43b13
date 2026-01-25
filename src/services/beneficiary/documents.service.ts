@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { getErrorMessage } from '@/types/errors';
 import type { Database } from '@/integrations/supabase/types';
 
 export class BeneficiaryDocumentsService {
@@ -21,8 +22,8 @@ export class BeneficiaryDocumentsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary documents', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary documents', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -69,8 +70,8 @@ export class BeneficiaryDocumentsService {
       if (error) throw error;
       if (!data) throw new Error('فشل رفع المستند');
       return data;
-    } catch (error) {
-      productionLogger.error('Error uploading document', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error uploading document', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -98,8 +99,8 @@ export class BeneficiaryDocumentsService {
         .eq('id', documentId);
 
       if (error) throw error;
-    } catch (error) {
-      productionLogger.error('Error deleting document', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error deleting document', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -118,8 +119,8 @@ export class BeneficiaryDocumentsService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary activity', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary activity', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -144,8 +145,8 @@ export class BeneficiaryDocumentsService {
         bank_name: data.bank_name || '',
         account_number: data.bank_account_number || '',
       }];
-    } catch (error) {
-      productionLogger.error('Error fetching bank accounts', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching bank accounts', { error: getErrorMessage(error) });
       throw error;
     }
   }

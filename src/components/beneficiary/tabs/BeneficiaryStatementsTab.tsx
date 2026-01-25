@@ -16,6 +16,7 @@ import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryD
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { getErrorMessage } from "@/types/errors";
 import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
 import { formatCurrency } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
@@ -95,8 +96,8 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
       link.click();
 
       toast.success('تم تصدير كشف الحساب بنجاح');
-    } catch (error) {
-      productionLogger.error('Export failed', error);
+    } catch (error: unknown) {
+      productionLogger.error('Export failed', { error: getErrorMessage(error) });
       toast.error('فشل تصدير كشف الحساب');
     }
   };

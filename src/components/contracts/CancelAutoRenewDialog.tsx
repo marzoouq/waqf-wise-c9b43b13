@@ -66,8 +66,7 @@ export function CancelAutoRenewDialog({
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       onOpenChange(false);
       setReason('');
-    } catch (error) {
-      console.error('Error cancelling auto-renew:', error);
+    } catch (_error) {
       toast.error('حدث خطأ أثناء إلغاء التجديد التلقائي');
     } finally {
       setIsSubmitting(false);

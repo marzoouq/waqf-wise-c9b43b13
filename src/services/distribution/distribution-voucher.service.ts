@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { getErrorMessage } from '@/types/errors';
 import type { Database } from '@/integrations/supabase/types';
 
 export interface VoucherRecord {
@@ -49,8 +50,8 @@ export class DistributionVoucherService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      productionLogger.error('Error fetching distribution vouchers', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching distribution vouchers', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -69,8 +70,8 @@ export class DistributionVoucherService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء السند');
       return data;
-    } catch (error) {
-      productionLogger.error('Error creating voucher', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error creating voucher', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -88,8 +89,8 @@ export class DistributionVoucherService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      productionLogger.error('Error fetching distribution vouchers with details', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching distribution vouchers with details', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -114,8 +115,8 @@ export class DistributionVoucherService {
         totalAmount: data.reduce((sum, v) => sum + v.amount, 0),
         paidAmount: data.filter(v => v.status === 'paid').reduce((sum, v) => sum + v.amount, 0),
       };
-    } catch (error) {
-      productionLogger.error('Error fetching distribution voucher stats', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching distribution voucher stats', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -142,8 +143,8 @@ export class DistributionVoucherService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
-      productionLogger.error('Error fetching payment vouchers list', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching payment vouchers list', { error: getErrorMessage(error) });
       throw error;
     }
   }

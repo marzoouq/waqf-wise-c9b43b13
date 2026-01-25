@@ -5,6 +5,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
 import { matchesStatus } from '@/lib/constants';
+import { getErrorMessage } from '@/types/errors';
 
 export class AnalysisService {
   /**
@@ -41,8 +42,8 @@ export class AnalysisService {
         byCategory: [],
         byYear,
       };
-    } catch (error) {
-      logger.error(error, { context: 'get_distribution_analysis_report', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'get_distribution_analysis_report', severity: 'medium', message: getErrorMessage(error) });
       throw error;
     }
   }
@@ -68,8 +69,8 @@ export class AnalysisService {
       }));
 
       return { funds: result };
-    } catch (error) {
-      logger.error(error, { context: 'get_funds_performance_report', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'get_funds_performance_report', severity: 'medium', message: getErrorMessage(error) });
       throw error;
     }
   }
@@ -107,8 +108,8 @@ export class AnalysisService {
         ],
         charts: [],
       };
-    } catch (error) {
-      logger.error(error, { context: 'get_interactive_dashboard', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'get_interactive_dashboard', severity: 'medium', message: getErrorMessage(error) });
       throw error;
     }
   }
@@ -138,8 +139,8 @@ export class AnalysisService {
         total,
         overdueAmount: 0,
       };
-    } catch (error) {
-      logger.error(error, { context: 'get_loans_aging_report', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'get_loans_aging_report', severity: 'medium', message: getErrorMessage(error) });
       throw error;
     }
   }
@@ -173,8 +174,8 @@ export class AnalysisService {
         byCategory: [],
         byProperty: [],
       };
-    } catch (error) {
-      logger.error(error, { context: 'get_maintenance_cost_report', severity: 'medium' });
+    } catch (error: unknown) {
+      logger.error(error, { context: 'get_maintenance_cost_report', severity: 'medium', message: getErrorMessage(error) });
       throw error;
     }
   }

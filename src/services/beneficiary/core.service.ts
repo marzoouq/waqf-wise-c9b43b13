@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { getErrorMessage } from '@/types/errors';
 import { matchesStatus } from '@/lib/constants';
 import { withRetry, SUPABASE_RETRY_OPTIONS } from '@/lib/retry-helper';
 import type { Beneficiary } from '@/types/beneficiary';
@@ -66,8 +67,8 @@ export class BeneficiaryCoreService {
 
       if (error) throw error;
       return { data: (data || []) as Beneficiary[], count: count || 0 };
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiaries', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiaries', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -100,8 +101,8 @@ export class BeneficiaryCoreService {
         throw error;
       }
       return data as Beneficiary | null;
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -119,8 +120,8 @@ export class BeneficiaryCoreService {
 
       if (error) throw error;
       return data as Beneficiary | null;
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary by national ID', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary by national ID', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -144,8 +145,8 @@ export class BeneficiaryCoreService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء المستفيد');
       return data as Beneficiary;
-    } catch (error) {
-      productionLogger.error('Error creating beneficiary', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error creating beneficiary', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -165,8 +166,8 @@ export class BeneficiaryCoreService {
       if (error) throw error;
       if (!data) throw new Error('المستفيد غير موجود');
       return data as Beneficiary;
-    } catch (error) {
-      productionLogger.error('Error updating beneficiary', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error updating beneficiary', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -189,8 +190,8 @@ export class BeneficiaryCoreService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
-      productionLogger.error('Error deleting beneficiary', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error deleting beneficiary', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -237,8 +238,8 @@ export class BeneficiaryCoreService {
       };
 
       return stats;
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary stats', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary stats', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -256,8 +257,8 @@ export class BeneficiaryCoreService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
-      productionLogger.error('Error fetching beneficiary statistics', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching beneficiary statistics', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -283,8 +284,8 @@ export class BeneficiaryCoreService {
 
       if (error) throw error;
       return (data || []) as Beneficiary[];
-    } catch (error) {
-      productionLogger.error('Error fetching family members', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching family members', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -327,8 +328,8 @@ export class BeneficiaryCoreService {
       const { data, error } = await query.order('full_name');
       if (error) throw error;
       return (data || []) as Beneficiary[];
-    } catch (error) {
-      productionLogger.error('Error in advanced search', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error in advanced search', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -345,8 +346,8 @@ export class BeneficiaryCoreService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      productionLogger.error('Error fetching categories', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error fetching categories', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -361,8 +362,8 @@ export class BeneficiaryCoreService {
         email,
         login_enabled_at: new Date().toISOString(),
       });
-    } catch (error) {
-      productionLogger.error('Error enabling login', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error enabling login', { error: getErrorMessage(error) });
       throw error;
     }
   }
@@ -389,8 +390,8 @@ export class BeneficiaryCoreService {
       if (error) throw error;
       if (!data) throw new Error('المستفيد غير موجود');
       return data as Beneficiary;
-    } catch (error) {
-      productionLogger.error('Error updating notification preferences', error);
+    } catch (error: unknown) {
+      productionLogger.error('Error updating notification preferences', { error: getErrorMessage(error) });
       throw error;
     }
   }
