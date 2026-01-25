@@ -32,6 +32,7 @@ export class ChatbotService {
       .from("chatbot_conversations")
       .select("id, message, message_type, created_at, quick_reply_id")
       .eq("user_id", userId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: true })
       .limit(100);
 
