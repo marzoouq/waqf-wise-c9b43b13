@@ -20,7 +20,7 @@ export function useSystemAlerts() {
     try {
       await NotificationService.resolveAlert(alertId);
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_ALERTS });
-    } catch (error) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) {
         console.error('Error resolving alert:', error);
       }

@@ -37,7 +37,7 @@ export function useDistributionEngine() {
         });
 
         return simulation;
-      } catch (error) {
+      } catch (error: unknown) {
         productionLogger.error('خطأ في حساب التوزيع:', error);
         toast({
           title: 'خطأ في الحساب',
@@ -84,7 +84,7 @@ export function useDistributionEngine() {
         });
 
         return results;
-      } catch (error) {
+      } catch (error: unknown) {
         productionLogger.error('خطأ في حساب السيناريوهات:', error);
         toast({
           title: 'خطأ في الحساب',

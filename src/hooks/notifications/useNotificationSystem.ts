@@ -29,7 +29,7 @@ export function useNotificationSystem() {
         priority: params.priority,
       });
       return { success: true, data };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Failed to send notification:', error);
       toast.error('فشل إرسال الإشعار');
       return { success: false, error };

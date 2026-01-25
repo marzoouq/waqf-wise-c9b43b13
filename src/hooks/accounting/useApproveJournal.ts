@@ -29,7 +29,7 @@ export function useApproveJournal(onSuccess?: () => void) {
       invalidateAccountingQueries(queryClient);
       
       onSuccess?.();
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الموافقة";
       toast({
         title: "خطأ",
@@ -66,7 +66,7 @@ export function useApproveJournal(onSuccess?: () => void) {
       invalidateAccountingQueries(queryClient);
       
       onSuccess?.();
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الرفض";
       toast({
         title: "خطأ",

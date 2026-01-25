@@ -28,7 +28,7 @@ export function useCashFlowCalculation() {
         periodStart: fiscalYear.start_date,
         periodEnd: fiscalYear.end_date,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error("Error calculating cash flow", error, {
         context: 'CashFlowCalculation',
         severity: 'medium',

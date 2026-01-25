@@ -54,7 +54,7 @@ export function usePushNotifications() {
         });
         return false;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'push_notification_permission', severity: 'low' });
       return false;
     }
@@ -106,7 +106,7 @@ export function usePushNotifications() {
         title: 'تم الاشتراك',
         description: 'سيتم إرسال الإشعارات الفورية إليك',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'push_notification_subscribe', severity: 'medium' });
       toast({
         title: 'خطأ',
@@ -140,7 +140,7 @@ export function usePushNotifications() {
         title: 'تم الإلغاء',
         description: 'تم إلغاء الاشتراك في الإشعارات الفورية',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'push_notification_unsubscribe', severity: 'medium' });
       toast({
         title: 'خطأ',

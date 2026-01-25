@@ -39,7 +39,7 @@ export function useSelfHealing(options: UseSelfHealingOptions = {}) {
         }
 
         return result.data;
-      } catch (error) {
+      } catch (error: unknown) {
         toast({
           title: '❌ فشل في جلب البيانات',
           description: 'تعذر جلب البيانات حتى من الذاكرة المؤقتة',
@@ -58,7 +58,7 @@ export function useSelfHealing(options: UseSelfHealingOptions = {}) {
     async <T,>(operation: () => Promise<T>, maxAttempts: number = 3): Promise<T> => {
       try {
         return await retryOperation(operation);
-      } catch (error) {
+      } catch (error: unknown) {
         if (options.showToastOnRetry) {
           toast({
             title: '❌ فشلت العملية',

@@ -38,7 +38,7 @@ export function useChangePassword() {
       });
 
       return { success: true };
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث كلمة المرور';
       toast({
         title: "خطأ",

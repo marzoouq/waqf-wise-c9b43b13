@@ -50,7 +50,7 @@ export const useRentalPaymentArchiving = () => {
         context: 'archive_rental_documents',
         metadata: { invoice_id: params.invoiceId, receipt_id: params.receiptId }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'archive_rental_documents', severity: 'medium' });
     }
   };
@@ -85,7 +85,7 @@ async function archiveInvoicePDF(
       referenceType: 'invoice',
       description: `فاتورة ${invoiceData.invoice_number} - ${tenantName || 'غير محدد'}`
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(error, { context: 'archive_invoice_pdf', severity: 'medium' });
   }
 }
@@ -117,7 +117,7 @@ async function archiveReceiptPDF(
       referenceType: 'payment',
       description: `سند قبض ${receiptData.payment_number || receiptData.id} - ${tenantName || 'غير محدد'}`
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(error, { context: 'archive_receipt_pdf', severity: 'medium' });
   }
 }

@@ -142,7 +142,7 @@ export function useDeleteConfirmation<T = string>({
         itemName: null,
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
       toast.error(errorMessage);
       onError?.(err);

@@ -99,7 +99,7 @@ function getBrowserPerformanceMetrics(): LatestMetrics {
     if (perfWithMemory.memory) {
       metrics.memoryUsage = (perfWithMemory.memory.usedJSHeapSize / perfWithMemory.memory.jsHeapSizeLimit) * 100;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('[Performance] Error getting metrics:', error);
   }
 

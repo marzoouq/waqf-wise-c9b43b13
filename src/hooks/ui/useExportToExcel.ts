@@ -24,7 +24,7 @@ export function useExportToExcel() {
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${options.filename}`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { 
         context: 'export_to_excel', 
         severity: 'low'

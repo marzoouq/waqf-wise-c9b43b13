@@ -111,7 +111,7 @@ export function useBatchPayments(distributionId?: string) {
           description: `تم إنشاء ${numberOfBatches} دفعة مجدولة`,
         });
         return data;
-      } catch (error) {
+      } catch (error: unknown) {
         toast({
           title: 'خطأ',
           description: error instanceof Error ? error.message : 'فشل إنشاء الجداول',
@@ -148,7 +148,7 @@ export function useBatchPayments(distributionId?: string) {
         });
 
         return true;
-      } catch (error) {
+      } catch (error: unknown) {
         await updateSchedule.mutateAsync({
           id: scheduleId,
           updates: {
