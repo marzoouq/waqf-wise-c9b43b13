@@ -102,12 +102,18 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
   componentImport: () => Promise<{ default: T }>,
   options: LazyRetryOptions = {}
 ): React.LazyExoticComponent<T> {
-  const {
+const {
     retries = 3,
     interval = 1500,
     onError,
     cacheBusting = true
   } = options;
+
+  // ✅ v2.1.0: إضافة Jitter لتجنب thundering herd
+  const getDelayWithJitter = (baseDelay: number): number => {
+    const jitter = Math.random() * 0.3 * baseDelay; // 0-30% jitter
+    return baseDelay + jitter;
+  };
 
   return lazy(async () => {
     let lastError: Error | null = null;
@@ -155,8 +161,9 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
         
         // Don't wait after the last attempt
         if (attempt < retries - 1) {
-          // Exponential backoff: 1.5s, 3s, 4.5s
-          const delay = interval * (attempt + 1);
+          // Exponential backoff with jitter: ~1.5s, ~3s, ~4.5s
+          const baseDelay = interval * (attempt + 1);
+          const delay = getDelayWithJitter(baseDelay);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
