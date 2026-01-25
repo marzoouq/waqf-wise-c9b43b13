@@ -1,11 +1,9 @@
 /**
  * أداة تصدير التقارير
+ * v2.9.34 - Dynamic imports for better LCP
  */
 
 import type { ReportResult, CustomReportTemplate } from "@/services/report.service";
-import * as ExcelJS from "exceljs";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 /**
  * تصدير التقرير إلى Excel
@@ -14,6 +12,9 @@ export async function exportToExcel(
   template: CustomReportTemplate,
   result: ReportResult
 ): Promise<void> {
+  // Dynamic import to avoid blocking initial page load
+  const ExcelJS = await import('exceljs');
+  
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(template.name);
 
@@ -72,6 +73,15 @@ export async function exportToPDF(
   template: CustomReportTemplate,
   result: ReportResult
 ): Promise<void> {
+  // Dynamic imports to avoid blocking initial page load
+  const [jsPDFModule, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  
+  const jsPDF = jsPDFModule.default;
+  const autoTable = autoTableModule.default;
+
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
