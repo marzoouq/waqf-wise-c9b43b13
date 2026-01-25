@@ -53,7 +53,10 @@ export const PROPERTIES_KEYS = {
   // Waqf
   WAQF_SUMMARY: ['waqf-summary'] as const,
   WAQF_UNITS: ['waqf-units'] as const,
+  WAQF_UNITS_DATA: ['waqf_units'] as const, // للتوافق مع الكود القديم
   WAQF_REVENUE: (waqfUnitId?: string, fiscalYearId?: string) => ['waqf_revenue', waqfUnitId, fiscalYearId] as const,
   WAQF_BUDGETS: (fiscalYearId?: string) => ['waqf-budgets', fiscalYearId] as const,
   WAQF_RESERVES: ['waqf-reserves'] as const,
+  UNLINKED_PROPERTIES: ['unlinked-properties'] as const,
+  WAQF_UNIT_PROPERTIES: (waqfUnitId?: string) => ['waqf-unit-properties', waqfUnitId] as const,
 } as const;

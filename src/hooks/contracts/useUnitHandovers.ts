@@ -111,9 +111,10 @@ export function useUnitHandovers(contractId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على النموذج');
       return data;
     },
     onSuccess: () => {
@@ -172,9 +173,10 @@ export function useUnitHandovers(contractId?: string) {
         .update({ [field]: signed })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على النموذج');
       return data;
     },
     onSuccess: () => {

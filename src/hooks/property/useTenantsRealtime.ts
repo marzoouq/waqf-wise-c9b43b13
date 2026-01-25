@@ -26,8 +26,8 @@ export function useTenantsRealtime() {
         { event: '*', schema: 'public', table: 'tenant_ledger' },
         () => {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
-          queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
-          queryClient.invalidateQueries({ queryKey: ['tenants-aging'] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS_AGING });
         }
       )
       .on(
@@ -35,7 +35,7 @@ export function useTenantsRealtime() {
         { event: '*', schema: 'public', table: 'contracts' },
         () => {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
-          queryClient.invalidateQueries({ queryKey: ['tenant-contracts'] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
         }
       )
       .subscribe();

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import type { Json } from '@/integrations/supabase/types';
 import { logger } from "@/lib/logger";
 import { FundService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface WaqfUnit {
   id: string;
@@ -42,13 +43,13 @@ export function useWaqfUnits() {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       'waqf_units',
-      () => { queryClient.invalidateQueries({ queryKey: ['waqf_units'] }); }
+      () => { queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS_DATA }); }
     );
     return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: waqfUnits = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['waqf_units'],
+    queryKey: QUERY_KEYS.WAQF_UNITS_DATA,
     queryFn: () => FundService.getWaqfUnits(),
   });
 
@@ -56,7 +57,7 @@ export function useWaqfUnits() {
     mutationFn: (waqfUnit: Omit<WaqfUnit, 'id' | 'code' | 'created_at' | 'updated_at'>) => 
       FundService.createWaqfUnit({ ...waqfUnit, code: '' }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS_DATA });
       addActivity({
         action: `تم إضافة قلم وقف جديد: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
@@ -72,7 +73,7 @@ export function useWaqfUnits() {
     mutationFn: ({ id, ...updates }: Partial<WaqfUnit> & { id: string }) => 
       FundService.updateWaqfUnit(id, updates),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS_DATA });
       addActivity({
         action: `تم تحديث قلم الوقف: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
@@ -87,7 +88,7 @@ export function useWaqfUnits() {
   const deleteWaqfUnit = useMutation({
     mutationFn: (id: string) => FundService.deleteWaqfUnit(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_UNITS_DATA });
       addActivity({
         action: 'تم حذف قلم وقف',
         user_name: user?.user_metadata?.full_name || 'مستخدم',

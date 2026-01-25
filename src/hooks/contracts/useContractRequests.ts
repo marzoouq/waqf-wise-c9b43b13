@@ -179,9 +179,10 @@ export function useContractRequests(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على الطلب');
       return data;
     },
     onSuccess: (data) => {
@@ -221,9 +222,10 @@ export function useContractRequests(contractId?: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على الطلب');
       return data;
     },
     onSuccess: (data) => {

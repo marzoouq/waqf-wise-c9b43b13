@@ -256,6 +256,63 @@ export class ContractService {
     return data;
   }
 
+  /**
+   * إنهاء العقد مبكراً مع تسجيل التسوية
+   */
+  static async earlyTerminate(params: {
+    contractId: string;
+    terminationDate: string;
+    finalAmount: number;
+    notes?: string;
+    existingNotes?: string;
+  }): Promise<void> {
+    const { contractId, terminationDate, finalAmount, notes, existingNotes } = params;
+
+    // 1. تحديث حالة العقد
+    const { error: contractError } = await supabase
+      .from('contracts')
+      .update({ 
+        status: 'منتهي',
+        notes: `${existingNotes || ''}\n\n--- إنهاء مبكر ---\nتاريخ الإنهاء: ${terminationDate}\nالتسوية: ${Math.abs(finalAmount)} ر.س ${finalAmount > 0 ? '(استرداد للمستأجر)' : '(مستحق على المستأجر)'}\n${notes ? 'ملاحظات: ' + notes : ''}`
+      })
+      .eq('id', contractId);
+
+    if (contractError) throw contractError;
+
+    // 2. جلب tenant_id من العقد
+    const { data: contractData } = await supabase
+      .from('contracts')
+      .select('tenant_id')
+      .eq('id', contractId)
+      .maybeSingle();
+
+    // 3. تسجيل قيد في tenant_ledger
+    if (contractData?.tenant_id && finalAmount !== 0) {
+      await supabase.from('tenant_ledger').insert({
+        tenant_id: contractData.tenant_id,
+        contract_id: contractId,
+        transaction_type: finalAmount > 0 ? 'refund' : 'charge',
+        transaction_date: terminationDate,
+        credit_amount: finalAmount > 0 ? Math.abs(finalAmount) : 0,
+        debit_amount: finalAmount < 0 ? Math.abs(finalAmount) : 0,
+        description: `تسوية إنهاء مبكر للعقد`,
+        reference_type: 'early_termination',
+        reference_id: contractId,
+      });
+    }
+
+    // 4. تحرير الوحدات
+    await supabase
+      .from('property_units')
+      .update({
+        current_contract_id: null,
+        current_tenant_id: null,
+        occupancy_status: 'شاغر',
+        updated_at: new Date().toISOString()
+      })
+      .eq('current_contract_id', contractId);
+  }
+
   static async getExpiringSoon(days: number = 30): Promise<Contract[]> {
     const future = new Date();
     future.setDate(future.getDate() + days);
