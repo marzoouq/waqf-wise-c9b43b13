@@ -9,6 +9,7 @@ import { Beneficiary } from "@/types/beneficiary";
 import { Loader2 } from "lucide-react";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useBeneficiaryAttachments } from "@/hooks/beneficiary/useBeneficiaryAttachments";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface BeneficiaryAttachmentsDialogProps {
   open: boolean;
@@ -43,7 +44,7 @@ export function BeneficiaryAttachmentsDialog({
         description: `تم رفع ${files.length} ملف`,
       });
 
-      queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary.id] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiary.id) });
       setUploadedFiles([]);
     } catch (error: unknown) {
       productionLogger.error('Error uploading files', error);
@@ -66,7 +67,7 @@ export function BeneficiaryAttachmentsDialog({
         description: "تم حذف المرفق بنجاح",
       });
 
-      queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary?.id] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiary?.id || '') });
     } catch (error: unknown) {
       productionLogger.error('Error deleting attachment', error);
       toast({

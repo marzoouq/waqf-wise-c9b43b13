@@ -32,7 +32,8 @@ export const PROPERTIES_KEYS = {
   TENANT: (id: string) => ['tenant', id] as const,
   TENANT_LEDGER: ['tenant-ledger'] as const,
   TENANT_LEDGER_BY_ID: (tenantId: string) => ['tenant-ledger', tenantId] as const,
-  TENANT_RECEIPTS: ['tenant-receipts'] as const,
+  TENANT_RECEIPTS: (tenantId: string) => ['tenant-receipts', tenantId] as const,
+  TENANT_CONTRACTS: (tenantId: string) => ['tenant-contracts', tenantId] as const,
   TENANTS_AGING: ['tenants-aging'] as const,
 
   // Rental Payments

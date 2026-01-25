@@ -19,7 +19,7 @@ export function usePropertyUnits(propertyId?: string) {
   const addUnit = useMutation({
     mutationFn: (unit: DbPropertyUnitInsert) => PropertyService.createUnit(unit),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['property-units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId || '') });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
         title: "تمت الإضافة بنجاح",
@@ -32,9 +32,9 @@ export function usePropertyUnits(propertyId?: string) {
     mutationFn: ({ id, ...updates }: DbPropertyUnitUpdate & { id: string }) => 
       PropertyService.updateUnit(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['property-units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId || '') });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
-      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث الوحدة بنجاح",
@@ -45,7 +45,7 @@ export function usePropertyUnits(propertyId?: string) {
   const deleteUnit = useMutation({
     mutationFn: (id: string) => PropertyService.deleteUnit(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['property-units'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId || '') });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
         title: "تم الحذف بنجاح",

@@ -35,8 +35,8 @@ export const PAYMENTS_KEYS = {
   // Loans
   LOANS: ['loans'] as const,
   LOAN: (id: string) => ['loan', id] as const,
-  LOAN_PAYMENTS: (loanId: string) => ['loan-payments', loanId] as const,
-  LOAN_INSTALLMENTS: (loanId?: string) => ['loan-installments', loanId] as const,
+  LOAN_PAYMENTS: (loanId?: string) => ['loan_payments', loanId] as const,
+  LOAN_INSTALLMENTS: (loanId?: string) => ['loan_installments', loanId] as const,
   LOAN_SCHEDULES: (loanId: string) => ['loan-schedules', loanId] as const,
   LOANS_WITH_APPROVALS: ['loans_with_approvals'] as const,
   LOANS_AGING: ['loans-aging'] as const,

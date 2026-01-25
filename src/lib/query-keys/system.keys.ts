@@ -16,6 +16,9 @@ export const SYSTEM_KEYS = {
   RECENT_ERRORS: ['recent-errors'] as const,
   ACTIVE_ALERTS: ['active-alerts'] as const,
   FIX_ATTEMPTS: ['fix-attempts'] as const,
+  SECURITY_STATS: ['security-stats'] as const,
+  SELF_HEALING_STATS: ['self-healing-stats'] as const,
+  STORAGE_USAGE_CHART: ['storage-usage-chart'] as const,
   
   // Audit & Logs
   AUDIT_LOGS: ['audit-logs'] as const,

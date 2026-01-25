@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { commonValidation } from "@/lib/validationSchemas";
 import { useAutoJournalEntry } from "@/hooks/payments/useAutoJournalEntry";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 const receiptSchema = z.object({
   payment_date: commonValidation.dateString("التاريخ غير صحيح"),
@@ -72,7 +73,7 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
         description: "تم إضافة سند القبض وإنشاء القيد المحاسبي",
       });
 
-      queryClient.invalidateQueries({ queryKey: ['cashier-stats'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASHIER_STATS });
       
       form.reset();
       onOpenChange(false);

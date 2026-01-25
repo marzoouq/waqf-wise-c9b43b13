@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface SecurityStats {
   failedLogins: number;
@@ -15,7 +16,7 @@ interface SecurityStats {
 
 export function useSecurityStats() {
   const { data: stats, isLoading, error } = useQuery({
-    queryKey: ["security-stats"],
+    queryKey: QUERY_KEYS.SECURITY_STATS,
     queryFn: async (): Promise<SecurityStats> => {
       // Get date 30 days ago
       const thirtyDaysAgo = new Date();

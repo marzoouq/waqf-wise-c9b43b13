@@ -7,6 +7,7 @@ import { Upload, FileText, Trash2, Eye } from "lucide-react";
 import { DocumentUploadDialog } from "../DocumentUploadDialog";
 import { useBeneficiaryDocuments } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface BeneficiaryDocumentsTabProps {
   beneficiaryId: string;
@@ -201,7 +202,7 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
         open={isUploadOpen}
         onOpenChange={setIsUploadOpen}
         onUploadComplete={() => {
-          queryClient.invalidateQueries({ queryKey: ["beneficiary-documents"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_DOCUMENTS(beneficiaryId) });
         }}
       />
     </div>

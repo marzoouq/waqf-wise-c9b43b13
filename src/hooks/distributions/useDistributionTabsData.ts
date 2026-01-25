@@ -16,7 +16,7 @@ import type {
 // ==================== Distribution Timeline Hook ====================
 export function useDistributionTimeline(distributionId: string | undefined) {
   const approvalsQuery = useQuery({
-    queryKey: ['distribution-timeline-approvals', distributionId],
+    queryKey: QUERY_KEYS.APPROVAL_HISTORY,
     queryFn: async (): Promise<DistributionApproval[]> => {
       if (!distributionId) return [];
       return DistributionService.getDistributionApprovals(distributionId);
@@ -25,7 +25,7 @@ export function useDistributionTimeline(distributionId: string | undefined) {
   });
 
   const historyQuery = useQuery({
-    queryKey: ['distribution-timeline-history', distributionId],
+    queryKey: QUERY_KEYS.DISTRIBUTION_DETAILS(distributionId || ''),
     queryFn: async (): Promise<ApprovalHistoryItem[]> => {
       if (!distributionId) return [];
       return DistributionService.getDistributionHistory(distributionId);

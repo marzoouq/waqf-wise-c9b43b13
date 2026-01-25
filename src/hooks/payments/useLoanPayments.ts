@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/infrastructure/react-query";
 import { logger } from "@/lib/logger";
 import { LoansService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface LoanPayment {
   id: string;
@@ -31,17 +32,17 @@ export function useLoanPayments(loanId?: string) {
   // Real-time subscription
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('loan_payments', () => {
-      queryClient.invalidateQueries({ queryKey: ['loan_payments'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOAN_PAYMENTS(loanId) });
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [queryClient]);
+  }, [queryClient, loanId]);
 
   // Fetch payments
   const { data: payments = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['loan_payments', loanId],
+    queryKey: QUERY_KEYS.LOAN_PAYMENTS(loanId),
     queryFn: () => LoansService.getLoanPayments(loanId),
     enabled: !!loanId,
     ...QUERY_CONFIG.LOANS,
@@ -100,10 +101,10 @@ export function useLoanPayments(loanId?: string) {
       return paymentData;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['loan_payments'] });
-      queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOAN_PAYMENTS(loanId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOAN_INSTALLMENTS(loanId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       
       addActivity({
         action: `تم تسجيل دفعة قرض: ${data.payment_number}`,

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/ui/use-toast';
 import { AccountingService } from '@/services';
 import type { Json } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface MatchingConditions {
   amount_tolerance: number;
@@ -81,7 +82,7 @@ export function useBankMatching() {
   const { toast } = useToast();
 
   const { data: rules, isLoading: isLoadingRules } = useQuery({
-    queryKey: ['bank_matching_rules'],
+    queryKey: QUERY_KEYS.BANK_MATCHING_RULES,
     queryFn: async () => {
       const data = await AccountingService.getBankMatchingRules();
       return data.map(item => ({
@@ -96,7 +97,7 @@ export function useBankMatching() {
   });
 
   const { data: matches, isLoading: isLoadingMatches } = useQuery({
-    queryKey: ['bank_reconciliation_matches'],
+    queryKey: QUERY_KEYS.BANK_RECONCILIATION_MATCHES,
     queryFn: async () => {
       const data = await AccountingService.getBankReconciliationMatches();
       return data as BankReconciliationMatch[];
@@ -193,8 +194,8 @@ export function useBankMatching() {
       return { suggestions, autoMatched: autoMatches.length };
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['bank_transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['bank_reconciliation_matches'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_RECONCILIATION_MATCHES });
       toast({
         title: 'تمت المطابقة التلقائية',
         description: `تم مطابقة ${data.autoMatched} عملية تلقائياً، و ${data.suggestions.length - data.autoMatched} اقتراح للمراجعة`,
@@ -221,8 +222,8 @@ export function useBankMatching() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank_transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['bank_reconciliation_matches'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_RECONCILIATION_MATCHES });
       toast({
         title: 'تمت المطابقة',
         description: 'تم ربط العملية البنكية بالقيد المحاسبي بنجاح',
@@ -235,8 +236,8 @@ export function useBankMatching() {
       await AccountingService.deleteBankMatch(matchId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bank_transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['bank_reconciliation_matches'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_RECONCILIATION_MATCHES });
       toast({
         title: 'تم الإلغاء',
         description: 'تم إلغاء المطابقة بنجاح',

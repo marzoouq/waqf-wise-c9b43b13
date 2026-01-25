@@ -51,13 +51,15 @@ export const ACCOUNTING_KEYS = {
   BANK_ACCOUNTS: ['bank_accounts'] as const,
   BANK_ACCOUNT: (id: string) => ['bank_account', id] as const,
   BANK_STATEMENTS: ['bank-statements'] as const,
-  BANK_TRANSACTIONS: ['bank-transactions'] as const,
+  BANK_TRANSACTIONS: ['bank_transactions'] as const,
   BANK_RECONCILIATION: ['bank-reconciliation'] as const,
   BANK_INTEGRATIONS: ['bank-integrations'] as const,
   BANK_STATEMENTS_DATA: ['bank_statements'] as const,
   BANK_TRANSACTIONS_DATA: ['bank_transactions'] as const,
   BANK_BALANCE_REALTIME: ['bank-balance-realtime'] as const,
   WAQF_CORPUS_REALTIME: ['waqf-corpus-realtime'] as const,
+  BANK_MATCHING_RULES: ['bank_matching_rules'] as const,
+  BANK_RECONCILIATION_MATCHES: ['bank_reconciliation_matches'] as const,
 
   // Invoices
   INVOICES: ['invoices'] as const,

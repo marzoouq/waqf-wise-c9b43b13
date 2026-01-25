@@ -14,6 +14,7 @@ export const DASHBOARD_KEYS = {
   CASHIER_STATS: ['cashier-stats'] as const,
   KPIS: (category?: string) => ['kpis', category] as const,
   DASHBOARD_KPIS: ['dashboard-kpis'] as const,
+  COLLECTION_STATS: ['collection-stats'] as const,
   
   // Dashboard Data
   DASHBOARD_BENEFICIARIES: (timeRange?: string) => ['dashboard-beneficiaries', timeRange] as const,

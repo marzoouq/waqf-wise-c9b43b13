@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { matchesStatus } from '@/lib/constants';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface CollectionStats {
   // إحصائيات التحصيل
@@ -57,7 +58,7 @@ export interface ExpiringContract {
 
 export function useCollectionStats() {
   return useQuery({
-    queryKey: ['collection-stats'],
+    queryKey: QUERY_KEYS.COLLECTION_STATS,
     queryFn: async (): Promise<CollectionStats> => {
       const today = new Date().toISOString().split('T')[0];
       const thirtyDaysFromNow = new Date();

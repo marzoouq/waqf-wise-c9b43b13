@@ -23,6 +23,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { generateReceiptPDF } from '@/lib/generateReceiptPDF';
 import { RentalPaymentService } from '@/services/rental-payment.service';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface TenantReceiptsProps {
   tenantId: string;
@@ -50,7 +51,7 @@ export function TenantReceipts({ tenantId, tenantName }: TenantReceiptsProps) {
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
 
   const { data: receipts, isLoading, error, refetch } = useQuery({
-    queryKey: ['tenant-receipts', tenantId],
+    queryKey: QUERY_KEYS.TENANT_RECEIPTS(tenantId),
     queryFn: async () => {
       // جلب السندات من rental_payments المرتبطة بعقود المستأجر
       const { data: contracts, error: contractsError } = await supabase

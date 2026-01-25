@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { type Contract } from '@/hooks/property/useContracts';
 import { format } from 'date-fns';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { ar } from 'date-fns/locale';
 
 interface CancelAutoRenewDialogProps {
@@ -63,7 +64,7 @@ export function CancelAutoRenewDialog({
       if (error) throw error;
 
       toast.success('تم إلغاء التجديد التلقائي بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       onOpenChange(false);
       setReason('');
     } catch (_error) {

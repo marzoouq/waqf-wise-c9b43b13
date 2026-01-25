@@ -110,7 +110,9 @@ export function QuickPaymentDialog({
       
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_RECEIPTS });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_RECEIPTS(tenant.id) });
+      }
       
       // إغلاق بعد ثانيتين لإظهار رسالة النجاح
       setTimeout(() => {

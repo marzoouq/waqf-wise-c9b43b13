@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArchiveService } from "@/services/archive.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 const COLORS = [
   "hsl(var(--chart-1))",
@@ -20,7 +21,7 @@ const COLORS = [
 
 export function StorageUsageChart() {
   const { data: storageData, isLoading, error, refetch } = useQuery({
-    queryKey: ["storage-usage-chart"],
+    queryKey: QUERY_KEYS.STORAGE_USAGE_CHART,
     queryFn: () => ArchiveService.getStorageUsageByCategory(),
     staleTime: 5 * 60 * 1000,
   });
