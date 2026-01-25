@@ -78,7 +78,7 @@ export class PropertyStatsService {
         totalMonthlyRevenue: monthlyRevenue,
         totalAnnualRevenue: monthlyRevenue * 12,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching property stats', error);
       throw error;
     }
@@ -233,7 +233,7 @@ export class PropertyStatsService {
         expectedAnnualRevenue,
         collectionRate,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching properties stats', error);
       throw error;
     }

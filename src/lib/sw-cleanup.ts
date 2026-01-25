@@ -37,7 +37,7 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
     }
     
     return true;
-  } catch (error) {
+  } catch (error: unknown) {
     const { productionLogger } = await import('@/lib/logger/production-logger');
     productionLogger.error('❌ خطأ في إلغاء تسجيل Service Workers:', error);
     return false;
@@ -70,7 +70,7 @@ export async function clearAllWorkboxCaches(): Promise<number> {
     }
     
     return deletedCount;
-  } catch (error) {
+  } catch (error: unknown) {
     const { productionLogger } = await import('@/lib/logger/production-logger');
     productionLogger.error('❌ خطأ في حذف caches:', error);
     return 0;

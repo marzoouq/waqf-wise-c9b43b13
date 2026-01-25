@@ -123,7 +123,7 @@ export class UnifiedFinancialService {
       }
 
       return this.getRevenueDataFallback();
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching unified revenue data from view', error);
       return this.getRevenueDataFallback();
     }
@@ -206,7 +206,7 @@ export class UnifiedFinancialService {
         pendingAmount,
         collectionRate
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error in revenue fallback', error);
       return {
         totalCollected: 0,
@@ -234,7 +234,7 @@ export class UnifiedFinancialService {
       if (error) throw error;
 
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching unified revenue breakdown', error);
       return [];
     }
@@ -273,7 +273,7 @@ export class UnifiedFinancialService {
         beneficiaryDistributions,
         approvedDistributions
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching distribution data', error);
       return {
         totalDistributions: 0,
@@ -341,7 +341,7 @@ export class UnifiedFinancialService {
         totalExpenses,
         fiscalYearRevenue
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching income data', error);
       return {
         netIncome: 0,
@@ -369,7 +369,7 @@ export class UnifiedFinancialService {
         collection_percentage: 0,
         transaction_count: 0
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching property collection summary', error);
       return {
         total_collected: 0,
@@ -394,7 +394,7 @@ export class UnifiedFinancialService {
       if (error) throw error;
 
       return Number(data) || 0;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching total collected', error);
       return 0;
     }
@@ -411,7 +411,7 @@ export class UnifiedFinancialService {
       if (error) throw error;
 
       return Number(data) || 0;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching collection percentage', error);
       return 0;
     }

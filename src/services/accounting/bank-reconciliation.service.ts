@@ -21,7 +21,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching bank accounts', error);
       throw error;
     }
@@ -40,7 +40,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching bank statement', error);
       throw error;
     }
@@ -59,7 +59,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching bank matching rules', error);
       throw error;
     }
@@ -77,7 +77,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching bank reconciliation matches', error);
       throw error;
     }
@@ -96,7 +96,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching unmatched bank transactions', error);
       throw error;
     }
@@ -120,7 +120,7 @@ export class BankReconciliationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching posted entries for matching', error);
       throw error;
     }
@@ -153,7 +153,7 @@ export class BankReconciliationService {
         .eq('id', match.bank_transaction_id);
 
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating bank match', error);
       throw error;
     }
@@ -188,7 +188,7 @@ export class BankReconciliationService {
         .update({ is_matched: false, journal_entry_id: null })
         .eq('id', match.bank_transaction_id);
 
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error deleting bank match', error);
       throw error;
     }

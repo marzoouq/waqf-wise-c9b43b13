@@ -28,7 +28,7 @@ export class FamilyService {
 
       if (error) throw error;
       return (data || []) as unknown as Family[];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching families', error);
       throw error;
     }
@@ -54,7 +54,7 @@ export class FamilyService {
 
       if (error) throw error;
       return data as unknown as Family | null;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching family by id', error);
       throw error;
     }
@@ -74,7 +74,7 @@ export class FamilyService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء العائلة');
       return data as unknown as Family;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating family', error);
       throw error;
     }
@@ -106,7 +106,7 @@ export class FamilyService {
       if (error) throw error;
       if (!data) throw new Error('العائلة غير موجودة');
       return data as unknown as Family;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating family', error);
       throw error;
     }
@@ -128,7 +128,7 @@ export class FamilyService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error archiving family', error);
       throw error;
     }
@@ -157,7 +157,7 @@ export class FamilyService {
 
       if (error) throw error;
       return (data || []) as unknown as FamilyMember[];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching family members', error);
       throw error;
     }
@@ -177,7 +177,7 @@ export class FamilyService {
       if (error) throw error;
       if (!data) throw new Error('فشل إضافة الفرد');
       return data as unknown as FamilyMember;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error adding family member', error);
       throw error;
     }
@@ -198,7 +198,7 @@ export class FamilyService {
       if (error) throw error;
       if (!data) throw new Error('الفرد غير موجود');
       return data as unknown as FamilyMember;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating family member', error);
       throw error;
     }
@@ -220,7 +220,7 @@ export class FamilyService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error removing family member', error);
       throw error;
     }
@@ -312,7 +312,7 @@ export class FamilyService {
           index === self.findIndex(t => t.id === m.id)
         )
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching beneficiary family tree', error);
       throw error;
     }

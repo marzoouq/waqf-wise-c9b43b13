@@ -33,7 +33,7 @@ export const DiagnosticsService = {
       }
 
       return { status: 'success', details: `الاتصال سريع: ${latency}ms`, latency };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'error',
         details: error instanceof Error ? error.message : 'فشل الاتصال بالخادم'
@@ -57,7 +57,7 @@ export const DiagnosticsService = {
       }
 
       return { status: 'success', details: `الاستعلام ناجح: ${latency}ms`, latency };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'error',
         details: error instanceof Error ? error.message : 'فشل الاستعلام'
@@ -83,7 +83,7 @@ export const DiagnosticsService = {
         details: data.session ? `جلسة نشطة: ${latency}ms` : `لا يوجد جلسة: ${latency}ms`,
         latency
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'error',
         details: error instanceof Error ? error.message : 'فشل فحص المصادقة'
@@ -135,7 +135,7 @@ export const DiagnosticsService = {
       }
 
       return { status: 'success', details: `الوظائف تعمل: ${latency}ms`, latency };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         status: 'warning',
         details: error instanceof Error ? error.message : 'تعذر اختبار الوظائف'

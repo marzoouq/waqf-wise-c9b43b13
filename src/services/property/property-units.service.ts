@@ -68,7 +68,7 @@ export class PropertyUnitsService {
       const { data, error } = await query;
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching property units', error);
       throw error;
     }
@@ -108,7 +108,7 @@ export class PropertyUnitsService {
 
       const maxNumber = Math.max(...numbers);
       return String(maxNumber + 1);
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error getting next unit number', error);
       return '101';
     }
@@ -177,7 +177,7 @@ export class PropertyUnitsService {
       }
 
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating property unit', error);
       throw error;
     }
@@ -208,7 +208,7 @@ export class PropertyUnitsService {
       if (error) throw error;
       if (!data) throw new Error("الوحدة غير موجودة");
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating property unit', error);
       throw error;
     }
@@ -245,7 +245,7 @@ export class PropertyUnitsService {
           .update({ units: units?.length || 0 })
           .eq('id', unit.property_id);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error deleting property unit', error);
       throw error;
     }
@@ -276,7 +276,7 @@ export class PropertyUnitsService {
         units: unitsResult.data || [],
         contracts: contractsResult.data || []
       };
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching property units and contracts', error);
       throw error;
     }

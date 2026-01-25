@@ -45,7 +45,7 @@ export class PropertyCoreService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching properties', error);
       throw error;
     }
@@ -64,7 +64,7 @@ export class PropertyCoreService {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching property', error);
       throw error;
     }
@@ -84,7 +84,7 @@ export class PropertyCoreService {
       if (error) throw error;
       if (!data) throw new Error('فشل إنشاء العقار');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error creating property', error);
       throw error;
     }
@@ -105,7 +105,7 @@ export class PropertyCoreService {
       if (error) throw error;
       if (!data) throw new Error('العقار غير موجود');
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error updating property', error);
       throw error;
     }
@@ -127,7 +127,7 @@ export class PropertyCoreService {
         .eq('id', id);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error archiving property', error);
       throw error;
     }
@@ -153,7 +153,7 @@ export class PropertyCoreService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching properties by type', error);
       throw error;
     }
@@ -170,7 +170,7 @@ export class PropertyCoreService {
 
       if (error) throw error;
       return (data || []).filter(p => (p.occupied || 0) < (p.units || 0));
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching vacant properties', error);
       throw error;
     }
@@ -188,7 +188,7 @@ export class PropertyCoreService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error fetching unlinked properties', error);
       throw error;
     }
@@ -205,7 +205,7 @@ export class PropertyCoreService {
         .eq('id', propertyId);
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       productionLogger.error('Error linking property to waqf unit', error);
       throw error;
     }
