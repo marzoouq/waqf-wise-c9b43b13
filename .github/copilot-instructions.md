@@ -1,5 +1,28 @@
 # Waqf Management System - AI Coding Agent Instructions
 
+> **Version**: 3.1.0  
+> **Last Updated**: 2026-01-24  
+> **Purpose**: This document provides comprehensive guidelines for AI coding agents and developers working on the Waqf Management System.
+
+## 📋 Project Summary
+
+**Waqf Management System** is an Arabic-first RTL platform for managing Islamic endowments (Waqf). Built with React 18.3, TypeScript 5.5+, Tailwind CSS, and Supabase (PostgreSQL 15), this production-ready system handles:
+
+- 👥 Beneficiary and family management
+- 💰 Complete accounting system with auto-generated journal entries
+- 🏢 Property and contract management
+- 💵 Smart distribution system based on Waqf conditions
+- 📚 Electronic archival and document management
+- 📊 Advanced reporting and analytics
+- 🔐 Role-based access control (7 roles)
+- ✅ Multi-level approval workflows
+
+**Repository**: `marzoouq/waqf-wise-c9b43b13`  
+**Language**: Arabic (RTL-first with full English support)  
+**Status**: 🟢 Production Ready (Type Safety: 99.5%)
+
+---
+
 ## Architecture Overview
 
 This is an **Arabic-first RTL Waqf (Islamic endowment) management platform** built with React + TypeScript + Tailwind + Supabase.
@@ -360,4 +383,225 @@ supabase functions deploy <function-name>  # Deploy
 
 ---
 
-**آخر تحديث:** 2026-01-22 | **الإصدار:** 3.1.0
+---
+
+## 🛠️ Essential Commands
+
+### Development
+```bash
+npm run dev              # Start dev server (Vite) - http://localhost:5173
+npm run build            # Production build
+npm run preview          # Preview production build
+npm run lint             # ESLint check (enforced in pre-commit)
+```
+
+### Testing
+```bash
+npm run test             # Run all tests (11,000+ unit/integration tests)
+npm run test:watch       # Interactive watch mode
+npm run test:ui          # Vitest UI mode
+npm run test:coverage    # Coverage report
+npm run e2e              # Playwright E2E tests
+npm run e2e:ui           # Playwright UI mode
+npm run e2e:headed       # E2E tests with browser
+npm run e2e:debug        # E2E tests in debug mode
+```
+
+### Analysis
+```bash
+npm run analyze          # Bundle size visualization
+```
+
+### Supabase Edge Functions
+```bash
+# In supabase/ directory
+supabase functions serve              # Local development
+supabase functions deploy <name>      # Deploy specific function
+```
+
+**Important**: Always run tests before committing. Pre-commit hooks will run `npx lint-staged` automatically.
+
+---
+
+## 🔒 Boundaries & Prohibited Actions
+
+### ❌ NEVER Do These Things
+
+1. **Direct Database Access in Components/Pages**
+   - Always use: Component → Hook → Service → Supabase
+   - Exception: Realtime subscriptions in hooks via useEffect
+
+2. **Use `any` Type**
+   ```typescript
+   // ❌ FORBIDDEN
+   const data: any = fetchData();
+   
+   // ✅ REQUIRED
+   const data: UserData = fetchData();
+   ```
+
+3. **Modify Protected Files Without Reading ADR**
+   - `supabase/functions/*` (🔴 Critical - Backend security)
+   - `src/lib/constants.ts` (🟠 High - System-wide impact)
+   - `docs/ARCHITECTURE_DECISIONS.md` (🔴 Critical - Governance)
+   - Any file with `🔒 PROTECTED FILE` comment
+
+4. **Use `.single()` Instead of `.maybeSingle()`**
+   ```typescript
+   // ❌ DANGEROUS - throws if not found
+   const { data } = await supabase.from('users').select('*').eq('id', id).single();
+   
+   // ✅ SAFE - returns null if not found
+   const { data } = await supabase.from('users').select('*').eq('id', id).maybeSingle();
+   ```
+
+5. **Create Query Keys or Config Outside Centralized Files**
+   - Always import from `@/infrastructure/react-query`
+   - Never create QUERY_CONFIG or CACHE_TIMES in other files
+
+6. **Direct Color Classes**
+   ```typescript
+   // ❌ FORBIDDEN - direct colors
+   className="text-white bg-blue-500"
+   
+   // ✅ REQUIRED - semantic tokens from index.css
+   className="text-foreground bg-primary"
+   ```
+
+7. **Use `left/right` Instead of `start/end` (RTL Support)**
+   ```typescript
+   // ❌ FORBIDDEN
+   className="ml-4 text-left"
+   
+   // ✅ REQUIRED
+   className="ms-4 text-start"
+   ```
+
+8. **Commit Sensitive Data**
+   - No credentials, API keys, or secrets
+   - Check `.env` files are in `.gitignore`
+   - Use Supabase Edge Functions with `SERVICE_ROLE_KEY` (ADR-005)
+
+9. **Use VACUUM in Migrations**
+   - Transactions don't allow VACUUM in Supabase migrations (ADR-002)
+
+10. **Break Architectural Decisions Without New ADR**
+    - Read relevant ADR in `docs/ARCHITECTURE_DECISIONS.md` first
+    - Document breaking changes in new ADR
+    - Get explicit approval
+
+### ✅ Safe Directories to Modify
+- `src/components/` (UI components)
+- `src/hooks/` (Custom hooks following patterns)
+- `src/services/` (Following facade pattern for large services)
+- `src/pages/` (Route pages)
+- `src/types/` (TypeScript types)
+- `src/lib/utils/` (Utility functions)
+- Tests files (`src/__tests__/`, `e2e/`)
+- Documentation (`docs/`, `README.md`, etc.)
+
+---
+
+## 📚 Key Documentation References
+
+**Must Read Before Major Changes:**
+- [`docs/ARCHITECTURE_RULES.md`](../docs/ARCHITECTURE_RULES.md) - Strict coding rules (Arabic + English)
+- [`docs/ARCHITECTURE_DECISIONS.md`](../docs/ARCHITECTURE_DECISIONS.md) - All ADRs (Architecture Decision Records)
+- [`docs/SECURITY_GUIDELINES.md`](../docs/SECURITY_GUIDELINES.md) - Security best practices
+- [`docs/ROLES_AND_PERMISSIONS.md`](../docs/ROLES_AND_PERMISSIONS.md) - Complete RBAC system
+
+**Architecture & Patterns:**
+- [`src/services/README.md`](../src/services/README.md) - Service layer documentation (42 services)
+- [`src/hooks/README.md`](../src/hooks/README.md) - Hooks organization (170+ hooks in 36 folders)
+- [`src/routes/README.md`](../src/routes/README.md) - Routing structure (7 route files)
+
+**Technical References:**
+- [`src/lib/query-keys/`](../src/lib/query-keys/) - All query keys (400+ in 9 files)
+- [`src/lib/query-invalidation.ts`](../src/lib/query-invalidation.ts) - Batched cache invalidation helpers
+- [`src/lib/errors/index.ts`](../src/lib/errors/index.ts) - Error handling utilities
+- [`src/infrastructure/react-query/`](../src/infrastructure/react-query/) - Query config & cache times
+- [`README.md`](../README.md) - Project overview (Arabic)
+- [`AI_CODING_AGENT.md`](../AI_CODING_AGENT.md) - Additional developer guidance
+
+---
+
+## 🎯 Contribution Guidelines for AI Agents
+
+### Before Making Changes
+
+1. **Understand the Issue Completely**
+   - Read the issue description and all comments
+   - Understand the user's requirements (may be in Arabic)
+   - Check for related issues or PRs
+
+2. **Explore the Codebase**
+   - Use `grep` or `glob` tools to find relevant files
+   - Read existing implementations of similar features
+   - Check the test structure
+
+3. **Plan Your Changes**
+   - Make minimal, surgical changes
+   - Follow existing patterns consistently
+   - Avoid breaking existing functionality
+
+### While Making Changes
+
+1. **Follow the Architecture**
+   - Component → Hook → Service → Supabase (always)
+   - Use facade pattern for large services
+   - Keep components focused on UI only
+
+2. **Write Tests**
+   - Add tests for new features
+   - Update tests for modified features
+   - Ensure tests pass before committing
+
+3. **Type Safety**
+   - Never use `any` type
+   - Define explicit types in `src/types/`
+   - Use existing types when available
+
+4. **Error Handling**
+   ```typescript
+   import { handleError, showSuccess, createMutationErrorHandler } from '@/lib/errors';
+   
+   // In mutations
+   useMutation({
+     mutationFn: () => BeneficiaryService.create(data),
+     onSuccess: () => showSuccess('تم الإنشاء بنجاح'),
+     onError: createMutationErrorHandler({ 
+       context: 'create-beneficiary',
+       severity: 'high'
+     })
+   });
+   ```
+
+### After Making Changes
+
+1. **Test Thoroughly**
+   ```bash
+   npm run lint          # Check code style
+   npm run test          # Run unit/integration tests
+   npm run e2e           # Run E2E tests (if UI changes)
+   npm run build         # Ensure build succeeds
+   ```
+
+2. **Verify Changes**
+   - Run the app locally and test the feature
+   - Check console for errors
+   - Verify RTL support for Arabic text
+   - Test different user roles (if applicable)
+
+3. **Document Changes**
+   - Update relevant documentation
+   - Add comments for complex logic
+   - Update CHANGELOG.md for significant changes
+
+4. **Commit with Clear Messages**
+   - Use descriptive commit messages
+   - Reference issue numbers
+   - Use conventional commits format
+
+---
+
+**آخر تحديث:** 2026-01-24 | **الإصدار:** 3.1.0
