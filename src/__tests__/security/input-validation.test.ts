@@ -15,15 +15,25 @@ describe('Input Validation Security', () => {
       '"><script>alert(1)</script>',
     ];
 
+    const sanitizeInput = (input: string): string => {
+      let previous: string;
+      let current = input;
+      do {
+        previous = current;
+        current = current
+          // Remove all angle brackets to prevent any HTML tags including <script>
+          .replace(/[<>]/g, '')
+          // Remove javascript: protocol
+          .replace(/javascript:/gi, '')
+          // Remove inline event handler attributes (onclick=, onload=, etc.)
+          .replace(/on\w+=/gi, '');
+      } while (current !== previous);
+      return current;
+    };
+
     it.each(dangerousInputs)('should sanitize dangerous input: %s', (input) => {
-      // Simulate sanitization logic
-      const sanitized = input
-        // Remove all angle brackets to prevent any HTML tags including <script>
-        .replace(/[<>]/g, '')
-        // Remove javascript: protocol
-        .replace(/javascript:/gi, '')
-        // Remove inline event handler attributes (onclick=, onload=, etc.)
-        .replace(/on\w+=/gi, '');
+      // Simulate sanitization logic with repeated application to avoid incomplete multi-character sanitization
+      const sanitized = sanitizeInput(input);
       
       expect(sanitized).not.toContain('<script');
       expect(sanitized.toLowerCase()).not.toContain('javascript:');
